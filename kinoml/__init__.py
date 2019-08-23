@@ -3,9 +3,6 @@ KinoML
 Machine Learning for kinase modeling
 """
 
-# Add imports here
-from .kinoml import *
-
 # Handle versioneer
 from ._version import get_versions
 versions = get_versions()
