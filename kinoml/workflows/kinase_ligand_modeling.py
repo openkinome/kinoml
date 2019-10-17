@@ -88,9 +88,16 @@ def _superpose_ligand(ligand, dataset):
     superposed_conformers : array, shape=len(dataset)*len(ligand.conformers)*ligand.n_atoms*3
     scores : array, shape=len(dataset)*len(ligand.conformers)
     """
+    pass
+
+
+def _align_sequence():
+    pass
 
 
 def main():
+    # Temporarily add imports here to have a broader picture of the code
+
     args = parse_cli()
 
     # Part A1 - align ligands
