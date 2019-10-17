@@ -1,11 +1,13 @@
 name: test
 channels:
+- conda-forge
 dependencies:
-    # Base depends
+  # Base depends
   - python
   - pip
-
-    # Testing
+  - pandas
+  - requests
+  # Testing
   - pytest
   - pytest-cov
   - codecov
