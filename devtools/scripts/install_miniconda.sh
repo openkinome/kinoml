@@ -38,9 +38,9 @@ conda update --quiet --all
 cat << "EOF" > ~/.minicondarc
 eval "$($HOME/miniconda/bin/conda shell.bash hook)"
 if [ -d $HOME/miniconda/envs/test ]; then
-    conda activate test
+    conda activate test && echo "Activated test environment"
 else
-    conda activate
+    conda activate && echo "Activated base environment"
 fi
 EOF
 
