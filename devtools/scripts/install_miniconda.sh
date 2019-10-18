@@ -1,3 +1,5 @@
+set -euxo pipefail
+
 # Temporarily change directory to $HOME to install software
 pushd .
 cd $HOME
@@ -23,11 +25,9 @@ bash $MINICONDA -b -p $MINICONDA_HOME
 
 # Configure miniconda
 export PIP_ARGS="-U"
-# New to conda >=4.4
-echo ". $MINICONDA_HOME/etc/profile.d/conda.sh" >> ~/.bashrc  # Source the profile.d file
-echo "conda activate" >> ~/.bashrc  # Activate conda
-source ~/.bashrc  # source file to get new commands
-#export PATH=$MINICONDA_HOME/bin:$PATH  # Old way, should not be needed anymore
+# Enable Miniconda
+eval "$($MINICONDA_HOME/bin/conda shell.bash hook)"
+conda activate
 
 conda config --add channels conda-forge
 
