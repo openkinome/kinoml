@@ -9,7 +9,7 @@ jobs:
     strategy:
       max-parallel: 4
       matrix:
-        os: [macOS-10.14, ubuntu-18.04]
+        os: [macOS-latest ubuntu-latest]
         python-version: [3.6, 3.7]
 
     steps:
@@ -21,8 +21,10 @@ jobs:
         ulimit -a
     - name: Set up Miniconda
       run: |
-        source devtools/travis-ci/before_install.sh
+        source devtools/scripts/install_miniconda.sh
         python -V
+      env:
+        OPERATING_SYSTEM: ${{ matrix.os }}
     - name: Create environment for package
       run: |
         python devtools/scripts/create_conda_env.py -n=test -p=${{ matrix.python-version }} devtools/conda-envs/test_env.yaml
