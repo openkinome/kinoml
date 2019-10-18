@@ -25,6 +25,8 @@ jobs:
         python -V
       env:
         OPERATING_SYSTEM: ${{ matrix.os }}
+    - name: Debug .minicondarc
+      run: cat ~/.minicondarc
     - name: Create environment for package
       shell: bash --noprofile --rcfile $HOME/.minicondarc -euxo pipefail {0}
       run: |
