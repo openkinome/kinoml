@@ -67,7 +67,6 @@ class Biosequence(str):
             return objects[0]
         return objects
 
-
     def cut(self, start, stop, check=True):
         """
         Slice a sequence using biological notation
@@ -99,7 +98,8 @@ class Biosequence(str):
         if check:
             assert start_res == self[start_pos-1], f"Element at position {start_pos} is not {start_res}"
             assert stop_res == self[stop_pos-1], f"Element at position {stop_pos} is not {stop_res}"
-        return self.__class__(self[start_pos-1:stop_pos], header=f"{self.header}{ ' | ' if self.header else '' }Cut: {start}/{stop}")
+        return self.__class__(self[start_pos-1:stop_pos],
+                              header=f"{self.header}{ ' | ' if self.header else '' }Cut: {start}/{stop}")
 
     def mutate(self, *mutations, raise_errors=True):
         """
@@ -250,4 +250,3 @@ class DNASequence(Biosequence):
 class RNASequence(Biosequence):
     ALPHABET = "AUCG"
     _ACCESSION_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=nuccore&id={}&rettype=fasta&retmode=text"
-

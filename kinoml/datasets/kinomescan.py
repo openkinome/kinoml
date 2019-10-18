@@ -2,11 +2,9 @@
 Handlers for datasets based on KINOMEscan assays.
 """
 import re
-from collections import Counter
-from operator import itemgetter
 
 import pandas as pd
-from kinoml.datasets.utils import Biosequence, AminoAcidSequence
+from kinoml.datasets.utils import AminoAcidSequence
 from kinoml.utils import datapath, grouper
 
 
@@ -67,7 +65,6 @@ class KINOMEscan:
             start, stop = start_stop_string.split("/")
             cut_sequences.append(sequence.cut(start, stop))
         self.data['cut_sequence'] = list(map(str, cut_sequences))
-
 
 
 if __name__ == "__main__":
