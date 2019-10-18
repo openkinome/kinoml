@@ -35,5 +35,14 @@ conda config --set always_yes yes
 conda install conda conda-build jinja2 anaconda-client
 conda update --quiet --all
 
+cat << "EOF" > ~/.minicondarc
+eval "$($HOME/miniconda/bin/conda shell.bash hook)"
+if [ -d $HOME/miniconda/envs/test ]; then
+    conda activate test
+else
+    conda activate
+fi
+EOF
+
 # Restore original directory
 popd
