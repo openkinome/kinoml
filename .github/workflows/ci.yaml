@@ -27,15 +27,15 @@ jobs:
         OPERATING_SYSTEM: ${{ matrix.os }}
     - name: Create environment for package
       run: |
-        eval "$($MINICONDA_HOME/bin/conda shell.bash hook)" && conda activate
+        eval "$($HOME/miniconda/bin/conda shell.bash hook)" && conda activate
         python devtools/scripts/create_conda_env.py -n=test -p=${{ matrix.python-version }} devtools/conda-envs/test_env.yaml
     - name: Install package
       run: |
-        eval "$($MINICONDA_HOME/bin/conda shell.bash hook)" && conda activate test
+        eval "$($HOME/miniconda/bin/conda shell.bash hook)" && conda activate test
         pip install . --no-deps
     - name: Lint with flake8
       run: |
-        eval "$($MINICONDA_HOME/bin/conda shell.bash hook)" && conda activate test
+        eval "$($HOME/miniconda/bin/conda shell.bash hook)" && conda activate test
         pip install flake8
         # stop the build if there are Python syntax errors or undefined names
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
@@ -43,9 +43,9 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Run tests
       run: |
-        eval "$($MINICONDA_HOME/bin/conda shell.bash hook)" && conda activate test
+        eval "$($HOME/miniconda/bin/conda shell.bash hook)" && conda activate test
         pytest -v --cov=kinoml kinoml/tests/
     - name: Code coverage
       run: |
-        eval "$($MINICONDA_HOME/bin/conda shell.bash hook)" && conda activate test
+        eval "$($HOME/miniconda/bin/conda shell.bash hook)" && conda activate test
         codecov
