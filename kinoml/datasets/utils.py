@@ -24,7 +24,7 @@ class Biosequence(str):
 
     def __new__(cls, value, header='', *args, **kwargs):
         if not all(c in cls.ALPHABET for c in value):
-            raise ValueError(f'Biosequence can only contain characters in {ALPHABET}')
+            raise ValueError(f'Biosequence can only contain characters in {cls.ALPHABET}')
         s = super().__new__(cls, value, *args, **kwargs)
         s.header = header
         return s
