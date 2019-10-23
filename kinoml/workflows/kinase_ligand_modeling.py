@@ -35,6 +35,7 @@ Originally developed at https://github.com/karanicolaslab/kinmodel.
 
 """
 
+from argparse import ArgumentParser
 import os
 import numpy as np
 from openforcefield.topology import Molecule
@@ -80,7 +81,7 @@ def _superpose_ligand(ligand, dataset):
     ligand : openforcefield.topology.Molecule
         Query ligand that will be superposed. Conformers must have been generated
         previously.
-    dataset : str
+    dataset : str or list of openforcefield.topology.Molecule
         Path to a SDF file containing the target database
 
     Returns
@@ -88,8 +89,30 @@ def _superpose_ligand(ligand, dataset):
     superposed_conformers : array, shape=len(dataset)*len(ligand.conformers)*ligand.n_atoms*3
     scores : array, shape=len(dataset)*len(ligand.conformers)
     """
-    pass
+    if isinstance(dataset, str):
+        dataset = _load_dataset(dataset)
+    for molecule in dataset:
+        # align(molecule, ligand)
+        pass
 
+
+def _load_dataset(path):
+    """
+    Load a molecule dataset into a list of OFF Molecules
+
+    Parameters
+    ----------
+    path : str or list of str
+        Path to the dataset file (SDF, MOL) or multiple files.
+        Supported formats are SDF, MOL, PDB
+
+    Returns
+    -------
+    list of openforcefield.topology.Molecule
+    """
+    if isinstance(path, (list, tuple)):
+        pass
+    pass
 
 def _align_sequence():
     pass
