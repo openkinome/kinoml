@@ -14,14 +14,14 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
-    - name: Add conda to PATH
+    - name: Setup conda
       shell: bash
       if: startsWith(matrix.os, 'macOS') || startsWith(matrix.os, 'ubuntu')
-      run: echo "::add-path::$CONDA/bin"
-    - name: Add conda to PATH
+      run: ::set-env name=CONDA_EXE::$CONDA/bin/conda
+    - name: Setup conda
       shell: bash
       if: startsWith(matrix.os, 'windows')
-      run: echo "::add-path::$CONDA\Scripts"
+      run: ::set-env name=CONDA_EXE::$CONDA/Scripts/conda.exe
     - name: Additional info about the build
       shell: bash
       run: |
@@ -31,17 +31,17 @@ jobs:
     - name: Create environment for package
       shell: bash
       run: |
-        conda activate
+        eval "$(${CONDA_EXE} shell.bash hook)" && conda activate
         python devtools/scripts/create_conda_env.py -n=test -p=${{ matrix.python-version }} devtools/conda-envs/test_env.yaml
     - name: Install package
       shell: bash
       run: |
-        conda activate test
+        eval "$(${CONDA_EXE} shell.bash hook)" && conda activate test
         pip install . --no-deps
     - name: Lint with flake8
       shell: bash
       run: |
-        conda activate test
+        eval "$(${CONDA_EXE} shell.bash hook)" && conda activate test
         pip install flake8
         # stop the build if there are Python syntax errors or undefined names
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
@@ -50,10 +50,10 @@ jobs:
     - name: Run tests
       shell: bash
       run: |
-        conda activate test
+        eval "$(${CONDA_EXE} shell.bash hook)" && conda activate test
         pytest -v --cov=kinoml kinoml/tests/
     - name: Code coverage
       shell: bash
       run: |
-        conda activate test
+        eval "$(${CONDA_EXE} shell.bash hook)" && conda activate test
         codecov
