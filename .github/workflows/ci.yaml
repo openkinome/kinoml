@@ -16,7 +16,7 @@ jobs:
     - uses: actions/checkout@v1
     - name: Add conda to PATH
       shell: bash
-      if: !startsWith(matrix.os, 'windows')
+      if: startsWith(matrix.os, 'macOS') || startsWith(matrix.os, 'ubuntu')
       run: echo "::add-path::$CONDA/bin"
     - name: Add conda to PATH
       shell: bash
