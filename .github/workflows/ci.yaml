@@ -17,11 +17,11 @@ jobs:
     - name: Setup conda
       shell: bash
       if: startsWith(matrix.os, 'macOS') || startsWith(matrix.os, 'ubuntu')
-      run: ::set-env name=CONDA_EXE::$CONDA/bin/conda
+      run: echo "::set-env name=CONDA_EXE::$CONDA/bin/conda"
     - name: Setup conda
       shell: bash
       if: startsWith(matrix.os, 'windows')
-      run: ::set-env name=CONDA_EXE::$CONDA/Scripts/conda.exe
+      run: echo "::set-env name=CONDA_EXE::$CONDA/Scripts/conda.exe"
     - name: Additional info about the build
       shell: bash
       run: |
