@@ -8,6 +8,11 @@ class _BaseFeaturizer:
         - ``kinoml.core.ligand.Ligand``
         - ``kinoml.core.protein.Protein``
         - ``kinoml.core.complex.Complex``
+
+    Parameters
+    ==========
+    molecule
+        Depending on the implementation, small compound, protein, etc.
     """
 
     def __init__(self, molecule):
@@ -17,4 +22,14 @@ class _BaseFeaturizer:
         raise NotImplementedError("Implement this method in your subclass")
 
     def featurize(self):
+        """
+        Main entry point for Featurization API. Check ``self._featurize``
+        for implementation details.
+
+        Returns
+        =======
+        featurized
+            Featurized representation of ``self.molecule`` (implementation
+            dependent).
+        """
         return self._featurize()
