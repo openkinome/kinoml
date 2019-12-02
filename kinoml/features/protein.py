@@ -36,7 +36,7 @@ class AminoAcidCompositionFeaturizer(_BaseFeaturizer):
         _counter[k] -= 1
 
     def _featurize(self):
-        count = _counter.copy()
+        count = self._counter.copy()
         count.update(self.molecule.sequence)
         return np.array(count.values())
 
