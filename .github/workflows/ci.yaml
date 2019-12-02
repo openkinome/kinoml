@@ -16,7 +16,7 @@ jobs:
     - name: Set-up conda
       shell: bash
       run: |
-        cat << "EOF" >> ~/conda_init.sh
+        cat <<'EOF' >> ~/conda_init.sh
           if [ -d ${CONDA}/envs/test ]; then
             CONDA_ENV="test"
           else
