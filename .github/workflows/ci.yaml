@@ -10,14 +10,14 @@ jobs:
       matrix:
         os: [macOS-latest, ubuntu-latest, windows-latest]
         python-version: [3.6, 3.7]
+        bash-with-conda: ["bash --noprofile --rcfile ~/conda_init.sh -i -e -o pipefail"]
 
     steps:
     - uses: actions/checkout@v1
     - name: Set-up conda
       shell: bash
       run: |
-        cat <<EOF > ~/.bash_profile
-          echo "Initializing conda..."
+        cat << EOF >> ~/.conda_init
           if [ -d ${CONDA}/envs/test ]; then
             CONDA_ENV="test"
           else
@@ -40,17 +40,17 @@ jobs:
         df -h
         ulimit -a
     - name: Create environment for package
-      shell: bash --norc -eo pipefail {0}
+      shell: ${{ matrix.bash-with-conda }}
       run: |
         conda info
         python devtools/scripts/create_conda_env.py -n=test -p=${{ matrix.python-version }} devtools/conda-envs/test_env.yaml
     - name: Install package
-      shell: bash --norc -eo pipefail {0}
+      shell: ${{ matrix.bash-with-conda }}
       run: |
         pip install . --no-deps
         conda list
     - name: Lint with flake8
-      shell: bash --norc -eo pipefail {0}
+      shell: ${{ matrix.bash-with-conda }}
       run: |
         pip install flake8
         # stop the build if there are Python syntax errors or undefined names
@@ -58,7 +58,7 @@ jobs:
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Run tests
-      shell: bash --norc -eo pipefail {0}
+      shell: ${{ matrix.bash-with-conda }}
       run: |
         eval "$(${CONDA_EXE} shell.bash hook)" && conda activate test
         pytest -v --cov=kinoml --cov-report=xml --color=yes kinoml/tests/
