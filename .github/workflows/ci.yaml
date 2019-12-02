@@ -24,11 +24,11 @@ jobs:
           fi
           case ${{ matrix.os }} in
             windows*)
-              eval "$(${CONDA}/condabin/conda.bat shell.bash hook)"
+              eval "$(${CONDA}/condabin/conda.bat shell.bash hook)";;
             macOS*)
-              eval "$(${CONDA}/condabin/conda shell.bash hook)"
+              eval "$(${CONDA}/condabin/conda shell.bash hook)";;
             *)
-              eval "$(conda shell.bash hook)"
+              eval "$(conda shell.bash hook)";;
           esac
           conda activate $CONDA_ENV
         EOF
@@ -41,6 +41,7 @@ jobs:
     - name: Create environment for package
       shell: bash --noprofile --rcfile ~/.conda_bashrc -eo pipefail {0}
       run: |
+        conda info
         python devtools/scripts/create_conda_env.py -n=test -p=${{ matrix.python-version }} devtools/conda-envs/test_env.yaml
     - name: Install package
       shell: bash --noprofile --rcfile ~/.conda_bashrc -eo pipefail {0}
