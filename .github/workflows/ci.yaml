@@ -17,6 +17,7 @@ jobs:
       shell: bash
       run: |
         cat <<EOF > ~/.conda_bashrc
+          echo "Initializing conda..."
           if [ -d ${CONDA}/envs/test ]; then
             CONDA_ENV="test"
           else
