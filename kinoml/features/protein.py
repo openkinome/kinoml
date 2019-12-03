@@ -27,7 +27,7 @@ class HashFeaturizer(_BaseFeaturizer):
 class AminoAcidCompositionFeaturizer(_BaseFeaturizer):
 
     """
-
+    Featurizes the protein using the composition of the residues in the binding site.
     """
 
     # Initialize a Counter object with 0 counts
@@ -36,6 +36,15 @@ class AminoAcidCompositionFeaturizer(_BaseFeaturizer):
         _counter[k] -= 1
 
     def _featurize(self):
+        """
+        Featurizes a protein using the residue count in the binding site.
+
+        Returns
+        =======
+        np.array
+            The count of amino acid in the binding site, with shape (``len(ALL_AMINOACIDS``)).
+
+        """
         count = self._counter.copy()
         count.update(self.molecule.sequence)
         return np.array(count.values())
@@ -44,7 +53,8 @@ class AminoAcidCompositionFeaturizer(_BaseFeaturizer):
 class SequenceFeaturizer(_BaseFeaturizer):
 
     """
-    Featurize the sequence of the protein to a int-vector
+    Featurize the sequence of the protein to a one hot encoding
+    using the symbols in ``ALL_AMINOACIDS``.
 
     """
 
@@ -55,6 +65,16 @@ class SequenceFeaturizer(_BaseFeaturizer):
         self.pad_up_to = pad_up_to
 
     def _featurize(self):
+        """
+        Featurizes the binding site sequence of a protein using
+        a one hot encoding of the amino acids.
+
+        Returns
+        =======
+        np.matrix
+            One hot encoding of the sequence, with shape (``len(ALL_AMINOACIDS)``, ``len(self.molecule.sequence)``).
+
+        """
         vec = np.array([self.DICTIONARY[aa] for aa in self.molecule.sequence])
         ohe = tf.keras.utils.to_categorical(vec, len(self.DICTIONARY))
 
