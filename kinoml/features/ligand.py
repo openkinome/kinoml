@@ -47,6 +47,11 @@ class OneHotSMILESFeaturizer(_BaseFeaturizer):
         =======
         np.array
             One-hot encoded SMILES, with shape (``self.pad_up_to``, ``len(self.DICTIONARY``)).
+
+        Notes
+        =======
+        Double element symbols (such as Cl, Br for atoms and @@ for chirality) are replaced
+        with single element symbols (L, R and $ respectively).
         """
         import tensorflow as tf
         smiles = self.molecule.to_smiles().replace("Cl", "L").replace("Br", "R").replace("@@", "$")
@@ -75,6 +80,14 @@ class MorganFingerprintFeaturizer(_BaseFeaturizer):
         self.nbits = nbits
 
     def _featurize(self):
+        """
+        Featurizes ``self.molecule`` as a Morgan Fingerprint using RDKit
+
+        Returns
+        ========
+        np.array
+            Morgan fingerprint of radius 2 of molecule, with shape ``nbits``. 
+        """
         from rdkit.Chem.AllChem import GetMorganFingerprintAsBitVect
         m = self.molecule.to_rdkit()
         if m is None:
@@ -109,6 +122,12 @@ class GraphFeaturizer(_BaseFeaturizer):
         =======
         np.array
             Graph matrix, with shape (``self.pad_up_to``, ``self.N_FEATURES``)).
+
+        Notes
+        ======
+        Please refer to https://pytorch-geometric.readthedocs.io/en/latest/modules/nn.html
+        for the Pytorch implementation.
+        Please refer to https://arxiv.org/pdf/1609.02907.pdf for the original article.
         """
 
         from rdkit import Chem
