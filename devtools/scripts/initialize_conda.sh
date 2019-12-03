@@ -1,4 +1,4 @@
-case ${{ matrix.os }} in
+case ${CI_OS} in
     windows*)
         eval "$(${CONDA}/condabin/conda.bat shell.bash hook)";;
     macOS*)
