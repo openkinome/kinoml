@@ -7,9 +7,8 @@ case ${CI_OS} in
         eval "$(conda shell.bash hook)";;
 esac
 
-if [ -d ${CONDA}/envs/test ]; then
+if [ -d ${CONDA}/envs/test ] || [ -d $HOME/.conda/envs/test ]; then
     conda activate test
 else
     conda activate
 fi
-
