@@ -31,7 +31,7 @@ jobs:
       shell: bash
       run: |
         . devtools/scripts/initialize_conda.sh
-        pip install . --no-deps
+        python -m pip install . --no-deps
         conda list
     - name: Lint with flake8
       shell: bash
