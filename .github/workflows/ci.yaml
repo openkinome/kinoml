@@ -1,6 +1,6 @@
 name: CI
 
-on: [push]
+on: [push, pull_request]
 
 jobs:
   test:
@@ -10,17 +10,11 @@ jobs:
       matrix:
         os: [macOS-latest, ubuntu-latest, windows-latest]
         python-version: [3.6, 3.7]
+    env:
+      CI_OS: ${{ matrix.os }}
 
     steps:
     - uses: actions/checkout@v1
-    - name: Setup conda (Ubuntu, macOS)
-      shell: bash
-      if: startsWith(matrix.os, 'macOS') || startsWith(matrix.os, 'ubuntu')
-      run: echo "::set-env name=CONDA_EXE::$CONDA/bin/conda"
-    - name: Setup conda (Windows)
-      shell: bash
-      if: startsWith(matrix.os, 'windows')
-      run: echo "::set-env name=CONDA_EXE::$CONDA/Scripts/conda.exe"
     - name: Additional info about the build
       shell: bash
       run: |
@@ -30,17 +24,19 @@ jobs:
     - name: Create environment for package
       shell: bash
       run: |
-        eval "$(${CONDA_EXE} shell.bash hook)" && conda activate
+        . devtools/scripts/initialize_conda.sh
+        conda info
         python devtools/scripts/create_conda_env.py -n=test -p=${{ matrix.python-version }} devtools/conda-envs/test_env.yaml
     - name: Install package
       shell: bash
       run: |
-        eval "$(${CONDA_EXE} shell.bash hook)" && conda activate test
-        pip install . --no-deps
+        . devtools/scripts/initialize_conda.sh
+        python -m pip install . --no-deps
+        conda list
     - name: Lint with flake8
       shell: bash
       run: |
-        eval "$(${CONDA_EXE} shell.bash hook)" && conda activate test
+        . devtools/scripts/initialize_conda.sh
         pip install flake8
         # stop the build if there are Python syntax errors or undefined names
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
@@ -49,10 +45,13 @@ jobs:
     - name: Run tests
       shell: bash
       run: |
-        eval "$(${CONDA_EXE} shell.bash hook)" && conda activate test
-        pytest -v --cov=kinoml kinoml/tests/
-    - name: Code coverage
-      shell: bash
-      run: |
-        eval "$(${CONDA_EXE} shell.bash hook)" && conda activate test
-        codecov
+        . devtools/scripts/initialize_conda.sh
+        pytest -v --cov=kinoml --cov-report=xml --color=yes kinoml/tests/
+
+    - name: CodeCov
+      uses: codecov/codecov-action@v1
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        file: ./coverage.xml
+        flags: unittests
+        yml: ./.codecov.yml
