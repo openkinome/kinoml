@@ -74,10 +74,11 @@ class MorganFingerprintFeaturizer(_BaseFeaturizer):
         Length of the resulting bit vector
     """
 
-    def __init__(self, radius=2, nbits=512, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, molecule, radius=2, nbits=512, *args, **kwargs):
+        #super().__init__(*args, **kwargs)
         self.radius = radius
         self.nbits = nbits
+        self.molecule = molecule
 
     def _featurize(self):
         """
@@ -88,8 +89,10 @@ class MorganFingerprintFeaturizer(_BaseFeaturizer):
         np.array
             Morgan fingerprint of radius 2 of molecule, with shape ``nbits``. 
         """
+        from rdkit import Chem
         from rdkit.Chem.AllChem import GetMorganFingerprintAsBitVect
-        m = self.molecule.to_rdkit()
+        #m = self.molecule.to_rdkit()
+        m = Chem.MolFromSmiles(self.molecule)
         if m is None:
             return np.nan
         return np.array(GetMorganFingerprintAsBitVect(m, radius=self.radius, nBits=self.nbits))
