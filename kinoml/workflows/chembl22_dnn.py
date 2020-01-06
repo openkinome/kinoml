@@ -104,7 +104,6 @@ if __name__ == '__main__':
             x_train, x_test = x[train_index], x[test_index]
             y_train, y_test = y[train_index], y[test_index]
 
-
             print('---Train')
 
             for epoch in range(nb_epoch):
