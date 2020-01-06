@@ -17,7 +17,40 @@ class DNN(nn.Module):
     def forward(self, x):
         x = F.relu(self.fc1(x)) # All activations are relu expect for the last layer which is a sigmoid
         x = F.relu(self.fc2(x))
+        x = self.dropout1(x)
         x = F.relu(self.fc3(x))
+        x = self.dropout2(x)
         x = F.relu(self.fc4(x))
         x = F.relu(self.fc5(x))
-        return F.sigmoid(self.fc6(x))
+        return torch.sigmoid(self.fc6(x))
+
+
+class CNN(nn.Module):
+    def __init__(self):
+        super(CNN, self).__init__()
+        self.conv = nn.Conv1d(in_channels=53, out_channels=100, kernel_size=10) # conv : 1D convolution
+        self.dropout = nn.Dropout(0.2)
+        self.fc1 = nn.Linear(22*100, 64)
+        #self.BN1 = nn.BatchNorm1d(64)
+        self.fc2 = nn.Linear(64, 32)
+        #self.BN2 = nn.BatchNorm1d(32)
+        self.fc3 = nn.Linear(32, 1)
+
+    def forward(self, x):
+        #print('Input shape before conv : ' , x.size())
+        x = self.conv(x)
+        x = F.relu(x)
+        #print('Input shape after conv : ' , x.size())
+        x = F.max_pool1d(x, 4)
+        #print('Input shape after 4 maxpool : ' , x.size())
+        x = torch.flatten(x, 1)
+        #print('Input shape after flatten : ' , x.size())
+        x = self.dropout(x)
+        x = F.relu(self.fc1(x))
+        x = F.relu(self.fc2(x))
+        return torch.sigmoid(self.fc3(x))
+
+
+class GCN(nn.Module):
+    pass
+
