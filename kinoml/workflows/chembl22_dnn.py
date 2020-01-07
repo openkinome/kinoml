@@ -27,6 +27,9 @@ import torch.optim as optim
 from ml.models_pytorch import DNN
 from features.ligand import MorganFingerprintFeaturizer
 
+import logging
+logging.basicConfig(level=logging.INFO, filename='parameters.log', filemode='w')
+
 
 if __name__ == '__main__':
 
@@ -36,10 +39,11 @@ if __name__ == '__main__':
 
     # Set threshold for activity
     c = 6.3
-    print(f'Threshold at {c}')
+    logging.info(f'Threshold for activity is {c}')
 
     seed_cv = 42 # For reproductibility
     K = 5 # Fold Cross Validation
+    logging.info(f'Cross-validation with {K} folds')
     k =  35 # Nb of kinase to remove
     nb_epoch = 25 # Nb of epochs for training
 
@@ -52,7 +56,7 @@ if __name__ == '__main__':
 
     # Build model which will be used for all kinases
     model = DNN()
-    print(model)
+    logging.info(f'Model architecture: {model}')
     optimizer = optim.Adam(model.parameters(), lr = 0.001)
     criterion = nn.BCELoss() # Binary Cross Entropy Loss
 
@@ -142,7 +146,7 @@ if __name__ == '__main__':
             y_test = y_test.detach().numpy()
 
             # Transform probability of belonging to one class into 0 or 1 value at threshold 0.5
-            y_pred =(y_pred>0.5) 
+            y_pred = y_pred>0.5 
 
             if(all(y_pred[0] == elem for elem in y_pred)):
                 print(f'The model predicts all values at {y_pred[0]}')
@@ -163,11 +167,11 @@ if __name__ == '__main__':
         conf_matrix_std = np.std(np.array(conf_matrix_per_fold), axis=0)
 
         print(f' Metrics of CV for kinase {kinase} ')
-        print(f' Accuracy : Mean : {round(acc_mean, 2)} and std : {round(acc_std, 2)} ')
-        print(f' TN : Mean : {round(conf_matrix_mean[0], 2)} and std : {round(conf_matrix_std[0], 2)} ')
-        print(f' FP : Mean : {round(conf_matrix_mean[1], 2)} and std : {round(conf_matrix_std[1], 2)} ')
-        print(f' FN : Mean : {round(conf_matrix_mean[2], 2)} and std : {round(conf_matrix_std[2], 2)} ')
-        print(f' TP : Mean : {round(conf_matrix_mean[3], 2)} and std : {round(conf_matrix_std[3], 2)} ')
+        print(f' Accuracy : Mean : {acc_mean:.2f} and std : {acc_std:.2f} ')
+        print(f' TN : Mean : {conf_matrix_mean[0]:.2f} and std : {conf_matrix_std[0]:.2f} ')
+        print(f' FP : Mean : {conf_matrix_mean[1]:.2f} and std : {conf_matrix_std[1]:.2f} ')
+        print(f' FN : Mean : {conf_matrix_mean[2]:.2f} and std : {conf_matrix_std[2]:.2f} ')
+        print(f' TP : Mean : {conf_matrix_mean[3]:.2f} and std : {conf_matrix_std[3]:.2f} ')
 
         # Zero Counts per kinase
         zero_count = (y==0).sum()
