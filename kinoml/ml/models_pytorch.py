@@ -1,11 +1,28 @@
+"""
+Implementation in Pytorch of some Deep Neural Networks
+"""
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
 class DNN(nn.Module):
-    def __init__(self):
+    """
+    Builds a Pytorch model (a Dense Neural Network) and a feed-forward pass
+
+    Parameters
+    ==========
+    input_dim : int, optional=512
+        Expected shape of the input data
+
+    Returns
+    =======
+    model : a feed-forward pass of the dense neural network with activation functions
+    """
+    def __init__(self, input_dim=512):
         super(DNN, self).__init__()
-        self.fc1 = nn.Linear(512, 350) # fc1: 1st fully connected layer with 350 nodes
+        self.input_dim = input_dim
+        self.fc1 = nn.Linear(self.input_dim, 350) # fc1: 1st fully connected layer with 350 nodes
         self.fc2 = nn.Linear(350, 200) # fc2: 2nd fully connected layer with 200 nodes
         self.dropout1 = nn.Dropout(0.2) # dropout1: 1st dropout layer
         self.fc3 = nn.Linear(200, 100)
@@ -15,6 +32,9 @@ class DNN(nn.Module):
         self.fc6 = nn.Linear(16, 1)
 
     def forward(self, x):
+        """
+        Defines the foward pass for a given input 'x'
+        """
         x = F.relu(self.fc1(x)) # All activations are relu expect for the last layer which is a sigmoid
         x = F.relu(self.fc2(x))
         x = self.dropout1(x)
@@ -26,6 +46,18 @@ class DNN(nn.Module):
 
 
 class CNN(nn.Module):
+    """
+    Builds a Pytorch model (a Convolutional Neural Network) and a feed-forward pass
+
+    Parameters
+    ==========
+    input_shape : tuple of int
+        Expected shape of the input data
+
+    Returns
+    =======
+    model : a feed-forward pass of the convolutional neural network with activation functions
+    """
     def __init__(self):
         super(CNN, self).__init__()
         self.conv = nn.Conv1d(in_channels=53, out_channels=100, kernel_size=10) # conv : 1D convolution
@@ -37,6 +69,9 @@ class CNN(nn.Module):
         self.fc3 = nn.Linear(32, 1)
 
     def forward(self, x):
+        """
+        Defines the foward pass for a given input 'x'
+        """
         #print('Input shape before conv : ' , x.size())
         x = self.conv(x)
         x = F.relu(x)
