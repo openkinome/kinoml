@@ -35,39 +35,32 @@ class OneHotSMILESFeaturizer(_BaseFeaturizer):
     )}
 
     def __init__(self, molecule, pad_up_to=None, *args, **kwargs):
-        #super().__init__(*args, **kwargs)
-        self.molecule = molecule
+        super().__init__(molecule, *args, **kwargs)
         self.pad_up_to = pad_up_to
 
     def _featurize(self):
         """
         Featurizes ``self.molecule`` as a one-hot encoding of the SMILES representation.
         If ``self.pad_up_to`` is defined, the padded version will be returned.
-#
-#        Returns
-#        =======
-#        np.array
-#            One-hot encoded SMILES, with shape (``len(self.DICTIONARY``, ``self.pad_up_to``, )).
-#
-#        Notes
-#        =======
-#        Double element symbols (such as Cl, Br for atoms and @@ for chirality) are replaced
-#        with single element symbols (L, R and $ respectively).
-#        """
-        ohe_matrix = np.zeros((len(self.DICTIONARY), len(self.molecule)))
-        for i, dict_char in enumerate(self.DICTIONARY):
-            for j, molecule_char in enumerate(self.molecule):
-                if dict_char == molecule_char:
-                    ohe_matrix[i,j] = 1
+
+        Returns
+        =======
+        np.array
+            One-hot encoded SMILES, with shape (``len(self.DICTIONARY``, ``self.pad_up_to``, )).
+
+        Notes
+        =======
+        Double element symbols (such as Cl, Br for atoms and @@ for chirality) are replaced
+        with single element symbols (L, R and $ respectively).
+        """
+        smiles = self.molecule.to_smiles().replace("Cl", "L").replace("Br", "R").replace("@@", "$")
+        ohe_matrix = np.zeros((len(self.DICTIONARY), len(smiles)))
+        for i, character in enumerate(smiles):
+            ohe_matrix[self.DICTIONARY[character],i] = 1
+
         if self.pad_up_to is not None:
             return np.pad(ohe_matrix, ((0,0), (0, self.pad_up_to-len(self.molecule))), mode='constant')
-        else: 
-            return ohe_matrix
-#        smiles = self.molecule.to_smiles().replace("Cl", "L").replace("Br", "R").replace("@@", "$")
-#        vec = np.array([self.DICTIONARY[c] for c in smiles])
-#        if self.pad_up_to is not None:
-#            vec = np.pad(vec, (0, self.pad_up_to - len(vec)))
-#        return tf.keras.utils.to_categorical(vec, len(self.DICTIONARY))
+        return ohe_matrix
 
 
 class MorganFingerprintFeaturizer(_BaseFeaturizer):
@@ -96,7 +89,7 @@ class MorganFingerprintFeaturizer(_BaseFeaturizer):
         Returns
         ========
         np.array
-            Morgan fingerprint of radius 2 of molecule, with shape ``nbits``. 
+            Morgan fingerprint of radius 2 of molecule, with shape ``nbits``.
         """
         from rdkit import Chem
         from rdkit.Chem.AllChem import GetMorganFingerprintAsBitVect

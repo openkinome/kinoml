@@ -86,21 +86,21 @@ class SequenceFeaturizer(_BaseFeaturizer):
 
 class OneHotEncodingAminoAcid:
     """
-        Featurizes the binding site sequence of a protein using
-        a one hot encoding of the amino acids.
-        This class assumes that the sequence of the binding site is composed of 20 amino acids (as is the case in KLIFS)
-        and therefore does not require padding.
+    Featurizes the binding site sequence of a protein using
+    a one hot encoding of the amino acids.
+    This class assumes that the sequence of the binding site is composed of 20 amino acids (as is the case in KLIFS)
+    and therefore does not require padding.
 
-        Returns
-        =======
-        np.matrix
-            One hot encoding of the sequence, with shape (``len(ALL_AMINOACIDS)``, ``len(self.molecule.sequence)``).
+    Returns
+    =======
+    np.matrix
+        One hot encoding of the sequence, with shape (``len(ALL_AMINOACIDS)``, ``len(self.molecule.sequence)``).
     """
 
     def __init__(self, amino_acid_seq):
         self.amino_acid_seq = amino_acid_seq
         self.len_seq = len(amino_acid_seq)
-    
+
     def from_seq2oh(self):
         ohe_matrix = np.zeros((len(ALL_AMINOACIDS), self.len_seq))
         for i, dict_char in enumerate(ALL_AMINOACIDS):

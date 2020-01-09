@@ -15,7 +15,7 @@ class _BaseFeaturizer:
         Depending on the implementation, small compound, protein, etc.
     """
 
-    def __init__(self, molecule):
+    def __init__(self, molecule, *args, **kwargs):
         self.molecule = molecule
 
     def _featurize(self):
