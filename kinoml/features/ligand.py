@@ -14,6 +14,7 @@ class OneHotSMILESFeaturizer(_BaseFeaturizer):
 
     Parameters
     ==========
+    molecule : kinoml.core.ligand.RDKitMolecule
     pad_up_to : int or None, optional=None
         Fill featurized data with zeros until pad-length is met.
 
@@ -70,6 +71,7 @@ class MorganFingerprintFeaturizer(_BaseFeaturizer):
 
     Parameters
     ==========
+    molecule : kinoml.core.ligand.RDKitMolecule
     radius : int, optional=2
         Morgan fingerprint neighborhood radius
     nbits : int, optional=512
@@ -77,10 +79,9 @@ class MorganFingerprintFeaturizer(_BaseFeaturizer):
     """
 
     def __init__(self, molecule, radius=2, nbits=512, *args, **kwargs):
-        #super().__init__(*args, **kwargs)
+        super().__init__(molecule, *args, **kwargs)
         self.radius = radius
         self.nbits = nbits
-        self.molecule = molecule
 
     def _featurize(self):
         """
@@ -91,10 +92,8 @@ class MorganFingerprintFeaturizer(_BaseFeaturizer):
         np.array
             Morgan fingerprint of radius 2 of molecule, with shape ``nbits``.
         """
-        from rdkit import Chem
         from rdkit.Chem.AllChem import GetMorganFingerprintAsBitVect
-        #m = self.molecule.to_rdkit()
-        m = Chem.MolFromSmiles(self.molecule)
+        m = self.molecule
         if m is None:
             return np.nan
         return np.array(GetMorganFingerprintAsBitVect(m, radius=self.radius, nBits=self.nbits))
@@ -108,14 +107,15 @@ class GraphFeaturizer(_BaseFeaturizer):
 
     Parameters
     ==========
+    molecule : kinoml.core.ligand.RDKitMolecule
     pad_up_to : int or None, optional=None
         Fill featurized data with zeros until pad-length is met.
     """
 
     N_FEATURES = 2
 
-    def __init__(self, pad_up_to=None, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, molecule, pad_up_to=None, *args, **kwargs):
+        super().__init__(molecule, *args, **kwargs)
         self.pad_up_to = pad_up_to
 
     def _featurize(self):
@@ -140,7 +140,7 @@ class GraphFeaturizer(_BaseFeaturizer):
         from rdkit.Chem import rdmolops
         from scipy.linalg import fractional_matrix_power
 
-        mol = self.molecule.to_rdkit()
+        mol = self.molecule
 
         self_adjacency_matrix = rdmolops.GetAdjacencyMatrix(mol) + np.identity(mol.GetNumAtoms())
         per_atom_features = np.matrix([self._per_atom_features(atom) for atom in mol.GetAtoms()])
