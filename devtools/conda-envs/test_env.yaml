@@ -1,9 +1,22 @@
 name: test
 channels:
+  - conda-forge
+  - omnia
 dependencies:
     # Base depends
   - python
   - pip
+
+  # Production
+  - pytorch
+  - rdkit
+  - numpy
+  - scipy
+  - matplotlib
+  - scikit-learn
+  - pandas
+  - requests
+  - openforcefield
 
     # Testing
   - pytest
