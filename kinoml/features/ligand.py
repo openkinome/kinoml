@@ -60,7 +60,7 @@ class OneHotSMILESFeaturizer(_BaseFeaturizer):
             ohe_matrix[self.DICTIONARY[character],i] = 1
 
         if self.pad_up_to is not None:
-            return np.pad(ohe_matrix, ((0,0), (0, self.pad_up_to-len(self.molecule))), mode='constant')
+            return np.pad(ohe_matrix, ((0,0), (0, self.pad_up_to-len(smiles))), mode='constant')
         return ohe_matrix
 
 

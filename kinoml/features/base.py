@@ -5,7 +5,7 @@ class _BaseFeaturizer:
     Featurization API. Subclasses must implement ``self._featurize``, considering
     that ``self.molecule`` can represent slightly different object models:
 
-        - ``kinoml.core.ligand.Ligand``
+        - ``kinoml.core.ligand.Ligand`` or ``kinoml.core.ligand.RDKitLigand``
         - ``kinoml.core.protein.Protein``
         - ``kinoml.core.complex.Complex``
 

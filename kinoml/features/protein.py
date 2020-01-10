@@ -5,7 +5,7 @@ Featurizers built around ``kinoml.core.protein.Protein`` objects.
 from collections import Counter
 
 import numpy as np
-#import tensorflow as tf
+import hashlib
 
 from .base import _BaseFeaturizer
 
@@ -19,9 +19,11 @@ class HashFeaturizer(_BaseFeaturizer):
     Hash an attribute of the protein, such as the name or id.
     """
 
+    SEED = 42
+
     def _featurize(self):
-        # write the featurization strategy here
-        return hash(self.molecule.id)
+        h = hashlib.sha256(self.molecule.name.encode())
+        return int(h.hexdigest(), base=16)
 
 
 class AminoAcidCompositionFeaturizer(_BaseFeaturizer):
