@@ -5,7 +5,7 @@ Featurizers built around ``kinoml.core.ligand.Ligand`` objects.
 import numpy as np
 
 from .base import _BaseFeaturizer
-
+from .utils import one_hot_encode
 
 class OneHotSMILESFeaturizer(_BaseFeaturizer):
 
@@ -55,9 +55,7 @@ class OneHotSMILESFeaturizer(_BaseFeaturizer):
         with single element symbols (L, R and $ respectively).
         """
         smiles = self.molecule.to_smiles().replace("Cl", "L").replace("Br", "R").replace("@@", "$")
-        ohe_matrix = np.zeros((len(self.DICTIONARY), len(smiles)))
-        for i, character in enumerate(smiles):
-            ohe_matrix[self.DICTIONARY[character],i] = 1
+        ohe_matrix = one_hot_encode(smiles, self.DICTIONARY)
 
         if self.pad_up_to is not None:
             return np.pad(ohe_matrix, ((0,0), (0, self.pad_up_to-len(smiles))), mode='constant')
