@@ -7,10 +7,46 @@ import numpy as np
 from .base import _BaseFeaturizer
 from .utils import one_hot_encode
 
+
+class MorganFingerprintFeaturizer(_BaseFeaturizer):
+
+    """
+    Featurizes a ``Ligand`` using Morgan fingerprints bitvectors
+
+    Parameters
+    ==========
+    molecule : kinoml.core.ligand.RDKitMolecule
+    radius : int, optional=2
+        Morgan fingerprint neighborhood radius
+    nbits : int, optional=512
+        Length of the resulting bit vector
+    """
+
+    def __init__(self, molecule, radius=2, nbits=512, *args, **kwargs):
+        super().__init__(molecule, *args, **kwargs)
+        self.radius = radius
+        self.nbits = nbits
+
+    def _featurize(self):
+        """
+        Featurizes ``self.molecule`` as a Morgan Fingerprint using RDKit
+
+        Returns
+        ========
+        np.array
+            Morgan fingerprint of radius ``radius`` of molecule, with shape ``nbits``.
+        """
+        from rdkit.Chem.AllChem import GetMorganFingerprintAsBitVect
+        m = self.molecule
+        if m is not None:
+            return np.array(GetMorganFingerprintAsBitVect(m, radius=self.radius, nBits=self.nbits))
+
+
+
 class OneHotSMILESFeaturizer(_BaseFeaturizer):
 
     """
-    One-hot encodes a ``Ligand``'s canonical SMILES representation.
+    One-hot encodes a ``Ligand`` from a canonical SMILES representation.
 
     Parameters
     ==========
@@ -61,41 +97,7 @@ class OneHotSMILESFeaturizer(_BaseFeaturizer):
             return np.pad(ohe_matrix, ((0,0), (0, self.pad_up_to-len(smiles))), mode='constant')
         return ohe_matrix
 
-
-class MorganFingerprintFeaturizer(_BaseFeaturizer):
-
-    """
-    Featurizes a ``Ligand`` using Morgan fingerprints bitvectors
-
-    Parameters
-    ==========
-    molecule : kinoml.core.ligand.RDKitMolecule
-    radius : int, optional=2
-        Morgan fingerprint neighborhood radius
-    nbits : int, optional=512
-        Length of the resulting bit vector
-    """
-
-    def __init__(self, molecule, radius=2, nbits=512, *args, **kwargs):
-        super().__init__(molecule, *args, **kwargs)
-        self.radius = radius
-        self.nbits = nbits
-
-    def _featurize(self):
-        """
-        Featurizes ``self.molecule`` as a Morgan Fingerprint using RDKit
-
-        Returns
-        ========
-        np.array
-            Morgan fingerprint of radius 2 of molecule, with shape ``nbits``.
-        """
-        from rdkit.Chem.AllChem import GetMorganFingerprintAsBitVect
-        m = self.molecule
-        if m is None:
-            return np.nan
-        return np.array(GetMorganFingerprintAsBitVect(m, radius=self.radius, nBits=self.nbits))
-
+     
 
 class GraphFeaturizer(_BaseFeaturizer):
 
