@@ -89,14 +89,16 @@ class SequenceFeaturizer(_BaseFeaturizer):
 
     DICTIONARY = {c: i for i, c in enumerate(ALL_AMINOACIDS)}
 
-    def __init__(self, pad_up_to=None, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, molecule, pad_up_to=None, *args, **kwargs):
+        super().__init__(molecule, *args, **kwargs)
         self.pad_up_to = pad_up_to
+    
 
     def _featurize(self):
         """
         Featurizes the binding site sequence of a protein using
         a one hot encoding of the amino acids.
+        If ``self.pad_up_to`` is defined, the padded version will be returned.
 
         Returns
         =======
@@ -104,9 +106,7 @@ class SequenceFeaturizer(_BaseFeaturizer):
             One hot encoding of the sequence, with shape (``len(ALL_AMINOACIDS)``, ``len(self.molecule.sequence)``).
 
         """
-        ohe = one_hot_encode(self.molecule.sequence, self.DICTIONARY)
-
+        ohe_matrix = one_hot_encode(self.molecule.sequence, self.DICTIONARY)
         if self.pad_up_to is not None:
-            ohe = np.pad(vec, (0, self.pad_up_to - len(ohe)))
-
-        return ohe
+            return np.pad(ohe_matrix, ((0,0), (0, self.pad_up_to-len(self.molecule.sequence))), mode='constant')
+        return ohe_matrix

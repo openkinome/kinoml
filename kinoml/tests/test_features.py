@@ -3,7 +3,7 @@ import numpy as np
 from kinoml.core.ligand import RDKitLigand
 from kinoml.features.ligand import OneHotSMILESFeaturizer, MorganFingerprintFeaturizer
 from kinoml.core.protein import Protein
-from kinoml.features.protein import HashFeaturizer, AminoAcidCompositionFeaturizer
+from kinoml.features.protein import HashFeaturizer, AminoAcidCompositionFeaturizer, SequenceFeaturizer
 
 ###
 #  LIGAND
@@ -63,3 +63,18 @@ def test_protein_AminoAcidCompositionFeaturizer(sequence, solution):
     featurizer = AminoAcidCompositionFeaturizer(protein)
     composition = featurizer.featurize()
     assert (composition == solution).all()
+
+
+@pytest.mark.parametrize("sequence, solution", [
+    ("AA", np.concatenate((np.array([[1]*2 + [0]*83]),np.zeros([19,85])), axis=0)),
+    ("AAAY", np.concatenate((
+        np.array([[1]*3 + [0]*82]).reshape([1, np.array([[1]*3 + [0]*82]).shape[1]]),
+        np.zeros([18,85]),
+        np.array([0]*3 + [1] + [0]*81).reshape([1, np.array([0]*3 + [1] + [0]*81).shape[0]])
+        ), axis=0))
+])
+def test_protein_SequenceFeaturizer(sequence, solution):
+    protein = Protein(sequence=sequence)
+    featurizer = SequenceFeaturizer(protein, pad_up_to=85)
+    ohe_seq = featurizer.featurize()
+    assert np.array_equal(ohe_seq, solution)
