@@ -1,17 +1,25 @@
-####
-# Ligand
-####
-
 import pytest
 import numpy as np
 from kinoml.core.ligand import RDKitLigand
 from kinoml.features.ligand import OneHotSMILESFeaturizer, MorganFingerprintFeaturizer
 from kinoml.core.protein import Protein
-from kinoml.features.protein import HashFeaturizer
+from kinoml.features.protein import HashFeaturizer, AminoAcidCompositionFeaturizer
 
 ###
 #  LIGAND
 ###
+
+@pytest.mark.parametrize("smiles, solution", [
+    ("C", np.array([0]*240 + [1] + [0]*(512-241))),
+    ("B", np.array([0]*129 + [1] + [0]*(512-130))),
+])
+def test_ligand_MorganFingerprintFeaturizer(smiles, solution, radius=2, nbits=512):
+    molecule = RDKitLigand.from_smiles(smiles)
+    rdmol = molecule.molecule
+    featurizer = MorganFingerprintFeaturizer(rdmol, radius=radius, nbits=nbits)
+    fingerprint = featurizer.featurize()
+    assert (fingerprint == solution).all()
+
 
 @pytest.mark.parametrize("smiles, solution", [
     ("C", np.array([[0, 1] + [0]*51])),
@@ -26,18 +34,6 @@ def test_ligand_OneHotSMILESFeaturizer(smiles, solution):
     matrix = featurizer.featurize()
     assert matrix.shape == solution.T.shape
     assert (matrix == solution.T).all()
-
-
-@pytest.mark.parametrize("smiles, solution", [
-    ("C", np.array([0]*240 + [1] + [0]*(512-241))),
-    ("B", np.array([0]*129 + [1] + [0]*(512-130))),
-])
-def test_ligand_MorganFingerprintFeaturizer(smiles, solution, radius=2, nbits=512):
-    molecule = RDKitLigand.from_smiles(smiles)
-    rdmol = molecule.molecule
-    featurizer = MorganFingerprintFeaturizer(rdmol, radius=radius, nbits=nbits)
-    fingerprint = featurizer.featurize()
-    assert (fingerprint == solution).all()
 
 
 ###
@@ -55,3 +51,15 @@ def test_protein_HashFeaturizer(name, solution):
     featurizer = HashFeaturizer(protein)
     hashed = featurizer.featurize()
     assert hashed == solution
+
+
+@pytest.mark.parametrize("sequence, solution", [
+    ("AA", np.array([2]*1 + [0]*19)),
+    ("KKLGAGQFGEVWMVAVKTMAFLAEANVMKTLQDKLVKLHAVYIITEFMAKGSLLDFLKSFIEQRNYIHRDLRAANILVIADFGLA",
+    np.array([11, 0, 4, 4, 6, 5, 2, 6, 8, 11, 4, 3, 0, 3, 3, 2, 3, 7, 1, 2]))
+])
+def test_protein_AminoAcidCompositionFeaturizer(sequence, solution):
+    protein = Protein(sequence=sequence)
+    featurizer = AminoAcidCompositionFeaturizer(protein)
+    composition = featurizer.featurize()
+    assert (composition == solution).all()
