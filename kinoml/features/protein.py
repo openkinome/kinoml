@@ -8,7 +8,7 @@ import numpy as np
 import hashlib
 
 from .base import _BaseFeaturizer
-from .utils import one_hot_encode
+from .utils import one_hot_encode, normalize
 
 ALL_AMINOACIDS = "ACDEFGHIKLMNPQRSTVWY"
 
@@ -17,13 +17,40 @@ class HashFeaturizer(_BaseFeaturizer):
 
     """
     Hash an attribute of the protein, such as the name or id.
+    
+    Parameters
+    ==========
+    molecule : kinoml.core.protein
+    normalize : bool, default=False
+        Normalizes the hash
+
+    Attributes
+    ==========
+    SEED : int
+        Sets the seed for the hashing
     """
 
     SEED = 42
 
+    def __init__(self, molecule, normalize=False, *args, **kwargs):
+        super().__init__(molecule, *args, **kwargs)
+        self.normalize = normalize
+        self.molecule = molecule
+
     def _featurize(self):
+        """
+        Featurizes the protein using the hash of the protein name.
+
+        Returns
+        =======
+        The hash of the name of the molecule, normalized or not.
+
+        """
         h = hashlib.sha256(self.molecule.name.encode())
+        if self.normalize is True:
+            return normalize(int(h.hexdigest(), base=16))
         return int(h.hexdigest(), base=16)
+        
 
 
 class AminoAcidCompositionFeaturizer(_BaseFeaturizer):
@@ -49,7 +76,7 @@ class AminoAcidCompositionFeaturizer(_BaseFeaturizer):
         """
         count = self._counter.copy()
         count.update(self.molecule.sequence)
-        return np.array(count.values())
+        return np.array(list(count.values()))
 
 
 class SequenceFeaturizer(_BaseFeaturizer):
