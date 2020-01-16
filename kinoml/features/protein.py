@@ -21,16 +21,9 @@ class HashFeaturizer(_BaseFeaturizer):
     Parameters
     ==========
     molecule : kinoml.core.protein
-    normalize : bool, default=False
+    normalize : bool, default=True
         Normalizes the hash
-
-    Attributes
-    ==========
-    SEED : int
-        Sets the seed for the hashing
     """
-
-    SEED = 42
 
     def __init__(self, molecule, normalize=True, *args, **kwargs):
         super().__init__(molecule, *args, **kwargs)
@@ -43,7 +36,7 @@ class HashFeaturizer(_BaseFeaturizer):
 
         Returns
         =======
-        The hash of the name of the molecule, normalized or not.
+        The hash of the name of the molecule, normalized by default (value between 0 and 1)
 
         """
         h = hashlib.sha256(self.molecule.name.encode(encoding='UTF-8'))
