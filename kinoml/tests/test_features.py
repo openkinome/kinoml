@@ -43,12 +43,11 @@ def test_ligand_OneHotSMILESFeaturizer(smiles, solution):
 
 @pytest.mark.parametrize("name, solution", [
     ("ABL1", 51359244412987742411871251883764241382133335241692098893198855723797693410968),
-    ("TK", 94240903631043095486486222526930572378578908819371024688233288433881997985526),
-    ("Ññ", 80345342214904496436064957164160100315589462262335309353169746645107183191772)
+    ("Aàédñ", 22328255358516025959549316196054983245698711806101617436556179761578791369492)
 ])
 def test_protein_HashFeaturizer(name, solution):
     protein = Protein(name=name)
-    featurizer = HashFeaturizer(protein)
+    featurizer = HashFeaturizer(protein, normalize=False)
     hashed = featurizer.featurize()
     assert hashed == solution
 

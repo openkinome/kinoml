@@ -8,7 +8,7 @@ import numpy as np
 import hashlib
 
 from .base import _BaseFeaturizer
-from .utils import one_hot_encode, normalize
+from .utils import one_hot_encode
 
 ALL_AMINOACIDS = "ACDEFGHIKLMNPQRSTVWY"
 
@@ -32,10 +32,10 @@ class HashFeaturizer(_BaseFeaturizer):
 
     SEED = 42
 
-    def __init__(self, molecule, normalize=False, *args, **kwargs):
+    def __init__(self, molecule, normalize=True, *args, **kwargs):
         super().__init__(molecule, *args, **kwargs)
-        self.normalize = normalize
         self.molecule = molecule
+        self.normalize = normalize
 
     def _featurize(self):
         """
@@ -46,9 +46,9 @@ class HashFeaturizer(_BaseFeaturizer):
         The hash of the name of the molecule, normalized or not.
 
         """
-        h = hashlib.sha256(self.molecule.name.encode())
-        if self.normalize is True:
-            return normalize(int(h.hexdigest(), base=16))
+        h = hashlib.sha256(self.molecule.name.encode(encoding='UTF-8'))
+        if self.normalize:
+            return int(h.hexdigest(), base=16)/2**256
         return int(h.hexdigest(), base=16)
         
 
