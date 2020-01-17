@@ -135,8 +135,13 @@ class GraphFeaturizer(_BaseFeaturizer):
         from rdkit.Chem import rdmolops
 
         per_atom_features = np.array([self._per_atom_features(atom) for atom in self.molecule.GetAtoms()])
+        adjacency_matrix = rdmolops.GetAdjacencyMatrix(self.molecule)
 
-        return (rdmolops.GetAdjacencyMatrix(self.molecule), per_atom_features)
+        if self.pad_up_to is not None:
+            adjacency_matrix_pad = np.pad(adjacency_matrix, ((0, self.pad_up_to - self.molecule.GetNumAtoms()), (0, self.pad_up_to - self.molecule.GetNumAtoms())), mode='constant')
+            per_atom_features_pad = np.pad(per_atom_features, ((0, self.pad_up_to - self.molecule.GetNumAtoms()), (0,0)), mode='constant')
+            return (adjacency_matrix_pad, per_atom_features_pad)
+        return (adjacency_matrix, per_atom_features)
 
     def _per_atom_features(self, atom):
         """
