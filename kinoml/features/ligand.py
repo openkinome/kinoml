@@ -34,12 +34,14 @@ class MorganFingerprintFeaturizer(_BaseFeaturizer):
         Returns
         ========
         np.array
-            Morgan fingerprint of radius ``radius`` of molecule, with shape ``nbits``.
+            Morgan fingerprint of radius ``radius`` of molecule,
+            with shape ``nbits``.
         """
         from rdkit.Chem.AllChem import GetMorganFingerprintAsBitVect
         m = self.molecule
         if m is not None:
-            return np.array(GetMorganFingerprintAsBitVect(m, radius=self.radius, nBits=self.nbits))
+            return np.array(GetMorganFingerprintAsBitVect(m,
+            radius=self.radius, nBits=self.nbits))
 
 
 
@@ -77,24 +79,27 @@ class OneHotSMILESFeaturizer(_BaseFeaturizer):
 
     def _featurize(self):
         """
-        Featurizes ``self.molecule`` as a one-hot encoding of the SMILES representation.
+        Featurizes ``self.molecule`` as a one-hot encoding
+        of the SMILES representation.
         If ``self.pad_up_to`` is defined, the padded version will be returned.
 
         Returns
         =======
         np.array
-            One-hot encoded SMILES, with shape (``len(self.DICTIONARY``, ``self.pad_up_to``, )).
+            One-hot encoded SMILES, with
+            shape (``len(self.DICTIONARY``, ``self.pad_up_to``, )).
 
         Notes
         =======
-        Double element symbols (such as Cl, Br for atoms and @@ for chirality) are replaced
-        with single element symbols (L, R and $ respectively).
+        Double element symbols (such as Cl, Br for atoms and @@ for chirality)
+        are replaced with single element symbols (L, R and $ respectively).
         """
         smiles = self.molecule.to_smiles().replace("Cl", "L").replace("Br", "R").replace("@@", "$")
         ohe_matrix = one_hot_encode(smiles, self.DICTIONARY)
 
         if self.pad_up_to is not None:
-            return np.pad(ohe_matrix, ((0,0), (0, self.pad_up_to-len(smiles))), mode='constant')
+            return np.pad(ohe_matrix, ((0,0), (0, self.pad_up_to-len(smiles))),
+            mode='constant')
         return ohe_matrix
 
      
@@ -127,19 +132,26 @@ class GraphFeaturizer(_BaseFeaturizer):
         Returns
         =======
         tuple of 2 elements
-            - Adjacency matrix of the molecule with shape (N_atoms, N_atoms), where N_atoms is the number of atoms in the molecule
+            - Adjacency matrix of the molecule with shape (N_atoms, N_atoms),
+            where N_atoms is the number of atoms in the molecule
             - Feature matrix with shape (N_atoms, ``self.N_FEATURES``)
         """
 
         from rdkit import Chem
         from rdkit.Chem import rdmolops
 
-        per_atom_features = np.array([self._per_atom_features(atom) for atom in self.molecule.GetAtoms()])
+        per_atom_features = np.array([self._per_atom_features(atom)
+            for atom in self.molecule.GetAtoms()])
         adjacency_matrix = rdmolops.GetAdjacencyMatrix(self.molecule)
 
         if self.pad_up_to is not None:
-            adjacency_matrix_pad = np.pad(adjacency_matrix, ((0, self.pad_up_to - self.molecule.GetNumAtoms()), (0, self.pad_up_to - self.molecule.GetNumAtoms())), mode='constant')
-            per_atom_features_pad = np.pad(per_atom_features, ((0, self.pad_up_to - self.molecule.GetNumAtoms()), (0,0)), mode='constant')
+            adjacency_matrix_pad = np.pad(adjacency_matrix,
+            ((0, self.pad_up_to - self.molecule.GetNumAtoms()),
+            (0, self.pad_up_to - self.molecule.GetNumAtoms())),
+            mode='constant')
+            per_atom_features_pad = np.pad(per_atom_features,
+            ((0, self.pad_up_to - self.molecule.GetNumAtoms()), (0,0)),
+            mode='constant')
             return (adjacency_matrix_pad, per_atom_features_pad)
         return (adjacency_matrix, per_atom_features)
 

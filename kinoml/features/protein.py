@@ -36,7 +36,8 @@ class HashFeaturizer(_BaseFeaturizer):
 
         Returns
         =======
-        The hash of the name of the molecule, normalized by default (value between 0 and 1)
+        The hash of the name of the molecule,
+        normalized by default (value between 0 and 1)
 
         """
         h = hashlib.sha256(self.molecule.name.encode(encoding='UTF-8'))
@@ -49,7 +50,8 @@ class HashFeaturizer(_BaseFeaturizer):
 class AminoAcidCompositionFeaturizer(_BaseFeaturizer):
 
     """
-    Featurizes the protein using the composition of the residues in the binding site.
+    Featurizes the protein using the composition of the residues
+    in the binding site.
     """
 
     # Initialize a Counter object with 0 counts
@@ -64,7 +66,8 @@ class AminoAcidCompositionFeaturizer(_BaseFeaturizer):
         Returns
         =======
         np.array
-            The count of amino acid in the binding site, with shape (``len(ALL_AMINOACIDS``)).
+            The count of amino acid in the binding site
+            with shape (``len(ALL_AMINOACIDS``)).
 
         """
         count = self._counter.copy()
@@ -96,10 +99,13 @@ class SequenceFeaturizer(_BaseFeaturizer):
         Returns
         =======
         np.matrix
-            One hot encoding of the sequence, with shape (``len(ALL_AMINOACIDS)``, ``len(self.molecule.sequence)``).
+            One hot encoding of the sequence with
+            shape (``len(ALL_AMINOACIDS)``, ``len(self.molecule.sequence)``).
 
         """
         ohe_matrix = one_hot_encode(self.molecule.sequence, self.DICTIONARY)
         if self.pad_up_to is not None:
-            return np.pad(ohe_matrix, ((0,0), (0, self.pad_up_to-len(self.molecule.sequence))), mode='constant')
+            return np.pad(ohe_matrix,
+            ((0,0), (0, self.pad_up_to-len(self.molecule.sequence))),
+            mode='constant')
         return ohe_matrix
