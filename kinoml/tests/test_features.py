@@ -1,7 +1,7 @@
 import pytest
 import numpy as np
 from kinoml.core.ligand import RDKitLigand
-from kinoml.features.ligand import OneHotSMILESFeaturizer, MorganFingerprintFeaturizer
+from kinoml.features.ligand import MorganFingerprintFeaturizer, OneHotSMILESFeaturizer, GraphFeaturizer
 from kinoml.core.protein import Protein
 from kinoml.features.protein import HashFeaturizer, AminoAcidCompositionFeaturizer, SequenceFeaturizer
 
@@ -34,6 +34,19 @@ def test_ligand_OneHotSMILESFeaturizer(smiles, solution):
     matrix = featurizer.featurize()
     assert matrix.shape == solution.T.shape
     assert (matrix == solution.T).all()
+
+@pytest.mark.parametrize("smiles, solution", [
+    ("C", (np.array([[0]]), np.array([[6, 0, 0]]))),
+    ("CC", (np.array([[0,1],[1,0]]), np.array([[6, 1, 1], [6, 1, 1]])))
+])
+def test_ligand_GraphFeaturizer(smiles, solution):
+    molecule = RDKitLigand.from_smiles(smiles)
+    rdmol = molecule.molecule
+    featurizer = GraphFeaturizer(rdmol)
+    graph = featurizer.featurize()
+    assert np.array_equal(graph[1], solution[1])
+    assert np.array_equal(graph[0], solution[0])
+
 
 
 ###

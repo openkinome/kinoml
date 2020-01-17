@@ -112,11 +112,12 @@ class GraphFeaturizer(_BaseFeaturizer):
         Fill featurized data with zeros until pad-length is met.
     """
 
-    N_FEATURES = 2
+    N_FEATURES = 3
 
     def __init__(self, molecule, pad_up_to=None, *args, **kwargs):
         super().__init__(molecule, *args, **kwargs)
         self.pad_up_to = pad_up_to
+        self.molecule = molecule
 
     def _featurize(self):
         """
@@ -125,35 +126,17 @@ class GraphFeaturizer(_BaseFeaturizer):
 
         Returns
         =======
-        np.array
-            Graph matrix, with shape (``self.pad_up_to``, ``self.N_FEATURES``)).
-
-        Notes
-        ======
-        Please refer to https://pytorch-geometric.readthedocs.io/en/latest/modules/nn.html
-        for the Pytorch implementation.
-        Please refer to https://arxiv.org/pdf/1609.02907.pdf for the original article.
+        tuple of 2 elements
+            - Adjacency matrix of the molecule with shape (N_atoms, N_atoms), where N_atoms is the number of atoms in the molecule
+            - Feature matrix with shape (N_atoms, ``self.N_FEATURES``)
         """
 
         from rdkit import Chem
-        from rdkit.Chem import AllChem
         from rdkit.Chem import rdmolops
-        from scipy.linalg import fractional_matrix_power
 
-        mol = self.molecule
+        per_atom_features = np.array([self._per_atom_features(atom) for atom in self.molecule.GetAtoms()])
 
-        self_adjacency_matrix = rdmolops.GetAdjacencyMatrix(mol) + np.identity(mol.GetNumAtoms())
-        per_atom_features = np.matrix([self._per_atom_features(atom) for atom in mol.GetAtoms()])
-        degree_matrix = np.matrix(np.diag([a.GetDegree() for a in mol.GetAtoms()]))
-        self_degree_matrix = np.matrix(np.diag([a.GetDegree() + 1 for a in mol.GetAtoms()]))
-        inv_self_degree_matrix = fractional_matrix_power(self_degree_matrix, -0.5)
-
-        out = inv_self_degree_matrix * self_adjacency_matrix * inv_self_degree_matrix * per_atom_features
-
-        if self.pad_up_to is not None:
-            out = np.pad(out, (0, self.pad_up_to - out.shape[0]))
-
-        return out
+        return (rdmolops.GetAdjacencyMatrix(self.molecule), per_atom_features)
 
     def _per_atom_features(self, atom):
         """
@@ -167,6 +150,6 @@ class GraphFeaturizer(_BaseFeaturizer):
         Returns
         =======
         tuple
-            Atomic number, number of neighbors
+            Atomic number, number of neighbors, valence
         """
-        return atom.GetAtomicNum(), atom.GetDegree()
+        return atom.GetAtomicNum(), atom.GetDegree(), atom.GetExplicitValence()

@@ -22,7 +22,7 @@ class HashFeaturizer(_BaseFeaturizer):
     ==========
     molecule : kinoml.core.protein
     normalize : bool, default=True
-        Normalizes the hash
+        Normalizes the hash to obtain a value in the unit interval
     """
 
     def __init__(self, molecule, normalize=True, *args, **kwargs):
