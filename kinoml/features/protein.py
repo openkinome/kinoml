@@ -128,7 +128,7 @@ class GraphSeqFeaturizer(_BaseFeaturizer):
         """
         Featurize the sequence of the protein as a graph:
         the adjacency matrix which is a tridiagonal matrix and per node feature, 
-        which is the one-hot encoding of the amino acids, using ``DICTIONARY``
+        which is the one-hot encoding of the amino acids, using ``DICTIONARY``.
         If ``self.pad_up_to`` is defined, the padded version will be returned.
 
         Returns
@@ -136,7 +136,7 @@ class GraphSeqFeaturizer(_BaseFeaturizer):
         tuple of 2 elements
             - Adjacency matrix of the amino acid sequence (N_amino_acid, N_amino_acid),
             where N_amino_acid is the number of amino acids.
-        - Feature matrix with shape (N_amino_acid, ``len(self.DICTIONARY)``)
+            - Feature matrix with shape (``len(self.DICTIONARY)``, N_amino_acid)
         """
 
         adjacency_matrix = np.diag([1]*(len(self.molecule.sequence)-1), 1) + np.diag([1]*(len(self.molecule.sequence)-1), -1)
