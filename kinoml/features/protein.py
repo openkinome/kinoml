@@ -109,3 +109,46 @@ class SequenceFeaturizer(_BaseFeaturizer):
             ((0,0), (0, self.pad_up_to-len(self.molecule.sequence))),
             mode='constant')
         return ohe_matrix
+
+
+class GraphSeqFeaturizer(_BaseFeaturizer):
+    """
+    Creates a graph representation of the sequence of the protein,
+    using the symbols in ``ALL_AMINOACIDS``.
+    """
+    
+    DICTIONARY = {c: i for i, c in enumerate(ALL_AMINOACIDS)}
+
+    def __init__(self, molecule, pad_up_to=None, *args, **kwargs):
+        super().__init__(molecule, *args, **kwargs)
+        self.molecule = molecule
+        self.pad_up_to = pad_up_to
+
+    def _featurize(self):
+        """
+        Featurize the sequence of the protein as a graph:
+        the adjacency matrix which is a tridiagonal matrix and per node feature, 
+        which is the one-hot encoding of the amino acids, using ``DICTIONARY``
+        If ``self.pad_up_to`` is defined, the padded version will be returned.
+
+        Returns
+        =======
+        tuple of 2 elements
+            - Adjacency matrix of the amino acid sequence (N_amino_acid, N_amino_acid),
+            where N_amino_acid is the number of amino acids.
+        - Feature matrix with shape (N_amino_acid, ``len(self.DICTIONARY)``)
+        """
+
+        adjacency_matrix = np.diag([1]*(len(self.molecule.sequence)-1), 1) + np.diag([1]*(len(self.molecule.sequence)-1), -1)
+        per_node_feature_matrix = one_hot_encode(self.molecule.sequence, self.DICTIONARY)
+
+        if self.pad_up_to is not None:
+            adjacency_matrix_pad = np.pad(adjacency_matrix,
+            ((0, self.pad_up_to - len(self.molecule.sequence)),
+            (0, self.pad_up_to - len(self.molecule.sequence))),
+            mode='constant')
+            per_node_feature_pad = np.pad(per_node_feature_matrix,
+            ((0, 0), (0,self.pad_up_to - len(self.molecule.sequence))),
+            mode='constant')
+            return (adjacency_matrix_pad, per_node_feature_pad)
+        return (adjacency_matrix, per_node_feature_matrix)
