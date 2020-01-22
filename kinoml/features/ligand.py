@@ -38,7 +38,7 @@ class MorganFingerprintFeaturizer(_BaseFeaturizer):
             with shape ``nbits``.
         """
         from rdkit.Chem.AllChem import GetMorganFingerprintAsBitVect
-        m = self.molecule
+        m = self.molecule.molecule
         if m is not None:
             return np.array(GetMorganFingerprintAsBitVect(m,
             radius=self.radius, nBits=self.nbits))

@@ -15,8 +15,7 @@ from kinoml.features.protein import HashFeaturizer, AminoAcidCompositionFeaturiz
 ])
 def test_ligand_MorganFingerprintFeaturizer(smiles, solution, radius=2, nbits=512):
     molecule = RDKitLigand.from_smiles(smiles)
-    rdmol = molecule.molecule
-    featurizer = MorganFingerprintFeaturizer(rdmol, radius=radius, nbits=nbits)
+    featurizer = MorganFingerprintFeaturizer(molecule, radius=radius, nbits=nbits)
     fingerprint = featurizer.featurize()
     assert (fingerprint == solution).all()
 

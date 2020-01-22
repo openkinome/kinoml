@@ -5,6 +5,7 @@ Implementation in Pytorch of some Deep Neural Networks
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+#from torch_geometric.nn import GCNConv
 
 class DNN(nn.Module):
     """
@@ -87,5 +88,26 @@ class CNN(nn.Module):
 
 
 class GCN(nn.Module):
+    """
+    Builds a Pytorch model (a Graph Convolutional Network) and a feed-forward pass
+
+    Returns
+    =======
+    model : a feed-forward pass of the GCN with activation functions
+    """
     pass
+
+#    def __init__(self):
+#        super(GCN, self).__init__()
+#        self.conv1 = GCNConv(N_nodes, 128)
+#        self.conv2 = GCNConv(265, 64)
+#        self.conv3 = GCNConv(128, 1)
+#
+#    def forward(self, data):
+#        x, edge_index = data.x, data.edge_index
+#
+#        x1 = F.relu(self.conv1(x, edge_index))
+#        x2 = F.relu(self.conv2(x1, edge_index))
+#        return torch.sigmoid(self.conv3(x2, edge_index))
+
 

@@ -1,18 +1,3 @@
-'''
-This script uses the pre-processed data file df_reduced.pkl that is generated from the ChEMBL22 data set.
-
-Type of target used: single-target (i.e. ligand-based model)
-Type of featurizer for the ligand: Morgan fingerprint
-Type of model: a Dense Neural Network (DNN) using Pytorch
-
-Please run in terminal the following command:
-$ export PYTHONPATH=$(dirname $(pwd))
-
-And check the PYTHONPATH with: 
-$ echo $PYTHONPATH
-
-'''
-
 # Imports
 import pandas as pd
 import numpy as np
@@ -24,18 +9,35 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 
-from ml.models_pytorch import DNN
-from features.ligand import MorganFingerprintFeaturizer
-
+from kinoml.ml.models_pytorch import DNN
+from kinoml.features.ligand import MorganFingerprintFeaturizer
+from kinoml.core.ligand import RDKitLigand
 import logging
-logging.basicConfig(level=logging.INFO, filename='parameters.log', filemode='w')
 
+def main(path_to_data, output_file=None):
+    """
+    This function uses the pre-processed data file df_reduced.pkl that is
+    generated from the ChEMBL22 data set.
 
-if __name__ == '__main__':
+    Type of target used: single-target (i.e. ligand-based model)
+    Type of featurizer for the ligand: Morgan fingerprint
+    Type of model: a Dense Neural Network (DNN) using Pytorch
+
+    Parameters
+    =========
+    path_to_data : str
+        The ChEMBL22 pre-processed data using a .pkl file.
+    output_file : str, optional=None
+        If not None, the results will be saved to this file.
+
+    Returns
+    =======
+    results_cv : pd.DataFrame
+        The columns representing the different chosen metrics
+    """
 
     # Load pre-processed data
-    p = Path(__file__).resolve()
-    data = pd.read_pickle(f'{p.parents[1]}/data/df_reduced.pkl')
+    data = pd.read_pickle(path_to_data)
 
     # Set threshold for activity
     c = 6.3
@@ -63,8 +65,8 @@ if __name__ == '__main__':
     # Loop over all kinases in the data set and obtain statistics
     for i,kinase in enumerate(data.columns[:(-2-k)]):
 
-        print('====================================================')
-        print(f'{K} Fold Cross Validation for kinase #{i+1} {kinase}')
+        logging.info('====================================================')
+        logging.info(f'{K} Fold Cross Validation for kinase #{i+1} {kinase}')
 
         df = data[[kinase, 'smi_can']]
 
@@ -72,10 +74,10 @@ if __name__ == '__main__':
         df_na = df.dropna()
         df_na.reset_index(drop=True, inplace=True)
 
-        print(f'Kinase {kinase} has {len(df_na)} measurements')
+        logging.info(f'Kinase {kinase} has {len(df_na)} measurements')
 
         # Define input: Transform canonical SMILES into morgan fingerprint
-        x = df_na['smi_can'].apply(lambda x: MorganFingerprintFeaturizer(x).featurize())
+        x = df_na['smi_can'].apply(lambda x: MorganFingerprintFeaturizer(RDKitLigand.from_smiles(x)).featurize())
         x = torch.tensor(x).type(torch.FloatTensor)
 
         # Convert data to binary values at threshold c
@@ -91,9 +93,9 @@ if __name__ == '__main__':
         y = torch.from_numpy(np.asarray(y)).type(torch.FloatTensor)
 
         if x.shape[0] != y.shape[0]:
-            print('Shape of input and target differ')
+            logging.info('Shape of input and target differ')
         else:
-            print(f'Shape of input: {x.shape} and output: {y.shape} .')
+            logging.info(f'Shape of input: {x.shape} and output: {y.shape} .')
 
         # Metric per fold (K values)
         acc_per_fold = []
@@ -103,29 +105,29 @@ if __name__ == '__main__':
         kfold = KFold(n_splits=K, random_state=seed_cv)
         for j, (train_index, test_index) in enumerate(kfold.split(x, y)):
 
-            print(f'Fold {j}')
+            logging.info(f'Fold {j}')
 
             x_train, x_test = x[train_index], x[test_index]
             y_train, y_test = y[train_index], y[test_index]
 
-            print('---Train')
+            logging.info('---Train')
 
             for epoch in range(nb_epoch):
-                
+
                 # Clear the previous gradients
                 optimizer.zero_grad()
-                
+
                 # Feedforward pass
                 outputs_train = torch.squeeze(model(x_train)) # Use torch.squeeze to remove axis with 1 dimension
-                
+
                 if outputs_train.shape != y_train.shape:
-                    print('The shape of the true value of the target differs..'
+                    logging.info('The shape of the true value of the target differs..'
                           '..from the shape of the value predicted by the model.')
                 if torch.min(outputs_train)<0 or torch.max(outputs_train)>1:
-                    print('The predicted values are out of range.')
-                    
+                    logging.info('The predicted values are out of range.')
+
                 if all(outputs_train[0] == elem for elem in outputs_train):
-                    print(f'The model predicts all values at {outputs_train[0]} .')
+                    logging.info(f'The model predicts all values at {outputs_train[0]} .')
 
                 loss = criterion(outputs_train, y_train)
                 loss.backward()
@@ -137,7 +139,7 @@ if __name__ == '__main__':
             #model = DNN()
             #model.load_state_dict(torch.load(f'{p.parents[0]}/model_weights.pth'))
 
-            print('---Predict')
+            logging.info('---Predict')
             # Test trained model on the test set
             outputs_test = torch.squeeze(model(x_test))
 
@@ -146,36 +148,36 @@ if __name__ == '__main__':
             y_test = y_test.detach().numpy()
 
             # Transform probability of belonging to one class into 0 or 1 value at threshold 0.5
-            y_pred = y_pred>0.5 
+            y_pred = y_pred>0.5
 
             if(all(y_pred[0] == elem for elem in y_pred)):
-                print(f'The model predicts all values at {y_pred[0]}')
+                logging.info(f'The model predicts all values at {y_pred[0]}')
 
-            print(f'# of elements on the test set: {len(y_test)}, # zero counts on the test set: {(y_test==0).sum()} ')
+            logging.info(f'# of elements on the test set: {len(y_test)}, # zero counts on the test set: {(y_test==0).sum()} ')
 
             # Metrics on each fold
             acc_per_fold.append(accuracy_score(y_test, y_pred))
             conf_matrix_per_fold.append(confusion_matrix(y_test, y_pred).ravel())
-            
 
-        # Mean on all K folds 
+
+        # Mean on all K folds
         acc_mean = np.mean(acc_per_fold)
         conf_matrix_mean = np.mean(np.array(conf_matrix_per_fold), axis=0)
-        
+
         # Std on all K folds
         acc_std = np.std(acc_per_fold)
         conf_matrix_std = np.std(np.array(conf_matrix_per_fold), axis=0)
 
-        print(f' Metrics of CV for kinase {kinase} ')
-        print(f' Accuracy : Mean : {acc_mean:.2f} and std : {acc_std:.2f} ')
-        print(f' TN : Mean : {conf_matrix_mean[0]:.2f} and std : {conf_matrix_std[0]:.2f} ')
-        print(f' FP : Mean : {conf_matrix_mean[1]:.2f} and std : {conf_matrix_std[1]:.2f} ')
-        print(f' FN : Mean : {conf_matrix_mean[2]:.2f} and std : {conf_matrix_std[2]:.2f} ')
-        print(f' TP : Mean : {conf_matrix_mean[3]:.2f} and std : {conf_matrix_std[3]:.2f} ')
+        logging.info(f' Metrics of CV for kinase {kinase} ')
+        logging.info(f' Accuracy : Mean : {acc_mean:.2f} and std : {acc_std:.2f} ')
+        logging.info(f' TN : Mean : {conf_matrix_mean[0]:.2f} and std : {conf_matrix_std[0]:.2f} ')
+        logging.info(f' FP : Mean : {conf_matrix_mean[1]:.2f} and std : {conf_matrix_std[1]:.2f} ')
+        logging.info(f' FN : Mean : {conf_matrix_mean[2]:.2f} and std : {conf_matrix_std[2]:.2f} ')
+        logging.info(f' TP : Mean : {conf_matrix_mean[3]:.2f} and std : {conf_matrix_std[3]:.2f} ')
 
         # Zero Counts per kinase
         zero_count = (y==0).sum()
-        print(f' Total nb: {len(y)} and nb of zero counts : {zero_count}')
+        logging.info(f' Total nb: {len(y)} and nb of zero counts : {zero_count}')
         zero_count_per_kinase.append(zero_count)
 
         acc_mean_per_kinase.append(acc_mean)
@@ -190,4 +192,13 @@ if __name__ == '__main__':
                                 zero_count_per_kinase])
     results_cv.columns = [data.columns[:(-2-k)]]
     results_cv.index = ['Acc Mean', 'Acc Std', 'Conf Mean', 'Conf Std', 'Zero Count']
-    results_cv = results_cv.to_pickle('DNN_results_cv.pkl')
+    if output_file is not None:
+        results_cv.to_pickle(output_file)
+    return results_cv
+
+if __name__ == '__main__':
+    logging.basicConfig(level=logging.INFO, filename='parameters.log', filemode='w')
+
+    # Load pre-processed data
+    p = Path(__file__).resolve()
+    main(f'{p.parents[1]}/data/df_reduced.pkl', output_file='DNN_results_cv.pkl')
