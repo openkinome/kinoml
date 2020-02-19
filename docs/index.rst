@@ -11,6 +11,7 @@ Welcome to KinoML's documentation!
    :caption: Contents:
 
    getting_started
+   terminology
    api
 
 
