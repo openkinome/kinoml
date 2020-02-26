@@ -13,16 +13,16 @@ This object is responsible for:
 
 The process of going from chemical-like information to numerical information is called `featurization`, and is performed by `featurizers`. Most featurizers will work in a one-by-one basis: they only need one input to provide the output. Some, however, could need contextual information from the dataset to perform that operation (averaging measurements, caching already existing structures, etc). As a result, they all can take an additional optional keyword argument holding the whole dataset.
 
-```
-def featurizer(data_point_to_featurize, dataset=None):
-    pass
+.. code-block:: python
 
-```
+    def featurizer(data_point_to_featurize, dataset=None):
+        pass
 
 
-```
-Chemical data -------[featurization]----> Numerical n-dimensional arrays ---> Framework-native object
-```
+.. code-block::
+    
+    Chemical data -------[featurization]----> Numerical n-dimensional arrays ---> Framework-native object
+
 
 In this step, we might also perform filtering: discard non-desired/compatible data points. This is done with `Filter` objects. Filtering alters the shape of the data because it will always remove data points following some criterion.
 
