@@ -74,7 +74,7 @@ class Kinase(Protein):
 
     """
     Extends ``Protein`` to provide kinase-specific methods of
-    instanciation.    
+    instantiation.    
     """
 
     @classmethod
@@ -116,6 +116,7 @@ class Biosequence(str):
     def from_accession(cls, *accession):
         """
         Get FASTA sequence from an online accession identifier
+        
         Parameters
         ----------
         accession : str

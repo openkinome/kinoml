@@ -24,6 +24,18 @@ class KINOMEScanDatasetProvider(BaseDatasetProvider):
         df = pd.read_csv(filename)
 
         # Goal 1: obtain chemical_data (list of MolecularSystem)
+        kinases = ...  # generator? sequences -> Kinase
+        ligands = ...  # smiles -> Ligand
+
+        measurements = []
+        conditions = AssayConditions(...)
+        for kinase, ligand in product(kinases, ligands):
+            protein_ligand_complex = self._get_complex(kinase, ligand)
+            measurement = DiscoverXMeasurement(
+                df[kinase, ligand], protein_ligand_complex, conditions=conditions
+            )  # conditions might be provided by this subclass already
+            measurement.conditions = conditions
+            protein_ligand_complex.measurement = measurement
 
         # Goal 2: obtain clean measurements
 

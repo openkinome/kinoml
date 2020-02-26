@@ -3,7 +3,7 @@ from .ligand import Ligand
 from .measurements import Measured
 
 
-class MolecularSystem:
+class Complex:
 
     """
     
@@ -25,11 +25,13 @@ class MolecularSystem:
             if isinstance(component, Protein):
                 yield component
 
-    def is_complex(self):
-        return len(self.ligand) == 1 and len(self.protein) == 1
+    def sanity_check(self):  # this is a requirement
+        return len(self.ligand) >= 1 and len(self.protein) >= 1
+    
+    def dock()
 
 
-class MeasuredMolecularSystem(MolecularSystem, Measured):
+class MeasuredComplex(Complex, Measured):
 
     """
     
@@ -39,3 +41,5 @@ class MeasuredMolecularSystem(MolecularSystem, Measured):
         super().__init__(*args, **kwargs)
         assert hasattr(self, "components")
         assert hasattr(self, "measure")
+
+

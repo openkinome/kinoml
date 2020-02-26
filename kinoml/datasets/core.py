@@ -35,8 +35,8 @@ class BaseDatasetProvider(abc.ABC):
             measurements[:] = np.NaN
         self._measurements = np.reshape(measurements, (len(self.data), -1))
         self.data = [
-            MeasuredMolecularSystem(system, measure)
-            for system, measure in zip(self._data, self._measurements)
+            MeasuredMolecularSystem(system, measurement)
+            for system, measurement in zip(self._data, self._measurements)
         ]
         self.featurizers = featurizers
 
@@ -80,10 +80,10 @@ class BaseDatasetProvider(abc.ABC):
         --------
         
         >>> provider = DatasetProvider()
-        >>> provider.featurize()
+        >>> provider.featurize()  # optional
         >>> splitter = TimeSplitter()
         >>> split_indices = splitter.split(provider.data)
-        >>> dataset = provider.to_dataset("pytorch")
+        >>> dataset = provider.to_dataset("pytorch")  # .featurize() under the hood
         >>> X_train, X_test, y_train, y_test = train_test_split(dataset, split_indices)
         
         
