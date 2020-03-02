@@ -1,5 +1,5 @@
 mkdocs==1.0.4
-mkautodoc==0.7.1
+mkdocstrings==0.7.1
 mkdocs-material
 mkdocs-minify-plugin
 pymdown-extensions
