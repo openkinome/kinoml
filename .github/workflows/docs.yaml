@@ -1,4 +1,4 @@
-name: Mkdocs on GitHub Pages
+name: MkDocs
 
 on:
   push:
@@ -12,19 +12,18 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Setup Python
-        uses: actions/setup-python@v1
-        with:
-          python-version: '3.6'
-          architecture: 'x64'
-
-      - name: Install dependencies
+      - name: Create environment for package
+        shell: bash
         run: |
-          python3 -m pip install --upgrade pip
-          python3 -m pip install -r docs/requirements.txt
-          python3 -m pip install -e .
+          . devtools/scripts/initialize_conda.sh
+          python devtools/scripts/create_conda_env.py -n=docs -p=3.7 devtools/conda-envs/test_env.yaml
+          python -m pip install . --no-deps
 
-      - run: mkdocs build
+      - name: Build docs
+        shell: bash
+        run: |
+          . devtools/scripts/initialize_conda.sh
+          mkdocs build
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
