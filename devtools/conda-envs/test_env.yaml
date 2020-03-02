@@ -1,16 +1,19 @@
 name: test
 channels:
 dependencies:
-    # Base depends
+  # Base depends
   - python
   - pip
 
-    # Testing
+  # Testing
   - pytest
   - pytest-cov
   - codecov
 
-    # Pip-only installs
-  #- pip:
-  #  - codecov
-
+  # Docs
+  - pip:
+    - mkdocs==1.0.4
+    - mkautodoc==0.7.1
+    - mkdocs-material
+    - mkdocs-minify-plugin
+    - pymdown-extensions
