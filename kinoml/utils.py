@@ -1,7 +1,11 @@
 from pathlib import Path
 from itertools import zip_longest
+from collections import defaultdict
 
-_HERE = Path(__file__).parent
+from appdirs import AppDirs
+
+APPDIR = AppDirs(appname="kinoml", appauthor="openkinome")
+PACKAGE_ROOT = Path(__file__).parent
 
 
 class FromDistpatcherMixin:
@@ -20,6 +24,7 @@ class FromDistpatcherMixin:
 def datapath(path):
     """
     Return absolute path to a file contained in this package's ``data``.
+
     Parameters
     ----------
     path : str
@@ -29,7 +34,7 @@ def datapath(path):
     str
         Absolute path
     """
-    return _HERE / "data" / path
+    return PACKAGE_ROOT / "data" / path
 
 
 def grouper(iterable, n, fillvalue=None):
@@ -39,3 +44,18 @@ def grouper(iterable, n, fillvalue=None):
     """
     args = [iter(iterable)] * n
     return zip_longest(*args, fillvalue=fillvalue)
+
+
+class defaultdictwithargs(defaultdict):
+    """
+    A defaultdict that will create new values based on the missing value
+    """
+
+    def __init__(self, call):
+        super().__init__(None)  # base class doesn't get a factory
+        self.call = call
+
+    def __missing__(self, key):  # called when key not in dict
+        result = self.call(key)
+        self[key] = result
+        return result

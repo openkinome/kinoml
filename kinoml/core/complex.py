@@ -6,7 +6,7 @@ from .measurements import Measured
 class Complex:
 
     """
-    
+
     """
 
     def __init__(self, components, *args, **kwargs):
@@ -27,19 +27,19 @@ class Complex:
 
     def sanity_check(self):  # this is a requirement
         return len(self.ligand) >= 1 and len(self.protein) >= 1
-    
-    def dock()
+
+    def dock():
+        pass
 
 
 class MeasuredComplex(Complex, Measured):
 
     """
-    
+
     """
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         assert hasattr(self, "components")
         assert hasattr(self, "measure")
-
 

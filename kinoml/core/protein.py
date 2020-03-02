@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 class Protein(Structure, FromDistpatcherMixin):
     """
-    
+
     """
 
     def __init__(self, name=None):
@@ -74,7 +74,7 @@ class Kinase(Protein):
 
     """
     Extends ``Protein`` to provide kinase-specific methods of
-    instantiation.    
+    instantiation.
     """
 
     @classmethod
@@ -103,20 +103,26 @@ class Biosequence(str):
     _ACCESSION_URL = None
     ACCESSION_MAX_RETRIEVAL = 50
 
-    def __new__(cls, value, header="", *args, **kwargs):
-        if not all(c in cls.ALPHABET for c in value):
+    def __new__(cls, value, header="", _provenance=None, *args, **kwargs):
+        diff = set(value).difference(cls.ALPHABET)
+        if diff:
             raise ValueError(
-                f"Biosequence can only contain characters in {cls.ALPHABET}"
+                f"Biosequence can only contain characters in {cls.ALPHABET}, "
+                f"but found these extra ones: {diff}."
             )
         s = super().__new__(cls, value, *args, **kwargs)
         s.header = header
+        s._provenance = {}
+        # TODO: We might override some provenance data with this blind update
+        if _provenance is not None:
+            s._provenance.update(_provenance)
         return s
 
     @classmethod
-    def from_accession(cls, *accession):
+    def from_accession(cls, *accessions):
         """
         Get FASTA sequence from an online accession identifier
-        
+
         Parameters
         ----------
         accession : str
@@ -127,11 +133,11 @@ class Biosequence(str):
         """
         if cls._ACCESSION_URL is None:
             raise NotImplementedError
-        if len(accession) > cls.ACCESSION_MAX_RETRIEVAL:
+        if len(accessions) > cls.ACCESSION_MAX_RETRIEVAL:
             raise ValueError(
                 f"You can only provide {cls.ACCESSION_MAX_RETRIEVAL} accessions at the same time."
             )
-        r = requests.get(cls._ACCESSION_URL.format(",".join(accession)))
+        r = requests.get(cls._ACCESSION_URL.format(",".join(accessions)))
         r.raise_for_status()
         sequences = []
         for line in r.text.splitlines():
@@ -144,9 +150,16 @@ class Biosequence(str):
                 sequences[-1]["sequence"].append(line)
         if not sequences:
             return
-        objects = [cls("".join(s["sequence"]), header=s["header"]) for s in sequences]
+        objects = []
+        for sequence, accession in zip(sequences, accessions):
+            obj = cls(
+                "".join(sequence["sequence"]),
+                header=sequence["header"],
+                _provenance={"accession": accession},
+            )
+            objects.append(obj)
         if not objects:
-            return
+            return None
         if len(objects) == 1:
             return objects[0]
         return objects
@@ -186,6 +199,7 @@ class Biosequence(str):
         return self.__class__(
             self[start_pos - 1 : stop_pos],
             header=f"{self.header}{ ' | ' if self.header else '' }Cut: {start}/{stop}",
+            _provenance={"cut": (start, stop)},
         )
 
     def mutate(self, *mutations, raise_errors=True):
@@ -235,6 +249,7 @@ class Biosequence(str):
             operation = getattr(mutated, f"_mutate_with_{mutation_types[mutation]}")
             mutated = operation(mutation)
         mutated.header += f" (mutations: {', '.join(mutations)})"
+        mutated._provenance.update({"mutations": mutations})
         return mutated
 
     @staticmethod
