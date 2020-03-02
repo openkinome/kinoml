@@ -16,6 +16,7 @@ jobs:
         shell: bash
         run: |
           . devtools/scripts/initialize_conda.sh
+          conda activate
           python devtools/scripts/create_conda_env.py -n=docs -p=3.7 devtools/conda-envs/test_env.yaml
           python -m pip install . --no-deps
 
@@ -23,6 +24,7 @@ jobs:
         shell: bash
         run: |
           . devtools/scripts/initialize_conda.sh
+          conda activate docs
           mkdocs build
 
       - name: Deploy
