@@ -5,7 +5,6 @@ on:
     branches:
       - master
       - mkdocs
-  pull_request:
 
 jobs:
   deploy:

@@ -20,9 +20,7 @@ markdown_extensions:
 plugins:
   - search
   - minify
-  - mkdocstrings:
-      watch:
-        - kinoml
+  - mkdocstrings
 
 # Edit below for the menus
 nav:
