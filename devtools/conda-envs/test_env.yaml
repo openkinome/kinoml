@@ -17,4 +17,5 @@ dependencies:
     - https://github.com/pawamoy/mkdocstrings/archive/8e8d604ba95363c140841c84535d2350d7ebbfe3.zip
     - mkdocs-material
     - mkdocs-minify-plugin
+    - mkdocs-git-revision-date-localized-plugin
     - pymdown-extensions

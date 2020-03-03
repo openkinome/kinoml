@@ -1,17 +1,15 @@
-# Welcome to MkDocs
+# KinoML
 
-For full documentation visit [mkdocs.org](https://www.mkdocs.org).
+Structure-informed machine learning for kinase modeling
 
-## Commands
+<!-- The following block is possible thanks to the admonitions plugin -->
+<!-- https://squidfunk.github.io/mkdocs-material/extensions/admonition/ -->
+!!! warning
 
-* `mkdocs new [dir-name]` - Create a new project.
-* `mkdocs serve` - Start the live-reloading docs server.
-* `mkdocs build` - Build the documentation site.
-* `mkdocs -h` - Print help message and exit.
+    This is module is undergoing heavy development. None of the API calls are final. This software is provided without any guarantees of correctness, you will likely encounter bugs.
 
-## Project layout
+    If you are interested in this code, please wait for the official release to use it. In the mean time, to stay informed of development progress you are encouraged to:
 
-    mkdocs.yml    # The configuration file.
-    docs/
-        index.md  # The documentation homepage.
-        ...       # Other markdown pages, images and other files.
+    * Subscribe for new releases (use `Watch> Releases only` on GitHub)
+    * Check out the [Github repository](https://github.com/openkinome/kinoml).
+

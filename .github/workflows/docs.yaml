@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      # TODO: Remove before PR merge
       - mkdocs
 
 jobs:

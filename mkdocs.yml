@@ -4,26 +4,53 @@ site_url: https://openkinome.github.io/kinoml
 repo_url: https://github.com/openkinome/kinoml
 repo_name: openkinome/kinoml
 
+# Edit below for the menus
+nav:
+  - Home: index.md
+  - Getting started: getting_started.md
+  - Developers:
+    - Writing docs: howtodocs.md
+    - API Reference: api.md
+
+
+# Do not modify below this line unless you _know_ what you are doing
 theme:
   name: "material"
 
 extra_css:
   - css/custom.css
 
+extra_javascript:
+  - 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML'
 
 markdown_extensions:
   - admonition
   - codehilite:
       guess_lang: false
+  - footnotes
+  - toc:
+      permalink: true
+  - pymdownx.arithmatex
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.critic
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:pymdownx.emoji.twemoji
+      emoji_generator: !!python/name:pymdownx.emoji.to_svg
+  - pymdownx.inlinehilite
+  - pymdownx.magiclink
+  - pymdownx.mark
+  - pymdownx.smartsymbols
   - pymdownx.superfences
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
 
 plugins:
   - search
-  - minify
+  - git-revision-date-localized
+  - minify:
+      minify_html: true
   - mkdocstrings
-
-# Edit below for the menus
-nav:
-  - Home: index.md
-  - Getting started: getting_started.md
-  - Reference: api.md
