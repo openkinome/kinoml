@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - master
+      # TODO: Remove api before merging to master
+      - api
 
 jobs:
   deploy:
