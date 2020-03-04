@@ -27,6 +27,8 @@ jobs:
         run: |
           . devtools/scripts/initialize_conda.sh
           conda activate docs
+          # Required to load docstrings sample module inside docs/
+          export PYTHONPATH=$(pwd)
           mkdocs build
 
       - name: Deploy
