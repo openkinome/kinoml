@@ -1,39 +1,38 @@
-# Welcome to mkdocs
+# How to write docs with mkdocs
 
 For full documentation visit [mkdocs.org](https://www.mkdocs.org).
 
-## Commands
+## Basics
 
-* `mkdocs new [dir-name]` - Create a new project.
-* `mkdocs serve` - Start the live-reloading docs server.
-* `mkdocs build` - Build the documentation site.
-* `mkdocs -h` - Print help message and exit.
+* `mkdocs serve` - Start the live-reloading docs server locally
 
-## Project layout
+Project layout:
 
     mkdocs.yml    # The configuration file.
     docs/
         index.md  # The documentation homepage.
         ...       # Other markdown pages, images and other files.
 
-##  How to write docs with mkdocs
-
 `MkDocs` are markdown documents, so the answer is easy: just use plain Markdown and, optionally, the supported extensions. More info [in the official docs](https://www.mkdocs.org/user-guide/writing-your-docs/#writing-with-markdown).
+
+### Supported extensions
 
 The theme we are using is `material`, which supports very fancy [extensions](https://squidfunk.github.io/mkdocs-material/extensions/admonition/).
 
-For example, `admonitions` like this block:
+
+#### Admonitions
+
 
 !!! tip
     This is so cool huh? Check all styles [here](https://squidfunk.github.io/mkdocs-material/extensions/admonition/#types).
 
-```
+```md
 !!! tip
     This is so cool huh? Check all styles [here](https://squidfunk.github.io/mkdocs-material/extensions/admonition/#types).
 
 ```
 
-Or citations:
+#### Citations
 
 > This is a very important finding.[^1]
 
@@ -45,7 +44,7 @@ Or citations:
 
 These are written with labels like this:
 
-```
+```md
 > This is a very important finding.[^1]
 
 > This is yet another finding.[^Rodríguez-Guerra and Pedregal, 1990]
@@ -54,6 +53,111 @@ These are written with labels like this:
 
 [^Rodríguez-Guerra and Pedregal, 1990]: A kid named Jaime.
 ```
+
+#### LaTeX
+
+Either in blocks
+
+$$
+\frac{n!}{k!(n-k)!} = \binom{n}{k} * Jaime
+$$
+
+```latex
+$$
+\frac{n!}{k!(n-k)!} = \binom{n}{k} * Jaime
+$$
+```
+
+or inline:
+
+> This my best equation ever: $p(x|y) = \frac{p(y|x)p(x)}{p(y)}$
+
+```latex
+This my best equation ever: $p(x|y) = \frac{p(y|x)p(x)}{p(y)}$
+```
+
+#### Checkboxes
+
+- [ ] Checkbox
+- [X] Checkbox
+
+```
+- [ ] Checkbox
+- [X] Checkbox
+```
+
+#### Emoji
+
+Github shortcuts are supported:
+
+:smile: :heart: :thumbsup:
+
+```
+:smile: :heart: :thumbsup:
+```
+
+#### Tabbed fences
+
+``` tab="Step 1"
+
+This is the step 1
+```
+
+```python tab="Step 2"
+
+# This is the step 2 with python code highlighting
+he = Element("Helium")
+```
+
+``` tab="Step 3"
+
+This is the step 3
+```
+
+This line interrupts the fences and creates a new block of tabs
+
+```python tab="Step 4"
+
+# This is the step 4 with python code highlighting
+be = Element("Beryllium")
+```
+
+Obtained with:
+
+    ``` tab="Step 1"
+
+    This is the step 1
+    ```
+
+    ```python tab="Step 2"
+
+    # This is the step 2 with python code highlighting
+    he = Element("Helium")
+    ```
+
+    ``` tab="Step 3"
+
+    This is the step 3
+    ```
+
+    This line interrupts the fences and creates a new block of tabs
+
+    ```python tab="Step 4"
+
+    # This is the step 4 with python code highlighting
+    be = Element("Beryllium")
+    ```
+
+#### Extra inline markup
+
+| Code      | Result  |
+|-----------|---------|
+| `==hey==` | ==hey== |
+| `~~hey~~` | ~~hey~~ |
+| `^^hey^^` | ^^hey^^ |
+| `a^migo^` | a^migo^ |
+| `-->`     | -->     |
+
 
 ### Docstrings
 
@@ -107,48 +211,26 @@ We are using [`mkdocstrings`](https://pawamoy.github.io/mkdocstrings/) for our d
         - `Return` or `Returns` for return value.
 
         They are all case-insensitive, so you can write `RETURNS:` or `params:`.
-    """
-
-### More docstring examples
-
-More examples, with and without types:
-
-```python
-def function(arg1, kwarg=None):
-    """
-    Example function
-
-    Parameters:
-        arg1 (dict): Some description for this argument.
-            This type (in parenthesis) is ignored.
-        kwarg: Some more descriptions
-
-    Returns:
-        A description for the returned value
 
     __Examples__
 
-    The triple quotes below should be backticks (`)
-    '''python
-    2 + 2 == 4
-    # True
-    '''
+    Experimental support. You need code fences and an extra blank line at the end
+    so they can be highlighted _and_ recognized by `pytest`.
+    Check https://github.com/pawamoy/mkdocstrings/issues/52 for updates.
+
+        ```python
+        >>> 2 + 2 == 4
+        True
+
+        ```
+
     """
-    pass
 
 
-def function_with_types(
-    arg1: dict, kwarg: "type hints can be whatever" = None
-) -> tuple:
-    """
-    Example function. Types will be inferred from type hints!
+## Real docstring examples
 
-    Parameters:
-        arg1: Yeah
-        kwarg: None
+Check [docs._docstrings_example][] and its source code below.
 
-    Returns:
-        Something
-    """
-    pass
-```
+***
+
+::: docs._docstrings_example

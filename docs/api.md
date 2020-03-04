@@ -1,5 +1,3 @@
-# API documentation
+# API reference
 
-<!-- Examples: mkdocstrings requires paths to MODULES -->
-
-::: kinoml.__init__
+Work in progress.

@@ -9,8 +9,8 @@ nav:
   - Home: index.md
   - Getting started: getting_started.md
   - Developers:
-    - Writing docs: howtodocs.md
     - API Reference: api.md
+    - How to write docs: howtodocs.md
 
 
 # Do not modify below this line unless you _know_ what you are doing
@@ -51,6 +51,8 @@ markdown_extensions:
 plugins:
   - search
   - git-revision-date-localized
-  - minify:
-      minify_html: true
-  - mkdocstrings
+  # - minify:
+  #     minify_html: true
+  - mkdocstrings:
+      watch:
+        - kinoml
