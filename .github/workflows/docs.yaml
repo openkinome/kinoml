@@ -5,7 +5,7 @@ on:
   - pull_request
 
 jobs:
-  deploy:
+  mkdocs:
     runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v2
@@ -35,4 +35,5 @@ jobs:
           publish_dir: ./site
         # We want to test docs building in PR, but we we
         # will only deploy if we are on / have merged to master
-        if: github.ref == 'master'
+        # Whitelist api for PR #8
+        if: github.ref == 'master' || github.head_ref == 'api'
