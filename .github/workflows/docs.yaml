@@ -1,11 +1,8 @@
 name: Docs
 
 on:
-  push:
-    branches:
-      - master
-      # TODO: Remove api before merging to master
-      - api
+  - push
+  - pull_request
 
 jobs:
   deploy:
@@ -36,3 +33,6 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./site
+        # We want to test docs building in PR, but we we
+        # will only deploy if we are on master
+        if: github.ref == 'master'
