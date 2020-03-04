@@ -51,8 +51,8 @@ markdown_extensions:
 plugins:
   - search
   - git-revision-date-localized
-  # - minify:
-  #     minify_html: true
+  - minify:
+      minify_html: true
   - mkdocstrings:
       watch:
         - kinoml
