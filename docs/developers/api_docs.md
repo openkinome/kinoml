@@ -229,8 +229,10 @@ We are using [`mkdocstrings`](https://pawamoy.github.io/mkdocstrings/) for our d
 
 ## Real docstring examples
 
-Check [docs._docstrings_example][] and its source code below.
+<!-- This reference only works because we are manually adding PYTHONPATH in GH Actions -->
+
+Check [docs.developers._docstrings_example][] and its source code below.
 
 ***
 
-::: docs._docstrings_example
+::: docs.developers._docstrings_example

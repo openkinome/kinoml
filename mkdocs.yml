@@ -13,8 +13,8 @@ nav:
   - Tutorials:
     - Example 1: tutorials/example.md
   - Development guide:
-    - Base concepts: api_concepts.md
-    - How to write docs: api_docs.md
+    - Base concepts: developers/api_concepts.md
+    - How to write docs: developers/api_docs.md
   - API Reference:
       - kinoml: api/__init__.md
       - analysis: api/analysis/__init__.md
