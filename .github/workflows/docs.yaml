@@ -1,11 +1,9 @@
-name: docs
+name: Docs
 
 on:
   push:
     branches:
       - master
-      # TODO: Remove before PR merge
-      - mkdocs
 
 jobs:
   deploy:
