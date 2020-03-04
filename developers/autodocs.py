@@ -5,7 +5,10 @@ from collections import defaultdict
 import yaml
 
 """
-Execute from repository root
+Create stubs for all API reference *.md files
+and propose a menu tree (you probably need to edit it to your liking)
+
+Redefine docs and package below and execute from repository root
 """
 
 docs = "apidocs"
