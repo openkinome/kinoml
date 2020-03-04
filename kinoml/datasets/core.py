@@ -12,16 +12,15 @@ class BaseDatasetProvider:
     """
     Base object for all Dataset classes
 
-    Parameters
-    ----------
-    chemical_data : list of kinoml.core.MolecularSystem-like
-    measurements : array-like of shape (len(chemical_data), N)
-        We will reshape it for you if you provide shape=(len(chemical_data),)
-    featurizers : list of kinoml.features.BaseFeaturizer-like
+    Parameters:
+        chemical_data: list of kinoml.core.MolecularSystem-like
+        measurements: array-like of shape (len(chemical_data), N)
+            We will reshape it for you if you provide shape=(len(chemical_data),)
+        featurizers: list of kinoml.features.BaseFeaturizer-like
 
-    Attributes
-    ----------
-    data : list of kinoml.core.MeasuredMolecularSystem-like
+    __Attributes__
+
+    - `data`: list of kinoml.core.MeasuredMolecularSystem-like
     """
 
     _raw_data = None
@@ -65,23 +64,21 @@ class BaseDatasetProvider:
         Generate a clean <style>.data.Dataset object for further steps
         in the pipeline (model building, etc).
 
-        Notes
-        -----
-        This step is lossy because the resulting objects will no longer
-        hold chemical data. Operations depending on such information,
-        must be performed first.
+        !!! Note
+            This step is lossy because the resulting objects will no longer
+            hold chemical data. Operations depending on such information,
+            must be performed first.
 
-        Examples
-        --------
+        __Examples__
 
+        ```python
         >>> provider = DatasetProvider()
         >>> provider.featurize()  # optional
         >>> splitter = TimeSplitter()
         >>> split_indices = splitter.split(provider.data)
         >>> dataset = provider.to_dataset("pytorch")  # .featurize() under the hood
         >>> X_train, X_test, y_train, y_test = train_test_split(dataset, split_indices)
-
-
+        ```
         """
         raise NotImplementedError
 

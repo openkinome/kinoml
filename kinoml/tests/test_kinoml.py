@@ -7,6 +7,9 @@ import kinoml
 import pytest
 import sys
 
+
 def test_kinoml_imported():
-    """Sample test, will always pass so long as import statement worked"""
+    """
+    Sample test, will always pass so long as import statement worked
+    """
     assert "kinoml" in sys.modules

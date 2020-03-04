@@ -1,21 +1,28 @@
+from typing import Union, Iterable, Any
+
+from .conditions import AssayConditions
+
+
 class BaseMeasurement:
     """
-    We will have several subclasses depending on the experiment
+    We will have several subclasses depending on the experiment.
     They will also provide loss functions tailored to it.
 
-    Parameters
-    ----------
-    value : float, int, or any other numeric representation
-        Not necessarily scalar! Some experiments can have more than
-        one replicate.
-    conditions : kinoml.core.conditions.AssayConditions-like
-    components : list of kinoml.core.{protein,ligand,complex} objects
-        The molecular entities measured
+    Parameters:
+        value: The numeric measurement(s)
+        conditions: Experimental conditions of this measurement
+        components: Molecular entities measured
 
     TODO: Investigate possible uses for `pint`
     """
 
-    def __init__(self, value, conditions, components, **kwargs):
+    def __init__(
+        self,
+        value: Union[float, Iterable[Union[float]]],
+        conditions: AssayConditions,
+        components: Iterable[Any],
+        **kwargs,
+    ):
         self.value = value
         self.conditions = conditions
         self.components = components

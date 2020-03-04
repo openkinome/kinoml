@@ -1,8 +1,8 @@
-Terminology
-===========
+# Base concepts in our API
 
-DatasetProvider
----------------
+
+## DatasetProvider
+
 
 This object is responsible for:
 
@@ -13,26 +13,22 @@ This object is responsible for:
 
 The process of going from chemical-like information to numerical information is called `featurization`, and is performed by `featurizers`. Most featurizers will work in a one-by-one basis: they only need one input to provide the output. Some, however, could need contextual information from the dataset to perform that operation (averaging measurements, caching already existing structures, etc). As a result, they all can take an additional optional keyword argument holding the whole dataset.
 
-.. code-block:: python
+```python
+def featurizer(data_point_to_featurize, dataset=None):
+    pass
+```
 
-    def featurizer(data_point_to_featurize, dataset=None):
-        pass
-
-
-.. code-block::
-    
     Chemical data -------[featurization]----> Numerical n-dimensional arrays ---> Framework-native object
 
 
 In this step, we might also perform filtering: discard non-desired/compatible data points. This is done with `Filter` objects. Filtering alters the shape of the data because it will always remove data points following some criterion.
 
-Dataset
--------
+## Dataset
+
 
 This object contains numerical data only. They can be post-processed with `Transformer` objects native to the framework in use.
 
-MolecularSystem
----------------
+## MolecularSystem
 
 This object is central to DatasetProvider, because it describes the object model that will hold all the chemical information we can infer from the raw data.
 

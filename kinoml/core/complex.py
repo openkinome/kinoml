@@ -6,7 +6,7 @@ from .measurements import Measured
 class Complex:
 
     """
-
+    Complex objects host one protein and one ligand, at least.
     """
 
     def __init__(self, components, *args, **kwargs):
@@ -30,16 +30,3 @@ class Complex:
 
     def dock():
         pass
-
-
-class MeasuredComplex(Complex, Measured):
-
-    """
-
-    """
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        assert hasattr(self, "components")
-        assert hasattr(self, "measure")
-

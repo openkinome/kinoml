@@ -1,4 +1,5 @@
 from collections import defaultdict
+from typing import List, AnyStr, Dict, Any, Callable
 
 import pandas as pd
 
@@ -11,51 +12,46 @@ from ...core.conditions import AssayConditions
 from ...utils import datapath, defaultdictwithargs
 
 
-class PKIS2DatasetProvider:
+class PKIS2DatasetProvider(BaseDatasetProvider):
 
     """
-    Loads PKIS2 dataset as providd in `Progress towards a public chemogenomic set
-    for protein kinases and a call for contributions` (DOI: 10.1371/journal.pone.0181585)
+    Loads PKIS2 dataset as provided in _Progress towards a public chemogenomic set
+    for protein kinases and a call for contributions_[^1].
+
+    [^1]: DOI: 10.1371/journal.pone.0181585
 
     It will build a dataframe where the SMILES-representation of ligands are the index
     and the columns are the kinase names. To map between KINOMEscan kinase names and
-    actual sequences, helper object ``kinoml.datatasets.kinomescan.utils.KINOMEScanMapper``
+    actual sequences, helper object `kinoml.datatasets.kinomescan.utils.KINOMEScanMapper`
     is instantiated as a class attribute.
 
-    Parameters
-    ----------
-    featurizers : list of callables, optional=None
-        Callables that will modify the raw chemical data into other representations.
+    Parameters:
+        featurizers: Modify the raw chemical data into other representations.
 
-    Attributes
-    ----------
-    kinases : lazy dict, str->AminoAcidSequence
-        Dict that will generate and cache AminoAcidSequence objects upon access,
+    __Attributes__
+
+    - `kinases`: Dict that will generate and cache `AminoAcidSequence` objects upon access,
         with keys being any of the KINOMEScan kinase names
-    ligands : lazy dict, str->Ligand
-        Dict that will generate and cache Ligand objects upon access, with keys
-        being any of the available SMILES
-    available_kinases : list of str
-        All possible kinase names available in this dataset
-    available_ligands : list of str
-        All possible SMILES available in this dataset
+    - `ligands`: Dict that will generate and cache `Ligand` objects upon access, with keys
+      being any of the available SMILES
+    - `available_kinases`: All possible kinase names available in this dataset
+    - `available_ligands`: All possible SMILES available in this dataset
 
-    Class attributes
-    ----------------
-    _RAW_DATASHEET : str
-        CSV file to load PKIS2 data from. If the file format is
-        different (columns, etc), sublass and reimplement ``self._read_dataframe``.
+    __Class attributes__
 
-    Examples
-    --------
+    - `_RAW_DATASHEET`: CSV file to load PKIS2 data from. If the file format is
+        different (columns, etc), subclass and reimplement `self._read_dataframe`.
 
+    __Examples__
+
+    ```python
     >>> from kinoml.datasets.kinomescan.pkis2 import PKIS2DatasetProvider
     >>> provider = PKIS2DatasetProvider()
     >>> kin = provider.kinases["ABL2"]
     >>> lig = provider.ligands[provider.available_ligands[0]]
     >>> measurement = provider.measurements[kin, lig]
     >>> print(f"% displacement for kinase={kin.header} and ligand={lig.to_smiles()} is {measurement}"
-
+    ```
     """
 
     _RAW_SPREADSHEET = datapath("kinomescan/journal.pone.0181585.s004.csv")
@@ -63,15 +59,20 @@ class PKIS2DatasetProvider:
 
     ASSAY_CONDITIONS = AssayConditions(pH=7.0)
 
-    def __init__(self, featurizers=None, *args, **kwargs):
+    def __init__(self, featurizers: List[Callable] = None, *args, **kwargs):
         self._df = self._read_dataframe(self._RAW_SPREADSHEET)
-        self.available_kinases = self._df.columns.tolist()
-        self.available_ligands = self._df.index.tolist()
+        self.available_kinases: List[str] = self._df.columns.tolist()
+        # TODO: this might be a wrong assumption if SMILES are malformed?
+        self.available_ligands: List[str] = self._df.index.tolist()
 
         # Lazy dicts that will only create objects on key accesss
-        self.kinases = defaultdictwithargs(self._process_kinase)
-        self.ligands = defaultdictwithargs(self._process_ligand)
-        self.measurements = defaultdictwithargs(self._process_measurement)
+        self.kinases: Dict[AnyStr, AminoAcidSequence] = defaultdictwithargs(
+            self._process_kinase
+        )
+        self.ligands: Dict[AnyStr, Ligand] = defaultdictwithargs(self._process_ligand)
+        self.measurements: Dict[
+            AnyStr, PercentageDisplacementMeasurement
+        ] = defaultdictwithargs(self._process_measurement)
 
         # Featurizers
         self._featurizers = featurizers
