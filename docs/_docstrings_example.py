@@ -3,6 +3,8 @@ Example module to show how docstrings are written for
 mkdocs + mkdocstrings
 """
 
+import typing
+
 
 def example_function(arg1, kwarg=None) -> object:
     """
@@ -33,7 +35,7 @@ def example_function(arg1, kwarg=None) -> object:
     pass
 
 
-def example_function_with_type_hints(arg1: dict, kwarg: "whatever" = None) -> object:
+def example_function_with_type_hints(arg1: dict, kwarg: typing.Any = None) -> object:
     """
     Example function to demonstrate how APIs are rendered
 
