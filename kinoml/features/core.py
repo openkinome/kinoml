@@ -1,0 +1,2 @@
+class BaseFeaturizer:
+    pass

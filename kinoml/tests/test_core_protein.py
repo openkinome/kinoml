@@ -16,11 +16,11 @@ def test_biosequence_cut():
     assert s.cut("T2", "T8") == "TCGTHCT"
 
 
-def test_biosequence_from_accession():
-    s = AminoAcidSequence.from_accession("NP_005148.2")
+def test_biosequence_from_ncbi():
+    s = AminoAcidSequence.from_ncbi("NP_005148.2")
     assert "NP_005148.2" in s.header
 
 
-def test_biosequences_from_acessions():
-    ss = AminoAcidSequence.from_accession("NP_005148.2", "NP_001607.1")
+def test_biosequences_from_ncbis():
+    ss = AminoAcidSequence.from_ncbi("NP_005148.2", "NP_001607.1")
     assert len(ss) == 2

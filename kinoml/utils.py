@@ -12,9 +12,7 @@ PACKAGE_ROOT = Path(__file__).parent
 class FromDistpatcherMixin:
     @classmethod
     def _from_dispatcher(cls, value, handler, handler_argname, prefix):
-        available_methods = [
-            n[len(prefix) :] for n in cls.__dict__ if n.startswith(prefix)
-        ]
+        available_methods = [n[len(prefix) :] for n in cls.__dict__ if n.startswith(prefix)]
         if handler not in available_methods:
             raise ValueError(
                 f"`{handler_argname}` must be one of: {', '.join(available_methods)}."

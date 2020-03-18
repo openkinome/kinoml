@@ -28,5 +28,5 @@ class Complex:
     def sanity_check(self):  # this is a requirement
         return len(self.ligand) >= 1 and len(self.protein) >= 1
 
-    def dock():
-        pass
+    def dock(self):
+        raise NotImplementedError
