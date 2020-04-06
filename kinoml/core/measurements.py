@@ -1,9 +1,7 @@
 from typing import Union, Iterable, Any
 
 from .conditions import AssayConditions
-from .protein import Protein
-from .ligand import Ligand
-from .sequence import AminoAcidSequence
+from .components import MolecularComponent
 
 
 class BaseMeasurement:
@@ -17,20 +15,21 @@ class BaseMeasurement:
         components: Molecular entities measured
         strict: Whether to perform sanity checks at initialization.
 
-
-    TODO: Investigate possible uses for `pint`
+    !!! todo
+        Investigate possible uses for `pint`
     """
 
     def __init__(
         self,
         value: Union[float, Iterable[float]],
         conditions: AssayConditions,
-        components: Iterable[Union[AminoAcidSequence, Protein, Ligand]],
+        components: Iterable[MolecularComponent],
         strict: bool = True,
         **kwargs,
     ):
         self.value = value
         self.conditions = conditions
+        # TODO: Do we want `components` here? It might introduce cyclic dependencies.
         self.components = components
 
         if strict:
@@ -40,7 +39,6 @@ class BaseMeasurement:
         """
         Perform some checks for valid values
         """
-        raise NotImplementedError
 
 
 class PercentageDisplacementMeasurement(BaseMeasurement):
@@ -59,4 +57,3 @@ class PercentageDisplacementMeasurement(BaseMeasurement):
         the math here?
         """
         pass
-

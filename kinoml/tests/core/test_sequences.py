@@ -1,4 +1,9 @@
-from ..core.protein import Biosequence, AminoAcidSequence
+"""
+Test kinoml.core.sequences and derived objects
+"""
+
+from ...core.sequences import Biosequence
+from ...core.proteins import AminoAcidSequence
 
 
 def test_biosequence_mutation():

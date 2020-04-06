@@ -2,10 +2,12 @@ import logging
 
 from openforcefield.topology import Molecule
 
+from .components import BaseLigand
+
 logger = logging.getLogger(__name__)
 
 
-class Ligand(Molecule):
+class Ligand(Molecule, BaseLigand):
 
     """
     Small molecule object based on the OpenForceField toolkit.

@@ -1,6 +1,10 @@
 from string import ascii_letters
 from collections import Counter
 import logging
+import re
+from typing import Union, Iterable
+
+import requests
 
 logger = logging.getLogger(__name__)
 
@@ -257,13 +261,6 @@ class Biosequence(str):
         residue = search.group(2)
         assert all(r in self.ALPHABET for r in residue)
         return self.__class__(f"{self[:position]}{residue}{self[position:]}")
-
-
-class AminoAcidSequence(Biosequence):
-    """Biosequence that only allows proteinic aminoacids"""
-
-    ALPHABET = "ACDEFGHIKLMNPQRSTVWY"
-    _ACCESSION_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=protein&id={}&rettype=fasta&retmode=text"
 
 
 class DNASequence(Biosequence):

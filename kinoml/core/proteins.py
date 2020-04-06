@@ -7,13 +7,21 @@ from pathlib import Path
 
 import requests
 
-from .sequence import AminoAcidSequence
+from .components import BaseProtein
+from .sequences import Biosequence
 from ..utils import FromDistpatcherMixin
 
 logger = logging.getLogger(__name__)
 
 
-class Protein:
+class AminoAcidSequence(Biosequence, BaseProtein):
+    """Biosequence that only allows proteinic aminoacids"""
+
+    ALPHABET = "ACDEFGHIKLMNPQRSTVWY"
+    _ACCESSION_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=protein&id={}&rettype=fasta&retmode=text"
+
+
+class ProteinStructure(BaseProtein):
     """
     Structural representation of a protein
 
@@ -50,7 +58,7 @@ class Protein:
         return AminoAcidSequence(s)
 
 
-class Kinase(Protein):
+class Kinase(ProteinStructure):
 
     """
     Extends `Protein` to provide kinase-specific methods of
@@ -68,4 +76,3 @@ class Kinase(Protein):
     @classmethod
     def from_manning(cls, identifier, **kwargs):
         raise NotImplementedError
-

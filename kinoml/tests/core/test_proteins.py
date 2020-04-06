@@ -1,0 +1,3 @@
+"""
+Test kinoml.core.proteins
+"""

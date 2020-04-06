@@ -1,5 +1,5 @@
-from ..core import BaseDatasetProvider
+from ..core import ProteinLigandDatasetProvider
 
 
-class KinomeScanDatasetProvider(BaseDatasetProvider):
+class KinomeScanDatasetProvider(ProteinLigandDatasetProvider):
     pass

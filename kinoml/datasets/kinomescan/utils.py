@@ -2,9 +2,9 @@ import re
 import logging
 from pathlib import Path
 import pandas as pd
-from typing import Any, AnyStr
+from typing import Union, AnyStr, Iterable
 
-from ...core.protein import AminoAcidSequence
+from ...core.proteins import AminoAcidSequence
 from ...utils import grouper, datapath, APPDIR
 
 logger = logging.getLogger(__name__)
@@ -30,7 +30,7 @@ class KINOMEScanMapper:
 
     def __init__(
         self,
-        raw_datasheet: Any[AnyStr, Path] = datapath(
+        raw_datasheet: Union[AnyStr, Path] = datapath(
             "kinomescan/DiscoverX_489_Kinase_Assay_Construct_Information.csv"
         ),
         use_cache: bool = True,

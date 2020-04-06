@@ -1,17 +1,18 @@
 from collections import defaultdict
-from typing import List, AnyStr, Dict, Any, Callable
+from typing import List, AnyStr, Dict, Any, Callable, Union
 from pathlib import Path
 
 import pandas as pd
 
 from .utils import KINOMEScanMapper
 from .core import KinomeScanDatasetProvider
-from ...core.protein import AminoAcidSequence
-from ...core.ligand import Ligand
-from ...core.measurements import PercentageDisplacementMeasurement
-from ...core.conditions import AssayConditions
+from ...core.proteins import AminoAcidSequence
+from ...core.ligands import Ligand
+from ...core.systems import ProteinLigandComplex
+from ...core.measurements import BaseMeasurement, PercentageDisplacementMeasurement
+from ...core.conditions import BaseConditions, AssayConditions
 from ...features.core import BaseFeaturizer
-from ...utils import datapath, defaultdictwithargs
+from ...utils import datapath
 
 
 class PKIS2DatasetProvider(KinomeScanDatasetProvider):
@@ -33,52 +34,68 @@ class PKIS2DatasetProvider(KinomeScanDatasetProvider):
             different than the default, subclass and reimplement `self._read_dataframe`.
         assay_conditions: Conditions in which the experiment took place. Default is
 
-    __Attributes__
-
-    - `kinases`: Dict that will generate and cache `AminoAcidSequence` objects upon access,
-        with keys being any of the KINOMEScan kinase names
-    - `ligands`: Dict that will generate and cache `Ligand` objects upon access, with keys
-      being any of the available SMILES
-    - `available_kinases`: All possible kinase names available in this dataset
-    - `available_ligands`: All possible SMILES available in this dataset
-
     __Examples__
 
     ```python
     >>> from kinoml.datasets.kinomescan.pkis2 import PKIS2DatasetProvider
-    >>> provider = PKIS2DatasetProvider()
-    >>> kin = provider.kinases["ABL2"]
-    >>> lig = provider.ligands[provider.available_ligands[0]]
-    >>> measurement = provider.measurements[kin, lig]
-    >>> print(f"% displacement for kinase={kin.header} and ligand={lig.to_smiles()} is {measurement}"
+    >>> provider = PKIS2DatasetProvider.from_source()
+    >>> system = provider.systems[0]
+    >>> print(f"% displacement for kinase={system.protein.header} and ligand={system.ligand.to_smiles()} is {system.measurement}"
+
     ```
     """
 
-    def __init__(
-        self,
-        featurizers: List[BaseFeaturizer] = None,
-        raw_spreadsheet: Any[AnyStr, Path] = datapath("kinomescan/journal.pone.0181585.s004.csv"),
-        assay_conditions: AssayConditions = AssayConditions(pH=7.0),
-        *args,
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    @classmethod
+    def from_source(
+        cls,
+        filename: Union[AnyStr, Path] = datapath("kinomescan/journal.pone.0181585.s004.csv"),
+        measurement_type: BaseMeasurement = PercentageDisplacementMeasurement,
+        conditions: BaseConditions = AssayConditions(pH=7.0),
         **kwargs
     ):
-        self.raw_spreadsheet = raw_spreadsheet
-        self.assay_conditions = assay_conditions
+        """
+        Create a DatasetProvider out of the raw data in a file
 
-        self._df = self._read_dataframe(self.raw_spreadsheet)
-        self.available_kinases: List[str] = self._df.columns.tolist()
-        # TODO: this might be a wrong assumption if SMILES are malformed?
-        self.available_ligands: List[str] = self._df.index.tolist()
+        Parameters:
+            filename: CSV file with the protein-ligand measurements
+            measurement_type: which type of measurement was taken for each pair
+            conditions: experimental conditions of the assay
 
-        # Lazy dicts that will only create objects on key access
-        self.kinases = defaultdictwithargs(self._process_kinase)
-        self.ligands = defaultdictwithargs(self._process_ligand)
-        self.measurements = defaultdictwithargs(self._process_measurement)
+        !!! todo
+            Investigate lazy access and object generation
+        """
+        df = cls._read_dataframe(filename)
 
-        # Featurizers
-        self._featurizers = featurizers
+        # Read in proteins
+        mapper = KINOMEScanMapper()
+        kinases = []
+        for kin_name in df.columns:
+            sequence = mapper.sequence_for_name(kin_name)
+            kinases.append(AminoAcidSequence(sequence, header=kin_name))
 
-    def _read_dataframe(self, filename):
+        # Read in ligands
+        ligands = []
+        for smiles in df.index[df.index.notna()]:
+            ligand = Ligand.from_smiles(smiles, allow_undefined_stereo=True)
+            ligands.append(ligand)
+
+        # Build ProteinLigandComplex objects
+        complexes = []
+        for i, ligand in enumerate(ligands):
+            for j, kinase in enumerate(kinases):
+                measurement = measurement_type(
+                    df.iloc[i, j], conditions=conditions, components=[kinase, ligand]
+                )
+                comp = ProteinLigandComplex(components=[kinase, ligand], measurement=measurement)
+                complexes.append(comp)
+
+        return cls(systems=complexes, conditions=conditions, **kwargs)
+
+    @staticmethod
+    def _read_dataframe(filename: Union[AnyStr, Path]) -> pd.DataFrame:
         """
         Consume raw datasheet into a Pandas dataframe. This method must
         provide a Dataframe with the following parameters:
@@ -90,47 +107,3 @@ class PKIS2DatasetProvider(KinomeScanDatasetProvider):
         """
         # Kinase names are columns 7>413. Smiles appear at column 3.
         return pd.read_csv(filename, usecols=[3] + list(range(7, 413)), index_col=0)
-
-    def _process_kinase(self, name):
-        """
-        Given the name of a kinase, query NCBI for its sequence. This uses
-        `self._kinase_name_mapper`, an instance of `KINOMEScanMapper`.
-        """
-        sequence = self._kinase_name_mapper.sequence_for_name(name)
-        return AminoAcidSequence(sequence, header=name)
-
-    def _process_ligand(self, ligand):
-        """
-        Helper to build a Ligand from a SMILES string. Result will be cached
-        in a per-instance dictionary (see `__init__`).
-        """
-        if isinstance(ligand, str):
-            return Ligand.from_smiles(ligand)
-        return ligand
-
-    def _process_measurement(self, kinase_ligand):
-        """
-        Helper to return the measurement concerning a protein
-        and a ligand. Key must be a 2-tuple of (AminoAcidSequence, Ligand).
-
-        This will access the internal dataframe using the provenance information
-        (original unprocessed SMILES, Kinase name) to get the number and build
-        a PercentageDisplacementMeasure object with the relevant assay conditions.
-
-        Result will be stored in a per-instance dictionary (see `__init__`).
-        """
-        assert len(kinase_ligand) == 2, "Key must be a 2-tuple of (AminoAcidSequence, Ligand)."
-        kinase, ligand = kinase_ligand
-        if not isinstance(kinase, AminoAcidSequence):
-            raise TypeError("`kinase` must be a kinoml.core.protein.AminoAcidSequence object")
-        if not isinstance(ligand, Ligand):
-            raise TypeError("`ligand` must be a kinoml.core.ligand.Ligand object")
-
-        smiles = ligand._provenance["smiles"]
-        measurement = self._df.loc[smiles, kinase.header]
-        return PercentageDisplacementMeasurement(
-            measurement, conditions=self.assay_conditions, components=[kinase, ligand],
-        )
-
-    def featurize(self):
-        return super().featurize()

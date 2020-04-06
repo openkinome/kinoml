@@ -3,6 +3,7 @@ import logging
 
 import numpy as np
 
+from ..utils import defaultdictwithargs
 
 logger = logging.getLogger(__name__)
 
@@ -10,39 +11,24 @@ logger = logging.getLogger(__name__)
 class BaseDatasetProvider:
 
     """
-    Base object for all Dataset classes
+    Base object for all DatasetProvider classes
 
     Parameters:
-        chemical_data: list of kinoml.core.MolecularSystem-like
-        measurements: array-like of shape (len(chemical_data), N)
-            We will reshape it for you if you provide shape=(len(chemical_data),)
+        systems: list of kinoml.core.complex.MeasuredComplex
         featurizers: list of kinoml.features.BaseFeaturizer-like
 
-    __Attributes__
-
-    - `data`: list of kinoml.core.MeasuredMolecularSystem-like
     """
 
     _raw_data = None
 
-    def __init__(
-        self, chemical_data, measurements=None, featurizers=None, *args, **kwargs
-    ):
-        self._data = chemical_data
-        if measurements is None:
-            measurements = np.empty((len(self.data), 1))
-            measurements[:] = np.NaN
-        self._measurements = np.reshape(measurements, (len(self.data), -1))
-        # self.data = [
-        #     MeasuredMolecularSystem(system, measurement)
-        #     for system, measurement in zip(self._data, self._measurements)
-        # ]
+    def __init__(self, systems, featurizers=None, *args, **kwargs):
+        self.systems = systems
         self.featurizers = featurizers
 
     @classmethod
     def from_source(cls, filename=None, **kwargs):
         """
-        Parse CSV to object model. This method is responsible of generating
+        Parse CSV/raw file to object model. This method is responsible of generating
         the objects for `self.data` and `self.measurements`, if relevant.
         Additional kwargs will be passed to `__init__`
         """
@@ -55,7 +41,7 @@ class BaseDatasetProvider:
         raise NotImplementedError
 
     def featurized_data(self):
-        for ms in self.data:
+        for ms in self.systems:
             yield ms.featurized_data
         # This might create a sklearn-compatible view into the features as default
 
@@ -91,3 +77,13 @@ class BaseDatasetProvider:
     def to_numpy(self, *args, **kwargs):
         raise NotImplementedError
 
+    @property
+    def assay_conditions(self):
+        conditions = set()
+        for system in self.systems:
+            conditions.add(system.measurement.conditions)
+        return conditions
+
+
+class ProteinLigandDatasetProvider(BaseDatasetProvider):
+    pass
