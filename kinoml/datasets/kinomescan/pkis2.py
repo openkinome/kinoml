@@ -28,12 +28,6 @@ class PKIS2DatasetProvider(KinomeScanDatasetProvider):
     actual sequences, helper object `kinoml.datatasets.kinomescan.utils.KINOMEScanMapper`
     is instantiated as a class attribute.
 
-    Parameters:
-        featurizers: Modify the raw chemical data into other representations.
-        raw_datasheet: CSV file to load PKIS2 data from. If the file format is
-            different than the default, subclass and reimplement `self._read_dataframe`.
-        assay_conditions: Conditions in which the experiment took place. Default is
-
     __Examples__
 
     ```python

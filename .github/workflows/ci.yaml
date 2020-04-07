@@ -69,7 +69,7 @@ jobs:
           flags: unittests
           yml: ./.codecov.yml
 
-  more:
+  lint-format:
     runs-on: ubuntu-18.04
     env:
       CI_OS: ubuntu-18.04

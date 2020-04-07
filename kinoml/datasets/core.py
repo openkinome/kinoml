@@ -15,14 +15,11 @@ class BaseDatasetProvider:
     """
     Base object for all DatasetProvider classes.
 
-
-
-
     Parameters:
         systems: A DatasetProvider holds a list of `kinoml.core.systems.System` objects
             (or any of its subclasses). A `System` is a collection of `MolecularComponent`
             objects (e.g. protein or ligand-like entities), plus an optional `Measurement`.
-        featurizers:
+        featurizers: Pipeline of descriptor featurization schemes
 
     """
 
