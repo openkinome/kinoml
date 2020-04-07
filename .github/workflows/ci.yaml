@@ -99,7 +99,7 @@ jobs:
         run: |
           . devtools/github-actions/initialize_conda.sh
           conda activate test
-          black --check -l 99 kinoml/
+          black --check -l 99 kinoml/ --ignore=kinoml/_version.py
 
   mkdocs:
     runs-on: ubuntu-18.04

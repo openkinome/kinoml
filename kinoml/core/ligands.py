@@ -25,7 +25,7 @@ class Ligand(Molecule, BaseLigand):
     del __init__.__doc__
 
     @classmethod
-    def from_smiles(cls, smiles, **kwargs):
+    def from_smiles(cls, smiles, **kwargs):  # pylint: disable=arguments-differ
         """
         Same as `openforcefield.topology.Molecule`, but adding
         information about the original SMILES to `._provenance` dict.

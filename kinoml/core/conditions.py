@@ -23,7 +23,6 @@ class BaseConditions:
         """
         Perform some checks for valid values
         """
-        pass
 
     def _properties(self):
         """

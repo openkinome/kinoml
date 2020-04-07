@@ -1,5 +1,4 @@
-from collections import defaultdict
-from typing import List, AnyStr, Dict, Any, Callable, Union
+from typing import AnyStr, Union
 from pathlib import Path
 
 import pandas as pd
@@ -11,7 +10,6 @@ from ...core.ligands import Ligand
 from ...core.systems import ProteinLigandComplex
 from ...core.measurements import BaseMeasurement, PercentageDisplacementMeasurement
 from ...core.conditions import BaseConditions, AssayConditions
-from ...features.core import BaseFeaturizer
 from ...utils import datapath
 
 
@@ -43,7 +41,7 @@ class PKIS2DatasetProvider(KinomeScanDatasetProvider):
         super().__init__(*args, **kwargs)
 
     @classmethod
-    def from_source(
+    def from_source(  # pylint: disable=arguments-differ
         cls,
         filename: Union[AnyStr, Path] = datapath("kinomescan/journal.pone.0181585.s004.csv"),
         measurement_type: BaseMeasurement = PercentageDisplacementMeasurement,

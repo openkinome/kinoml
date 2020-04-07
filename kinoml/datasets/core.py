@@ -1,11 +1,8 @@
-import abc
 import logging
 from typing import Iterable
-import numpy as np
 
 from ..core.systems import System
 from ..features.core import BaseFeaturizer
-from ..utils import defaultdictwithargs
 
 logger = logging.getLogger(__name__)
 

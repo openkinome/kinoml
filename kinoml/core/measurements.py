@@ -1,4 +1,4 @@
-from typing import Union, Iterable, Any
+from typing import Union, Iterable
 
 import numpy as np
 
@@ -48,7 +48,6 @@ class BaseMeasurement:
         """
         Perform some checks for valid values
         """
-        pass
 
     def __eq__(self, other):
         return (
@@ -73,4 +72,3 @@ class PercentageDisplacementMeasurement(BaseMeasurement):
         Ideally, `self.conditions` should contain all we need to do
         the math here?
         """
-        pass

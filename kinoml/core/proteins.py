@@ -1,15 +1,7 @@
-from typing import Union, Iterable
-from string import ascii_letters
-import re
 import logging
-import os
-from pathlib import Path
-
-import requests
 
 from .components import BaseProtein
 from .sequences import Biosequence
-from ..utils import FromDistpatcherMixin
 
 logger = logging.getLogger(__name__)
 
