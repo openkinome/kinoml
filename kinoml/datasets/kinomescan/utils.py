@@ -3,6 +3,7 @@ import logging
 from pathlib import Path
 import pandas as pd
 from typing import Union, AnyStr, Iterable
+from time import sleep
 
 from ...core.proteins import AminoAcidSequence
 from ...utils import grouper, datapath, APPDIR
@@ -111,6 +112,7 @@ class KINOMEScanMapper:
         max_requests = AminoAcidSequence.ACCESSION_MAX_RETRIEVAL
         for accession in grouper(accessions, max_requests, fillvalue=""):
             sequences.extend(AminoAcidSequence.from_ncbi(*accession))
+            sleep(0.5)
         return sequences
 
     @staticmethod
