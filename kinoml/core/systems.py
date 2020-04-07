@@ -9,12 +9,12 @@ from .proteins import BaseProtein
 class System:
 
     """
-    Complex objects host one protein and one ligand, at least, and
-    a measurement.
+    System objects host one or more MolecularComponent objects,
+    and, optionally, a measurement.
 
     Parameters:
         components: Molecular entities defining this system
-        measurement: Optional measurement for this complex.
+        measurement: Optional measurement for this system.
         strict: Whether to perform sanity checks (default) or not.
     """
 
@@ -39,7 +39,7 @@ class System:
 
     @measurement.setter
     def measurement(self, value):
-        assert isinstance(value, BaseMeasurement)
+        assert value is None or isinstance(value, BaseMeasurement)
         self._measurement = value
 
     def sanity_checks(self):

@@ -66,7 +66,7 @@ class KINOMEScanMapper:
         """
         Given a NCBI identifier, return the corresponding FASTA sequence
         """
-        return self._data[self._data.accession == accession].sequence
+        return self._data[self._data.accession == accession].sequence.values
 
     def _obtain_sequences(
         self,

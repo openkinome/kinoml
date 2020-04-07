@@ -40,7 +40,7 @@ class PKIS2DatasetProvider(KinomeScanDatasetProvider):
     >>> from kinoml.datasets.kinomescan.pkis2 import PKIS2DatasetProvider
     >>> provider = PKIS2DatasetProvider.from_source()
     >>> system = provider.systems[0]
-    >>> print(f"% displacement for kinase={system.protein.header} and ligand={system.ligand.to_smiles()} is {system.measurement}"
+    >>> print(f"% displacement for kinase={system.protein.name} and ligand={system.ligand.to_smiles()} is {system.measurement}"
 
     ```
     """
@@ -74,7 +74,7 @@ class PKIS2DatasetProvider(KinomeScanDatasetProvider):
         kinases = []
         for kin_name in df.columns:
             sequence = mapper.sequence_for_name(kin_name)
-            kinases.append(AminoAcidSequence(sequence, header=kin_name))
+            kinases.append(AminoAcidSequence(sequence, name=kin_name))
 
         # Read in ligands
         ligands = []

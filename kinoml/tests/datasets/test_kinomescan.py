@@ -2,7 +2,12 @@
 Test kinoml.datasets.kinomescan
 """
 
-from kinoml.core.measurements import PercentageDisplacementMeasurement
+
+def test_kinomescan_mapper():
+    from kinoml.datasets.kinomescan.utils import KINOMEScanMapper
+
+    mapper = KINOMEScanMapper()
+    assert mapper.sequence_for_name("ABL2") == mapper.sequence_for_accession("NP_005149.4")
 
 
 def test_pkis2():

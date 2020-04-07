@@ -24,7 +24,7 @@ class Biosequence(str):
     _ACCESSION_URL = None
     ACCESSION_MAX_RETRIEVAL = 50
 
-    def __new__(cls, value, header="", _provenance=None, *args, **kwargs):
+    def __new__(cls, value, name="", _provenance=None, *args, **kwargs):
         """
         We are subclassing `str` to:
 
@@ -38,7 +38,7 @@ class Biosequence(str):
                 f"but found these extra ones: {diff}."
             )
         s = super().__new__(cls, value, *args, **kwargs)
-        s.header = header
+        s.name = name
         s._provenance = {}
         # TODO: We might override some provenance data with this blind update
         if _provenance is not None:
@@ -62,7 +62,7 @@ class Biosequence(str):
         >>> sequence = AminoAcidSequence.from_ncbi("AAC05299.1")
         >>> print(sequence[:10])
         MSVNSEKSSS
-        >>> print(sequence.header)
+        >>> print(sequence.name)
         AAC05299.1 serine kinase SRPK2 [Homo sapiens]
 
         ```
@@ -81,7 +81,7 @@ class Biosequence(str):
             if not line:
                 continue
             if line.startswith(">"):
-                sequences.append({"header": line[1:], "sequence": []})
+                sequences.append({"name": line[1:], "sequence": []})
             else:
                 sequences[-1]["sequence"].append(line)
         if not sequences:
@@ -90,7 +90,7 @@ class Biosequence(str):
         for sequence, accession in zip(sequences, accessions):
             obj = cls(
                 "".join(sequence["sequence"]),
-                header=sequence["header"],
+                name=sequence["name"],
                 _provenance={"accession": accession},
             )
             objects.append(obj)
@@ -133,7 +133,7 @@ class Biosequence(str):
             ), f"Element at position {stop_pos} is not {stop_res}"
         return self.__class__(
             self[start_pos - 1 : stop_pos],
-            header=f"{self.header}{ ' | ' if self.header else '' }Cut: {start}/{stop}",
+            name=f"{self.name}{ ' | ' if self.name else '' }Cut: {start}/{stop}",
             _provenance={"cut": (start, stop)},
         )
 
@@ -182,7 +182,7 @@ class Biosequence(str):
                 continue
             operation = getattr(mutated, f"_mutate_with_{mutation_types[mutation]}")
             mutated = operation(mutation)
-        mutated.header += f" (mutations: {', '.join(mutations)})"
+        mutated.name += f" (mutations: {', '.join(mutations)})"
         mutated._provenance.update({"mutations": mutations})
         return mutated
 

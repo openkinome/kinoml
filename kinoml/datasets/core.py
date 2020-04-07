@@ -1,8 +1,10 @@
 import abc
 import logging
-
+from typing import Iterable
 import numpy as np
 
+from ..core.systems import System
+from ..features.core import BaseFeaturizer
 from ..utils import defaultdictwithargs
 
 logger = logging.getLogger(__name__)
@@ -11,17 +13,28 @@ logger = logging.getLogger(__name__)
 class BaseDatasetProvider:
 
     """
-    Base object for all DatasetProvider classes
+    Base object for all DatasetProvider classes.
+
+
+
 
     Parameters:
-        systems: list of kinoml.core.complex.MeasuredComplex
-        featurizers: list of kinoml.features.BaseFeaturizer-like
+        systems: A DatasetProvider holds a list of `kinoml.core.systems.System` objects
+            (or any of its subclasses). A `System` is a collection of `MolecularComponent`
+            objects (e.g. protein or ligand-like entities), plus an optional `Measurement`.
+        featurizers:
 
     """
 
     _raw_data = None
 
-    def __init__(self, systems, featurizers=None, *args, **kwargs):
+    def __init__(
+        self,
+        systems: Iterable[System],
+        featurizers: Iterable[BaseFeaturizer] = None,
+        *args,
+        **kwargs
+    ):
         self.systems = systems
         self.featurizers = featurizers
 
