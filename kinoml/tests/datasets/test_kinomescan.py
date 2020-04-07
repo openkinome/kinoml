@@ -15,4 +15,4 @@ def test_pkis2():
 
     provider = PKIS2DatasetProvider.from_source()
     assert len(provider.systems) == 261_870
-    assert provider.systems[0].measurement.value == 14.0
+    assert (provider.systems[0].measurement.values == 14.0).all()
