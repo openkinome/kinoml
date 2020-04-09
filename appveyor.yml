@@ -38,7 +38,11 @@ install:
 build: false
 
 test_script:
-  - pytest -v --cov=kinoml kinoml\\tests
+  # ignoring pep8 and linter for now until all
+  # PEP8 errors have not been fixed first to avoid
+  # to lock the gates (CI jobs).
+  # So for now we just run the py37 jobs during CI execution
+  - tox -e py37
 
 on_success:
   - codecov
