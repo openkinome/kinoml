@@ -2,127 +2,127 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
      <loc>https://openkinome.github.io/kinoml/</loc>
-     <lastmod>2020-04-07</lastmod>
+     <lastmod>2020-04-16</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>https://openkinome.github.io/kinoml/install/</loc>
-     <lastmod>2020-04-07</lastmod>
+     <lastmod>2020-04-16</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>https://openkinome.github.io/kinoml/getting_started/</loc>
-     <lastmod>2020-04-07</lastmod>
+     <lastmod>2020-04-16</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>https://openkinome.github.io/kinoml/tutorials/example/</loc>
-     <lastmod>2020-04-07</lastmod>
+     <lastmod>2020-04-16</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>https://openkinome.github.io/kinoml/developers/api_concepts/</loc>
-     <lastmod>2020-04-07</lastmod>
+     <lastmod>2020-04-16</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>https://openkinome.github.io/kinoml/developers/api_docs/</loc>
-     <lastmod>2020-04-07</lastmod>
+     <lastmod>2020-04-16</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>https://openkinome.github.io/kinoml/api/__init__/</loc>
-     <lastmod>2020-04-07</lastmod>
+     <lastmod>2020-04-16</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>https://openkinome.github.io/kinoml/api/analysis/__init__/</loc>
-     <lastmod>2020-04-07</lastmod>
+     <lastmod>2020-04-16</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>https://openkinome.github.io/kinoml/api/core/components/</loc>
-     <lastmod>2020-04-07</lastmod>
+     <lastmod>2020-04-16</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>https://openkinome.github.io/kinoml/api/core/conditions/</loc>
-     <lastmod>2020-04-07</lastmod>
+     <lastmod>2020-04-16</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>https://openkinome.github.io/kinoml/api/core/ligands/</loc>
-     <lastmod>2020-04-07</lastmod>
+     <lastmod>2020-04-16</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>https://openkinome.github.io/kinoml/api/core/measurements/</loc>
-     <lastmod>2020-04-07</lastmod>
+     <lastmod>2020-04-16</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>https://openkinome.github.io/kinoml/api/core/proteins/</loc>
-     <lastmod>2020-04-07</lastmod>
+     <lastmod>2020-04-16</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>https://openkinome.github.io/kinoml/api/core/sequences/</loc>
-     <lastmod>2020-04-07</lastmod>
+     <lastmod>2020-04-16</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>https://openkinome.github.io/kinoml/api/core/systems/</loc>
-     <lastmod>2020-04-07</lastmod>
+     <lastmod>2020-04-16</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>https://openkinome.github.io/kinoml/api/datasets/core/</loc>
-     <lastmod>2020-04-07</lastmod>
+     <lastmod>2020-04-16</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>https://openkinome.github.io/kinoml/api/datasets/kinomescan/pkis2/</loc>
-     <lastmod>2020-04-07</lastmod>
+     <lastmod>2020-04-16</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>https://openkinome.github.io/kinoml/api/datasets/kinomescan/utils/</loc>
-     <lastmod>2020-04-07</lastmod>
+     <lastmod>2020-04-16</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>https://openkinome.github.io/kinoml/api/docking/__init__/</loc>
-     <lastmod>2020-04-07</lastmod>
+     <lastmod>2020-04-16</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>https://openkinome.github.io/kinoml/api/features/__init__/</loc>
-     <lastmod>2020-04-07</lastmod>
+     <lastmod>2020-04-16</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>https://openkinome.github.io/kinoml/api/ml/__init__/</loc>
-     <lastmod>2020-04-07</lastmod>
+     <lastmod>2020-04-16</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>https://openkinome.github.io/kinoml/api/modeling/__init__/</loc>
-     <lastmod>2020-04-07</lastmod>
+     <lastmod>2020-04-16</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>https://openkinome.github.io/kinoml/api/optimize/__init__/</loc>
-     <lastmod>2020-04-07</lastmod>
+     <lastmod>2020-04-16</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>https://openkinome.github.io/kinoml/api/workflows/__init__/</loc>
-     <lastmod>2020-04-07</lastmod>
+     <lastmod>2020-04-16</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>https://openkinome.github.io/kinoml/api/utils/</loc>
-     <lastmod>2020-04-07</lastmod>
+     <lastmod>2020-04-16</lastmod>
      <changefreq>daily</changefreq>
     </url>
 </urlset>
