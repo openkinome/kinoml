@@ -46,7 +46,11 @@
 81
 82
 83
-84</pre></div></td><td class=code><div class=codehilite><pre><span></span><code>    <span class=nd>@classmethod</span>
+84
+85
+86
+87
+88</pre></div></td><td class=code><div class=codehilite><pre><span></span><code>    <span class=nd>@classmethod</span>
     <span class=k>def</span> <span class=nf>from_source</span><span class=p>(</span>  <span class=c1># pylint: disable=arguments-differ</span>
         <span class=bp>cls</span><span class=p>,</span>
         <span class=n>filename</span><span class=p>:</span> <span class=n>Union</span><span class=p>[</span><span class=n>AnyStr</span><span class=p>,</span> <span class=n>Path</span><span class=p>]</span> <span class=o>=</span> <span class=n>datapath</span><span class=p>(</span><span class=s2>&quot;kinomescan/journal.pone.0181585.s004.csv&quot;</span><span class=p>),</span>
@@ -72,7 +76,11 @@
         <span class=n>kinases</span> <span class=o>=</span> <span class=p>[]</span>
         <span class=k>for</span> <span class=n>kin_name</span> <span class=ow>in</span> <span class=n>df</span><span class=o>.</span><span class=n>columns</span><span class=p>:</span>
             <span class=n>sequence</span> <span class=o>=</span> <span class=n>mapper</span><span class=o>.</span><span class=n>sequence_for_name</span><span class=p>(</span><span class=n>kin_name</span><span class=p>)</span>
-            <span class=n>kinases</span><span class=o>.</span><span class=n>append</span><span class=p>(</span><span class=n>AminoAcidSequence</span><span class=p>(</span><span class=n>sequence</span><span class=p>,</span> <span class=n>name</span><span class=o>=</span><span class=n>kin_name</span><span class=p>))</span>
+            <span class=n>accession</span> <span class=o>=</span> <span class=n>mapper</span><span class=o>.</span><span class=n>accession_for_name</span><span class=p>(</span><span class=n>kin_name</span><span class=p>)</span>
+            <span class=n>mutation</span> <span class=o>=</span> <span class=n>mapper</span><span class=o>.</span><span class=n>mutations_for_name</span><span class=p>(</span><span class=n>kin_name</span><span class=p>)</span>
+            <span class=n>start_stop</span> <span class=o>=</span> <span class=n>mapper</span><span class=o>.</span><span class=n>start_stop_for_name</span><span class=p>(</span><span class=n>kin_name</span><span class=p>)</span>
+            <span class=n>provenance</span> <span class=o>=</span> <span class=p>{</span><span class=s2>&quot;accession&quot;</span><span class=p>:</span> <span class=n>accession</span><span class=p>,</span> <span class=s2>&quot;mutation&quot;</span><span class=p>:</span> <span class=n>mutation</span><span class=p>,</span> <span class=s2>&quot;start_stop&quot;</span><span class=p>:</span> <span class=n>start_stop</span><span class=p>}</span>
+            <span class=n>kinases</span><span class=o>.</span><span class=n>append</span><span class=p>(</span><span class=n>AminoAcidSequence</span><span class=p>(</span><span class=n>sequence</span><span class=p>,</span> <span class=n>name</span><span class=o>=</span><span class=n>kin_name</span><span class=p>,</span> <span class=n>_provenance</span><span class=o>=</span><span class=n>provenance</span><span class=p>))</span>
 
         <span class=c1># Read in ligands</span>
         <span class=n>ligands</span> <span class=o>=</span> <span class=p>[]</span>
