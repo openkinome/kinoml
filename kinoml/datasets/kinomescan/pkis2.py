@@ -63,7 +63,11 @@ class PKIS2DatasetProvider(KinomeScanDatasetProvider):
         kinases = []
         for kin_name in df.columns:
             sequence = mapper.sequence_for_name(kin_name)
-            kinases.append(AminoAcidSequence(sequence, name=kin_name))
+            accession = mapper.accession_for_name(kin_name)
+            mutation = mapper.mutations_for_name(kin_name)
+            start_stop = mapper.start_stop_for_name(kin_name)
+            provenance = {"accession": accession, "mutation": mutation, "start_stop": start_stop}
+            kinases.append(AminoAcidSequence(sequence, name=kin_name, _provenance=provenance))
 
         # Read in ligands
         ligands = []
