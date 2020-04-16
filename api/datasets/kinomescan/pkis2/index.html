@@ -2,8 +2,7 @@
 <span class=o>&gt;&gt;&gt;</span> <span class=n>provider</span> <span class=o>=</span> <span class=n>PKIS2DatasetProvider</span><span class=o>.</span><span class=n>from_source</span><span class=p>()</span>
 <span class=o>&gt;&gt;&gt;</span> <span class=n>system</span> <span class=o>=</span> <span class=n>provider</span><span class=o>.</span><span class=n>systems</span><span class=p>[</span><span class=mi>0</span><span class=p>]</span>
 <span class=o>&gt;&gt;&gt;</span> <span class=nb>print</span><span class=p>(</span><span class=sa>f</span><span class=s2>&quot;% displacement for kinase=</span><span class=si>{</span><span class=n>system</span><span class=o>.</span><span class=n>protein</span><span class=o>.</span><span class=n>name</span><span class=si>}</span><span class=s2> and ligand=</span><span class=si>{</span><span class=n>system</span><span class=o>.</span><span class=n>ligand</span><span class=o>.</span><span class=n>to_smiles</span><span class=p>()</span><span class=si>}</span><span class=s2> is </span><span class=si>{</span><span class=n>system</span><span class=o>.</span><span class=n>measurement</span><span class=si>}</span><span class=s2>&quot;</span>
-</code></pre></div> <h3 id=kinoml.datasets.kinomescan.pkis2.PKIS2DatasetProvider.from_source><code class=codehilite><span class=n>from_source</span><span class=p>(</span><span class=n>filename</span><span class=o>=</span><span class=n>PosixPath</span><span class=p>(</span><span class=s1>&#39;/home/runner/work/kinoml/kinoml/kinoml/data/kinomescan/journal.pone.0181585.s004.csv&#39;</span><span class=p>),</span> <span class=n>measurement_type</span><span class=o>=&lt;</span><span class=k>class</span> <span class=err>&#39;</span><span class=nc>kinoml</span><span class=o>.</span><span class=n>core</span><span class=o>.</span><span class=n>measurements</span><span class=o>.</span><span class=n>PercentageDisplacementMeasurement</span><span class=s1>&#39;&gt;, conditions=&lt;AssayConditions pH=7.0&gt;, **kwargs)</span></code> <em>(classmethod)</em><a class=headerlink href=#kinoml.datasets.kinomescan.pkis2.PKIS2DatasetProvider.from_source title="Permanent link">&para;</a></h3> <div class=autodoc> <details class=note><summary>Show source code in <code>kinomescan/pkis2.py</code></summary><table class=codehilitetable><tr><td class=linenos><div class=linenodiv><pre><span></span>40
-41
+</code></pre></div> <h3 id=kinoml.datasets.kinomescan.pkis2.PKIS2DatasetProvider.from_source><code class=codehilite><span class=n>from_source</span><span class=p>(</span><span class=n>filename</span><span class=o>=</span><span class=n>PosixPath</span><span class=p>(</span><span class=s1>&#39;/home/runner/work/kinoml/kinoml/kinoml/data/kinomescan/journal.pone.0181585.s004.csv&#39;</span><span class=p>),</span> <span class=n>measurement_type</span><span class=o>=&lt;</span><span class=k>class</span> <span class=err>&#39;</span><span class=nc>kinoml</span><span class=o>.</span><span class=n>core</span><span class=o>.</span><span class=n>measurements</span><span class=o>.</span><span class=n>PercentageDisplacementMeasurement</span><span class=s1>&#39;&gt;, conditions=&lt;AssayConditions pH=7.0&gt;, **kwargs)</span></code> <em>(classmethod)</em><a class=headerlink href=#kinoml.datasets.kinomescan.pkis2.PKIS2DatasetProvider.from_source title="Permanent link">&para;</a></h3> <div class=autodoc> <details class=note><summary>Show source code in <code>kinomescan/pkis2.py</code></summary><table class=codehilitetable><tr><td class=linenos><div class=linenodiv><pre><span></span>41
 42
 43
 44
@@ -50,7 +49,10 @@
 85
 86
 87
-88</pre></div></td><td class=code><div class=codehilite><pre><span></span><code>    <span class=nd>@classmethod</span>
+88
+89
+90
+91</pre></div></td><td class=code><div class=codehilite><pre><span></span><code>    <span class=nd>@classmethod</span>
     <span class=k>def</span> <span class=nf>from_source</span><span class=p>(</span>  <span class=c1># pylint: disable=arguments-differ</span>
         <span class=bp>cls</span><span class=p>,</span>
         <span class=n>filename</span><span class=p>:</span> <span class=n>Union</span><span class=p>[</span><span class=n>AnyStr</span><span class=p>,</span> <span class=n>Path</span><span class=p>]</span> <span class=o>=</span> <span class=n>datapath</span><span class=p>(</span><span class=s2>&quot;kinomescan/journal.pone.0181585.s004.csv&quot;</span><span class=p>),</span>
@@ -69,7 +71,7 @@
 <span class=sd>        !!! todo</span>
 <span class=sd>            Investigate lazy access and object generation</span>
 <span class=sd>        &quot;&quot;&quot;</span>
-        <span class=n>df</span> <span class=o>=</span> <span class=bp>cls</span><span class=o>.</span><span class=n>_read_dataframe</span><span class=p>(</span><span class=n>filename</span><span class=p>)</span>
+        <span class=n>df</span> <span class=o>=</span> <span class=bp>cls</span><span class=o>.</span><span class=n>_read_dataframe</span><span class=p>(</span><span class=n>filename</span><span class=p>)[:</span><span class=mi>50</span><span class=p>]</span>
 
         <span class=c1># Read in proteins</span>
         <span class=n>mapper</span> <span class=o>=</span> <span class=n>KINOMEScanMapper</span><span class=p>()</span>
@@ -77,15 +79,17 @@
         <span class=k>for</span> <span class=n>kin_name</span> <span class=ow>in</span> <span class=n>df</span><span class=o>.</span><span class=n>columns</span><span class=p>:</span>
             <span class=n>sequence</span> <span class=o>=</span> <span class=n>mapper</span><span class=o>.</span><span class=n>sequence_for_name</span><span class=p>(</span><span class=n>kin_name</span><span class=p>)</span>
             <span class=n>accession</span> <span class=o>=</span> <span class=n>mapper</span><span class=o>.</span><span class=n>accession_for_name</span><span class=p>(</span><span class=n>kin_name</span><span class=p>)</span>
-            <span class=n>mutation</span> <span class=o>=</span> <span class=n>mapper</span><span class=o>.</span><span class=n>mutations_for_name</span><span class=p>(</span><span class=n>kin_name</span><span class=p>)</span>
+            <span class=n>mutations</span> <span class=o>=</span> <span class=n>mapper</span><span class=o>.</span><span class=n>mutations_for_name</span><span class=p>(</span><span class=n>kin_name</span><span class=p>)</span>
+            <span class=k>if</span> <span class=n>math</span><span class=o>.</span><span class=n>isnan</span><span class=p>(</span><span class=n>mutations</span><span class=p>):</span>
+                <span class=n>mutations</span> <span class=o>=</span> <span class=kc>None</span>
             <span class=n>start_stop</span> <span class=o>=</span> <span class=n>mapper</span><span class=o>.</span><span class=n>start_stop_for_name</span><span class=p>(</span><span class=n>kin_name</span><span class=p>)</span>
-            <span class=n>provenance</span> <span class=o>=</span> <span class=p>{</span><span class=s2>&quot;accession&quot;</span><span class=p>:</span> <span class=n>accession</span><span class=p>,</span> <span class=s2>&quot;mutation&quot;</span><span class=p>:</span> <span class=n>mutation</span><span class=p>,</span> <span class=s2>&quot;start_stop&quot;</span><span class=p>:</span> <span class=n>start_stop</span><span class=p>}</span>
+            <span class=n>provenance</span> <span class=o>=</span> <span class=p>{</span><span class=s2>&quot;accession&quot;</span><span class=p>:</span> <span class=n>accession</span><span class=p>,</span> <span class=s2>&quot;mutations&quot;</span><span class=p>:</span> <span class=n>mutations</span><span class=p>,</span> <span class=s2>&quot;start_stop&quot;</span><span class=p>:</span> <span class=n>start_stop</span><span class=p>}</span>
             <span class=n>kinases</span><span class=o>.</span><span class=n>append</span><span class=p>(</span><span class=n>AminoAcidSequence</span><span class=p>(</span><span class=n>sequence</span><span class=p>,</span> <span class=n>name</span><span class=o>=</span><span class=n>kin_name</span><span class=p>,</span> <span class=n>_provenance</span><span class=o>=</span><span class=n>provenance</span><span class=p>))</span>
 
         <span class=c1># Read in ligands</span>
         <span class=n>ligands</span> <span class=o>=</span> <span class=p>[]</span>
         <span class=k>for</span> <span class=n>smiles</span> <span class=ow>in</span> <span class=n>df</span><span class=o>.</span><span class=n>index</span><span class=p>[</span><span class=n>df</span><span class=o>.</span><span class=n>index</span><span class=o>.</span><span class=n>notna</span><span class=p>()]:</span>
-            <span class=n>ligand</span> <span class=o>=</span> <span class=n>Ligand</span><span class=o>.</span><span class=n>from_smiles</span><span class=p>(</span><span class=n>smiles</span><span class=p>,</span> <span class=n>allow_undefined_stereo</span><span class=o>=</span><span class=kc>True</span><span class=p>)</span>
+            <span class=n>ligand</span> <span class=o>=</span> <span class=n>Ligand</span><span class=o>.</span><span class=n>from_smiles</span><span class=p>(</span><span class=n>smiles</span><span class=p>,</span> <span class=n>name</span><span class=o>=</span><span class=n>smiles</span><span class=p>,</span> <span class=n>allow_undefined_stereo</span><span class=o>=</span><span class=kc>True</span><span class=p>)</span>
             <span class=n>ligands</span><span class=o>.</span><span class=n>append</span><span class=p>(</span><span class=n>ligand</span><span class=p>)</span>
 
         <span class=c1># Build ProteinLigandComplex objects</span>
