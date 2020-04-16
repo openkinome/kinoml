@@ -24,7 +24,7 @@ class System:
         measurement: Union[None, BaseMeasurement] = None,
         strict: bool = True,
         *args,
-        **kwargs
+        **kwargs,
     ):
         super().__init__(*args, **kwargs)
         self._measurement = None
@@ -46,7 +46,14 @@ class System:
         assert self.components, "`System` must specify at least one component"
 
     @property
-    def weight(self):
+    def name(self) -> str:
+        """
+        Generates a readable name out of the components names
+        """
+        return " & ".join([c.name for c in self.components])
+
+    @property
+    def weight(self) -> float:
         """
         Calculate the molecular weight of the system
 
@@ -57,6 +64,13 @@ class System:
         for component in self.components:
             mass += component.mass  # It will be unimplemented for some types!
         return mass
+
+    def __repr__(self) -> str:
+        return (
+            f"<{self.__class__.__name__} with "
+            f"{len(self.components)} components ({', '.join([repr(c) for c in self.components])}) "
+            f"and {self.measurement!r}>"
+        )
 
 
 class ProteinLigandComplex(System):

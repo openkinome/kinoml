@@ -6,11 +6,15 @@ from .sequences import Biosequence
 logger = logging.getLogger(__name__)
 
 
-class AminoAcidSequence(Biosequence, BaseProtein):
+class AminoAcidSequence(BaseProtein, Biosequence):
     """Biosequence that only allows proteinic aminoacids"""
 
     ALPHABET = "ACDEFGHIKLMNPQRSTVWY"
     _ACCESSION_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=protein&id={}&rettype=fasta&retmode=text"
+
+    def __init__(self, sequence, name="", *args, **kwargs):
+        BaseProtein.__init__(self, name=name, *args, **kwargs)
+        Biosequence.__init__(self)
 
 
 class ProteinStructure(BaseProtein):
@@ -20,9 +24,6 @@ class ProteinStructure(BaseProtein):
     !!! todo
         This is probably going to be redone, so do not invest too much
     """
-
-    def __init__(self, name=None):
-        self.name = name
 
     @classmethod
     def from_file(cls, path, ext=None, **kwargs):

@@ -37,9 +37,6 @@ class PKIS2DatasetProvider(KinomeScanDatasetProvider):
     ```
     """
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
     @classmethod
     def from_source(  # pylint: disable=arguments-differ
         cls,

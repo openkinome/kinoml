@@ -56,6 +56,9 @@ class BaseMeasurement:
             and self.components == other.components
         )
 
+    def __repr__(self) -> str:
+        return f"<{self.__class__.__name__} values={self.values} conditions={self.conditions!r}>"
+
 
 class PercentageDisplacementMeasurement(BaseMeasurement):
 

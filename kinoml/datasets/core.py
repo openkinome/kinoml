@@ -1,6 +1,8 @@
 import logging
 from typing import Iterable
 
+import pandas as pd
+
 from ..core.systems import System
 from ..features.core import BaseFeaturizer
 
@@ -27,7 +29,7 @@ class BaseDatasetProvider:
         systems: Iterable[System],
         featurizers: Iterable[BaseFeaturizer] = None,
         *args,
-        **kwargs
+        **kwargs,
     ):
         self.systems = systems
         self.featurizers = featurizers
@@ -75,6 +77,24 @@ class BaseDatasetProvider:
         """
         raise NotImplementedError
 
+    def to_dataframe(self, *args, **kwargs):
+        """
+        Generates a `pandas.DataFrame` containing information on the systems
+        and their measurements
+
+        Returns:
+            pandas.DataFrame
+        """
+        if not self.systems:
+            return pd.DataFrame()
+        s = self.systems[0]
+        records = [
+            [s.__class__.__name__, "n_components", f"Avg {s.measurement.__class__.__name__}",]
+        ]
+        for system in self.systems:
+            records.append([system.name, len(system.components), system.measurement.values.mean()])
+        return pd.DataFrame.from_records(records[1:], columns=records[0])
+
     def to_pytorch(self, *args, **kwargs):
         raise NotImplementedError
 
@@ -90,6 +110,9 @@ class BaseDatasetProvider:
         for system in self.systems:
             conditions.add(system.measurement.conditions)
         return conditions
+
+    def __repr__(self) -> str:
+        return f"<{self.__class__.__name__} with {len(self.systems)} systems>"
 
 
 class ProteinLigandDatasetProvider(BaseDatasetProvider):

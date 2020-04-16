@@ -24,12 +24,12 @@ class BaseConditions:
         Perform some checks for valid values
         """
 
-    def _properties(self):
+    def _properties(self, classname=True):
         """
         Return a dictionary with the classname and all defined properties.
         Used for equality comparisons in subclasses.
         """
-        props = {"classname": self.__class__.__name__}
+        props = {"classname": self.__class__.__name__} if classname else {}
         for name in dir(self):
             if name.startswith("_"):
                 continue
@@ -43,6 +43,12 @@ class BaseConditions:
 
     def __eq__(self, other):
         return self._properties() == other._properties()
+
+    def __repr__(self) -> str:
+        return (
+            f"<{self.__class__.__name__} "
+            f"{' '.join([f'{k}={v}' for k, v in self._properties(classname=False).items()])}>"
+        )
 
 
 class AssayConditions(BaseConditions):
