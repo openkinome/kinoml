@@ -61,7 +61,7 @@ class KINOMEScanMapper:
             self._data.to_csv(cached_path)
 
     def name_is_mutated(self, name: AnyStr):
-        return self._data.loc[name, "mutation"] is None
+        return self._data.loc[name, "mutation"] in (None, pd.np.nan, float("nan"), "NaN")
 
     def sequence_for_name(self, name: AnyStr):
         """

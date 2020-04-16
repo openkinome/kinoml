@@ -17,8 +17,8 @@ class Ligand(BaseLigand, Molecule):
     """
 
     def __init__(self, _provenance=None, name="", *args, **kwargs):
-        BaseLigand.__init__(self, name=name, _provenance=_provenance)
         Molecule.__init__(self, *args, **kwargs)
+        BaseLigand.__init__(self, name=name, _provenance=_provenance)
 
     del __init__.__doc__
 

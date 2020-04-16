@@ -1,5 +1,6 @@
 from typing import AnyStr, Union
 from pathlib import Path
+import math
 
 import pandas as pd
 
@@ -56,7 +57,7 @@ class PKIS2DatasetProvider(KinomeScanDatasetProvider):
         !!! todo
             Investigate lazy access and object generation
         """
-        df = cls._read_dataframe(filename)
+        df = cls._read_dataframe(filename)[:50]
 
         # Read in proteins
         mapper = KINOMEScanMapper()
@@ -64,15 +65,17 @@ class PKIS2DatasetProvider(KinomeScanDatasetProvider):
         for kin_name in df.columns:
             sequence = mapper.sequence_for_name(kin_name)
             accession = mapper.accession_for_name(kin_name)
-            mutation = mapper.mutations_for_name(kin_name)
+            mutations = mapper.mutations_for_name(kin_name)
+            if math.isnan(mutations):
+                mutations = None
             start_stop = mapper.start_stop_for_name(kin_name)
-            provenance = {"accession": accession, "mutation": mutation, "start_stop": start_stop}
+            provenance = {"accession": accession, "mutations": mutations, "start_stop": start_stop}
             kinases.append(AminoAcidSequence(sequence, name=kin_name, _provenance=provenance))
 
         # Read in ligands
         ligands = []
         for smiles in df.index[df.index.notna()]:
-            ligand = Ligand.from_smiles(smiles, allow_undefined_stereo=True)
+            ligand = Ligand.from_smiles(smiles, name=smiles, allow_undefined_stereo=True)
             ligands.append(ligand)
 
         # Build ProteinLigandComplex objects
