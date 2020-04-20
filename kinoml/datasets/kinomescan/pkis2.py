@@ -55,9 +55,11 @@ class PKIS2DatasetProvider(KinomeScanDatasetProvider):
             conditions: experimental conditions of the assay
 
         !!! todo
-            Investigate lazy access and object generation
+            - Investigate lazy access and object generation
+            - Review accuracy of item access by indices (correlative order?)
         """
-        df = cls._read_dataframe(filename)[:50]
+        df = cls._read_dataframe(filename)
+        df = df.index[df.index.notna()]
 
         # Read in proteins
         mapper = KINOMEScanMapper()
@@ -74,16 +76,17 @@ class PKIS2DatasetProvider(KinomeScanDatasetProvider):
 
         # Read in ligands
         ligands = []
-        for smiles in df.index[df.index.notna()]:
+        for smiles in df.index:
             ligand = Ligand.from_smiles(smiles, name=smiles, allow_undefined_stereo=True)
             ligands.append(ligand)
 
+        lol = list(df.itertuples(index=False, name=None))  # FIXME: This might be dangerous
         # Build ProteinLigandComplex objects
         complexes = []
         for i, ligand in enumerate(ligands):
             for j, kinase in enumerate(kinases):
                 measurement = measurement_type(
-                    df.iloc[i, j], conditions=conditions, components=[kinase, ligand]
+                    lol[i][j], conditions=conditions, components=[kinase, ligand]
                 )
                 comp = ProteinLigandComplex(components=[kinase, ligand], measurement=measurement)
                 complexes.append(comp)
