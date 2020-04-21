@@ -1,4 +1,6 @@
-from typing import Union
+from __future__ import annotations
+
+from typing import Union, Iterable
 
 from .components import MolecularComponent
 from .ligands import BaseLigand
@@ -20,7 +22,7 @@ class System:
 
     def __init__(
         self,
-        components: [MolecularComponent],
+        components: Iterable[MolecularComponent],
         measurement: Union[None, BaseMeasurement] = None,
         strict: bool = True,
         *args,
@@ -30,6 +32,7 @@ class System:
         self._measurement = None
         self.components = components
         self.measurement = measurement
+        self.featurizations = {}
         if strict:
             self.sanity_checks()
 
@@ -62,7 +65,9 @@ class System:
         """
         mass = 0
         for component in self.components:
-            mass += component.mass  # It will be unimplemented for some types!
+            if not hasattr(component, "mass"):  # It will be unimplemented for some types!
+                raise TypeError("This system contains at least one component without mass.")
+            mass += component.mass
         return mass
 
     def __repr__(self) -> str:

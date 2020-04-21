@@ -1,5 +1,6 @@
 import logging
 from typing import Iterable
+from copy import deepcopy
 
 import pandas as pd
 
@@ -18,21 +19,14 @@ class BaseDatasetProvider:
         systems: A DatasetProvider holds a list of `kinoml.core.systems.System` objects
             (or any of its subclasses). A `System` is a collection of `MolecularComponent`
             objects (e.g. protein or ligand-like entities), plus an optional `Measurement`.
-        featurizers: Pipeline of descriptor featurization schemes
-
     """
 
     _raw_data = None
 
     def __init__(
-        self,
-        systems: Iterable[System],
-        featurizers: Iterable[BaseFeaturizer] = None,
-        *args,
-        **kwargs,
+        self, systems: Iterable[System], *args, **kwargs,
     ):
         self.systems = systems
-        self.featurizers = featurizers
 
     @classmethod
     def from_source(cls, filename=None, **kwargs):
@@ -43,16 +37,32 @@ class BaseDatasetProvider:
         """
         raise NotImplementedError
 
-    def featurize(self):
+    def featurize(self, *featurizers: Iterable[BaseFeaturizer]) -> System:
         """
-        Apply featurizers to self.data and self.measurements.
+        Given a collection of `kinoml.features.core.BaseFeaturizers`, apply them
+        to the present systems.
+
+        Parameters:
+            featurizers: Featurization schemes that will be applied to the system,
+                in a stacked way.
+
+        !!! todo
+            * Do we want to support parallel featurizing too or only stacked featurization?
+            * Shall we modify the system in place (default now), return the modified copy or store it?
         """
-        raise NotImplementedError
+        # Do we assume the dataset is homogeneous (single type of system and associated measurement)?
+        # That would allow to only check once (e.g. test support for first system)
+        for system in self.systems:
+            for featurizer in featurizers:
+                featurizer.supports(system, raise_errors=True)
+                # .supports() will test for system type, type of components, type of measurement, etc
+                system["last"] = system[featurizer.name] = featurizer.featurize(
+                    system, inplace=True
+                )
 
     def featurized_data(self):
         for ms in self.systems:
-            yield ms.featurized_data
-        # This might create a sklearn-compatible view into the features as default
+            yield ms.featurizations["last"]
 
     def _to_dataset(self, style="pytorch"):
         """

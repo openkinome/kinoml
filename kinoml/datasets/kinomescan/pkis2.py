@@ -59,7 +59,7 @@ class PKIS2DatasetProvider(KinomeScanDatasetProvider):
             - Review accuracy of item access by indices (correlative order?)
         """
         df = cls._read_dataframe(filename)
-        df = df.index[df.index.notna()]
+        df = df[df.index.notna()]
 
         # Read in proteins
         mapper = KINOMEScanMapper()
