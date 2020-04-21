@@ -3,6 +3,7 @@ from typing import Iterable
 from copy import deepcopy
 
 import pandas as pd
+from tqdm import tqdm
 
 from ..core.systems import System
 from ..features.core import BaseFeaturizer
@@ -52,17 +53,20 @@ class BaseDatasetProvider:
         """
         # Do we assume the dataset is homogeneous (single type of system and associated measurement)?
         # That would allow to only check once (e.g. test support for first system)
-        for system in self.systems:
+        for system in tqdm(self.systems, desc="Featurizing systems..."):
             for featurizer in featurizers:
                 featurizer.supports(system, raise_errors=True)
                 # .supports() will test for system type, type of components, type of measurement, etc
-                system["last"] = system[featurizer.name] = featurizer.featurize(
-                    system, inplace=True
-                )
+                system.featurizations[featurizer.name] = featurizer.featurize(system, inplace=True)
+                system.featurizations["last"] = system.featurizations[featurizer.name]
 
-    def featurized_data(self):
+    def clear_featurizations(self):
+        for system in self.systems:
+            system.featurizations.clear()
+
+    def featurized_systems(self):
         for ms in self.systems:
-            yield ms.featurizations["last"]
+            yield ms, ms.featurizations["last"]
 
     def _to_dataset(self, style="pytorch"):
         """

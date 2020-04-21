@@ -11,6 +11,7 @@ dependencies:
   - pint
   - appdirs
   - openforcefield
+  - tqdm
 
   # Testing
   - pytest
