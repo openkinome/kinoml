@@ -3,6 +3,7 @@ Featurizers that mostly concern ligand-based models
 """
 from __future__ import annotations
 import numpy as np
+from functools import lru_cache
 
 from .core import BaseFeaturizer, BaseOneHotEncodingFeaturizer
 from ..core.systems import System
@@ -47,13 +48,17 @@ class MorganFingerprintFeaturizer(SingleLigandFeaturizer):
             Morgan fingerprint of radius `radius` of molecule,
             with shape `nbits`.
         """
-        from rdkit.Chem.AllChem import GetMorganFingerprintAsBitVect as Morgan
-
         for component in system.components:  # we only return the first ligand found for now
             if isinstance(component, Ligand):
-                mol = component.to_rdkit()
-                fp = Morgan(mol, radius=self.radius, nBits=self.nbits)
-                return np.asarray(fp)
+                return self._featurize_ligand(component)
+
+    @lru_cache(maxsize=1000)
+    def _featurize_ligand(self, ligand):
+        from rdkit.Chem.AllChem import GetMorganFingerprintAsBitVect as Morgan
+
+        mol = ligand.to_rdkit()
+        fp = Morgan(mol, radius=self.radius, nBits=self.nbits)
+        return np.asarray(fp)
 
 
 class OneHotSMILESFeaturizer(BaseOneHotEncodingFeaturizer, SingleLigandFeaturizer):
