@@ -134,18 +134,17 @@ class GraphLigandFeaturizer(SingleLigandFeaturizer):
 
         Returns:
             A two-tuple with:
-            - Adjacency matrix of the molecule with shape (n_atoms, n_atoms)
+            - Graph connectivity of the molecule with shape (2, n_edges)
             - Feature matrix with shape (n_atoms, n_features)
         """
 
         from rdkit import Chem
-        from rdkit.Chem import rdmolops
 
         ligand = [c for c in system.components if isinstance(c, Ligand)][0].to_rdkit()
-        adjacency_matrix = rdmolops.GetAdjacencyMatrix(ligand)
+        connectivity_graph = _connectivity_COO_format(ligand)
         per_atom_features = np.array([self.per_atom_features(a) for a in ligand.GetAtoms()])
 
-        return adjacency_matrix, per_atom_features
+        return connectivity_graph, per_atom_features
 
     @staticmethod
     def _per_atom_features(atom: rdkit.Chem.Atom) -> tuple:
@@ -155,6 +154,38 @@ class GraphLigandFeaturizer(SingleLigandFeaturizer):
         Parameters:
             atom: rdkit atom to extract features from
         Returns:
-            Atomic number, number of neighbors, valence
+            Atomic number, number of neighbors, valence,
+            atomic mass, formal charge, number of implicit hydrogens,
+            bool (if atom is in a ring), bool (if atom is aromatic), number of radical electrons
         """
-        return atom.GetAtomicNum(), atom.GetDegree(), atom.GetExplicitValence()
+        return (
+            atom.GetAtomicNum(),
+            atom.GetDegree(),
+            atom.GetExplicitValence(),
+            atom.GetMass(),
+            atom.GetFormalCharge(),
+            atom.GetNumImplicitHs(),
+            atom.IsInRing(),
+            atom.GetIsAromatic(),
+            atom.GetNumRadicalElectrons()
+        )
+
+    @staticmethod
+    def _connectivity_COO_format(mol: rdkit.Chem.rdchem.Mol) -> array:
+        """
+        Returns the connectivity of the molecular graph in COO format.
+
+        Parameters:
+            mol: rdkit molecule to extract bonds from
+        Returns:
+            array: graph connectivity in COO format with shape [2, num_edges]
+        """
+
+        row, col = [], []
+
+        for bond in mol.GetBonds():
+            start, end = bond.GetBeginAtomIdx(), bond.GetEndAtomIdx()
+            row += [start, end]
+            col += [end, start]
+
+        return np.array([row, col])
