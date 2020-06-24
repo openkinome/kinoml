@@ -1,11 +1,14 @@
 import logging
 from typing import Iterable
 from copy import deepcopy
+from functools import wraps
+from operator import attrgetter
 
+import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
-from ..core.systems import System
+from ..core.measurements import BaseMeasurement
 from ..features.core import BaseFeaturizer
 
 logger = logging.getLogger(__name__)
@@ -17,17 +20,20 @@ class BaseDatasetProvider:
     Base object for all DatasetProvider classes.
 
     Parameters:
-        systems: A DatasetProvider holds a list of `kinoml.core.systems.System` objects
-            (or any of its subclasses). A `System` is a collection of `MolecularComponent`
-            objects (e.g. protein or ligand-like entities), plus an optional `Measurement`.
+        measurements: A DatasetProvider holds a list of `kinoml.core.measurements.BaseMeasurement`
+            objects (or any of its subclasses). They must be of the same type!
     """
 
     _raw_data = None
 
     def __init__(
-        self, systems: Iterable[System], *args, **kwargs,
+        self, measurements: Iterable[BaseMeasurement], *args, **kwargs,
     ):
-        self.systems = systems
+        types = {type(measurement) for measurement in measurements}
+        assert (
+            len(types) == 1
+        ), f"Dataset providers can only allow one type of measurement! You provided: {types}"
+        self.measurements = measurements
 
     @classmethod
     def from_source(cls, filename=None, **kwargs):
@@ -38,35 +44,35 @@ class BaseDatasetProvider:
         """
         raise NotImplementedError
 
-    def featurize(self, *featurizers: Iterable[BaseFeaturizer]) -> System:
+    def featurize(self, *featurizers: Iterable[BaseFeaturizer]):
         """
         Given a collection of `kinoml.features.core.BaseFeaturizers`, apply them
-        to the present systems.
+        to the systems present in the `self.measurements`.
 
         Parameters:
-            featurizers: Featurization schemes that will be applied to the system,
+            featurizers: Featurization schemes that will be applied to the systems,
                 in a stacked way.
 
         !!! todo
             * Do we want to support parallel featurizing too or only stacked featurization?
             * Shall we modify the system in place (default now), return the modified copy or store it?
         """
-        # Do we assume the dataset is homogeneous (single type of system and associated measurement)?
-        # That would allow to only check once (e.g. test support for first system)
-        for system in tqdm(self.systems, desc="Featurizing systems..."):
+        systems = self.systems
+        for featurizer in featurizers:
+            # .supports() will test for system type, type of components, type of measurement, etc
+            featurizer.supports(next(iter(systems)), raise_errors=True)
+
+        for system in tqdm(systems, desc="Featurizing systems..."):
             for featurizer in featurizers:
-                featurizer.supports(system, raise_errors=True)
-                # .supports() will test for system type, type of components, type of measurement, etc
                 system.featurizations[featurizer.name] = featurizer.featurize(system, inplace=True)
-                system.featurizations["last"] = system.featurizations[featurizer.name]
+            system.featurizations["last"] = system.featurizations[featurizers[-1].name]
 
     def clear_featurizations(self):
         for system in self.systems:
             system.featurizations.clear()
 
-    def featurized_systems(self):
-        for ms in self.systems:
-            yield ms, ms.featurizations["last"]
+    def featurized_systems(self, key="last"):
+        return [ms.system.featurizations[key] for ms in self.measurements]
 
     def _to_dataset(self, style="pytorch"):
         """
@@ -101,16 +107,23 @@ class BaseDatasetProvider:
         """
         if not self.systems:
             return pd.DataFrame()
-        s = self.systems[0]
+        columns = ["Systems", "n_components", self.measurements[0].__class__.__name__]
         records = [
-            [s.__class__.__name__, "n_components", f"Avg {s.measurement.__class__.__name__}",]
+            (
+                measurement.system.name,
+                len(measurement.system.components),
+                measurement.values.mean(),
+            )
+            for measurement in self.measurements
         ]
-        for system in self.systems:
-            records.append([system.name, len(system.components), system.measurement.values.mean()])
-        return pd.DataFrame.from_records(records[1:], columns=records[0])
 
-    def to_pytorch(self, *args, **kwargs):
-        raise NotImplementedError
+        return pd.DataFrame.from_records(records, columns=columns)
+
+    def to_pytorch(self, **kwargs):
+        from .torch_datasets import TorchDataset
+
+        dataset = TorchDataset(self.featurized_systems(), self.measurements_as_array(**kwargs))
+        return dataset
 
     def to_tensorflow(self, *args, **kwargs):
         raise NotImplementedError
@@ -118,15 +131,63 @@ class BaseDatasetProvider:
     def to_numpy(self, *args, **kwargs):
         raise NotImplementedError
 
+    def mapping(self, backend="pytorch"):
+        """
+        Draft implementation of a modular mapping function, based on individual contributions
+        from different measurement types.
+        """
+        assert backend in ("pytorch",), f"Backend {backend} is not supported!"
+        return getattr(self, f"_mapping_{backend}")(self.measurement_type.mapping(backend=backend))
+
+    @staticmethod
+    def _mapping_pytorch(mapping):
+        def inner_mapping(values, **kwargs):
+            """
+            Pytorch sum of the tensors returned by the underlying `mapping` function,
+            implemented by the `MeasurementType` class. `kwargs` are forwarded blindly.
+            Check `self.measurement_type` to explore its `.mapping()` method
+            for more information.
+            """
+            import torch
+
+            tensor = torch.empty(len(values))
+            tensor[:] = mapping(values, **kwargs)
+            # TODO: Do we want to sum the mappings here or just the losses?
+            #       Probably the losses, right?
+            return tensor  # .sum(1)
+
+        return inner_mapping
+
+    @staticmethod
+    def _loss_tensorflow(**kwargs):
+        raise NotImplementedError("Implement in your subclass!")
+
     @property
-    def assay_conditions(self):
-        conditions = set()
-        for system in self.systems:
-            conditions.add(system.measurement.conditions)
-        return conditions
+    def systems(self):
+        return list({ms.system for ms in self.measurements})
+
+    @property
+    def measurement_type(self):
+        return type(self.measurements[0])
+
+    def measurements_as_array(self, reduce=np.mean):
+        import numpy as np
+
+        result = np.empty(len(self.measurements))
+        for i, measurement in enumerate(self.measurements):
+            result[i] = reduce(measurement.values)
+        return result
+
+    @property
+    def conditions(self):
+        return {ms.conditions for ms in self.measurements}
 
     def __repr__(self) -> str:
-        return f"<{self.__class__.__name__} with {len(self.systems)} systems>"
+        return (
+            f"<{self.__class__.__name__} with "
+            f"{len(self.measurements)} {self.measurement_type.__name__} measurements "
+            f"and {len(self.systems)} systems>"
+        )
 
 
 class ProteinLigandDatasetProvider(BaseDatasetProvider):

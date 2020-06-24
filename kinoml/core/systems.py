@@ -4,7 +4,6 @@ from typing import Union, Iterable
 
 from .components import MolecularComponent
 from .ligands import BaseLigand
-from .measurements import BaseMeasurement
 from .proteins import BaseProtein
 
 
@@ -21,29 +20,18 @@ class System:
     """
 
     def __init__(
-        self,
-        components: Iterable[MolecularComponent],
-        measurement: Union[None, BaseMeasurement] = None,
-        strict: bool = True,
-        *args,
-        **kwargs,
+        self, components: Iterable[MolecularComponent], strict: bool = True, *args, **kwargs,
     ):
         super().__init__(*args, **kwargs)
-        self._measurement = None
         self.components = components
-        self.measurement = measurement
         self.featurizations = {}
         if strict:
             self.sanity_checks()
 
-    @property
-    def measurement(self):
-        return self._measurement
-
-    @measurement.setter
-    def measurement(self, value):
-        assert value is None or isinstance(value, BaseMeasurement)
-        self._measurement = value
+    def _components_by_type(self, type_):
+        for component in self.components:
+            if isinstance(component, type_):
+                yield component
 
     def sanity_checks(self):
         assert self.components, "`System` must specify at least one component"
@@ -73,8 +61,7 @@ class System:
     def __repr__(self) -> str:
         return (
             f"<{self.__class__.__name__} with "
-            f"{len(self.components)} components ({', '.join([repr(c) for c in self.components])}) "
-            f"and {self.measurement!r}>"
+            f"{len(self.components)} components ({', '.join([repr(c) for c in self.components])})>"
         )
 
 
@@ -85,46 +72,27 @@ class ProteinLigandComplex(System):
 
     @property
     def ligand(self):
-        for component in self.components:
-            if isinstance(component, BaseLigand):
-                return component
+        return list(self._components_by_type(BaseLigand))[0]
 
     @property
     def protein(self):
-        for component in self.components:
-            if isinstance(component, BaseProtein):
-                return component
+        return list(self._components_by_type(BaseProtein))[0]
 
     @property
     def ligands(self):
-        for component in self.components:
-            if isinstance(component, BaseLigand):
-                yield component
+        return list(self._components_by_type(BaseLigand))
 
     @property
     def proteins(self):
-        for component in self.components:
-            if isinstance(component, BaseProtein):
-                yield component
+        return list(self._components_by_type(BaseProtein))
 
     def sanity_checks(self):  # this is a requirement
         super().sanity_checks()
-        assert (
-            len(list(self.ligands)) >= 1 and len(list(self.proteins)) >= 1
-        ), "A ProteinLigandComplex must specify at least one Ligand and one Protein"
+        assert len(list(self.ligands)) >= 1 and len(list(self.proteins)) >= 1, (
+            "A ProteinLigandComplex must specify at least one Ligand and one Protein. "
+            f"Current contents: {self}."
+        )
 
     # Bonus perks!
     def dock(self):
         raise NotImplementedError
-
-
-class MeasuredSystem(System):
-
-    """
-    Subclass of System that requires a non-null `measurement` attribute.
-    """
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        if self.measurement is None:
-            raise ValueError("`MeasuredSystem` must specify a non-null measurement.")

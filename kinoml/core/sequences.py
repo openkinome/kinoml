@@ -39,6 +39,7 @@ class Biosequence(str):
             )
         s = super().__new__(cls, value, *args, **kwargs)
         s.name = name
+        s.sequence = value
         s._provenance = {}
         # TODO: We might override some provenance data with this blind update
         if _provenance is not None:

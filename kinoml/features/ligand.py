@@ -58,7 +58,7 @@ class MorganFingerprintFeaturizer(SingleLigandFeaturizer):
 
         mol = ligand.to_rdkit()
         fp = Morgan(mol, radius=self.radius, nBits=self.nbits)
-        return np.asarray(fp)
+        return np.asarray(fp, dtype="uint8")
 
 
 class OneHotSMILESFeaturizer(BaseOneHotEncodingFeaturizer, SingleLigandFeaturizer):
