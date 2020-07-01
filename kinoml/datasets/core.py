@@ -15,6 +15,58 @@ logger = logging.getLogger(__name__)
 
 
 class BaseDatasetProvider:
+    """
+    API specification for dataset providers
+    """
+
+    @classmethod
+    def from_source(cls, filename=None, **kwargs):
+        """
+        Parse CSV/raw files to object model.
+        """
+        raise NotImplementedError
+
+    def observation_model(self, backend="pytorch"):
+        raise NotImplementedError
+
+    @property
+    def systems(self):
+        raise NotImplementedError
+
+    @property
+    def measurement_type(self):
+        raise NotImplementedError
+
+    def measurements_as_array(self, reduce=np.mean):
+        raise NotImplementedError
+
+    @property
+    def conditions(self):
+        raise NotImplementedError
+
+    def featurize(self, *featurizers: Iterable[BaseFeaturizer]):
+        raise NotImplementedError
+
+    def clear_featurizations(self):
+        raise NotImplementedError
+
+    def featurized_systems(self, key="last"):
+        raise NotImplementedError
+
+    def to_dataframe(self, *args, **kwargs):
+        raise NotImplementedError
+
+    def to_pytorch(self, **kwargs):
+        raise NotImplementedError
+
+    def to_tensorflow(self, *args, **kwargs):
+        raise NotImplementedError
+
+    def to_numpy(self, *args, **kwargs):
+        raise NotImplementedError
+
+
+class DatasetProvider(BaseDatasetProvider):
 
     """
     Base object for all DatasetProvider classes.
@@ -120,10 +172,12 @@ class BaseDatasetProvider:
         return pd.DataFrame.from_records(records, columns=columns)
 
     def to_pytorch(self, **kwargs):
+        import torch
         from .torch_datasets import TorchDataset
 
-        dataset = TorchDataset(self.featurized_systems(), self.measurements_as_array(**kwargs))
-        return dataset
+        systems = torch.Tensor(self.featurized_systems())
+        measurements = torch.from_numpy(self.measurements_as_array(**kwargs))
+        return TorchDataset(systems, measurements)
 
     def to_tensorflow(self, *args, **kwargs):
         raise NotImplementedError
@@ -131,36 +185,12 @@ class BaseDatasetProvider:
     def to_numpy(self, *args, **kwargs):
         raise NotImplementedError
 
-    def mapping(self, backend="pytorch"):
+    def observation_model(self, backend="pytorch"):
         """
-        Draft implementation of a modular mapping function, based on individual contributions
+        Draft implementation of a modular observation model, based on individual contributions
         from different measurement types.
         """
-        assert backend in ("pytorch",), f"Backend {backend} is not supported!"
-        return getattr(self, f"_mapping_{backend}")(self.measurement_type.mapping(backend=backend))
-
-    @staticmethod
-    def _mapping_pytorch(mapping):
-        def inner_mapping(values, **kwargs):
-            """
-            Pytorch sum of the tensors returned by the underlying `mapping` function,
-            implemented by the `MeasurementType` class. `kwargs` are forwarded blindly.
-            Check `self.measurement_type` to explore its `.mapping()` method
-            for more information.
-            """
-            import torch
-
-            tensor = torch.empty(len(values))
-            tensor[:] = mapping(values, **kwargs)
-            # TODO: Do we want to sum the mappings here or just the losses?
-            #       Probably the losses, right?
-            return tensor  # .sum(1)
-
-        return inner_mapping
-
-    @staticmethod
-    def _loss_tensorflow(**kwargs):
-        raise NotImplementedError("Implement in your subclass!")
+        return self.measurement_type.observation_model(backend=backend)
 
     @property
     def systems(self):
@@ -171,8 +201,6 @@ class BaseDatasetProvider:
         return type(self.measurements[0])
 
     def measurements_as_array(self, reduce=np.mean):
-        import numpy as np
-
         result = np.empty(len(self.measurements))
         for i, measurement in enumerate(self.measurements):
             result[i] = reduce(measurement.values)
@@ -190,5 +218,47 @@ class BaseDatasetProvider:
         )
 
 
-class ProteinLigandDatasetProvider(BaseDatasetProvider):
+class MultiDatasetProvider(DatasetProvider):
+    def __init__(self, providers):
+        self.providers = providers
+
+    def observation_models(self, backend="pytorch"):
+        return [p.observation_model(backend=backend) for p in self.providers]
+
+    @property
+    def measurements(self):
+        """
+        Note that right now we are flattening the list for API compatibility.
+
+        With a flattened list:
+
+        >>> lengths = [len(p) for p in providers]
+        >>> first = self.measurements[:lengths[0]]
+        >>> second = self.measurements[lengths[0]:lengths[0] + lengths[1]]
+
+        With several lists:
+
+        >>> first, second = self.measurements
+        """
+        return [ms for prov in self.providers for ms in prov.measurements]
+
+    def to_dataframe(self, *args, **kwargs):
+        columns = ["Systems", "n_components", "Measurement", "MeasurementType"]
+        records = []
+        for provider in self.providers:
+            measurement_type = provider.measurement_type.__name__
+            for measurement in provider.measurements:
+                records.append(
+                    (
+                        measurement.system.name,
+                        len(measurement.system.components),
+                        measurement.values.mean(),
+                        measurement_type,
+                    )
+                )
+
+        return pd.DataFrame.from_records(records, columns=columns)
+
+
+class ProteinLigandDatasetProvider(DatasetProvider):
     pass

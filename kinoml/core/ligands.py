@@ -16,15 +16,15 @@ class Ligand(BaseLigand, Molecule):
         Everything in this class
     """
 
-    def __init__(self, _provenance=None, name="", *args, **kwargs):
+    def __init__(self, metadata=None, name="", *args, **kwargs):
         Molecule.__init__(self, *args, **kwargs)
-        BaseLigand.__init__(self, name=name, _provenance=_provenance)
+        BaseLigand.__init__(self, name=name, metadata=metadata)
 
     @classmethod
     def from_smiles(cls, smiles, name=None, **kwargs):  # pylint: disable=arguments-differ
         """
         Same as `openforcefield.topology.Molecule`, but adding
-        information about the original SMILES to `._provenance` dict.
+        information about the original SMILES to `.metadata` dict.
 
         !!! todo
             Inheritance from these methods in OFF is broken because they
@@ -37,14 +37,14 @@ class Ligand(BaseLigand, Molecule):
         self = super().from_smiles(smiles, **kwargs)
         if name is None:
             name = smiles
-        super().__init__(self, name=name, _provenance={"smiles": smiles})
+        super().__init__(self, name=name, metadata={"smiles": smiles})
         return self
 
     def to_dict(self):
         d = super().to_dict()
-        d["_provenance"] = self._provenance.copy()
+        d["metadata"] = self.metadata.copy()
         return d
 
     def _initialize_from_dict(self, molecule_dict):
         super()._initialize_from_dict(molecule_dict)
-        self._provenance = molecule_dict["_provenance"].copy()
+        self.metadata = molecule_dict["metadata"].copy()

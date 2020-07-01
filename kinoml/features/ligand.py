@@ -104,7 +104,7 @@ class OneHotRawSMILESFeaturizer(OneHotSMILESFeaturizer):
         for comp in system.components:
             if isinstance(comp, Ligand):  # we only process the first one now
                 return (
-                    comp._provenance["smiles"]
+                    comp.metadata["smiles"]
                     .replace("Cl", "L")
                     .replace("Br", "R")
                     .replace("@@", "$")

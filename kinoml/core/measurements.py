@@ -31,13 +31,14 @@ class BaseMeasurement:
         system: System,
         errors: Union[float, Iterable[float]] = np.nan,
         strict: bool = True,
+        metadata: dict = None,
         **kwargs,
     ):
         self._values = np.reshape(values, (1,))
         self._errors = np.reshape(errors, (1,))
         self.conditions = conditions
         self.system = system
-
+        self.metadata = metadata or {}
         if strict:
             self.sanity_checks()
 
@@ -50,13 +51,13 @@ class BaseMeasurement:
         return self._errors
 
     @classmethod
-    def mapping(cls, backend="pytorch"):
+    def observation_model(cls, backend="pytorch"):
         """
-        The mapping function must be defined Measurement type, in the appropriate
+        The observation_model function must be defined Measurement type, in the appropriate
         subclass. It dispatches to underlying static methods, suffixed by the
-        backend (e.g. `mapping_pytorch`, `mapping_tensorflow`). These methods are
+        backend (e.g. `_observation_model_pytorch`, `_observation_model_tensorflow`). These methods are
         _static_, so they do not have access to the class. This is done on purpose
-        for composability of modular mapping functions. The parent DatasetProvider
+        for composability of modular observation_model functions. The parent DatasetProvider
         classes will request just the function (and not the computed value), and
         will pass the needed variables. The signature is, hence, undefined.
 
@@ -65,14 +66,14 @@ class BaseMeasurement:
         - `values`
         - `errors`
         """
-        return cls._mapping(backend=backend)
+        return cls._observation_model(backend=backend)
 
     @classmethod
-    def _mapping(cls, backend="pytorch", type_=None):
+    def _observation_model(cls, backend="pytorch", type_=None):
         assert backend in ("pytorch", "tensorflow"), f"Backend {backend} is not supported!"
-        return getattr(cls, f"_mapping_{backend}")
+        return getattr(cls, f"_observation_model_{backend}")
 
-    def _mapping_pytorch(self, **kwargs):
+    def _observation_model_pytorch(self, **kwargs):
         raise NotImplementedError("Implement in your subclass!")
 
     def sanity_checks(self):
@@ -102,7 +103,7 @@ class PercentageDisplacementMeasurement(BaseMeasurement):
         assert (0 <= self.values <= 100).all(), "One or more values are not in [0, 100]"
 
     @classmethod
-    def mapping(cls, backend="pytorch"):
+    def observation_model(cls, backend="pytorch"):
         r"""
         For the percent displacement measurements available from KinomeScan, we make the assumption (see JDC's notes) that
 
@@ -110,7 +111,7 @@ class PercentageDisplacementMeasurement(BaseMeasurement):
         D([I]) \approx \frac{1}{1 + \frac{K_d}{[I]}}
         $$
 
-        For KinomeSCAN assays, all assays are usually performed at a single concentration, $ [I] \sim 1 \mu M $.
+        For KinomeSCAN assays, all assays are usually performed at a single molar concentration, $ [I] \sim 1 \mu M $.
 
         We therefore define the following function:
 
@@ -118,15 +119,15 @@ class PercentageDisplacementMeasurement(BaseMeasurement):
         \mathbf{F}_{KinomeScan}(\Delta g, [I]) = \frac{1}{1 + \frac{exp[-\Delta g] * 1[M]}{[I]}}.
         $$
         """
-        return cls._mapping(backend=backend)
+        return cls._observation_model(backend=backend)
 
     @staticmethod
-    def _mapping_pytorch(values, inhibitor_conc=1, **kwargs):
+    def _observation_model_pytorch(values, inhibitor_conc=1, **kwargs):
         # TODO: Mask nan-values!
         import torch
 
-        values = torch.from_numpy(values)
-        return 1 / (1 + torch.exp(-values) * 1 / inhibitor_conc)
+        # values = torch.from_numpy(values)
+        return 1 / (1 + torch.exp(values) * inhibitor_conc)
 
 
 class IC50Measurement(BaseMeasurement):
@@ -136,7 +137,7 @@ class IC50Measurement(BaseMeasurement):
     """
 
     @classmethod
-    def mapping(cls, backend="pytorch"):
+    def observation_model(cls, backend="pytorch"):
         r"""
         We use the Cheng Prusoff equation here.
 
@@ -163,16 +164,16 @@ class IC50Measurement(BaseMeasurement):
         $$
 
         """
-        return cls._mapping(backend=backend)
+        return cls._observation_model(backend=backend)
 
     @staticmethod
-    def _mapping_pytorch(
+    def _observation_model_pytorch(
         values, substrate_conc=1, michaelis_constant=1, inhibitor_conc=1, **kwargs
     ):
         import torch
 
-        values = torch.from_numpy(values.reshape((-1, 1)))
-        return (1 + substrate_conc / michaelis_constant) * (torch.exp(-values) * inhibitor_conc)
+        # values = torch.from_numpy(values.reshape((-1, 1)))
+        return (1 + substrate_conc / michaelis_constant) * torch.exp(values) * inhibitor_conc
 
 
 class KiMeasurement(BaseMeasurement):
@@ -182,17 +183,17 @@ class KiMeasurement(BaseMeasurement):
     """
 
     @classmethod
-    def mapping(cls, backend="pytorch"):
+    def observation_model(cls, backend="pytorch"):
         r"""
         We make the assumption that $K_i \approx K_d$ and therefore $\mathbf{F}_{K_i} = \mathbf{F}_{K_d}$.
         """
-        return cls._mapping(backend=backend)
+        return cls._observation_model(backend=backend)
 
-    def _mapping_pytorch(self, values, inhibitor_conc=1, **kwargs):
+    def _observation_model_pytorch(self, values, inhibitor_conc=1, **kwargs):
         import torch
 
-        values = torch.from_numpy(values.reshape((-1, 1)))
-        return torch.exp(-values) * inhibitor_conc
+        # values = torch.from_numpy(values.reshape((-1, 1)))
+        return torch.exp(values) * inhibitor_conc
 
 
 class KdMeasurement(BaseMeasurement):
@@ -202,7 +203,7 @@ class KdMeasurement(BaseMeasurement):
     """
 
     @classmethod
-    def mapping(cls, backend="pytorch"):
+    def observation_model(cls, backend="pytorch"):
         r"""
         We define the following physics-based function
         $$
@@ -216,10 +217,10 @@ class KdMeasurement(BaseMeasurement):
         $$
 
         """
-        return cls._mapping(backend=backend)
+        return cls._observation_model(backend=backend)
 
-    def _mapping_pytorch(self, values, inhibitor_conc=1, **kwargs):
+    def _observation_model_pytorch(self, values, inhibitor_conc=1, **kwargs):
         import torch
 
-        values = torch.from_numpy(values.reshape((-1, 1)))
-        return torch.exp(-values) * inhibitor_conc
+        # values = torch.from_numpy(values.reshape((-1, 1)))
+        return torch.exp(values) * inhibitor_conc

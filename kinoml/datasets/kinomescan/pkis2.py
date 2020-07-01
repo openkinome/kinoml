@@ -33,7 +33,7 @@ class PKIS2DatasetProvider(KinomeScanDatasetProvider):
     >>> from kinoml.datasets.kinomescan.pkis2 import PKIS2DatasetProvider
     >>> provider = PKIS2DatasetProvider.from_source()
     >>> system = provider.systems[0]
-    >>> print(f"% displacement for kinase={system.protein.name} and ligand={system.ligand.to_smiles()} is {system.measurement}"
+    >>> print(f"% displacement for kinase={system.protein.name} and ligand={system.ligand.to_smiles()} is {system.measurement}")
 
     ```
     """
@@ -71,8 +71,8 @@ class PKIS2DatasetProvider(KinomeScanDatasetProvider):
             if math.isnan(mutations):
                 mutations = None
             start_stop = mapper.start_stop_for_name(kin_name)
-            provenance = {"accession": accession, "mutations": mutations, "start_stop": start_stop}
-            kinases.append(AminoAcidSequence(sequence, name=kin_name, _provenance=provenance))
+            metadata = {"accession": accession, "mutations": mutations, "start_stop": start_stop}
+            kinases.append(AminoAcidSequence(sequence, name=kin_name, metadata=metadata))
 
         # Read in ligands
         ligands = []
