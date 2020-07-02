@@ -116,18 +116,17 @@ class PercentageDisplacementMeasurement(BaseMeasurement):
         We therefore define the following function:
 
         $$
-        \mathbf{F}_{KinomeScan}(\Delta g, [I]) = \frac{1}{1 + \frac{exp[-\Delta g] * 1[M]}{[I]}}.
+        \mathbf{F}_{KinomeScan}(\Delta g, [I]) = \frac{1}{1 + \frac{exp[\Delta g] * 1[M]}{[I]}}.
         $$
         """
         return cls._observation_model(backend=backend)
 
     @staticmethod
-    def _observation_model_pytorch(values, inhibitor_conc=1, **kwargs):
-        # TODO: Mask nan-values!
+    def _observation_model_pytorch(values, inhibitor_conc=1e-6, **kwargs):
         import torch
 
         # values = torch.from_numpy(values)
-        return 1 / (1 + torch.exp(values) * inhibitor_conc)
+        return 100 / (1 + torch.exp(values) / inhibitor_conc)
 
 
 class IC50Measurement(BaseMeasurement):
