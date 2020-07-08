@@ -116,7 +116,7 @@ class DatasetProvider(BaseDatasetProvider):
 
         for system in tqdm(systems, desc="Featurizing systems..."):
             for featurizer in featurizers:
-                system.featurizations[featurizer.name] = featurizer.featurize(system, inplace=True)
+                featurizer.featurize(system, inplace=True)
             system.featurizations["last"] = system.featurizations[featurizers[-1].name]
 
     def clear_featurizations(self):
@@ -172,12 +172,9 @@ class DatasetProvider(BaseDatasetProvider):
         return pd.DataFrame.from_records(records, columns=columns)
 
     def to_pytorch(self, **kwargs):
-        import torch
         from .torch_datasets import TorchDataset
 
-        systems = torch.Tensor(self.featurized_systems())
-        measurements = torch.from_numpy(self.measurements_as_array(**kwargs))
-        return TorchDataset(systems, measurements)
+        return TorchDataset(self.featurized_systems(), self.measurements_as_array(**kwargs))
 
     def to_tensorflow(self, *args, **kwargs):
         raise NotImplementedError
