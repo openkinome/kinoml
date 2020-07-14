@@ -59,8 +59,8 @@ class ChEMBLDatasetProvider(MultiDatasetProvider):
                     zf.extractall(tmpdir)
                 cached_path.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copyfile(Path(tmpdir) / csv_filename, cached_path)
-        df = pd.read_csv(cached_path)  # .dropna(subset=["compound_structures.canonical_smiles"])
-        return df
+        df = pd.read_csv(cached_path).dropna(subset=["compound_structures.canonical_smiles"])
+        # return df
 
         measurement_type_classes = {
             "IC50": IC50Measurement,
@@ -71,11 +71,10 @@ class ChEMBLDatasetProvider(MultiDatasetProvider):
         systems = {}
         kinases = {}
         ligands = {}
-        for row in tqdm(df.to_dict("records")[:100]):
+        filtered_records = df[df["activities.standard_type"].isin(set(measurement_types))]
+        for row in tqdm(filtered_records.to_dict("records")):
             try:
                 measurement_type_key = row["activities.standard_type"]
-                if measurement_type_key not in measurement_types:
-                    continue
                 kinase_key = row["component_sequences.sequence"]
                 ligand_key = row["compound_structures.canonical_smiles"]
                 system_key = (kinase_key, ligand_key)
@@ -118,8 +117,11 @@ class ChEMBLDatasetProvider(MultiDatasetProvider):
             except Exception as exc:
                 print("Couldn't process record", row)
                 print("Exception", exc)
-
-        providers = [_SingleTypeChEMBLDatasetProvider(ms) for ms in measurements_by_type.values()]
+        providers = [
+            _SingleTypeChEMBLDatasetProvider(list(ms))
+            for ms in measurements_by_type.values()
+            if len(ms)
+        ]
         return cls(providers)
 
 
