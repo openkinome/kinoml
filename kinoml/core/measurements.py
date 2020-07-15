@@ -170,7 +170,7 @@ class IC50Measurement(BaseMeasurement):
 
     @staticmethod
     def _observation_model_pytorch(
-        values, substrate_conc=1, michaelis_constant=1, inhibitor_conc=1, **kwargs
+        values, substrate_conc=1e-6, michaelis_constant=1, inhibitor_conc=1e-6, **kwargs
     ):
         import torch
 
@@ -192,7 +192,7 @@ class KiMeasurement(BaseMeasurement):
     """
 
     @staticmethod
-    def _observation_model_pytorch(values, inhibitor_conc=1, **kwargs):
+    def _observation_model_pytorch(values, inhibitor_conc=1e-6, **kwargs):
         import torch
 
         return torch.exp(values) * inhibitor_conc
@@ -222,7 +222,7 @@ class KdMeasurement(BaseMeasurement):
     """
 
     @staticmethod
-    def _observation_model_pytorch(values, inhibitor_conc=1, **kwargs):
+    def _observation_model_pytorch(values, inhibitor_conc=1e-6, **kwargs):
         import torch
 
         return torch.exp(values) * inhibitor_conc

@@ -3,6 +3,7 @@ Creates DatasetProvider objects from ChEMBL activity data
 """
 from urllib.request import urlopen
 import shutil
+import random
 from tempfile import TemporaryDirectory
 from zipfile import ZipFile
 from pathlib import Path
@@ -31,6 +32,7 @@ class ChEMBLDatasetProvider(MultiDatasetProvider):
         cls,
         filename="https://github.com/openkinome/datascripts/releases/download/v0.1/activities-chembl27.zip",
         measurement_types=("IC50", "Ki", "Kd"),
+        sample=None,
         **kwargs
     ):
         """
@@ -71,8 +73,12 @@ class ChEMBLDatasetProvider(MultiDatasetProvider):
         systems = {}
         kinases = {}
         ligands = {}
-        filtered_records = df[df["activities.standard_type"].isin(set(measurement_types))]
-        for row in tqdm(filtered_records.to_dict("records")):
+        filtered_records = df[df["activities.standard_type"].isin(set(measurement_types))].to_dict(
+            "records"
+        )
+        if sample is not None:
+            filtered_records = random.sample(filtered_records, sample)
+        for row in tqdm(filtered_records):
             try:
                 measurement_type_key = row["activities.standard_type"]
                 kinase_key = row["component_sequences.sequence"]

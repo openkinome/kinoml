@@ -226,18 +226,22 @@ class MultiDatasetProvider(DatasetProvider):
     def measurements(self):
         """
         Note that right now we are flattening the list for API compatibility.
-
         With a flattened list:
-
         >>> lengths = [len(p) for p in providers]
         >>> first = self.measurements[:lengths[0]]
         >>> second = self.measurements[lengths[0]:lengths[0] + lengths[1]]
-
         With several lists:
-
         >>> first, second = self.measurements
         """
         return [ms for prov in self.providers for ms in prov.measurements]
+
+    def indices_by_provider(self):
+        indices = {}
+        offset = 0
+        for p in self.providers:
+            indices[p.measurement_type] = slice(offset, offset + len(p.measurements))
+            offset += len(p.measurements)
+        return indices
 
     def to_dataframe(self, *args, **kwargs):
         columns = ["Systems", "n_components", "Measurement", "MeasurementType"]
@@ -255,6 +259,9 @@ class MultiDatasetProvider(DatasetProvider):
                 )
 
         return pd.DataFrame.from_records(records, columns=columns)
+
+    def to_pytorch(self, **kwargs):
+        return [p.to_pytorch(**kwargs) for p in self.providers]
 
 
 class ProteinLigandDatasetProvider(DatasetProvider):
