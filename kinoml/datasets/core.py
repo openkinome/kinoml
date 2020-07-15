@@ -182,12 +182,12 @@ class DatasetProvider(BaseDatasetProvider):
     def to_numpy(self, *args, **kwargs):
         raise NotImplementedError
 
-    def observation_model(self, backend="pytorch"):
+    def observation_model(self, **kwargs):
         """
         Draft implementation of a modular observation model, based on individual contributions
         from different measurement types.
         """
-        return self.measurement_type.observation_model(backend=backend)
+        return self.measurement_type.observation_model(**kwargs)
 
     @property
     def systems(self):
@@ -219,8 +219,8 @@ class MultiDatasetProvider(DatasetProvider):
     def __init__(self, providers):
         self.providers = providers
 
-    def observation_models(self, backend="pytorch"):
-        return [p.observation_model(backend=backend) for p in self.providers]
+    def observation_models(self, **kwargs):
+        return [p.observation_model(**kwargs) for p in self.providers]
 
     @property
     def measurements(self):
