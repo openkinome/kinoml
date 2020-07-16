@@ -171,10 +171,23 @@ class DatasetProvider(BaseDatasetProvider):
 
         return pd.DataFrame.from_records(records, columns=columns)
 
-    def to_pytorch(self, **kwargs):
+    def to_pytorch(self, featurizer=None, **kwargs):
         from .torch_datasets import TorchDataset
 
-        return TorchDataset(self.featurized_systems(), self.measurements_as_array(**kwargs))
+        if featurizer is not None:
+            systems = [ms.system for ms in self.measurements]
+            return TorchDataset(
+                systems,
+                self.measurements_as_array(**kwargs),
+                featurizer=featurizer,
+                observation_model=self.observation_model(backend="pytorch"),
+            )
+        # else
+        return TorchDataset(
+            self.featurized_systems(),
+            self.measurements_as_array(**kwargs),
+            observation_model=self.observation_model(backend="pytorch"),
+        )
 
     def to_tensorflow(self, *args, **kwargs):
         raise NotImplementedError

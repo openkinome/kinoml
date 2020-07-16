@@ -39,6 +39,9 @@ class BaseFeaturizer:
         system.featurizations[self.name] = features
         return system
 
+    def __call__(self, *args, **kwargs):
+        return self.featurize(*args, **kwargs)
+
     def _featurize(self, system: System) -> object:
         """
         Implement this method to do the actual work for `self.featurize()`.
@@ -245,3 +248,8 @@ class HashFeaturizer(BaseFeaturizer):
         if self.normalize:
             return np.reshape(int(h.hexdigest(), base=16) / 2 ** 256, (1,))
         return np.reshape(int(h.hexdigest(), base=16), (1,))
+
+
+class NullFeaturizer(BaseFeaturizer):
+    def featurize(self, system, inplace: bool = True) -> object:
+        return system

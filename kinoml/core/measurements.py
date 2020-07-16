@@ -232,3 +232,7 @@ class KdMeasurement(BaseMeasurement):
         import torch
 
         return -torch.log10(KdMeasurement._observation_model_pytorch(*args, **kwargs))
+
+
+def null_observation_model(arg):
+    return arg

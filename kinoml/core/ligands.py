@@ -7,6 +7,12 @@ from .components import BaseLigand
 logger = logging.getLogger(__name__)
 
 
+class SmilesLigand(BaseLigand):
+    def __init__(self, smiles, metadata=None, name="", *args, **kwargs):
+        BaseLigand.__init__(self, name=name, metadata=metadata)
+        self.smiles = smiles
+
+
 class Ligand(BaseLigand, Molecule):
 
     """
@@ -21,7 +27,9 @@ class Ligand(BaseLigand, Molecule):
         BaseLigand.__init__(self, name=name, metadata=metadata)
 
     @classmethod
-    def from_smiles(cls, smiles, name=None, **kwargs):  # pylint: disable=arguments-differ
+    def from_smiles(
+        cls, smiles, name=None, allow_undefined_stereo=True, **kwargs
+    ):  # pylint: disable=arguments-differ
         """
         Same as `openforcefield.topology.Molecule`, but adding
         information about the original SMILES to `.metadata` dict.
@@ -34,7 +42,7 @@ class Ligand(BaseLigand, Molecule):
 
             PR #583 has been submitted to patch upstream
         """
-        self = super().from_smiles(smiles, **kwargs)
+        self = super().from_smiles(smiles, allow_undefined_stereo=allow_undefined_stereo, **kwargs)
         if name is None:
             name = smiles
         super().__init__(self, name=name, metadata={"smiles": smiles})
