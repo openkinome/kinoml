@@ -127,7 +127,7 @@ class PercentageDisplacementMeasurement(BaseMeasurement):
     def _observation_model_pytorch(values, inhibitor_conc=1e-6, **kwargs):
         import torch
 
-        return 100 / (1 + torch.exp(values) / inhibitor_conc)
+        return 100 * (1 - 1 / (1 + inhibitor_conc / torch.exp(values)))
 
     @staticmethod
     def _observation_model_log10_pytorch(*args, **kwargs):
