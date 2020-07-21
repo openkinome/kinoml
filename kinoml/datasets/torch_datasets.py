@@ -3,10 +3,7 @@ from functools import lru_cache
 import torch
 from torch.utils.data import Dataset, DataLoader
 
-from ..features.core import NullFeaturizer
 from ..core.measurements import null_observation_model as _null_observation_model
-
-_null_featurizer = NullFeaturizer()
 
 
 class TorchDataset(Dataset):
@@ -14,7 +11,7 @@ class TorchDataset(Dataset):
         self,
         systems,
         measurements,
-        featurizer: callable = _null_featurizer,
+        featurizer: callable = None,
         observation_model: callable = _null_observation_model,
     ):
         assert len(systems) == len(measurements), "Systems and Measurements must match in size!"
@@ -22,11 +19,21 @@ class TorchDataset(Dataset):
         # note we are using as_tensor to _avoid_ copies if possible
         self.systems = systems
         self.measurements = measurements
-        self.featurizer = featurizer
         self.observation_model = observation_model
+        self.featurizer = featurizer
 
-    @lru_cache(maxsize=100000)
-    def __getitem__(self, index):
+        self._getitem = (
+            self._getitem_without_featurizer
+            if featurizer is None
+            else self._getitem_with_featurizer
+        )
+
+    @lru_cache(maxsize=100_000)
+    def _getitem_with_featurizer(self, index):
+        """
+        In this case, the DatasetProvider is passing System objects that will
+        be featurized (and memoized) upon access only.
+        """
         # TODO: featurize y?
 
         X = torch.as_tensor(
@@ -37,6 +44,22 @@ class TorchDataset(Dataset):
         y = torch.as_tensor(self.measurements[index], device=self.device)
         return X, y
 
+    @lru_cache(maxsize=100_000)
+    def _getitem_without_featurizer(self, index):
+        """
+        In this case, the DatasetProvider is passing the numpy arrays already,
+        so we don't need to featurize anything
+        """
+        # TODO: featurize y?
+
+        X = torch.as_tensor(self.systems[index], device=self.device, dtype=torch.float,)
+        y = torch.as_tensor(self.measurements[index], device=self.device)
+        return X, y
+
+    def __getitem__(self, index):
+        # self._getitem is defined at __init__, depending on the value of self.featurizer
+        return self._getitem(index)
+
     def __len__(self):
         return len(self.systems)
 
@@ -44,6 +67,6 @@ class TorchDataset(Dataset):
         return DataLoader(dataset=self, **kwargs)
 
     def estimate_input_size(self):
-        if isinstance(self.featurizer, NullFeaturizer):
+        if self.featurizer is None:
             return self.systems[0].shape
         return self.featurizer(self.systems[0]).featurizations[self.featurizer.name].shape
