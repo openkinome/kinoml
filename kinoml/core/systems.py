@@ -26,14 +26,14 @@ class System:
         self.components = components
         self.featurizations = {}
         if strict:
-            self.sanity_checks()
+            self.check()
 
     def _components_by_type(self, type_):
         for component in self.components:
             if isinstance(component, type_):
                 yield component
 
-    def sanity_checks(self):
+    def check(self):
         assert self.components, "`System` must specify at least one component"
 
     @property
@@ -86,8 +86,8 @@ class ProteinLigandComplex(System):
     def proteins(self):
         return list(self._components_by_type(BaseProtein))
 
-    def sanity_checks(self):  # this is a requirement
-        super().sanity_checks()
+    def check(self):  # this is a requirement
+        super().check()
         assert len(list(self.ligands)) >= 1 and len(list(self.proteins)) >= 1, (
             "A ProteinLigandComplex must specify at least one Ligand and one Protein. "
             f"Current contents: {self}."

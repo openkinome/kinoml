@@ -40,7 +40,7 @@ class BaseMeasurement:
         self.system = system
         self.metadata = metadata or {}
         if strict:
-            self.sanity_checks()
+            self.check()
 
     @property
     def values(self):
@@ -83,7 +83,7 @@ class BaseMeasurement:
     def _observation_model_log10_pytorch(*args, **kwargs):
         raise NotImplementedError("Implement in your subclass!")
 
-    def sanity_checks(self):
+    def check(self):
         """
         Perform some checks for valid values
         """
@@ -119,15 +119,15 @@ class PercentageDisplacementMeasurement(BaseMeasurement):
     $$
     """
 
-    def sanity_checks(self):
-        super().sanity_checks()
+    def check(self):
+        super().check()
         assert (0 <= self.values <= 100).all(), "One or more values are not in [0, 100]"
 
     @staticmethod
-    def _observation_model_pytorch(values, inhibitor_conc=1e-6, **kwargs):
+    def _observation_model_pytorch(dG_over_KT, inhibitor_conc=1e-6, **kwargs):
         import torch
 
-        return 100 * (1 - 1 / (1 + inhibitor_conc / torch.exp(values)))
+        return 100 * (1 - 1 / (1 + inhibitor_conc / torch.exp(dG_over_KT)))
 
     @staticmethod
     def _observation_model_log10_pytorch(*args, **kwargs):
@@ -170,11 +170,11 @@ class IC50Measurement(BaseMeasurement):
 
     @staticmethod
     def _observation_model_pytorch(
-        values, substrate_conc=1e-6, michaelis_constant=1, inhibitor_conc=1e-6, **kwargs
+        dG_over_KT, substrate_conc=1e-6, michaelis_constant=1, inhibitor_conc=1e-6, **kwargs
     ):
         import torch
 
-        return (1 + substrate_conc / michaelis_constant) * torch.exp(values) * inhibitor_conc
+        return (1 + substrate_conc / michaelis_constant) * torch.exp(dG_over_KT) * inhibitor_conc
 
     @staticmethod
     def _observation_model_log10_pytorch(*args, **kwargs):
@@ -192,10 +192,10 @@ class KiMeasurement(BaseMeasurement):
     """
 
     @staticmethod
-    def _observation_model_pytorch(values, inhibitor_conc=1e-6, **kwargs):
+    def _observation_model_pytorch(dG_over_KT, inhibitor_conc=1e-6, **kwargs):
         import torch
 
-        return torch.exp(values) * inhibitor_conc
+        return torch.exp(dG_over_KT) * inhibitor_conc
 
     @staticmethod
     def _observation_model_log10_pytorch(*args, **kwargs):
@@ -222,10 +222,10 @@ class KdMeasurement(BaseMeasurement):
     """
 
     @staticmethod
-    def _observation_model_pytorch(values, inhibitor_conc=1e-6, **kwargs):
+    def _observation_model_pytorch(dG_over_KT, inhibitor_conc=1e-6, **kwargs):
         import torch
 
-        return torch.exp(values) * inhibitor_conc
+        return torch.exp(dG_over_KT) * inhibitor_conc
 
     @staticmethod
     def _observation_model_log10_pytorch(*args, **kwargs):
