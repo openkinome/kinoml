@@ -90,6 +90,8 @@ class MorganFingerprintFeaturizer(SingleLigandFeaturizer):
     def _featurize_ligand(self, ligand):
         from rdkit.Chem.AllChem import GetMorganFingerprintAsBitVect as Morgan
 
+        # FIXME: Check whether OFF uses canonical smiles internally, or not
+        # otherwise, we should force that behaviour ourselves!
         mol = ligand.to_rdkit()
         fp = Morgan(mol, radius=self.radius, nBits=self.nbits)
         return np.asarray(fp, dtype="uint8")

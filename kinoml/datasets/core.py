@@ -171,7 +171,7 @@ class DatasetProvider(BaseDatasetProvider):
 
         return pd.DataFrame.from_records(records, columns=columns)
 
-    def to_pytorch(self, featurizer=None, **kwargs):
+    def to_pytorch(self, featurizer=None, minus_log10=False, **kwargs):
         from .torch_datasets import TorchDataset
 
         if featurizer is not None:
@@ -180,13 +180,15 @@ class DatasetProvider(BaseDatasetProvider):
                 systems,
                 self.measurements_as_array(**kwargs),
                 featurizer=featurizer,
-                observation_model=self.observation_model(backend="pytorch"),
+                observation_model=self.observation_model(
+                    backend="pytorch", minus_log10=minus_log10
+                ),
             )
         # else
         return TorchDataset(
             self.featurized_systems(),
             self.measurements_as_array(**kwargs),
-            observation_model=self.observation_model(backend="pytorch"),
+            observation_model=self.observation_model(backend="pytorch", minus_log10=minus_log10),
         )
 
     def to_tensorflow(self, *args, **kwargs):

@@ -51,7 +51,7 @@ class BaseMeasurement:
         return self._errors
 
     @classmethod
-    def observation_model(cls, backend="pytorch", log10=False):
+    def observation_model(cls, backend="pytorch", minus_log10=False):
         """
         The observation_model function must be defined Measurement type, in the appropriate
         subclass. It dispatches to underlying static methods, suffixed by the
@@ -66,13 +66,13 @@ class BaseMeasurement:
         - `values`
         - `errors`
         """
-        return cls._observation_model(backend=backend, log10=log10)
+        return cls._observation_model(backend=backend, minus_log10=minus_log10)
 
     @classmethod
-    def _observation_model(cls, backend="pytorch", log10=False, type_=None):
+    def _observation_model(cls, backend="pytorch", minus_log10=False, type_=None):
         assert backend in ("pytorch", "tensorflow"), f"Backend {backend} is not supported!"
-        if log10:
-            return getattr(cls, f"_observation_model_log10_{backend}")
+        if minus_log10:
+            return getattr(cls, f"_observation_model_minus_log10_{backend}")
         return getattr(cls, f"_observation_model_{backend}")
 
     @staticmethod
@@ -80,7 +80,7 @@ class BaseMeasurement:
         raise NotImplementedError("Implement in your subclass!")
 
     @staticmethod
-    def _observation_model_log10_pytorch(*args, **kwargs):
+    def _observation_model_minus_log10_pytorch(*args, **kwargs):
         raise NotImplementedError("Implement in your subclass!")
 
     def check(self):
@@ -125,12 +125,13 @@ class PercentageDisplacementMeasurement(BaseMeasurement):
 
     @staticmethod
     def _observation_model_pytorch(dG_over_KT, inhibitor_conc=1e-6, **kwargs):
+        # FIXME: this might be upside down -- check!
         import torch
 
         return 100 * (1 - 1 / (1 + inhibitor_conc / torch.exp(dG_over_KT)))
 
     @staticmethod
-    def _observation_model_log10_pytorch(*args, **kwargs):
+    def _observation_model_minus_log10_pytorch(*args, **kwargs):
         import torch
 
         return -torch.log10(
@@ -177,7 +178,7 @@ class IC50Measurement(BaseMeasurement):
         return (1 + substrate_conc / michaelis_constant) * torch.exp(dG_over_KT) * inhibitor_conc
 
     @staticmethod
-    def _observation_model_log10_pytorch(*args, **kwargs):
+    def _observation_model_minus_log10_pytorch(*args, **kwargs):
         import torch
 
         return -torch.log10(IC50Measurement._observation_model_pytorch(*args, **kwargs))
@@ -198,7 +199,7 @@ class KiMeasurement(BaseMeasurement):
         return torch.exp(dG_over_KT) * inhibitor_conc
 
     @staticmethod
-    def _observation_model_log10_pytorch(*args, **kwargs):
+    def _observation_model_minus_log10_pytorch(*args, **kwargs):
         import torch
 
         return -torch.log10(KiMeasurement._observation_model_pytorch(*args, **kwargs))
@@ -228,7 +229,7 @@ class KdMeasurement(BaseMeasurement):
         return torch.exp(dG_over_KT) * inhibitor_conc
 
     @staticmethod
-    def _observation_model_log10_pytorch(*args, **kwargs):
+    def _observation_model_minus_log10_pytorch(*args, **kwargs):
         import torch
 
         return -torch.log10(KdMeasurement._observation_model_pytorch(*args, **kwargs))
