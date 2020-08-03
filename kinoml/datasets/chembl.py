@@ -9,14 +9,14 @@ from zipfile import ZipFile
 from pathlib import Path
 
 import pandas as pd
-from tqdm import tqdm
+from tqdm.auto import tqdm
 
 from .core import MultiDatasetProvider, ProteinLigandDatasetProvider
 from ..core.conditions import AssayConditions
 from ..core.proteins import AminoAcidSequence
 from ..core.ligands import SmilesLigand
 from ..core.systems import ProteinLigandComplex
-from ..core.measurements import IC50Measurement, KiMeasurement, KdMeasurement
+from ..core.measurements import pIC50Measurement, pKiMeasurement, pKdMeasurement
 from ..utils import APPDIR
 
 
@@ -33,7 +33,7 @@ class ChEMBLDatasetProvider(MultiDatasetProvider):
         filename="https://github.com/openkinome/datascripts/releases/download/v0.1/activities-chembl27.zip",
         measurement_types=("IC50", "Ki", "Kd"),
         sample=None,
-        **kwargs
+        **kwargs,
     ):
         """
         Create a MultiDatasetProvider out of the raw data contained in the zip file
@@ -61,21 +61,35 @@ class ChEMBLDatasetProvider(MultiDatasetProvider):
                     zf.extractall(tmpdir)
                 cached_path.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copyfile(Path(tmpdir) / csv_filename, cached_path)
-        df = pd.read_csv(cached_path).dropna(subset=["compound_structures.canonical_smiles"])
-        # return df
+
+        df = pd.read_csv(cached_path)
+
+        # add a new column with -log10 of the activities
+        # FIXME: Some values are 0.0nM, which results in infinity when -log10 is applied
+        #        How do we deal with them? We are dropping them for now.
+        df = df.assign(p_activities=-pd.np.log10(df["activities.standard_value"]))
+
+        # drop NAs _and_ infinities
+        with pd.option_context("mode.use_inf_as_na", True):
+            df = df.dropna(
+                subset=[
+                    "compound_structures.canonical_smiles",
+                    "activities.standard_value",
+                    "p_activities",
+                ]
+            )
 
         measurement_type_classes = {
-            "IC50": IC50Measurement,
-            "Ki": KiMeasurement,
-            "Kd": KdMeasurement,
+            "IC50": pIC50Measurement,
+            "Ki": pKiMeasurement,
+            "Kd": pKdMeasurement,
         }
         measurements_by_type = {"IC50": [], "Ki": [], "Kd": []}
         systems = {}
         kinases = {}
         ligands = {}
-        filtered_records = df[df["activities.standard_type"].isin(set(measurement_types))].to_dict(
-            "records"
-        )
+        chosen_types_labels = df["activities.standard_type"].isin(set(measurement_types))
+        filtered_records = df[chosen_types_labels].to_dict("records")
         if sample is not None:
             filtered_records = random.sample(filtered_records, sample)
         for row in tqdm(filtered_records):
@@ -105,14 +119,14 @@ class ChEMBLDatasetProvider(MultiDatasetProvider):
                 conditions = AssayConditions(pH=7)
                 system = ProteinLigandComplex([kinases[kinase_key], ligands[ligand_key]])
                 metadata = {
-                    "unit": row["activities.standard_units"],
+                    "unit": f"-log10({row['activities.standard_units']})",
                     "confidence": row["assays.confidence_score"],
                     "chembl_activity": row["activities.activity_id"],
                     "chembl_document": row["docs.doc_id"],
                     "year": row["docs.year"],
                 }
                 measurement = MeasurementType(
-                    values=row["activities.standard_value"],
+                    values=row["p_activities"],
                     system=systems[system_key],
                     conditions=conditions,
                     metadata=metadata,
@@ -120,7 +134,7 @@ class ChEMBLDatasetProvider(MultiDatasetProvider):
                 measurements_by_type[measurement_type_key].append(measurement)
             except Exception as exc:
                 print("Couldn't process record", row)
-                print("Exception", exc)
+                print("Exception:", exc)
         providers = [
             _SingleTypeChEMBLDatasetProvider(list(ms))
             for ms in measurements_by_type.values()

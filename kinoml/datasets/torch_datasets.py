@@ -33,8 +33,16 @@ class PrefeaturizedTorchDataset(Dataset):
 
 
 class TorchDataset(PrefeaturizedTorchDataset):
-    def __init__(self, featurizer, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(
+        self,
+        systems,
+        measurements,
+        featurizer=None,
+        observation_model: callable = _null_observation_model,
+    ):
+        super().__init__(systems, measurements, observation_model=observation_model)
+        if featurizer is None:
+            raise ValueError("TorchDataset requires `featurizer` keyword argument!")
         self.featurizer = featurizer
 
     def estimate_input_size(self):

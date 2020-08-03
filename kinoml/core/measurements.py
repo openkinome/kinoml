@@ -51,7 +51,7 @@ class BaseMeasurement:
         return self._errors
 
     @classmethod
-    def observation_model(cls, backend="pytorch", minus_log10=False):
+    def observation_model(cls, backend="pytorch"):
         """
         The observation_model function must be defined Measurement type, in the appropriate
         subclass. It dispatches to underlying static methods, suffixed by the
@@ -66,21 +66,15 @@ class BaseMeasurement:
         - `values`
         - `errors`
         """
-        return cls._observation_model(backend=backend, minus_log10=minus_log10)
+        return cls._observation_model(backend=backend)
 
     @classmethod
-    def _observation_model(cls, backend="pytorch", minus_log10=False, type_=None):
+    def _observation_model(cls, backend="pytorch", type_=None):
         assert backend in ("pytorch", "tensorflow"), f"Backend {backend} is not supported!"
-        if minus_log10:
-            return getattr(cls, f"_observation_model_minus_log10_{backend}")
         return getattr(cls, f"_observation_model_{backend}")
 
     @staticmethod
     def _observation_model_pytorch(*args, **kwargs):
-        raise NotImplementedError("Implement in your subclass!")
-
-    @staticmethod
-    def _observation_model_minus_log10_pytorch(*args, **kwargs):
         raise NotImplementedError("Implement in your subclass!")
 
     def check(self):
@@ -130,16 +124,8 @@ class PercentageDisplacementMeasurement(BaseMeasurement):
 
         return 100 * (1 - 1 / (1 + inhibitor_conc / torch.exp(dG_over_KT)))
 
-    @staticmethod
-    def _observation_model_minus_log10_pytorch(*args, **kwargs):
-        import torch
 
-        return -torch.log10(
-            PercentageDisplacementMeasurement._observation_model_pytorch(*args, **kwargs)
-        )
-
-
-class IC50Measurement(BaseMeasurement):
+class pIC50Measurement(BaseMeasurement):
 
     r"""
     Measurement where the value(s) come from IC50 experiments
@@ -177,14 +163,13 @@ class IC50Measurement(BaseMeasurement):
 
         return (1 + substrate_conc / michaelis_constant) * torch.exp(dG_over_KT) * inhibitor_conc
 
-    @staticmethod
-    def _observation_model_minus_log10_pytorch(*args, **kwargs):
-        import torch
+    def check(self):
+        super().check()
+        msg = f"Values for {self.__class__.__name__} are expected to be in the [-20, 20] range."
+        assert (-20 <= self.values <= 20).all(), msg
 
-        return -torch.log10(IC50Measurement._observation_model_pytorch(*args, **kwargs))
 
-
-class KiMeasurement(BaseMeasurement):
+class pKiMeasurement(BaseMeasurement):
 
     r"""
     Measurement where the value(s) come from K_i_ experiments
@@ -198,14 +183,13 @@ class KiMeasurement(BaseMeasurement):
 
         return torch.exp(dG_over_KT) * inhibitor_conc
 
-    @staticmethod
-    def _observation_model_minus_log10_pytorch(*args, **kwargs):
-        import torch
+    def check(self):
+        super().check()
+        msg = f"Values for {self.__class__.__name__} are expected to be in the [-20, 20] range."
+        assert (-20 <= self.values <= 20).all(), msg
 
-        return -torch.log10(KiMeasurement._observation_model_pytorch(*args, **kwargs))
 
-
-class KdMeasurement(BaseMeasurement):
+class pKdMeasurement(BaseMeasurement):
 
     r"""
     Measurement where the value(s) come from Kd experiments
@@ -228,11 +212,10 @@ class KdMeasurement(BaseMeasurement):
 
         return torch.exp(dG_over_KT) * inhibitor_conc
 
-    @staticmethod
-    def _observation_model_minus_log10_pytorch(*args, **kwargs):
-        import torch
-
-        return -torch.log10(KdMeasurement._observation_model_pytorch(*args, **kwargs))
+    def check(self):
+        super().check()
+        msg = f"Values for {self.__class__.__name__} are expected to be in the [-20, 20] range."
+        assert (-20 <= self.values <= 20).all(), msg
 
 
 def null_observation_model(arg):
