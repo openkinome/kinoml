@@ -1,0 +1,13 @@
+name: Cancel previous
+on: [push]
+jobs:
+  cancel:
+    if: github.repository == 'openkinome/kinoml'
+    name: 'Cancel Previous Runs'
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: styfle/cancel-workflow-action@0.4.1
+        with:
+          workflow_id: 231683,116359
+          access_token: ${{ github.token }}
