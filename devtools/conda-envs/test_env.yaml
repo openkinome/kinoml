@@ -1,6 +1,8 @@
 name: test
 channels:
   - conda-forge
+  - pytorch
+  - defaults
   - omnia
 dependencies:
   # Base depends
@@ -12,18 +14,26 @@ dependencies:
   - appdirs
   - openforcefield
   - tqdm
+  - torch
+  - torchvision
+  - cudatoolkit 10.2
 
   # Testing
   - pytest
   - pytest-cov
   - codecov
 
-  # Docs
   - pip:
+      # PyTorch trees
+      - https://github.com/ValentinFigue/Sklearn_PyTorch/archive/1b56a43e41de331ecdf73d08418f75bb34c9fa06.tar.gz
+      # Docs
       - mkdocs==1.0.4
       # mkdocstrings master as of 20200302
-      - https://github.com/pawamoy/mkdocstrings/archive/8e8d604ba95363c140841c84535d2350d7ebbfe3.zip
+      - https://github.com/pawamoy/mkdocstrings/archive/8e8d604ba95363c140841c84535d2350d7ebbfe3.tar.gz
       - mkdocs-material==4.6.3
       - mkdocs-minify-plugin==0.2.3
       - mkdocs-git-revision-date-localized-plugin==0.5.0
       - pymdown-extensions==6.3
+### After creating the environment, you will need to run these two commands to override lastest OFF with a dev version
+# conda remove --force openforcefield
+# pip install --no-deps https://github.com/openforcefield/openforcefield/archive/toolkit-inheritance.zip

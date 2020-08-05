@@ -7,6 +7,12 @@ from .components import BaseLigand
 logger = logging.getLogger(__name__)
 
 
+class SmilesLigand(BaseLigand):
+    def __init__(self, smiles, metadata=None, name="", *args, **kwargs):
+        BaseLigand.__init__(self, name=name, metadata=metadata)
+        self.smiles = smiles
+
+
 class Ligand(BaseLigand, Molecule):
 
     """
@@ -16,15 +22,17 @@ class Ligand(BaseLigand, Molecule):
         Everything in this class
     """
 
-    def __init__(self, _provenance=None, name="", *args, **kwargs):
+    def __init__(self, metadata=None, name="", *args, **kwargs):
         Molecule.__init__(self, *args, **kwargs)
-        BaseLigand.__init__(self, name=name, _provenance=_provenance)
+        BaseLigand.__init__(self, name=name, metadata=metadata)
 
     @classmethod
-    def from_smiles(cls, smiles, name=None, **kwargs):  # pylint: disable=arguments-differ
+    def from_smiles(
+        cls, smiles, name=None, allow_undefined_stereo=True, **kwargs
+    ):  # pylint: disable=arguments-differ
         """
         Same as `openforcefield.topology.Molecule`, but adding
-        information about the original SMILES to `._provenance` dict.
+        information about the original SMILES to `.metadata` dict.
 
         !!! todo
             Inheritance from these methods in OFF is broken because they
@@ -34,17 +42,17 @@ class Ligand(BaseLigand, Molecule):
 
             PR #583 has been submitted to patch upstream
         """
-        self = super().from_smiles(smiles, **kwargs)
+        self = super().from_smiles(smiles, allow_undefined_stereo=allow_undefined_stereo, **kwargs)
         if name is None:
             name = smiles
-        super().__init__(self, name=name, _provenance={"smiles": smiles})
+        super().__init__(self, name=name, metadata={"smiles": smiles})
         return self
 
     def to_dict(self):
         d = super().to_dict()
-        d["_provenance"] = self._provenance.copy()
+        d["metadata"] = self.metadata.copy()
         return d
 
     def _initialize_from_dict(self, molecule_dict):
         super()._initialize_from_dict(molecule_dict)
-        self._provenance = molecule_dict["_provenance"].copy()
+        self.metadata = molecule_dict["metadata"].copy()

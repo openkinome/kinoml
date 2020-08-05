@@ -24,11 +24,11 @@ class Biosequence(str):
     _ACCESSION_URL = None
     ACCESSION_MAX_RETRIEVAL = 50
 
-    def __new__(cls, value, name="", _provenance=None, *args, **kwargs):
+    def __new__(cls, value, name="", metadata=None, *args, **kwargs):
         """
         We are subclassing `str` to:
 
-        - provide a `._provenance` dict
+        - provide a `.metadata` dict
         - validate input is part of the allowed alphabet
         """
         diff = set(value).difference(cls.ALPHABET)
@@ -39,10 +39,11 @@ class Biosequence(str):
             )
         s = super().__new__(cls, value, *args, **kwargs)
         s.name = name
-        s._provenance = {}
-        # TODO: We might override some provenance data with this blind update
-        if _provenance is not None:
-            s._provenance.update(_provenance)
+        s.sequence = value
+        s.metadata = {}
+        # TODO: We might override some metadata data with this blind update
+        if metadata is not None:
+            s.metadata.update(metadata)
         return s
 
     @classmethod
@@ -91,7 +92,7 @@ class Biosequence(str):
             obj = cls(
                 "".join(sequence["sequence"]),
                 name=sequence["name"],
-                _provenance={"accession": accession},
+                metadata={"accession": accession},
             )
             objects.append(obj)
         if not objects:
@@ -134,7 +135,7 @@ class Biosequence(str):
         return self.__class__(
             self[start_pos - 1 : stop_pos],
             name=f"{self.name}{ ' | ' if self.name else '' }Cut: {start}/{stop}",
-            _provenance={"cut": (start, stop)},
+            metadata={"cut": (start, stop)},
         )
 
     def mutate(self, *mutations: str, raise_errors: bool = True) -> "Biosequence":
@@ -183,7 +184,7 @@ class Biosequence(str):
             operation = getattr(mutated, f"_mutate_with_{mutation_types[mutation]}")
             mutated = operation(mutation)
         mutated.name += f" (mutations: {', '.join(mutations)})"
-        mutated._provenance.update({"mutations": mutations})
+        mutated.metadata.update({"mutations": mutations})
         return mutated
 
     @staticmethod

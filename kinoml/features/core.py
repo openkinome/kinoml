@@ -8,6 +8,7 @@ and `._supports`, if needed.
 from __future__ import annotations
 from copy import deepcopy
 from typing import Hashable
+import hashlib
 
 import numpy as np
 
@@ -21,7 +22,7 @@ class BaseFeaturizer:
 
     _SUPPORTED_TYPES = (System,)
 
-    def featurize(self, system, inplace: bool = False) -> object:
+    def featurize(self, system, inplace: bool = True) -> object:
         """
         Given an system (compatible with `_SUPPORTED_TYPES`), apply
         the featurization scheme implemented in this class.
@@ -33,13 +34,19 @@ class BaseFeaturizer:
         if not inplace:
             system = deepcopy(system)
         self.supports(system)
-        return self._featurize(system)
+        features = self._featurize(system)
+        # TODO: Define self.id() to provide a unique key per class name and chosen init args
+        system.featurizations[self.name] = features
+        return system
+
+    def __call__(self, *args, **kwargs):
+        return self.featurize(*args, **kwargs)
 
     def _featurize(self, system: System) -> object:
         """
         Implement this method to do the actual work for `self.featurize()`.
         """
-        return None
+        raise NotImplementedError("Implement in your subclass")
 
     def supports(self, *systems: System, raise_errors: bool = True) -> bool:
         """
@@ -87,7 +94,7 @@ class BaseFeaturizer:
         return f"<{self.name}>"
 
 
-class Stacked(BaseFeaturizer):
+class Pipeline(BaseFeaturizer):
 
     """
     Featurizer-compatible class that provides a way to stack
@@ -100,10 +107,10 @@ class Stacked(BaseFeaturizer):
     def __init__(self, featurizers: Iterable[BaseFeaturizer]):
         self.featurizers = featurizers
 
-    def _featurize(self, system):
+    def _featurize(self, system_or_array):
         for featurizer in self.featurizers:
-            system = featurizer.featurize(system, inplace=True)
-        return system
+            system_or_array = featurizer._featurize(system_or_array)
+        return system_or_array
 
     def supports(self, *systems: System, raise_errors: bool = False) -> bool:
         """
@@ -125,7 +132,17 @@ class Stacked(BaseFeaturizer):
 
     @property
     def name(self):
-        return f"{self.__class__.__name__}([{', '.join([f.__name__.__class__ for f in self.featurizers])}])"
+        return f"{self.__class__.__name__}([{', '.join([f.name for f in self.featurizers])}])"
+
+
+class Concatenated(Pipeline):
+    def __init__(self, featurizers: Iterable[BaseFeaturizer], axis=0):
+        self.featurizers = featurizers
+        self.axis = axis
+
+    def _featurize(self, system_or_array):
+        features = [f._featurize(system_or_array) for f in self.featurizers]
+        return np.concatenate(features, axis=self.axis)
 
 
 class BaseOneHotEncodingFeaturizer(BaseFeaturizer):
@@ -184,10 +201,55 @@ class PadFeaturizer(BaseFeaturizer):
         self.key = "last"
         self.pad_with = pad_with
 
-    def _featurize(self, system: System) -> np.ndarray:
-        arraylike = np.asarray(system.featurizations[self.key])
+    def _featurize(self, system_or_array: System) -> np.ndarray:
+        if hasattr(system_or_array, "featurizations"):
+            arraylike = np.asarray(system_or_array.featurizations[self.key])
+        else:
+            arraylike = system_or_array
         pads = []
-        for current_size, requested_size in zip(arraylike.shape, shape):
-            assert requested_size >= current_size
+        for current_size, requested_size in zip(arraylike.shape, self.shape):
+            assert (
+                requested_size >= current_size
+            ), f"{requested_size} is smaller than {current_size}!"
             pads.append([0, requested_size - current_size])
         return np.pad(arraylike, pads, mode="constant", constant_values=self.pad_with)
+
+
+class HashFeaturizer(BaseFeaturizer):
+
+    """
+    Hash an attribute of the protein, such as the name or id.
+
+    Parameters
+    ==========
+    attribute : str or tuple
+        Attribute(s) in the target object that will be hashed
+    normalize : bool, default=True
+        Normalizes the hash to obtain a value in the unit interval
+    """
+
+    def __init__(self, attributes, normalize=True, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.attributes = attributes
+        self.normalize = normalize
+
+    def _featurize(self, system):
+        """
+        Featurizes a component using the hash of the chosen attribute.
+
+        Returns:
+            Sha256'd attribute
+        """
+        inputdata = system
+        for attr in self.attributes:
+            inputdata = getattr(inputdata, attr)
+
+        h = hashlib.sha256(inputdata.encode(encoding="UTF-8"))
+        if self.normalize:
+            return np.reshape(int(h.hexdigest(), base=16) / 2 ** 256, (1,))
+        return np.reshape(int(h.hexdigest(), base=16), (1,))
+
+
+class NullFeaturizer(BaseFeaturizer):
+    def featurize(self, system, inplace: bool = True) -> object:
+        return system

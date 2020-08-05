@@ -85,6 +85,9 @@ jobs:
           python devtools/scripts/create_conda_env.py -n=test -p=${{ matrix.python-version }} devtools/conda-envs/test_env.yaml
           conda activate test
           conda install pylint black
+          # We need this until https://github.com/openforcefield/openforcefield/pull/583 is merged
+          conda remove --force openforcefield
+          pip install -U https://github.com/openforcefield/openforcefield/archive/toolkit-inheritance.zip
 
       - name: Run pylint
         shell: bash

@@ -17,8 +17,8 @@ def test_pkis2():
     from kinoml.datasets.kinomescan.pkis2 import PKIS2DatasetProvider
 
     provider = PKIS2DatasetProvider.from_source()
-    assert len(provider.systems) == 261_870
-    assert (provider.systems[0].measurement.values == 14.0).all()
+    assert len(provider.measurements) == 261_870
+    assert (provider.measurements[0].values == 14.0).all()
 
 
 def test_access_by_index_roundtrip():
