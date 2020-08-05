@@ -1,7 +1,7 @@
 name: test
 channels:
-  - conda-forge
   - pytorch
+  - conda-forge
   - defaults
   - omnia
 dependencies:
@@ -16,7 +16,7 @@ dependencies:
   - tqdm
   - torch
   - torchvision
-  - cudatoolkit 10.2
+  #- cudatoolkit 10.2
 
   # Testing
   - pytest
