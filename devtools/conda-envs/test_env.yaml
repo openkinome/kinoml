@@ -14,7 +14,7 @@ dependencies:
   - appdirs
   - openforcefield
   - tqdm
-  - torch
+  - pytorch
   - torchvision
   #- cudatoolkit 10.2
 
