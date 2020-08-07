@@ -18,8 +18,8 @@ class PrefeaturizedTorchDataset(Dataset):
         self.observation_model = observation_model
 
     def __getitem__(self, index):
-        X = torch.as_tensor(self.systems[index], device=self.device, dtype=torch.float)
-        y = torch.as_tensor(self.measurements[index], device=self.device)
+        X = torch.tensor(self.systems[index], device=self.device, dtype=torch.float)
+        y = torch.tensor(self.measurements[index], device=self.device)
         return X, y
 
     def __len__(self):
@@ -56,10 +56,11 @@ class TorchDataset(PrefeaturizedTorchDataset):
         """
         # TODO: featurize y?
 
-        X = torch.as_tensor(
+        X = torch.tensor(
             self.featurizer(self.systems[index]).featurizations[self.featurizer.name],
             device=self.device,
             dtype=torch.float,
+            requires_grad=True,
         )
-        y = torch.as_tensor(self.measurements[index], device=self.device)
+        y = torch.tensor(self.measurements[index], device=self.device, requires_grad=True)
         return X, y
