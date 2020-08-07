@@ -65,9 +65,10 @@ class ChEMBLDatasetProvider(MultiDatasetProvider):
         df = pd.read_csv(cached_path)
 
         # add a new column with -log10 of the activities
+        # we also convert nM to M by multiplying times 1E-9
         # FIXME: Some values are 0.0nM, which results in infinity when -log10 is applied
         #        How do we deal with them? We are dropping them for now.
-        df = df.assign(p_activities=-pd.np.log10(df["activities.standard_value"]))
+        df = df.assign(p_activities=-pd.np.log10(df["activities.standard_value"] * 1e-9))
 
         # drop NAs _and_ infinities
         with pd.option_context("mode.use_inf_as_na", True):
