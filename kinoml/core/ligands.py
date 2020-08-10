@@ -13,6 +13,14 @@ class SmilesLigand(BaseLigand):
         self.smiles = smiles
 
 
+class FileLigand(BaseLigand):
+    def __init__(self, path, metadata=None, name="", *args, **kwargs):
+        BaseLigand.__init__(self, name=name, metadata=metadata)
+        if path.startswith("http"):
+            print("We would download this and save it to appdir.user_cache")
+        self.path = path
+
+
 class Ligand(BaseLigand, Molecule):
 
     """
