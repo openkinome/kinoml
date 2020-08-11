@@ -4,6 +4,7 @@ channels:
   - conda-forge
   - defaults
   - omnia
+  - openeye
 dependencies:
   # Base depends
   - python
@@ -16,6 +17,7 @@ dependencies:
   - tqdm
   - pytorch
   - torchvision
+  - openeye-toolkits
   #- cudatoolkit 10.2
 
   # Testing
