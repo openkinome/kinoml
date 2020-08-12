@@ -63,3 +63,23 @@ class defaultdictwithargs(defaultdict):
         result = self.call(key)
         self[key] = result
         return result
+
+
+def download_file(url: str, path: str):
+    """
+    Download a file and save it locally.
+    Parameters
+    ----------
+    url: str
+        URL for downloading data.
+    path: str
+        Path to save downloaded data.
+    """
+    import requests
+
+    response = requests.get(url)
+    with open(path, "w") as write_file:
+        write_file.write(response.text)
+        # TODO: check if successful, e.g. response.ok
+
+    return
