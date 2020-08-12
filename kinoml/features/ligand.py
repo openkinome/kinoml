@@ -42,6 +42,14 @@ class SingleLigandFeaturizer(BaseFeaturizer):
 
 
 class SmilesToLigandFeaturizer(SingleLigandFeaturizer):
+    _styles = ("openforcefield", "rdkit")
+
+    def __init__(self, style="openforcefield"):
+        assert (
+            style in self._styles
+        ), f"`{self.__class__.__name__}.style` must be one of {self._styles}"
+        self._style = style
+
     def _supports(self, system):
         super_checks = super()._supports(system)
         ligands = [c for c in system.components if isinstance(c, SmilesLigand)]
@@ -56,7 +64,14 @@ class SmilesToLigandFeaturizer(SingleLigandFeaturizer):
             `Ligand` object
         """
         ligand = self._find_ligand(system, type_=SmilesLigand)
-        return Ligand.from_smiles(ligand.smiles, name=ligand.name)
+        if self._style == "openforcefield":
+            return Ligand.from_smiles(ligand.smiles, name=ligand.name)
+        elif self._style == "rdkit":
+            from rdkit.Chem import MolFromSmiles
+
+            return MolFromSmiles(ligand.smiles)
+        else:
+            raise ValueError(f"`{self.__class__.__name__}.style` must be one of {self._styles}")
 
 
 class MorganFingerprintFeaturizer(SingleLigandFeaturizer):
@@ -83,7 +98,9 @@ class MorganFingerprintFeaturizer(SingleLigandFeaturizer):
             Morgan fingerprint of radius `radius` of molecule,
             with shape `nbits`.
         """
-        ligand = self._find_ligand(system)
+        from rdkit.Chem import Mol as RDKitMol
+
+        ligand = self._find_ligand(system, type_=(Ligand, RDKitMol))
         return self._featurize_ligand(ligand)
 
     @lru_cache(maxsize=1000)
@@ -92,8 +109,9 @@ class MorganFingerprintFeaturizer(SingleLigandFeaturizer):
 
         # FIXME: Check whether OFF uses canonical smiles internally, or not
         # otherwise, we should force that behaviour ourselves!
-        mol = ligand.to_rdkit()
-        fp = Morgan(mol, radius=self.radius, nBits=self.nbits)
+        if isinstance(ligand, Ligand):
+            ligand = ligand.to_rdkit()
+        fp = Morgan(ligand, radius=self.radius, nBits=self.nbits)
         return np.asarray(fp, dtype="uint8")
 
 
