@@ -3,6 +3,7 @@ import logging
 from openforcefield.topology import Molecule
 
 from .components import BaseLigand
+from ..utils import download_file
 
 logger = logging.getLogger(__name__)
 
@@ -17,8 +18,23 @@ class FileLigand(BaseLigand):
     def __init__(self, path, metadata=None, name="", *args, **kwargs):
         BaseLigand.__init__(self, name=name, metadata=metadata)
         if path.startswith("http"):
-            print("We would download this and save it to appdir.user_cache")
-        self.path = path
+            from appdirs import user_cache_dir
+
+            # TODO: where to save, how to name
+            self.path = f"{user_cache_dir()}/{self.name}.{path.split('.')[-1]}"
+            download_file(path, self.path)
+        else:
+            self.path = path
+
+
+class PDBLigand(FileLigand):
+    def __init__(self, pdb_id, metadata=None, name="", *args, **kwargs):
+        from appdirs import user_cache_dir
+
+        FileLigand.__init__(self, path="", name=name, metadata=metadata)
+        self.pdb_id = pdb_id
+        self.path = f"{user_cache_dir()}/{self.name}.sdf"
+        download_file(f"https://files.rcsb.org/ligands/view/{pdb_id}_ideal.sdf", self.path)
 
 
 class Ligand(BaseLigand, Molecule):

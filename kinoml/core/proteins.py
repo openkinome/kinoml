@@ -2,6 +2,7 @@ import logging
 
 from .components import BaseProtein
 from .sequences import Biosequence
+from ..utils import download_file
 
 logger = logging.getLogger(__name__)
 
@@ -21,8 +22,25 @@ class FileProtein(BaseProtein):
     def __init__(self, path, metadata=None, name="", *args, **kwargs):
         BaseProtein.__init__(self, name=name, metadata=metadata)
         if path.startswith("http"):
-            print("We would download this and save it to appdir.user_cache")
-        self.path = path
+            from appdirs import user_cache_dir
+
+            # TODO: where to save, how to name
+            self.path = f"{user_cache_dir()}/{self.name}.{path.split('.')[-1]}"
+            download_file(path, self.path)
+        else:
+            self.path = path
+
+
+class PDBProtein(FileProtein):
+    def __init__(self, pdb_id, metadata=None, name="", *args, **kwargs):
+        from appdirs import user_cache_dir
+
+        FileProtein.__init__(self, path="", name=name, metadata=metadata)
+        self.pdb_id = pdb_id
+        self.path = f"{user_cache_dir()}/{self.name}.pdb"  # TODO: if not available go for mmcif
+        download_file(f"https://files.rcsb.org/download/{pdb_id}.pdb", self.path)
+        self.electron_density_path = f"{user_cache_dir()}/{self.name}.mtz"
+        download_file(f"https://edmaps.rcsb.org/coefficients/{pdb_id}.mtz", self.electron_density_path)
 
 
 class ProteinStructure(BaseProtein):
