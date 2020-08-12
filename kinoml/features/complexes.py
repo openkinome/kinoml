@@ -6,6 +6,8 @@ from __future__ import annotations
 from functools import lru_cache
 from typing import List, Union
 
+from appdirs import user_cache_dir
+
 from .core import BaseFeaturizer
 from ..core.ligands import FileLigand
 from ..core.proteins import FileProtein
@@ -59,11 +61,11 @@ class OpenEyesProteinLigandDockingFeaturizer(BaseFeaturizer):
             raise NotImplemented
 
         # TODO: where to store data
-        protein_path = "/path/to/protein.pdb"  # mmcif writing not supported by openeye
+        protein_path = f"{user_cache_dir()}/{system.protein.name}.pdb"  # mmcif writing not supported by openeye
         self._write_molecules([prepared_protein], protein_path)
         file_protein = FileProtein(path=protein_path)
 
-        ligand_path = "/path/to/ligand.sdf"
+        ligand_path = f"{user_cache_dir()}/{system.ligand.name}.sdf"
         self._write_molecules(docking_poses, ligand_path)
         file_ligand = FileLigand(path=ligand_path)
         protein_ligand_complex = ProteinLigandComplex(
