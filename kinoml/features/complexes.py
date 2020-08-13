@@ -44,12 +44,21 @@ class OpenEyesProteinLigandDockingFeaturizer(BaseFeaturizer):
         """
         ligands = self._read_molecules(system.ligand.path)
         protein = self._read_molecules(system.protein.path)[0]
+        # TODO: electron density might be redundant here, if already used in separate protein preparation workflow
+        if system.protein.electron_density_path is not None:
+            electron_density = self._read_electron_density(
+                system.protein.electron_density_path
+            )
+        else:
+            electron_density = None
 
         # TODO: more sophisticated decision between hybrid and chemgauss docking
         if self._has_ligand(protein):
 
             # TODO: electron density, loop database
-            prepared_protein, prepared_ligand = self._prepare_complex(protein)
+            prepared_protein, prepared_ligand = self._prepare_complex(
+                protein, electron_density
+            )
             hybrid_receptor = self._create_hybrid_receptor(
                 prepared_protein, prepared_ligand
             )
@@ -106,6 +115,26 @@ class OpenEyesProteinLigandDockingFeaturizer(BaseFeaturizer):
         # TODO: returns empty list if something goes wrong
         return molecules
 
+    @staticmethod
+    def _read_electron_density(path: str) -> Union[oegrid.OESkewGrid, None]:
+        """
+        Read electron density from a file.
+        Parameters
+        ----------
+        path: str
+            Path to electron density file.
+        Returns
+        -------
+        electron_density: oegrid.OESkewGrid or None
+            A List of molecules as OpenEye molecules.
+        """
+        from openeye import oegrid
+
+        electron_density = oegrid.OESkewGrid()
+        # TODO: different map formats
+        if not oegrid.OEReadMTZ(path, electron_density, oegrid.OEMTZMapType_Fwt):
+            electron_density = None
+        return electron_density
 
     @staticmethod
     def _write_molecules(molecules: List[oechem.OEGraphMol], path: str):
