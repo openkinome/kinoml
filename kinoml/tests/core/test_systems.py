@@ -7,20 +7,17 @@ import pytest
 
 def test_system():
     from kinoml.core.components import MolecularComponent
-    from kinoml.core.systems import System, MeasuredSystem
+    from kinoml.core.systems import System
     from kinoml.core.measurements import BaseMeasurement
     from kinoml.core.conditions import AssayConditions
 
-    System(components=[MolecularComponent()])
+    components = [MolecularComponent()]
+    system = System(components=components)
     # This doesn't raise an error
     System(components=[], strict=False)
     # This does
     with pytest.raises(AssertionError):
         System(components=[])
-
-    comps = [MolecularComponent()]
-    measurement = BaseMeasurement(0.0, conditions=AssayConditions(), components=comps)
-    assert MeasuredSystem(components=comps, measurement=measurement)
 
 
 def test_protein_ligand_complex():

@@ -25,7 +25,7 @@ def test_biosequence_from_ncbi():
     accession = "NP_005148.2"
     s = AminoAcidSequence.from_ncbi(accession)
     assert accession in s.name
-    assert s._provenance["accession"] == accession
+    assert s.metadata["accession"] == accession
 
 
 def test_biosequences_from_ncbis():

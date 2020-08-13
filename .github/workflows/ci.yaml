@@ -4,9 +4,13 @@ on:
   push:
     branches:
       - "master"
+      - "maintenance/.+"
   pull_request:
+    branches:
+      - "master"
+      - "maintenance/.+"
   schedule:
-    # Nightly Tests
+    # Run a cron job once daily
     - cron: "0 0 * * *"
 
 jobs:
@@ -17,11 +21,17 @@ jobs:
       matrix:
         os: [macOS-latest, ubuntu-latest]
         python-version: [3.6, 3.7]
-    env:
-      CI_OS: ${{ matrix.os }}
 
     steps:
       - uses: actions/checkout@v2
+
+      - uses: goanpeca/setup-miniconda@v1
+        with:
+          python-version: ${{ matrix.python-version }}
+          activate-environment: test
+          channel-priority: true
+          environment-file: devtools/conda-envs/test_env.yaml
+          auto-activate-base: false
 
       - name: Additional info about the build
         shell: bash
@@ -30,33 +40,27 @@ jobs:
           df -h
           ulimit -a
 
-      - name: Fix conda in MacOS
-        shell: bash
-        if: startsWith(matrix.os, 'macOS')
+      - name: Environment Information
+        shell: bash -l {0}
         run: |
-          sudo chown -R $(id -u):$(id -g) ${CONDA}
-
-      - name: Create environment for package
-        shell: bash
-        run: |
-          . devtools/github-actions/initialize_conda.sh
-          conda activate
           conda info --all
-          python devtools/scripts/create_conda_env.py -n=test -p=${{ matrix.python-version }} devtools/conda-envs/test_env.yaml
+          conda list
+
+      - name: Patch openforcefield
+        shell: bash -l {0}
+        run: |
+          # We need this until https://github.com/openforcefield/openforcefield/pull/583 is merged
+          conda remove --force openforcefield
+          pip install -U https://github.com/openforcefield/openforcefield/archive/toolkit-inheritance.zip --no-deps
 
       - name: Install package
-        shell: bash
+        shell: bash -l {0}
         run: |
-          . devtools/github-actions/initialize_conda.sh
-          conda activate test
-          python -m pip install . --no-deps
-          conda list --show-channel-urls
+          python -m pip install --no-deps .
 
       - name: Run tests
-        shell: bash
+        shell: bash -l {0}
         run: |
-          . devtools/github-actions/initialize_conda.sh
-          conda activate test
           pytest -v --cov=kinoml --cov-report=xml --color=yes kinoml/tests/
 
       - name: CodeCov
@@ -69,58 +73,101 @@ jobs:
 
   lint-format:
     runs-on: ubuntu-18.04
-    env:
-      CI_OS: ubuntu-18.04
 
     steps:
       - uses: actions/checkout@v2
 
-      - name: Install linter and formatter
+      - uses: goanpeca/setup-miniconda@v1
+        with:
+          python-version: ${{ matrix.python-version }}
+          activate-environment: test
+          channel-priority: true
+          environment-file: devtools/conda-envs/test_env.yaml
+          auto-activate-base: false
+
+      - name: Additional info about the build
         shell: bash
         run: |
-          . devtools/github-actions/initialize_conda.sh
-          conda activate
-          python devtools/scripts/create_conda_env.py -n=test -p=${{ matrix.python-version }} devtools/conda-envs/test_env.yaml
-          conda activate test
+          uname -a
+          df -h
+          ulimit -a
+
+      - name: Environment Information
+        shell: bash -l {0}
+        run: |
+          conda info --all
+          conda list
+
+      - name: Install linter / formatter
+        shell: bash -l {0}
+        run: |
           conda install pylint black
 
-      - name: Run pylint
-        shell: bash
+      - name: Patch openforcefield
+        shell: bash -l {0}
         run: |
-          . devtools/github-actions/initialize_conda.sh
-          conda activate test
+          # We need this until https://github.com/openforcefield/openforcefield/pull/583 is merged
+          conda remove --force openforcefield
+          pip install -U https://github.com/openforcefield/openforcefield/archive/toolkit-inheritance.zip --no-deps
+
+      - name: Install package
+        shell: bash -l {0}
+        run: |
+          python -m pip install --no-deps .
+
+      - name: Run pylint
+        shell: bash -l {0}
+        run: |
           pylint kinoml/
 
       - name: Run black check
-        shell: bash
+        shell: bash -l {0}
         if: always()
         run: |
-          . devtools/github-actions/initialize_conda.sh
-          conda activate test
           black --check -l 99 kinoml/ --exclude kinoml/_version.py
 
   mkdocs:
     runs-on: ubuntu-18.04
-    env:
-      CI_OS: ubuntu-18.04
 
     steps:
       - uses: actions/checkout@v2
 
-      - name: Create environment for package
+      - uses: goanpeca/setup-miniconda@v1
+        with:
+          python-version: ${{ matrix.python-version }}
+          activate-environment: test
+          channel-priority: true
+          environment-file: devtools/conda-envs/test_env.yaml
+          auto-activate-base: false
+
+      - name: Additional info about the build
         shell: bash
         run: |
-          . devtools/github-actions/initialize_conda.sh
-          conda activate
-          python devtools/scripts/create_conda_env.py -n=docs -p=3.7 devtools/conda-envs/test_env.yaml
-          conda activate docs
-          python -m pip install . --no-deps
+          uname -a
+          df -h
+          ulimit -a
+
+      - name: Environment Information
+        shell: bash -l {0}
+        run: |
+          conda info --all
+          conda list
+
+      - name: Patch openforcefield
+        shell: bash -l {0}
+        run: |
+          # We need this until https://github.com/openforcefield/openforcefield/pull/583 is merged
+          conda remove --force openforcefield
+          pip install -U https://github.com/openforcefield/openforcefield/archive/toolkit-inheritance.zip --no-deps
+
+      - name: Install package
+        shell: bash -l {0}
+        run: |
+          python -m pip install --no-deps .
 
       - name: Build docs
         shell: bash
         run: |
-          . devtools/github-actions/initialize_conda.sh
-          conda activate docs
           # Required to load docstrings sample module inside docs/
           export PYTHONPATH=$(pwd)
           mkdocs build

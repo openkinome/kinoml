@@ -17,9 +17,9 @@ class BaseConditions:
 
     def __init__(self, strict: bool = True):
         if strict:
-            self.sanity_checks()
+            self.check()
 
-    def sanity_checks(self):
+    def check(self):
         """
         Perform some checks for valid values
         """
@@ -70,6 +70,6 @@ class AssayConditions(BaseConditions):
     def pH(self):
         return self._pH
 
-    def sanity_checks(self):
-        super().sanity_checks()
+    def check(self):
+        super().check()
         assert 0 <= self.pH <= 14, f"pH must be within [0, 14], but {self.pH} was specified"

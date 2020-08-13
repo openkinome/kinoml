@@ -5,11 +5,11 @@ class MolecularComponent:
     molecular entities are derived from this class.
     """
 
-    def __init__(self, name="", _provenance=None, *args, **kwargs):
+    def __init__(self, name="", metadata=None, *args, **kwargs):
         self.name = name
-        if _provenance is None:
-            _provenance = {}
-        self._provenance = _provenance
+        if metadata is None:
+            metadata = {}
+        self.metadata = metadata
 
     def __repr__(self) -> str:
         return f"<{self.__class__.__name__} name={self.name}>"

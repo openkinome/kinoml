@@ -7,7 +7,7 @@ from functools import lru_cache
 
 from .core import BaseFeaturizer, BaseOneHotEncodingFeaturizer
 from ..core.systems import System
-from ..core.ligands import Ligand
+from ..core.ligands import BaseLigand, SmilesLigand, Ligand
 
 
 class SingleLigandFeaturizer(BaseFeaturizer):
@@ -20,8 +20,58 @@ class SingleLigandFeaturizer(BaseFeaturizer):
         Check that exactly one ligand is present in the System
         """
         super_checks = super()._supports(system)
-        ligands = [c for c in system.components if isinstance(c, Ligand)]
+        ligands = [c for c in system.components if isinstance(c, BaseLigand)]
         return all([super_checks, len(ligands) == 1])
+
+    def _find_ligand(self, system_or_ligand: Union[System, BaseLigand], type_=Ligand):
+        if isinstance(system_or_ligand, type_):
+            return system_or_ligand
+        # we only return the first ligand found for now
+        for component in system_or_ligand.components:
+            if isinstance(component, type_):
+                ligand = component
+                break
+        else:  # look in featurizations?
+            for key, feature in system_or_ligand.featurizations.items():
+                if isinstance(feature, type_):
+                    ligand = feature
+                    break
+            else:
+                raise ValueError(f"No {type_} instances found in system {system_or_ligand}")
+        return ligand
+
+
+class SmilesToLigandFeaturizer(SingleLigandFeaturizer):
+    _styles = ("openforcefield", "rdkit")
+
+    def __init__(self, style="openforcefield"):
+        assert (
+            style in self._styles
+        ), f"`{self.__class__.__name__}.style` must be one of {self._styles}"
+        self._style = style
+
+    def _supports(self, system):
+        super_checks = super()._supports(system)
+        ligands = [c for c in system.components if isinstance(c, SmilesLigand)]
+        return all([super_checks, len(ligands) == 1])
+
+    @lru_cache(maxsize=1000)
+    def _featurize(self, system: System) -> np.ndarray:
+        """
+        Featurizes a `SmilesLigand` component and builds a `Ligand` object
+
+        Returns:
+            `Ligand` object
+        """
+        ligand = self._find_ligand(system, type_=SmilesLigand)
+        if self._style == "openforcefield":
+            return Ligand.from_smiles(ligand.smiles, name=ligand.name)
+        elif self._style == "rdkit":
+            from rdkit.Chem import MolFromSmiles
+
+            return MolFromSmiles(ligand.smiles)
+        else:
+            raise ValueError(f"`{self.__class__.__name__}.style` must be one of {self._styles}")
 
 
 class MorganFingerprintFeaturizer(SingleLigandFeaturizer):
@@ -48,17 +98,21 @@ class MorganFingerprintFeaturizer(SingleLigandFeaturizer):
             Morgan fingerprint of radius `radius` of molecule,
             with shape `nbits`.
         """
-        for component in system.components:  # we only return the first ligand found for now
-            if isinstance(component, Ligand):
-                return self._featurize_ligand(component)
+        from rdkit.Chem import Mol as RDKitMol
+
+        ligand = self._find_ligand(system, type_=(Ligand, RDKitMol))
+        return self._featurize_ligand(ligand)
 
     @lru_cache(maxsize=1000)
     def _featurize_ligand(self, ligand):
         from rdkit.Chem.AllChem import GetMorganFingerprintAsBitVect as Morgan
 
-        mol = ligand.to_rdkit()
-        fp = Morgan(mol, radius=self.radius, nBits=self.nbits)
-        return np.asarray(fp)
+        # FIXME: Check whether OFF uses canonical smiles internally, or not
+        # otherwise, we should force that behaviour ourselves!
+        if isinstance(ligand, Ligand):
+            ligand = ligand.to_rdkit()
+        fp = Morgan(ligand, radius=self.radius, nBits=self.nbits)
+        return np.asarray(fp, dtype="uint8")
 
 
 class OneHotSMILESFeaturizer(BaseOneHotEncodingFeaturizer, SingleLigandFeaturizer):
@@ -88,9 +142,8 @@ class OneHotSMILESFeaturizer(BaseOneHotEncodingFeaturizer, SingleLigandFeaturize
         Double element symbols (such as `Cl`, `Br` for atoms and `@@` for chirality)
         are replaced with single element symbols (`L`, `R` and `$` respectively).
         """
-        for comp in system.components:
-            if isinstance(comp, Ligand):  # we only process the first one now
-                return comp.to_smiles().replace("Cl", "L").replace("Br", "R").replace("@@", "$")
+        ligand = self._find_ligand(system)
+        return ligand.to_smiles().replace("Cl", "L").replace("Br", "R").replace("@@", "$")
 
 
 class OneHotRawSMILESFeaturizer(OneHotSMILESFeaturizer):
@@ -101,14 +154,8 @@ class OneHotRawSMILESFeaturizer(OneHotSMILESFeaturizer):
         Double element symbols (such as `Cl`, `Br` for atoms and `@@` for chirality)
         are replaced with single element symbols (`L`, `R` and `$` respectively).
         """
-        for comp in system.components:
-            if isinstance(comp, Ligand):  # we only process the first one now
-                return (
-                    comp._provenance["smiles"]
-                    .replace("Cl", "L")
-                    .replace("Br", "R")
-                    .replace("@@", "$")
-                )
+        ligand = self._find_ligand(system)
+        return ligand.metadata["smiles"].replace("Cl", "L").replace("Br", "R").replace("@@", "$")
 
 
 class GraphLigandFeaturizer(SingleLigandFeaturizer):
@@ -117,7 +164,7 @@ class GraphLigandFeaturizer(SingleLigandFeaturizer):
     Creates a graph representation of a `Ligand`-like component.
     Each node (atom) is decorated with several RDKit descriptors
 
-    Check ``self._features_per_atom`` for details.
+    Check ``self._per_atom_features`` for details.
 
     Parameters:
         per_atom_features: function that takes a `RDKit.Chem.Atom` object
@@ -128,6 +175,7 @@ class GraphLigandFeaturizer(SingleLigandFeaturizer):
     def __init__(self, per_atom_features: callable = None):
         self.per_atom_features = per_atom_features or self._per_atom_features
 
+    @lru_cache(maxsize=1000)
     def _featurize(self, system: System) -> tuple:
         """
         Featurizes ligands contained in a System as a labeled graph.
@@ -140,9 +188,9 @@ class GraphLigandFeaturizer(SingleLigandFeaturizer):
 
         from rdkit import Chem
 
-        ligand = [c for c in system.components if isinstance(c, Ligand)][0].to_rdkit()
-        connectivity_graph = _connectivity_COO_format(ligand)
-        per_atom_features = np.array([self.per_atom_features(a) for a in ligand.GetAtoms()])
+        ligand = self._find_ligand(system).to_rdkit()
+        connectivity_graph = self._connectivity_COO_format(ligand)
+        per_atom_features = np.array([self._per_atom_features(a) for a in ligand.GetAtoms()])
 
         return connectivity_graph, per_atom_features
 
@@ -167,7 +215,7 @@ class GraphLigandFeaturizer(SingleLigandFeaturizer):
             atom.GetNumImplicitHs(),
             atom.IsInRing(),
             atom.GetIsAromatic(),
-            atom.GetNumRadicalElectrons()
+            atom.GetNumRadicalElectrons(),
         )
 
     @staticmethod

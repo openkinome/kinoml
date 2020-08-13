@@ -33,7 +33,7 @@ class PKIS2DatasetProvider(KinomeScanDatasetProvider):
     >>> from kinoml.datasets.kinomescan.pkis2 import PKIS2DatasetProvider
     >>> provider = PKIS2DatasetProvider.from_source()
     >>> system = provider.systems[0]
-    >>> print(f"% displacement for kinase={system.protein.name} and ligand={system.ligand.to_smiles()} is {system.measurement}"
+    >>> print(f"% displacement for kinase={system.protein.name} and ligand={system.ligand.to_smiles()} is {system.measurement}")
 
     ```
     """
@@ -71,8 +71,8 @@ class PKIS2DatasetProvider(KinomeScanDatasetProvider):
             if math.isnan(mutations):
                 mutations = None
             start_stop = mapper.start_stop_for_name(kin_name)
-            provenance = {"accession": accession, "mutations": mutations, "start_stop": start_stop}
-            kinases.append(AminoAcidSequence(sequence, name=kin_name, _provenance=provenance))
+            metadata = {"accession": accession, "mutations": mutations, "start_stop": start_stop}
+            kinases.append(AminoAcidSequence(sequence, name=kin_name, metadata=metadata))
 
         # Read in ligands
         ligands = []
@@ -81,17 +81,23 @@ class PKIS2DatasetProvider(KinomeScanDatasetProvider):
             ligands.append(ligand)
 
         lol = list(df.itertuples(index=False, name=None))  # FIXME: This might be dangerous
+
         # Build ProteinLigandComplex objects
-        complexes = []
+        systems = {}
+        measurements = []
         for i, ligand in enumerate(ligands):
             for j, kinase in enumerate(kinases):
-                measurement = measurement_type(
-                    lol[i][j], conditions=conditions, components=[kinase, ligand]
-                )
-                comp = ProteinLigandComplex(components=[kinase, ligand], measurement=measurement)
-                complexes.append(comp)
+                value = lol[i][j]
+                if not value and value != 0:
+                    continue  # this is a nan cell
+                key = (ligand.to_smiles(), kinase.sequence)
+                if key not in systems:
+                    systems[key] = ProteinLigandComplex([kinase, ligand])
+                system = systems[key]
+                measurement = measurement_type(value, conditions=conditions, system=system)
+                measurements.append(measurement)
 
-        return cls(systems=complexes, conditions=conditions, **kwargs)
+        return cls(measurements=measurements, **kwargs)
 
     @staticmethod
     def _read_dataframe(filename: Union[AnyStr, Path]) -> pd.DataFrame:
