@@ -123,6 +123,12 @@ class OpenEyesProteinLigandDockingFeaturizer(BaseFeaturizer):
                 )
             elif suffix == "cif":
                 ifs.SetFlavor(oechem.OEFormat_MMCIF, oechem.OEIFlavor_MMCIF_Default)
+            elif suffix == "mol":
+                ifs.SetFlavor(oechem.OEFormat_MDL, oechem.OEIFlavor_MDL_Default)
+            elif suffix == "mol2":
+                ifs.SetFlavor(oechem.OEFormat_MOL2, oechem.OEIFlavor_MOL2_Default)
+            elif suffix == "xyz":
+                ifs.SetFlavor(oechem.OEFormat_XYZ, oechem.OEIFlavor_XYZ_Default)
             # TODO: add reasonable defaults for other file formats
 
             molecule = oechem.OEGraphMol()
