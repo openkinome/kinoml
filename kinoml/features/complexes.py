@@ -42,8 +42,8 @@ class OpenEyesProteinLigandDockingFeaturizer(BaseFeaturizer):
         protein_ligand_complex: ProteinLigandComplex
             The same system but with docked ligand.
         """
-        ligands = self._read_ligands(system.ligand.path)
-        protein = self._read_protein(system.protein.path)
+        ligands = self._read_molecules(system.ligand.path)
+        protein = self._read_molecules(system.protein.path)[0]
 
         # TODO: more sophisticated decision between hybrid and chemgauss docking
         if self._has_ligand(protein):
@@ -75,44 +75,22 @@ class OpenEyesProteinLigandDockingFeaturizer(BaseFeaturizer):
         return protein_ligand_complex
 
     @staticmethod
-    def _read_ligands(path: str) -> List[oechem.OEGraphMol]:
+    def _read_molecules(path: str) -> List[oechem.OEGraphMol]:
         """
-        Read ligands from a file.
+        Read molecules from a file.
         Parameters
         ----------
         path: str
-            Path to ligand file.
+            Path to molecule file.
         Returns
         -------
         molecules: list of oechem.OEGraphMol
-            A List of ligands as OpenEye molecules.
-        """
-        from openeye import oechem
-
-        molecules = []
-        with oechem.oemolistream(path) as ifs:
-            for molecule in ifs.GetOEGraphMols():
-                molecules.append(oechem.OEGraphMol(molecule))
-
-        # TODO: returns empty list if something goes wrong
-        return molecules
-
-    @staticmethod
-    def _read_protein(path: str) -> oechem.OEGraphMol:
-        """
-        Read a protein from a file.
-        Parameters
-        ----------
-        path: str
-            Path to protein file.
-        Returns
-        -------
-        molecule: oechem.OEGraphMol
-            A protein as OpenEye molecule.
+            A List of molecules as OpenEye molecules.
         """
         from openeye import oechem
 
         suffix = path.split(".")[-1]
+        molecules = []
         with oechem.oemolistream(path) as ifs:
             if suffix == "pdb":
                 ifs.SetFlavor(
@@ -121,21 +99,13 @@ class OpenEyesProteinLigandDockingFeaturizer(BaseFeaturizer):
                     | oechem.OEIFlavor_PDB_DATA
                     | oechem.OEIFlavor_PDB_ALTLOC,
                 )
-            elif suffix == "cif":
-                ifs.SetFlavor(oechem.OEFormat_MMCIF, oechem.OEIFlavor_MMCIF_Default)
-            elif suffix == "mol":
-                ifs.SetFlavor(oechem.OEFormat_MDL, oechem.OEIFlavor_MDL_Default)
-            elif suffix == "mol2":
-                ifs.SetFlavor(oechem.OEFormat_MOL2, oechem.OEIFlavor_MOL2_Default)
-            elif suffix == "xyz":
-                ifs.SetFlavor(oechem.OEFormat_XYZ, oechem.OEIFlavor_XYZ_Default)
-            # TODO: add reasonable defaults for other file formats
+            # add more flavors here if behavior should be different from `Default`
+            for molecule in ifs.GetOEGraphMols():
+                molecules.append(oechem.OEGraphMol(molecule))
 
-            molecule = oechem.OEGraphMol()
-            oechem.OEReadMolecule(ifs, molecule)
+        # TODO: returns empty list if something goes wrong
+        return molecules
 
-        # TODO: returns molecule with 0 atoms if something goes wrong
-        return molecule
 
     @staticmethod
     def _write_molecules(molecules: List[oechem.OEGraphMol], path: str):
