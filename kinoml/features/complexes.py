@@ -4,13 +4,13 @@ subclasses thereof
 """
 from __future__ import annotations
 from functools import lru_cache
-from typing import List, Union
+from typing import List, Union, Tuple
 
 from appdirs import user_cache_dir
 
 from .core import BaseFeaturizer
 from ..core.ligands import FileLigand
-from ..core.proteins import FileProtein
+from ..core.proteins import FileProtein, PDBProtein
 from ..core.systems import ProteinLigandComplex
 
 
@@ -63,18 +63,27 @@ class OpenEyesProteinLigandDockingFeaturizer(BaseFeaturizer):
                 prepared_protein, prepared_ligand
             )
             docking_poses = self._hybrid_docking(hybrid_receptor, ligands)
-
         else:
-            # TODO: identify pocket with point or box
-            # TODO: check possibility to define design unit with residue (would consider electron density)
-            raise NotImplemented
+            if isinstance(system.protein, PDBProtein):
+                # TODO: check possibility to define design unit with residue (would consider electron density)
+                prepared_protein = self._prepare_protein(protein)
+                klifs_pocket = PDBProtein.klifs_pocket(
+                    system.protein.pdb_id
+                )  # TODO: specify chain and altloc
+                box_dimensions = self._resids_to_box(protein, klifs_pocket)
+                box_receptor = self._create_box_receptor(protein, box_dimensions)
+                docking_poses = self._chemgauss_docking(box_receptor, ligands)
+            else:
+                raise NotImplemented
 
         # TODO: where to store data
         protein_path = f"{user_cache_dir()}/{system.protein.name}.pdb"  # mmcif writing not supported by openeye
         self._write_molecules([prepared_protein], protein_path)
         file_protein = FileProtein(path=protein_path)
 
-        ligand_path = f"{user_cache_dir()}/{system.ligand.name}.sdf"
+        ligand_path = (
+            f"{user_cache_dir()}/{system.protein.name}_{system.ligand.name}.sdf"
+        )
         self._write_molecules(docking_poses, ligand_path)
         file_ligand = FileLigand(path=ligand_path)
         protein_ligand_complex = ProteinLigandComplex(
@@ -279,10 +288,8 @@ class OpenEyesProteinLigandDockingFeaturizer(BaseFeaturizer):
         if len(bio_design_units) == 1:
             bio_design_unit = bio_design_units[0]
         elif len(bio_design_units) > 1:
-            print("More than one design unit found---using first one")
             bio_design_unit = bio_design_units[0]
         else:
-            print("No design units found")
             # TODO: Returns None if something goes wrong
             return None
 
@@ -350,14 +357,51 @@ class OpenEyesProteinLigandDockingFeaturizer(BaseFeaturizer):
         return receptor
 
     @staticmethod
+    def _resids_to_box(
+        protein: oechem.OEGraphMol, resids: List[int]
+    ) -> Tuple[float, float, float, float, float, float]:
+        """
+        Retrieve box dimensions of a list if residues.
+        Parameters
+        ----------
+        protein: oechem.OEGraphMol
+            An OpenEye molecule holding a protein structure.
+        resids: list of int
+            A list of resids defining the residues of interest.
+        Returns
+        -------
+        box_dimensions: tuple of float
+            The box dimensions in the order of xmax, ymax, zmax, xmin, ymin, zmin.
+        """
+        from openeye import oechem
+
+        coordinates = oechem.OEFloatArray(protein.NumAtoms() * 3)
+        oechem.OEGetPackedCoords(protein, coordinates)
+
+        x_coordinates = []
+        y_coordinates = []
+        z_coordinates = []
+        for i, atom in enumerate(protein.GetAtoms()):
+            if oechem.OEAtomGetResidue(atom).GetResidueNumber() in resids:
+                x_coordinates.append(coordinates[i * 3])
+                y_coordinates.append(coordinates[(i * 3) + 1])
+                z_coordinates.append(coordinates[(i * 3) + 2])
+
+        box_dimensions = (
+            max(x_coordinates),
+            max(y_coordinates),
+            max(z_coordinates),
+            min(x_coordinates),
+            min(y_coordinates),
+            min(z_coordinates),
+        )
+
+        return box_dimensions
+
+    @staticmethod
     def _create_box_receptor(
         protein: oechem.OEGraphMol,
-        xmax: Union[float, int],
-        ymax: Union[float, int],
-        zmax: Union[float, int],
-        xmin: Union[float, int],
-        ymin: Union[float, int],
-        zmin: Union[float, int],
+        box_dimensions: Tuple[float, float, float, float, float, float],
     ) -> oechem.OEGraphMol:
         """
         Create a box receptor for docking.
@@ -365,18 +409,8 @@ class OpenEyesProteinLigandDockingFeaturizer(BaseFeaturizer):
         ----------
         protein: oechem.OEGraphMol
             An OpenEye molecule holding a prepared protein structure.
-        xmax: float or int
-            Maximal number in x direction.
-        ymax: float or int
-            Maximal number in y direction.
-        zmax: float or int
-            Maximal number in z direction.
-        xmin: float or int
-            Minimal number in x direction.
-        ymin: float or int
-            Minimal number in x direction.
-        zmin: float or int
-            Minimal number in z direction.
+        box_dimensions: tuple of float
+            The box dimensions in the order of xmax, ymax, zmax, xmin, ymin, zmin.
         Returns
         -------
         receptor: oechem.OEGraphMol
@@ -385,7 +419,7 @@ class OpenEyesProteinLigandDockingFeaturizer(BaseFeaturizer):
         from openeye import oechem, oedocking
 
         # create receptor
-        box = oedocking.OEBox(xmax, ymax, zmax, xmin, ymin, zmin)
+        box = oedocking.OEBox(*box_dimensions)
         receptor = oechem.OEGraphMol()
         oedocking.OEMakeReceptor(receptor, protein, box)
 
