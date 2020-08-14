@@ -14,6 +14,7 @@ dependencies:
   - pint
   - appdirs
   - openforcefield
+  - mdanalysis
   - tqdm
   - pytorch
   - torchvision
