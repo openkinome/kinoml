@@ -1,6 +1,6 @@
 import logging
 
-from .components import BaseProtein
+from .components import BaseProtein, BaseStructure
 from .sequences import Biosequence
 from ..utils import download_file
 
@@ -22,7 +22,7 @@ class FileProtein(BaseProtein):
     def __init__(
         self, path, electron_density_path=None, metadata=None, name="", *args, **kwargs
     ):
-        BaseProtein.__init__(self, name=name, metadata=metadata)
+        super().__init__(self, name=name, metadata=metadata)
         if path.startswith("http"):
             from appdirs import user_cache_dir
 
@@ -61,7 +61,7 @@ class PDBProtein(FileProtein):
         )
 
 
-class ProteinStructure(BaseProtein):
+class ProteinStructure(BaseProtein, BaseStructure):
     """
     Structural representation of a protein
 
@@ -71,7 +71,11 @@ class ProteinStructure(BaseProtein):
 
     @classmethod
     def from_file(cls, path, ext=None, **kwargs):
-        raise NotImplementedError
+        from MDAnalysis import Universe
+        from pathlib import Path
+        u = Universe(path)
+        p = Path(path)
+        return cls(name=p.name, metadata={"path": path}, universe=u, **kwargs)
 
     @classmethod
     def from_sequence(cls, sequence, **kwargs):
