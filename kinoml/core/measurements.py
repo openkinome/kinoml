@@ -157,7 +157,7 @@ class pIC50Measurement(BaseMeasurement):
 
     @staticmethod
     def _observation_model_pytorch(
-        dG_over_KT, substrate_conc=1e-6, michaelis_constant=1, inhibitor_conc=1e-6, **kwargs
+        dG_over_KT, substrate_conc=1e-6, michaelis_constant=1, inhibitor_conc=1, **kwargs
     ):
         import torch
 
@@ -165,7 +165,6 @@ class pIC50Measurement(BaseMeasurement):
             (1 + substrate_conc / michaelis_constant)
             * torch.exp(dG_over_KT)
             * inhibitor_conc
-            * 1e-9
         )
 
     def check(self):
