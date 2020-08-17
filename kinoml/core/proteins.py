@@ -109,9 +109,10 @@ class ProteinStructure(BaseProtein, BaseStructure):
     def from_file(cls, path, ext=None, **kwargs):
         from MDAnalysis import Universe
         from pathlib import Path
+
         u = Universe(path)
         p = Path(path)
-        return cls(name=p.name, metadata={"path": path}, universe=u, **kwargs)
+        return cls(pname=p.name, metadata={"path": path}, universe=u, **kwargs)
 
     @classmethod
     def from_sequence(cls, sequence, **kwargs):
@@ -127,11 +128,36 @@ class ProteinStructure(BaseProtein, BaseStructure):
 
     @classmethod
     def from_name(cls, identifier, **kwargs):
-        raise NotImplementedError
+        import requests
+        import tempfile
+        from MDAnalysis import Universe
+        from pathlib import Path
+
+        url = f"https://files.rcsb.org/download/{identifier}.pdb"
+        response = requests.get(url)
+
+        with tempfile.NamedTemporaryFile(suffix=".pdb") as temp_file:
+            temp_file.write(response.content)
+            u = Universe(temp_file.name)
+            p = Path(temp_file.name)
+
+            return cls(pname=p.name, metadata={"id": identifier}, universe=u, **kwargs)
 
     @property
     def sequence(self):
-        s = "".join([r.symbol for r in self.residues])
+        from MDAnalysis.lib.util import convert_aa_code
+
+        pdb_seq = []
+        three_l_codes = [convert_aa_code(i) for i in list(AminoAcidSequence.ALPHABET)]
+
+        for r in self.universe.residues:
+            if r.resname in three_l_codes:
+                pdb_seq.append(convert_aa_code(r.resname))
+            else:
+                continue
+
+        s = "".join(pdb_seq)
+
         return AminoAcidSequence(s)
 
 
