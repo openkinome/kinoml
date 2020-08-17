@@ -128,7 +128,7 @@ class PercentageDisplacementMeasurement(BaseMeasurement):
 class pIC50Measurement(BaseMeasurement):
 
     r"""
-    Measurement where the value(s) come from IC50 experiments
+    Measurement where the value(s) come from pIC50 experiments
 
     We use the Cheng Prusoff equation here.
 
@@ -138,20 +138,27 @@ class pIC50Measurement(BaseMeasurement):
     K_i = \frac{IC50}{1+\frac{[S]}{K_m}}
     \end{equation}
 
-    We make the following assumptions here
-    1. $[S] = K_m$
-    2. $K_i \approx K_d$
+    We make the following assumption (which will be relaxed in the future)
+    $K_i \approx K_d$
 
-    In the future, we will relax these assumptions.
-
-    Under these assumptions, the Cheng-Prusoff equation becomes
+    Under this assumptions, the Cheng-Prusoff equation becomes
     $$
-    IC50 \approx 2 * K_d
+    IC50 \approx {1+\frac{[S]}{K_m}} * K_d
     $$
 
     We define the following function
     $$
-    \mathbf{F}_{IC50}(\Delta g) = 2 * \mathbf{F}_{K_d}(\Delta g) = 2 * exp[-\Delta g] * 1[M]
+    \mathbf{F}_{IC50}(\Delta g) = {1+\frac{[S]}{K_m}} * \mathbf{F}_{K_d}(\Delta g) = {1+\frac{[S]}{K_m}} * exp[-\Delta g] * 1[M]
+    $$
+
+    Given IC50 values given in molar units, we obtain pI50 values in molar units using the tranformation
+    $$
+    pIC50 [M] = -log_{10}(IC50[M])
+    $$
+
+    Finally the observation model for pIC50 values is
+    $$
+    \mathbf{F}_{pIC50}(\Delta g) = -log10({1+\frac{[S]}{K_m}} * exp[-\Delta g] * 1[M])
     $$
     """
 
