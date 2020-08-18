@@ -23,7 +23,7 @@ class FileProtein(BaseProtein):
     def __init__(
         self, path, electron_density_path=None, metadata=None, name="", *args, **kwargs
     ):
-        super().__init__(self, name=name, metadata=metadata)
+        super().__init__(name=name, metadata=metadata, *args, **kwargs)
         if path.startswith("http"):
             from appdirs import user_cache_dir
 
@@ -46,10 +46,10 @@ class FileProtein(BaseProtein):
 
 
 class PDBProtein(FileProtein):
-    def __init__(self, pdb_id, metadata=None, name="", *args, **kwargs):
+    def __init__(self, pdb_id, path="", metadata=None, name="", *args, **kwargs):
+        super().__init__(path=path, metadata=metadata, name=name, *args, **kwargs)
         from appdirs import user_cache_dir
 
-        FileProtein.__init__(self, path="", name=name, metadata=metadata)
         self.pdb_id = pdb_id
         self.path = (
             f"{user_cache_dir()}/{self.name}.pdb"  # TODO: if not available go for mmcif
@@ -109,6 +109,7 @@ class ProteinStructure(BaseProtein, BaseStructure):
     def from_file(cls, path, ext=None, **kwargs):
         from MDAnalysis import Universe
         from pathlib import Path
+
         u = Universe(path)
         p = Path(path)
         return cls(name=p.name, metadata={"path": path}, universe=u, **kwargs)
