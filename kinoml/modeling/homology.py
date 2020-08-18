@@ -49,6 +49,18 @@ class HomologyModel(): # inherent a Base class?
 
         return top_pdb_template
 
+    def get_uniprot_sequence(self, identifier: str):
+        import requests
+        from io import StringIO
+
+        params = {"query": identifier, "format": "fasta"}
+        response = requests.get("http://www.uniprot.org/uniprot/", params)
+
+        up_sequence = response.text.split('\n', 1)[1].replace('\n','')
+
+        return up_sequence
+
+
     def get_alignment():
         raise NotImplementedError
     
