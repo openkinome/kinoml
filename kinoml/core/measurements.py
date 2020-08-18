@@ -148,7 +148,7 @@ class pIC50Measurement(BaseMeasurement):
 
     We define the following function
     $$
-    \mathbf{F}_{IC50}(\Delta g) = {1+\frac{[S]}{K_m}} * \mathbf{F}_{K_d}(\Delta g) = {1+\frac{[S]}{K_m}} * exp[-\Delta g] * 1[M]
+    \mathbf{F}_{IC_{50}}(\Delta g) = \Big({1+\frac{[S]}{K_m}}\Big) * \mathbf{F}_{K_d}(\Delta g) = \Big({1+\frac{[S]}{K_m}}\Big) * exp[\Delta g] * C[M].
     $$
 
     Given IC50 values given in molar units, we obtain pI50 values in molar units using the tranformation
@@ -158,7 +158,7 @@ class pIC50Measurement(BaseMeasurement):
 
     Finally the observation model for pIC50 values is
     $$
-    \mathbf{F}_{pIC50}(\Delta g) = -log10({1+\frac{[S]}{K_m}} * exp[-\Delta g] * 1[M])
+    \mathbf{F}_{pIC_{50}}(\Delta g) = - \frac{\Delta g + \ln\Big(\big(1+\frac{[S]}{K_m}\big)*C\Big)}{\ln(10)}.
     $$
     """
 
@@ -167,12 +167,9 @@ class pIC50Measurement(BaseMeasurement):
         dG_over_KT, substrate_conc=1e-6, michaelis_constant=1, inhibitor_conc=1, **kwargs
     ):
         import torch
+        import numpy
 
-        return -torch.log10(
-            (1 + substrate_conc / michaelis_constant)
-            * torch.exp(dG_over_KT)
-            * inhibitor_conc
-        )
+        return -(dG_over_KT + numpy.log((1 + substrate_conc / michaelis_constant) * inhibitor_conc)) * 1 / numpy.log(10)
 
     def check(self):
         super().check()
@@ -185,14 +182,15 @@ class pKiMeasurement(BaseMeasurement):
     r"""
     Measurement where the value(s) come from K_i_ experiments
 
-    We make the assumption that $K_i \approx K_d$ and therefore $\mathbf{F}_{K_i} = \mathbf{F}_{K_d}$.
+    We make the assumption that $K_i \approx K_d$ and therefore $\mathbf{F}_{pK_i} = \mathbf{F}_{pK_d}$.
     """
 
     @staticmethod
-    def _observation_model_pytorch(dG_over_KT, inhibitor_conc=1e-6, **kwargs):
+    def _observation_model_pytorch(dG_over_KT, inhibitor_conc=1, **kwargs):
         import torch
+        import numpy
 
-        return -torch.log10(torch.exp(dG_over_KT) * inhibitor_conc * 1e-9)
+        return -(dG_over_KT + numpy.log(inhibitor_conc)) * 1 / numpy.log(10)
 
     def check(self):
         super().check()
@@ -206,22 +204,19 @@ class pKdMeasurement(BaseMeasurement):
     Measurement where the value(s) come from Kd experiments
 
     We define the following physics-based function
-    $$
-    \mathbf{F}_{K_d}(\Delta g) = exp[-\Delta g] * 1[M].
-    $$
-
-    If we have measurements at different concentrations $I$ (unit [M]) , then the function can further be defined as
 
     $$
-    \mathbf{F}_{K_d}(\Delta g, I) = exp[-\Delta g] * I[M].
-        $$
+    \mathbf{F}_{pK_d}(\Delta g) = - \frac{\Delta g + \ln(C)}{\ln(10)},
+    $$
+    where C given in molar [M] can be adapted if measurements were undertaken at different concentrations. 
     """
 
     @staticmethod
-    def _observation_model_pytorch(dG_over_KT, inhibitor_conc=1e-6, **kwargs):
+    def _observation_model_pytorch(dG_over_KT, inhibitor_conc=1, **kwargs):
         import torch
+        import numpy
 
-        return -torch.log10(torch.exp(dG_over_KT) * inhibitor_conc * 1e-9)
+        return -(dG_over_KT + numpy.log(inhibitor_conc)) * 1 / numpy.log(10)
 
     def check(self):
         super().check()
