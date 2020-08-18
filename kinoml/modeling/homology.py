@@ -61,8 +61,36 @@ class HomologyModel(): # inherent a Base class?
         return up_sequence
 
 
-    def get_alignment():
-        raise NotImplementedError
+    def get_alignment(self, sequence_1, sequence_2):
+
+        import tempfile
+        from modeller import alignment, log, environ
+        log.verbose()
+        env = environ()
+
+        aln = alignment(env)
+        aln.append_sequence(sequence_1, blank_single_chain=True)
+        aln.append_sequence(sequence_2, blank_single_chain=True)
+
+        aln[0].code = 'seq1'
+        aln[1].code = 'seq2'
+
+        aln.edit(edit_align_codes='seq1', base_align_codes='seq2',
+         min_base_entries=1, overhang=3)
+
+        aln.align()
+
+        with tempfile.NamedTemporaryFile(suffix=".ali") as temp_file:
+            aln.write(file=temp_file)
+            temp_file.seek(0) # rewind the file for reading
+        
+        #TODO: edit alignment to remove long indels 
+
+            # # DEBUGGING
+            # for i, line in enumerate(temp_file.readlines()):
+            #     print(line.decode("utf-8"))
+
+        return alignment_file
     
 
     def get_model():

@@ -5,6 +5,7 @@ channels:
   - defaults
   - omnia
   - openeye
+  - salilab
 dependencies:
   # Base depends
   - python
@@ -19,6 +20,7 @@ dependencies:
   - pytorch
   - torchvision
   - openeye-toolkits
+  - modeller
   #- cudatoolkit 10.2
 
   # Testing
