@@ -69,28 +69,48 @@ class HomologyModel(): # inherent a Base class?
         env = environ()
 
         aln = alignment(env)
+
+        # add the sequences
         aln.append_sequence(sequence_1, blank_single_chain=True)
         aln.append_sequence(sequence_2, blank_single_chain=True)
 
         aln[0].code = 'seq1'
         aln[1].code = 'seq2'
 
-        aln.edit(edit_align_codes='seq1', base_align_codes='seq2',
-         min_base_entries=1, overhang=3)
+        # aln[0].atom_file = "4yne.pdb"
+        # aln[0].prottyp = 'structureX'
 
+        # align the sequences
         aln.align()
 
         with tempfile.NamedTemporaryFile(suffix=".ali") as temp_file:
             aln.write(file=temp_file)
             temp_file.seek(0) # rewind the file for reading
-        
-        #TODO: edit alignment to remove long indels 
+
+            ali_lines = []
+            for line in temp_file.readlines():
+                line_str = line.decode("utf-8")
+                ali_lines.append(line_str.strip())
+
+            index = ali_lines.index(">P1;seq2")
+
+            ali_1 = ali_lines[:index][1:-1] # template
+            ali_2 = ali_lines[index:] # target
+
+            ali_1_new, ali_2_new = [], []
+
+            # need to run through each list with 
+            for i, (a, b) in enumerate(zip(ali_1, ali_2)):
+
+                if any(c.isalpha() for c in a): 
+                    ali_1_new.append(ali_1[i])
+                    ali_2_new.append(ali_2[i])
 
             # # DEBUGGING
             # for i, line in enumerate(temp_file.readlines()):
             #     print(line.decode("utf-8"))
 
-        return alignment_file
+        raise NotImplementedError
     
 
     def get_model():
