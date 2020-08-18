@@ -4,6 +4,7 @@ subclasses thereof
 """
 from __future__ import annotations
 from functools import lru_cache
+from typing import Union
 
 from appdirs import user_cache_dir
 
@@ -39,7 +40,9 @@ class OpenEyesProteinLigandDockingFeaturizer(BaseFeaturizer):
     The file itself could be a URL.
     """
 
-    from openeye import oechem, oegrid  # only needed for typing
+    def __init__(self, loop_db: Union[str, None] = None):
+        from pathlib import Path
+        self.loop_db = str(Path(loop_db).expanduser().resolve())
 
     _SUPPORTED_TYPES = (ProteinLigandComplex,)
 
@@ -71,14 +74,14 @@ class OpenEyesProteinLigandDockingFeaturizer(BaseFeaturizer):
 
             # TODO: electron density, loop database
             prepared_protein, prepared_ligand = prepare_complex(
-                protein, electron_density
+                protein, electron_density, self.loop_db
             )
             hybrid_receptor = create_hybrid_receptor(prepared_protein, prepared_ligand)
             docking_poses = hybrid_docking(hybrid_receptor, ligands)
         else:  # TODO: this is very kinase specific, should be more generic
             if isinstance(system.protein, PDBProtein):
                 # TODO: check possibility to define design unit with residue (would consider electron density)
-                prepared_protein = prepare_protein(protein)
+                prepared_protein = prepare_protein(protein, self.loop_db)
                 klifs_pocket = PDBProtein.klifs_pocket(
                     system.protein.pdb_id
                 )  # TODO: specify chain and altloc
