@@ -118,11 +118,11 @@ class PercentageDisplacementMeasurement(BaseMeasurement):
         assert (0 <= self.values <= 100).all(), "One or more values are not in [0, 100]"
 
     @staticmethod
-    def _observation_model_pytorch(dG_over_KT, inhibitor_conc=1e-6, **kwargs):
+    def _observation_model_pytorch(dG_over_KT, inhibitor_conc=1, **kwargs):
         # FIXME: this might be upside down -- check!
         import torch
 
-        return 100 * (1 - 1 / (1 + inhibitor_conc / torch.exp(dG_over_KT)))
+        return 100 * (1 - 1 / (1 +1  / torch.exp(dG_over_KT)))
 
 
 class pIC50Measurement(BaseMeasurement):
