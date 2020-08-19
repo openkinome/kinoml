@@ -1,6 +1,6 @@
 from typing import List, Union
 
-from openeye import oechem, oegrid
+from openeye import oechem, oegrid, oespruce
 
 
 def read_molecules(path: str) -> List[oechem.OEGraphMol]:
@@ -49,6 +49,8 @@ def read_electron_density(path: str) -> Union[oegrid.OESkewGrid, None]:
     # TODO: different map formats
     if not oegrid.OEReadMTZ(path, electron_density, oegrid.OEMTZMapType_Fwt):
         electron_density = None
+
+    # TODO: returns None if something goes wrong
     return electron_density
 
 
@@ -92,10 +94,52 @@ def has_ligand(molecule: oechem.OEGraphMol) -> bool:
     return False
 
 
+def _set_design_unit_options(
+    loop_db: Union[str, None] = None,
+    cap_C_termini: bool = True,
+    cap_N_termini: bool = True,
+) -> oespruce.OEMakeDesignUnitOptions:
+    """
+    Set options for design unit generation.
+    Parameters
+    ----------
+    loop_db: str or None
+        Path to OpenEye Spruce loop database.
+    cap_C_termini: bool
+        If C termini should be capped with ACE.
+    cap_N_termini: bool
+        If N termini should be capped with NME.
+    Returns
+    -------
+    design_unit_options: oespruce.OEMakeDesignUnitOptions
+        An OpenEye class holding options for design unit generation.
+    """
+    design_unit_options = oespruce.OEMakeDesignUnitOptions()
+
+    if loop_db is not None:
+        design_unit_options.GetPrepOptions().GetBuildOptions().GetLoopBuilderOptions().SetLoopDBFilename(
+            loop_db
+        )
+
+    if cap_C_termini:
+        design_unit_options.GetPrepOptions().GetBuildOptions().SetCapCTermini(True)
+    else:
+        design_unit_options.GetPrepOptions().GetBuildOptions().SetCapCTermini(False)
+
+    if cap_N_termini:
+        design_unit_options.GetPrepOptions().GetBuildOptions().SetCapNTermini(True)
+    else:
+        design_unit_options.GetPrepOptions().GetBuildOptions().SetCapNTermini(False)
+
+    return design_unit_options
+
+
 def prepare_complex(
     protein_ligand_complex: oechem.OEGraphMol,
     electron_density: Union[oegrid.OESkewGrid, None] = None,
     loop_db: Union[str, None] = None,
+    cap_C_termini: bool = True,
+    cap_N_termini: bool = True,
 ) -> List[Union[oechem.OEGraphMol, None]]:
     """
     Prepare an OpenEye molecule holding a protein ligand complex for docking.
@@ -107,6 +151,10 @@ def prepare_complex(
         An OpenEye grid holding the electron density.
     loop_db: str or None
         Path to OpenEye Spruce loop database.
+    cap_C_termini: bool
+        If C termini should be capped with ACE.
+    cap_N_termini: bool
+        If N termini should be capped with NME.
     Returns
     -------
     protein: oechem.OEGraphMol
@@ -114,15 +162,14 @@ def prepare_complex(
     ligand: oechem.OEGraphMol
         An OpenEye molecule holding a prepared ligand structure.
     """
-    from openeye import oespruce
 
-    # create design units
+    # set design unit options
     structure_metadata = oespruce.OEStructureMetadata()
-    design_unit_options = oespruce.OEMakeDesignUnitOptions()
-    if loop_db is not None:
-        design_unit_options.GetPrepOptions().GetBuildOptions().GetLoopBuilderOptions().SetLoopDBFilename(
-            loop_db
-        )
+    design_unit_options = _set_design_unit_options(
+        loop_db, cap_C_termini, cap_N_termini
+    )
+
+    # make design units
     if electron_density is None:
         design_units = list(
             oespruce.OEMakeDesignUnits(
@@ -158,7 +205,10 @@ def prepare_complex(
 
 
 def prepare_protein(
-    protein: oechem.OEGraphMol, loop_db: Union[str, None] = None
+    protein: oechem.OEGraphMol,
+    loop_db: Union[str, None] = None,
+    cap_C_termini: bool = True,
+    cap_N_termini: bool = True,
 ) -> Union[oechem.OEGraphMol, None]:
     """
     Prepare an OpenEye molecule holding a protein structure for docking.
@@ -168,20 +218,23 @@ def prepare_protein(
         An OpenEye molecule holding a structure with protein.
     loop_db: str
         Path to OpenEye Spruce loop database.
+    cap_C_termini: bool
+        If C termini should be capped with ACE.
+    cap_N_termini: bool
+        If N termini should be capped with NME.
     Returns
     -------
     protein: oechem.OEGraphMol
         An OpenEye molecule holding a prepared protein structure.
     """
-    from openeye import oespruce
 
-    # create bio design units
+    # set bio design unit options
     structure_metadata = oespruce.OEStructureMetadata()
-    design_unit_options = oespruce.OEMakeDesignUnitOptions()
-    if loop_db is not None:
-        design_unit_options.GetPrepOptions().GetBuildOptions().GetLoopBuilderOptions().SetLoopDBFilename(
-            loop_db
-        )
+    design_unit_options = _set_design_unit_options(
+        loop_db, cap_C_termini, cap_N_termini
+    )
+
+    # make bio design units
     bio_design_units = list(
         oespruce.OEMakeBioDesignUnits(protein, structure_metadata, design_unit_options)
     )
