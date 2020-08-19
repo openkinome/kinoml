@@ -1,8 +1,7 @@
 from ..core.proteins import ProteinStructure
-from typing import Union
 
 
-class HomologyModel(): # inherent a Base class? 
+class HomologyModel:  #  TODO inherent a Base class?
 
     """
     Given a UniProt identifier, generate a template on to which 
@@ -14,10 +13,16 @@ class HomologyModel(): # inherent a Base class?
     homology model.
     """
 
-    def __init__(self, identifier=None, template=None, sequence=None, *args, **kwargs):
-        self. identifier = identifier
-        self.template = template
-        self.sequence = sequence
+    def __init__(self, name="", path="", *args, **kwargs):
+        from appdirs import user_cache_dir
+
+        self.name = name
+        self.path = f"{user_cache_dir()}/{self.name}.ali"
+        #  TODO specify id, template, and sequence here? e.g.:
+
+        #  self.identifier = identifier
+        #  self.template = template
+        #  self.sequence = sequence
 
 
     def get_pdb_template(self, sequence):
@@ -32,18 +37,20 @@ class HomologyModel(): # inherent a Base class?
         pdb_template: ProteinStructure
             A ProteinStructure object generated from retrieval from a PDB BLAST search.
         """
-        
+
         from prody import blastPDB
         import tempfile
         import pickle
 
         blast_record = blastPDB(sequence)
 
-        with tempfile.NamedTemporaryFile(suffix='.pkl') as temp_file:
+        with tempfile.NamedTemporaryFile(suffix=".pkl") as temp_file:
             pickle.dump(blast_record, temp_file)
 
-            blast_record = pickle.load(open(temp_file.name, 'rb'))
-            best = blast_record.getBest()['pdb_id']
+            blast_record = pickle.load(open(temp_file.name, "rb"))
+            best = blast_record.getBest()["pdb_id"]
+
+            #  TODO add option based on sequency similarity cut off
 
             top_pdb_template = ProteinStructure.from_name(best)
 
@@ -56,15 +63,18 @@ class HomologyModel(): # inherent a Base class?
         params = {"query": identifier, "format": "fasta"}
         response = requests.get("http://www.uniprot.org/uniprot/", params)
 
-        up_sequence = response.text.split('\n', 1)[1].replace('\n','')
+        up_sequence = response.text.split("\n", 1)[1].replace("\n", "")
+
+        #  TODO add option to specify just the kinase domain
 
         return up_sequence
 
-
     def get_alignment(self, sequence_1, sequence_2):
 
+        #  TODO write output to a logger
         import tempfile
         from modeller import alignment, log, environ
+
         log.verbose()
         env = environ()
 
@@ -74,45 +84,45 @@ class HomologyModel(): # inherent a Base class?
         aln.append_sequence(sequence_1, blank_single_chain=True)
         aln.append_sequence(sequence_2, blank_single_chain=True)
 
-        aln[0].code = 'seq1'
-        aln[1].code = 'seq2'
-
-        # aln[0].atom_file = "4yne.pdb"
-        # aln[0].prottyp = 'structureX'
+        aln[0].code = "seq1"
+        aln[1].code = "seq2"
 
         # align the sequences
         aln.align()
 
         with tempfile.NamedTemporaryFile(suffix=".ali") as temp_file:
             aln.write(file=temp_file)
-            temp_file.seek(0) # rewind the file for reading
+            temp_file.seek(0)  # rewind the file for reading
 
             ali_lines = []
             for line in temp_file.readlines():
                 line_str = line.decode("utf-8")
                 ali_lines.append(line_str.strip())
 
+            # split the list for easy reading
             index = ali_lines.index(">P1;seq2")
-
-            ali_1 = ali_lines[:index][1:-1] # template
-            ali_2 = ali_lines[index:] # target
+            ali_1 = ali_lines[:index][1:-1]  # template
+            ali_2 = ali_lines[index:]  # target
 
             ali_1_new, ali_2_new = [], []
 
-            # need to run through each list with 
+            # remove long blank regions in template seq "-"
             for i, (a, b) in enumerate(zip(ali_1, ali_2)):
 
-                if any(c.isalpha() for c in a): 
+                if any(c.isalpha() for c in a):
                     ali_1_new.append(ali_1[i])
-                    ali_2_new.append(ali_2[i])
+                    ali_2_new.append(ali_2[i])  # remove corresponding seq in target
 
-            # # DEBUGGING
-            # for i, line in enumerate(temp_file.readlines()):
-            #     print(line.decode("utf-8"))
+            #  TODO add name of PDB to template header
+            #  TODO change sequence numbers in alignment file
 
+        # write new alignment file without long blank regions
+        with open(self.path, 'w') as ali_file: # saving the file to cache
+            for item in ali_1_new:
+                ali_file.write("%s\n" % item)
+            for item in ali_2_new:
+                ali_file.write("%s\n" % item)
+        
+
+    def get_model(self, template_structure, alignment):
         raise NotImplementedError
-    
-
-    def get_model():
-        raise NotImplementedError
-
