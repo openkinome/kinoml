@@ -110,9 +110,16 @@ class ProteinStructure(BaseProtein, BaseStructure):
         from MDAnalysis import Universe
         from pathlib import Path
 
+        identifier = f"{path.split('/')[-1].split('.')[0]}"  #  set id to be the file name
+
         u = Universe(path)
         p = Path(path)
-        return cls(pname=p.name, metadata={"path": path}, universe=u, **kwargs)
+        return cls(
+            pname=p.name,
+            metadata={"path": path, "id": identifier},
+            universe=u,
+            **kwargs,
+        )
 
     @classmethod
     def from_sequence(cls, sequence, **kwargs):

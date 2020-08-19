@@ -13,7 +13,7 @@ class HomologyModel:  #  TODO inherent a Base class?
     homology model.
     """
 
-    def __init__(self, name="", path="", *args, **kwargs):
+    def __init__(self, name="", *args, **kwargs):
         from appdirs import user_cache_dir
 
         self.name = name
@@ -69,7 +69,7 @@ class HomologyModel:  #  TODO inherent a Base class?
 
         return up_sequence
 
-    def get_alignment(self, sequence_1, sequence_2):
+    def get_alignment(self, template_system, canonical_sequence):
 
         #  TODO write output to a logger
         import tempfile
@@ -81,11 +81,11 @@ class HomologyModel:  #  TODO inherent a Base class?
         aln = alignment(env)
 
         # add the sequences
-        aln.append_sequence(sequence_1, blank_single_chain=True)
-        aln.append_sequence(sequence_2, blank_single_chain=True)
+        aln.append_sequence(template_system.sequence.sequence, blank_single_chain=True)
+        aln.append_sequence(canonical_sequence, blank_single_chain=True)
 
-        aln[0].code = "seq1"
-        aln[1].code = "seq2"
+        aln[0].code = template_system.metadata['id']
+        aln[1].code = "target_seq" #  TODO set target sequence name to be UniProt ID
 
         # align the sequences
         aln.align()
@@ -100,7 +100,7 @@ class HomologyModel:  #  TODO inherent a Base class?
                 ali_lines.append(line_str.strip())
 
             # split the list for easy reading
-            index = ali_lines.index(">P1;seq2")
+            index = ali_lines.index(">P1;target_seq")
             ali_1 = ali_lines[:index][1:-1]  # template
             ali_2 = ali_lines[index:]  # target
 
@@ -113,7 +113,6 @@ class HomologyModel:  #  TODO inherent a Base class?
                     ali_1_new.append(ali_1[i])
                     ali_2_new.append(ali_2[i])  # remove corresponding seq in target
 
-            #  TODO add name of PDB to template header
             #  TODO change sequence numbers in alignment file
 
         # write new alignment file without long blank regions
