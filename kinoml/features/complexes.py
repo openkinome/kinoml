@@ -41,8 +41,7 @@ class OpenEyesProteinLigandDockingFeaturizer(BaseFeaturizer):
     """
 
     def __init__(self, loop_db: Union[str, None] = None):
-        from pathlib import Path
-        self.loop_db = str(Path(loop_db).expanduser().resolve())
+        self.loop_db = loop_db
 
     _SUPPORTED_TYPES = (ProteinLigandComplex,)
 

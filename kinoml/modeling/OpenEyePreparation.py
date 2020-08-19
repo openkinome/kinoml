@@ -15,6 +15,9 @@ def read_molecules(path: str) -> List[oechem.OEGraphMol]:
     molecules: list of oechem.OEGraphMol
         A List of molecules as OpenEye molecules.
     """
+    from pathlib import Path
+
+    path = str(Path(path).expanduser().resolve())
     suffix = path.split(".")[-1]
     molecules = []
     with oechem.oemolistream(path) as ifs:
@@ -45,6 +48,9 @@ def read_electron_density(path: str) -> Union[oegrid.OESkewGrid, None]:
     electron_density: oegrid.OESkewGrid or None
         A List of molecules as OpenEye molecules.
     """
+    from pathlib import Path
+
+    path = str(Path(path).expanduser().resolve())
     electron_density = oegrid.OESkewGrid()
     # TODO: different map formats
     if not oegrid.OEReadMTZ(path, electron_density, oegrid.OEMTZMapType_Fwt):
@@ -64,6 +70,9 @@ def write_molecules(molecules: List[oechem.OEGraphMol], path: str):
     path: str
         File path for saving molecules.
     """
+    from pathlib import Path
+
+    path = str(Path(path).expanduser().resolve())
     with oechem.oemolostream(path) as ofs:
         for molecule in molecules:
             oechem.OEWriteMolecule(ofs, molecule)
@@ -114,8 +123,11 @@ def _set_design_unit_options(
     design_unit_options: oespruce.OEMakeDesignUnitOptions
         An OpenEye class holding options for design unit generation.
     """
-    design_unit_options = oespruce.OEMakeDesignUnitOptions()
+    from pathlib import Path
 
+    loop_db = str(Path(loop_db).expanduser().resolve())
+
+    design_unit_options = oespruce.OEMakeDesignUnitOptions()
     if loop_db is not None:
         design_unit_options.GetPrepOptions().GetBuildOptions().GetLoopBuilderOptions().SetLoopDBFilename(
             loop_db
