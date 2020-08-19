@@ -205,6 +205,10 @@ def prepare_complex(
         # TODO: Returns list of Nones if something goes wrong
         return [None, None]
 
+    # add missing backbone atoms
+    oespruce.OEFixBackbone(design_unit)
+    # TODO: This does not work for some reason
+
     # get protein
     protein = oechem.OEGraphMol()
     design_unit.GetProtein(protein)
@@ -257,6 +261,10 @@ def prepare_protein(
     else:
         # TODO: Returns None if something goes wrong
         return None
+
+    # add missing backbone atoms
+    oespruce.OEFixBackbone(bio_design_unit)
+    # TODO: This does not work for some reason
 
     # get protein
     protein = oechem.OEGraphMol()
