@@ -50,7 +50,6 @@ class HomologyModel:  #  TODO inherent a Base class?
 
         return top_pdb_template
 
-
     def get_uniprot_sequence(self, identifier: str):
         import requests
         from io import StringIO
@@ -63,7 +62,6 @@ class HomologyModel:  #  TODO inherent a Base class?
         #  TODO add option to specify just the kinase domain
 
         return up_sequence
-
 
     def get_alignment(self, template_system, canonical_sequence, pdb_entry=False):
 
@@ -86,17 +84,17 @@ class HomologyModel:  #  TODO inherent a Base class?
         elif pdb_entry == True:
             from appdirs import user_cache_dir
 
-            self.pdbpath = f"{user_cache_dir()}/{pdb_id}.pdb"
+            template_system.metadata['path'] = f"{user_cache_dir()}/{pdb_id}.pdb"
 
             # TODO there is probably a better way to this, it's a
             # repeat of ..core.proteins.ProteinStructure.from_name
             url = f"https://files.rcsb.org/download/{pdb_id}.pdb"
             response = requests.get(url)
 
-            with open(self.pdbpath, "wb") as pdb_file:  # saving the pdb to cache
+            with open(template_system.metadata['path'], "wb") as pdb_file:  # saving the pdb to cache
                 pdb_file.write(response.content)
 
-            env.io.atom_files_directory = [pdb_file.name.split(".")[0].split(pdb_id)[0]]
+            env.io.atom_files_directory = [template_system.metadata["path"].split(".")[0].split(pdb_id)[0]]
 
         aln = alignment(env)
         mdl = model(env)
@@ -114,7 +112,7 @@ class HomologyModel:  #  TODO inherent a Base class?
         # edit canonical target sequence keywords
         aln[1].code = "target_seq"  #  TODO set target sequence name to be UniProt ID?
 
-        # align the sequences
+        # align the sequences TODO should we use salign() instead?
         aln.align()
 
         with tempfile.NamedTemporaryFile(suffix=".ali") as temp_file:
@@ -150,6 +148,31 @@ class HomologyModel:  #  TODO inherent a Base class?
             for item in ali_2_new:
                 ali_file.write("%s\n" % item)
 
+    def get_model(self, template_system, alignment):
+        from modeller import log, environ
+        from modeller.automodel import dope_loopmodel, assess
 
-    def get_model(self, template_structure, alignment):
-        raise NotImplementedError
+        log.verbose()
+        env = environ()
+
+        pdb_id = template_system.metadata["id"]
+
+        env.io.atom_files_directory = [
+                template_system.metadata["path"].split(".")[0].split(pdb_id)[0]]
+
+        a = dope_loopmodel(
+            env,
+            alnfile = alignment,
+            knowns = template_system.metadata['id'],
+            sequence = 'target_seq',
+            loop_assess_methods=(assess.DOPE, assess.GA341))
+
+        a.starting_model= 1
+        a.ending_model  = 1
+
+        # TODO could add loop refinement option here
+        # TODO files are written out to ./, need to move after generation
+        # no way to specify output dir according to modeller docs
+
+        a.make()
+
