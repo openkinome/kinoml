@@ -148,7 +148,7 @@ class HomologyModel:  #  TODO inherent a Base class?
             for item in ali_2_new:
                 ali_file.write("%s\n" % item)
 
-    def get_model(self, template_system, alignment):
+    def get_model(self, template_system, alignment, num_models):
         from modeller import log, environ
         from modeller.automodel import dope_loopmodel, assess
 
@@ -168,7 +168,7 @@ class HomologyModel:  #  TODO inherent a Base class?
             loop_assess_methods=(assess.DOPE, assess.GA341))
 
         a.starting_model= 1
-        a.ending_model  = 1
+        a.ending_model  = num_models
 
         # TODO could add loop refinement option here
         # TODO files are written out to ./, need to move after generation
