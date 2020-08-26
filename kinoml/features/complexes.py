@@ -19,7 +19,7 @@ from ..docking.OpenEyeDocking import (
     hybrid_docking,
     resids_to_box,
 )
-from ..modeling.OpenEyePreparation import (
+from ..modeling.OpenEyeModeling import (
     has_ligand,
     prepare_complex,
     prepare_protein,
