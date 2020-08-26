@@ -204,13 +204,16 @@ def prepare_complex(
         # TODO: Returns list of Nones if something goes wrong
         return [None, None]
 
-    # add missing backbone atoms
-    oespruce.OEFixBackbone(design_unit)
-    # TODO: This does not work for some reason
-
     # get protein
     protein = oechem.OEGraphMol()
     design_unit.GetProtein(protein)
+
+    # add missing OXT backbone atoms, not handled by OEFixBackbone in OESpruce 1.1.0
+    for atom in protein.GetAtoms():
+        if "H'" in atom.GetName():
+            atom.SetAtomicNum(8)
+            atom.SetName("OXT")
+            atom.SetFormalCharge(-1)
 
     # get ligand
     ligand = oechem.OEGraphMol()
@@ -261,12 +264,15 @@ def prepare_protein(
         # TODO: Returns None if something goes wrong
         return None
 
-    # add missing backbone atoms
-    oespruce.OEFixBackbone(bio_design_unit)
-    # TODO: This does not work for some reason
-
     # get protein
     protein = oechem.OEGraphMol()
     bio_design_unit.GetProtein(protein)
+
+    # add missing OXT backbone atoms, not handled by OEFixBackbone in OESpruce 1.1.0
+    for atom in protein.GetAtoms():
+        if "H'" in atom.GetName():
+            atom.SetAtomicNum(8)
+            atom.SetName("OXT")
+            atom.SetFormalCharge(-1)
 
     return protein
