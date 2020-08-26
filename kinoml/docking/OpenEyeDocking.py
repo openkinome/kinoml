@@ -128,7 +128,7 @@ def create_box_receptor(
     return receptor
 
 
-def run_docking(
+def _run_docking(
     receptor: oechem.OEGraphMol,
     molecules: List[oechem.OEGraphMol],
     dock_method: int,
@@ -249,7 +249,7 @@ def hybrid_docking(
     from openeye import oedocking
 
     dock_method = oedocking.OEDockMethod_Hybrid2
-    docked_molecules = run_docking(hybrid_receptor, molecules, dock_method, num_poses)
+    docked_molecules = _run_docking(hybrid_receptor, molecules, dock_method, num_poses)
 
     return docked_molecules
 
@@ -275,6 +275,6 @@ def chemgauss_docking(
     from openeye import oedocking
 
     dock_method = oedocking.OEDockMethod_Chemgauss4
-    docked_molecules = run_docking(receptor, molecules, dock_method, num_poses)
+    docked_molecules = _run_docking(receptor, molecules, dock_method, num_poses)
 
     return docked_molecules
