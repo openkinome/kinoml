@@ -45,12 +45,10 @@ def key_klifs_residues(numbering):
     key_res['group1'].append(numbering[8]) # res5 in P-loop
 
     ## feature group 2: aC-related features
-    #angle between aC and aE helices
+    #angle between aC and aE helices and the key salt bridge
     key_res['group2'].append(numbering[19])  # res0 in aC
     key_res['group2'].append(numbering[29])  # res10 in aC
     key_res['group2'].append(numbering[62])  # end of aE
-
-    # key salt bridge
     key_res['group2'].append(numbering[16])  # K in beta III
     key_res['group2'].append(numbering[23])  # E in aC
 
@@ -150,7 +148,7 @@ def compute_simple_protein_features(u, key_res):
     ## Dunbrack distances D1, D2
     dis[0][0] = int(u.select_atoms(f"resid {key_res['group3'][3]} and name CA")[0].ix) # ExxxX CA
     dis[0][1] = int(u.select_atoms(f"resid {key_res['group3'][2]} and name CZ")[0].ix) # DFG-Phe CZ
-    dis[1][0] = int(u.select_atoms(f"resid {key_res['group2'][0]} and name CA")[0].ix) # K in beta III CA 
+    dis[1][0] = int(u.select_atoms(f"resid {key_res['group2'][3]} and name CA")[0].ix) # K in beta III CA 
     dis[1][1] = dis[0][1] # DFG-Phe CZ
 
     # check if there is any missing coordinates; if so, skip dihedral/distance calculation for those residues
@@ -174,10 +172,14 @@ def compute_simple_protein_features(u, key_res):
         dih_ags.append(AtomGroup(dih[i], u))
     dihedrals = Dihedral(dih_ags).run().angles
 
+    each_frame = list()
     for i in range(2):
         ag0 = AtomGroup([dis[i][0]], u) # first atom in each atom pair
         ag1 = AtomGroup([dis[i][1]], u) # second atom in each atom pair
-        distances.append(dist(ag0, ag1)[-1][0])
+        each_frame.append(dist(ag0, ag1)[-1][0])
+    each_frame = np.array(each_frame)
+    distances.append(each_frame)
+
     # clean up
     del u, dih, dis
     return dihedrals, distances
