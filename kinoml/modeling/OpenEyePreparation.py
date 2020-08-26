@@ -134,10 +134,16 @@ def _prepare_structure(
     ligand: oechem.OEGraphMol
         An OpenEye molecule holding a prepared ligand structure.
     """
+
     def _has_residue_number(atom, residue_numbers=real_termini):
         """Return True if atom matches any given residue number."""
         residue = oechem.OEAtomGetResidue(atom)
-        return any([True if residue.GetResidueNumber() == residue_number else False for residue_number in residue_numbers])
+        return any(
+            [
+                True if residue.GetResidueNumber() == residue_number else False
+                for residue_number in residue_numbers
+            ]
+        )
 
     # set design unit options
     structure_metadata = oespruce.OEStructureMetadata()
@@ -147,8 +153,11 @@ def _prepare_structure(
         design_unit_options.GetPrepOptions().GetBuildOptions().SetCapNTermini(False)
     if loop_db is not None:
         from pathlib import Path
+
         loop_db = str(Path(loop_db).expanduser().resolve())
-        design_unit_options.GetPrepOptions().GetBuildOptions().GetLoopBuilderOptions().SetLoopDBFilename(loop_db)
+        design_unit_options.GetPrepOptions().GetBuildOptions().GetLoopBuilderOptions().SetLoopDBFilename(
+            loop_db
+        )
 
     # cap all termini but biologically real termini
     if real_termini is not None and cap_termini is True:
@@ -160,11 +169,23 @@ def _prepare_structure(
     # make design units
     if has_ligand:
         if electron_density is None:
-            design_units = list(oespruce.OEMakeDesignUnits(structure, structure_metadata, design_unit_options))
+            design_units = list(
+                oespruce.OEMakeDesignUnits(
+                    structure, structure_metadata, design_unit_options
+                )
+            )
         else:
-            design_units = list(oespruce.OEMakeDesignUnits(structure, electron_density, structure_metadata, design_unit_options))
+            design_units = list(
+                oespruce.OEMakeDesignUnits(
+                    structure, electron_density, structure_metadata, design_unit_options
+                )
+            )
     else:
-        design_units = list(oespruce.OEMakeBioDesignUnits(structure, structure_metadata, design_unit_options))
+        design_units = list(
+            oespruce.OEMakeBioDesignUnits(
+                structure, structure_metadata, design_unit_options
+            )
+        )
 
     if len(design_units) == 1:
         design_unit = design_units[0]
@@ -224,7 +245,14 @@ def prepare_complex(
     ligand: oechem.OEGraphMol
         An OpenEye molecule holding a prepared ligand structure.
     """
-    return _prepare_structure(structure=protein_ligand_complex, has_ligand=True, electron_density=electron_density, loop_db=loop_db, cap_termini=cap_termini, real_termini=real_termini)
+    return _prepare_structure(
+        structure=protein_ligand_complex,
+        has_ligand=True,
+        electron_density=electron_density,
+        loop_db=loop_db,
+        cap_termini=cap_termini,
+        real_termini=real_termini,
+    )
 
 
 def prepare_protein(
@@ -250,4 +278,10 @@ def prepare_protein(
     protein: oechem.OEGraphMol
         An OpenEye molecule holding a prepared protein structure.
     """
-    return _prepare_structure(structure=protein, has_ligand=False, loop_db=loop_db, cap_termini=cap_termini, real_termini=real_termini)
+    return _prepare_structure(
+        structure=protein,
+        has_ligand=False,
+        loop_db=loop_db,
+        cap_termini=cap_termini,
+        real_termini=real_termini,
+    )
