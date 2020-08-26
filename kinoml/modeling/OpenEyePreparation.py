@@ -125,10 +125,9 @@ def _set_design_unit_options(
     """
     from pathlib import Path
 
-    loop_db = str(Path(loop_db).expanduser().resolve())
-
     design_unit_options = oespruce.OEMakeDesignUnitOptions()
     if loop_db is not None:
+        loop_db = str(Path(loop_db).expanduser().resolve())
         design_unit_options.GetPrepOptions().GetBuildOptions().GetLoopBuilderOptions().SetLoopDBFilename(
             loop_db
         )
