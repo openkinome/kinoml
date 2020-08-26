@@ -3,6 +3,29 @@ from typing import List, Union
 from openeye import oechem, oegrid, oespruce
 
 
+def read_smiles(smiles: str) -> oechem.OEGraphMol:
+    """
+    Read molecule from a smiles string.
+    Parameters
+    ----------
+    smiles: str
+        Smiles string.
+    Returns
+    -------
+    molecule: oechem.OEGraphMol
+        A molecule as OpenEye molecules.
+    """
+    ims = oechem.oemolistream()
+    ims.SetFormat(oechem.OEFormat_SMI)
+    ims.openstring(smiles)
+
+    molecules = []
+    for molecule in ims.GetOEMols():
+        molecules.append(oechem.OEGraphMol(molecule))
+
+    return molecules[0]
+
+
 def read_molecules(path: str) -> List[oechem.OEGraphMol]:
     """
     Read molecules from a file.

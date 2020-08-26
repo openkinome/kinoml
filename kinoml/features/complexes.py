@@ -9,7 +9,7 @@ from typing import Union
 from appdirs import user_cache_dir
 
 from .core import BaseFeaturizer
-from ..core.ligands import FileLigand
+from ..core.ligands import FileLigand, SmilesLigand
 from ..core.proteins import FileProtein, PDBProtein
 from ..core.systems import ProteinLigandComplex
 from ..docking.OpenEyeDocking import (
@@ -25,6 +25,7 @@ from ..modeling.OpenEyePreparation import (
     prepare_protein,
     read_electron_density,
     read_molecules,
+    read_smiles,
     write_molecules,
 )
 
@@ -35,9 +36,9 @@ class OpenEyesProteinLigandDockingFeaturizer(BaseFeaturizer):
     Given a System with exactly one protein and one ligand,
     dock the ligand in the designated binding pocket.
 
-    We assume that a file-based System object will be passed; this
-    means we will have a System.components with (FileProtein, FileLigand).
-    The file itself could be a URL.
+    We assume that a smiles and file-based System object will be passed;
+    this means we will have a System.components with FileProtein and
+    FileLigand or SmilesLigand. The file itself could be a URL.
     """
 
     def __init__(self, loop_db: Union[str, None] = None):
@@ -58,7 +59,10 @@ class OpenEyesProteinLigandDockingFeaturizer(BaseFeaturizer):
         protein_ligand_complex: ProteinLigandComplex
             The same system but with docked ligand.
         """
-        ligands = read_molecules(system.ligand.path)
+        if isinstance(system.ligand, SmilesLigand):
+            ligands = [read_smiles(system.ligand.smiles)]
+        else:
+            ligands = read_molecules(system.ligand.path)
         protein = read_molecules(system.protein.path)[0]
         # TODO: electron density might be redundant here, if already used in separate protein preparation workflow
         if system.protein.electron_density_path is not None:
@@ -71,7 +75,6 @@ class OpenEyesProteinLigandDockingFeaturizer(BaseFeaturizer):
         # TODO: more sophisticated decision between hybrid and chemgauss docking
         if has_ligand(protein):
 
-            # TODO: electron density, loop database
             prepared_protein, prepared_ligand = prepare_complex(
                 protein, electron_density, self.loop_db
             )
@@ -103,5 +106,5 @@ class OpenEyesProteinLigandDockingFeaturizer(BaseFeaturizer):
         protein_ligand_complex = ProteinLigandComplex(
             components=[file_protein, file_ligand]
         )
-
+        # TODO: returns a ProteinLigandComplex with PDBProtein and SmilesLigand instead of FileProtein and FileLigand
         return protein_ligand_complex
