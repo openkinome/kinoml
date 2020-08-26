@@ -179,6 +179,7 @@ def compute_simple_protein_features(u, key_res):
         each_frame.append(dist(ag0, ag1)[-1][0])
     each_frame = np.array(each_frame)
     distances.append(each_frame)
+
     # clean up
     del u, dih, dis
     return dihedrals, distances
