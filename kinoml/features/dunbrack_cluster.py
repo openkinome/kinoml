@@ -2,6 +2,13 @@
 Tools to assign a structure or a trajectory of structures into 
 conformational clusters based on Modi and Dunbrack, 2019 (https://pubmed.ncbi.nlm.nih.gov/30867294/) 
 '''
+from pathlib import Path
+import tempfile
+
+from appdirs import user_cache_dir
+import pandas as pd
+
+
 def assign(dihedrals, distances):
     from math import cos
     import numpy as np
@@ -83,3 +90,78 @@ def assign(dihedrals, distances):
                     clust_assign = c
             assignment.append(clust_assign)
     return assignment 
+
+
+class PDBDunbrack:
+
+    _PDB_DUNBRACK_LIBRARY = Path(f"{user_cache_dir()}/pdb_dunbrack_library.csv")
+
+    def __init__(self):
+        self.pdb_dunbrack_library = self.update()
+
+    def __repr__(self):
+        return f"<{self._PDB_DUNBRACK_LIBRARY}>"
+
+    def update(self, reinitialize: bool = False) -> pd.DataFrame:
+        """
+        Update DataFrame holding information about kinases from the KLIFS database and the corresponding Dunbrack
+        cluster.
+        Parameters
+        ----------
+        reinitialize: bool
+            If the DataFrame should be built from scratch.
+        Returns
+        -------
+        pdb_dunbrack_library: pd.DataFrame
+            DataFrame holding information about kinases from KLIFS and the corresponding Dunbrack cluster.
+        """
+        from .klifs import query_klifs_database
+        import klifs_utils
+        import MDAnalysis as mda
+        from .protein_struct_features import key_klifs_residues, compute_simple_protein_features
+        from tqdm import tqdm
+
+        # get available kinase information from KLIFS
+        klifs_kinase_ids = klifs_utils.remote.kinases.kinase_names().kinase_ID.to_list()
+        klifs_kinase_df = klifs_utils.remote.structures.structures_from_kinase_ids(klifs_kinase_ids)
+
+        # initialize library
+        if not self._PDB_DUNBRACK_LIBRARY.is_file() or reinitialize is True:
+            columns = list(klifs_kinase_df.columns) + ["dunbrack_cluster"]
+            pdb_dunbrack_library = pd.DataFrame(columns=columns)
+            pdb_dunbrack_library.to_csv(self._PDB_DUNBRACK_LIBRARY, index=False)
+
+        pdb_dunbrack_library = pd.read_csv(self._PDB_DUNBRACK_LIBRARY)
+
+        counter = 0
+        for index, row in tqdm(klifs_kinase_df.iterrows(), total=klifs_kinase_df.shape[0]):
+            structure_id = row["structure_ID"]
+            if structure_id not in list(pdb_dunbrack_library["structure_ID"]):
+                counter += 1
+                try:  # assign dunbrack cluster
+                    with tempfile.NamedTemporaryFile(suffix=".pdb", mode="w+t") as temp_file:
+                        pdb_text = klifs_utils.remote.coordinates.complex._complex_pdb_text(structure_id)
+                        temp_file.write(pdb_text)
+                        u = mda.Universe(temp_file.name)
+                        klifs = query_klifs_database(row["pdb"], row["chain"])
+                        key_res = key_klifs_residues(klifs['numbering'])
+                        dihedrals, distances = compute_simple_protein_features(u, key_res)
+                        assignment = assign(dihedrals, distances)[0]
+                except:  # catch all errors and assign None
+                    assignment = None
+                row["dunbrack_cluster"] = assignment
+                pdb_dunbrack_library = pdb_dunbrack_library.append(row, ignore_index=True)
+                if counter % 10 == 0:  # save every 10th structure, so one can pause in between
+                    pdb_dunbrack_library.to_csv(self._PDB_DUNBRACK_LIBRARY, index=False)
+
+        pdb_dunbrack_library.to_csv(self._PDB_DUNBRACK_LIBRARY, index=False)
+        return pdb_dunbrack_library
+
+    def structures_by_cluster(self, cluster_id):
+        """
+
+        """
+        import pandas as pd
+        pdb_dunbrack_library = pd.read_csv(self._PDB_DUNBRACK_LIBRARY)
+        structures = pdb_dunbrack_library[pdb_dunbrack_library["dunbrack_cluster"] == cluster_id]
+        return structures
