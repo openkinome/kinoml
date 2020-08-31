@@ -101,7 +101,7 @@ class PDBDunbrack:
         self.pdb_dunbrack_library = self.update()
 
     def __repr__(self):
-        return f"<{self._PDB_DUNBRACK_LIBRARY}>"
+        return f"<PDBDunbrack library located at {self._PDB_DUNBRACK_LIBRARY} contains {self.pdb_dunbrack_library.shape[0]} structures.>"
 
     def update(self, reinitialize: bool = False) -> pd.DataFrame:
         """
