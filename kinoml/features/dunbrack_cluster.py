@@ -4,6 +4,7 @@ conformational clusters based on Modi and Dunbrack, 2019 (https://pubmed.ncbi.nl
 '''
 from pathlib import Path
 import tempfile
+from typing import Union
 
 from appdirs import user_cache_dir
 import pandas as pd
@@ -157,11 +158,20 @@ class PDBDunbrack:
         pdb_dunbrack_library.to_csv(self._PDB_DUNBRACK_LIBRARY, index=False)
         return pdb_dunbrack_library
 
-    def structures_by_cluster(self, cluster_id):
+    def structures_by_cluster(self, cluster_id: Union[int, None]) -> pd.DataFrame:
         """
-
+        Get KLIFS kinase information of structures matching the given Dunbrack cluster ID.
+        Parameters
+        ----------
+        cluster_id: int or None
+            Dunbrack cluser ID of interest. None for structures that were not assigned to any cluster.
+        Returns
+        -------
+        structures: pd.DataFrame
+            KLIFS kinase information about matching structures.
         """
-        import pandas as pd
-        pdb_dunbrack_library = pd.read_csv(self._PDB_DUNBRACK_LIBRARY)
-        structures = pdb_dunbrack_library[pdb_dunbrack_library["dunbrack_cluster"] == cluster_id]
+        if cluster_id is None:
+            structures = self.pdb_dunbrack_library[self.pdb_dunbrack_library["dunbrack_cluster"].isnull()]
+        else:
+            structures = self.pdb_dunbrack_library[self.pdb_dunbrack_library["dunbrack_cluster"] == cluster_id]
         return structures
