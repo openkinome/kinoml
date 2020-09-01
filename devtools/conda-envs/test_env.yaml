@@ -16,6 +16,7 @@ dependencies:
   - tqdm
   - pytorch 1.6
   - torchvision
+  - xgboost
   #- cudatoolkit 10.2
 
   # Testing
