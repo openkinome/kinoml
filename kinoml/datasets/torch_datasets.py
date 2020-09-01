@@ -19,7 +19,7 @@ class PrefeaturizedTorchDataset(Dataset):
 
     def __getitem__(self, index):
         X = torch.tensor(self.systems[index], device=self.device, dtype=torch.float)
-        y = torch.tensor(self.measurements[index], device=self.device)
+        y = torch.tensor(self.measurements[index], device=self.device, dtype=torch.float)
         return X, y
 
     def __len__(self):
@@ -62,5 +62,5 @@ class TorchDataset(PrefeaturizedTorchDataset):
             dtype=torch.float,
             requires_grad=True,
         )
-        y = torch.tensor(self.measurements[index], device=self.device, requires_grad=True)
+        y = torch.tensor(self.measurements[index], device=self.device, requires_grad=True, dtype=torch.float)
         return X, y
