@@ -188,6 +188,16 @@ class DatasetProvider(BaseDatasetProvider):
             observation_model=self.observation_model(backend="pytorch"),
         )
 
+    def to_xgboost(self, **kwargs):
+        from xgboost import DMatrix
+
+        dmatrix = DMatrix(
+            np.asarray(self.featurized_systems()), self.measurements_as_array(**kwargs)
+        )
+        ## TODO: Uncomment when XGB observation models are implemented
+        # dmatrix.observation_model = self.observation_model(backend="xgboost", loss="mse")
+        return dmatrix
+
     def to_tensorflow(self, *args, **kwargs):
         raise NotImplementedError
 
@@ -274,6 +284,9 @@ class MultiDatasetProvider(DatasetProvider):
 
     def to_pytorch(self, **kwargs):
         return [p.to_pytorch(**kwargs) for p in self.providers]
+
+    def to_xgboost(self, **kwargs):
+        return [p.to_xgboost(**kwargs) for p in self.providers]
 
 
 class ProteinLigandDatasetProvider(DatasetProvider):

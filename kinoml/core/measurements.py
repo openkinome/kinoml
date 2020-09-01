@@ -70,11 +70,20 @@ class BaseMeasurement:
 
     @classmethod
     def _observation_model(cls, backend="pytorch", type_=None):
-        assert backend in ("pytorch", "tensorflow"), f"Backend {backend} is not supported!"
-        return getattr(cls, f"_observation_model_{backend}")
+        try:
+            method = getattr(cls, f"_observation_model_{backend}")
+        except AttributeError:
+            msg = f"Observation model for backend `{backend}` is not available for `{cls}` types"
+            raise NotImplementedError(msg)
+        else:
+            return method
 
     @staticmethod
     def _observation_model_pytorch(*args, **kwargs):
+        raise NotImplementedError("Implement in your subclass!")
+
+    @staticmethod
+    def _observation_model_xgboost(*args, **kwargs):
         raise NotImplementedError("Implement in your subclass!")
 
     def check(self):
@@ -122,7 +131,12 @@ class PercentageDisplacementMeasurement(BaseMeasurement):
         # FIXME: this might be upside down -- check!
         import torch
 
-        return 100 * (1 - 1 / (1 +1  / torch.exp(dG_over_KT)))
+        return 100 * (1 - 1 / (1 + 1 / torch.exp(dG_over_KT)))
+
+    @staticmethod
+    def _observation_model_xgboost(dG_over_KT, dmatrix, inhibitor_conc=1, **kwargs):
+        # TODO
+        raise NotImplementedError
 
 
 class pIC50Measurement(BaseMeasurement):
@@ -169,7 +183,40 @@ class pIC50Measurement(BaseMeasurement):
         import torch
         import numpy
 
-        return -(dG_over_KT + numpy.log((1 + substrate_conc / michaelis_constant) * inhibitor_conc)) * 1 / numpy.log(10)
+        return (
+            -(dG_over_KT + numpy.log((1 + substrate_conc / michaelis_constant) * inhibitor_conc))
+            * 1
+            / numpy.log(10)
+        )
+
+    @staticmethod
+    def _observation_model_xgboost(
+        dG_over_KT, dmatrix, substrate_conc=1e-6, michaelis_constant=1, inhibitor_conc=1, **kwargs
+    ):
+        """
+        In XGBoost, observation models also application the loss function. In this specific case,
+        MSE is applied and differentiated (twice) to provide the gradients and hessian matrices.
+
+        $$
+        loss = 1/2 * (observation_pIC50(preds)-labels)^2
+        $$
+
+        Parameters:
+            dmatrix : xgboost.DMatrix
+                Passed automatically by the xgboost loop
+
+        """
+        import numpy as np
+
+        LN10 = np.log(10)
+
+        labels = dmatrix.get_label()
+        constant = np.log((1 + substrate_conc / michaelis_constant) * inhibitor_conc) / LN10
+
+        grad = (labels + dG_over_KT / LN10 + constant) * 1 / LN10
+        hess = np.full(grad.shape, 1 / LN10 ** 2)
+
+        return grad, hess
 
     def check(self):
         super().check()
@@ -192,6 +239,11 @@ class pKiMeasurement(BaseMeasurement):
 
         return -(dG_over_KT + numpy.log(inhibitor_conc)) * 1 / numpy.log(10)
 
+    @staticmethod
+    def _observation_model_xgboost(dG_over_KT, dmatrix, inhibitor_conc=1, **kwargs):
+        # TODO
+        raise NotImplementedError
+
     def check(self):
         super().check()
         msg = f"Values for {self.__class__.__name__} are expected to be in the [0, 15] range."
@@ -208,7 +260,7 @@ class pKdMeasurement(BaseMeasurement):
     $$
     \mathbf{F}_{pK_d}(\Delta g) = - \frac{\Delta g + \ln(C)}{\ln(10)},
     $$
-    where C given in molar [M] can be adapted if measurements were undertaken at different concentrations. 
+    where C given in molar [M] can be adapted if measurements were undertaken at different concentrations.
     """
 
     @staticmethod
@@ -217,6 +269,11 @@ class pKdMeasurement(BaseMeasurement):
         import numpy
 
         return -(dG_over_KT + numpy.log(inhibitor_conc)) * 1 / numpy.log(10)
+
+    @staticmethod
+    def _observation_model_xgboost(dG_over_KT, dmatrix, inhibitor_conc=1, **kwargs):
+        # TODO
+        raise NotImplementedError
 
     def check(self):
         super().check()
