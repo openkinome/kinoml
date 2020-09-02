@@ -70,11 +70,20 @@ class BaseMeasurement:
 
     @classmethod
     def _observation_model(cls, backend="pytorch", type_=None):
-        assert backend in ("pytorch", "tensorflow"), f"Backend {backend} is not supported!"
-        return getattr(cls, f"_observation_model_{backend}")
+        try:
+            method = getattr(cls, f"_observation_model_{backend}")
+        except AttributeError:
+            msg = f"Observation model for backend `{backend}` is not available for `{cls}` types"
+            raise NotImplementedError(msg)
+        else:
+            return method
 
     @staticmethod
     def _observation_model_pytorch(*args, **kwargs):
+        raise NotImplementedError("Implement in your subclass!")
+
+    @staticmethod
+    def _observation_model_xgboost(*args, **kwargs):
         raise NotImplementedError("Implement in your subclass!")
 
     def check(self):
@@ -118,17 +127,22 @@ class PercentageDisplacementMeasurement(BaseMeasurement):
         assert (0 <= self.values <= 100).all(), "One or more values are not in [0, 100]"
 
     @staticmethod
-    def _observation_model_pytorch(dG_over_KT, inhibitor_conc=1e-6, **kwargs):
+    def _observation_model_pytorch(dG_over_KT, inhibitor_conc=1, **kwargs):
         # FIXME: this might be upside down -- check!
         import torch
 
-        return 100 * (1 - 1 / (1 + inhibitor_conc / torch.exp(dG_over_KT)))
+        return 100 * (1 - 1 / (1 + 1 / torch.exp(dG_over_KT)))
+
+    @staticmethod
+    def _observation_model_xgboost(dG_over_KT, dmatrix, inhibitor_conc=1, **kwargs):
+        # TODO
+        raise NotImplementedError
 
 
 class pIC50Measurement(BaseMeasurement):
 
     r"""
-    Measurement where the value(s) come from IC50 experiments
+    Measurement where the value(s) come from pIC50 experiments
 
     We use the Cheng Prusoff equation here.
 
@@ -138,35 +152,71 @@ class pIC50Measurement(BaseMeasurement):
     K_i = \frac{IC50}{1+\frac{[S]}{K_m}}
     \end{equation}
 
-    We make the following assumptions here
-    1. $[S] = K_m$
-    2. $K_i \approx K_d$
+    We make the following assumption (which will be relaxed in the future)
+    $K_i \approx K_d$
 
-    In the future, we will relax these assumptions.
-
-    Under these assumptions, the Cheng-Prusoff equation becomes
+    Under this assumptions, the Cheng-Prusoff equation becomes
     $$
-    IC50 \approx 2 * K_d
+    IC50 \approx {1+\frac{[S]}{K_m}} * K_d
     $$
 
     We define the following function
     $$
-    \mathbf{F}_{IC50}(\Delta g) = 2 * \mathbf{F}_{K_d}(\Delta g) = 2 * exp[-\Delta g] * 1[M]
+    \mathbf{F}_{IC_{50}}(\Delta g) = \Big({1+\frac{[S]}{K_m}}\Big) * \mathbf{F}_{K_d}(\Delta g) = \Big({1+\frac{[S]}{K_m}}\Big) * exp[\Delta g] * C[M].
+    $$
+
+    Given IC50 values given in molar units, we obtain pI50 values in molar units using the tranformation
+    $$
+    pIC50 [M] = -log_{10}(IC50[M])
+    $$
+
+    Finally the observation model for pIC50 values is
+    $$
+    \mathbf{F}_{pIC_{50}}(\Delta g) = - \frac{\Delta g + \ln\Big(\big(1+\frac{[S]}{K_m}\big)*C\Big)}{\ln(10)}.
     $$
     """
 
     @staticmethod
     def _observation_model_pytorch(
-        dG_over_KT, substrate_conc=1e-6, michaelis_constant=1, inhibitor_conc=1e-6, **kwargs
+        dG_over_KT, substrate_conc=1e-6, michaelis_constant=1, inhibitor_conc=1, **kwargs
     ):
         import torch
+        import numpy
 
-        return -torch.log10(
-            (1 + substrate_conc / michaelis_constant)
-            * torch.exp(dG_over_KT)
-            * inhibitor_conc
-            * 1e-9
+        return (
+            -(dG_over_KT + numpy.log((1 + substrate_conc / michaelis_constant) * inhibitor_conc))
+            * 1
+            / numpy.log(10)
         )
+
+    @staticmethod
+    def _observation_model_xgboost(
+        dG_over_KT, dmatrix, substrate_conc=1e-6, michaelis_constant=1, inhibitor_conc=1, **kwargs
+    ):
+        """
+        In XGBoost, observation models also application the loss function. In this specific case,
+        MSE is applied and differentiated (twice) to provide the gradients and hessian matrices.
+
+        $$
+        loss = 1/2 * (observation_pIC50(preds)-labels)^2
+        $$
+
+        Parameters:
+            dmatrix : xgboost.DMatrix
+                Passed automatically by the xgboost loop
+
+        """
+        import numpy as np
+
+        LN10 = np.log(10)
+
+        labels = dmatrix.get_label()
+        constant = np.log((1 + substrate_conc / michaelis_constant) * inhibitor_conc) / LN10
+
+        grad = (labels + dG_over_KT / LN10 + constant) * 1 / LN10
+        hess = np.full(grad.shape, 1 / LN10 ** 2)
+
+        return grad, hess
 
     def check(self):
         super().check()
@@ -179,14 +229,20 @@ class pKiMeasurement(BaseMeasurement):
     r"""
     Measurement where the value(s) come from K_i_ experiments
 
-    We make the assumption that $K_i \approx K_d$ and therefore $\mathbf{F}_{K_i} = \mathbf{F}_{K_d}$.
+    We make the assumption that $K_i \approx K_d$ and therefore $\mathbf{F}_{pK_i} = \mathbf{F}_{pK_d}$.
     """
 
     @staticmethod
-    def _observation_model_pytorch(dG_over_KT, inhibitor_conc=1e-6, **kwargs):
+    def _observation_model_pytorch(dG_over_KT, inhibitor_conc=1, **kwargs):
         import torch
+        import numpy
 
-        return -torch.log10(torch.exp(dG_over_KT) * inhibitor_conc * 1e-9)
+        return -(dG_over_KT + numpy.log(inhibitor_conc)) * 1 / numpy.log(10)
+
+    @staticmethod
+    def _observation_model_xgboost(dG_over_KT, dmatrix, inhibitor_conc=1, **kwargs):
+        # TODO
+        raise NotImplementedError
 
     def check(self):
         super().check()
@@ -200,22 +256,24 @@ class pKdMeasurement(BaseMeasurement):
     Measurement where the value(s) come from Kd experiments
 
     We define the following physics-based function
-    $$
-    \mathbf{F}_{K_d}(\Delta g) = exp[-\Delta g] * 1[M].
-    $$
-
-    If we have measurements at different concentrations $I$ (unit [M]) , then the function can further be defined as
 
     $$
-    \mathbf{F}_{K_d}(\Delta g, I) = exp[-\Delta g] * I[M].
-        $$
+    \mathbf{F}_{pK_d}(\Delta g) = - \frac{\Delta g + \ln(C)}{\ln(10)},
+    $$
+    where C given in molar [M] can be adapted if measurements were undertaken at different concentrations.
     """
 
     @staticmethod
-    def _observation_model_pytorch(dG_over_KT, inhibitor_conc=1e-6, **kwargs):
+    def _observation_model_pytorch(dG_over_KT, inhibitor_conc=1, **kwargs):
         import torch
+        import numpy
 
-        return -torch.log10(torch.exp(dG_over_KT) * inhibitor_conc * 1e-9)
+        return -(dG_over_KT + numpy.log(inhibitor_conc)) * 1 / numpy.log(10)
+
+    @staticmethod
+    def _observation_model_xgboost(dG_over_KT, dmatrix, inhibitor_conc=1, **kwargs):
+        # TODO
+        raise NotImplementedError
 
     def check(self):
         super().check()
