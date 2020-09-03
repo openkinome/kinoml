@@ -30,7 +30,7 @@ class BaseMeasurement:
         conditions: AssayConditions,
         system: System,
         errors: Union[float, Iterable[float]] = np.nan,
-        groups: set = None,
+        group: Union[int, str] = None,
         strict: bool = True,
         metadata: dict = None,
         **kwargs,
@@ -39,7 +39,7 @@ class BaseMeasurement:
         self._errors = np.reshape(errors, (1,))
         self.conditions = conditions
         self.system = system
-        self.groups = groups or set()
+        self.group = group
         self.metadata = metadata or {}
         if strict:
             self.check()

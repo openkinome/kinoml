@@ -8,11 +8,18 @@ class BaseGrouper:
     def __init__(self):
         pass
 
-    def assign(self, dataset):
+    def assign(self, dataset, overwrite=False):
         groups = self._assign(dataset)
         for key, indices in groups.items():
             for index in indices:
-                dataset.measurements[index].groups.add(key)
+                ms = dataset.measurements[index]
+                if not overwrite and ms.group is not None:
+                    raise ValueError(
+                        f"Cannot assign group to `{ms}` because a group is "
+                        f"already assigned: {ms.group}. Choose `overwrite=True` "
+                        f"to ignore existing groups."
+                    )
+                dataset.measurements[index].group = key
         return dataset
 
     def _assign(self, dataset):
