@@ -109,19 +109,19 @@ class PercentageDisplacementMeasurement(BaseMeasurement):
     r"""
     Measurement where the value(s) must be percentage(s) of displacement.
 
-    For the percent displacement measurements available from KinomeScan, we make the assumption (see JDC's notes) that
+    For the percent displacement measurements available from KinomeScan, we have the following:
 
     $$
-    D([I]) \approx \frac{1}{1 + \frac{K_d}{[I]}}
+    D([I]) = \frac{1}{1 + \frac{K_d}{[I]}}
     $$
-
-    For KinomeSCAN assays, all assays are usually performed at a single molar concentration, $ [I] \sim 1 \mu M $.
 
     We therefore define the following function:
 
     $$
-    \mathbf{F}_{KinomeScan}(\Delta g, [I]) = \frac{1}{1 + \frac{exp[\Delta g] * 1[M]}{[I]}}.
+    \mathbf{F}_{KinomeScan}(\Delta g, [I]) = 100 * \frac{1}{1 + \frac{exp[\Delta g] * C[M]}{[I]}},
     $$
+
+    where $C$ is the standard concentration of 1 [M].
     """
 
     def check(self):
@@ -129,11 +129,11 @@ class PercentageDisplacementMeasurement(BaseMeasurement):
         assert (0 <= self.values <= 100).all(), "One or more values are not in [0, 100]"
 
     @staticmethod
-    def _observation_model_pytorch(dG_over_KT, inhibitor_conc=1, **kwargs):
-        # FIXME: this might be upside down -- check!
+    def _observation_model_pytorch(dG_over_KT, inhibitor_conc=1, std_conc=1, **kwargs):
+
         import torch
 
-        return 100 * (1 - 1 / (1 + 1 / torch.exp(dG_over_KT)))
+        return 100 * (1 / (torch.exp(dG_over_KT) * std_conc) / inhibitor_conc)
 
     @staticmethod
     def _observation_model_xgboost(dG_over_KT, dmatrix, inhibitor_conc=1, **kwargs):
