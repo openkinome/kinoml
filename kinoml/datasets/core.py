@@ -3,6 +3,7 @@ from typing import Iterable
 from copy import deepcopy
 from functools import wraps
 from operator import attrgetter
+from collections import defaultdict
 
 import numpy as np
 import pandas as pd
@@ -38,6 +39,9 @@ class BaseDatasetProvider:
         raise NotImplementedError
 
     def measurements_as_array(self, reduce=np.mean):
+        raise NotImplementedError
+
+    def measurements_by_group(self):
         raise NotImplementedError
 
     @property
@@ -86,6 +90,9 @@ class DatasetProvider(BaseDatasetProvider):
             len(types) == 1
         ), f"Dataset providers can only allow one type of measurement! You provided: {types}"
         self.measurements = measurements
+
+    def __len__(self):
+        return len(self.measurements)
 
     @classmethod
     def from_source(cls, filename=None, **kwargs):
@@ -224,6 +231,15 @@ class DatasetProvider(BaseDatasetProvider):
         for i, measurement in enumerate(self.measurements):
             result[i] = reduce(measurement.values)
         return result
+
+    def measurements_by_group(self):
+        groups = {}
+        for measurement in self.measurements:
+            for key in measurement.groups:
+                if key not in groups:
+                    groups[key] = []
+                groups[key].append(measurement)
+        return groups
 
     @property
     def conditions(self):
