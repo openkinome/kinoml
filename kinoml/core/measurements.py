@@ -136,11 +136,55 @@ class PercentageDisplacementMeasurement(BaseMeasurement):
         import torch
 
         return (100 * inhibitor_conc) / (inhibitor_conc + (std_conc * torch.exp(dG_over_KT)))
+        # return 100 * (1 / (1 + (torch.exp(dG_over_KT) * std_conc) / inhibitor_conc))
 
     @staticmethod
-    def _observation_model_xgboost(dG_over_KT, dmatrix, inhibitor_conc=1, **kwargs):
-        # TODO
-        raise NotImplementedError
+    def _observation_model_xgboost(dG_over_KT, inhibitor_conc=1, std_conc=1, **kwargs):
+
+        '''
+        Return the observation model.
+
+        $$
+        F(\Delta g) = 100 * \frac{1}{1 + \frac{exp[\Delta g] * C[M]}{[I]}},
+        $$
+        '''
+
+        import numpy as np
+
+        return 100 * 1 / (1 + (np.exp(dG_over_KT) * std_conc) / inhibitor_conc))
+
+    @staticmethod
+    def _custom_loss_xgboost(dG_over_KT, dmatrix, inhibitor_conc=1, std_conc=1, **kwargs):
+
+        '''
+        Return the gradient and the hessian of the loss defined by
+
+        $$
+        L(y, \hat y) = \frac{1}{2} * (y - F(\hat y)) ** 2.
+        $$
+
+        See theory notes for more details.
+        '''
+
+        # TODO Check if this is the write way of integrating the custom loss for xgboost.
+
+        import numpy as np
+
+        labels = dmatrix.get_label()
+
+        constant = -1 * 100 *  inhibitor_conc
+
+        temp = std_conc * np.exp(dG_over_KT)
+
+        difference = 100 * inhibitor_conc / (inhibitor_conc + temp) - labels
+
+        grad = constant * difference * temp / ((inhibitor_conc + temp)**2)
+
+        numerator = (inhibitor_conc + temp)**2 * temp - 2 * temp**2 * (inhibitor_conc + temp)
+
+        hess = (constant * temp/((inhibitor_conc + temp)**2) ) ** 2 + constant / ((inhibitor_conc + temp)**4) * numerator
+
+        return grad, hess
 
 
 class pIC50Measurement(BaseMeasurement):
