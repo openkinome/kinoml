@@ -3,6 +3,7 @@ from typing import Iterable
 from copy import deepcopy
 from functools import wraps
 from operator import attrgetter
+from collections import defaultdict
 
 import numpy as np
 import pandas as pd
@@ -38,6 +39,9 @@ class BaseDatasetProvider:
         raise NotImplementedError
 
     def measurements_as_array(self, reduce=np.mean):
+        raise NotImplementedError
+
+    def measurements_by_group(self):
         raise NotImplementedError
 
     @property
@@ -86,6 +90,9 @@ class DatasetProvider(BaseDatasetProvider):
             len(types) == 1
         ), f"Dataset providers can only allow one type of measurement! You provided: {types}"
         self.measurements = measurements
+
+    def __len__(self):
+        return len(self.measurements)
 
     @classmethod
     def from_source(cls, filename=None, **kwargs):
@@ -225,6 +232,22 @@ class DatasetProvider(BaseDatasetProvider):
             result[i] = reduce(measurement.values)
         return result
 
+    def split_by_groups(self) -> dict:
+        """
+        If a `kinoml.datasets.groups` class has been applied to this instance,
+        this method will create more DatasetProvider instances, one per group.
+
+
+        """
+        groups = defaultdict(list)
+        for measurement in self.measurements:
+            groups[measurement.group].append(measurement)
+
+        datasets = {}
+        for key, measurements in groups.items():
+            datasets[key] = type(self)(measurements)
+        return datasets
+
     @property
     def conditions(self):
         return {ms.conditions for ms in self.measurements}
@@ -238,7 +261,16 @@ class DatasetProvider(BaseDatasetProvider):
 
 
 class MultiDatasetProvider(DatasetProvider):
-    def __init__(self, providers):
+    def __init__(self, measurements: Iterable[BaseMeasurement], *args, **kwargs):
+        by_type = defaultdict(list)
+        for measurement in measurements:
+            by_type[type(measurement)].append(measurement)
+
+        providers = []
+        for typed_measurements in by_type.values():
+            if typed_measurements:
+                providers.append(DatasetProvider(typed_measurements))
+
         self.providers = providers
 
     def observation_models(self, **kwargs):

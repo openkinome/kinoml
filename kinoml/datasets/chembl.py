@@ -89,7 +89,7 @@ class ChEMBLDatasetProvider(MultiDatasetProvider):
             "Ki": pKiMeasurement,
             "Kd": pKdMeasurement,
         }
-        measurements_by_type = {"IC50": [], "Ki": [], "Kd": []}
+        measurements = []
         systems = {}
         kinases = {}
         ligands = {}
@@ -136,17 +136,9 @@ class ChEMBLDatasetProvider(MultiDatasetProvider):
                     conditions=conditions,
                     metadata=metadata,
                 )
-                measurements_by_type[measurement_type_key].append(measurement)
+                measurements.append(measurement)
             except Exception as exc:
                 print("Couldn't process record", row)
                 print("Exception:", exc)
-        providers = [
-            _SingleTypeChEMBLDatasetProvider(list(ms))
-            for ms in measurements_by_type.values()
-            if len(ms)
-        ]
-        return cls(providers)
 
-
-class _SingleTypeChEMBLDatasetProvider(ProteinLigandDatasetProvider):
-    pass
+        return cls(measurements)
