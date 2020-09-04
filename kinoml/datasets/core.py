@@ -4,6 +4,7 @@ from copy import deepcopy
 from functools import wraps
 from operator import attrgetter
 from collections import defaultdict
+import multiprocessing
 
 import numpy as np
 import pandas as pd
@@ -103,7 +104,7 @@ class DatasetProvider(BaseDatasetProvider):
         """
         raise NotImplementedError
 
-    def featurize(self, *featurizers: Iterable[BaseFeaturizer]):
+    def featurize(self, *featurizers: Iterable[BaseFeaturizer], processes=1, chunksize=1):
         """
         Given a collection of `kinoml.features.core.BaseFeaturizers`, apply them
         to the systems present in the `self.measurements`.
@@ -113,7 +114,7 @@ class DatasetProvider(BaseDatasetProvider):
                 in a stacked way.
 
         !!! todo
-            * Do we want to support parallel featurizing too or only stacked featurization?
+            * This function can be easily parallelized, and is often the bottleneck!
             * Shall we modify the system in place (default now), return the modified copy or store it?
         """
         systems = self.systems
@@ -121,10 +122,36 @@ class DatasetProvider(BaseDatasetProvider):
             # .supports() will test for system type, type of components, type of measurement, etc
             featurizer.supports(next(iter(systems)), raise_errors=True)
 
-        for system in tqdm(systems, desc="Featurizing systems..."):
+        with multiprocessing.Pool(processes=processes) as pool:
+            new_featurizations = list(
+                tqdm(
+                    pool.imap(self._featurize_one, ((featurizers, s) for s in systems), chunksize),
+                    total=len(systems),
+                )
+            )
+
+        for system, featurizations in zip(systems, new_featurizations):
+            system.featurizations.update(featurizations)
+
+        invalid = sum(1 for system in systems if "failed" in system.featurizations)
+        if invalid:
+            logger.warning(
+                "There were %d systems that could not be featurized! "
+                "Check `system.featurizations['failed']` for more info.",
+                invalid,
+            )
+        return systems
+
+    @staticmethod
+    def _featurize_one(featurizers_and_system):
+        featurizers, system = featurizers_and_system
+        try:
             for featurizer in featurizers:
                 featurizer.featurize(system, inplace=True)
             system.featurizations["last"] = system.featurizations[featurizers[-1].name]
+        except Exception as exc:
+            system.featurizations["failed"] = [featurizers, exc]
+        return system.featurizations
 
     def clear_featurizations(self):
         for system in self.systems:

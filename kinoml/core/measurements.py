@@ -6,6 +6,9 @@ from .conditions import AssayConditions
 from .systems import System
 
 
+LN10 = np.log(10)
+
+
 class BaseMeasurement:
     """
     We will have several subclasses depending on the experiment.
@@ -130,10 +133,9 @@ class PercentageDisplacementMeasurement(BaseMeasurement):
 
     @staticmethod
     def _observation_model_pytorch(dG_over_KT, inhibitor_conc=1, std_conc=1, **kwargs):
-
         import torch
 
-        return 100 * (1 / (torch.exp(dG_over_KT) * std_conc) / inhibitor_conc)
+        return (100 * inhibitor_conc) / (inhibitor_conc + (std_conc * torch.exp(dG_over_KT)))
 
     @staticmethod
     def _observation_model_xgboost(dG_over_KT, dmatrix, inhibitor_conc=1, **kwargs):
@@ -183,13 +185,9 @@ class pIC50Measurement(BaseMeasurement):
         dG_over_KT, substrate_conc=1e-6, michaelis_constant=1, inhibitor_conc=1, **kwargs
     ):
         import torch
-        import numpy
 
-        return (
-            -(dG_over_KT + numpy.log((1 + substrate_conc / michaelis_constant) * inhibitor_conc))
-            * 1
-            / numpy.log(10)
-        )
+        constant = np.log((1 + substrate_conc / michaelis_constant) * inhibitor_conc)
+        return -(dG_over_KT + constant) / LN10
 
     @staticmethod
     def _observation_model_xgboost(
@@ -208,15 +206,11 @@ class pIC50Measurement(BaseMeasurement):
                 Passed automatically by the xgboost loop
 
         """
-        import numpy as np
-
-        LN10 = np.log(10)
-
         labels = dmatrix.get_label()
         constant = np.log((1 + substrate_conc / michaelis_constant) * inhibitor_conc) / LN10
 
-        grad = (labels + dG_over_KT / LN10 + constant) * 1 / LN10
-        hess = np.full(grad.shape, 1 / LN10 ** 2)
+        grad = (labels + dG_over_KT / LN10 + constant) / LN10
+        hess = np.full(grad.shape, 1 / (LN10 * LN10))
 
         return grad, hess
 
@@ -237,9 +231,8 @@ class pKiMeasurement(BaseMeasurement):
     @staticmethod
     def _observation_model_pytorch(dG_over_KT, inhibitor_conc=1, **kwargs):
         import torch
-        import numpy
 
-        return -(dG_over_KT + numpy.log(inhibitor_conc)) * 1 / numpy.log(10)
+        return -(dG_over_KT + np.log(inhibitor_conc)) / LN10
 
     @staticmethod
     def _observation_model_xgboost(dG_over_KT, dmatrix, inhibitor_conc=1, **kwargs):
@@ -268,9 +261,8 @@ class pKdMeasurement(BaseMeasurement):
     @staticmethod
     def _observation_model_pytorch(dG_over_KT, inhibitor_conc=1, **kwargs):
         import torch
-        import numpy
 
-        return -(dG_over_KT + numpy.log(inhibitor_conc)) * 1 / numpy.log(10)
+        return -(dG_over_KT + np.log(inhibitor_conc)) / LN10
 
     @staticmethod
     def _observation_model_xgboost(dG_over_KT, dmatrix, inhibitor_conc=1, **kwargs):

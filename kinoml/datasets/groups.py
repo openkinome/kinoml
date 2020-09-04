@@ -2,6 +2,9 @@
 Splitting strategies for datasets
 """
 import random
+from collections import defaultdict
+
+from tqdm.auto import tqdm
 
 
 class BaseGrouper:
@@ -10,16 +13,17 @@ class BaseGrouper:
 
     def assign(self, dataset, overwrite=False):
         groups = self._assign(dataset)
+        measurements = dataset.measurements
         for key, indices in groups.items():
             for index in indices:
-                ms = dataset.measurements[index]
+                ms = measurements[index]
                 if not overwrite and ms.group is not None:
                     raise ValueError(
                         f"Cannot assign group to `{ms}` because a group is "
                         f"already assigned: {ms.group}. Choose `overwrite=True` "
                         f"to ignore existing groups."
                     )
-                dataset.measurements[index].group = key
+                ms.group = key
         return dataset
 
     def _assign(self, dataset):
@@ -55,6 +59,23 @@ class RandomGrouper(BaseGrouper):
             end = start + int(round(ratio * length, 0))
             groups[key] = indices[start:end]
             start = end
+        return groups
+
+
+class CallableGrouper(BaseGrouper):
+    """
+    A grouper that applies a user-provided function to each Measurement
+    in the Dataset. Returned value should be the name of the group.
+    """
+
+    def __init__(self, function):
+        self.function = function
+
+    def _assign(self, dataset):
+        groups = defaultdict(list)
+        for i, measurement in tqdm(enumerate(dataset.measurements)):
+            key = self.function(measurement)
+            groups[key].append(i)
         return groups
 
 
