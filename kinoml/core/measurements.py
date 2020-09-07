@@ -151,7 +151,7 @@ class PercentageDisplacementMeasurement(BaseMeasurement):
 
         import numpy as np
 
-        return 100 * 1 / (1 + (np.exp(dG_over_KT) * standard_conc) / inhibitor_conc))
+        return 100 * 1 / (1 + (np.exp(dG_over_KT) * standard_conc) / inhibitor_conc)
 
     @staticmethod
     def _custom_loss_xgboost(dG_over_KT, dmatrix, inhibitor_conc=1, standard_conc=1, **kwargs):
