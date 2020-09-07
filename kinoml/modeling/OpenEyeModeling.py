@@ -308,3 +308,125 @@ def prepare_protein(
         cap_termini=cap_termini,
         real_termini=real_termini,
     )
+
+
+def klifs_kinases_by_uniprot_id(uniprot_id):
+    import klifs_utils
+    kinase_names = klifs_utils.remote.kinases.kinase_names()
+    kinases = klifs_utils.remote.kinases.kinases_from_kinase_names(list(kinase_names.name))
+    kinase_id = kinases[kinases.uniprot == uniprot_id].kinase_ID.iloc[0]
+    kinases = klifs_utils.remote.structures.structures_from_kinase_ids([kinase_id])
+    return kinases
+
+
+def get_klifs_ligand(structure_id):
+    import klifs_utils
+    from openeye import oechem
+
+    mol2_text = klifs_utils.remote.coordinates.ligand._ligand_mol2_text(structure_id)
+    ims = oechem.oemolistream()
+    ims.SetFormat(oechem.OEFormat_MOL2)
+    ims.openstring(mol2_text)
+
+    molecules = []
+    for molecule in ims.GetOEGraphMols():
+        molecules.append(oechem.OEGraphMol(molecule))
+
+    return molecules[0]
+
+
+def generate_tautomers(molecule):
+    from openeye import oechem, oequacpac
+
+    tautomer_options = oequacpac.OETautomerOptions()
+    tautomer_options.SetMaxTautomersGenerated(4096)
+    tautomer_options.SetMaxTautomersToReturn(16)
+    tautomer_options.SetCarbonHybridization(True)
+    tautomer_options.SetMaxZoneSize(50)
+    tautomer_options.SetApplyWarts(True)
+    pKa_norm = True
+    tautomers = [
+        oechem.OEMol(tautomer)
+        for tautomer in oequacpac.OEGetReasonableTautomers(
+            molecule, tautomer_options, pKa_norm
+        )
+    ]
+    return tautomers
+
+
+def generate_enantiomers(molecule, ignore=False):
+    from openeye import oechem, oeomega
+    enantiomers = [oechem.OEMol(enantiomer) for enantiomer in oeomega.OEFlipper(molecule.GetActive(), 12, ignore)]
+    return enantiomers
+
+
+def generate_conformers(molecule):
+    from openeye import oechem, oeomega
+    omega_options = oeomega.OEOmegaOptions()
+    omega_options.SetMaxSearchTime(60.0)  # time out
+    omega_options.SetMaxConfs(1000)  # default: 200
+    omega = oeomega.OEOmega(omega_options)
+    omega.SetStrictStereo(False)
+    conformers = oechem.OEMol(molecule)
+    omega.Build(conformers)
+    return conformers
+
+
+def overlay_molecules(refmol, fitmol, score_only=False):
+    from openeye import oechem, oeshape
+    prep = oeshape.OEOverlapPrep()
+    prep.Prep(refmol)
+
+    overlay = oeshape.OEOverlay()
+    overlay.SetupRef(refmol)
+
+    prep.Prep(fitmol)
+    score = oeshape.OEBestOverlayScore()
+    overlay.BestOverlay(score, fitmol, oeshape.OEHighestTanimoto())
+    if score_only:
+        return score.GetTanimotoCombo()
+    else:
+        overlay = [refmol]
+        fitmol = oechem.OEGraphMol(fitmol.GetConf(oechem.OEHasConfIdx(score.GetFitConfIdx())))
+        score.Transform(fitmol)
+        overlay.append(fitmol)
+        return score.GetTanimotoCombo(), overlay
+
+
+def select_structure(uniprot_id, smiles):
+    import itertools
+
+    # search for available kinase structure
+    # TODO: ligand might be co-crystalized with kinase of different species but very similar sequence
+    kinases = klifs_kinases_by_uniprot_id(uniprot_id)
+    if len(kinases) == 0:
+        return None
+
+    # sort by quality according to KLIFS classification
+    # high quality structures come first
+    # TODO: additional filtering -> Abl1: nilotinib -> 5mo4 (with allosteric ligand and mutations) preferred over 3cs9
+    kinases = kinases.sort_values(by=['alt', 'chain', 'quality_score'], ascending=[True, True, False])
+
+    # search for kinase structures with orthosteric ligand
+    kinase_complexes = kinases[kinases.ligand != 0]
+    if len(kinase_complexes) == 0:  # pick structure with highest quality
+        return kinases.iloc[0]
+    else:  # pick structure with similar ligand and high quality
+        # get resolved structure of orthosteric ligands
+        complex_ligands = [get_klifs_ligand(structure_id) for structure_id in kinase_complexes.structure_ID]
+
+        # get reasonable conformations of ligand of interest
+        ligand = read_smiles(smiles)
+        tautomers = generate_tautomers(ligand)
+        enantiomers = [generate_enantiomers(tautomer) for tautomer in tautomers]
+        conformations_ensemble = [generate_conformers(enantiomer) for enantiomer in itertools.chain.from_iterable(enantiomers)]
+
+        # overlay and score
+        scores = []
+        for conformations in conformations_ensemble:
+            scores += [[i, overlay_molecules(complex_ligand, conformations, True)] for i, complex_ligand in enumerate(complex_ligands)]
+        score_threshold = max([score[1] for score in scores]) - 0.1
+
+        # pick highest quality structure from structures with similar ligands
+        index = min([score[0] for score in scores if score[1] >= score_threshold])
+        return kinase_complexes.iloc[index]
