@@ -3,8 +3,6 @@ from ..core.sequences import KinaseDomainAminoAcidSequence
 
 
 class HomologyModel:  #  TODO inherent a Base class?
-
-
     def __init__(self, *args, **kwargs):
         from appdirs import user_cache_dir
 
@@ -14,7 +12,6 @@ class HomologyModel:  #  TODO inherent a Base class?
         #  self.identifier = identifier
         #  self.template = template
         #  self.sequence = sequence
-
 
     def get_pdb_template(
         self,
@@ -44,7 +41,6 @@ class HomologyModel:  #  TODO inherent a Base class?
         #  TODO add option based on sequency similarity cut off
 
         return hits
-
 
     def get_sequence(
         self, identifier: str, kinase: bool = False, backend: str = "uniprot"
@@ -87,7 +83,6 @@ class HomologyModel:  #  TODO inherent a Base class?
             sequence = response.text.split("\n", 1)[1].replace("\n", "")
 
         return sequence
-
 
     def get_alignment(
         self, template_system, canonical_sequence, pdb_entry=False, window=15
@@ -228,7 +223,6 @@ class HomologyModel:  #  TODO inherent a Base class?
                     continue
             for item in ali_2_final:
                 ali_file.write("%s\n" % item)  # write the target sequence lines
-
 
     def get_model(
         self, template_system: ProteinStructure, alignment, num_models: int = 100
