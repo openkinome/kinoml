@@ -61,8 +61,6 @@ jobs:
       - name: Run tests
         shell: bash -l {0}
         run: |
-          . devtools/github-actions/initialize_conda.sh
-          conda activate test
           pytest -v --cov=kinoml --cov-report=xml --color=yes kinoml/tests/
 
       - name: CodeCov

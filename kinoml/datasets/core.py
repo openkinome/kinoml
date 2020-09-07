@@ -3,10 +3,12 @@ from typing import Iterable
 from copy import deepcopy
 from functools import wraps
 from operator import attrgetter
+from collections import defaultdict
+import multiprocessing
 
 import numpy as np
 import pandas as pd
-from tqdm import tqdm
+from tqdm.auto import tqdm
 
 from ..core.measurements import BaseMeasurement
 from ..features.core import BaseFeaturizer
@@ -38,6 +40,9 @@ class BaseDatasetProvider:
         raise NotImplementedError
 
     def measurements_as_array(self, reduce=np.mean):
+        raise NotImplementedError
+
+    def measurements_by_group(self):
         raise NotImplementedError
 
     @property
@@ -87,6 +92,9 @@ class DatasetProvider(BaseDatasetProvider):
         ), f"Dataset providers can only allow one type of measurement! You provided: {types}"
         self.measurements = measurements
 
+    def __len__(self):
+        return len(self.measurements)
+
     @classmethod
     def from_source(cls, filename=None, **kwargs):
         """
@@ -96,7 +104,7 @@ class DatasetProvider(BaseDatasetProvider):
         """
         raise NotImplementedError
 
-    def featurize(self, *featurizers: Iterable[BaseFeaturizer]):
+    def featurize(self, *featurizers: Iterable[BaseFeaturizer], processes=1, chunksize=1):
         """
         Given a collection of `kinoml.features.core.BaseFeaturizers`, apply them
         to the systems present in the `self.measurements`.
@@ -106,7 +114,7 @@ class DatasetProvider(BaseDatasetProvider):
                 in a stacked way.
 
         !!! todo
-            * Do we want to support parallel featurizing too or only stacked featurization?
+            * This function can be easily parallelized, and is often the bottleneck!
             * Shall we modify the system in place (default now), return the modified copy or store it?
         """
         systems = self.systems
@@ -114,10 +122,36 @@ class DatasetProvider(BaseDatasetProvider):
             # .supports() will test for system type, type of components, type of measurement, etc
             featurizer.supports(next(iter(systems)), raise_errors=True)
 
-        for system in tqdm(systems, desc="Featurizing systems..."):
+        with multiprocessing.Pool(processes=processes) as pool:
+            new_featurizations = list(
+                tqdm(
+                    pool.imap(self._featurize_one, ((featurizers, s) for s in systems), chunksize),
+                    total=len(systems),
+                )
+            )
+
+        for system, featurizations in zip(systems, new_featurizations):
+            system.featurizations.update(featurizations)
+
+        invalid = sum(1 for system in systems if "failed" in system.featurizations)
+        if invalid:
+            logger.warning(
+                "There were %d systems that could not be featurized! "
+                "Check `system.featurizations['failed']` for more info.",
+                invalid,
+            )
+        return systems
+
+    @staticmethod
+    def _featurize_one(featurizers_and_system):
+        featurizers, system = featurizers_and_system
+        try:
             for featurizer in featurizers:
                 featurizer.featurize(system, inplace=True)
             system.featurizations["last"] = system.featurizations[featurizers[-1].name]
+        except Exception as exc:
+            system.featurizations["failed"] = [featurizers, exc]
+        return system.featurizations
 
     def clear_featurizations(self):
         for system in self.systems:
@@ -188,6 +222,16 @@ class DatasetProvider(BaseDatasetProvider):
             observation_model=self.observation_model(backend="pytorch"),
         )
 
+    def to_xgboost(self, **kwargs):
+        from xgboost import DMatrix
+
+        dmatrix = DMatrix(
+            np.asarray(self.featurized_systems()), self.measurements_as_array(**kwargs)
+        )
+        ## TODO: Uncomment when XGB observation models are implemented
+        # dmatrix.observation_model = self.observation_model(backend="xgboost", loss="mse")
+        return dmatrix
+
     def to_tensorflow(self, *args, **kwargs):
         raise NotImplementedError
 
@@ -215,6 +259,22 @@ class DatasetProvider(BaseDatasetProvider):
             result[i] = reduce(measurement.values)
         return result
 
+    def split_by_groups(self) -> dict:
+        """
+        If a `kinoml.datasets.groups` class has been applied to this instance,
+        this method will create more DatasetProvider instances, one per group.
+
+
+        """
+        groups = defaultdict(list)
+        for measurement in self.measurements:
+            groups[measurement.group].append(measurement)
+
+        datasets = {}
+        for key, measurements in groups.items():
+            datasets[key] = type(self)(measurements)
+        return datasets
+
     @property
     def conditions(self):
         return {ms.conditions for ms in self.measurements}
@@ -228,7 +288,16 @@ class DatasetProvider(BaseDatasetProvider):
 
 
 class MultiDatasetProvider(DatasetProvider):
-    def __init__(self, providers):
+    def __init__(self, measurements: Iterable[BaseMeasurement], *args, **kwargs):
+        by_type = defaultdict(list)
+        for measurement in measurements:
+            by_type[type(measurement)].append(measurement)
+
+        providers = []
+        for typed_measurements in by_type.values():
+            if typed_measurements:
+                providers.append(DatasetProvider(typed_measurements))
+
         self.providers = providers
 
     def observation_models(self, **kwargs):
@@ -274,6 +343,9 @@ class MultiDatasetProvider(DatasetProvider):
 
     def to_pytorch(self, **kwargs):
         return [p.to_pytorch(**kwargs) for p in self.providers]
+
+    def to_xgboost(self, **kwargs):
+        return [p.to_xgboost(**kwargs) for p in self.providers]
 
 
 class ProteinLigandDatasetProvider(DatasetProvider):

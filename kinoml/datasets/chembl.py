@@ -64,10 +64,13 @@ class ChEMBLDatasetProvider(MultiDatasetProvider):
 
         df = pd.read_csv(cached_path)
 
+        # Filter out extremely large or small values
+        # FIXME: Consider dynamic range of each assay instead of filtering out
         # add a new column with -log10 of the activities
+        activities = df["activities.standard_value"]
+        df = df[(1e6 >= activities) & (activities > 1e-6)]
+
         # we also convert nM to M by multiplying times 1E-9
-        # FIXME: Some values are 0.0nM, which results in infinity when -log10 is applied
-        #        How do we deal with them? We are dropping them for now.
         df = df.assign(p_activities=-pd.np.log10(df["activities.standard_value"] * 1e-9))
 
         # drop NAs _and_ infinities
@@ -79,13 +82,14 @@ class ChEMBLDatasetProvider(MultiDatasetProvider):
                     "p_activities",
                 ]
             )
+            # DROP outside range [1e-6, 1E6]
 
         measurement_type_classes = {
             "IC50": pIC50Measurement,
             "Ki": pKiMeasurement,
             "Kd": pKdMeasurement,
         }
-        measurements_by_type = {"IC50": [], "Ki": [], "Kd": []}
+        measurements = []
         systems = {}
         kinases = {}
         ligands = {}
@@ -120,7 +124,7 @@ class ChEMBLDatasetProvider(MultiDatasetProvider):
                 conditions = AssayConditions(pH=7)
                 system = ProteinLigandComplex([kinases[kinase_key], ligands[ligand_key]])
                 metadata = {
-                    "unit": f"-log10({row['activities.standard_units']})",
+                    "unit": f"-log10({row['activities.standard_units']}E-9)",
                     "confidence": row["assays.confidence_score"],
                     "chembl_activity": row["activities.activity_id"],
                     "chembl_document": row["docs.doc_id"],
@@ -132,17 +136,9 @@ class ChEMBLDatasetProvider(MultiDatasetProvider):
                     conditions=conditions,
                     metadata=metadata,
                 )
-                measurements_by_type[measurement_type_key].append(measurement)
+                measurements.append(measurement)
             except Exception as exc:
                 print("Couldn't process record", row)
                 print("Exception:", exc)
-        providers = [
-            _SingleTypeChEMBLDatasetProvider(list(ms))
-            for ms in measurements_by_type.values()
-            if len(ms)
-        ]
-        return cls(providers)
 
-
-class _SingleTypeChEMBLDatasetProvider(ProteinLigandDatasetProvider):
-    pass
+        return cls(measurements)

@@ -6,6 +6,9 @@ from .conditions import AssayConditions
 from .systems import System
 
 
+LN10 = np.log(10)
+
+
 class BaseMeasurement:
     """
     We will have several subclasses depending on the experiment.
@@ -30,6 +33,7 @@ class BaseMeasurement:
         conditions: AssayConditions,
         system: System,
         errors: Union[float, Iterable[float]] = np.nan,
+        group: Union[int, str] = None,
         strict: bool = True,
         metadata: dict = None,
         **kwargs,
@@ -38,6 +42,7 @@ class BaseMeasurement:
         self._errors = np.reshape(errors, (1,))
         self.conditions = conditions
         self.system = system
+        self.group = group
         self.metadata = metadata or {}
         if strict:
             self.check()
@@ -70,12 +75,40 @@ class BaseMeasurement:
 
     @classmethod
     def _observation_model(cls, backend="pytorch", type_=None):
-        assert backend in ("pytorch", "tensorflow"), f"Backend {backend} is not supported!"
-        return getattr(cls, f"_observation_model_{backend}")
+        try:
+            method = getattr(cls, f"_observation_model_{backend}")
+        except AttributeError:
+            msg = f"Observation model for backend `{backend}` is not available for `{cls}` types"
+            raise NotImplementedError(msg)
+        else:
+            return method
 
     @staticmethod
     def _observation_model_pytorch(*args, **kwargs):
         raise NotImplementedError("Implement in your subclass!")
+
+    @staticmethod
+    def _observation_model_xgboost(*args, **kwargs):
+        raise NotImplementedError("Implement in your subclass!")
+
+    @classmethod
+    def loss_adapter(cls, backend="xgboost", loss="mse"):
+        """
+        Some frameworks require objective functions to include the
+        observation model transformation in the same callable. This
+        method provides a factory of such methods.
+        """
+        return cls._loss_adapter(backend=backend, loss=loss)
+
+    @classmethod
+    def _loss_adapter(cls, backend="xgboost", loss="mse"):
+        try:
+            method = getattr(cls, f"_loss_adapter_{backend}__{loss}")
+        except AttributeError:
+            msg = f"Adapter for backend `{backend}` and loss `{loss}` is not available for `{cls}` types"
+            raise NotImplementedError(msg)
+        else:
+            return method
 
     def check(self):
         """
@@ -98,19 +131,19 @@ class PercentageDisplacementMeasurement(BaseMeasurement):
     r"""
     Measurement where the value(s) must be percentage(s) of displacement.
 
-    For the percent displacement measurements available from KinomeScan, we make the assumption (see JDC's notes) that
+    For the percent displacement measurements available from KinomeScan, we have the following:
 
     $$
-    D([I]) \approx \frac{1}{1 + \frac{K_d}{[I]}}
+    D([I]) = \frac{1}{1 + \frac{K_d}{[I]}}
     $$
-
-    For KinomeSCAN assays, all assays are usually performed at a single molar concentration, $ [I] \sim 1 \mu M $.
 
     We therefore define the following function:
 
     $$
-    \mathbf{F}_{KinomeScan}(\Delta g, [I]) = \frac{1}{1 + \frac{exp[\Delta g] * 1[M]}{[I]}}.
+    \mathbf{F}_{KinomeScan}(\Delta g, [I]) = 100 * \frac{1}{1 + \frac{exp[\Delta g] * C[M]}{[I]}},
     $$
+
+    where $C$ is the standard concentration of 1 [M].
     """
 
     def check(self):
@@ -118,17 +151,62 @@ class PercentageDisplacementMeasurement(BaseMeasurement):
         assert (0 <= self.values <= 100).all(), "One or more values are not in [0, 100]"
 
     @staticmethod
-    def _observation_model_pytorch(dG_over_KT, inhibitor_conc=1e-6, **kwargs):
-        # FIXME: this might be upside down -- check!
+    def _observation_model_pytorch(dG_over_KT, inhibitor_conc=1, standard_conc=1, **kwargs):
         import torch
 
-        return 100 * (1 - 1 / (1 + inhibitor_conc / torch.exp(dG_over_KT)))
+        return (100 * inhibitor_conc) / (inhibitor_conc + (standard_conc * torch.exp(dG_over_KT)))
+        # return 100 * (1 / (1 + (torch.exp(dG_over_KT) * standard_conc) / inhibitor_conc))
+
+    @staticmethod
+    def _observation_model_numpy(dG_over_KT, inhibitor_conc=1, standard_conc=1, **kwargs):
+        r"""
+        Return the observation model.
+
+        $$
+        F(\Delta g) = 100 * \frac{1}{1 + \frac{exp[\Delta g] * C[M]}{[I]}},
+        $$
+        """
+        return (100 * inhibitor_conc) / (inhibitor_conc + (standard_conc * np.exp(dG_over_KT)))
+        # return 100 * 1 / (1 + (np.exp(dG_over_KT) * standard_conc) / inhibitor_conc)
+
+    _observation_model_xgboost = _observation_model_numpy
+
+    @staticmethod
+    def _loss_adapter_xgboost__mse(
+        dG_over_KT, dmatrix, inhibitor_conc=1, standard_conc=1, **kwargs
+    ):
+        r"""
+        Return the gradient and the hessian of the loss defined by
+
+        $$
+        L(y, \hat y) = \frac{1}{2} * (y - F(\hat y)) ** 2.
+        $$
+
+        See theory notes for more details.
+        """
+        # TODO Check if this is the right way of integrating the custom loss for xgboost.
+
+        labels = dmatrix.get_label()
+
+        constant = -1 * 100 * inhibitor_conc
+        temp = standard_conc * np.exp(dG_over_KT)
+        difference = 100 * inhibitor_conc / (inhibitor_conc + temp) - labels
+
+        grad = constant * difference * temp / ((inhibitor_conc + temp) ** 2)
+
+        numerator = (inhibitor_conc + temp) ** 2 * temp - 2 * temp ** 2 * (inhibitor_conc + temp)
+        hess_sum_a = (constant * temp / ((inhibitor_conc + temp) ** 2)) ** 2
+        hess_sum_b = constant / ((inhibitor_conc + temp) ** 4) * numerator
+
+        hess = hess_sum_a + hess_sum_b
+
+        return grad, hess
 
 
 class pIC50Measurement(BaseMeasurement):
 
     r"""
-    Measurement where the value(s) come from IC50 experiments
+    Measurement where the value(s) come from pIC50 experiments
 
     We use the Cheng Prusoff equation here.
 
@@ -138,35 +216,71 @@ class pIC50Measurement(BaseMeasurement):
     K_i = \frac{IC50}{1+\frac{[S]}{K_m}}
     \end{equation}
 
-    We make the following assumptions here
-    1. $[S] = K_m$
-    2. $K_i \approx K_d$
+    We make the following assumption (which will be relaxed in the future)
+    $K_i \approx K_d$
 
-    In the future, we will relax these assumptions.
-
-    Under these assumptions, the Cheng-Prusoff equation becomes
+    Under this assumptions, the Cheng-Prusoff equation becomes
     $$
-    IC50 \approx 2 * K_d
+    IC50 \approx {1+\frac{[S]}{K_m}} * K_d
     $$
 
     We define the following function
     $$
-    \mathbf{F}_{IC50}(\Delta g) = 2 * \mathbf{F}_{K_d}(\Delta g) = 2 * exp[-\Delta g] * 1[M]
+    \mathbf{F}_{IC_{50}}(\Delta g) = \Big({1+\frac{[S]}{K_m}}\Big) * \mathbf{F}_{K_d}(\Delta g) = \Big({1+\frac{[S]}{K_m}}\Big) * exp[\Delta g] * C[M].
+    $$
+
+    Given IC50 values given in molar units, we obtain pI50 values in molar units using the tranformation
+    $$
+    pIC50 [M] = -log_{10}(IC50[M])
+    $$
+
+    Finally the observation model for pIC50 values is
+    $$
+    \mathbf{F}_{pIC_{50}}(\Delta g) = - \frac{\Delta g + \ln\Big(\big(1+\frac{[S]}{K_m}\big)*C\Big)}{\ln(10)}.
     $$
     """
 
     @staticmethod
     def _observation_model_pytorch(
-        dG_over_KT, substrate_conc=1e-6, michaelis_constant=1, inhibitor_conc=1e-6, **kwargs
+        dG_over_KT, substrate_conc=1e-6, michaelis_constant=1, standard_conc=1, **kwargs
     ):
-        import torch
+        constant = np.log((1 + substrate_conc / michaelis_constant) * standard_conc)
+        return -(dG_over_KT + constant) / LN10
 
-        return (1 + substrate_conc / michaelis_constant) * torch.exp(dG_over_KT) * inhibitor_conc
+    # implementation does not rely on any torch.* methods so we can just reuse it
+    # for other backends via aliases
+    _observation_model_numpy = _observation_model_pytorch
+    _observation_model_xgboost = _observation_model_pytorch
+
+    @staticmethod
+    def _loss_adapter_xgboost__mse(
+        dG_over_KT, dmatrix, substrate_conc=1e-6, michaelis_constant=1, standard_conc=1, **kwargs
+    ):
+        """
+        In XGBoost, observation models need to be applied within the loss function. In this specific case,
+        MSE is applied and differentiated (twice) to provide the gradients and hessian matrices.
+
+        $$
+        loss = 1/2 * (observation_pIC50(preds)-labels)^2
+        $$
+
+        Parameters:
+            dmatrix : xgboost.DMatrix
+                Passed automatically by the xgboost loop
+
+        """
+        labels = dmatrix.get_label()
+        constant = np.log((1 + substrate_conc / michaelis_constant) * standard_conc) / LN10
+
+        grad = (labels + dG_over_KT / LN10 + constant) / LN10
+        hess = np.full(grad.shape, 1 / (LN10 * LN10))
+
+        return grad, hess
 
     def check(self):
         super().check()
-        msg = f"Values for {self.__class__.__name__} are expected to be in the [-20, 20] range."
-        assert (-20 <= self.values <= 20).all(), msg
+        msg = f"Values for {self.__class__.__name__} are expected to be in the [0, 15] range."
+        assert (0 <= self.values <= 15).all(), msg
 
 
 class pKiMeasurement(BaseMeasurement):
@@ -174,19 +288,27 @@ class pKiMeasurement(BaseMeasurement):
     r"""
     Measurement where the value(s) come from K_i_ experiments
 
-    We make the assumption that $K_i \approx K_d$ and therefore $\mathbf{F}_{K_i} = \mathbf{F}_{K_d}$.
+    We make the assumption that $K_i \approx K_d$ and therefore $\mathbf{F}_{pK_i} = \mathbf{F}_{pK_d}$.
     """
 
     @staticmethod
-    def _observation_model_pytorch(dG_over_KT, inhibitor_conc=1e-6, **kwargs):
-        import torch
+    def _observation_model_pytorch(dG_over_KT, standard_conc=1, **kwargs):
+        return -(dG_over_KT + np.log(standard_conc)) / LN10
 
-        return torch.exp(dG_over_KT) * inhibitor_conc
+    # implementation does not rely on any torch.* methods so we can just reuse it
+    # for other backends via aliases
+    _observation_model_numpy = _observation_model_pytorch
+    _observation_model_xgboost = _observation_model_pytorch
+
+    @staticmethod
+    def _loss_adapter_xgboost__mse(dG_over_KT, dmatrix, standard_conc=1, **kwargs):
+        # TODO
+        raise NotImplementedError
 
     def check(self):
         super().check()
-        msg = f"Values for {self.__class__.__name__} are expected to be in the [-20, 20] range."
-        assert (-20 <= self.values <= 20).all(), msg
+        msg = f"Values for {self.__class__.__name__} are expected to be in the [0, 15] range."
+        assert (0 <= self.values <= 15).all(), msg
 
 
 class pKdMeasurement(BaseMeasurement):
@@ -195,27 +317,31 @@ class pKdMeasurement(BaseMeasurement):
     Measurement where the value(s) come from Kd experiments
 
     We define the following physics-based function
-    $$
-    \mathbf{F}_{K_d}(\Delta g) = exp[-\Delta g] * 1[M].
-    $$
-
-    If we have measurements at different concentrations $I$ (unit [M]) , then the function can further be defined as
 
     $$
-    \mathbf{F}_{K_d}(\Delta g, I) = exp[-\Delta g] * I[M].
-        $$
+    \mathbf{F}_{pK_d}(\Delta g) = - \frac{\Delta g + \ln(C)}{\ln(10)},
+    $$
+    where C given in molar [M] can be adapted if measurements were undertaken at different concentrations.
     """
 
     @staticmethod
-    def _observation_model_pytorch(dG_over_KT, inhibitor_conc=1e-6, **kwargs):
-        import torch
+    def _observation_model_pytorch(dG_over_KT, standard_conc=1, **kwargs):
+        return -(dG_over_KT + np.log(standard_conc)) / LN10
 
-        return torch.exp(dG_over_KT) * inhibitor_conc
+    # implementation does not rely on any torch.* methods so we can just reuse it
+    # for other backends via aliases
+    _observation_model_numpy = _observation_model_pytorch
+    _observation_model_xgboost = _observation_model_pytorch
+
+    @staticmethod
+    def _loss_adapter_xgboost__mse(dG_over_KT, dmatrix, standard_conc=1, **kwargs):
+        # TODO
+        raise NotImplementedError
 
     def check(self):
         super().check()
-        msg = f"Values for {self.__class__.__name__} are expected to be in the [-20, 20] range."
-        assert (-20 <= self.values <= 20).all(), msg
+        msg = f"Values for {self.__class__.__name__} are expected to be in the [0, 15] range."
+        assert (0 <= self.values <= 15).all(), msg
 
 
 def null_observation_model(arg):
