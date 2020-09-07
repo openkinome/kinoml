@@ -226,16 +226,16 @@ class pIC50Measurement(BaseMeasurement):
 
     @staticmethod
     def _observation_model_pytorch(
-        dG_over_KT, substrate_conc=1e-6, michaelis_constant=1, inhibitor_conc=1, **kwargs
+        dG_over_KT, substrate_conc=1e-6, michaelis_constant=1, standard_conc=1, **kwargs
     ):
         import torch
 
-        constant = np.log((1 + substrate_conc / michaelis_constant) * inhibitor_conc)
+        constant = np.log((1 + substrate_conc / michaelis_constant) * standard_conc)
         return -(dG_over_KT + constant) / LN10
 
     @staticmethod
     def _observation_model_xgboost(
-        dG_over_KT, dmatrix, substrate_conc=1e-6, michaelis_constant=1, inhibitor_conc=1, **kwargs
+        dG_over_KT, dmatrix, substrate_conc=1e-6, michaelis_constant=1, standard_conc=1, **kwargs
     ):
         """
         In XGBoost, observation models also application the loss function. In this specific case,
@@ -251,7 +251,7 @@ class pIC50Measurement(BaseMeasurement):
 
         """
         labels = dmatrix.get_label()
-        constant = np.log((1 + substrate_conc / michaelis_constant) * inhibitor_conc) / LN10
+        constant = np.log((1 + substrate_conc / michaelis_constant) * standard_conc) / LN10
 
         grad = (labels + dG_over_KT / LN10 + constant) / LN10
         hess = np.full(grad.shape, 1 / (LN10 * LN10))
@@ -273,13 +273,13 @@ class pKiMeasurement(BaseMeasurement):
     """
 
     @staticmethod
-    def _observation_model_pytorch(dG_over_KT, inhibitor_conc=1, **kwargs):
+    def _observation_model_pytorch(dG_over_KT, standard_conc=1, **kwargs):
         import torch
 
-        return -(dG_over_KT + np.log(inhibitor_conc)) / LN10
+        return -(dG_over_KT + np.log(standard_conc)) / LN10
 
     @staticmethod
-    def _observation_model_xgboost(dG_over_KT, dmatrix, inhibitor_conc=1, **kwargs):
+    def _observation_model_xgboost(dG_over_KT, dmatrix, standard_conc=1, **kwargs):
         # TODO
         raise NotImplementedError
 
@@ -303,13 +303,13 @@ class pKdMeasurement(BaseMeasurement):
     """
 
     @staticmethod
-    def _observation_model_pytorch(dG_over_KT, inhibitor_conc=1, **kwargs):
+    def _observation_model_pytorch(dG_over_KT, standard_conc=1, **kwargs):
         import torch
 
-        return -(dG_over_KT + np.log(inhibitor_conc)) / LN10
+        return -(dG_over_KT + np.log(standard_conc)) / LN10
 
     @staticmethod
-    def _observation_model_xgboost(dG_over_KT, dmatrix, inhibitor_conc=1, **kwargs):
+    def _observation_model_xgboost(dG_over_KT, dmatrix, standard_conc=1, **kwargs):
         # TODO
         raise NotImplementedError
 
