@@ -53,7 +53,7 @@ class HomologyModel:  #  TODO inherent a Base class?
         return hits
 
     def get_sequence(
-        self, identifier: str, kinase: bool = True, backend: str = "uniprot"
+        self, identifier: str, kinase: bool = False, backend: str = "uniprot"
     ):
         import requests
         from io import StringIO
