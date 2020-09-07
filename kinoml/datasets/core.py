@@ -245,6 +245,13 @@ class DatasetProvider(BaseDatasetProvider):
         """
         return self.measurement_type.observation_model(**kwargs)
 
+    def loss_adapter(self, **kwargs):
+        """
+        Observation model plus loss function, wrapped in a single callable. Return types are
+        backend-dependent.
+        """
+        return self.measurement_type.loss_adapter(**kwargs)
+
     @property
     def systems(self):
         return list({ms.system for ms in self.measurements})
@@ -302,6 +309,15 @@ class MultiDatasetProvider(DatasetProvider):
 
     def observation_models(self, **kwargs):
         return [p.observation_model(**kwargs) for p in self.providers]
+
+    def loss_adapters(self, **kwargs):
+        return [p.loss_adapter(**kwargs) for p in self.providers]
+
+    def observation_model(self, **kwargs):
+        raise NotImplementedError(f"{type(self)} must use `.observation_models()` (plural)")
+
+    def loss_adapter(self, **kwargs):
+        raise NotImplementedError(f"{type(self)} must use `.loss_adapters()` (plural)")
 
     @property
     def measurements(self):
