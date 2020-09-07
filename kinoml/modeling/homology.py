@@ -1,15 +1,16 @@
 from ..core.proteins import ProteinStructure
+from ..core.sequences import KinaseDomainAminoAcidSequence
 
 
 class HomologyModel:  #  TODO inherent a Base class?
 
     """
-    Given a UniProt identifier, generate a template on to which 
+    Given a UniProt identifier, generate a template on to which
     a homology model can be made and constrcut a homology model.
 
-    The passed sequence will be used to generate a PDB template 
-    structure (based on a BLAST search) or, if provided, use a 
-    pre-generated template. This will be used to produce a final 
+    The passed sequence will be used to generate a PDB template
+    structure (based on a BLAST search) or, if provided, use a
+    pre-generated template. This will be used to produce a final
     homology model.
     """
 
@@ -50,18 +51,31 @@ class HomologyModel:  #  TODO inherent a Base class?
 
         return top_pdb_template
 
-    def get_uniprot_sequence(self, identifier: str):
+    def get_sequence(
+        self, identifier: str, kinase: bool = True, backend: str = "uniprot"
+    ):
         import requests
         from io import StringIO
 
-        params = {"query": identifier, "format": "fasta"}
-        response = requests.get("http://www.uniprot.org/uniprot/", params)
+        if kinase:
+            if backend == "uniprot":
+                sequence = KinaseDomainAminoAcidSequence.from_uniprot(identifier)
+            elif backend == "ncbi":
+                sequence = KinaseDomainAminoAcidSequence.from_ncbi(identifier)
+            else:
+                raise ValueError(
+                    'Backend "%s" not supported. Please choose from ["uniprot", "ncbi"]'
+                    % (backend)
+                )
 
-        up_sequence = response.text.split("\n", 1)[1].replace("\n", "")
+        else:
 
-        #  TODO add option to specify just the kinase domain
+            params = {"query": identifier, "format": "fasta"}
+            response = requests.get("http://www.uniprot.org/uniprot/", params)
 
-        return up_sequence
+            sequence = response.text.split("\n", 1)[1].replace("\n", "")
+
+        return sequence
 
     def get_alignment(
         self, template_system, canonical_sequence, pdb_entry=False, window=15
@@ -202,7 +216,6 @@ class HomologyModel:  #  TODO inherent a Base class?
                     continue
             for item in ali_2_final:
                 ali_file.write("%s\n" % item)  # write the target sequence lines
-
 
     def get_model(self, template_system, alignment, num_models):
         from modeller import log, environ
