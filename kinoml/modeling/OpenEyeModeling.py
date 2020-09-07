@@ -1,6 +1,7 @@
 from typing import List, Union
 
 from openeye import oechem, oegrid, oespruce
+import pandas as pd
 
 
 def read_smiles(smiles: str) -> oechem.OEGraphMol:
@@ -310,16 +311,41 @@ def prepare_protein(
     )
 
 
-def klifs_kinases_by_uniprot_id(uniprot_id):
+def klifs_kinases_by_uniprot_id(uniprot_id: str) -> pd.DataFrame:
+    """
+    Retrieve KLIFS structure details about kinases matching the given Uniprot ID.
+    Parameters
+    ----------
+    uniprot_id: str
+        Uniprot identifier.
+    Returns
+    -------
+    kinases: pd.DataFrame
+        KLIFS structure details.
+    """
     import klifs_utils
+
     kinase_names = klifs_utils.remote.kinases.kinase_names()
-    kinases = klifs_utils.remote.kinases.kinases_from_kinase_names(list(kinase_names.name))
+    kinases = klifs_utils.remote.kinases.kinases_from_kinase_names(
+        list(kinase_names.name)
+    )
     kinase_id = kinases[kinases.uniprot == uniprot_id].kinase_ID.iloc[0]
     kinases = klifs_utils.remote.structures.structures_from_kinase_ids([kinase_id])
     return kinases
 
 
-def get_klifs_ligand(structure_id):
+def get_klifs_ligand(structure_id: int) -> oechem.OEGraphMol:
+    """
+    Retrieve orthosteric ligand from KLIFS.
+    Parameters
+    ----------
+    structure_id: int
+        KLIFS structure identifier.
+    Returns
+    -------
+    molecule: oechem.OEGraphMol
+        An OpenEye molecule holding the orthosteric ligand.
+    """
     import klifs_utils
     from openeye import oechem
 
@@ -335,7 +361,18 @@ def get_klifs_ligand(structure_id):
     return molecules[0]
 
 
-def generate_tautomers(molecule):
+def generate_tautomers(molecule: oechem.OEGraphMol) -> List[oechem.OEGraphMol]:
+    """
+    Generate reasonable tautomers of a given molecule.
+    Parameters
+    ----------
+    molecule: oechem.OEGraphMol
+        An OpenEye molecule.
+    Returns
+    -------
+    tautomers: list of oechem.OEGraphMol
+        A list of OpenEye molecules holding the tautomers.
+    """
     from openeye import oechem, oequacpac
 
     tautomer_options = oequacpac.OETautomerOptions()
@@ -346,7 +383,7 @@ def generate_tautomers(molecule):
     tautomer_options.SetApplyWarts(True)
     pKa_norm = True
     tautomers = [
-        oechem.OEMol(tautomer)
+        oechem.OEGraphMol(tautomer)
         for tautomer in oequacpac.OEGetReasonableTautomers(
             molecule, tautomer_options, pKa_norm
         )
@@ -354,17 +391,54 @@ def generate_tautomers(molecule):
     return tautomers
 
 
-def generate_enantiomers(molecule, ignore=False):
+def generate_enantiomers(
+    molecule: oechem.OEGraphMol, max_centers: int = 12, ignore: bool = False
+) -> List[oechem.OEGraphMol]:
+    """
+    Generate enantiomers of a given molecule.
+    Parameters
+    ----------
+    molecule: oechem.OEGraphMol
+        An OpenEye molecule.
+    max_centers: int
+        The maximal number of stereo centers to enumerate.
+    ignore: bool
+        If specified stereo centers should be ignored.
+    Returns
+    -------
+    enantiomers: list of oechem.OEGraphMol
+        A list of OpenEye molecules holding the enantiomers.
+    """
     from openeye import oechem, oeomega
-    enantiomers = [oechem.OEMol(enantiomer) for enantiomer in oeomega.OEFlipper(molecule.GetActive(), 12, ignore)]
+
+    enantiomers = [
+        oechem.OEGraphMol(enantiomer)
+        for enantiomer in oeomega.OEFlipper(molecule, max_centers, ignore)
+    ]
     return enantiomers
 
 
-def generate_conformers(molecule):
+def generate_conformers(
+    molecule: oechem.OEGraphMol, max_conformations: int = 1000
+) -> oechem.OEMol:
+    """
+    Generate enantiomers of a given molecule.
+    Parameters
+    ----------
+    molecule: oechem.OEGraphMol
+        An OpenEye molecule.
+    max_conformations: int
+        Maximal number of conformations to generate.
+    Returns
+    -------
+    conformers: oechem.OEMol
+        An OpenEye multi-conformer molecule holding the generated conformations.
+    """
     from openeye import oechem, oeomega
+
     omega_options = oeomega.OEOmegaOptions()
     omega_options.SetMaxSearchTime(60.0)  # time out
-    omega_options.SetMaxConfs(1000)  # default: 200
+    omega_options.SetMaxConfs(max_conformations)
     omega = oeomega.OEOmega(omega_options)
     omega.SetStrictStereo(False)
     conformers = oechem.OEMol(molecule)
@@ -372,28 +446,63 @@ def generate_conformers(molecule):
     return conformers
 
 
-def overlay_molecules(refmol, fitmol, score_only=False):
+def overlay_molecules(
+    reference_molecule: oechem.OEGraphMol,
+    fit_molecule: oechem.OEMol,
+    return_overlay: bool = True,
+) -> (int, List[oechem.OEGraphMol]):
+    """
+    Overlay two molecules and calculate TanimotoCombo score.
+    Parameters
+    ----------
+    reference_molecule: oechem.OEGraphMol
+        An OpenEye molecule holding the reference molecule for overlay.
+    fit_molecule: oechem.OEMol
+        An OpenEye multi-conformer molecule holding the fit molecule for overlay.
+    return_overlay: bool
+        If the best scored overlay of molecules should be returned.
+    Returns
+    -------
+        : int or int and list of oechem.OEGraphMol
+        The TanimotoCombo score of the best overlay and the overlay if score_only is set False.
+    """
     from openeye import oechem, oeshape
+
     prep = oeshape.OEOverlapPrep()
-    prep.Prep(refmol)
+    prep.Prep(reference_molecule)
 
     overlay = oeshape.OEOverlay()
-    overlay.SetupRef(refmol)
+    overlay.SetupRef(reference_molecule)
 
-    prep.Prep(fitmol)
+    prep.Prep(fit_molecule)
     score = oeshape.OEBestOverlayScore()
-    overlay.BestOverlay(score, fitmol, oeshape.OEHighestTanimoto())
-    if score_only:
+    overlay.BestOverlay(score, fit_molecule, oeshape.OEHighestTanimoto())
+    if not return_overlay:
         return score.GetTanimotoCombo()
     else:
-        overlay = [refmol]
-        fitmol = oechem.OEGraphMol(fitmol.GetConf(oechem.OEHasConfIdx(score.GetFitConfIdx())))
-        score.Transform(fitmol)
-        overlay.append(fitmol)
+        overlay = [reference_molecule]
+        fit_molecule = oechem.OEGraphMol(
+            fit_molecule.GetConf(oechem.OEHasConfIdx(score.GetFitConfIdx()))
+        )
+        score.Transform(fit_molecule)
+        overlay.append(fit_molecule)
         return score.GetTanimotoCombo(), overlay
 
 
-def select_structure(uniprot_id, smiles):
+def select_structure(uniprot_id: str, smiles: str) -> Union[None, pd.Series]:
+    """
+    Select a suitable kinase structure for docking a small molecule into the orthosteric pocket.
+    Parameters
+    ----------
+    uniprot_id: str
+        Uniprot identifier.
+    smiles: str
+        The molecule in smiles format.
+    Returns
+    -------
+        : pd.Series
+        Details about most reasonable kinase structure for docking the small molecule.
+    """
     import itertools
 
     # search for available kinase structure
@@ -405,7 +514,9 @@ def select_structure(uniprot_id, smiles):
     # sort by quality according to KLIFS classification
     # high quality structures come first
     # TODO: additional filtering -> Abl1: nilotinib -> 5mo4 (with allosteric ligand and mutations) preferred over 3cs9
-    kinases = kinases.sort_values(by=['alt', 'chain', 'quality_score'], ascending=[True, True, False])
+    kinases = kinases.sort_values(
+        by=["alt", "chain", "quality_score"], ascending=[True, True, False]
+    )
 
     # search for kinase structures with orthosteric ligand
     kinase_complexes = kinases[kinases.ligand != 0]
@@ -413,18 +524,27 @@ def select_structure(uniprot_id, smiles):
         return kinases.iloc[0]
     else:  # pick structure with similar ligand and high quality
         # get resolved structure of orthosteric ligands
-        complex_ligands = [get_klifs_ligand(structure_id) for structure_id in kinase_complexes.structure_ID]
+        complex_ligands = [
+            get_klifs_ligand(structure_id)
+            for structure_id in kinase_complexes.structure_ID
+        ]
 
         # get reasonable conformations of ligand of interest
         ligand = read_smiles(smiles)
         tautomers = generate_tautomers(ligand)
         enantiomers = [generate_enantiomers(tautomer) for tautomer in tautomers]
-        conformations_ensemble = [generate_conformers(enantiomer) for enantiomer in itertools.chain.from_iterable(enantiomers)]
+        conformations_ensemble = [
+            generate_conformers(enantiomer)
+            for enantiomer in itertools.chain.from_iterable(enantiomers)
+        ]
 
         # overlay and score
         scores = []
         for conformations in conformations_ensemble:
-            scores += [[i, overlay_molecules(complex_ligand, conformations, True)] for i, complex_ligand in enumerate(complex_ligands)]
+            scores += [
+                [i, overlay_molecules(complex_ligand, conformations, False)]
+                for i, complex_ligand in enumerate(complex_ligands)
+            ]
         score_threshold = max([score[1] for score in scores]) - 0.1
 
         # pick highest quality structure from structures with similar ligands
