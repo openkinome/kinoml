@@ -91,6 +91,25 @@ class BaseMeasurement:
     def _observation_model_xgboost(*args, **kwargs):
         raise NotImplementedError("Implement in your subclass!")
 
+    @classmethod
+    def loss_adapter(cls, backend="xgboost", loss="mse"):
+        """
+        Some frameworks require objective functions to include the
+        observation model transformation in the same callable. This
+        method provides a factory of such methods.
+        """
+        return cls._loss_adapter(backend=backend, loss=loss)
+
+    @classmethod
+    def _loss_adapter(cls, backend="xgboost", loss="mse"):
+        try:
+            method = getattr(cls, f"_loss_adapter_{backend}__{loss}")
+        except AttributeError:
+            msg = f"Adapter for backend `{backend}` and loss `{loss}` is not available for `{cls}` types"
+            raise NotImplementedError(msg)
+        else:
+            return method
+
     def check(self):
         """
         Perform some checks for valid values
@@ -139,24 +158,24 @@ class PercentageDisplacementMeasurement(BaseMeasurement):
         # return 100 * (1 / (1 + (torch.exp(dG_over_KT) * standard_conc) / inhibitor_conc))
 
     @staticmethod
-    def _observation_model_xgboost(dG_over_KT, inhibitor_conc=1, standard_conc=1, **kwargs):
-
-        '''
+    def _observation_model_numpy(dG_over_KT, inhibitor_conc=1, standard_conc=1, **kwargs):
+        r"""
         Return the observation model.
 
         $$
         F(\Delta g) = 100 * \frac{1}{1 + \frac{exp[\Delta g] * C[M]}{[I]}},
         $$
-        '''
+        """
+        return (100 * inhibitor_conc) / (inhibitor_conc + (standard_conc * np.exp(dG_over_KT)))
+        # return 100 * 1 / (1 + (np.exp(dG_over_KT) * standard_conc) / inhibitor_conc)
 
-        import numpy as np
-
-        return 100 * 1 / (1 + (np.exp(dG_over_KT) * standard_conc) / inhibitor_conc))
+    _observation_model_xgboost = _observation_model_numpy
 
     @staticmethod
-    def _custom_loss_xgboost(dG_over_KT, dmatrix, inhibitor_conc=1, standard_conc=1, **kwargs):
-
-        '''
+    def _loss_adapter_xgboost__mse(
+        dG_over_KT, dmatrix, inhibitor_conc=1, standard_conc=1, **kwargs
+    ):
+        r"""
         Return the gradient and the hessian of the loss defined by
 
         $$
@@ -164,25 +183,22 @@ class PercentageDisplacementMeasurement(BaseMeasurement):
         $$
 
         See theory notes for more details.
-        '''
-
-        # TODO Check if this is the write way of integrating the custom loss for xgboost.
-
-        import numpy as np
+        """
+        # TODO Check if this is the right way of integrating the custom loss for xgboost.
 
         labels = dmatrix.get_label()
 
-        constant = -1 * 100 *  inhibitor_conc
-
+        constant = -1 * 100 * inhibitor_conc
         temp = standard_conc * np.exp(dG_over_KT)
-
         difference = 100 * inhibitor_conc / (inhibitor_conc + temp) - labels
 
-        grad = constant * difference * temp / ((inhibitor_conc + temp)**2)
+        grad = constant * difference * temp / ((inhibitor_conc + temp) ** 2)
 
-        numerator = (inhibitor_conc + temp)**2 * temp - 2 * temp**2 * (inhibitor_conc + temp)
+        numerator = (inhibitor_conc + temp) ** 2 * temp - 2 * temp ** 2 * (inhibitor_conc + temp)
+        hess_sum_a = (constant * temp / ((inhibitor_conc + temp) ** 2)) ** 2
+        hess_sum_b = constant / ((inhibitor_conc + temp) ** 4) * numerator
 
-        hess = (constant * temp/((inhibitor_conc + temp)**2) ) ** 2 + constant / ((inhibitor_conc + temp)**4) * numerator
+        hess = hess_sum_a + hess_sum_b
 
         return grad, hess
 
@@ -228,17 +244,20 @@ class pIC50Measurement(BaseMeasurement):
     def _observation_model_pytorch(
         dG_over_KT, substrate_conc=1e-6, michaelis_constant=1, standard_conc=1, **kwargs
     ):
-        import torch
-
         constant = np.log((1 + substrate_conc / michaelis_constant) * standard_conc)
         return -(dG_over_KT + constant) / LN10
 
+    # implementation does not rely on any torch.* methods so we can just reuse it
+    # for other backends via aliases
+    _observation_model_numpy = _observation_model_pytorch
+    _observation_model_xgboost = _observation_model_pytorch
+
     @staticmethod
-    def _observation_model_xgboost(
+    def _loss_adapter_xgboost__mse(
         dG_over_KT, dmatrix, substrate_conc=1e-6, michaelis_constant=1, standard_conc=1, **kwargs
     ):
         """
-        In XGBoost, observation models also application the loss function. In this specific case,
+        In XGBoost, observation models need to be applied within the loss function. In this specific case,
         MSE is applied and differentiated (twice) to provide the gradients and hessian matrices.
 
         $$
@@ -274,12 +293,15 @@ class pKiMeasurement(BaseMeasurement):
 
     @staticmethod
     def _observation_model_pytorch(dG_over_KT, standard_conc=1, **kwargs):
-        import torch
-
         return -(dG_over_KT + np.log(standard_conc)) / LN10
 
+    # implementation does not rely on any torch.* methods so we can just reuse it
+    # for other backends via aliases
+    _observation_model_numpy = _observation_model_pytorch
+    _observation_model_xgboost = _observation_model_pytorch
+
     @staticmethod
-    def _observation_model_xgboost(dG_over_KT, dmatrix, standard_conc=1, **kwargs):
+    def _loss_adapter_xgboost__mse(dG_over_KT, dmatrix, standard_conc=1, **kwargs):
         # TODO
         raise NotImplementedError
 
@@ -304,12 +326,15 @@ class pKdMeasurement(BaseMeasurement):
 
     @staticmethod
     def _observation_model_pytorch(dG_over_KT, standard_conc=1, **kwargs):
-        import torch
-
         return -(dG_over_KT + np.log(standard_conc)) / LN10
 
+    # implementation does not rely on any torch.* methods so we can just reuse it
+    # for other backends via aliases
+    _observation_model_numpy = _observation_model_pytorch
+    _observation_model_xgboost = _observation_model_pytorch
+
     @staticmethod
-    def _observation_model_xgboost(dG_over_KT, dmatrix, standard_conc=1, **kwargs):
+    def _loss_adapter_xgboost__mse(dG_over_KT, dmatrix, standard_conc=1, **kwargs):
         # TODO
         raise NotImplementedError
 
