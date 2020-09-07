@@ -132,14 +132,14 @@ class PercentageDisplacementMeasurement(BaseMeasurement):
         assert (0 <= self.values <= 100).all(), "One or more values are not in [0, 100]"
 
     @staticmethod
-    def _observation_model_pytorch(dG_over_KT, inhibitor_conc=1, std_conc=1, **kwargs):
+    def _observation_model_pytorch(dG_over_KT, inhibitor_conc=1, standard_conc=1, **kwargs):
         import torch
 
-        return (100 * inhibitor_conc) / (inhibitor_conc + (std_conc * torch.exp(dG_over_KT)))
-        # return 100 * (1 / (1 + (torch.exp(dG_over_KT) * std_conc) / inhibitor_conc))
+        return (100 * inhibitor_conc) / (inhibitor_conc + (standard_conc * torch.exp(dG_over_KT)))
+        # return 100 * (1 / (1 + (torch.exp(dG_over_KT) * standard_conc) / inhibitor_conc))
 
     @staticmethod
-    def _observation_model_xgboost(dG_over_KT, inhibitor_conc=1, std_conc=1, **kwargs):
+    def _observation_model_xgboost(dG_over_KT, inhibitor_conc=1, standard_conc=1, **kwargs):
 
         '''
         Return the observation model.
@@ -151,10 +151,10 @@ class PercentageDisplacementMeasurement(BaseMeasurement):
 
         import numpy as np
 
-        return 100 * 1 / (1 + (np.exp(dG_over_KT) * std_conc) / inhibitor_conc))
+        return 100 * 1 / (1 + (np.exp(dG_over_KT) * standard_conc) / inhibitor_conc))
 
     @staticmethod
-    def _custom_loss_xgboost(dG_over_KT, dmatrix, inhibitor_conc=1, std_conc=1, **kwargs):
+    def _custom_loss_xgboost(dG_over_KT, dmatrix, inhibitor_conc=1, standard_conc=1, **kwargs):
 
         '''
         Return the gradient and the hessian of the loss defined by
@@ -174,7 +174,7 @@ class PercentageDisplacementMeasurement(BaseMeasurement):
 
         constant = -1 * 100 *  inhibitor_conc
 
-        temp = std_conc * np.exp(dG_over_KT)
+        temp = standard_conc * np.exp(dG_over_KT)
 
         difference = 100 * inhibitor_conc / (inhibitor_conc + temp) - labels
 
