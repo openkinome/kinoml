@@ -24,17 +24,21 @@ class HomologyModel:  #  TODO inherent a Base class?
         #  self.template = template
         #  self.sequence = sequence
 
-    def get_pdb_template(self, sequence):
+    def get_pdb_template(
+        self,
+        sequence,
+    ):
         """
         Retrieve a template structure from PDB from a BLAST search
         Parameters
         ----------
         sequence: str
             A string of the protein sequence
+
         Returns
         -------
-        pdb_template: ProteinStructure
-            A ProteinStructure object generated from retrieval from a PDB BLAST search.
+        hits: dict
+            A dictionary generated from ProDy with PDB hits.
         """
 
         from prody import blastPDB
@@ -42,14 +46,11 @@ class HomologyModel:  #  TODO inherent a Base class?
         import pickle
 
         blast_record = blastPDB(sequence)
-        best = blast_record.getBest()["pdb_id"]
-
-        top_pdb_template = ProteinStructure.from_name(best)
+        hits = blast_record.getHits()
 
         #  TODO add option based on sequency similarity cut off
-        #  TODO add option to return all pdb models, not just the best
 
-        return top_pdb_template
+        return hits
 
     def get_sequence(
         self, identifier: str, kinase: bool = True, backend: str = "uniprot"
