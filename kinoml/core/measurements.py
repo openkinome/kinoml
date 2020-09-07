@@ -172,7 +172,7 @@ class PercentageDisplacementMeasurement(BaseMeasurement):
 
         labels = dmatrix.get_label()
 
-        constant = -1 * 100 *  inhibitor_conc
+        constant = -1 * 100 * inhibitor_conc
 
         temp = standard_conc * np.exp(dG_over_KT)
 
@@ -182,7 +182,8 @@ class PercentageDisplacementMeasurement(BaseMeasurement):
 
         numerator = (inhibitor_conc + temp)**2 * temp - 2 * temp**2 * (inhibitor_conc + temp)
 
-        hess = (constant * temp/((inhibitor_conc + temp)**2) ) ** 2 + constant / ((inhibitor_conc + temp)**4) * numerator
+        hess = (constant * temp/((inhibitor_conc + temp)**2)) ** 2
+                + constant / ((inhibitor_conc + temp)**4) * numerator
 
         return grad, hess
 
