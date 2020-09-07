@@ -151,14 +151,20 @@ class PercentageDisplacementMeasurement(BaseMeasurement):
         assert (0 <= self.values <= 100).all(), "One or more values are not in [0, 100]"
 
     @staticmethod
-    def _observation_model_pytorch(dG_over_KT, inhibitor_conc=1, standard_conc=1, **kwargs):
+    def _observation_model_pytorch(
+        dG_over_KT, inhibitor_conc=1, standard_conc=1, **kwargs
+    ):
         import torch
 
-        return (100 * inhibitor_conc) / (inhibitor_conc + (standard_conc * torch.exp(dG_over_KT)))
+        return (100 * inhibitor_conc) / (
+            inhibitor_conc + (standard_conc * torch.exp(dG_over_KT))
+        )
         # return 100 * (1 / (1 + (torch.exp(dG_over_KT) * standard_conc) / inhibitor_conc))
 
     @staticmethod
-    def _observation_model_numpy(dG_over_KT, inhibitor_conc=1, standard_conc=1, **kwargs):
+    def _observation_model_numpy(
+        dG_over_KT, inhibitor_conc=1, standard_conc=1, **kwargs
+    ):
         r"""
         Return the observation model.
 
@@ -166,7 +172,9 @@ class PercentageDisplacementMeasurement(BaseMeasurement):
         F(\Delta g) = 100 * \frac{1}{1 + \frac{exp[\Delta g] * C[M]}{[I]}},
         $$
         """
-        return (100 * inhibitor_conc) / (inhibitor_conc + (standard_conc * np.exp(dG_over_KT)))
+        return (100 * inhibitor_conc) / (
+            inhibitor_conc + (standard_conc * np.exp(dG_over_KT))
+        )
         # return 100 * 1 / (1 + (np.exp(dG_over_KT) * standard_conc) / inhibitor_conc)
 
     _observation_model_xgboost = _observation_model_numpy
@@ -190,15 +198,14 @@ class PercentageDisplacementMeasurement(BaseMeasurement):
 
         constant = -1 * 100 * inhibitor_conc
         temp = standard_conc * np.exp(dG_over_KT)
-        difference = 100 * inhibitor_conc / (inhibitor_conc + temp) - labels
+        summation = inhibitor_conc + temp
+        difference = 100 * inhibitor_conc / summation - labels
 
-        grad = constant * difference * temp / ((inhibitor_conc + temp) ** 2)
+        grad = constant * difference * temp / (summation ** 2)
 
-        numerator = (inhibitor_conc + temp) ** 2 * temp - 2 * temp ** 2 * (inhibitor_conc + temp)
-        hess_sum_a = (constant * temp / ((inhibitor_conc + temp) ** 2)) ** 2
-        hess_sum_b = constant / ((inhibitor_conc + temp) ** 4) * numerator
+        numerator = temp * summation - 2 * temp ** 2
 
-        hess = hess_sum_a + hess_sum_b
+        hess = grad ** 2 + difference * constant * numerator / (summation ** 3)
 
         return grad, hess
 
@@ -254,7 +261,12 @@ class pIC50Measurement(BaseMeasurement):
 
     @staticmethod
     def _loss_adapter_xgboost__mse(
-        dG_over_KT, dmatrix, substrate_conc=1e-6, michaelis_constant=1, standard_conc=1, **kwargs
+        dG_over_KT,
+        dmatrix,
+        substrate_conc=1e-6,
+        michaelis_constant=1,
+        standard_conc=1,
+        **kwargs,
     ):
         """
         In XGBoost, observation models need to be applied within the loss function. In this specific case,
@@ -270,7 +282,9 @@ class pIC50Measurement(BaseMeasurement):
 
         """
         labels = dmatrix.get_label()
-        constant = np.log((1 + substrate_conc / michaelis_constant) * standard_conc) / LN10
+        constant = (
+            np.log((1 + substrate_conc / michaelis_constant) * standard_conc) / LN10
+        )
 
         grad = (labels + dG_over_KT / LN10 + constant) / LN10
         hess = np.full(grad.shape, 1 / (LN10 * LN10))
