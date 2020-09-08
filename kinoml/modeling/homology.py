@@ -66,20 +66,19 @@ class HomologyModel:  #  TODO inherent a Base class?
         from io import StringIO
 
         if kinase:
-            if backend == "uniprot":
-                sequence = KinaseDomainAminoAcidSequence.from_uniprot(identifier)
-            elif backend == "ncbi":
-                sequence = KinaseDomainAminoAcidSequence.from_ncbi(identifier)
-            else:
+            try:
+                from_method = getattr(KinaseDomainAminoAcidSequence, f"from_{backend}")
+            except AttributeError:
                 raise ValueError(
                     'Backend "%s" not supported. Please choose from ["uniprot", "ncbi"]'
                     % (backend)
                 )
+            else:
+                sequence = from_method(identifier)
 
         else:
             params = {"query": identifier, "format": "fasta"}
             response = requests.get("http://www.uniprot.org/uniprot/", params)
-
             sequence = response.text.split("\n", 1)[1].replace("\n", "")
 
         return sequence
