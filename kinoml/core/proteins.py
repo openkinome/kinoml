@@ -121,7 +121,7 @@ class ProteinStructure(BaseProtein, BaseStructure):
             metadata={"path": path, "id": identifier},
             universe=u,
             **kwargs,
-            )
+        )
 
     @classmethod
     def from_sequence(cls, sequence, **kwargs):
