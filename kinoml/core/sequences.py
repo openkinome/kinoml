@@ -276,3 +276,75 @@ class RNASequence(Biosequence):
 
     ALPHABET = "AUCG"
     _ACCESSION_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=nuccore&id={}&rettype=fasta&retmode=text"
+
+
+class KinaseDomainAminoAcidSequence(Biosequence):
+    """Biosequence for kinase domain amino acid sequences."""
+
+    ACCESSION_MAX_RETRIEVAL = None
+
+    @classmethod
+    def from_uniprot(
+        cls, *uniprot_ids: str,
+    ) -> Union[
+        "KinaseDomainAminoAcidSequence", Iterable["KinaseDomainAminoAcidSequence"], None
+    ]:
+        """
+        Retrieve kinase domain amino acid sequences of kinases defined by their Uniprot identifiers.
+        Parameters
+        ----------
+        uniprot_ids: str
+            Uniprot identifier(s). Multiple can be provided.
+        Returns
+        -------
+        kinase_domain_sequences: KinaseDomainAminoAcidSequence or list of KinaseDomainAminoAcidSequence or None
+            Retrieved kinase domain amino acid sequence(s).
+        """
+        import requests
+        import json
+
+        objects = []
+        for uniprot_id in uniprot_ids:
+            # request data
+            response = requests.get(
+                f"https://www.ebi.ac.uk/proteins/api/proteins/{uniprot_id}"
+            )
+            protein = json.loads(response.text)
+
+            # find protein kinase domains
+            for feature in protein["features"]:
+                if feature["type"] == "DOMAIN":
+                    if feature["description"] == "Protein kinase":
+                        # get kinase domain sequence details
+                        sequence = protein["sequence"]["sequence"]
+                        name = protein["id"]
+                        begin = int(feature["begin"])
+                        if begin == 1:
+                            true_N_terminus = True
+                        else:
+                            true_N_terminus = False
+                        end = int(feature["end"])
+                        if end == len(sequence):
+                            true_C_terminus = True
+                        else:
+                            true_C_terminus = False
+                        kinase_domain_sequence = sequence[begin - 1 : end]
+                        objects.append(
+                            cls(
+                                kinase_domain_sequence,
+                                name=name,
+                                metadata={
+                                    "uniprot_id": uniprot_id,
+                                    "begin": begin,
+                                    "end": end,
+                                    "true_N_terminus": true_N_terminus,
+                                    "true_C_terminus": true_C_terminus,
+                                },
+                            )
+                        )
+
+        if len(objects) == 0:
+            return None
+        elif len(objects) == 1:
+            return objects[0]
+        return objects
