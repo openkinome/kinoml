@@ -107,19 +107,21 @@ class ProteinStructure(BaseProtein, BaseStructure):
 
     @classmethod
     def from_file(cls, path, ext=None, **kwargs):
+
         from MDAnalysis import Universe
         from pathlib import Path
 
-        identifier = f"{path.split('/')[-1].split('.')[0]}"  #  set id to be the file name
+        identifier = Path(path).stem  #  set id to be the file name
 
         u = Universe(path)
         p = Path(path)
+
         return cls(
             pname=p.name,
             metadata={"path": path, "id": identifier},
             universe=u,
             **kwargs,
-        )
+            )
 
     @classmethod
     def from_sequence(cls, sequence, **kwargs):
