@@ -137,18 +137,12 @@ class ProteinStructure(BaseProtein, BaseStructure):
     def from_name(cls, identifier, **kwargs):
         import requests
         import tempfile
-        from MDAnalysis import Universe
+        import MDAnalysis as mda
         from pathlib import Path
 
-        url = f"https://files.rcsb.org/download/{identifier}.pdb"
-        response = requests.get(url)
+        u = mda.fetch_mmtf(identifier)
 
-        with tempfile.NamedTemporaryFile(suffix=".pdb") as temp_file:
-            temp_file.write(response.content)
-            u = Universe(temp_file.name)
-            p = Path(temp_file.name)
-
-            return cls(pname=p.name, metadata={"id": identifier}, universe=u, **kwargs)
+        return cls(metadata={"id": identifier}, universe=u, **kwargs)
 
     @property
     def sequence(self):
