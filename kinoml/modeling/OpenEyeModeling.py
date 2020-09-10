@@ -550,3 +550,102 @@ def select_structure(uniprot_id: str, smiles: str) -> Union[None, pd.Series]:
         # pick highest quality structure from structures with similar ligands
         index = min([score[0] for score in scores if score[1] >= score_threshold])
         return kinase_complexes.iloc[index]
+
+
+def get_sequence(structure: oechem.OEGraphMol) -> str:
+    """
+    Get the amino acid sequence with one letter characters of an OpenEye molecule holding a protein structure. All
+    residues not perceived as amino acid will receive the character 'X'.
+    Parameters
+    ----------
+    structure: oechem.OEGraphMol
+        An OpenEye molecule holding a protein structure.
+    Returns
+    -------
+    sequence: str
+        The amino acid sequence of the protein with one letter characters.
+    """
+    sequence = []
+    hv = oechem.OEHierView(structure)
+    for residue in hv.GetResidues():
+        if oechem.OEIsStandardProteinResidue(residue):
+            sequence.append(oechem.OEGetAminoAcidCode(oechem.OEGetResidueIndex(residue.GetResidueName())))
+        else:
+            sequence.append('X')
+    sequence = "".join(sequence)
+    return sequence
+
+
+def mutate_structure(target_structure: oechem.OEGraphMol, template_sequence: str) -> oechem.OEGraphMol:
+    """
+    Mutate a protein structure according to an amino acid sequence.
+    Parameters
+    ----------
+    target_structure: oechem.OEGraphMol
+        An OpenEye molecule holding a protein structure to mutate.
+    template_sequence: str
+        A template one letter amino acid sequence, which defines the sequence the target structure should be mutated
+        to. Protein residues not matching a template sequence will be either mutated or deleted.
+    Returns
+    -------
+    mutated_structure: oechem.OEGraphMol
+        An OpenEye molecule holding the mutated protein structure.
+    """
+    from Bio import pairwise2
+    import copy
+
+    # align template and target sequences
+    target_sequence = get_sequence(target_structure)
+    template_sequence, target_sequence = pairwise2.align.globalxs(template_sequence, target_sequence, -10, 0)[0][:2]
+
+    mutated_structure = copy.deepcopy(target_structure)  # don't touch input structure
+    hierview = oechem.OEHierView(mutated_structure)
+    structure_residues = hierview.GetResidues()
+    # adjust target structure to match template sequence
+    for template_sequence_residue, target_sequence_residue in zip(template_sequence, target_sequence):
+        if template_sequence_residue == '-':
+            # delete any non protein residue from target structure
+            structure_residue = structure_residues.next()
+            if target_sequence_residue != 'X':
+                # delete
+                for atom in structure_residue.GetAtoms():
+                    mutated_structure.DeleteAtom(atom)
+        else:
+            # compare amino acids
+            if target_sequence_residue != '-':
+                structure_residue = structure_residues.next()
+                if target_sequence_residue not in ['X', template_sequence_residue]:
+                    # mutate
+                    structure_residue = structure_residue.GetOEResidue()
+                    three_letter_code = oechem.OEGetResidueName(oechem.OEGetResidueIndexFromCode(template_sequence_residue))
+                    oespruce.OEMutateResidue(mutated_structure, structure_residue, three_letter_code)
+
+    return mutated_structure
+
+
+def renumber_structure(target_structure: oechem.OEGraphMol, residue_numbers: List[int]) -> oechem.OEGraphMol:
+    """
+    Renumber the residues of a protein structure according to the given list of residue numbers.
+    Parameters
+    ----------
+    target_structure: oechem.OEGraphMol
+        An OpenEye molecule holding the protein structure to renumber.
+    residue_numbers: list of int
+        A list of residue numbers matching the order of the target structure.
+    Returns
+    -------
+    renumbered_structure: oechem.OEGraphMol
+        An OpenEye molecule holding the cropped protein structure.
+    """
+    import copy
+
+    renumbered_structure = copy.deepcopy(target_structure)  # don't touch input structure
+    hierview = oechem.OEHierView(renumbered_structure)
+    structure_residues = hierview.GetResidues()
+    for residue_number, structure_residue in zip(residue_numbers, structure_residues):
+        structure_residue_mod = structure_residue.GetOEResidue()
+        structure_residue_mod.SetResidueNumber(residue_number)
+        for residue_atom in structure_residue.GetAtoms():
+            oechem.OEAtomSetResidue(residue_atom, structure_residue_mod)
+
+    return renumbered_structure
