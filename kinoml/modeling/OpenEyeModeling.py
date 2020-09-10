@@ -619,6 +619,9 @@ def mutate_structure(target_structure: oechem.OEGraphMol, template_sequence: str
                     structure_residue = structure_residue.GetOEResidue()
                     three_letter_code = oechem.OEGetResidueName(oechem.OEGetResidueIndexFromCode(template_sequence_residue))
                     oespruce.OEMutateResidue(mutated_structure, structure_residue, three_letter_code)
+    # OEMutateResidue doesn't build sidechains and doesn't add hydrogens automatically
+    oespruce.OEBuildSidechains(mutated_structure)  
+    oechem.OEPlaceHydrogens(mutated_structure)
 
     return mutated_structure
 
