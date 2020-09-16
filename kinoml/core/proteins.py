@@ -32,6 +32,7 @@ class FileProtein(BaseProtein):
             download_file(path, self.path)
         else:
             self.path = path
+        self.electron_density_path = electron_density_path
         if electron_density_path is not None:
             if electron_density_path.starswith("http"):
                 from appdirs import user_cache_dir
@@ -41,8 +42,6 @@ class FileProtein(BaseProtein):
                     f"{user_cache_dir()}/{self.name}.{path.split('.')[-1]}"
                 )
                 download_file(path, self.path)
-            else:
-                self.electron_density_path = electron_density_path
 
 
 class PDBProtein(FileProtein):
