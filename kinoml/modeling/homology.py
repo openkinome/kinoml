@@ -3,13 +3,14 @@ from ..core.sequences import KinaseDomainAminoAcidSequence
 
 
 class HomologyModel:  #  TODO inherent a Base class?
-    def __init__(self, *args, **kwargs):
-        from appdirs import user_cache_dir
-
-        self.alipath = f"{user_cache_dir()}/alignment.ali"
+    def __init__(self, metadata=None, *args, **kwargs):
         #  TODO specify id, template, and sequence here? e.g.:
 
-        #  self.identifier = identifier
+        if metadata is None:
+            metadata = {}
+        self.metadata = metadata
+
+        # self.identifier = identifier
         #  self.template = template
         #  self.sequence = sequence
 
@@ -273,11 +274,17 @@ class HomologyModel:  #  TODO inherent a Base class?
 
 
 class Alignment:
-    def __init__(self, metadata=None, alignment=None, *args, **kwargs):
+    def __init__(
+        self, metadata=None, alignment=None, alignment_file_path=None, *args, **kwargs
+    ):
+
+        from appdirs import user_cache_dir
+
         if metadata is None:
             metadata = {}
         self.metadata = metadata
         self.alignment = alignment
+        self.alignment_file_path = f"{user_cache_dir()}/alignment.ali"
 
     @classmethod
     def get_alignment(cls, seq1: str, seq2: str, local: bool = True):
@@ -286,6 +293,8 @@ class Alignment:
         import biotite.sequence.align as align
         import numpy as np
 
+        # create the default matrix
+        # TODO add more options for the choice of matrix
         matrix = align.SubstitutionMatrix.std_protein_matrix()
 
         alignments = align.align_optimal(
@@ -311,3 +320,56 @@ class Alignment:
                 "codes": codes,
             },
         )
+
+    @classmethod
+    def make_ali_file(
+        cls,
+        aligned_seq1: str,
+        aligned_seq2: str,
+        template: ProteinStructure,
+        target: KinaseDomainAminoAcidSequence,
+        path: str,
+    ):
+
+        # Convert None entries into dashes
+        conv = lambda i: i or "-"
+        seq1_dashed = [conv(i) for i in aligned_seq1]
+        seq2_dashed = [conv(i) for i in aligned_seq2]
+
+        # Setup formatting for alignment file
+        max_length = 75
+
+        # TODO make this more generalisable
+        # we assume target is not str (but it can be if kinase=False in HomologyModel.get_sequence())
+        # also need to handle if using backend='ncbi' in HomologyModel.get_sequence()
+        protein = template.metadata['id']
+        try:
+            sequence = target.metadata['uniprot_id']
+        except:
+            sequence = "sequence_ID"
+
+        # TODO add start and end residue numbers
+
+        # saving the file to path
+        with open(f"{path}", "w") as ali_file:
+            for i in range(len(seq1_dashed)):
+                if i == 0:
+                    ali_file.write(f"P1>;{protein}\n")
+                    ali_file.write(
+                        f"structureX:{protein}:     : :     : :::     :     \n"
+                    )
+                ali_file.write(seq1_dashed[i])
+                if (i + 1) % max_length == 0:
+                    ali_file.write("\n")
+
+            for i in range(len(seq2_dashed)):
+                # start new line below first sequence
+                if i == 0:
+                    ali_file.write("\n")
+                    ali_file.write(f"P1>;{sequence}\n")
+                    ali_file.write(
+                        f"sequence:{sequence}:     : :     : :::     :     \n"
+                    )
+                ali_file.write(seq2_dashed[i])
+                if (i + 1) % max_length == 0:
+                    ali_file.write("\n")
