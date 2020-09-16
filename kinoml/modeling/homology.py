@@ -83,28 +83,10 @@ class HomologyModel:  #  TODO inherent a Base class?
 
         return sequence
 
-    def get_alignment(seq1: str, seq2: str, local: bool = True):
-
-        import biotite.sequence as seq
-        import biotite.sequence.align as align
-        import numpy as np
-
-        matrix = align.SubstitutionMatrix.std_protein_matrix()
-
-        alignments = align.align_optimal(
-            seq.ProteinSequence(seq1),
-            seq.ProteinSequence(seq2),
-            matrix,
-            local=local,
-        )
-
-        alignment = alignments[0]
-
-        return alignment
-
     def get_modeller_alignment(
         self, template_system, canonical_sequence, pdb_entry=False, window=15
     ):
+
         #  WIP
         #  TODO write output to a logger
         import tempfile
@@ -288,3 +270,44 @@ class HomologyModel:  #  TODO inherent a Base class?
         # no way to specify output dir according to modeller docs
 
         a.make()
+
+
+class Alignment:
+    def __init__(self, metadata=None, alignment=None, *args, **kwargs):
+        if metadata is None:
+            metadata = {}
+        self.metadata = metadata
+        self.alignment = alignment
+
+    @classmethod
+    def get_alignment(cls, seq1: str, seq2: str, local: bool = True):
+
+        import biotite.sequence as seq
+        import biotite.sequence.align as align
+        import numpy as np
+
+        matrix = align.SubstitutionMatrix.std_protein_matrix()
+
+        alignments = align.align_optimal(
+            seq.ProteinSequence(seq1),
+            seq.ProteinSequence(seq2),
+            matrix,
+            local=local,
+        )
+
+        alignment = alignments[0]
+
+        score = alignment.score
+        seq_identity = align.get_sequence_identity(alignment)
+        symbols = align.get_symbols(alignment)
+        codes = align.get_codes(alignment)
+
+        return cls(
+            alignment=alignment,
+            metadata={
+                "score": score,
+                "sequence_identity": seq_identity,
+                "symbols": symbols,
+                "codes": codes,
+            },
+        )
