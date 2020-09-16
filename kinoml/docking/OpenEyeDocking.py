@@ -2,6 +2,8 @@ from typing import List, Tuple, Union
 
 from openeye import oechem
 
+from ..modeling.OpenEyeModeling import generate_reasonable_conformations
+
 
 def create_hybrid_receptor(
     protein: oechem.OEGraphMol, ligand: oechem.OEGraphMol
@@ -151,7 +153,7 @@ def _run_docking(
     docked_molecules: list of oechem.OEGraphMol
         A list of OpenEye molecules holding the docked molecules.
     """
-    from openeye import oedocking, oequacpac, oeomega
+    from openeye import oedocking
 
     # initialize receptor
     dock_resolution = oedocking.OESearchResolution_High
@@ -167,41 +169,20 @@ def _run_docking(
 
     # dock molecules
     for molecule in molecules:
-        # enumerate tautomers
-        tautomer_options = oequacpac.OETautomerOptions()
-        tautomer_options.SetMaxTautomersGenerated(4096)
-        tautomer_options.SetMaxTautomersToReturn(16)
-        tautomer_options.SetCarbonHybridization(True)
-        tautomer_options.SetMaxZoneSize(50)
-        tautomer_options.SetApplyWarts(True)
-        pKa_norm = True
-        tautomers = [
-            oechem.OEMol(tautomer)
-            for tautomer in oequacpac.OEGetReasonableTautomers(
-                molecule, tautomer_options, pKa_norm
-            )
-        ]
-
-        # set up omega
-        # TODO: Improve omega options
-        omega_options = oeomega.OEOmegaOptions()
-        omega_options.SetMaxSearchTime(60.0)  # time out
-        omega = oeomega.OEOmega(omega_options)
-        omega.SetStrictStereo(False)  # enumerate stereochemistry if uncertain
+        # tautomers, enantiomers, conformations
+        conformations_ensemble = generate_reasonable_conformations(molecule)
 
         docked_tautomers = list()
         # dock tautomers
-        for mol in tautomers:
+        for conformations in conformations_ensemble:
             docked_mol = oechem.OEMol()
-            # expand conformers
-            omega.Build(mol)
 
             # dock molecule
-            return_code = dock.DockMultiConformerMolecule(docked_mol, mol, num_poses)
+            return_code = dock.DockMultiConformerMolecule(docked_mol, conformations, num_poses)
             if return_code != oedocking.OEDockingReturnCode_Success:
                 # TODO: Maybe something for logging
                 print(
-                    f"Docking failed for molecule with title {mol.GetTitle()} with error code "
+                    f"Docking failed for molecule with title {conformations.GetTitle()} with error code "
                     f"{oedocking.OEDockingReturnCodeGetName(return_code)}."
                 )
                 continue
