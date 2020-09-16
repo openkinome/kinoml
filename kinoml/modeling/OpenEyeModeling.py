@@ -500,11 +500,11 @@ def generate_enantiomers(
     return enantiomers
 
 
-def generate_conformers(
+def generate_conformations(
     molecule: oechem.OEGraphMol, max_conformations: int = 1000
 ) -> oechem.OEMol:
     """
-    Generate enantiomers of a given molecule.
+    Generate conformations of a given molecule.
     Parameters
     ----------
     molecule: oechem.OEGraphMol
@@ -513,7 +513,7 @@ def generate_conformers(
         Maximal number of conformations to generate.
     Returns
     -------
-    conformers: oechem.OEMol
+    conformations: oechem.OEMol
         An OpenEye multi-conformer molecule holding the generated conformations.
     """
     from openeye import oechem, oeomega
@@ -523,9 +523,32 @@ def generate_conformers(
     omega_options.SetMaxConfs(max_conformations)
     omega = oeomega.OEOmega(omega_options)
     omega.SetStrictStereo(False)
-    conformers = oechem.OEMol(molecule)
-    omega.Build(conformers)
-    return conformers
+    conformations = oechem.OEMol(molecule)
+    omega.Build(conformations)
+    return conformations
+
+
+def generate_reasonable_conformations(molecule: oechem.OEGraphMol) -> List[oechem.OEMol]:
+    """
+    Generate conformations of reasonable enantiomers and tautomers of a given molecule.
+    Parameters
+    ----------
+    molecule: oechem.ORGraphMol
+        An OpenEye molecule.
+    Returns
+    -------
+    conformations_ensemble: list of oechem.OEMol
+        A list of multi-conformer molecules.
+    """
+    import itertools
+
+    tautomers = generate_tautomers(molecule)
+    enantiomers = [generate_enantiomers(tautomer) for tautomer in tautomers]
+    conformations_ensemble = [
+        generate_conformations(enantiomer)
+        for enantiomer in itertools.chain.from_iterable(enantiomers)
+    ]
+    return conformations_ensemble
 
 
 def overlay_molecules(
@@ -616,12 +639,7 @@ def select_structure(uniprot_id: str, smiles: str) -> Union[None, pd.Series]:
 
         # get reasonable conformations of ligand of interest
         ligand = read_smiles(smiles)
-        tautomers = generate_tautomers(ligand)
-        enantiomers = [generate_enantiomers(tautomer) for tautomer in tautomers]
-        conformations_ensemble = [
-            generate_conformers(enantiomer)
-            for enantiomer in itertools.chain.from_iterable(enantiomers)
-        ]
+        conformations_ensemble = generate_reasonable_conformations(ligand)
 
         # overlay and score
         scores = []
