@@ -83,7 +83,26 @@ class HomologyModel:  #  TODO inherent a Base class?
 
         return sequence
 
-    def get_alignment(
+    def get_alignment(seq1: str, seq2: str, local: bool = True):
+
+        import biotite.sequence as seq
+        import biotite.sequence.align as align
+        import numpy as np
+
+        matrix = align.SubstitutionMatrix.std_protein_matrix()
+
+        alignments = align.align_optimal(
+            seq.ProteinSequence(seq1),
+            seq.ProteinSequence(seq2),
+            matrix,
+            local=local,
+        )
+
+        alignment = alignments[0]
+
+        return alignment
+
+    def get_modeller_alignment(
         self, template_system, canonical_sequence, pdb_entry=False, window=15
     ):
         #  WIP
