@@ -600,8 +600,11 @@ def select_structure(uniprot_id: str, smiles: str) -> Union[None, pd.Series]:
         by=["alt", "chain", "quality_score"], ascending=[True, True, False]
     )
 
-    # search for kinase structures with orthosteric ligand
+    # filter for kinase structures with orthosteric ligand
     kinase_complexes = kinases[kinases.ligand != 0]
+    # filter for structures with no allosteric ligand
+    kinase_complexes = kinase_complexes[kinase_complexes.allosteric_ligand == 0]
+
     if len(kinase_complexes) == 0:  # pick structure with highest quality
         return kinases.iloc[0]
     else:  # pick structure with similar ligand and high quality
