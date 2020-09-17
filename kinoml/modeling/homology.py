@@ -1,5 +1,6 @@
 from ..core.proteins import ProteinStructure
 from ..core.sequences import KinaseDomainAminoAcidSequence
+from typing import Union
 
 
 class HomologyModel:  #  TODO inherent a Base class?
@@ -327,7 +328,7 @@ class Alignment:
         aligned_seq1: str,
         aligned_seq2: str,
         template: ProteinStructure,
-        target: KinaseDomainAminoAcidSequence,
+        target: Union[str, KinaseDomainAminoAcidSequence],
         path: str,
     ):
 
@@ -336,17 +337,19 @@ class Alignment:
         seq1_dashed = [conv(i) for i in aligned_seq1]
         seq2_dashed = [conv(i) for i in aligned_seq2]
 
-        # Setup formatting for alignment file
+        # Setup formatting for MODELLER alignment file
         max_length = 75
 
-        # TODO make this more generalisable
-        # we assume target is not str (but it can be if kinase=False in HomologyModel.get_sequence())
-        # also need to handle if using backend='ncbi' in HomologyModel.get_sequence()
-        protein = template.metadata['id']
+        protein_id = template.metadata["id"]
+
+        # TODO handle if using backend='ncbi' in HomologyModel.get_sequence()
+
+        # handle if target is KinaseDomainAminoAcidSequence vs. str
         try:
-            sequence = target.metadata['uniprot_id']
+            sequence_id = getattr(target, "metadata")["uniprot_id"]
         except:
-            sequence = "sequence_ID"
+            # TODO handle the name well if type(target) is str
+            sequence_id = "sequence_id"
 
         # TODO add start and end residue numbers
 
@@ -354,9 +357,9 @@ class Alignment:
         with open(f"{path}", "w") as ali_file:
             for i in range(len(seq1_dashed)):
                 if i == 0:
-                    ali_file.write(f"P1>;{protein}\n")
+                    ali_file.write(f"P1>;{protein_id}\n")
                     ali_file.write(
-                        f"structureX:{protein}:     : :     : :::     :     \n"
+                        f"structureX:{protein_id}:     : :     : :::     :     \n"
                     )
                 ali_file.write(seq1_dashed[i])
                 if (i + 1) % max_length == 0:
@@ -366,9 +369,9 @@ class Alignment:
                 # start new line below first sequence
                 if i == 0:
                     ali_file.write("\n")
-                    ali_file.write(f"P1>;{sequence}\n")
+                    ali_file.write(f"P1>;{sequence_id}\n")
                     ali_file.write(
-                        f"sequence:{sequence}:     : :     : :::     :     \n"
+                        f"sequence:{sequence_id}:     : :     : :::     :     \n"
                     )
                 ali_file.write(seq2_dashed[i])
                 if (i + 1) % max_length == 0:
