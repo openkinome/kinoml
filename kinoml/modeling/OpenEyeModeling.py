@@ -160,7 +160,7 @@ def _OEFixWaterFragmentNumbers(solvent):
             fragment_counter[res.GetFragmentNumber()] = 0
         fragment_counter[res.GetFragmentNumber()] += 1
     largest_solvent_fn_count = -1
-    largest_solvent_fn = - 1
+    largest_solvent_fn = -1
     for fn in fragment_counter:
         if fragment_counter[fn] > largest_solvent_fn_count:
             largest_solvent_fn_count = fragment_counter[fn]
@@ -177,7 +177,9 @@ def _OEFixConnectionNH(protein):
     """
     Temporary fix, thanks to Jesper!
     """
-    for atom in protein.GetAtoms(oechem.OEAndAtom(oespruce.OEIsModeledAtom(), oechem.OEIsNitrogen())):
+    for atom in protein.GetAtoms(
+        oechem.OEAndAtom(oespruce.OEIsModeledAtom(), oechem.OEIsNitrogen())
+    ):
         if oechem.OEGetPDBAtomIndex(atom) == oechem.OEPDBAtomName_N:
             expected_h_count = 1
             if oechem.OEGetResidueIndex(atom) == oechem.OEResidueIndex_PRO:
@@ -528,7 +530,9 @@ def generate_conformations(
     return conformations
 
 
-def generate_reasonable_conformations(molecule: oechem.OEGraphMol) -> List[oechem.OEMol]:
+def generate_reasonable_conformations(
+    molecule: oechem.OEGraphMol,
+) -> List[oechem.OEMol]:
     """
     Generate conformations of reasonable enantiomers and tautomers of a given molecule.
     Parameters
@@ -549,6 +553,44 @@ def generate_reasonable_conformations(molecule: oechem.OEGraphMol) -> List[oeche
         for enantiomer in itertools.chain.from_iterable(enantiomers)
     ]
     return conformations_ensemble
+
+
+def optimize_poses(
+    docking_poses: List[oechem.OEGraphMol],
+    protein: Union[oechem.OEMolBase, oechem.OEGraphMol],
+) -> List[oechem.OEGraphMol]:
+    """
+    Optimize the torsions of docking poses in a protein binding site.
+    Parameters
+    ----------
+    docking_poses: list of oechem.OEGraphMol
+        The docking poses to optimize.
+    protein: oechem.OEGraphMol or oechem.MolBase
+        The OpenEye molecule holding a protein structure.
+    Returns
+    -------
+    optimized_docking_poses: list of oechem.OEGraphMol
+        The optimized docking poses.
+    """
+    from openeye import oeszybki
+
+    options = oeszybki.OESzybkiOptions()
+    options.SetRunType(oeszybki.OERunType_TorsionsOpt)
+    options.GetProteinOptions().SetExactVdWProteinLigand(True)
+    options.GetProteinOptions().SetProteinElectrostaticModel(
+        oeszybki.OEProteinElectrostatics_ExactCoulomb
+    )
+    options.GetOptOptions().SetGradTolerance(0.00001)
+    szybki = oeszybki.OESzybki(options)
+    szybki.SetProtein(protein)
+
+    optimized_docking_poses = []
+    for docking_pose in docking_poses:
+        result = oeszybki.OESzybkiResults()
+        szybki(docking_pose, result)
+        optimized_docking_poses.append(oechem.OEGraphMol(docking_pose))
+
+    return optimized_docking_poses
 
 
 def overlay_molecules(
@@ -672,14 +714,20 @@ def get_sequence(structure: oechem.OEGraphMol) -> str:
     hv = oechem.OEHierView(structure)
     for residue in hv.GetResidues():
         if oechem.OEIsStandardProteinResidue(residue):
-            sequence.append(oechem.OEGetAminoAcidCode(oechem.OEGetResidueIndex(residue.GetResidueName())))
+            sequence.append(
+                oechem.OEGetAminoAcidCode(
+                    oechem.OEGetResidueIndex(residue.GetResidueName())
+                )
+            )
         else:
-            sequence.append('X')
+            sequence.append("X")
     sequence = "".join(sequence)
     return sequence
 
 
-def mutate_structure(target_structure: oechem.OEGraphMol, template_sequence: str) -> oechem.OEGraphMol:
+def mutate_structure(
+    target_structure: oechem.OEGraphMol, template_sequence: str
+) -> oechem.OEGraphMol:
     """
     Mutate a protein structure according to an amino acid sequence.
     Parameters
@@ -699,37 +747,47 @@ def mutate_structure(target_structure: oechem.OEGraphMol, template_sequence: str
 
     # align template and target sequences
     target_sequence = get_sequence(target_structure)
-    template_sequence, target_sequence = pairwise2.align.globalxs(template_sequence, target_sequence, -10, 0)[0][:2]
+    template_sequence, target_sequence = pairwise2.align.globalxs(
+        template_sequence, target_sequence, -10, 0
+    )[0][:2]
 
     mutated_structure = copy.deepcopy(target_structure)  # don't touch input structure
     hierview = oechem.OEHierView(mutated_structure)
     structure_residues = hierview.GetResidues()
     # adjust target structure to match template sequence
-    for template_sequence_residue, target_sequence_residue in zip(template_sequence, target_sequence):
-        if template_sequence_residue == '-':
+    for template_sequence_residue, target_sequence_residue in zip(
+        template_sequence, target_sequence
+    ):
+        if template_sequence_residue == "-":
             # delete any non protein residue from target structure
             structure_residue = structure_residues.next()
-            if target_sequence_residue != 'X':
+            if target_sequence_residue != "X":
                 # delete
                 for atom in structure_residue.GetAtoms():
                     mutated_structure.DeleteAtom(atom)
         else:
             # compare amino acids
-            if target_sequence_residue != '-':
+            if target_sequence_residue != "-":
                 structure_residue = structure_residues.next()
-                if target_sequence_residue not in ['X', template_sequence_residue]:
+                if target_sequence_residue not in ["X", template_sequence_residue]:
                     # mutate
                     structure_residue = structure_residue.GetOEResidue()
-                    three_letter_code = oechem.OEGetResidueName(oechem.OEGetResidueIndexFromCode(template_sequence_residue))
-                    oespruce.OEMutateResidue(mutated_structure, structure_residue, three_letter_code)
+                    three_letter_code = oechem.OEGetResidueName(
+                        oechem.OEGetResidueIndexFromCode(template_sequence_residue)
+                    )
+                    oespruce.OEMutateResidue(
+                        mutated_structure, structure_residue, three_letter_code
+                    )
     # OEMutateResidue doesn't build sidechains and doesn't add hydrogens automatically
-    oespruce.OEBuildSidechains(mutated_structure)  
+    oespruce.OEBuildSidechains(mutated_structure)
     oechem.OEPlaceHydrogens(mutated_structure)
 
     return mutated_structure
 
 
-def renumber_structure(target_structure: oechem.OEGraphMol, residue_numbers: List[int]) -> oechem.OEGraphMol:
+def renumber_structure(
+    target_structure: oechem.OEGraphMol, residue_numbers: List[int]
+) -> oechem.OEGraphMol:
     """
     Renumber the residues of a protein structure according to the given list of residue numbers.
     Parameters
@@ -745,7 +803,9 @@ def renumber_structure(target_structure: oechem.OEGraphMol, residue_numbers: Lis
     """
     import copy
 
-    renumbered_structure = copy.deepcopy(target_structure)  # don't touch input structure
+    renumbered_structure = copy.deepcopy(
+        target_structure
+    )  # don't touch input structure
     hierview = oechem.OEHierView(renumbered_structure)
     structure_residues = hierview.GetResidues()
     for residue_number, structure_residue in zip(residue_numbers, structure_residues):
