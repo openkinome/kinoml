@@ -2,8 +2,6 @@ from typing import List, Tuple, Union
 
 from openeye import oechem
 
-from ..modeling.OpenEyeModeling import generate_reasonable_conformations
-
 
 def create_hybrid_receptor(
     protein: oechem.OEGraphMol, ligand: oechem.OEGraphMol
@@ -147,6 +145,7 @@ def pose_molecules(
         A list of OpenEye molecules holding the docked molecules.
     """
     from openeye import oedocking
+    from ..modeling.OpenEyeModeling import generate_reasonable_conformations
 
     def probability(molecule: oechem.OEGraphMol):
         """Return the pose probability."""
@@ -189,7 +188,7 @@ def pose_molecules(
         # sort all conformations of all tautomers and enantiomers by score
         posed_conformations.sort(key=probability, reverse=True)
 
-        posed_molecules += posed_conformations
+        posed_molecules.append(posed_conformations[0])
 
     if len(posed_molecules) == 0:
         # TODO: returning None when something goes wrong
@@ -222,6 +221,7 @@ def _run_docking(
         A list of OpenEye molecules holding the docked molecules.
     """
     from openeye import oedocking
+    from ..modeling.OpenEyeModeling import generate_reasonable_conformations
 
     # initialize receptor
     dock_resolution = oedocking.OESearchResolution_High
