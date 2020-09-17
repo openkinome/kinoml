@@ -1,4 +1,4 @@
-from typing import List, Union
+from typing import List, Set, Union
 
 from openeye import oechem, oegrid, oespruce
 import pandas as pd
@@ -636,6 +636,56 @@ def overlay_molecules(
         return score.GetTanimotoCombo(), overlay
 
 
+def generate_isomeric_smiles_representations(molecule: oechem.OEGraphMol) -> Set[str]:
+    """
+    Generate reasonable isomeric smiles of a given OpenEye molecule.
+    Parameters
+    ----------
+    molecule: oechem.OEGraphMol
+        An OpenEye molecule.
+    Returns
+    -------
+    smiles_set: set of str
+        A set of reasonable isomeric smiles strings.
+    """
+    import itertools
+
+    tautomers = generate_tautomers(molecule)
+    enantiomers = [generate_enantiomers(tautomer) for tautomer in tautomers]
+    smiles_set = set(
+        [
+            oechem.OEMolToSmiles(enantiomer)
+            for enantiomer in itertools.chain.from_iterable(enantiomers)
+        ]
+    )
+    return smiles_set
+
+
+def compare_molecules(
+    molecule1: oechem.OEGraphMol, molecule2: oechem.OEGraphMol
+) -> bool:
+    """
+    Compare two smiles strings.
+    Parameters
+    ----------
+    molecule1: oechem.OEGraphMol
+        The first OpenEye molecule.
+    molecule2: oechem.OEGraphMol
+        The second OpenEye molecule.
+    Returns
+    -------
+    : bool
+        True if same molecules, else False.
+    """
+    reasonable_isomeric_smiles1 = generate_isomeric_smiles_representations(molecule1)
+    reasonable_isomeric_smiles2 = generate_isomeric_smiles_representations(molecule2)
+
+    if len(reasonable_isomeric_smiles1 & reasonable_isomeric_smiles2) == 0:
+        return False
+    else:
+        return True
+
+
 def select_structure(uniprot_id: str, smiles: str) -> Union[None, pd.Series]:
     """
     Select a suitable kinase structure for docking a small molecule into the orthosteric pocket.
@@ -660,7 +710,6 @@ def select_structure(uniprot_id: str, smiles: str) -> Union[None, pd.Series]:
 
     # sort by quality according to KLIFS classification
     # high quality structures come first
-    # TODO: additional filtering -> Abl1: nilotinib -> 5mo4 (with allosteric ligand and mutations) preferred over 3cs9
     kinases = kinases.sort_values(
         by=["alt", "chain", "quality_score"], ascending=[True, True, False]
     )
@@ -679,8 +728,13 @@ def select_structure(uniprot_id: str, smiles: str) -> Union[None, pd.Series]:
             for structure_id in kinase_complexes.structure_ID
         ]
 
-        # get reasonable conformations of ligand of interest
+        # try to find an identical co-crystallized ligand
         ligand = read_smiles(smiles)
+        for i, complex_ligand in enumerate(complex_ligands):
+            if compare_molecules(ligand, complex_ligand):
+                return kinase_complexes.iloc[i]
+
+        # get reasonable conformations of ligand of interest
         conformations_ensemble = generate_reasonable_conformations(ligand)
 
         # overlay and score
@@ -744,6 +798,12 @@ def mutate_structure(
     """
     from Bio import pairwise2
     import copy
+    import tempfile
+
+    # reloading structure helps for some reason
+    with tempfile.NamedTemporaryFile(suffix=".pdb") as temp_file:
+        write_molecules([target_structure], temp_file.name)
+        target_structure = read_molecules(temp_file.name)[0]
 
     # align template and target sequences
     target_sequence = get_sequence(target_structure)
@@ -775,9 +835,12 @@ def mutate_structure(
                     three_letter_code = oechem.OEGetResidueName(
                         oechem.OEGetResidueIndexFromCode(template_sequence_residue)
                     )
-                    oespruce.OEMutateResidue(
+                    if not oespruce.OEMutateResidue(
                         mutated_structure, structure_residue, three_letter_code
-                    )
+                    ):  # not sure why a second time helps
+                        oespruce.OEMutateResidue(
+                            mutated_structure, structure_residue, three_letter_code
+                        )
     # OEMutateResidue doesn't build sidechains and doesn't add hydrogens automatically
     oespruce.OEBuildSidechains(mutated_structure)
     oechem.OEPlaceHydrogens(mutated_structure)
