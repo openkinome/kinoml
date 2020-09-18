@@ -2,6 +2,7 @@ from ..core.proteins import ProteinStructure
 from ..core.sequences import KinaseDomainAminoAcidSequence
 from .alignment import Alignment
 
+
 class HomologyModel:  #  TODO inherent a Base class?
     def __init__(self, metadata=None, *args, **kwargs):
         #  TODO specify id, template, and sequence here? e.g.:
@@ -90,6 +91,7 @@ class HomologyModel:  #  TODO inherent a Base class?
         target_sequence: KinaseDomainAminoAcidSequence,
         alignment: Alignment,
         num_models: int = 100,
+        ligand: bool = False
     ):
         """
         Generate homology model(s) based on a template and alignment with MODELLER
@@ -104,6 +106,9 @@ class HomologyModel:  #  TODO inherent a Base class?
             sequences must be the same as present in template_system and target_sequence
         num_models: int
             The number of homology models to generate. default = 100
+        ligand: bool
+            Specify whether to include a bound ligand present in the template structure.
+            (Default: False)
         Returns
         -------
         """
@@ -120,6 +125,11 @@ class HomologyModel:  #  TODO inherent a Base class?
             template_system.metadata["path"].split(".")[0].split(pdb_id)[0]
         ]
 
+        # TODO: Fix model generation if ligand present
+        if ligand:
+            # Read in HETATM records from template
+            env.io.hetatm = True
+
         # TODO handle usage of "ncbi" instead of "uniprot_id"
         a = dope_loopmodel(
             env,
@@ -135,4 +145,3 @@ class HomologyModel:  #  TODO inherent a Base class?
         # TODO could add loop refinement option here
         # TODO need to specify output directory for models
         a.make()
-

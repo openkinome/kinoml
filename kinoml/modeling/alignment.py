@@ -70,10 +70,40 @@ class Alignment:
             },
         )
 
+    def _format_alignment_with_ligands(self, template, aligned_target_seq):
+
+        from MDAnalysis.lib.util import convert_aa_code
+
+        sel = template.universe.select_atoms("protein and name CA")
+        resnames = sel.resnames.tolist()
+        resnames_one_letter = [convert_aa_code(x) for x in resnames]
+
+        # get the last four AAs in the aligned target sequence
+        end_chunk = aligned_target_seq[-4:][::-1]
+        aa_store = []
+        # loop over residues in reverse
+        for i, letter in enumerate(resnames_one_letter[::-1]):
+            # read a chunk of four AAs
+            current_chunk = resnames_one_letter[::-1][i : i + 4]
+
+            # if the end of the aligned target sequence is hit, stop
+            if current_chunk == end_chunk:
+                break
+            # otherwise store the one letter AAs that need to be added
+            else:
+                aa_store.append(letter)
+
+        # create a one element list of dashes
+        dashes = "".join(["-" for x in aa_store])
+        # create one element list of AAs in the canonical order
+        amino_acids = "".join(aa_store[::-1])
+
+        return amino_acids, dashes
+
     def make_ali_file(
         self,
-        aligned_seq1: str,
-        aligned_seq2: str,
+        aligned_template_seq: str,
+        aligned_target_seq: str,
         template: ProteinStructure,
         target: Union[str, KinaseDomainAminoAcidSequence],
         ligand: bool = False,
@@ -81,14 +111,14 @@ class Alignment:
         """
         Generate an alignment file in MODELLER format
         ----------
-        aligned_seq1: str
-            The first aligned sequence
-        aligned_seq1: str
-            The second aligned sequence
+        aligned_template_seq: str
+            The aligned template sequence
+        aligned_target_seq: str
+            The aligned target sequence
         template: ProteinStructure
-            The template to be used in the alignment
+            The template structure
         target: list of str or KinaseDomainAminoAcidSequence
-            The target sequence to be used in the alignment
+            The original target sequence
         ligand: bool
             Specify whether to retain a ligand in the alignment.
             (Default: False)
@@ -98,8 +128,8 @@ class Alignment:
 
         # Convert None entries into dashes
         conv = lambda i: i or "-"
-        seq1_dashed = [conv(i) for i in aligned_seq1]
-        seq2_dashed = [conv(i) for i in aligned_seq2]
+        seq1_dashed = [conv(i) for i in aligned_template_seq]
+        seq2_dashed = [conv(i) for i in aligned_target_seq]
 
         # Setup formatting for MODELLER alignment file
         max_length = 75
@@ -127,7 +157,15 @@ class Alignment:
         protein_start = resids[protein_start_index]
         protein_end = ""
 
+        
+        if ligand:
+            # extract the AAs and No. dashes that need to be added in the alignment
+            tail_amino_acids, tail_dashes = self._format_alignment_with_ligands(
+                template, aligned_target_seq
+            )
+
         # write alignment file in MODELLER format
+        # TODO fix syntax for specifying ligand
         with open(f"{self.alignment_file_path}", "w") as ali_file:
             for i in range(len(seq1_dashed)):
                 if i == 0:
@@ -138,7 +176,7 @@ class Alignment:
                 ali_file.write(seq1_dashed[i])
                 if i == len(seq1_dashed) - 1:
                     if ligand:
-                        ali_file.write(".*")
+                        ali_file.write(f"{tail_amino_acids}/.*")
                     else:
                         ali_file.write("*")
                 if (i + 1) % max_length == 0:
@@ -148,13 +186,18 @@ class Alignment:
                 # start new line below first sequence
                 if i == 0:
                     ali_file.write(f"\n>P1;{sequence_id}\n")
-                    ali_file.write(
-                        f"sequence:{sequence_id}:{sequence_begin}: :{sequence_end}: :::     :     \n"
-                    )
+                    if ligand:
+                        ali_file.write(
+                            f"sequence:{sequence_id}:{sequence_begin}: :{sequence_end + len(tail_dashes)}: :::     :     \n"
+                        )
+                    else:
+                        ali_file.write(
+                            f"sequence:{sequence_id}:{sequence_begin}: :{sequence_end}: :::     :     \n"
+                        )
                 ali_file.write(seq2_dashed[i])
                 if i == len(seq2_dashed) - 1:
                     if ligand:
-                        ali_file.write(".*")
+                        ali_file.write(f"{tail_dashes}/.*")
                     else:
                         ali_file.write("*")
                 if (i + 1) % max_length == 0:
