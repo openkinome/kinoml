@@ -70,7 +70,7 @@ class Alignment:
             },
         )
 
-    def _format_alignment_with_ligands(self, template, aligned_target_seq):
+    def _format_alignment_with_ligands(self, template, aligned_template_seq):
 
         from MDAnalysis.lib.util import convert_aa_code
 
@@ -79,7 +79,7 @@ class Alignment:
         resnames_one_letter = [convert_aa_code(x) for x in resnames]
 
         # get the last four AAs in the aligned target sequence
-        end_chunk = aligned_target_seq[-4:][::-1]
+        end_chunk = aligned_template_seq[-4:][::-1]
         aa_store = []
         # loop over residues in reverse
         for i, letter in enumerate(resnames_one_letter[::-1]):
@@ -161,11 +161,11 @@ class Alignment:
         if ligand:
             # extract the AAs and No. dashes that need to be added in the alignment
             tail_amino_acids, tail_dashes = self._format_alignment_with_ligands(
-                template, aligned_target_seq
+                template, aligned_template_seq
             )
 
         # write alignment file in MODELLER format
-        # TODO fix syntax for specifying ligand
+        # TODO fix formatting when ligand = True (line length)
         with open(f"{self.alignment_file_path}", "w") as ali_file:
             for i in range(len(seq1_dashed)):
                 if i == 0:
