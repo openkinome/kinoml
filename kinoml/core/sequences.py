@@ -301,7 +301,7 @@ class KinaseDomainAminoAcidSequence(Biosequence):
             Uniprot identifier(s). Multiple can be provided.
         Returns
         -------
-        kinase_domain_sequences: KinaseDomainAminoAcidSequence or list of KinaseDomainAminoAcidSequence or None
+        kinase_domain_sequences: list of KinaseDomainAminoAcidSequence
             Retrieved kinase domain amino acid sequence(s).
         """
         import requests
@@ -347,8 +347,4 @@ class KinaseDomainAminoAcidSequence(Biosequence):
                             )
                         )
 
-        if len(objects) == 0:
-            return None
-        elif len(objects) == 1:
-            return objects[0]
         return objects
