@@ -208,6 +208,20 @@ def _OEFixLoopIssues(du):
     _OEFixWaterFragmentNumbers(solvent)
 
 
+def _OEFixMissingOXT(du):
+    """
+    Temporary fix, thanks to Jesper!
+    """
+    impl = du.GetImpl()
+    protein = impl.GetProtein()
+
+    for atom in protein.GetAtoms():
+        if "H'" in atom.GetName():
+            atom.SetAtomicNum(8)
+            atom.SetName("OXT")
+            atom.SetFormalCharge(-1)
+
+
 def _prepare_structure(
     structure: oechem.OEGraphMol,
     has_ligand: bool,
@@ -215,7 +229,7 @@ def _prepare_structure(
     loop_db: Union[str, None] = None,
     cap_termini: bool = True,
     real_termini: Union[List[int], None] = None,
-) -> Union[List[Union[oechem.OEGraphMol, None]], oechem.OEGraphMol, None]:
+) -> Union[oechem.OEDesignUnit, None]:
     """
     Prepare an OpenEye molecule holding a protein ligand complex for docking.
     Parameters
@@ -234,10 +248,9 @@ def _prepare_structure(
         Residue numbers of biologically real termini will not be capped with ACE and NME.
     Returns
     -------
-    protein: oechem.OEGraphMol
-        An OpenEye molecule holding a prepared protein structure.
-    ligand: oechem.OEGraphMol
-        An OpenEye molecule holding a prepared ligand structure.
+    design_unit: oechem.OEDesignUnit or None
+        An OpenEye design unit holding the prepared structure with the highest quality among all identified design
+        units.
     """
 
     def _has_residue_number(atom, residue_numbers=real_termini):
@@ -297,32 +310,14 @@ def _prepare_structure(
     elif len(design_units) > 1:
         design_unit = design_units[0]
     else:
-        # TODO: Returns None or list of Nones if something goes wrong
-        if has_ligand:
-            return [None, None]
-        else:
-            return None
+        # TODO: Returns None if something goes wrong
+        return None
 
-    # fix loop issues
+    # fix loop issues and missing OXT
     _OEFixLoopIssues(design_unit)
+    _OEFixMissingOXT(design_unit)
 
-    # get protein
-    protein = oechem.OEGraphMol()
-    design_unit.GetProtein(protein)
-
-    # add missing OXT backbone atoms, not handled by OEFixBackbone in OESpruce 1.1.0
-    for atom in protein.GetAtoms():
-        if "H'" in atom.GetName():
-            atom.SetAtomicNum(8)
-            atom.SetName("OXT")
-            atom.SetFormalCharge(-1)
-    if has_ligand:
-        # get ligand
-        ligand = oechem.OEGraphMol()
-        design_unit.GetLigand(ligand)
-        return [protein, ligand]
-    else:
-        return protein
+    return design_unit
 
 
 def prepare_complex(
@@ -331,7 +326,7 @@ def prepare_complex(
     loop_db: Union[str, None] = None,
     cap_termini: bool = True,
     real_termini: Union[List[int], None] = None,
-) -> List[Union[oechem.OEGraphMol, None]]:
+) -> Union[oechem.OEDesignUnit, None]:
     """
     Prepare an OpenEye molecule holding a protein ligand complex for docking.
     Parameters
@@ -348,10 +343,9 @@ def prepare_complex(
         Residue numbers of biologically real termini will not be capped with ACE and NME.
     Returns
     -------
-    protein: oechem.OEGraphMol
-        An OpenEye molecule holding a prepared protein structure.
-    ligand: oechem.OEGraphMol
-        An OpenEye molecule holding a prepared ligand structure.
+    design_unit: oechem.OEDesignUnit or None
+        An OpenEye design unit holding the prepared structure with the highest quality among all identified design
+        units.
     """
     return _prepare_structure(
         structure=protein_ligand_complex,
@@ -368,7 +362,7 @@ def prepare_protein(
     loop_db: Union[str, None] = None,
     cap_termini: bool = True,
     real_termini: Union[List[int], None] = None,
-) -> Union[oechem.OEGraphMol, None]:
+) -> Union[oechem.OEDesignUnit, None]:
     """
     Prepare an OpenEye molecule holding a protein structure for docking.
     Parameters
@@ -383,8 +377,9 @@ def prepare_protein(
         Residue numbers of biologically real termini will not be capped with ACE and NME.
     Returns
     -------
-    protein: oechem.OEGraphMol
-        An OpenEye molecule holding a prepared protein structure.
+    design_unit: oechem.OEDesignUnit or None
+        An OpenEye design unit holding the prepared structure with the highest quality among all identified design
+        units.
     """
     return _prepare_structure(
         structure=protein,

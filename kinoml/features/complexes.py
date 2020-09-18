@@ -59,6 +59,8 @@ class OpenEyesProteinLigandDockingFeaturizer(BaseFeaturizer):
         protein_ligand_complex: ProteinLigandComplex
             The same system but with docked ligand.
         """
+        from openeye import oechem
+
         if isinstance(system.ligand, SmilesLigand):
             ligands = [read_smiles(system.ligand.smiles)]
         else:
@@ -75,15 +77,19 @@ class OpenEyesProteinLigandDockingFeaturizer(BaseFeaturizer):
         # TODO: more sophisticated decision between hybrid and chemgauss docking
         if has_ligand(protein):
 
-            prepared_protein, prepared_ligand = prepare_complex(
-                protein, electron_density, self.loop_db
-            )
+            design_unit = prepare_complex(protein, electron_density, self.loop_db)
+            prepared_protein = oechem.OEGraphMol()
+            prepared_ligand = oechem.OEGraphMol()
+            design_unit.GetProtein(prepared_protein)
+            design_unit.GetLigand(prepared_ligand)
             hybrid_receptor = create_hybrid_receptor(prepared_protein, prepared_ligand)
             docking_poses = hybrid_docking(hybrid_receptor, ligands)
         else:  # TODO: this is very kinase specific, should be more generic
             if isinstance(system.protein, PDBProtein):
                 # TODO: check possibility to define design unit with residue (would consider electron density)
-                prepared_protein = prepare_protein(protein, self.loop_db)
+                design_unit = prepare_protein(protein, self.loop_db)
+                prepared_protein = oechem.OEGraphMol()
+                design_unit.GetProtein(prepared_protein)
                 klifs_pocket = PDBProtein.klifs_pocket(
                     system.protein.pdb_id
                 )  # TODO: specify chain and altloc
