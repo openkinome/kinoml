@@ -346,9 +346,13 @@ class Alignment:
         # handle if target is KinaseDomainAminoAcidSequence vs. str
         try:
             sequence_id = getattr(target, "metadata")["uniprot_id"]
+            sequence_begin = getattr(target, "metadata")["begin"]
+            sequence_end = getattr(target, "metadata")["end"]
         except:
-            # TODO handle the name well if type(target) is str
+            # TODO handle sequence_id, begining, and end if type(target) == str
             sequence_id = "sequence_id"
+            sequence_begin = "1"
+            sequence_end = len(target)
 
         # TODO add start and end residue numbers
 
@@ -372,7 +376,7 @@ class Alignment:
                     ali_file.write("\n")
                     ali_file.write(f"P1>;{sequence_id}\n")
                     ali_file.write(
-                        f"sequence:{sequence_id}:     : :     : :::     :     \n"
+                        f"sequence:{sequence_id}:{sequence_begin}: :{sequence_end}: :::     :     \n"
                     )
                 ali_file.write(seq2_dashed[i])
                 if i == len(seq2_dashed) -1 and ligand==True:
