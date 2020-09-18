@@ -141,10 +141,19 @@ class ProteinStructure(BaseProtein, BaseStructure):
         import tempfile
         import MDAnalysis as mda
         from pathlib import Path
+        from appdirs import user_cache_dir
+
+        p = f"{user_cache_dir()}/{identifier}.pdb"
+
+        url = f"https://files.rcsb.org/download/{identifier}.pdb"
+        response = requests.get(url)
+
+        with open(p, "wb") as pdb_file:  # saving the pdb to cache
+            pdb_file.write(response.content)
 
         u = mda.fetch_mmtf(identifier)
 
-        return cls(metadata={"id": identifier}, universe=u, **kwargs)
+        return cls(metadata={"path": p, "id": identifier}, universe=u, **kwargs)
 
     @property
     def sequence(self):
