@@ -322,14 +322,13 @@ class Alignment:
             },
         )
 
-    @classmethod
     def make_ali_file(
-        cls,
+        self,
         aligned_seq1: str,
         aligned_seq2: str,
         template: ProteinStructure,
         target: Union[str, KinaseDomainAminoAcidSequence],
-        path: str,
+        ligand: bool = False
     ):
 
         # Convert None entries into dashes
@@ -354,7 +353,7 @@ class Alignment:
         # TODO add start and end residue numbers
 
         # saving the file to path
-        with open(f"{path}", "w") as ali_file:
+        with open(f"{self.alignment_file_path}", "w") as ali_file:
             for i in range(len(seq1_dashed)):
                 if i == 0:
                     ali_file.write(f"P1>;{protein_id}\n")
@@ -362,6 +361,8 @@ class Alignment:
                         f"structureX:{protein_id}:     : :     : :::     :     \n"
                     )
                 ali_file.write(seq1_dashed[i])
+                if i == len(seq1_dashed) -1 and ligand==True:
+                    ali_file.write('.')
                 if (i + 1) % max_length == 0:
                     ali_file.write("\n")
 
@@ -374,5 +375,7 @@ class Alignment:
                         f"sequence:{sequence_id}:     : :     : :::     :     \n"
                     )
                 ali_file.write(seq2_dashed[i])
+                if i == len(seq2_dashed) -1 and ligand==True:
+                    ali_file.write('.')
                 if (i + 1) % max_length == 0:
                     ali_file.write("\n")
