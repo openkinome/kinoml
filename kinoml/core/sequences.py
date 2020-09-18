@@ -48,7 +48,8 @@ class Biosequence(str):
 
     @classmethod
     def from_ncbi(
-        cls, *accessions: str,
+        cls,
+        *accessions: str,
     ) -> Union["Biosequence", Iterable["Biosequence"]]:
         """
         Get FASTA sequence from an online NCBI identifier
@@ -289,7 +290,8 @@ class KinaseDomainAminoAcidSequence(Biosequence):
 
     @classmethod
     def from_uniprot(
-        cls, *uniprot_ids: str,
+        cls,
+        *uniprot_ids: str,
     ) -> Union[
         "KinaseDomainAminoAcidSequence", Iterable["KinaseDomainAminoAcidSequence"], None
     ]:
@@ -307,7 +309,6 @@ class KinaseDomainAminoAcidSequence(Biosequence):
         import requests
         import json
 
-        objects = []
         for uniprot_id in uniprot_ids:
             # request data
             response = requests.get(
@@ -333,18 +334,15 @@ class KinaseDomainAminoAcidSequence(Biosequence):
                         else:
                             true_C_terminus = False
                         kinase_domain_sequence = sequence[begin - 1 : end]
-                        objects.append(
-                            cls(
-                                kinase_domain_sequence,
-                                name=name,
-                                metadata={
-                                    "uniprot_id": uniprot_id,
-                                    "begin": begin,
-                                    "end": end,
-                                    "true_N_terminus": true_N_terminus,
-                                    "true_C_terminus": true_C_terminus,
-                                },
-                            )
-                        )
 
-        return objects
+        return cls(
+            kinase_domain_sequence,
+            name=name,
+            metadata={
+                "uniprot_id": uniprot_id,
+                "begin": begin,
+                "end": end,
+                "true_N_terminus": true_N_terminus,
+                "true_C_terminus": true_C_terminus,
+            },
+        )
