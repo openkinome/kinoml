@@ -45,7 +45,7 @@ class HomologyModel:  #  TODO inherent a Base class?
         return hits
 
     def get_sequence(
-        self, identifier: str, kinase: bool = False, backend: str = "uniprot"
+        self, identifier: str, kinase: bool = True, backend: str = "uniprot"
     ):
         """
         Retrieve a sequence based on an identifier code
@@ -54,7 +54,8 @@ class HomologyModel:  #  TODO inherent a Base class?
         identifier: str
             A string of the identifier to query (e.g 'P04629' from UniProt)
         kinase: bool
-            Specify whether the sequence search should query kinase domains
+            Specify whether the sequence search should query kinase domains.
+            (Default: True)
         backend: str
             Specify which database to query. Options = ["uniprot", "ncbi"]
 
@@ -71,10 +72,14 @@ class HomologyModel:  #  TODO inherent a Base class?
             try:
                 from_method = getattr(KinaseDomainAminoAcidSequence, f"from_{backend}")
             except AttributeError:
-                raise ValueError(
-                    'Backend "%s" not supported. Please choose from ["uniprot", "ncbi"]'
-                    % (backend)
-                )
+                # TODO implement ncbi backend
+                if backend == "ncbi":
+                    raise NotImplementedError
+                else:
+                    raise ValueError(
+                        'Backend "%s" not supported. Please choose from ["uniprot", "ncbi"]'
+                        % (backend)
+                    )
             else:
                 sequence = from_method(identifier)
 
@@ -91,7 +96,7 @@ class HomologyModel:  #  TODO inherent a Base class?
         target_sequence: KinaseDomainAminoAcidSequence,
         alignment: Alignment,
         num_models: int = 100,
-        ligand: bool = False
+        ligand: bool = False,
     ):
         """
         Generate homology model(s) based on a template and alignment with MODELLER
@@ -125,12 +130,12 @@ class HomologyModel:  #  TODO inherent a Base class?
             template_system.metadata["path"].split(".")[0].split(pdb_id)[0]
         ]
 
-        # TODO: Fix model generation if ligand present
         if ligand:
             # Read in HETATM records from template
             env.io.hetatm = True
 
         # TODO handle usage of "ncbi" instead of "uniprot_id"
+        # specify model paramters and score via DOPE
         a = dope_loopmodel(
             env,
             alnfile=alignment.alignment_file_path,

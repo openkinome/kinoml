@@ -157,15 +157,17 @@ class Alignment:
         protein_start = resids[protein_start_index]
         protein_end = ""
 
-        
         if ligand:
             # extract the AAs and No. dashes that need to be added in the alignment
             tail_amino_acids, tail_dashes = self._format_alignment_with_ligands(
                 template, aligned_template_seq
             )
 
+            # add on bufffer AAs / dashes so that Modeller finds the ligand correctly
+            seq1_dashed += tail_amino_acids
+            seq2_dashed += tail_dashes
+
         # write alignment file in MODELLER format
-        # TODO fix formatting when ligand = True (line length)
         with open(f"{self.alignment_file_path}", "w") as ali_file:
             for i in range(len(seq1_dashed)):
                 if i == 0:
@@ -176,7 +178,7 @@ class Alignment:
                 ali_file.write(seq1_dashed[i])
                 if i == len(seq1_dashed) - 1:
                     if ligand:
-                        ali_file.write(f"{tail_amino_acids}/.*")
+                        ali_file.write("/.*")
                     else:
                         ali_file.write("*")
                 if (i + 1) % max_length == 0:
@@ -197,7 +199,7 @@ class Alignment:
                 ali_file.write(seq2_dashed[i])
                 if i == len(seq2_dashed) - 1:
                     if ligand:
-                        ali_file.write(f"{tail_dashes}/.*")
+                        ali_file.write("/.*")
                     else:
                         ali_file.write("*")
                 if (i + 1) % max_length == 0:
