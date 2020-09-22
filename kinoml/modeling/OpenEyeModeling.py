@@ -425,11 +425,10 @@ def get_klifs_ligand(structure_id: int) -> oechem.OEGraphMol:
     molecule: oechem.OEGraphMol
         An OpenEye molecule holding the orthosteric ligand.
     """
-    from appdirs import user_cache_dir
     import klifs_utils
-    from pathlib import Path
+    from ..utils import LocalFileStorage
 
-    file_path = Path(user_cache_dir()) / f'klifs_{structure_id}_ligand.mol2'
+    file_path = LocalFileStorage.klifs_ligand_mol2(structure_id)
 
     if not file_path.is_file():
         mol2_text = klifs_utils.remote.coordinates.ligand._ligand_mol2_text(structure_id)

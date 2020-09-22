@@ -20,6 +20,27 @@ class FromDistpatcherMixin:
         return getattr(cls, prefix + handler)(value)
 
 
+class LocalFileStorage:
+
+    """
+    Generate standardized paths for storing and reading data locally.
+    """
+
+    from appdirs import user_cache_dir
+
+    DIRECTORY = user_cache_dir()
+
+    @staticmethod
+    def rcsb_structure_pdb(pdb_id, directory=DIRECTORY):
+        file_path = Path(directory) / f'pdb_{pdb_id}_structure.pdb'
+        return file_path
+
+    @staticmethod
+    def klifs_ligand_mol2(structure_id, directory=DIRECTORY):
+        file_path = Path(directory) / f'klifs_{structure_id}_ligand.mol2'
+        return file_path
+
+
 def datapath(path: str) -> Path:
     """
     Return absolute path to a file contained in this package's `data`.
