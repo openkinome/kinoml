@@ -425,19 +425,20 @@ def get_klifs_ligand(structure_id: int) -> oechem.OEGraphMol:
     molecule: oechem.OEGraphMol
         An OpenEye molecule holding the orthosteric ligand.
     """
+    from appdirs import user_cache_dir
     import klifs_utils
-    from openeye import oechem
+    from pathlib import Path
 
-    mol2_text = klifs_utils.remote.coordinates.ligand._ligand_mol2_text(structure_id)
-    ims = oechem.oemolistream()
-    ims.SetFormat(oechem.OEFormat_MOL2)
-    ims.openstring(mol2_text)
+    file_path = Path(user_cache_dir()) / f'klifs_{structure_id}_ligand.mol2'
 
-    molecules = []
-    for molecule in ims.GetOEGraphMols():
-        molecules.append(oechem.OEGraphMol(molecule))
+    if not file_path.is_file():
+        mol2_text = klifs_utils.remote.coordinates.ligand._ligand_mol2_text(structure_id)
+        with open(file_path, 'w') as wf:
+            wf.write(mol2_text)
 
-    return molecules[0]
+    molecule = read_molecules(file_path)[0]
+
+    return molecule
 
 
 def generate_tautomers(molecule: oechem.OEGraphMol) -> List[oechem.OEGraphMol]:
