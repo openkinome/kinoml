@@ -1,4 +1,4 @@
-from typing import List, Set, Union
+from typing import List, Set, Union, Iterable
 
 from openeye import oechem, oegrid, oespruce
 import pandas as pd
@@ -413,6 +413,28 @@ def klifs_kinases_by_uniprot_id(uniprot_id: str) -> pd.DataFrame:
     return kinases
 
 
+def klifs_kinase_from_uniprot_id(uniprot_id: str) -> pd.DataFrame:
+    """
+    Retrieve KLIFS kinase details about the kinase matching the given Uniprot ID.
+    Parameters
+    ----------
+    uniprot_id: str
+        Uniprot identifier.
+    Returns
+    -------
+    kinases: pd.Series
+        KLIFS structure details.
+    """
+    import klifs_utils
+
+    kinase_names = klifs_utils.remote.kinases.kinase_names()
+    kinases = klifs_utils.remote.kinases.kinases_from_kinase_names(
+        list(kinase_names.name)
+    )
+    kinase = kinases[kinases.uniprot == uniprot_id].iloc[0]
+    return kinase
+
+
 def get_klifs_ligand(structure_id: int) -> oechem.OEGraphMol:
     """
     Retrieve orthosteric ligand from KLIFS.
@@ -431,8 +453,10 @@ def get_klifs_ligand(structure_id: int) -> oechem.OEGraphMol:
     file_path = LocalFileStorage.klifs_ligand_mol2(structure_id)
 
     if not file_path.is_file():
-        mol2_text = klifs_utils.remote.coordinates.ligand._ligand_mol2_text(structure_id)
-        with open(file_path, 'w') as wf:
+        mol2_text = klifs_utils.remote.coordinates.ligand._ligand_mol2_text(
+            structure_id
+        )
+        with open(file_path, "w") as wf:
             wf.write(mol2_text)
 
     molecule = read_molecules(file_path)[0]
@@ -660,7 +684,7 @@ def compare_molecules(
     molecule1: oechem.OEGraphMol, molecule2: oechem.OEGraphMol
 ) -> bool:
     """
-    Compare two smiles strings.
+    Compare two OpenEye molecules.
     Parameters
     ----------
     molecule1: oechem.OEGraphMol
@@ -681,69 +705,239 @@ def compare_molecules(
         return True
 
 
-def select_structure(uniprot_id: str, smiles: str) -> Union[None, pd.Series]:
+def string_similarity(string1: str, string2: str) -> float:
     """
-    Select a suitable kinase structure for docking a small molecule into the orthosteric pocket.
+    Compare the characters of two strings.
     Parameters
     ----------
-    uniprot_id: str
+    string1: str
+        The first string.
+    string2: str
+        The second string.
+    Returns
+    -------
+        : float
+        Similarity of strings expressed as fraction of matching characters.
+    """
+    common = len([x for x, y in zip(string1, string2) if x == y])
+    return common / max([len(string1), len(string2)])
+
+
+def smiles_from_pdb(ligand_ids: Iterable[str]) -> dict:
+    """
+    Retrieve SMILES of molecules defined by their PDB chemical identifier.
+    Parameters
+    ----------
+    ligand_ids: iterable of str
+        Iterable of PDB chemical identifiers.
+    Returns
+    -------
+    ligands: dict
+        Dictionary with PDB chemical identifier as keys and SMILES as values.
+    """
+    import requests
+    from xml.etree import ElementTree
+
+    ligands = {}
+    url = f"https://www.rcsb.org/pdb/rest/describeHet?chemicalID={','.join(set(ligand_ids))}"
+    response = requests.get(url)
+    tree = ElementTree.fromstring(response.text)
+    for element in tree.findall(".//ligand"):
+        ligand_id = element.get("chemicalID")
+        if element.find("smiles") is not None:
+            smiles = element.find("smiles").text
+        else:
+            smiles = None
+        ligands[ligand_id] = smiles
+    return ligands
+
+
+def select_ligand_structure(
+    klifs_kinase_id: int, smiles: str, shape: bool = False
+) -> pd.DataFrame:
+    """
+    Select a kinase structure from KLIFS holding a ligand similar to the given SMILES and bound to a kinase
+    similar to the kinase of interest.
+    Parameters
+    ----------
+    klifs_kinase_id: int
         Uniprot identifier.
     smiles: str
         The molecule in smiles format.
+    shape: bool
+        If shape should be considered for identifying similar ligands.
     Returns
     -------
         : pd.Series
-        Details about most reasonable kinase structure for docking the small molecule.
+        Details about selected kinase structure.
     """
-    import itertools
+    import klifs_utils
+    from rdkit import Chem, RDLogger
+    from rdkit.Chem import AllChem, DataStructs
 
-    # search for available kinase structure
-    # TODO: ligand might be co-crystalized with kinase of different species but very similar sequence
-    kinases = klifs_kinases_by_uniprot_id(uniprot_id)
-    if len(kinases) == 0:
-        return None
+    RDLogger.DisableLog("rdApp.*")
 
-    # sort by quality according to KLIFS classification
-    # high quality structures come first
-    kinases = kinases.sort_values(
+    # retrieve kinase information from KLIFS
+    kinase_details = klifs_utils.remote.kinases.kinases_from_kinase_ids(
+        [klifs_kinase_id]
+    ).iloc[0]
+
+    # retrieve kinase structures from KLIFS and filter for orthosteric ligands
+    kinase_ids = klifs_utils.remote.kinases.kinase_names().kinase_ID.to_list()
+    structures = klifs_utils.remote.structures.structures_from_kinase_ids(kinase_ids)
+    structures = structures[structures["ligand"] != 0]  # orthosteric ligand
+    structures = structures.groupby("pdb").filter(
+        lambda x: len(set(x["ligand"])) == 1
+    )  # single orthosteric ligand
+    structures = structures[structures.allosteric_ligand == 0]  # no allosteric ligand
+    # keep entry with highest quality score (alt 'A' preferred over alt 'B', chain 'A' preferred over 'B')
+    structures = structures.sort_values(
         by=["alt", "chain", "quality_score"], ascending=[True, True, False]
     )
+    structures = structures.groupby("pdb").head(1)
 
-    # filter for kinase structures with orthosteric ligand
-    kinase_complexes = kinases[kinases.ligand != 0]
-    # filter for structures with no allosteric ligand
-    kinase_complexes = kinase_complexes[kinase_complexes.allosteric_ligand == 0]
+    # store smiles in structures dataframe
+    co_crystallized_ligands = smiles_from_pdb(structures.ligand)
+    smiles_column = []
+    for ligand_id in structures.ligand:
+        if ligand_id in co_crystallized_ligands.keys():
+            smiles_column.append(co_crystallized_ligands[ligand_id])
+        else:
+            smiles_column.append(None)
+    structures["smiles"] = smiles_column
+    structures = structures[
+        structures.smiles.notnull()
+    ]  # remove structures with missing smiles
 
-    if len(kinase_complexes) == 0:  # pick structure with highest quality
-        return kinases.iloc[0]
-    else:  # pick structure with similar ligand and high quality
-        # get resolved structure of orthosteric ligands
-        complex_ligands = [
-            get_klifs_ligand(structure_id)
-            for structure_id in kinase_complexes.structure_ID
-        ]
-
-        # try to find an identical co-crystallized ligand
-        ligand = read_smiles(smiles)
-        for i, complex_ligand in enumerate(complex_ligands):
-            if compare_molecules(ligand, complex_ligand):
-                return kinase_complexes.iloc[i]
-
-        # get reasonable conformations of ligand of interest
-        conformations_ensemble = generate_reasonable_conformations(ligand)
-
-        # overlay and score
-        scores = []
-        for conformations in conformations_ensemble:
-            scores += [
-                [i, overlay_molecules(complex_ligand, conformations, False)]
-                for i, complex_ligand in enumerate(complex_ligands)
+    # try to find identical co-crystallized ligands
+    ligand = read_smiles(smiles)
+    identical_ligands = []
+    for i, complex_ligand in enumerate(structures.smiles):
+        if compare_molecules(ligand, read_smiles(complex_ligand)):
+            identical_ligands.append(i)
+    if len(identical_ligands) > 0:
+        structures = structures.iloc[identical_ligands]
+        # try to find the same kinase
+        if structures.kinase_ID.isin([kinase_details.kinase_ID]).any():
+            structures = structures[
+                structures.kinase_ID.isin([kinase_details.kinase_ID])
             ]
-        score_threshold = max([score[1] for score in scores]) - 0.1
+    else:
+        if shape:
+            # get resolved structure of orthosteric ligands
+            complex_ligands = [
+                get_klifs_ligand(structure_id)
+                for structure_id in structures.structure_ID
+            ]
 
-        # pick highest quality structure from structures with similar ligands
-        index = min([score[0] for score in scores if score[1] >= score_threshold])
-        return kinase_complexes.iloc[index]
+            # get reasonable conformations of ligand of interest
+            conformations_ensemble = generate_reasonable_conformations(ligand)
+
+            # overlay and score
+            overlay_scores = []
+            for conformations in conformations_ensemble:
+                overlay_scores += [
+                    [i, overlay_molecules(complex_ligand, conformations, False)]
+                    for i, complex_ligand in enumerate(complex_ligands)
+                ]
+            overlay_score_threshold = max([score[1] for score in overlay_scores]) - 0.2
+
+            # pick structures with similar ligands
+            structures = structures.iloc[
+                [
+                    score[0]
+                    for score in overlay_scores
+                    if score[1] >= overlay_score_threshold
+                ]
+            ]
+        else:
+            rdkit_molecules = [
+                Chem.MolFromSmiles(smiles) for smiles in structures.smiles
+            ]
+            structures["rdkit_molecules"] = rdkit_molecules
+            structures = structures[structures.rdkit_molecules.notnull()]
+            structures["rdkit_fingerprint"] = [
+                AllChem.GetMorganFingerprint(rdkit_molecule, 2, useFeatures=True)
+                for rdkit_molecule in structures.rdkit_molecules
+            ]
+            ligand_fingerprint = AllChem.GetMorganFingerprint(
+                Chem.MolFromSmiles(smiles), 2, useFeatures=True
+            )
+            fingerprint_similarities = [
+                [i, DataStructs.DiceSimilarity(ligand_fingerprint, fingerprint)]
+                for i, fingerprint in enumerate(structures.rdkit_fingerprint)
+            ]
+            fingerprint_similarity_threshold = (
+                max([similarity[1] for similarity in fingerprint_similarities]) - 0.1
+            )
+            structures = structures.iloc[
+                [
+                    similarity[0]
+                    for similarity in fingerprint_similarities
+                    if similarity[1] >= fingerprint_similarity_threshold
+                ]
+            ]
+
+    # find most similar kinase pockets
+    pocket_similarities = [
+        string_similarity(structure_pocket, kinase_details.pocket)
+        for structure_pocket in structures.pocket
+    ]
+    structures["pocket_similarity"] = pocket_similarities
+    pocket_similarity_threshold = max(pocket_similarities) - 0.1
+    structures = structures[structures.pocket_similarity >= pocket_similarity_threshold]
+    structure_for_ligand = structures.iloc[0]
+
+    return structure_for_ligand
+
+
+def select_protein_structure(
+    klifs_kinase_id: int,
+    dfg: Union[str, None] = None,
+    alpha_c_helix: Union[str, None] = None,
+):
+    """
+    Select a kinase structure from KLIFS holding kinase structure similar to the kinase of interest and with the
+    specified conformation.
+    Parameters
+    ----------
+    klifs_kinase_id: int
+        Uniprot identifier.
+    dfg: str
+        The DFG conformation.
+    alpha_c_helix: bool
+        The alpha C helix conformation.
+    Returns
+    -------
+        : pd.Series
+        Details about selected kinase structure.
+    """
+    import klifs_utils
+
+    # retrieve kinase information from KLIFS
+    kinase_details = klifs_utils.remote.kinases.kinases_from_kinase_ids(
+        [klifs_kinase_id]
+    ).iloc[0]
+
+    # retrieve kinase structures from KLIFS and filter for orthosteric ligands
+    structures = klifs_utils.remote.structures.structures_from_kinase_ids(
+        [kinase_details.kinase_ID]
+    )
+    if dfg is not None:
+        structures = structures[structures.DFG == dfg]
+    if alpha_c_helix is not None:
+        structures = structures[structures.aC_helix == alpha_c_helix]
+
+    if len(structures) == 0:
+        # TODO: integrate homology modeling
+        raise NotImplementedError
+    else:
+        structures = structures.sort_values(
+            by=["alt", "chain", "quality_score"], ascending=[True, True, False]
+        )
+        protein_structure = structures.iloc[0]
+
+    return protein_structure
 
 
 def get_sequence(structure: oechem.OEGraphMol) -> str:
@@ -873,3 +1067,35 @@ def renumber_structure(
             oechem.OEAtomSetResidue(residue_atom, structure_residue_mod)
 
     return renumbered_structure
+
+
+def superpose_proteins(
+    reference_protein: oechem.OEGraphMol, fit_protein: oechem.OEGraphMol
+) -> oechem.OEGraphMol:
+    """
+    Superpose a protein structure onto a reference protein.
+    Parameters
+    ----------
+    reference_protein: oechem.OEGraphMol
+        An OpenEye molecule holding a protein structure which will be used as reference during superposition.
+    fit_protein: oechem.OEGraphMol
+        An OpenEye molecule holding a protein structure which will be superposed onto the reference protein.
+    Returns
+    -------
+    superposed_protein: oechem.OEGraphMol
+        An OpenEye molecule holding the superposed protein structure.
+    """
+    # do not modify input
+    superposed_protein = fit_protein.CreateCopy()
+
+    # set superposition method
+    options = oespruce.OESuperpositionOptions()
+    options.SetSuperpositionType(oespruce.OESuperpositionType_Global)
+
+    # perform superposition
+    superposition = oespruce.OEStructuralSuperposition(
+        reference_protein, superposed_protein, options
+    )
+    superposition.Transform(superposed_protein)
+
+    return superposed_protein
