@@ -127,6 +127,96 @@ def has_ligand(molecule: oechem.OEGraphMol) -> bool:
     return False
 
 
+def select_chain(molecule, chain_id):
+    """
+    Select a chain from an OpenEye molecule.
+    Parameters
+    ----------
+    molecule: oechem.OEGraphMol
+        An OpenEye molecule holding a molecular structure.
+    chain_id: str
+        Chain identifier.
+    Returns
+    -------
+    selection: oechem.OEGraphMol
+        An OpenEye molecule holding the selected chain.
+    """
+    # do not change input mol
+    selection = molecule.CreateCopy()
+
+    # delete other chains
+    for atom in selection.GetAtoms():
+        residue = oechem.OEAtomGetResidue(atom)
+        if residue.GetChainID() != chain_id:
+            selection.DeleteAtom(atom)
+
+    return selection
+
+
+def select_altloc(molecule, altloc_id):
+    """
+    Select an alternate location from an OpenEye molecule.
+    Parameters
+    ----------
+    molecule: oechem.OEGraphMol
+        An OpenEye molecule holding a molecular structure.
+    altloc_id: str
+        Alternate location identifier.
+    Returns
+    -------
+    selection: oechem.OEGraphMol
+        An OpenEye molecule holding the selected alternate location.
+    """
+    # External libraries
+    from openeye import oechem
+
+    # do not change input mol
+    selection = molecule.CreateCopy()
+
+    allowed_altloc_ids = [' ', altloc_id]
+
+    # delete other alternate location
+    for atom in selection.GetAtoms():
+        residue = oechem.OEAtomGetResidue(atom)
+        if oechem.OEResidue.GetAlternateLocation(residue) not in allowed_altloc_ids:
+            selection.DeleteAtom(atom)
+
+    return selection
+
+
+def remove_non_protein(molecule: oechem.OEGraphMol, exceptions: Union[None, List[str]] = None, remove_water: bool = False) -> oechem.OEGraphMol:
+    """
+    Remove non-protein atoms from an OpenEye molecule.
+    Parameters
+    ----------
+    molecule: oechem.OEGraphMol
+        An OpenEye molecule holding a molecular structure.
+    exceptions: None or list of str
+        Exceptions that should not be removed.
+    remove_water: bool
+        If water should be removed.
+    Returns
+    -------
+    selection: oechem.OEGraphMol
+        An OpenEye molecule holding the filtered structure.
+    """
+    if exceptions is None:
+        exceptions = []
+    if remove_water is False:
+        exceptions.append("HOH")
+
+    # do not change input mol
+    selection = molecule.CreateCopy()
+
+    for atom in selection.GetAtoms():
+        residue = oechem.OEAtomGetResidue(atom)
+        if residue.IsHetAtom():
+            if residue.GetName() not in exceptions:
+                selection.DeleteAtom(atom)
+
+    return selection
+
+
 def _OEFixBuiltLoopFragmentNumbers(protein):
     """
     Temporary fix, thanks to Jesper!
