@@ -986,55 +986,57 @@ def mutate_structure(
         An OpenEye molecule holding the mutated protein structure.
     """
     from Bio import pairwise2
-    import copy
-    import tempfile
 
-    # reloading structure helps for some reason
-    with tempfile.NamedTemporaryFile(suffix=".pdb") as temp_file:
-        write_molecules([target_structure], temp_file.name)
-        target_structure = read_molecules(temp_file.name)[0]
-
-    # align template and target sequences
-    target_sequence = get_sequence(target_structure)
-    template_sequence, target_sequence = pairwise2.align.globalxs(
-        template_sequence, target_sequence, -10, 0
-    )[0][:2]
-
-    mutated_structure = copy.deepcopy(target_structure)  # don't touch input structure
-    hierview = oechem.OEHierView(mutated_structure)
-    structure_residues = hierview.GetResidues()
-    # adjust target structure to match template sequence
-    for template_sequence_residue, target_sequence_residue in zip(
-        template_sequence, target_sequence
-    ):
-        if template_sequence_residue == "-":
-            # delete any non protein residue from target structure
-            structure_residue = structure_residues.next()
-            if target_sequence_residue != "X":
-                # delete
-                for atom in structure_residue.GetAtoms():
-                    mutated_structure.DeleteAtom(atom)
-        else:
-            # compare amino acids
-            if target_sequence_residue != "-":
+    # the hierarchy view is more stable if reinitialized after each change
+    # https://docs.eyesopen.com/toolkits/python/oechemtk/biopolymers.html#a-hierarchy-view
+    finished = False
+    while not finished:
+        altered = False
+        # align template and target sequences
+        target_sequence = get_sequence(target_structure)
+        template_sequence_aligned, target_sequence_aligned = pairwise2.align.globalxs(
+            template_sequence, target_sequence, -10, 0
+        )[0][:2]
+        hierview = oechem.OEHierView(target_structure)
+        structure_residues = hierview.GetResidues()
+        # adjust target structure to match template sequence
+        for template_sequence_residue, target_sequence_residue in zip(
+            template_sequence_aligned, target_sequence_aligned
+        ):
+            if template_sequence_residue == "-":
+                # delete any non protein residue from target structure
                 structure_residue = structure_residues.next()
-                if target_sequence_residue not in ["X", template_sequence_residue]:
-                    # mutate
-                    structure_residue = structure_residue.GetOEResidue()
-                    three_letter_code = oechem.OEGetResidueName(
-                        oechem.OEGetResidueIndexFromCode(template_sequence_residue)
-                    )
-                    if not oespruce.OEMutateResidue(
-                        mutated_structure, structure_residue, three_letter_code
-                    ):  # not sure why a second time helps
-                        oespruce.OEMutateResidue(
-                            mutated_structure, structure_residue, three_letter_code
+                if target_sequence_residue != "X":
+                    # delete
+                    for atom in structure_residue.GetAtoms():
+                        target_structure.DeleteAtom(atom)
+                    # break loop and reinitialize
+                    altered = True
+                    break
+            else:
+                # compare amino acids
+                if target_sequence_residue != "-":
+                    structure_residue = structure_residues.next()
+                    if target_sequence_residue not in ["X", template_sequence_residue]:
+                        # mutate
+                        structure_residue = structure_residue.GetOEResidue()
+                        three_letter_code = oechem.OEGetResidueName(
+                            oechem.OEGetResidueIndexFromCode(template_sequence_residue)
                         )
+                        oespruce.OEMutateResidue(
+                            target_structure, structure_residue, three_letter_code
+                        )
+                        # break loop and reinitialize
+                        altered = True
+                        break
+        # leave while loop if no changes were introduced
+        if not altered:
+            finished = True
     # OEMutateResidue doesn't build sidechains and doesn't add hydrogens automatically
-    oespruce.OEBuildSidechains(mutated_structure)
-    oechem.OEPlaceHydrogens(mutated_structure)
+    oespruce.OEBuildSidechains(target_structure)
+    oechem.OEPlaceHydrogens(target_structure)
 
-    return mutated_structure
+    return target_structure
 
 
 def renumber_structure(
