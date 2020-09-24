@@ -1,7 +1,8 @@
 from functools import lru_cache
 
+import numpy as np
 import torch
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import Dataset, DataLoader, SubsetRandomSampler
 
 from ..core.measurements import null_observation_model as _null_observation_model
 
@@ -62,5 +63,35 @@ class TorchDataset(PrefeaturizedTorchDataset):
             dtype=torch.float,
             requires_grad=True,
         )
-        y = torch.tensor(self.measurements[index], device=self.device, requires_grad=True, dtype=torch.float)
+        y = torch.tensor(
+            self.measurements[index], device=self.device, requires_grad=True, dtype=torch.float
+        )
         return X, y
+
+
+class XyNpzTorchDataset(Dataset):
+    def __init__(self, npz):
+        data = np.load(npz)
+        self.data_X = torch.as_tensor(data["X"], dtype=torch.float32)
+        self.data_y = torch.as_tensor(data["y"], dtype=torch.float32)
+
+    def __getitem__(self, index):
+        return self.data_X[index], self.data_y[index]
+
+    def __len__(self):
+        return self.data_X.shape[0]
+
+    def input_size(self):
+        return self.data_X.shape[1]
+
+    def as_dataloader(self, train_test_split=None, **kwargs):
+        if train_test_split is not None and (0.0 < train_test_split < 1.0):
+            indices = list(range(len(self)))
+            np.random.shuffle(indices)
+            test_split = int(np.floor(train_test_split * len(self)))
+            train_indices, test_indices = indices[:test_split], indices[test_split:]
+            train = DataLoader(self, sampler=SubsetRandomSampler(train_indices), **kwargs)
+            test = DataLoader(self, sampler=SubsetRandomSampler(test_indices), **kwargs)
+            return train, test
+        # else
+        return DataLoader(self, **kwargs)
