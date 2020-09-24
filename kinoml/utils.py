@@ -99,8 +99,8 @@ def download_file(url: str, path: str):
     import requests
 
     response = requests.get(url)
-    with open(path, "w") as write_file:
-        write_file.write(response.text)
+    with open(path, "wb") as write_file:
+        write_file.write(response.content)
         # TODO: check if successful, e.g. response.ok
 
     return
