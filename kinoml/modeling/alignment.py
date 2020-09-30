@@ -168,7 +168,7 @@ class Alignment:
             seq2_dashed += tail_dashes
 
         # write alignment file in MODELLER format
-        with open(f"{self.alignment_file_path}", "w") as ali_file:
+        with open(self.alignment_file_path, "w") as ali_file:
             for i in range(len(seq1_dashed)):
                 if i == 0:
                     ali_file.write(f">P1;{protein_id}\n")
