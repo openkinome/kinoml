@@ -236,7 +236,7 @@ class OpenEyesKLIFSKinaseHybridDockingFeaturizer(OpenEyesHybridDockingFeaturizer
         split_options = oechem.OESplitMolComplexOptions()
         ligand_template_structure = list(oechem.OEGetMolComplexComponents(ligand_template_structure, split_options, split_options.GetLigandFilter()))[0]
 
-        if compare_molecules(ligand, ligand_template_structure):
+        if compare_molecules(ligand, ligand_template_structure) and ligand_template.pdb == protein_template.pdb:
             logging.debug(f"Found co-crystallized ligand ...")
             docking_pose = ligand_template_structure
         else:
