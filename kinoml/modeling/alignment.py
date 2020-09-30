@@ -127,9 +127,8 @@ class Alignment:
         """
 
         # Convert None entries into dashes
-        conv = lambda i: i or "-"
-        seq1_dashed = [conv(i) for i in aligned_template_seq]
-        seq2_dashed = [conv(i) for i in aligned_target_seq]
+        seq1_dashed = [i or "-" for i in aligned_template_seq]
+        seq2_dashed = [i or "-" for i in aligned_target_seq]
 
         # Setup formatting for MODELLER alignment file
         max_length = 75
