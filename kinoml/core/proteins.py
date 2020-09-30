@@ -3,7 +3,7 @@ from typing import List, Union
 
 from .components import BaseProtein, BaseStructure
 from .sequences import Biosequence
-from ..utils import download_file
+from ..utils import download_file, APPDIR
 
 logger = logging.getLogger(__name__)
 
@@ -142,18 +142,20 @@ class ProteinStructure(BaseProtein, BaseStructure):
         import MDAnalysis as mda
         from pathlib import Path
         from appdirs import user_cache_dir
+        
+        cached_path = Path(APPDIR.user_cache_dir)
 
-        p = f"{user_cache_dir()}/{identifier}.pdb"
+        path = f"{cached_path}/{identifier}.pdb"
 
         url = f"https://files.rcsb.org/download/{identifier}.pdb"
         response = requests.get(url)
 
-        with open(p, "wb") as pdb_file:  # saving the pdb to cache
+        with open(path, "wb") as pdb_file:  # saving the pdb to cache
             pdb_file.write(response.content)
 
         u = mda.fetch_mmtf(identifier)
 
-        return cls(metadata={"path": p, "id": identifier}, universe=u, **kwargs)
+        return cls(metadata={"path": path, "id": identifier}, universe=u, **kwargs)
 
     @property
     def sequence(self):
