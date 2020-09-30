@@ -153,7 +153,7 @@ class ProteinStructure(BaseProtein, BaseStructure):
         with open(path, "wb") as pdb_file:  # saving the pdb to cache
             pdb_file.write(response.content)
 
-        u = mda.fetch_mmtf(identifier)
+        u = mda.Universe(path)
 
         return cls(metadata={"path": path, "id": identifier}, universe=u, **kwargs)
 
