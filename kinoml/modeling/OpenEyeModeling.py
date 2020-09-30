@@ -315,9 +315,10 @@ def _OEFixMissingOXT(du):
 
 def _prepare_structure(
     structure: oechem.OEGraphMol,
-    has_ligand: bool,
+    has_ligand: bool = False,
     electron_density: Union[oegrid.OESkewGrid, None] = None,
     loop_db: Union[str, None] = None,
+    ligand_name: Union[str, None] = None,
     cap_termini: bool = True,
     real_termini: Union[List[int], None] = None,
 ) -> Union[oechem.OEDesignUnit, None]:
@@ -333,6 +334,8 @@ def _prepare_structure(
         An OpenEye grid holding the electron density.
     loop_db: str or None
         Path to OpenEye Spruce loop database.
+    ligand_name: str or None
+        The name of the ligand located in the binding pocket of interest.
     cap_termini: bool
         If termini should be capped with ACE and NME.
     real_termini: list of int or None
@@ -383,6 +386,10 @@ def _prepare_structure(
                     structure, structure_metadata, design_unit_options
                 )
             )
+            # filter design units for ligand of interest
+            if ligand_name is not None:
+                design_units = [design_unit for design_unit in design_units if ligand_name in design_unit.GetTitle()]
+
         else:
             design_units = list(
                 oespruce.OEMakeDesignUnits(
@@ -396,9 +403,7 @@ def _prepare_structure(
             )
         )
 
-    if len(design_units) == 1:
-        design_unit = design_units[0]
-    elif len(design_units) > 1:
+    if len(design_units) >= 1:
         design_unit = design_units[0]
     else:
         # TODO: Returns None if something goes wrong
@@ -415,6 +420,7 @@ def prepare_complex(
     protein_ligand_complex: oechem.OEGraphMol,
     electron_density: Union[oegrid.OESkewGrid, None] = None,
     loop_db: Union[str, None] = None,
+    ligand_name: Union[str, None] = None,
     cap_termini: bool = True,
     real_termini: Union[List[int], None] = None,
 ) -> Union[oechem.OEDesignUnit, None]:
@@ -428,6 +434,8 @@ def prepare_complex(
         An OpenEye grid holding the electron density.
     loop_db: str or None
         Path to OpenEye Spruce loop database.
+    ligand_name: str or None
+        The name of the ligand located in the binding pocket of interest.
     cap_termini: bool
         If termini should be capped with ACE and NME.
     real_termini: list of int or None
@@ -443,6 +451,7 @@ def prepare_complex(
         has_ligand=True,
         electron_density=electron_density,
         loop_db=loop_db,
+        ligand_name=ligand_name,
         cap_termini=cap_termini,
         real_termini=real_termini,
     )
@@ -474,7 +483,6 @@ def prepare_protein(
     """
     return _prepare_structure(
         structure=protein,
-        has_ligand=False,
         loop_db=loop_db,
         cap_termini=cap_termini,
         real_termini=real_termini,

@@ -190,16 +190,9 @@ class OpenEyesKLIFSKinaseHybridDockingFeaturizer(OpenEyesHybridDockingFeaturizer
         logging.debug(f"Preparing kinase domain of {protein_template.pdb} ...")
         kinase_domain_path = LocalFileStorage.rcsb_kinase_domain_pdb(protein_template.pdb)
         if not kinase_domain_path.is_file():
-            # TODO: results in problems during prepare_complex
-            #logging.debug(f"Selecting chain {protein_template.chain} ...")
-            #protein = select_chain(protein, protein_template.chain)
-            #logging.debug(f"Selecting alternate location {protein_template.alt} ...")
-            #protein = select_altloc(protein, protein_template.alt)
-            #logging.debug(f"Removing non protein atoms except water and {protein_template.ligand} ...")
-            #protein = remove_non_protein(protein, exceptions=[protein_template.ligand], remove_water=False)
             logging.debug(f"Generating design unit ...")
-            design_unit = prepare_complex(protein, electron_density, self.loop_db, cap_termini=False)
-            logging.debug(f"Extracting protein {protein_template.alt} ...")
+            design_unit = prepare_complex(protein, electron_density, self.loop_db, ligand_name=str(protein_template.ligand), cap_termini=False)
+            logging.debug(f"Extracting protein ...")
             protein = oechem.OEGraphMol()
             design_unit.GetProtein(protein)
             logging.debug(f"Retrieving kinase domain sequence for {kinase_details.uniprot} ...")
