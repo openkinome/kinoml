@@ -1,3 +1,4 @@
+import logging
 from typing import List, Set, Union, Iterable
 
 from openeye import oechem, oegrid, oespruce
@@ -842,194 +843,6 @@ def smiles_from_pdb(ligand_ids: Iterable[str]) -> dict:
     return ligands
 
 
-def select_ligand_structure(
-    klifs_kinase_id: int, smiles: str, shape: bool = False
-) -> pd.DataFrame:
-    """
-    Select a kinase structure from KLIFS holding a ligand similar to the given SMILES and bound to a kinase
-    similar to the kinase of interest.
-    Parameters
-    ----------
-    klifs_kinase_id: int
-        Uniprot identifier.
-    smiles: str
-        The molecule in smiles format.
-    shape: bool
-        If shape should be considered for identifying similar ligands.
-    Returns
-    -------
-        : pd.Series
-        Details about selected kinase structure.
-    """
-    import klifs_utils
-    from rdkit import Chem, RDLogger
-    from rdkit.Chem import AllChem, DataStructs
-
-    RDLogger.DisableLog("rdApp.*")
-
-    # retrieve kinase information from KLIFS
-    kinase_details = klifs_utils.remote.kinases.kinases_from_kinase_ids(
-        [klifs_kinase_id]
-    ).iloc[0]
-
-    # retrieve kinase structures from KLIFS and filter for orthosteric ligands
-    kinase_ids = klifs_utils.remote.kinases.kinase_names().kinase_ID.to_list()
-    structures = klifs_utils.remote.structures.structures_from_kinase_ids(kinase_ids)
-    structures = structures[structures["ligand"] != 0]  # orthosteric ligand
-    structures = structures.groupby("pdb").filter(
-        lambda x: len(set(x["ligand"])) == 1
-    )  # single orthosteric ligand
-    structures = structures[structures.allosteric_ligand == 0]  # no allosteric ligand
-    # keep entry with highest quality score (alt 'A' preferred over alt 'B', chain 'A' preferred over 'B')
-    structures = structures.sort_values(
-        by=["alt", "chain", "quality_score"], ascending=[True, True, False]
-    )
-    structures = structures.groupby("pdb").head(1)
-
-    # store smiles in structures dataframe
-    co_crystallized_ligands = smiles_from_pdb(structures.ligand)
-    smiles_column = []
-    for ligand_id in structures.ligand:
-        if ligand_id in co_crystallized_ligands.keys():
-            smiles_column.append(co_crystallized_ligands[ligand_id])
-        else:
-            smiles_column.append(None)
-    structures["smiles"] = smiles_column
-    structures = structures[
-        structures.smiles.notnull()
-    ]  # remove structures with missing smiles
-
-    # try to find identical co-crystallized ligands
-    ligand = read_smiles(smiles)
-    identical_ligands = []
-    for i, complex_ligand in enumerate(structures.smiles):
-        if compare_molecules(ligand, read_smiles(complex_ligand)):
-            identical_ligands.append(i)
-    if len(identical_ligands) > 0:
-        structures = structures.iloc[identical_ligands]
-        # try to find the same kinase
-        if structures.kinase_ID.isin([kinase_details.kinase_ID]).any():
-            structures = structures[
-                structures.kinase_ID.isin([kinase_details.kinase_ID])
-            ]
-    else:
-        if shape:
-            # get resolved structure of orthosteric ligands
-            complex_ligands = [
-                get_klifs_ligand(structure_id)
-                for structure_id in structures.structure_ID
-            ]
-
-            # get reasonable conformations of ligand of interest
-            conformations_ensemble = generate_reasonable_conformations(ligand)
-
-            # overlay and score
-            overlay_scores = []
-            for conformations in conformations_ensemble:
-                overlay_scores += [
-                    [i, overlay_molecules(complex_ligand, conformations, False)]
-                    for i, complex_ligand in enumerate(complex_ligands)
-                ]
-            overlay_score_threshold = max([score[1] for score in overlay_scores]) - 0.2
-
-            # pick structures with similar ligands
-            structures = structures.iloc[
-                [
-                    score[0]
-                    for score in overlay_scores
-                    if score[1] >= overlay_score_threshold
-                ]
-            ]
-        else:
-            rdkit_molecules = [
-                Chem.MolFromSmiles(smiles) for smiles in structures.smiles
-            ]
-            structures["rdkit_molecules"] = rdkit_molecules
-            structures = structures[structures.rdkit_molecules.notnull()]
-            structures["rdkit_fingerprint"] = [
-                AllChem.GetMorganFingerprint(rdkit_molecule, 2, useFeatures=True)
-                for rdkit_molecule in structures.rdkit_molecules
-            ]
-            ligand_fingerprint = AllChem.GetMorganFingerprint(
-                Chem.MolFromSmiles(smiles), 2, useFeatures=True
-            )
-            fingerprint_similarities = [
-                [i, DataStructs.DiceSimilarity(ligand_fingerprint, fingerprint)]
-                for i, fingerprint in enumerate(structures.rdkit_fingerprint)
-            ]
-            fingerprint_similarity_threshold = (
-                max([similarity[1] for similarity in fingerprint_similarities]) - 0.1
-            )
-            structures = structures.iloc[
-                [
-                    similarity[0]
-                    for similarity in fingerprint_similarities
-                    if similarity[1] >= fingerprint_similarity_threshold
-                ]
-            ]
-
-    # find most similar kinase pockets
-    pocket_similarities = [
-        string_similarity(structure_pocket, kinase_details.pocket)
-        for structure_pocket in structures.pocket
-    ]
-    structures["pocket_similarity"] = pocket_similarities
-    pocket_similarity_threshold = max(pocket_similarities) - 0.1
-    structures = structures[structures.pocket_similarity >= pocket_similarity_threshold]
-    structure_for_ligand = structures.iloc[0]
-
-    return structure_for_ligand
-
-
-def select_protein_structure(
-    klifs_kinase_id: int,
-    dfg: Union[str, None] = None,
-    alpha_c_helix: Union[str, None] = None,
-):
-    """
-    Select a kinase structure from KLIFS holding kinase structure similar to the kinase of interest and with the
-    specified conformation.
-    Parameters
-    ----------
-    klifs_kinase_id: int
-        Uniprot identifier.
-    dfg: str
-        The DFG conformation.
-    alpha_c_helix: bool
-        The alpha C helix conformation.
-    Returns
-    -------
-        : pd.Series
-        Details about selected kinase structure.
-    """
-    import klifs_utils
-
-    # retrieve kinase information from KLIFS
-    kinase_details = klifs_utils.remote.kinases.kinases_from_kinase_ids(
-        [klifs_kinase_id]
-    ).iloc[0]
-
-    # retrieve kinase structures from KLIFS and filter for orthosteric ligands
-    structures = klifs_utils.remote.structures.structures_from_kinase_ids(
-        [kinase_details.kinase_ID]
-    )
-    if dfg is not None:
-        structures = structures[structures.DFG == dfg]
-    if alpha_c_helix is not None:
-        structures = structures[structures.aC_helix == alpha_c_helix]
-
-    if len(structures) == 0:
-        # TODO: integrate homology modeling
-        raise NotImplementedError
-    else:
-        structures = structures.sort_values(
-            by=["alt", "chain", "quality_score"], ascending=[True, True, False]
-        )
-        protein_structure = structures.iloc[0]
-
-    return protein_structure
-
-
 def get_sequence(structure: oechem.OEGraphMol) -> str:
     """
     Get the amino acid sequence with one letter characters of an OpenEye molecule holding a protein structure. All
@@ -1087,6 +900,8 @@ def mutate_structure(
         template_sequence_aligned, target_sequence_aligned = pairwise2.align.globalxs(
             template_sequence, target_sequence, -10, 0
         )[0][:2]
+        logging.debug(f"Template sequence:\n{template_sequence}")
+        logging.debug(f"Target sequence:\n{target_sequence}")
         hierview = oechem.OEHierView(target_structure)
         structure_residues = hierview.GetResidues()
         # adjust target structure to match template sequence
@@ -1125,6 +940,8 @@ def mutate_structure(
     # OEMutateResidue doesn't build sidechains and doesn't add hydrogens automatically
     oespruce.OEBuildSidechains(target_structure)
     oechem.OEPlaceHydrogens(target_structure)
+    # update residue information
+    oechem.OEPerceiveResidues(target_structure, oechem.OEPreserveResInfo_All)
 
     return target_structure
 

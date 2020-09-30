@@ -45,55 +45,14 @@ class FileProtein(BaseProtein):
 
 
 class PDBProtein(FileProtein):
+
     def __init__(self, pdb_id, path="", metadata=None, name="", *args, **kwargs):
         super().__init__(path=path, metadata=metadata, name=name, *args, **kwargs)
-        from appdirs import user_cache_dir
+        from ..utils import LocalFileStorage
 
         self.pdb_id = pdb_id
-        self.path = (
-            f"{user_cache_dir()}/{self.name}.pdb"  # TODO: if not available go for mmcif
-        )
-        download_file(f"https://files.rcsb.org/download/{pdb_id}.pdb", self.path)
-        self.electron_density_path = f"{user_cache_dir()}/{self.name}.mtz"
-        download_file(
-            f"https://edmaps.rcsb.org/coefficients/{pdb_id}.mtz",
-            self.electron_density_path,
-        )
-
-    @staticmethod
-    def klifs_pocket(
-        pdb_id: str, chain: Union[str or None] = None, altloc: Union[str or None] = None
-    ) -> List[int]:
-        """
-        Read electron density from a file.
-        Parameters
-        ----------
-        pdb_id: str
-            PDB identifier.
-        chain: str or None
-            Chain identifier for PDB structure.
-        altloc: str or None
-            Alternate location identifier for PDB structure
-        Returns
-        -------
-        pocket_resids: list of int
-            A list of residue identifiers describing the pocket.
-        """
-        import klifs_utils
-
-        structures_df = klifs_utils.remote.structures.structures_from_pdb_ids(
-            pdb_id, chain=chain, alt=altloc
-        )
-        structure_id = structures_df.iloc[0]["structure_ID"]
-
-        pocket_df = klifs_utils.remote.coordinates.pocket.mol2_to_dataframe(
-            structure_id
-        )
-        pocket_resids = (
-            pocket_df["subst_name"].str.slice(start=3).astype(int).unique().tolist()
-        )
-
-        return pocket_resids
+        self.path = LocalFileStorage.rcsb_structure_pdb(pdb_id)
+        self.electron_density_path = LocalFileStorage.rcsb_electron_density_mtz(pdb_id)
 
 
 class ProteinStructure(BaseProtein, BaseStructure):

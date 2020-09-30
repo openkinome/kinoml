@@ -28,17 +28,54 @@ class LocalFileStorage:
 
     from appdirs import user_cache_dir
 
-    DIRECTORY = user_cache_dir()
+    DIRECTORY = Path(user_cache_dir())
 
     @staticmethod
     def rcsb_structure_pdb(pdb_id, directory=DIRECTORY):
-        file_path = Path(directory) / f'pdb_{pdb_id}_structure.pdb'
+        file_path = directory / f"rcsb_{pdb_id}.pdb"
+        return file_path
+
+    @staticmethod
+    def rcsb_ligand_sdf(pdb_id, chemical_id, chain, altloc, directory=DIRECTORY):
+        file_path = directory / f"rcsb_{pdb_id}_{chemical_id}_{chain}_{altloc}.sdf"
+        return file_path
+
+    @staticmethod
+    def rcsb_electron_density_mtz(pdb_id, directory=DIRECTORY):
+        file_path = directory / f"rcsb_{pdb_id}.mtz"
         return file_path
 
     @staticmethod
     def klifs_ligand_mol2(structure_id, directory=DIRECTORY):
-        file_path = Path(directory) / f'klifs_{structure_id}_ligand.mol2'
+        file_path = directory / f"klifs_{structure_id}_ligand.mol2"
         return file_path
+
+    @staticmethod
+    def rcsb_kinase_domain_pdb(pdb_id, directory=DIRECTORY):
+        file_path = directory / f"rcsb_{pdb_id}_kinase_domain.pdb"
+        return file_path
+
+    @staticmethod
+    def pdb_smiles_json(directory=DIRECTORY):
+        file_path = directory / "pdb_smiles.json"
+        return file_path
+
+
+class FileDownloader:
+
+    """
+    Download and store files locally.
+    """
+
+    @staticmethod
+    def rcsb_structure_pdb(pdb_id):
+        url = f"https://files.rcsb.org/download/{pdb_id}.pdb"
+        download_file(url, LocalFileStorage.rcsb_structure_pdb(pdb_id))
+
+    @staticmethod
+    def rcsb_electron_density_mtz(pdb_id):
+        url = f"https://edmaps.rcsb.org/coefficients/{pdb_id}.mtz"
+        download_file(url, LocalFileStorage.rcsb_electron_density_mtz(pdb_id))
 
 
 def datapath(path: str) -> Path:
