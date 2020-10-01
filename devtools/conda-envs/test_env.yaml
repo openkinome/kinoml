@@ -17,6 +17,7 @@ dependencies:
   - pytorch 1.6
   - torchvision
   - xgboost
+  - watermark
   #- cudatoolkit 10.2
 
   # Testing
