@@ -1016,3 +1016,77 @@ def superpose_proteins(
     superposition.Transform(superposed_protein)
 
     return superposed_protein
+
+
+def update_residue_identifiers(structure: oechem.OEGraphMol, keep_protein_residue_ids: bool = True) -> oechem.OEGraphMol:
+    """
+    Updates the atom, residue and chain ids of the given molecular structure. All residues become part of chain A. Atom
+    ids will start from 1. Residue will start from 1, except protein residue ids are fixed. This is especially useful,
+    if molecules were merged, which can result in overlapping atom and residue ids as well as separate chains.
+    Parameters
+    ----------
+    structure: oechem.OEGraphMol
+        The OpenEye molecule structure for updating atom and residue ids.
+    keep_protein_residue_ids: bool
+        If the protein residues should be kept.
+    Returns
+    -------
+    structure: oechem.OEGraphMol
+        The OpenEye molecule structure with updated atom and residue ids.
+    """
+    # update residue ids
+    residue_number = 0
+    hierarchical_view = oechem.OEHierView(structure)
+    for hv_residue in hierarchical_view.GetResidues():
+        residue = hv_residue.GetOEResidue()
+        residue.SetChainID("A")
+        if not residue.IsHetAtom() and keep_protein_residue_ids:
+            if residue.GetName() == "NME" and residue.GetResidueNumber() == residue_number:
+                # NME residues may have same id as preceding residue
+                residue_number += 1
+            else:
+                # catch protein residue id if those should not be touched
+                residue_number = residue.GetResidueNumber()
+
+        else:
+            # change residue id
+            residue_number += 1
+        residue.SetResidueNumber(residue_number)
+        for atom in hv_residue.GetAtoms():
+            oechem.OEAtomSetResidue(atom, residue)
+
+    # update residue identifiers, except atom names, residue ids,
+    # residue names, fragment number, chain id and record type
+    preserved_info = oechem.OEPreserveResInfo_ResidueNumber | oechem.OEPreserveResInfo_ResidueName | oechem.OEPreserveResInfo_HetAtom | oechem.OEPreserveResInfo_AtomName | oechem.OEPreserveResInfo_FragmentNumber | oechem.OEPreserveResInfo_ChainID
+    oechem.OEPerceiveResidues(structure, preserved_info)
+
+    return structure
+
+
+def clashing_atoms(molecule1: oechem.OEGraphMol, molecule2: oechem.OEGraphMol) -> bool:
+    """
+    Evaluates if the atoms of two molecules are clashing.
+    Parameters
+    ----------
+    molecule1: oechem.OEGraphMol
+        An OpenEye molecule.
+    molecule2: oechem.OEGraphMol
+        An OpenEye molecule.
+    Returns
+    -------
+    : bool
+        If any atoms of two molecules are clashing
+    """
+    import math
+
+    oechem.OEAssignCovalentRadii(molecule1)
+    oechem.OEAssignCovalentRadii(molecule2)
+    coordinates1_list = [molecule1.GetCoords()[x] for x in sorted(molecule1.GetCoords().keys())]
+    coordinates2_list = [molecule2.GetCoords()[x] for x in sorted(molecule2.GetCoords().keys())]
+    for atom1, coordinates1 in zip(molecule1.GetAtoms(), coordinates1_list):
+        for atom2, coordinates2 in zip(molecule2.GetAtoms(), coordinates2_list):
+            clash_threshold = atom1.GetRadius() + atom2.GetRadius()
+            distance = math.sqrt(sum((coordinate1 - coordinate2) ** 2.0 for coordinate1, coordinate2 in zip(coordinates1, coordinates2)))
+            if distance <= clash_threshold:
+                return True
+    return False
