@@ -151,7 +151,7 @@ class OpenEyesKLIFSKinaseHybridDockingFeaturizer(OpenEyesHybridDockingFeaturizer
         import klifs_utils
         from openeye import oechem
         from ..docking.OpenEyeDocking import create_hybrid_receptor, hybrid_docking
-        from ..modeling.OpenEyeModeling import select_chain, select_altloc, remove_non_protein, prepare_complex, prepare_protein, mutate_structure, renumber_structure, write_molecules, read_molecules, superpose_proteins, compare_molecules
+        from ..modeling.OpenEyeModeling import select_chain, select_altloc, remove_non_protein, prepare_complex, prepare_protein, mutate_structure, renumber_structure, write_molecules, read_molecules, superpose_proteins, compare_molecules, update_residue_identifiers, clashing_atoms
         from ..utils import LocalFileStorage, FileDownloader
 
         if not hasattr(system.protein, 'klifs_kinase_id'):
@@ -195,6 +195,9 @@ class OpenEyesKLIFSKinaseHybridDockingFeaturizer(OpenEyesHybridDockingFeaturizer
             logging.debug(f"Extracting protein ...")
             protein = oechem.OEGraphMol()
             design_unit.GetProtein(protein)
+            logging.debug(f"Extracting solvent ...")
+            solvent = oechem.OEGraphMol()
+            design_unit.GetSolvent(solvent)
             logging.debug(f"Retrieving kinase domain sequence for {kinase_details.uniprot} ...")
             kinase_domain_sequence = KinaseDomainAminoAcidSequence.from_uniprot(kinase_details.uniprot)
             logging.debug(f"Mutating kinase domain ...")
@@ -202,6 +205,8 @@ class OpenEyesKLIFSKinaseHybridDockingFeaturizer(OpenEyesHybridDockingFeaturizer
             residue_numbers = self.get_kinase_residue_numbers(mutated_structure, kinase_domain_sequence)
             logging.debug(f"Renumbering residues ...")
             renumbered_structure = renumber_structure(mutated_structure, residue_numbers)
+            logging.debug(f"Adding solvent to standardized kinase domain ...")
+            _a, _b = oechem.OEAddMols(renumbered_structure, solvent)
             real_termini = []
             if kinase_domain_sequence.metadata["true_N_terminus"]:
                 if kinase_domain_sequence.metadata["begin"] == residue_numbers[0]:
@@ -213,13 +218,15 @@ class OpenEyesKLIFSKinaseHybridDockingFeaturizer(OpenEyesHybridDockingFeaturizer
                 real_termini = None
             logging.debug(f"Capping kinase domain ...")
             design_unit = prepare_protein(renumbered_structure, cap_termini=True, real_termini=real_termini)
-            kinase_domain = oechem.OEGraphMol()
-            design_unit.GetProtein(kinase_domain)
+            solvated_kinase_domain = oechem.OEGraphMol()
+            components = oechem.OEDesignUnitComponents_Protein | oechem.OEDesignUnitComponents_Solvent
+            design_unit.GetComponents(solvated_kinase_domain, components)
+            solvated_kinase_domain = update_residue_identifiers(solvated_kinase_domain)
             logging.debug(f"Writing kinase domain to {kinase_domain_path}...")
-            write_molecules([kinase_domain], kinase_domain_path)
+            write_molecules([solvated_kinase_domain], kinase_domain_path)
         else:
             logging.debug(f"Reading kinase domain from {kinase_domain_path} ...")
-            kinase_domain = read_molecules(kinase_domain_path)[0]
+            solvated_kinase_domain = read_molecules(kinase_domain_path)[0]
 
         logging.debug(f"Preparing ligand of {ligand_template.pdb} ...")
         ligand_template_structure = PDBProtein(ligand_template.pdb)
@@ -231,22 +238,45 @@ class OpenEyesKLIFSKinaseHybridDockingFeaturizer(OpenEyesHybridDockingFeaturizer
         ligand_template_structure = select_chain(ligand_template_structure, ligand_template.chain)
         ligand_template_structure = select_altloc(ligand_template_structure, ligand_template.alt)
         ligand_template_structure = remove_non_protein(ligand_template_structure, exceptions=[ligand_template.ligand], remove_water=False)
-        ligand_template_structure = superpose_proteins(kinase_domain, ligand_template_structure)
+        ligand_template_structure = superpose_proteins(solvated_kinase_domain, ligand_template_structure)
         oechem.OEPlaceHydrogens(ligand_template_structure)
         split_options = oechem.OESplitMolComplexOptions()
         ligand_template_structure = list(oechem.OEGetMolComplexComponents(ligand_template_structure, split_options, split_options.GetLigandFilter()))[0]
+        oechem.OEClearPDBData(ligand_template_structure)  # important for later merging with kinase domain
 
         if compare_molecules(ligand, ligand_template_structure) and ligand_template.pdb == protein_template.pdb:
             logging.debug(f"Found co-crystallized ligand ...")
             docking_pose = ligand_template_structure
         else:
             logging.debug(f"Docking ligand into kinase domain ...")
-            hybrid_receptor = create_hybrid_receptor(kinase_domain, ligand_template_structure)
+            hybrid_receptor = create_hybrid_receptor(solvated_kinase_domain, ligand_template_structure)
             docking_pose = hybrid_docking(hybrid_receptor, [ligand])[0]
+            # generate residue information
+            oechem.OEPerceiveResidues(docking_pose, oechem.OEPreserveResInfo_None)
 
         logging.debug("Writing docking pose ...")
-        docking_pose_path = LocalFileStorage.DIRECTORY / f"{protein_template.pdb}_kinase_domain_{system.ligand.name}.sdf"
+        docking_pose_path = LocalFileStorage.DIRECTORY / f"rcsb_{protein_template.pdb}_kinase_domain_{system.ligand.name}.sdf"
         write_molecules([docking_pose], docking_pose_path)
+
+        logging.debug("Assembling kinase ligand complex ...")
+        split_options = oechem.OESplitMolComplexOptions()
+        kinase_domain = list(oechem.OEGetMolComplexComponents(solvated_kinase_domain, split_options, split_options.GetProteinFilter()))[0]
+        kinase_ligand_complex = oechem.OEGraphMol()
+        logging.debug("Adding kinase domain ...")
+        _a, _b = oechem.OEAddMols(kinase_ligand_complex, kinase_domain)
+        logging.debug("Adding ligand ...")
+        _a, _b = oechem.OEAddMols(kinase_ligand_complex, docking_pose)
+        solvent = list(oechem.OEGetMolComplexComponents(solvated_kinase_domain, split_options, split_options.GetWaterFilter()))
+        logging.debug("Adding water molecules ...")
+        for water_molecule in solvent:
+            if not clashing_atoms(docking_pose, water_molecule):
+                _a, _b = oechem.OEAddMols(kinase_ligand_complex, water_molecule)
+        oechem.OEPlaceHydrogens(kinase_ligand_complex)
+        kinase_ligand_complex = update_residue_identifiers(kinase_ligand_complex)
+
+        logging.debug("Writing kinase ligand complex ...")
+        complex_path = LocalFileStorage.DIRECTORY / f"{system.protein.name}_{system.ligand.name}.pdb"
+        write_molecules([kinase_ligand_complex], complex_path)
 
         file_protein = FileProtein(path=str(LocalFileStorage.rcsb_kinase_domain_pdb(protein_template.pdb)))
         file_ligand = FileLigand(path=str(docking_pose_path))
