@@ -43,31 +43,52 @@ class OpenEyesHybridDockingFeaturizer(BaseFeaturizer):
         protein_ligand_complex: ProteinLigandComplex
             The same system but with docked ligand.
         """
-        from appdirs import user_cache_dir
         from openeye import oechem
 
         from ..docking.OpenEyeDocking import create_hybrid_receptor, hybrid_docking
-        from ..modeling.OpenEyeModeling import prepare_complex, write_molecules
+        from ..modeling.OpenEyeModeling import prepare_complex, write_molecules, clashing_atoms, update_residue_identifiers
+        from ..utils import LocalFileStorage
 
         ligand, smiles, protein, electron_density = self.interpret_system(system)
 
         design_unit = prepare_complex(protein, electron_density, self.loop_db)
         prepared_protein = oechem.OEGraphMol()
+        prepared_solvent = oechem.OEGraphMol()
         prepared_ligand = oechem.OEGraphMol()
         design_unit.GetProtein(prepared_protein)
+        design_unit.GetProtein(prepared_solvent)
         design_unit.GetLigand(prepared_ligand)
         hybrid_receptor = create_hybrid_receptor(prepared_protein, prepared_ligand)
-        docking_poses = hybrid_docking(hybrid_receptor, [ligand])
+        docking_pose = hybrid_docking(hybrid_receptor, [ligand])[0]
+
+        logging.debug("Assembling components ...")
+        protein_ligand_complex = oechem.OEGraphMol()
+        logging.debug("Adding kinase domain ...")
+        _a, _b = oechem.OEAddMols(protein_ligand_complex, prepared_protein)
+        logging.debug("Adding ligand ...")
+        _a, _b = oechem.OEAddMols(protein_ligand_complex, docking_pose)
+        logging.debug("Adding water molecules ...")
+        split_options = oechem.OESplitMolComplexOptions()
+        solvent = list(oechem.OEGetMolComplexComponents(prepared_solvent, split_options, split_options.GetWaterFilter()))
+        for water_molecule in solvent:
+            if not clashing_atoms(docking_pose, water_molecule):
+                _a, _b = oechem.OEAddMols(protein_ligand_complex, water_molecule)
+        oechem.OEPlaceHydrogens(protein_ligand_complex)
+        protein_ligand_complex = update_residue_identifiers(protein_ligand_complex)
 
         # TODO: where to store data
-        protein_path = f"{user_cache_dir()}/{system.protein.name}.pdb"  # mmcif writing not supported by openeye
+        logging.debug("Writing protein ligand complex ...")
+        complex_path = LocalFileStorage.DIRECTORY / f"{system.protein.name}_{system.ligand.name}.pdb"
+        write_molecules([protein_ligand_complex], complex_path)
+
+        logging.debug("Writing protein ...")
+        protein_path = LocalFileStorage.DIRECTORY / f"{system.protein.name}_prep.pdb"
         write_molecules([prepared_protein], protein_path)
         file_protein = FileProtein(path=protein_path)
 
-        ligand_path = (
-            f"{user_cache_dir()}/{system.protein.name}_{system.ligand.name}.sdf"
-        )
-        write_molecules(docking_poses, ligand_path)
+        logging.debug("Writing ligand ...")
+        ligand_path = LocalFileStorage.DIRECTORY / f"{system.protein.name}_{system.ligand.name}.sdf"
+        write_molecules([docking_pose], ligand_path)
         file_ligand = FileLigand(path=ligand_path)
         protein_ligand_complex = ProteinLigandComplex(
             components=[file_protein, file_ligand]

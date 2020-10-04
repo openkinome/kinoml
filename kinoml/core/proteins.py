@@ -1,5 +1,4 @@
 import logging
-from typing import List, Union
 
 from .components import BaseProtein, BaseStructure
 from .sequences import Biosequence
@@ -24,7 +23,7 @@ class FileProtein(BaseProtein):
         self, path, electron_density_path=None, metadata=None, name="", *args, **kwargs
     ):
         super().__init__(name=name, metadata=metadata, *args, **kwargs)
-        if path.startswith("http"):
+        if str(path).startswith("http"):
             from appdirs import user_cache_dir
 
             # TODO: where to save, how to name
