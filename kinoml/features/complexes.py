@@ -79,10 +79,14 @@ class OpenEyesHybridDockingFeaturizer(BaseFeaturizer):
         # TODO: where to store data
         logging.debug("Writing protein ligand complex ...")
         complex_path = LocalFileStorage.DIRECTORY / f"{system.protein.name}_{system.ligand.name}.pdb"
+        oechem.OEClearPDBData(protein_ligand_complex)
+        oechem.OESetPDBData(protein_ligand_complex, "COMPND", f"\tFeaturizer: OpenEyesHybridDockingFeaturizer, Protein: {system.protein.name}, Ligand: {system.ligand.name}")
         write_molecules([protein_ligand_complex], complex_path)
 
         logging.debug("Writing protein ...")
         protein_path = LocalFileStorage.DIRECTORY / f"{system.protein.name}_prep.pdb"
+        oechem.OEClearPDBData(prepared_protein)
+        oechem.OESetPDBData(prepared_protein, "COMPND", f"\tFeaturizer: OpenEyesHybridDockingFeaturizer, Protein: {system.protein.name}")
         write_molecules([prepared_protein], protein_path)
         file_protein = FileProtein(path=protein_path)
 
@@ -244,6 +248,8 @@ class OpenEyesKLIFSKinaseHybridDockingFeaturizer(OpenEyesHybridDockingFeaturizer
             design_unit.GetComponents(solvated_kinase_domain, components)
             solvated_kinase_domain = update_residue_identifiers(solvated_kinase_domain)
             logging.debug(f"Writing kinase domain to {kinase_domain_path}...")
+            oechem.OEClearPDBData(solvated_kinase_domain)
+            oechem.OESetPDBData(solvated_kinase_domain, "COMPND", f"\tFeaturizer: OpenEyesKLIFSKinaseHybridDockingFeaturizer, PDB: {system.protein.pdb_id}, Kinase: {kinase_details.uniprot} {residue_numbers[0]}-{residue_numbers[-1]}")
             write_molecules([solvated_kinase_domain], kinase_domain_path)
         else:
             logging.debug(f"Reading kinase domain from {kinase_domain_path} ...")
@@ -297,6 +303,9 @@ class OpenEyesKLIFSKinaseHybridDockingFeaturizer(OpenEyesHybridDockingFeaturizer
 
         logging.debug("Writing kinase ligand complex ...")
         complex_path = LocalFileStorage.DIRECTORY / f"{system.protein.name}_{system.ligand.name}.pdb"
+        compnd_data = oechem.OEGetPDBData(solvated_kinase_domain, "COMPND")
+        oechem.OEClearPDBData(kinase_ligand_complex)
+        oechem.OESetPDBData(kinase_ligand_complex, "COMPND",  f"{compnd_data}, Ligand: {system.ligand.name}")
         write_molecules([kinase_ligand_complex], complex_path)
 
         file_protein = FileProtein(path=str(LocalFileStorage.rcsb_kinase_domain_pdb(protein_template.pdb)))
