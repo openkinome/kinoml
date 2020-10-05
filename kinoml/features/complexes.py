@@ -379,8 +379,14 @@ class OpenEyesKLIFSKinaseHybridDockingFeaturizer(OpenEyesHybridDockingFeaturizer
             docking_pose = ligand_template_structure
         else:
             logging.debug(f"Docking ligand into kinase domain ...")
+            split_options = oechem.OESplitMolComplexOptions()
+            kinase_domain = list(
+                oechem.OEGetMolComplexComponents(
+                    solvated_kinase_domain, split_options, split_options.GetProteinFilter()
+                )
+            )[0]
             hybrid_receptor = create_hybrid_receptor(
-                solvated_kinase_domain, ligand_template_structure
+                kinase_domain, ligand_template_structure
             )
             docking_pose = hybrid_docking(hybrid_receptor, [ligand])[0]
             # generate residue information
