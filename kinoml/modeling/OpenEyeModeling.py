@@ -174,7 +174,7 @@ def select_altloc(molecule, altloc_id):
     # do not change input mol
     selection = molecule.CreateCopy()
 
-    allowed_altloc_ids = [' ', altloc_id]
+    allowed_altloc_ids = [" ", altloc_id]
 
     # delete other alternate location
     for atom in selection.GetAtoms():
@@ -185,7 +185,11 @@ def select_altloc(molecule, altloc_id):
     return selection
 
 
-def remove_non_protein(molecule: oechem.OEGraphMol, exceptions: Union[None, List[str]] = None, remove_water: bool = False) -> oechem.OEGraphMol:
+def remove_non_protein(
+    molecule: oechem.OEGraphMol,
+    exceptions: Union[None, List[str]] = None,
+    remove_water: bool = False,
+) -> oechem.OEGraphMol:
     """
     Remove non-protein atoms from an OpenEye molecule.
     Parameters
@@ -388,7 +392,11 @@ def _prepare_structure(
             )
             # filter design units for ligand of interest
             if ligand_name is not None:
-                design_units = [design_unit for design_unit in design_units if ligand_name in design_unit.GetTitle()]
+                design_units = [
+                    design_unit
+                    for design_unit in design_units
+                    if ligand_name in design_unit.GetTitle()
+                ]
 
         else:
             design_units = list(
@@ -1018,7 +1026,9 @@ def superpose_proteins(
     return superposed_protein
 
 
-def update_residue_identifiers(structure: oechem.OEGraphMol, keep_protein_residue_ids: bool = True) -> oechem.OEGraphMol:
+def update_residue_identifiers(
+    structure: oechem.OEGraphMol, keep_protein_residue_ids: bool = True
+) -> oechem.OEGraphMol:
     """
     Updates the atom, residue and chain ids of the given molecular structure. All residues become part of chain A. Atom
     ids will start from 1. Residue will start from 1, except protein residue ids are fixed. This is especially useful,
@@ -1041,7 +1051,10 @@ def update_residue_identifiers(structure: oechem.OEGraphMol, keep_protein_residu
         residue = hv_residue.GetOEResidue()
         residue.SetChainID("A")
         if not residue.IsHetAtom() and keep_protein_residue_ids:
-            if residue.GetName() == "NME" and residue.GetResidueNumber() == residue_number:
+            if (
+                residue.GetName() == "NME"
+                and residue.GetResidueNumber() == residue_number
+            ):
                 # NME residues may have same id as preceding residue
                 residue_number += 1
             else:
@@ -1057,7 +1070,14 @@ def update_residue_identifiers(structure: oechem.OEGraphMol, keep_protein_residu
 
     # update residue identifiers, except atom names, residue ids,
     # residue names, fragment number, chain id and record type
-    preserved_info = oechem.OEPreserveResInfo_ResidueNumber | oechem.OEPreserveResInfo_ResidueName | oechem.OEPreserveResInfo_HetAtom | oechem.OEPreserveResInfo_AtomName | oechem.OEPreserveResInfo_FragmentNumber | oechem.OEPreserveResInfo_ChainID
+    preserved_info = (
+        oechem.OEPreserveResInfo_ResidueNumber
+        | oechem.OEPreserveResInfo_ResidueName
+        | oechem.OEPreserveResInfo_HetAtom
+        | oechem.OEPreserveResInfo_AtomName
+        | oechem.OEPreserveResInfo_FragmentNumber
+        | oechem.OEPreserveResInfo_ChainID
+    )
     oechem.OEPerceiveResidues(structure, preserved_info)
 
     return structure
@@ -1081,12 +1101,21 @@ def clashing_atoms(molecule1: oechem.OEGraphMol, molecule2: oechem.OEGraphMol) -
 
     oechem.OEAssignCovalentRadii(molecule1)
     oechem.OEAssignCovalentRadii(molecule2)
-    coordinates1_list = [molecule1.GetCoords()[x] for x in sorted(molecule1.GetCoords().keys())]
-    coordinates2_list = [molecule2.GetCoords()[x] for x in sorted(molecule2.GetCoords().keys())]
+    coordinates1_list = [
+        molecule1.GetCoords()[x] for x in sorted(molecule1.GetCoords().keys())
+    ]
+    coordinates2_list = [
+        molecule2.GetCoords()[x] for x in sorted(molecule2.GetCoords().keys())
+    ]
     for atom1, coordinates1 in zip(molecule1.GetAtoms(), coordinates1_list):
         for atom2, coordinates2 in zip(molecule2.GetAtoms(), coordinates2_list):
             clash_threshold = atom1.GetRadius() + atom2.GetRadius()
-            distance = math.sqrt(sum((coordinate1 - coordinate2) ** 2.0 for coordinate1, coordinate2 in zip(coordinates1, coordinates2)))
+            distance = math.sqrt(
+                sum(
+                    (coordinate1 - coordinate2) ** 2.0
+                    for coordinate1, coordinate2 in zip(coordinates1, coordinates2)
+                )
+            )
             if distance <= clash_threshold:
                 return True
     return False

@@ -46,7 +46,12 @@ class OpenEyesHybridDockingFeaturizer(BaseFeaturizer):
         from openeye import oechem
 
         from ..docking.OpenEyeDocking import create_hybrid_receptor, hybrid_docking
-        from ..modeling.OpenEyeModeling import prepare_complex, write_molecules, clashing_atoms, update_residue_identifiers
+        from ..modeling.OpenEyeModeling import (
+            prepare_complex,
+            write_molecules,
+            clashing_atoms,
+            update_residue_identifiers,
+        )
         from ..utils import LocalFileStorage
 
         ligand, smiles, protein, electron_density = self.interpret_system(system)
@@ -69,7 +74,11 @@ class OpenEyesHybridDockingFeaturizer(BaseFeaturizer):
         _a, _b = oechem.OEAddMols(protein_ligand_complex, docking_pose)
         logging.debug("Adding water molecules ...")
         split_options = oechem.OESplitMolComplexOptions()
-        solvent = list(oechem.OEGetMolComplexComponents(prepared_solvent, split_options, split_options.GetWaterFilter()))
+        solvent = list(
+            oechem.OEGetMolComplexComponents(
+                prepared_solvent, split_options, split_options.GetWaterFilter()
+            )
+        )
         for water_molecule in solvent:
             if not clashing_atoms(docking_pose, water_molecule):
                 _a, _b = oechem.OEAddMols(protein_ligand_complex, water_molecule)
@@ -78,20 +87,34 @@ class OpenEyesHybridDockingFeaturizer(BaseFeaturizer):
 
         # TODO: where to store data
         logging.debug("Writing protein ligand complex ...")
-        complex_path = LocalFileStorage.DIRECTORY / f"{system.protein.name}_{system.ligand.name}.pdb"
+        complex_path = (
+            LocalFileStorage.DIRECTORY
+            / f"{system.protein.name}_{system.ligand.name}.pdb"
+        )
         oechem.OEClearPDBData(protein_ligand_complex)
-        oechem.OESetPDBData(protein_ligand_complex, "COMPND", f"\tFeaturizer: OpenEyesHybridDockingFeaturizer, Protein: {system.protein.name}, Ligand: {system.ligand.name}")
+        oechem.OESetPDBData(
+            protein_ligand_complex,
+            "COMPND",
+            f"\tFeaturizer: OpenEyesHybridDockingFeaturizer, Protein: {system.protein.name}, Ligand: {system.ligand.name}",
+        )
         write_molecules([protein_ligand_complex], complex_path)
 
         logging.debug("Writing protein ...")
         protein_path = LocalFileStorage.DIRECTORY / f"{system.protein.name}_prep.pdb"
         oechem.OEClearPDBData(prepared_protein)
-        oechem.OESetPDBData(prepared_protein, "COMPND", f"\tFeaturizer: OpenEyesHybridDockingFeaturizer, Protein: {system.protein.name}")
+        oechem.OESetPDBData(
+            prepared_protein,
+            "COMPND",
+            f"\tFeaturizer: OpenEyesHybridDockingFeaturizer, Protein: {system.protein.name}",
+        )
         write_molecules([prepared_protein], protein_path)
         file_protein = FileProtein(path=protein_path)
 
         logging.debug("Writing ligand ...")
-        ligand_path = LocalFileStorage.DIRECTORY / f"{system.protein.name}_{system.ligand.name}.sdf"
+        ligand_path = (
+            LocalFileStorage.DIRECTORY
+            / f"{system.protein.name}_{system.ligand.name}.sdf"
+        )
         write_molecules([docking_pose], ligand_path)
         file_ligand = FileLigand(path=ligand_path)
         protein_ligand_complex = ProteinLigandComplex(
@@ -102,7 +125,11 @@ class OpenEyesHybridDockingFeaturizer(BaseFeaturizer):
     @staticmethod
     def interpret_system(system):
         from openeye import oechem
-        from ..modeling.OpenEyeModeling import read_smiles, read_molecules, read_electron_density
+        from ..modeling.OpenEyeModeling import (
+            read_smiles,
+            read_molecules,
+            read_electron_density,
+        )
         from ..utils import FileDownloader
 
         # ligand
@@ -119,9 +146,11 @@ class OpenEyesHybridDockingFeaturizer(BaseFeaturizer):
 
         # protein
         logging.debug("Interpreting protein ...")
-        if hasattr(system.protein, 'pdb_id'):
+        if hasattr(system.protein, "pdb_id"):
             if not system.protein.path.is_file():
-                logging.debug(f"Downloading protein structure {system.protein.pdb_id} from PDB ...")
+                logging.debug(
+                    f"Downloading protein structure {system.protein.pdb_id} from PDB ..."
+                )
                 FileDownloader.rcsb_structure_pdb(system.protein.pdb_id)
         logging.debug(f"Reading protein structure from {system.protein.path} ...")
         protein = read_molecules(system.protein.path)[0]
@@ -130,7 +159,7 @@ class OpenEyesHybridDockingFeaturizer(BaseFeaturizer):
         logging.debug("Interpreting electron density ...")
         electron_density = None
         # TODO: Kills Kernel for some reason
-        #if system.protein.electron_density_path is not None:
+        # if system.protein.electron_density_path is not None:
         #    if hasattr(system.protein, 'pdb_id'):
         #        if not system.protein.electron_density_path.is_file():
         #            logging.debug(f"Downloading electron density for structure {system.protein.pdb_id} from PDB ...")
@@ -149,9 +178,12 @@ class OpenEyesKLIFSKinaseHybridDockingFeaturizer(OpenEyesHybridDockingFeaturizer
     We assume that the system contains a BaseProtein with a
     'klifs_kinase_id' attribute and a SmilesLigand.
     """
+
     import pandas as pd
 
-    def __init__(self, loop_db: Union[str, None] = None, shape: bool = False, debug: bool = False):
+    def __init__(
+        self, loop_db: Union[str, None] = None, shape: bool = False, debug: bool = False
+    ):
         super().__init__(loop_db)
         self.loop_db = loop_db
         self.shape = shape
@@ -176,10 +208,24 @@ class OpenEyesKLIFSKinaseHybridDockingFeaturizer(OpenEyesHybridDockingFeaturizer
         import klifs_utils
         from openeye import oechem
         from ..docking.OpenEyeDocking import create_hybrid_receptor, hybrid_docking
-        from ..modeling.OpenEyeModeling import select_chain, select_altloc, remove_non_protein, prepare_complex, prepare_protein, mutate_structure, renumber_structure, write_molecules, read_molecules, superpose_proteins, compare_molecules, update_residue_identifiers, clashing_atoms
+        from ..modeling.OpenEyeModeling import (
+            select_chain,
+            select_altloc,
+            remove_non_protein,
+            prepare_complex,
+            prepare_protein,
+            mutate_structure,
+            renumber_structure,
+            write_molecules,
+            read_molecules,
+            superpose_proteins,
+            compare_molecules,
+            update_residue_identifiers,
+            clashing_atoms,
+        )
         from ..utils import LocalFileStorage, FileDownloader
 
-        if not hasattr(system.protein, 'klifs_kinase_id'):
+        if not hasattr(system.protein, "klifs_kinase_id"):
             print("The protein misses a 'klifs_kinase_id' attribute.")
             raise NotImplementedError
 
@@ -193,7 +239,9 @@ class OpenEyesKLIFSKinaseHybridDockingFeaturizer(OpenEyesHybridDockingFeaturizer
 
         logging.debug("Searching ligand template ...")
         # select structure for ligand modeling
-        ligand_template = self.select_ligand_template(system.protein.klifs_kinase_id, system.ligand.smiles, self.shape)
+        ligand_template = self.select_ligand_template(
+            system.protein.klifs_kinase_id, system.ligand.smiles, self.shape
+        )
         logging.debug(f"Selected {ligand_template.pdb} as ligand template ...")
 
         logging.debug("Searching kinase template ...")
@@ -201,23 +249,37 @@ class OpenEyesKLIFSKinaseHybridDockingFeaturizer(OpenEyesHybridDockingFeaturizer
         if ligand_template.kinase_ID == system.protein.klifs_kinase_id:
             protein_template = ligand_template
         else:
-            protein_template = self.select_protein_template(system.protein.klifs_kinase_id, ligand_template.DFG, ligand_template.aC_helix)
+            protein_template = self.select_protein_template(
+                system.protein.klifs_kinase_id,
+                ligand_template.DFG,
+                ligand_template.aC_helix,
+            )
         logging.debug(f"Selected {protein_template.pdb} as kinase template ...")
 
         logging.debug(f"Adding attributes to BaseProtein ...")
         system.protein.pdb_id = protein_template.pdb
         system.protein.path = LocalFileStorage.rcsb_structure_pdb(protein_template.pdb)
-        system.protein.electron_density_path = LocalFileStorage.rcsb_electron_density_mtz(protein_template.pdb)
+        system.protein.electron_density_path = LocalFileStorage.rcsb_electron_density_mtz(
+            protein_template.pdb
+        )
 
         logging.debug(f"Interpreting system ...")
         ligand, smiles, protein, electron_density = self.interpret_system(system)
 
         logging.debug(f"Preparing kinase domain of {protein_template.pdb} ...")
-        kinase_domain_path = LocalFileStorage.rcsb_kinase_domain_pdb(protein_template.pdb)
+        kinase_domain_path = LocalFileStorage.rcsb_kinase_domain_pdb(
+            protein_template.pdb
+        )
         if not kinase_domain_path.is_file():
             logging.debug(f"Generating design unit ...")
             if protein_template.ligand != 0:
-                design_unit = prepare_complex(protein, electron_density, self.loop_db, ligand_name=str(protein_template.ligand), cap_termini=False)
+                design_unit = prepare_complex(
+                    protein,
+                    electron_density,
+                    self.loop_db,
+                    ligand_name=str(protein_template.ligand),
+                    cap_termini=False,
+                )
             else:
                 design_unit = prepare_protein(protein, self.loop_db, cap_termini=False)
             logging.debug(f"Extracting protein ...")
@@ -226,13 +288,21 @@ class OpenEyesKLIFSKinaseHybridDockingFeaturizer(OpenEyesHybridDockingFeaturizer
             logging.debug(f"Extracting solvent ...")
             solvent = oechem.OEGraphMol()
             design_unit.GetSolvent(solvent)
-            logging.debug(f"Retrieving kinase domain sequence for {kinase_details.uniprot} ...")
-            kinase_domain_sequence = KinaseDomainAminoAcidSequence.from_uniprot(kinase_details.uniprot)
+            logging.debug(
+                f"Retrieving kinase domain sequence for {kinase_details.uniprot} ..."
+            )
+            kinase_domain_sequence = KinaseDomainAminoAcidSequence.from_uniprot(
+                kinase_details.uniprot
+            )
             logging.debug(f"Mutating kinase domain ...")
             mutated_structure = mutate_structure(protein, kinase_domain_sequence)
-            residue_numbers = self.get_kinase_residue_numbers(mutated_structure, kinase_domain_sequence)
+            residue_numbers = self.get_kinase_residue_numbers(
+                mutated_structure, kinase_domain_sequence
+            )
             logging.debug(f"Renumbering residues ...")
-            renumbered_structure = renumber_structure(mutated_structure, residue_numbers)
+            renumbered_structure = renumber_structure(
+                mutated_structure, residue_numbers
+            )
             logging.debug(f"Adding solvent to standardized kinase domain ...")
             _a, _b = oechem.OEAddMols(renumbered_structure, solvent)
             real_termini = []
@@ -245,14 +315,23 @@ class OpenEyesKLIFSKinaseHybridDockingFeaturizer(OpenEyesHybridDockingFeaturizer
             if len(real_termini) == 0:
                 real_termini = None
             logging.debug(f"Capping kinase domain ...")
-            design_unit = prepare_protein(renumbered_structure, cap_termini=True, real_termini=real_termini)
+            design_unit = prepare_protein(
+                renumbered_structure, cap_termini=True, real_termini=real_termini
+            )
             solvated_kinase_domain = oechem.OEGraphMol()
-            components = oechem.OEDesignUnitComponents_Protein | oechem.OEDesignUnitComponents_Solvent
+            components = (
+                oechem.OEDesignUnitComponents_Protein
+                | oechem.OEDesignUnitComponents_Solvent
+            )
             design_unit.GetComponents(solvated_kinase_domain, components)
             solvated_kinase_domain = update_residue_identifiers(solvated_kinase_domain)
             logging.debug(f"Writing kinase domain to {kinase_domain_path}...")
             oechem.OEClearPDBData(solvated_kinase_domain)
-            oechem.OESetPDBData(solvated_kinase_domain, "COMPND", f"\tFeaturizer: OpenEyesKLIFSKinaseHybridDockingFeaturizer, PDB: {system.protein.pdb_id}, Kinase: {kinase_details.uniprot} {residue_numbers[0]}-{residue_numbers[-1]}")
+            oechem.OESetPDBData(
+                solvated_kinase_domain,
+                "COMPND",
+                f"\tFeaturizer: OpenEyesKLIFSKinaseHybridDockingFeaturizer, PDB: {system.protein.pdb_id}, Kinase: {kinase_details.uniprot} {residue_numbers[0]}-{residue_numbers[-1]}",
+            )
             write_molecules([solvated_kinase_domain], kinase_domain_path)
         else:
             logging.debug(f"Reading kinase domain from {kinase_domain_path} ...")
@@ -262,41 +341,77 @@ class OpenEyesKLIFSKinaseHybridDockingFeaturizer(OpenEyesHybridDockingFeaturizer
         ligand_template_structure = PDBProtein(ligand_template.pdb)
         logging.debug("Interpreting protein ...")
         if not ligand_template_structure.path.is_file():
-            logging.debug(f"Downloading protein structure {ligand_template_structure.pdb_id} from PDB ...")
+            logging.debug(
+                f"Downloading protein structure {ligand_template_structure.pdb_id} from PDB ..."
+            )
             FileDownloader.rcsb_structure_pdb(ligand_template_structure.pdb_id)
         ligand_template_structure = read_molecules(ligand_template_structure.path)[0]
-        ligand_template_structure = select_chain(ligand_template_structure, ligand_template.chain)
-        ligand_template_structure = select_altloc(ligand_template_structure, ligand_template.alt)
-        ligand_template_structure = remove_non_protein(ligand_template_structure, exceptions=[ligand_template.ligand], remove_water=False)
-        ligand_template_structure = superpose_proteins(solvated_kinase_domain, ligand_template_structure)
+        ligand_template_structure = select_chain(
+            ligand_template_structure, ligand_template.chain
+        )
+        ligand_template_structure = select_altloc(
+            ligand_template_structure, ligand_template.alt
+        )
+        ligand_template_structure = remove_non_protein(
+            ligand_template_structure,
+            exceptions=[ligand_template.ligand],
+            remove_water=False,
+        )
+        ligand_template_structure = superpose_proteins(
+            solvated_kinase_domain, ligand_template_structure
+        )
         oechem.OEPlaceHydrogens(ligand_template_structure)
         split_options = oechem.OESplitMolComplexOptions()
-        ligand_template_structure = list(oechem.OEGetMolComplexComponents(ligand_template_structure, split_options, split_options.GetLigandFilter()))[0]
-        oechem.OEClearPDBData(ligand_template_structure)  # important for later merging with kinase domain
+        ligand_template_structure = list(
+            oechem.OEGetMolComplexComponents(
+                ligand_template_structure,
+                split_options,
+                split_options.GetLigandFilter(),
+            )
+        )[0]
+        oechem.OEClearPDBData(
+            ligand_template_structure
+        )  # important for later merging with kinase domain
 
-        if compare_molecules(ligand, ligand_template_structure) and ligand_template.pdb == protein_template.pdb:
+        if (
+            compare_molecules(ligand, ligand_template_structure)
+            and ligand_template.pdb == protein_template.pdb
+        ):
             logging.debug(f"Found co-crystallized ligand ...")
             docking_pose = ligand_template_structure
         else:
             logging.debug(f"Docking ligand into kinase domain ...")
-            hybrid_receptor = create_hybrid_receptor(solvated_kinase_domain, ligand_template_structure)
+            hybrid_receptor = create_hybrid_receptor(
+                solvated_kinase_domain, ligand_template_structure
+            )
             docking_pose = hybrid_docking(hybrid_receptor, [ligand])[0]
             # generate residue information
             oechem.OEPerceiveResidues(docking_pose, oechem.OEPreserveResInfo_None)
 
         logging.debug("Writing docking pose ...")
-        docking_pose_path = LocalFileStorage.DIRECTORY / f"rcsb_{protein_template.pdb}_kinase_domain_{system.ligand.name}.sdf"
+        docking_pose_path = (
+            LocalFileStorage.DIRECTORY
+            / f"rcsb_{protein_template.pdb}_kinase_domain_{system.ligand.name}.sdf"
+        )
         write_molecules([docking_pose], docking_pose_path)
 
         logging.debug("Assembling kinase ligand complex ...")
         split_options = oechem.OESplitMolComplexOptions()
-        kinase_domain = list(oechem.OEGetMolComplexComponents(solvated_kinase_domain, split_options, split_options.GetProteinFilter()))[0]
+        kinase_domain = list(
+            oechem.OEGetMolComplexComponents(
+                solvated_kinase_domain, split_options, split_options.GetProteinFilter()
+            )
+        )[0]
         kinase_ligand_complex = oechem.OEGraphMol()
         logging.debug("Adding kinase domain ...")
         _a, _b = oechem.OEAddMols(kinase_ligand_complex, kinase_domain)
         logging.debug("Adding ligand ...")
         _a, _b = oechem.OEAddMols(kinase_ligand_complex, docking_pose)
-        solvent = list(oechem.OEGetMolComplexComponents(solvated_kinase_domain, split_options, split_options.GetWaterFilter()))
+        solvent = list(
+            oechem.OEGetMolComplexComponents(
+                solvated_kinase_domain, split_options, split_options.GetWaterFilter()
+            )
+        )
         logging.debug("Adding water molecules ...")
         for water_molecule in solvent:
             if not clashing_atoms(docking_pose, water_molecule):
@@ -305,22 +420,34 @@ class OpenEyesKLIFSKinaseHybridDockingFeaturizer(OpenEyesHybridDockingFeaturizer
         kinase_ligand_complex = update_residue_identifiers(kinase_ligand_complex)
 
         logging.debug("Writing kinase ligand complex ...")
-        complex_path = LocalFileStorage.DIRECTORY / f"{system.protein.name}_{system.ligand.name}.pdb"
+        complex_path = (
+            LocalFileStorage.DIRECTORY
+            / f"{system.protein.name}_{system.ligand.name}.pdb"
+        )
         compnd_data = oechem.OEGetPDBData(solvated_kinase_domain, "COMPND")
         oechem.OEClearPDBData(kinase_ligand_complex)
-        oechem.OESetPDBData(kinase_ligand_complex, "COMPND",  f"{compnd_data}, Ligand: {system.ligand.name}")
+        oechem.OESetPDBData(
+            kinase_ligand_complex,
+            "COMPND",
+            f"{compnd_data}, Ligand: {system.ligand.name}",
+        )
         write_molecules([kinase_ligand_complex], complex_path)
 
-        file_protein = FileProtein(path=str(LocalFileStorage.rcsb_kinase_domain_pdb(protein_template.pdb)))
+        file_protein = FileProtein(
+            path=str(LocalFileStorage.rcsb_kinase_domain_pdb(protein_template.pdb))
+        )
         file_ligand = FileLigand(path=str(docking_pose_path))
 
-        kinase_ligand_complex = ProteinLigandComplex(components=[file_protein, file_ligand])
+        kinase_ligand_complex = ProteinLigandComplex(
+            components=[file_protein, file_ligand]
+        )
 
         return kinase_ligand_complex
 
     @staticmethod
     def select_ligand_template(
-            klifs_kinase_id: int, smiles: str, shape: bool) -> pd.DataFrame:
+        klifs_kinase_id: int, smiles: str, shape: bool
+    ) -> pd.DataFrame:
         """
         Select a kinase in complex with a ligand from KLIFS holding a ligand similar to the given SMILES and bound to
         a kinase similar to the kinase of interest.
@@ -343,7 +470,15 @@ class OpenEyesKLIFSKinaseHybridDockingFeaturizer(OpenEyesHybridDockingFeaturizer
         from rdkit import Chem, RDLogger
         from rdkit.Chem import AllChem, DataStructs
 
-        from ..modeling.OpenEyeModeling import read_smiles, smiles_from_pdb, compare_molecules, get_klifs_ligand, generate_reasonable_conformations, overlay_molecules, string_similarity
+        from ..modeling.OpenEyeModeling import (
+            read_smiles,
+            smiles_from_pdb,
+            compare_molecules,
+            get_klifs_ligand,
+            generate_reasonable_conformations,
+            overlay_molecules,
+            string_similarity,
+        )
         from ..utils import LocalFileStorage
 
         RDLogger.DisableLog("rdApp.*")
@@ -355,12 +490,16 @@ class OpenEyesKLIFSKinaseHybridDockingFeaturizer(OpenEyesHybridDockingFeaturizer
 
         # retrieve kinase structures from KLIFS and filter for orthosteric ligands
         kinase_ids = klifs_utils.remote.kinases.kinase_names().kinase_ID.to_list()
-        structures = klifs_utils.remote.structures.structures_from_kinase_ids(kinase_ids)
+        structures = klifs_utils.remote.structures.structures_from_kinase_ids(
+            kinase_ids
+        )
         structures = structures[structures["ligand"] != 0]  # orthosteric ligand
         structures = structures.groupby("pdb").filter(
             lambda x: len(set(x["ligand"])) == 1
         )  # single orthosteric ligand
-        structures = structures[structures.allosteric_ligand == 0]  # no allosteric ligand
+        structures = structures[
+            structures.allosteric_ligand == 0
+        ]  # no allosteric ligand
         # keep entry with highest quality score (alt 'A' preferred over alt 'B', chain 'A' preferred over 'B')
         structures = structures.sort_values(
             by=["alt", "chain", "quality_score"], ascending=[True, True, False]
@@ -373,7 +512,9 @@ class OpenEyesKLIFSKinaseHybridDockingFeaturizer(OpenEyesHybridDockingFeaturizer
                 pdb_to_smiles = json.load(rf)
         else:
             pdb_to_smiles = {}
-        pdb_to_smiles.update(smiles_from_pdb(set(structures.ligand) - set(pdb_to_smiles.keys())))
+        pdb_to_smiles.update(
+            smiles_from_pdb(set(structures.ligand) - set(pdb_to_smiles.keys()))
+        )
         with open(LocalFileStorage.pdb_smiles_json(), "w") as wf:
             json.dump(pdb_to_smiles, wf)
         smiles_column = []
@@ -418,7 +559,9 @@ class OpenEyesKLIFSKinaseHybridDockingFeaturizer(OpenEyesHybridDockingFeaturizer
                         [i, overlay_molecules(complex_ligand, conformations, False)]
                         for i, complex_ligand in enumerate(complex_ligands)
                     ]
-                overlay_score_threshold = max([score[1] for score in overlay_scores]) - 0.2
+                overlay_score_threshold = (
+                    max([score[1] for score in overlay_scores]) - 0.2
+                )
 
                 # pick structures with similar ligands
                 structures = structures.iloc[
@@ -446,7 +589,8 @@ class OpenEyesKLIFSKinaseHybridDockingFeaturizer(OpenEyesHybridDockingFeaturizer
                     for i, fingerprint in enumerate(structures.rdkit_fingerprint)
                 ]
                 fingerprint_similarity_threshold = (
-                        max([similarity[1] for similarity in fingerprint_similarities]) - 0.1
+                    max([similarity[1] for similarity in fingerprint_similarities])
+                    - 0.1
                 )
                 structures = structures.iloc[
                     [
@@ -463,16 +607,18 @@ class OpenEyesKLIFSKinaseHybridDockingFeaturizer(OpenEyesHybridDockingFeaturizer
         ]
         structures["pocket_similarity"] = pocket_similarities
         pocket_similarity_threshold = max(pocket_similarities) - 0.1
-        structures = structures[structures.pocket_similarity >= pocket_similarity_threshold]
+        structures = structures[
+            structures.pocket_similarity >= pocket_similarity_threshold
+        ]
         structure_for_ligand = structures.iloc[0]
 
         return structure_for_ligand
 
     @staticmethod
     def select_protein_template(
-            klifs_kinase_id: int,
-            dfg: Union[str, None] = None,
-            alpha_c_helix: Union[str, None] = None,
+        klifs_kinase_id: int,
+        dfg: Union[str, None] = None,
+        alpha_c_helix: Union[str, None] = None,
     ):
         """
         Select a kinase structure from KLIFS holding a kinase structure similar to the kinase of interest and with the
@@ -518,7 +664,9 @@ class OpenEyesKLIFSKinaseHybridDockingFeaturizer(OpenEyesHybridDockingFeaturizer
         return protein_structure
 
     @staticmethod
-    def get_kinase_residue_numbers(kinase_domain_structure, canonical_kinase_domain_sequence):
+    def get_kinase_residue_numbers(
+        kinase_domain_structure, canonical_kinase_domain_sequence
+    ):
         """
         Get the canonical residue numbers of a kinase domain structure.
         Parameters
@@ -536,12 +684,16 @@ class OpenEyesKLIFSKinaseHybridDockingFeaturizer(OpenEyesHybridDockingFeaturizer
         from kinoml.modeling.OpenEyeModeling import get_sequence
 
         target_sequence = get_sequence(kinase_domain_structure)
-        template_sequence, target_sequence = pairwise2.align.globalxs(canonical_kinase_domain_sequence, target_sequence, -10, 0)[0][:2]
+        template_sequence, target_sequence = pairwise2.align.globalxs(
+            canonical_kinase_domain_sequence, target_sequence, -10, 0
+        )[0][:2]
         logging.debug(f"Template sequence:\n{template_sequence}")
         logging.debug(f"Target sequence:\n{target_sequence}")
         residue_numbers = []
         residue_number = canonical_kinase_domain_sequence.metadata["begin"]
-        for template_sequence_residue, target_sequence_residue in zip(template_sequence, target_sequence):
+        for template_sequence_residue, target_sequence_residue in zip(
+            template_sequence, target_sequence
+        ):
             if template_sequence_residue != "-":
                 if target_sequence_residue != "-":
                     residue_numbers.append(residue_number)
