@@ -216,7 +216,10 @@ class OpenEyesKLIFSKinaseHybridDockingFeaturizer(OpenEyesHybridDockingFeaturizer
         kinase_domain_path = LocalFileStorage.rcsb_kinase_domain_pdb(protein_template.pdb)
         if not kinase_domain_path.is_file():
             logging.debug(f"Generating design unit ...")
-            design_unit = prepare_complex(protein, electron_density, self.loop_db, ligand_name=str(protein_template.ligand), cap_termini=False)
+            if protein_template.ligand != 0:
+                design_unit = prepare_complex(protein, electron_density, self.loop_db, ligand_name=str(protein_template.ligand), cap_termini=False)
+            else:
+                design_unit = prepare_protein(protein, self.loop_db, cap_termini=False)
             logging.debug(f"Extracting protein ...")
             protein = oechem.OEGraphMol()
             design_unit.GetProtein(protein)
