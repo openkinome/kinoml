@@ -182,13 +182,11 @@ class OpenEyesKLIFSKinaseHybridDockingFeaturizer(OpenEyesHybridDockingFeaturizer
     import pandas as pd
 
     def __init__(
-        self, loop_db: Union[str, None] = None, shape: bool = False, debug: bool = False
+        self, loop_db: Union[str, None] = None, shape: bool = False
     ):
         super().__init__(loop_db)
         self.loop_db = loop_db
         self.shape = shape
-        if debug:
-            logging.basicConfig(level=logging.DEBUG)
 
     _SUPPORTED_TYPES = (ProteinLigandComplex,)
 
