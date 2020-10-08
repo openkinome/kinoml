@@ -59,19 +59,19 @@ class OpenEyesHybridDockingFeaturizer(BaseFeaturizer):
         design_unit = prepare_complex(protein, electron_density, self.loop_db)
         prepared_protein = oechem.OEGraphMol()
         prepared_solvent = oechem.OEGraphMol()
-        prepared_ligand = oechem.OEGraphMol()
+        prepared_ligand = oechem.OEGraphMol()  # TODO: rename to template ligand
         design_unit.GetProtein(prepared_protein)
-        design_unit.GetProtein(prepared_solvent)
+        design_unit.GetSolvent(prepared_solvent)
         design_unit.GetLigand(prepared_ligand)
         hybrid_receptor = create_hybrid_receptor(prepared_protein, prepared_ligand)
         docking_pose = hybrid_docking(hybrid_receptor, [ligand])[0]
 
         logging.debug("Assembling components ...")
         protein_ligand_complex = oechem.OEGraphMol()
-        logging.debug("Adding kinase domain ...")
-        _a, _b = oechem.OEAddMols(protein_ligand_complex, prepared_protein)
+        logging.debug("Adding protein ...")
+        oechem.OEAddMols(protein_ligand_complex, prepared_protein)
         logging.debug("Adding ligand ...")
-        _a, _b = oechem.OEAddMols(protein_ligand_complex, docking_pose)
+        oechem.OEAddMols(protein_ligand_complex, docking_pose)
         logging.debug("Adding water molecules ...")
         split_options = oechem.OESplitMolComplexOptions()
         solvent = list(
@@ -79,9 +79,9 @@ class OpenEyesHybridDockingFeaturizer(BaseFeaturizer):
                 prepared_solvent, split_options, split_options.GetWaterFilter()
             )
         )
-        for water_molecule in solvent:
+        for water_molecule in solvent:  # TODO: slow, move to cKDtrees
             if not clashing_atoms(docking_pose, water_molecule):
-                _a, _b = oechem.OEAddMols(protein_ligand_complex, water_molecule)
+                oechem.OEAddMols(protein_ligand_complex, water_molecule)
         oechem.OEPlaceHydrogens(protein_ligand_complex)
         protein_ligand_complex = update_residue_identifiers(protein_ligand_complex)
 
@@ -95,7 +95,7 @@ class OpenEyesHybridDockingFeaturizer(BaseFeaturizer):
         oechem.OESetPDBData(
             protein_ligand_complex,
             "COMPND",
-            f"\tFeaturizer: OpenEyesHybridDockingFeaturizer, Protein: {system.protein.name}, Ligand: {system.ligand.name}",
+            f"\tFeaturizer: {self.__class__.__name__}, Protein: {system.protein.name}, Ligand: {system.ligand.name}",
         )
         write_molecules([protein_ligand_complex], complex_path)
 
@@ -158,18 +158,19 @@ class OpenEyesHybridDockingFeaturizer(BaseFeaturizer):
         # electron density
         logging.debug("Interpreting electron density ...")
         electron_density = None
-        # TODO: Kills Kernel for some reason
         # if system.protein.electron_density_path is not None:
         #    if hasattr(system.protein, 'pdb_id'):
         #        if not system.protein.electron_density_path.is_file():
         #            logging.debug(f"Downloading electron density for structure {system.protein.pdb_id} from PDB ...")
         #            FileDownloader.rcsb_electron_density_mtz(system.protein.pdb_id)
         #    logging.debug(f"Reading electron density from {system.protein.electron_density_path} ...")
+        # TODO: Kills Kernel for some reason
         #    electron_density = read_electron_density(system.protein.electron_density_path)
         logging.debug("Returning system components...")
         return ligand, smiles, protein, electron_density
 
 
+# TODO: OE...
 class OpenEyesKLIFSKinaseHybridDockingFeaturizer(OpenEyesHybridDockingFeaturizer):
     """
     Given a System with exactly one kinase and one ligand,
@@ -186,7 +187,7 @@ class OpenEyesKLIFSKinaseHybridDockingFeaturizer(OpenEyesHybridDockingFeaturizer
     ):
         super().__init__(loop_db)
         self.loop_db = loop_db
-        self.shape = shape
+        self.shape = shape  # TODO: rename to shape_overlay, add to docstring
 
     _SUPPORTED_TYPES = (ProteinLigandComplex,)
 
@@ -224,18 +225,16 @@ class OpenEyesKLIFSKinaseHybridDockingFeaturizer(OpenEyesHybridDockingFeaturizer
         from ..utils import LocalFileStorage, FileDownloader
 
         if not hasattr(system.protein, "klifs_kinase_id"):
-            print("The protein misses a 'klifs_kinase_id' attribute.")
-            raise NotImplementedError
+            raise NotImplementedError("The protein misses a 'klifs_kinase_id' attribute.")
 
         if not isinstance(system.ligand, SmilesLigand):
-            print("This featurizer needs a system with at SmilesLigand.")
-            raise NotImplementedError
+            raise NotImplementedError("This featurizer needs a system with at SmilesLigand.")
 
         kinase_details = klifs_utils.remote.kinases.kinases_from_kinase_ids(
             [system.protein.klifs_kinase_id]
         ).iloc[0]
 
-        logging.debug("Searching ligand template ...")
+        logging.debug("Searching ligand template ...")  # TODO: naming problem with co-crystallized ligand in hybrid docking, see above
         # select structure for ligand modeling
         ligand_template = self.select_ligand_template(
             system.protein.klifs_kinase_id, system.ligand.smiles, self.shape
@@ -254,7 +253,7 @@ class OpenEyesKLIFSKinaseHybridDockingFeaturizer(OpenEyesHybridDockingFeaturizer
             )
         logging.debug(f"Selected {protein_template.pdb} as kinase template ...")
 
-        logging.debug(f"Adding attributes to BaseProtein ...")
+        logging.debug(f"Adding attributes to BaseProtein ...")  # TODO: bad idea in a library
         system.protein.pdb_id = protein_template.pdb
         system.protein.path = LocalFileStorage.rcsb_structure_pdb(protein_template.pdb)
         system.protein.electron_density_path = LocalFileStorage.rcsb_electron_density_mtz(
@@ -277,7 +276,7 @@ class OpenEyesKLIFSKinaseHybridDockingFeaturizer(OpenEyesHybridDockingFeaturizer
                     self.loop_db,
                     ligand_name=str(protein_template.ligand),
                     cap_termini=False,
-                )
+                )  # TODO: put in helper function
             else:
                 design_unit = prepare_protein(protein, self.loop_db, cap_termini=False)
             logging.debug(f"Extracting protein ...")
@@ -302,7 +301,7 @@ class OpenEyesKLIFSKinaseHybridDockingFeaturizer(OpenEyesHybridDockingFeaturizer
                 mutated_structure, residue_numbers
             )
             logging.debug(f"Adding solvent to standardized kinase domain ...")
-            _a, _b = oechem.OEAddMols(renumbered_structure, solvent)
+            oechem.OEAddMols(renumbered_structure, solvent)
             real_termini = []
             if kinase_domain_sequence.metadata["true_N_terminus"]:
                 if kinase_domain_sequence.metadata["begin"] == residue_numbers[0]:
@@ -328,7 +327,7 @@ class OpenEyesKLIFSKinaseHybridDockingFeaturizer(OpenEyesHybridDockingFeaturizer
             oechem.OESetPDBData(
                 solvated_kinase_domain,
                 "COMPND",
-                f"\tFeaturizer: OpenEyesKLIFSKinaseHybridDockingFeaturizer, PDB: {system.protein.pdb_id}, Kinase: {kinase_details.uniprot} {residue_numbers[0]}-{residue_numbers[-1]}",
+                f"\tFeaturizer: {self.__class__.__name__}, PDB: {system.protein.pdb_id}, Kinase: {kinase_details.uniprot} {residue_numbers[0]}-{residue_numbers[-1]}",
             )
             write_molecules([solvated_kinase_domain], kinase_domain_path)
         else:
@@ -390,7 +389,7 @@ class OpenEyesKLIFSKinaseHybridDockingFeaturizer(OpenEyesHybridDockingFeaturizer
             )
             docking_pose = hybrid_docking(hybrid_receptor, [ligand])[0]
             # generate residue information
-            oechem.OEPerceiveResidues(docking_pose, oechem.OEPreserveResInfo_None)
+            oechem.OEPerceiveResidues(docking_pose, oechem.OEPreserveResInfo_None)  # TODO: not sure if this is needed
 
         logging.debug("Writing docking pose ...")
         docking_pose_path = (
@@ -446,7 +445,7 @@ class OpenEyesKLIFSKinaseHybridDockingFeaturizer(OpenEyesHybridDockingFeaturizer
             components=[file_protein, file_ligand]
         )
 
-        return kinase_ligand_complex
+        return kinase_ligand_complex  # TODO: MDAnalysis objects
 
     @staticmethod
     def select_ligand_template(
