@@ -53,8 +53,8 @@ class LocalFileStorage:
         return file_path
 
     @staticmethod
-    def rcsb_kinase_domain_pdb(pdb_id, directory=DIRECTORY):
-        file_path = directory / f"rcsb_{pdb_id}_kinase_domain.pdb"
+    def featurizer_result(featurizer_name, result_details, file_format, directory=DIRECTORY):
+        file_path = directory / f"kinoml_{featurizer_name}_{result_details}.{file_format}"
         return file_path
 
     @staticmethod

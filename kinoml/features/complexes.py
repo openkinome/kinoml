@@ -5,7 +5,7 @@ subclasses thereof
 from __future__ import annotations
 from functools import lru_cache
 import logging
-from typing import Union
+from typing import Union, Tuple
 
 from .core import BaseFeaturizer
 from ..core.ligands import FileLigand, SmilesLigand
@@ -29,6 +29,7 @@ class OEHybridDockingFeaturizer(BaseFeaturizer):
     loop_db: str
         The path to the loop database used by OESpruce to model missing loops.
     """
+    from openeye import oechem, oegrid
 
     def __init__(self, loop_db: Union[str, None] = None):
         self.loop_db = loop_db
@@ -51,85 +52,59 @@ class OEHybridDockingFeaturizer(BaseFeaturizer):
         from openeye import oechem
 
         from ..docking.OEDocking import create_hybrid_receptor, hybrid_docking
-        from ..modeling.OEModeling import (
-            prepare_complex,
-            write_molecules,
-            clashing_atoms,
-            update_residue_identifiers,
-        )
+        from ..modeling.OEModeling import prepare_complex, remove_non_protein
         from ..utils import LocalFileStorage
 
-        ligand, smiles, protein, electron_density = self.interpret_system(system)
+        logging.debug("Interpreting system ...")
+        ligand, protein, electron_density = self._interpret_system(system)
 
-        design_unit = prepare_complex(protein, electron_density, self.loop_db)
-        prepared_protein = oechem.OEGraphMol()
-        prepared_solvent = oechem.OEGraphMol()
-        prepared_ligand = oechem.OEGraphMol()  # TODO: rename to template ligand
-        design_unit.GetProtein(prepared_protein)
-        design_unit.GetSolvent(prepared_solvent)
-        design_unit.GetLigand(prepared_ligand)
-        hybrid_receptor = create_hybrid_receptor(prepared_protein, prepared_ligand)
+        logging.debug("Preparing protein ligand complex ...")
+        design_unit_path = LocalFileStorage.featurizer_result(self.__class__.__name__, f"{system.protein.name}_design_unit", "oedu")  # TODO: the file name needs to be unique
+        if design_unit_path.is_file():
+            design_unit = oechem.OEDesignUnit()
+            oechem.OEReadDesignUnit(str(design_unit_path), design_unit)
+        else:
+            design_unit = prepare_complex(protein, electron_density, self.loop_db)
+
+        logging.debug("Extracting components ...")
+        prepared_protein, prepared_solvent, prepared_ligand = self._get_components(design_unit)  # TODO: rename prepared_ligand
+
+        logging.debug("Creating hybrid receptor ...")
+        hybrid_receptor = create_hybrid_receptor(prepared_protein, prepared_ligand)  # TODO: take quite long, should save this somehow
+
+        logging.debug("Performing docking ...")
         docking_pose = hybrid_docking(hybrid_receptor, [ligand])[0]
 
-        logging.debug("Assembling components ...")
-        protein_ligand_complex = oechem.OEGraphMol()
-        logging.debug("Adding protein ...")
-        oechem.OEAddMols(protein_ligand_complex, prepared_protein)
-        logging.debug("Adding ligand ...")
-        oechem.OEAddMols(protein_ligand_complex, docking_pose)
-        logging.debug("Adding water molecules ...")
-        split_options = oechem.OESplitMolComplexOptions()
-        solvent = list(
-            oechem.OEGetMolComplexComponents(
-                prepared_solvent, split_options, split_options.GetWaterFilter()
-            )
-        )
-        for water_molecule in solvent:  # TODO: slow, move to cKDtrees
-            if not clashing_atoms(docking_pose, water_molecule):
-                oechem.OEAddMols(protein_ligand_complex, water_molecule)
-        oechem.OEPlaceHydrogens(protein_ligand_complex)
-        protein_ligand_complex = update_residue_identifiers(protein_ligand_complex)
+        logging.debug("Assembling molecular components ...")
+        protein_ligand_complex = self._assemble_complex(prepared_protein, prepared_solvent, docking_pose)
+        solvated_protein = remove_non_protein(protein_ligand_complex, remove_water=False)
 
-        # TODO: where to store data
-        logging.debug("Writing protein ligand complex ...")
-        complex_path = (
-            LocalFileStorage.DIRECTORY
-            / f"{system.protein.name}_{system.ligand.name}.pdb"
-        )
-        oechem.OEClearPDBData(protein_ligand_complex)
-        oechem.OESetPDBData(
-            protein_ligand_complex,
-            "COMPND",
-            f"\tFeaturizer: {self.__class__.__name__}, Protein: {system.protein.name}, Ligand: {system.ligand.name}",
-        )
-        write_molecules([protein_ligand_complex], complex_path)
+        logging.debug("Writing results ...")
+        solvated_protein_path, ligand_path = self._write_results(system, design_unit, solvated_protein, docking_pose, protein_ligand_complex)
 
-        logging.debug("Writing protein ...")
-        protein_path = LocalFileStorage.DIRECTORY / f"{system.protein.name}_prep.pdb"
-        oechem.OEClearPDBData(prepared_protein)
-        oechem.OESetPDBData(
-            prepared_protein,
-            "COMPND",
-            f"\tFeaturizer: {self.__class__.__name__}, Protein: {system.protein.name}",
-        )
-        write_molecules([prepared_protein], protein_path)
-        file_protein = FileProtein(path=protein_path)
-
-        logging.debug("Writing ligand ...")
-        ligand_path = (
-            LocalFileStorage.DIRECTORY
-            / f"{system.protein.name}_{system.ligand.name}.sdf"
-        )
-        write_molecules([docking_pose], ligand_path)
+        logging.debug("Generating new system components ...")
+        file_protein = FileProtein(path=solvated_protein_path)
         file_ligand = FileLigand(path=ligand_path)
         protein_ligand_complex = ProteinLigandComplex(
             components=[file_protein, file_ligand]
         )
+
+        logging.debug("Returning featurized system ...")
         return protein_ligand_complex
 
     @staticmethod
-    def interpret_system(system):
-        from openeye import oechem
+    def _interpret_system(system: ProteinLigandComplex) -> Tuple[oechem.OEGraphMol, oechem.OEGraphMol, Union[oegrid.OESkewGrid, None]]:
+        """
+        Interpret the given system components and retrieve OpenEye objects holding ligand, protein and electron density.
+        Parameters
+        ----------
+        system: ProteinLigandComplex
+            The system to featurize.
+        Returns
+        -------
+        : tuple of oechem.OEGraphMol, oechem.OEGraphMol and oegrid.OESkewGrid or None
+            OpenEye objects holding ligand, protein and electron density
+        """
         from ..modeling.OEModeling import (
             read_smiles,
             read_molecules,
@@ -137,19 +112,16 @@ class OEHybridDockingFeaturizer(BaseFeaturizer):
         )
         from ..utils import FileDownloader
 
-        # ligand
         logging.debug("Interpreting ligand ...")
         if isinstance(system.ligand, SmilesLigand):
-            smiles = system.ligand.smiles
             logging.debug("Loading ligand from SMILES string ...")
             ligand = read_smiles(system.ligand.smiles)
-        else:
+        elif isinstance(system.ligand, FileLigand):
             logging.debug(f"Loading ligand from {system.ligand.path} ...")
             ligand = read_molecules(system.ligand.path)[0]
-            logging.debug("Converting ligand to SMILES string ...")
-            smiles = oechem.OEMolToSmiles(ligand)
+        else:
+            raise NotImplementedError("Provide SmilesLigand or FileLigand.")
 
-        # protein
         logging.debug("Interpreting protein ...")
         if hasattr(system.protein, "pdb_id"):
             if not system.protein.path.is_file():
@@ -160,7 +132,6 @@ class OEHybridDockingFeaturizer(BaseFeaturizer):
         logging.debug(f"Reading protein structure from {system.protein.path} ...")
         protein = read_molecules(system.protein.path)[0]
 
-        # electron density
         logging.debug("Interpreting electron density ...")
         electron_density = None
         # if system.protein.electron_density_path is not None:
@@ -171,8 +142,151 @@ class OEHybridDockingFeaturizer(BaseFeaturizer):
         #    logging.debug(f"Reading electron density from {system.protein.electron_density_path} ...")
         # TODO: Kills Kernel for some reason
         #    electron_density = read_electron_density(system.protein.electron_density_path)
-        logging.debug("Returning system components...")
-        return ligand, smiles, protein, electron_density
+
+        return ligand, protein, electron_density
+
+    @staticmethod
+    def _get_components(design_unit: oechem.OEDesignUnit) -> Tuple[oechem.OEGraphMol(), oechem.OEGraphMol(), oechem.OEGraphMol()]:
+        """
+        Get protein, solvent and ligand components from an OpenEye design unit.
+        Parameters
+        ----------
+        design_unit: oechem.OEDesignUnit
+            The OpenEye design unit to extract components from.
+        Returns
+        -------
+        components: tuple of oechem.OEGraphMol, oechem.OEGraphMol and oechem.OEGraphMol
+            OpenEye molecules holding protein, solvent and ligand.
+        """
+        from openeye import oechem
+
+        protein, solvent, ligand = oechem.OEGraphMol(), oechem.OEGraphMol(), oechem.OEGraphMol()
+
+        logging.debug("Extracting molecular components ...")
+        design_unit.GetProtein(protein)
+        design_unit.GetSolvent(solvent)
+        design_unit.GetLigand(ligand)
+
+        logging.debug(f"Number of component atoms: Protein - {protein.NumAtoms()}, Solvent - {solvent.NumAtoms()}, Ligand - {ligand.NumAtoms()}.")
+        return protein, solvent, ligand
+
+    @staticmethod
+    def _assemble_complex(protein: oechem.OEGraphMol, solvent: oechem.OEGraphMol, ligand: oechem.OEGraphMol) -> oechem.OEGraphMol:
+        """
+        Assemble components of a solvated protein-ligand complex into a single OpenEye molecule. Water molecules will
+        be checked for clashes with the ligand.
+        Parameters
+        ----------
+        protein: oechem.OEGraphMol
+            An OpenEye molecule holding the protein of interest.
+        solvent: oechem.OEGraphMol
+            An OpenEye molecule holding the solvent of interest.
+        ligand: oechem.OEGraphMol
+            An OpenEye molecule holding the ligand of interest.
+        Returns
+        -------
+        protein_ligand_complex: oechem.OEGraphMol
+            An OpenEye molecule holding protein, ligand and solvent.
+        """
+        from openeye import oechem
+
+        from ..modeling.OEModeling import clashing_atoms, update_residue_identifiers, split_molecule_components
+
+        protein_ligand_complex = oechem.OEGraphMol()
+
+        logging.debug("Adding protein ...")
+        oechem.OEAddMols(protein_ligand_complex, protein)
+
+        logging.debug("Adding ligand ...")
+        oechem.OEAddMols(protein_ligand_complex, ligand)
+
+        logging.debug("Adding water molecules ...")
+        water_molecules = split_molecule_components(solvent)  # converts solvent molecule into a list of water molecules
+        for water_molecule in water_molecules:  # TODO: slow, move to cKDtrees
+            if not clashing_atoms(ligand, water_molecule):
+                oechem.OEAddMols(protein_ligand_complex, water_molecule)
+
+        logging.debug("Updating hydrogen positions ...")
+        oechem.OEPlaceHydrogens(protein_ligand_complex)
+
+        logging.debug("Updating residue identifiers ...")
+        protein_ligand_complex = update_residue_identifiers(protein_ligand_complex)
+
+        return protein_ligand_complex
+
+    def _write_results(self, system: ProteinLigandComplex, design_unit: oechem.OEDesignUnit, solvated_protein: oechem.OEGraphMol, ligand: oechem.OEGraphMol, protein_ligand_complex: oechem.OEGraphMol) -> Tuple[str, str]:
+        """
+        Write the docking featurizer results and retrieve the paths to protein and ligand.
+        Parameters
+        ----------
+        system: ProteinLigandComplex
+            The system to featurize.
+        design_unit: oechem.OEDesignUnit
+            The design unit of the prepared protein structure.
+        solvated_protein: oechem.OEGraphMol
+            The OpenEye molecule holding the protein and solvent molecules not clashing with the docked ligand.
+        ligand: oechem.OEGraphMol
+            The OpenEye molecule holding the docked ligand.
+        protein_ligand_complex: oechem.OEGraphMol
+            The OpenEye molecule holding protein, solvent and ligand.
+        Returns
+        -------
+        : tuple of str and str
+            Paths to prepared protein and docked ligand structure.
+        """
+        from openeye import oechem
+
+        from ..modeling.OEModeling import write_molecules
+        from ..utils import LocalFileStorage
+
+        logging.debug("Writing design unit ...")
+        design_unit_path = LocalFileStorage.featurizer_result(self.__class__.__name__, f"{system.protein.name}_design_unit", "oedu")
+        oechem.OEWriteDesignUnit(str(design_unit_path), design_unit)
+
+        logging.debug("Writing protein ...")
+        protein = self._update_pdb_header(solvated_protein, protein_name=system.protein.name, solvent_clashing_ligand_name=system.ligand.name, ligand_name="")
+        protein_path = LocalFileStorage.featurizer_result(self.__class__.__name__, f"{system.protein.name}_{system.ligand.name}_protein", "pdb")
+        write_molecules([protein], protein_path)
+
+        logging.debug("Writing ligand ...")
+        ligand_path = LocalFileStorage.featurizer_result(self.__class__.__name__, f"{system.protein.name}_{system.ligand.name}_ligand", "sdf")
+        write_molecules([ligand], ligand_path)
+
+        logging.debug("Writing protein ligand complex ...")
+        protein_ligand_complex = self._update_pdb_header(protein_ligand_complex, protein_name=system.protein.name, solvent_clashing_ligand_name=system.ligand.name, ligand_name=system.ligand.name)
+        complex_path = LocalFileStorage.featurizer_result(self.__class__.__name__, f"{system.protein.name}_{system.ligand.name}_complex", "pdb")
+        write_molecules([protein_ligand_complex], complex_path)
+
+        return protein_path, ligand_path
+
+    def _update_pdb_header(self, structure: oechem.OEGraphMol, protein_name: str, solvent_clashing_ligand_name: str, ligand_name: str) -> oechem.OEGraphMol:
+        """
+        Stores information about featurizer, protein, solvent and ligand in the PDB header COMPND section in the
+        given OpenEye molecule.
+        Parameters
+        ----------
+        structure: oechem.OEGraphMol
+            An OpenEye molecule.
+        protein_name: str
+            The name of the protein.
+        solvent_clashing_ligand_name: str
+            The name of the ligand that was used to remove clashing water molecules.
+        ligand_name: str
+            The name of the ligand.
+        Returns
+        -------
+        : oechem.OEGraphMol
+            The OpenEye molecule containing the update PDB header.
+        """
+        from openeye import oechem
+
+        oechem.OEClearPDBData(structure)
+        oechem.OESetPDBData(structure, "COMPND", f"\tFeaturizer: {self.__class__.__name__}")
+        oechem.OEAddPDBData(structure, "COMPND", f"\tProtein: {protein_name}")
+        oechem.OEAddPDBData(structure, "COMPND", f"\tSolvent: Removed water clashing with {solvent_clashing_ligand_name})")
+        oechem.OEAddPDBData(structure, "COMPND", f"\tLigand: {ligand_name})")
+
+        return structure
 
 
 class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
@@ -276,6 +390,12 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
         logging.debug(f"Interpreting system ...")
         ligand, smiles, protein, electron_density = self.interpret_system(system)
 
+        ##########################################################################################
+        # Kinase template preparation
+        # Parameters: klifs_entry.ligand, protein, electron_density, self.loop_db, kinase_details.uniprot
+        #
+        #
+        ##########################################################################################
         logging.debug(f"Preparing kinase domain of {protein_template.pdb} ...")
         kinase_domain_path = LocalFileStorage.rcsb_kinase_domain_pdb(
             protein_template.pdb
