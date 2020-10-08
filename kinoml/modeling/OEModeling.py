@@ -1083,6 +1083,33 @@ def update_residue_identifiers(
     return structure
 
 
+def split_molecule_components(molecule: oechem.OEGraphMol) -> List[oechem.OEGraphMol]:
+    """
+    Split an OpenEye Molecule into its bonded components.
+    Parameters
+    ----------
+    molecule: oechem.OEGraphMol
+        An OpenEye molecule holding multiple components.
+    Returns
+    -------
+    : list of oechem.OEGraphMol
+        A list of OpenEye molecules holding the split components.
+    """
+    # determine bonded components
+    number_of_components, part_list = oechem.OEDetermineComponents(molecule)
+    predicate = oechem.OEPartPredAtom(part_list)
+
+    # get bonded components
+    components = []
+    for i in range(number_of_components):
+        predicate.SelectPart(i + 1)
+        component = oechem.OEGraphMol()
+        oechem.OESubsetMol(component, molecule, predicate)
+        components.append(component)
+
+    return components
+
+
 def clashing_atoms(molecule1: oechem.OEGraphMol, molecule2: oechem.OEGraphMol) -> bool:
     """
     Evaluates if the atoms of two molecules are clashing.
