@@ -23,6 +23,11 @@ class OEHybridDockingFeaturizer(BaseFeaturizer):
     We assume that a smiles and file-based System object will be passed;
     this means we will have a System.components with FileProtein and
     FileLigand or SmilesLigand. The file itself could be a URL.
+
+    Parameters
+    ----------
+    loop_db: str
+        The path to the loop database used by OESpruce to model missing loops.
     """
 
     def __init__(self, loop_db: Union[str, None] = None):
@@ -170,7 +175,6 @@ class OEHybridDockingFeaturizer(BaseFeaturizer):
         return ligand, smiles, protein, electron_density
 
 
-# TODO: OE...
 class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
     """
     Given a System with exactly one kinase and one ligand,
@@ -178,16 +182,25 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
 
     We assume that the system contains a BaseProtein with a
     'klifs_kinase_id' attribute and a SmilesLigand.
+
+    Parameters
+    ----------
+    loop_db: str
+        The path to the loop database used by OESpruce to model missing loops.
+    shape_overlay: bool
+        If a shape overlay should be performed for selecting a ligand template
+        in the hybrid docking protocol. Otherwise fingerprint similarity will
+        be used.
     """
 
     import pandas as pd
 
     def __init__(
-        self, loop_db: Union[str, None] = None, shape: bool = False
+        self, loop_db: Union[str, None] = None, shape_overlay: bool = False
     ):
         super().__init__(loop_db)
         self.loop_db = loop_db
-        self.shape = shape  # TODO: rename to shape_overlay, add to docstring
+        self.shape_overlay = shape_overlay
 
     _SUPPORTED_TYPES = (ProteinLigandComplex,)
 
@@ -237,7 +250,7 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
         logging.debug("Searching ligand template ...")  # TODO: naming problem with co-crystallized ligand in hybrid docking, see above
         # select structure for ligand modeling
         ligand_template = self.select_ligand_template(
-            system.protein.klifs_kinase_id, system.ligand.smiles, self.shape
+            system.protein.klifs_kinase_id, system.ligand.smiles, self.shape_overlay
         )
         logging.debug(f"Selected {ligand_template.pdb} as ligand template ...")
 
@@ -389,7 +402,7 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
             )
             docking_pose = hybrid_docking(hybrid_receptor, [ligand])[0]
             # generate residue information
-            oechem.OEPerceiveResidues(docking_pose, oechem.OEPreserveResInfo_None)  # TODO: not sure if this is needed
+            oechem.OEPerceiveResidues(docking_pose, oechem.OEPreserveResInfo_None)
 
         logging.debug("Writing docking pose ...")
         docking_pose_path = (
@@ -656,8 +669,7 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
             structures = structures[structures.aC_helix == alpha_c_helix]
 
         if len(structures) == 0:
-            # TODO: integrate homology modeling
-            raise NotImplementedError
+            raise NotImplementedError("Would need homology modeling capability.")
         else:
             structures = structures.sort_values(
                 by=["alt", "chain", "quality_score"], ascending=[True, True, False]
