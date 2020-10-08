@@ -145,7 +145,7 @@ def pose_molecules(
         A list of OpenEye molecules holding the docked molecules.
     """
     from openeye import oedocking
-    from ..modeling.OpenEyeModeling import generate_reasonable_conformations
+    from ..modeling.OEModeling import generate_reasonable_conformations
 
     def probability(molecule: oechem.OEGraphMol):
         """Return the pose probability."""
@@ -221,7 +221,7 @@ def _run_docking(
         A list of OpenEye molecules holding the docked molecules.
     """
     from openeye import oedocking
-    from ..modeling.OpenEyeModeling import generate_reasonable_conformations
+    from ..modeling.OEModeling import generate_reasonable_conformations
 
     # initialize receptor
     dock_resolution = oedocking.OESearchResolution_High

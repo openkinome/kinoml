@@ -14,7 +14,7 @@ from ..core.sequences import KinaseDomainAminoAcidSequence
 from ..core.systems import ProteinLigandComplex
 
 
-class OpenEyesHybridDockingFeaturizer(BaseFeaturizer):
+class OEHybridDockingFeaturizer(BaseFeaturizer):
 
     """
     Given a System with exactly one protein and one ligand,
@@ -45,8 +45,8 @@ class OpenEyesHybridDockingFeaturizer(BaseFeaturizer):
         """
         from openeye import oechem
 
-        from ..docking.OpenEyeDocking import create_hybrid_receptor, hybrid_docking
-        from ..modeling.OpenEyeModeling import (
+        from ..docking.OEDocking import create_hybrid_receptor, hybrid_docking
+        from ..modeling.OEModeling import (
             prepare_complex,
             write_molecules,
             clashing_atoms,
@@ -105,7 +105,7 @@ class OpenEyesHybridDockingFeaturizer(BaseFeaturizer):
         oechem.OESetPDBData(
             prepared_protein,
             "COMPND",
-            f"\tFeaturizer: OpenEyesHybridDockingFeaturizer, Protein: {system.protein.name}",
+            f"\tFeaturizer: {self.__class__.__name__}, Protein: {system.protein.name}",
         )
         write_molecules([prepared_protein], protein_path)
         file_protein = FileProtein(path=protein_path)
@@ -125,7 +125,7 @@ class OpenEyesHybridDockingFeaturizer(BaseFeaturizer):
     @staticmethod
     def interpret_system(system):
         from openeye import oechem
-        from ..modeling.OpenEyeModeling import (
+        from ..modeling.OEModeling import (
             read_smiles,
             read_molecules,
             read_electron_density,
@@ -171,7 +171,7 @@ class OpenEyesHybridDockingFeaturizer(BaseFeaturizer):
 
 
 # TODO: OE...
-class OpenEyesKLIFSKinaseHybridDockingFeaturizer(OpenEyesHybridDockingFeaturizer):
+class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
     """
     Given a System with exactly one kinase and one ligand,
     dock the ligand in the designated binding pocket.
@@ -206,8 +206,8 @@ class OpenEyesKLIFSKinaseHybridDockingFeaturizer(OpenEyesHybridDockingFeaturizer
         """
         import klifs_utils
         from openeye import oechem
-        from ..docking.OpenEyeDocking import create_hybrid_receptor, hybrid_docking
-        from ..modeling.OpenEyeModeling import (
+        from ..docking.OEDocking import create_hybrid_receptor, hybrid_docking
+        from ..modeling.OEModeling import (
             select_chain,
             select_altloc,
             remove_non_protein,
@@ -473,7 +473,7 @@ class OpenEyesKLIFSKinaseHybridDockingFeaturizer(OpenEyesHybridDockingFeaturizer
         from rdkit import Chem, RDLogger
         from rdkit.Chem import AllChem, DataStructs
 
-        from ..modeling.OpenEyeModeling import (
+        from ..modeling.OEModeling import (
             read_smiles,
             smiles_from_pdb,
             compare_molecules,
@@ -684,7 +684,7 @@ class OpenEyesKLIFSKinaseHybridDockingFeaturizer(OpenEyesHybridDockingFeaturizer
             A list of canonical residue numbers in the same order as the residues in the given kinase domain structure.
         """
         from Bio import pairwise2
-        from kinoml.modeling.OpenEyeModeling import get_sequence
+        from kinoml.modeling.OEModeling import get_sequence
 
         target_sequence = get_sequence(kinase_domain_structure)
         template_sequence, target_sequence = pairwise2.align.globalxs(
