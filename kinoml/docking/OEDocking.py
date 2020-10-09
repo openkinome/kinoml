@@ -163,7 +163,7 @@ def pose_molecules(
     # pose molecules
     for molecule in molecules:
         # tautomers, enantiomers, conformations
-        conformations_ensemble = generate_reasonable_conformations(molecule)
+        conformations_ensemble = generate_reasonable_conformations(molecule, dense=True)
 
         posed_conformations = list()
         for conformations in conformations_ensemble:
@@ -238,7 +238,7 @@ def _run_docking(
     # dock molecules
     for molecule in molecules:
         # tautomers, enantiomers, conformations
-        conformations_ensemble = generate_reasonable_conformations(molecule)
+        conformations_ensemble = generate_reasonable_conformations(molecule, dense=True)
 
         docked_conformations = list()
         # dock tautomers

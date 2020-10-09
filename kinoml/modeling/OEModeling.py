@@ -104,30 +104,6 @@ def write_molecules(molecules: List[oechem.OEGraphMol], path: str):
     return
 
 
-def has_ligand(molecule: oechem.OEGraphMol) -> bool:
-    """
-    Check if OpenEye molecule contains a ligand.
-    Parameters
-    ----------
-    molecule: oechem.OEGraphMol
-        An OpenEye molecule.
-    Returns
-    -------
-    bool
-        True if molecule has ligand, False otherwise.
-    """
-    ligand = oechem.OEGraphMol()
-    protein = oechem.OEGraphMol()
-    water = oechem.OEGraphMol()
-    other = oechem.OEGraphMol()
-    oechem.OESplitMolComplex(ligand, protein, water, other, molecule)
-
-    if ligand.NumAtoms() > 0:
-        return True
-
-    return False
-
-
 def select_chain(molecule, chain_id):
     """
     Select a chain from an OpenEye molecule.
@@ -497,29 +473,6 @@ def prepare_protein(
     )
 
 
-def klifs_kinases_by_uniprot_id(uniprot_id: str) -> pd.DataFrame:
-    """
-    Retrieve KLIFS structure details about kinases matching the given Uniprot ID.
-    Parameters
-    ----------
-    uniprot_id: str
-        Uniprot identifier.
-    Returns
-    -------
-    kinases: pd.DataFrame
-        KLIFS structure details.
-    """
-    import klifs_utils
-
-    kinase_names = klifs_utils.remote.kinases.kinase_names()
-    kinases = klifs_utils.remote.kinases.kinases_from_kinase_names(
-        list(kinase_names.name)
-    )
-    kinase_id = kinases[kinases.uniprot == uniprot_id].kinase_ID.iloc[0]
-    kinases = klifs_utils.remote.structures.structures_from_kinase_ids([kinase_id])
-    return kinases
-
-
 def klifs_kinase_from_uniprot_id(uniprot_id: str) -> pd.DataFrame:
     """
     Retrieve KLIFS kinase details about the kinase matching the given Uniprot ID.
@@ -561,7 +514,7 @@ def get_klifs_ligand(structure_id: int) -> oechem.OEGraphMol:
 
     if not file_path.is_file():
         mol2_text = klifs_utils.remote.coordinates.ligand._ligand_mol2_text(
-            structure_id
+            str(structure_id)
         )
         with open(file_path, "w") as wf:
             wf.write(mol2_text)
@@ -628,9 +581,7 @@ def generate_enantiomers(
     return enantiomers
 
 
-def generate_conformations(
-    molecule: oechem.OEGraphMol, max_conformations: int = 1000
-) -> oechem.OEMol:
+def generate_conformations(molecule: oechem.OEGraphMol, max_conformations: int = 1000, dense: bool = False) -> oechem.OEMol:
     """
     Generate conformations of a given molecule.
     Parameters
@@ -639,6 +590,8 @@ def generate_conformations(
         An OpenEye molecule.
     max_conformations: int
         Maximal number of conformations to generate.
+    dense: bool
+        If densely sampled conformers should be generated. Will overwrite max_conformations settings.
     Returns
     -------
     conformations: oechem.OEMol
@@ -646,18 +599,25 @@ def generate_conformations(
     """
     from openeye import oechem, oeomega
 
-    omega_options = oeomega.OEOmegaOptions()
-    omega_options.SetMaxSearchTime(60.0)  # time out
-    omega_options.SetMaxConfs(max_conformations)
+    if dense:
+        omega_options = oeomega.OEOmegaOptions(oeomega.OEOmegaSampling_Dense)
+    else:
+        omega_options = oeomega.OEOmegaOptions()
+        omega_options.SetMaxSearchTime(60.0)  # time out
+        omega_options.SetMaxConfs(max_conformations)
+
     omega = oeomega.OEOmega(omega_options)
     omega.SetStrictStereo(False)
+
     conformations = oechem.OEMol(molecule)
     omega.Build(conformations)
+
     return conformations
 
 
 def generate_reasonable_conformations(
     molecule: oechem.OEGraphMol,
+    dense: bool = False,
 ) -> List[oechem.OEMol]:
     """
     Generate conformations of reasonable enantiomers and tautomers of a given molecule.
@@ -665,6 +625,8 @@ def generate_reasonable_conformations(
     ----------
     molecule: oechem.ORGraphMol
         An OpenEye molecule.
+    dense: bool
+        If densely sampled conformers should be generated.
     Returns
     -------
     conformations_ensemble: list of oechem.OEMol
@@ -675,7 +637,7 @@ def generate_reasonable_conformations(
     tautomers = generate_tautomers(molecule)
     enantiomers = [generate_enantiomers(tautomer) for tautomer in tautomers]
     conformations_ensemble = [
-        generate_conformations(enantiomer)
+        generate_conformations(enantiomer, dense)
         for enantiomer in itertools.chain.from_iterable(enantiomers)
     ]
     return conformations_ensemble
