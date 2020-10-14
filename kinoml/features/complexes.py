@@ -491,7 +491,7 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
         logging.debug("Retrieve kinase information from KLIFS ...")
         kinase_details = klifs_utils.remote.kinases.kinases_from_kinase_ids([klifs_kinase_id]).iloc[0]
 
-        logging.debug("Retrieve kinase structures from KLIFS and filter for orthosteric ligands ...")
+        logging.debug("Retrieve kinase structures from KLIFS for ligand template selection ...")
         structures = self._get_available_ligand_templates()
 
         logging.debug("Storing SMILES in structures dataframe ...")
@@ -550,6 +550,8 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
         structures = structures[
             structures.allosteric_ligand == 0
             ]  # no allosteric ligand
+        structures = structures[structures.DFG != 'na']  # no missing kinase conformations
+        structures = structures[structures.aC_helix != 'na']
 
         logging.debug("Sorting KLIFS entries by quality score...")
         # keep entry with highest quality score (alt 'A' preferred over alt 'B', chain 'A' preferred over 'B')
