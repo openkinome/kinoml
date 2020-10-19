@@ -555,7 +555,10 @@ def generate_tautomers(molecule: oechem.OEGraphMol) -> List[oechem.OEGraphMol]:
 
 
 def generate_enantiomers(
-    molecule: oechem.OEGraphMol, max_centers: int = 12, ignore: bool = False
+    molecule: oechem.OEGraphMol,
+    max_centers: int = 12,
+    force_flip: bool = False,
+    enumerate_nitrogens: bool = True,
 ) -> List[oechem.OEGraphMol]:
     """
     Generate enantiomers of a given molecule.
@@ -565,8 +568,10 @@ def generate_enantiomers(
         An OpenEye molecule.
     max_centers: int
         The maximal number of stereo centers to enumerate.
-    ignore: bool
+    force_flip: bool
         If specified stereo centers should be ignored.
+    enumerate_nitrogens: bool
+        If nitrogens with invertible pyramidal geometry should be enumerated.
     Returns
     -------
     enantiomers: list of oechem.OEGraphMol
@@ -576,12 +581,16 @@ def generate_enantiomers(
 
     enantiomers = [
         oechem.OEGraphMol(enantiomer)
-        for enantiomer in oeomega.OEFlipper(molecule, max_centers, ignore)
+        for enantiomer in oeomega.OEFlipper(
+            molecule, max_centers, force_flip, enumerate_nitrogens
+        )
     ]
     return enantiomers
 
 
-def generate_conformations(molecule: oechem.OEGraphMol, max_conformations: int = 1000, dense: bool = False) -> oechem.OEMol:
+def generate_conformations(
+    molecule: oechem.OEGraphMol, max_conformations: int = 1000, dense: bool = False
+) -> oechem.OEMol:
     """
     Generate conformations of a given molecule.
     Parameters
@@ -616,8 +625,7 @@ def generate_conformations(molecule: oechem.OEGraphMol, max_conformations: int =
 
 
 def generate_reasonable_conformations(
-    molecule: oechem.OEGraphMol,
-    dense: bool = False,
+    molecule: oechem.OEGraphMol, dense: bool = False,
 ) -> List[oechem.OEMol]:
     """
     Generate conformations of reasonable enantiomers and tautomers of a given molecule.
