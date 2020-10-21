@@ -608,15 +608,22 @@ def generate_conformations(
     """
     from openeye import oechem, oeomega
 
-    if dense:
-        omega_options = oeomega.OEOmegaOptions(oeomega.OEOmegaSampling_Dense)
+    if oeomega.OEIsMacrocycle(molecule):
+        omega_options = oeomega.OEMacrocycleOmegaOptions()
+        if dense:  # inspired by oeomega.OEOmegaSampling_Dense
+            omega_options.SetMaxConfs(20000)
+        else:
+            omega_options.SetMaxConfs(max_conformations)
+        omega = oeomega.OEMacrocycleOmega(omega_options)
     else:
-        omega_options = oeomega.OEOmegaOptions()
-        omega_options.SetMaxSearchTime(60.0)  # time out
-        omega_options.SetMaxConfs(max_conformations)
-
-    omega = oeomega.OEOmega(omega_options)
-    omega.SetStrictStereo(False)
+        if dense:
+            omega_options = oeomega.OEOmegaOptions(oeomega.OEOmegaSampling_Dense)
+        else:
+            omega_options = oeomega.OEOmegaOptions()
+            omega_options.SetMaxSearchTime(60.0)  # time out
+            omega_options.SetMaxConfs(max_conformations)
+        omega = oeomega.OEOmega(omega_options)
+        omega.SetStrictStereo(False)
 
     conformations = oechem.OEMol(molecule)
     omega.Build(conformations)
