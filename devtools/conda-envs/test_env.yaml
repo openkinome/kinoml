@@ -18,6 +18,7 @@ dependencies:
   - torchvision
   - xgboost
   - watermark
+  - pytorch-lightning
   #- cudatoolkit 10.2
 
   # Testing

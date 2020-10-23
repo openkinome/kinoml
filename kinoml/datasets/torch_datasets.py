@@ -3,6 +3,7 @@ from functools import lru_cache
 import numpy as np
 import torch
 from torch.utils.data import Dataset, DataLoader, SubsetRandomSampler
+import pytorch_lightning as pl
 
 from ..core.measurements import null_observation_model as _null_observation_model
 
@@ -74,6 +75,12 @@ class XyNpzTorchDataset(Dataset):
         data = np.load(npz)
         self.data_X = torch.as_tensor(data["X"], dtype=torch.float32)
         self.data_y = torch.as_tensor(data["y"], dtype=torch.float32)
+        if "idx_train" in data:
+            self.indices = {
+                key[4:]: data[key] for key in ["idx_train", "idx_test", "idx_val"] if key in data
+            }
+        else:
+            self.indices = {"train": True}
 
     def __getitem__(self, index):
         return self.data_X[index], self.data_y[index]
@@ -84,14 +91,42 @@ class XyNpzTorchDataset(Dataset):
     def input_size(self):
         return self.data_X.shape[1]
 
-    def as_dataloader(self, train_test_split=None, **kwargs):
-        if train_test_split is not None and (0.0 < train_test_split < 1.0):
-            indices = list(range(len(self)))
-            np.random.shuffle(indices)
-            test_split = int(np.floor(train_test_split * len(self)))
-            train_indices, test_indices = indices[:test_split], indices[test_split:]
-            train = DataLoader(self, sampler=SubsetRandomSampler(train_indices), **kwargs)
-            test = DataLoader(self, sampler=SubsetRandomSampler(test_indices), **kwargs)
-            return train, test
-        # else
-        return DataLoader(self, **kwargs)
+    def as_datamodule(self, observation_model=_null_observation_model, **kwargs):
+        return LightningDataModuleAdapter(
+            dataset=self, observation_model=observation_model, dataloader_options=kwargs,
+        )
+
+
+class LightningDataModuleAdapter(pl.LightningDataModule):
+    def __init__(
+        self,
+        dataset: Dataset,
+        observation_model: callable = _null_observation_model,
+        dataloader_options=None,
+    ):
+        super().__init__()
+        self.dataset = dataset
+        self.observation_model = observation_model
+        self.dataloader_options = dataloader_options or {}
+
+        self.prepare_data()
+        self.setup()
+
+    def _build_dataloader(self, kind="train"):
+        assert kind in ("train", "test", "val")
+        dl = DataLoader(
+            self.dataset,
+            sampler=SubsetRandomSampler(self.dataset.indices[kind]),
+            **self.dataloader_options,
+        )
+        dl.observation_model = self.observation_model
+        return dl
+
+    def train_dataloader(self):
+        return self._build_dataloader("train")
+
+    def val_dataloader(self):
+        return self._build_dataloader("val")
+
+    def test_dataloader(self):
+        return self._build_dataloader("test")
