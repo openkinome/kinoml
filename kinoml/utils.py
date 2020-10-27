@@ -2,6 +2,7 @@ from pathlib import Path
 from itertools import zip_longest
 from collections import defaultdict
 from typing import Iterable, Callable, Any
+from contextlib import contextmanager
 
 from appdirs import AppDirs
 
@@ -12,9 +13,7 @@ PACKAGE_ROOT = Path(__file__).parent
 class FromDistpatcherMixin:
     @classmethod
     def _from_dispatcher(cls, value, handler, handler_argname, prefix):
-        available_methods = [
-            n[len(prefix) :] for n in cls.__dict__ if n.startswith(prefix)
-        ]
+        available_methods = [n[len(prefix) :] for n in cls.__dict__ if n.startswith(prefix)]
         if handler not in available_methods:
             raise ValueError(
                 f"`{handler_argname}` must be one of: {', '.join(available_methods)}."
@@ -192,3 +191,14 @@ def watermark():
         print(check_output([conda, "info", "-s"], universal_newlines=True))
         print(check_output([conda, "list"], universal_newlines=True))
 
+
+def collapsible(fn, *args, **kwargs):
+    from ipywidgets import Output, Accordion
+
+    out = Output()
+    with out:
+        fn(*args, **kwargs)
+    acc = Accordion(children=[out])
+    acc.set_title(0, "View output")
+    acc.selected_index = None
+    return acc

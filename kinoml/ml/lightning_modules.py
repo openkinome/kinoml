@@ -46,27 +46,26 @@ class ObservationModelModule(pl.LightningModule):
         prediction = self.observation_model(delta_g)
         return prediction
 
-    def _standard_step(self, batch, batch_idx, kind="train", **kwargs):
+    def _standard_step(self, batch, batch_idx, **kwargs):
         x, y = batch
         predicted = self.forward(x)
         loss = self.loss_function(predicted, y.view(*predicted.shape))
         return predicted, loss
 
     def training_step(self, batch, batch_idx, **kwargs):
-        predicted, loss = self._standard_step(batch, batch_idx, kind="train", **kwargs)
-        self.log("train_loss", loss, on_step=True, on_epoch=True)
-        self.log("predicted", loss, on_step=True, on_epoch=True)
+        predicted, loss = self._standard_step(batch, batch_idx, **kwargs)
+        self.log("train_loss", loss, on_step=False, on_epoch=True, logger=True)
         return loss
 
     def _disabled_validation_step(self, batch, batch_idx, **kwargs):
-        predicted, loss = self._standard_step(batch, batch_idx, kind="val", **kwargs)
-        self.log("val_loss", loss)
+        predicted, loss = self._standard_step(batch, batch_idx, **kwargs)
+        self.log("val_loss", loss, on_step=False, on_epoch=True, logger=True)
         return loss
 
     def test_step(self, batch, batch_idx, **kwargs):
-        predicted, loss = self._standard_step(batch, batch_idx, kind="test", **kwargs)
+        predicted, loss = self._standard_step(batch, batch_idx, **kwargs)
         observed = batch[1].view(*predicted.shape)
-        self.log("loss", loss)
+        self.log("test_loss", loss)
         self.log("R2", self.metric_r2(predicted, observed))
         self.log("MAE", self.metric_mae(predicted, observed))
         self.log("MSE", self.metric_mse(predicted, observed))
