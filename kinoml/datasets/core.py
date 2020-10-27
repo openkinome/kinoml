@@ -3,7 +3,7 @@ from typing import Iterable
 from copy import deepcopy
 from functools import wraps
 from operator import attrgetter
-from collections import defaultdict
+from collections import defaultdict, Counter
 import multiprocessing
 
 import numpy as np
@@ -94,6 +94,18 @@ class DatasetProvider(BaseDatasetProvider):
 
     def __len__(self):
         return len(self.measurements)
+
+    def __repr__(self) -> str:
+        components = defaultdict(set)
+        for s in self.systems:
+            for c in s.components:
+                components[type(c).__name__].add(c.name)
+        components_str = ", ".join([f"{k}={len(v)}" for k, v in components.items()])
+        return (
+            f"<{self.__class__.__name__} with "
+            f"{len(self.measurements)} {self.measurement_type.__name__} measurements "
+            f"and {len(self.systems)} systems ({components_str})>"
+        )
 
     @classmethod
     def from_source(cls, filename=None, **kwargs):
@@ -225,9 +237,7 @@ class DatasetProvider(BaseDatasetProvider):
     def to_xgboost(self, **kwargs):
         from xgboost import DMatrix
 
-        dmatrix = DMatrix(
-            np.asarray(self.featurized_systems()), self.measurements_as_array(**kwargs)
-        )
+        dmatrix = DMatrix(self.to_numpy(**kwargs))
         ## TODO: Uncomment when XGB observation models are implemented
         # dmatrix.observation_model = self.observation_model(backend="xgboost", loss="mse")
         return dmatrix
@@ -235,8 +245,8 @@ class DatasetProvider(BaseDatasetProvider):
     def to_tensorflow(self, *args, **kwargs):
         raise NotImplementedError
 
-    def to_numpy(self, *args, **kwargs):
-        raise NotImplementedError
+    def to_numpy(self, **kwargs):
+        return np.asarray(self.featurized_systems()), self.measurements_as_array(**kwargs)
 
     def observation_model(self, **kwargs):
         """
@@ -244,6 +254,13 @@ class DatasetProvider(BaseDatasetProvider):
         from different measurement types.
         """
         return self.measurement_type.observation_model(**kwargs)
+
+    def loss_adapter(self, **kwargs):
+        """
+        Observation model plus loss function, wrapped in a single callable. Return types are
+        backend-dependent.
+        """
+        return self.measurement_type.loss_adapter(**kwargs)
 
     @property
     def systems(self):
@@ -253,10 +270,13 @@ class DatasetProvider(BaseDatasetProvider):
     def measurement_type(self):
         return type(self.measurements[0])
 
-    def measurements_as_array(self, reduce=np.mean):
-        result = np.empty(len(self.measurements))
+    def measurements_as_array(self, reduce=np.mean, dtype="float32"):
+        result = np.empty(len(self.measurements), dtype=dtype)
         for i, measurement in enumerate(self.measurements):
-            result[i] = reduce(measurement.values)
+            if measurement.values.shape[0] > 1:
+                result[i] = reduce(measurement.values)
+            else:
+                result[i] = measurement.values[0]
         return result
 
     def split_by_groups(self) -> dict:
@@ -279,13 +299,6 @@ class DatasetProvider(BaseDatasetProvider):
     def conditions(self):
         return {ms.conditions for ms in self.measurements}
 
-    def __repr__(self) -> str:
-        return (
-            f"<{self.__class__.__name__} with "
-            f"{len(self.measurements)} {self.measurement_type.__name__} measurements "
-            f"and {len(self.systems)} systems>"
-        )
-
 
 class MultiDatasetProvider(DatasetProvider):
     def __init__(self, measurements: Iterable[BaseMeasurement], *args, **kwargs):
@@ -302,6 +315,15 @@ class MultiDatasetProvider(DatasetProvider):
 
     def observation_models(self, **kwargs):
         return [p.observation_model(**kwargs) for p in self.providers]
+
+    def loss_adapters(self, **kwargs):
+        return [p.loss_adapter(**kwargs) for p in self.providers]
+
+    def observation_model(self, **kwargs):
+        raise NotImplementedError(f"{type(self)} must use `.observation_models()` (plural)")
+
+    def loss_adapter(self, **kwargs):
+        raise NotImplementedError(f"{type(self)} must use `.loss_adapters()` (plural)")
 
     @property
     def measurements(self):
@@ -341,11 +363,29 @@ class MultiDatasetProvider(DatasetProvider):
 
         return pd.DataFrame.from_records(records, columns=columns)
 
+    def to_numpy(self, **kwargs):
+        return [p.to_numpy(**kwargs) for p in self.providers]
+
     def to_pytorch(self, **kwargs):
         return [p.to_pytorch(**kwargs) for p in self.providers]
 
     def to_xgboost(self, **kwargs):
         return [p.to_xgboost(**kwargs) for p in self.providers]
+
+    def __repr__(self) -> str:
+        measurements = []
+        for p in self.providers:
+            measurements.append(f"{p.measurement_type.__name__}={len(p)}")
+        components = defaultdict(set)
+        for s in self.systems:
+            for c in s.components:
+                components[type(c).__name__].add(c.name)
+        components_str = ", ".join([f"{k}={len(v)}" for k, v in components.items()])
+        return (
+            f"<{self.__class__.__name__} with "
+            f"{len(self)} measurements ({', '.join(measurements)}), "
+            f"and {len(self.systems)} systems ({components_str})>"
+        )
 
 
 class ProteinLigandDatasetProvider(DatasetProvider):

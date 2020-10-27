@@ -1,3 +1,4 @@
+import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
@@ -70,6 +71,9 @@ class CNN(nn.Module):
 
     Parameters:
         input_shape: Expected shape of the input data
+
+    !!! todo
+        Provide keyword arguments for hardcoded numbers in `__init__`
     """
 
     def __init__(self, input_shape: int = 53):

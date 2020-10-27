@@ -23,6 +23,7 @@ dependencies:
   - xgboost
   - modeller
   - pytorch_lightning
+  - watermark
   #- cudatoolkit 10.2
 
   # Development

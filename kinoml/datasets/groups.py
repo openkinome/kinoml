@@ -11,8 +11,8 @@ class BaseGrouper:
     def __init__(self):
         pass
 
-    def assign(self, dataset, overwrite=False):
-        groups = self._assign(dataset)
+    def assign(self, dataset, overwrite=False, **kwargs):
+        groups = self.indices(dataset, **kwargs)
         measurements = dataset.measurements
         for key, indices in groups.items():
             for index in indices:
@@ -49,7 +49,7 @@ class RandomGrouper(BaseGrouper):
         assert sum(ratios.values()) == 1, f"`ratios` must sum 1, but you provided {ratios}"
         self.ratios = ratios
 
-    def _assign(self, dataset):
+    def indices(self, dataset):
         length = len(dataset)
         indices = list(range(length))
         random.shuffle(indices)
@@ -71,9 +71,13 @@ class CallableGrouper(BaseGrouper):
     def __init__(self, function):
         self.function = function
 
-    def _assign(self, dataset):
+    def indices(self, dataset, progress=True):
+        iterator = enumerate(dataset.measurements)
+        if progress:
+            iterator = tqdm(iterator)
+
         groups = defaultdict(list)
-        for i, measurement in tqdm(enumerate(dataset.measurements)):
+        for i, measurement in itrator:
             key = self.function(measurement)
             groups[key].append(i)
         return groups

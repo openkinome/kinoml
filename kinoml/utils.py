@@ -142,4 +142,53 @@ def download_file(url: str, path: str):
         write_file.write(response.content)
         # TODO: check if successful, e.g. response.ok
 
-    return
+
+def seed_everything(seed=1234):
+    import random
+    import os
+
+    random.seed(seed)
+    os.environ["PYTHONHASHSEED"] = str(seed)
+    try:
+        import numpy as np
+
+        np.random.seed(seed)
+    except ImportError:
+        pass
+    try:
+        import torch
+
+        torch.manual_seed(seed)
+        torch.cuda.manual_seed(seed)
+        torch.cuda.manual_seed_all(seed)  # if you are using multi-GPU.
+        torch.backends.cudnn.benchmark = False
+        torch.backends.cudnn.deterministic = True
+    except ImportError:
+        pass
+
+
+def watermark():
+    from IPython import get_ipython
+    from watermark import WaterMark
+    from distutils.spawn import find_executable
+    from subprocess import check_output
+
+    print("Watermark")
+    print("---------")
+    w = WaterMark(get_ipython()).watermark("-d -n -t -i -z -u -v -h -m -g -w -iv")
+
+    nvidiasmi = find_executable("nvidia-smi")
+    if nvidiasmi:
+        print()
+        print("nvidia-smi")
+        print("----------")
+        print(check_output([nvidiasmi], universal_newlines=True))
+
+    conda = find_executable("conda")
+    if conda:
+        print()
+        print("conda")
+        print("-----")
+        print(check_output([conda, "info", "-s"], universal_newlines=True))
+        print(check_output([conda, "list"], universal_newlines=True))
+
