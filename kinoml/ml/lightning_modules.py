@@ -7,22 +7,39 @@ from itertools import cycle
 import torch
 from torch.utils.data import DataLoader
 import pytorch_lightning as pl
+from pytorch_lightning import metrics
+from sklearn.metrics import r2_score
 
 from ..core.measurements import null_observation_model as _null_observation_model
 from ..analysis.plots import predicted_vs_observed
 
 
-class ObservationModelModule(pl.LightningModule):
-    _RESULTS = {"train": pl.TrainResult, "val": pl.EvalResult, "test": pl.EvalResult}
+class RootMeanSquaredError(metrics.MeanSquaredLogError):
+    def compute(self):
+        return torch.sqrt(super().compute())
 
+
+class ObservationModelModule(pl.LightningModule):
     def __init__(
-        self, nn_model, optimizer, loss_function, observation_model=_null_observation_model
+        self,
+        nn_model,
+        optimizer,
+        loss_function,
+        observation_model=_null_observation_model,
+        validate=True,
     ):
         super().__init__()
         self.nn_model = nn_model
         self.observation_model = observation_model
         self.optimizer = optimizer
         self.loss_function = loss_function
+        if validate:
+            self.validation_step = self._disabled_validation_step
+
+        self.metric_r2 = r2_score
+        self.metric_mae = metrics.MeanAbsoluteError()
+        self.metric_mse = metrics.MeanSquaredError()
+        self.metric_rmse = RootMeanSquaredError()
 
     def forward(self, x):
         delta_g = self.nn_model(x)
@@ -30,7 +47,6 @@ class ObservationModelModule(pl.LightningModule):
         return prediction
 
     def _standard_step(self, batch, batch_idx, kind="train", **kwargs):
-        assert kind in self._RESULTS
         x, y = batch
         predicted = self.forward(x)
         loss = self.loss_function(predicted, y.view(*predicted.shape))
@@ -38,29 +54,26 @@ class ObservationModelModule(pl.LightningModule):
 
     def training_step(self, batch, batch_idx, **kwargs):
         predicted, loss = self._standard_step(batch, batch_idx, kind="train", **kwargs)
-        result = pl.TrainResult(loss, early_stop_on=loss, checkpoint_on=loss)
-        result.log("train_loss", loss, on_step=True, on_epoch=True)
-        return result
+        self.log("train_loss", loss, on_step=True, on_epoch=True)
+        self.log("predicted", loss, on_step=True, on_epoch=True)
+        return loss
 
-    def validation_step(self, batch, batch_idx, **kwargs):
+    def _disabled_validation_step(self, batch, batch_idx, **kwargs):
         predicted, loss = self._standard_step(batch, batch_idx, kind="val", **kwargs)
-        result = pl.EvalResult(checkpoint_on=loss)
-        result.log("val_loss", loss)
-        return result
+        self.log("val_loss", loss)
+        return loss
 
     def test_step(self, batch, batch_idx, **kwargs):
         predicted, loss = self._standard_step(batch, batch_idx, kind="test", **kwargs)
         observed = batch[1].view(*predicted.shape)
-        result = pl.EvalResult()
-        result.test_loss = loss
-        result.log("R2", pl.metrics.sklearns.R2Score()(predicted, observed))
-        result.log("MAE", pl.metrics.functional.mae(predicted, observed))
-        result.log("MSE", pl.metrics.functional.mse(predicted, observed))
-        result.log("RMSE", pl.metrics.functional.rmse(predicted, observed))
-        result.plot = predicted_vs_observed(predicted, observed, with_metrics=False)
-        self.logger.experiment.add_figure("predicted_vs_observed", result.plot)
-        return result
+        self.log("loss", loss)
+        self.log("R2", self.metric_r2(predicted, observed))
+        self.log("MAE", self.metric_mae(predicted, observed))
+        self.log("MSE", self.metric_mse(predicted, observed))
+        self.log("RMSE", self.metric_rmse(predicted, observed))
+        plot = predicted_vs_observed(predicted, observed, with_metrics=False)
+        self.logger.experiment.add_figure("predicted_vs_observed", plot)
+        return loss
 
     def configure_optimizers(self):
         return self.optimizer
-
