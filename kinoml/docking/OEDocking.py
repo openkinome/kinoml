@@ -128,6 +128,75 @@ def create_box_receptor(
     return receptor
 
 
+def pose_molecules(
+    receptor: oechem.OEGraphMol, molecules: List[oechem.OEGraphMol]
+) -> Union[List[oechem.OEGraphMol], None]:
+    """
+    Generate a binding pose of molecules in a prepared receptor with OpenEye's Posit method.
+    Parameters
+    ----------
+    receptor: oechem.OEGraphMol
+        An OpenEye molecule holding the prepared receptor.
+    molecules: list of oechem.OEGraphMol
+        A list of OpenEye molecules holding prepared molecules for docking.
+    Returns
+    -------
+    posed_molecules: list of oechem.OEGraphMol or None
+        A list of OpenEye molecules holding the docked molecules.
+    """
+    from openeye import oedocking
+    from ..modeling.OEModeling import generate_reasonable_conformations
+
+    def probability(molecule: oechem.OEGraphMol):
+        """Return the pose probability."""
+        value = oechem.OEGetSDData(molecule, "POSIT::Probability")
+        return float(value)
+
+    # initialize receptor
+    options = oedocking.OEPositOptions()
+    options.SetIgnoreNitrogenStereo(True)  # nitrogen stereo centers can be problematic
+    options.SetPoseRelaxMode(oedocking.OEPoseRelaxMode_ALL)
+    poser = oedocking.OEPosit()
+    poser.Initialize(receptor)
+
+    posed_molecules = list()
+    # pose molecules
+    for molecule in molecules:
+        # tautomers, enantiomers, conformations
+        conformations_ensemble = generate_reasonable_conformations(molecule, dense=True)
+
+        posed_conformations = list()
+        for conformations in conformations_ensemble:
+            result = oedocking.OESinglePoseResult()
+            return_code = poser.Dock(result, conformations)
+            if return_code != oedocking.OEDockingReturnCode_Success:
+                # TODO: Maybe something for logging
+                print(
+                    f"POsing failed for molecule with title {conformations.GetTitle()} with error code "
+                    f"{oedocking.OEDockingReturnCodeGetName(return_code)}."
+                )
+                continue
+            else:
+                posed_conformation = result.GetPose()
+
+            # store probability and store pose
+            oechem.OESetSDData(
+                posed_conformation, "POSIT::Probability", str(result.GetProbability())
+            )
+            posed_conformations.append(oechem.OEGraphMol(posed_conformation))
+
+        # sort all conformations of all tautomers and enantiomers by score
+        posed_conformations.sort(key=probability, reverse=True)
+
+        posed_molecules.append(posed_conformations[0])
+
+    if len(posed_molecules) == 0:
+        # TODO: returning None when something goes wrong
+        return None
+
+    return posed_molecules
+
+
 def _run_docking(
     receptor: oechem.OEGraphMol,
     molecules: List[oechem.OEGraphMol],
@@ -148,10 +217,11 @@ def _run_docking(
         Number of docking poses to generate per molecule.
     Returns
     -------
-    docked_molecules: list of oechem.OEGraphMol
+    docked_molecules: list of oechem.OEGraphMol or None
         A list of OpenEye molecules holding the docked molecules.
     """
-    from openeye import oedocking, oequacpac, oeomega
+    from openeye import oedocking
+    from ..modeling.OEModeling import generate_reasonable_conformations
 
     # initialize receptor
     dock_resolution = oedocking.OESearchResolution_High
@@ -167,41 +237,22 @@ def _run_docking(
 
     # dock molecules
     for molecule in molecules:
-        # enumerate tautomers
-        tautomer_options = oequacpac.OETautomerOptions()
-        tautomer_options.SetMaxTautomersGenerated(4096)
-        tautomer_options.SetMaxTautomersToReturn(16)
-        tautomer_options.SetCarbonHybridization(True)
-        tautomer_options.SetMaxZoneSize(50)
-        tautomer_options.SetApplyWarts(True)
-        pKa_norm = True
-        tautomers = [
-            oechem.OEMol(tautomer)
-            for tautomer in oequacpac.OEGetReasonableTautomers(
-                molecule, tautomer_options, pKa_norm
-            )
-        ]
+        # tautomers, enantiomers, conformations
+        conformations_ensemble = generate_reasonable_conformations(molecule, dense=True)
 
-        # set up omega
-        # TODO: Improve omega options
-        omega_options = oeomega.OEOmegaOptions()
-        omega_options.SetMaxSearchTime(60.0)  # time out
-        omega = oeomega.OEOmega(omega_options)
-        omega.SetStrictStereo(False)  # enumerate stereochemistry if uncertain
-
-        docked_tautomers = list()
+        docked_conformations = list()
         # dock tautomers
-        for mol in tautomers:
+        for conformations in conformations_ensemble:
             docked_mol = oechem.OEMol()
-            # expand conformers
-            omega.Build(mol)
 
             # dock molecule
-            return_code = dock.DockMultiConformerMolecule(docked_mol, mol, num_poses)
+            return_code = dock.DockMultiConformerMolecule(
+                docked_mol, conformations, num_poses
+            )
             if return_code != oedocking.OEDockingReturnCode_Success:
                 # TODO: Maybe something for logging
                 print(
-                    f"Docking failed for molecule with title {mol.GetTitle()} with error code "
+                    f"Docking failed for molecule with title {conformations.GetTitle()} with error code "
                     f"{oedocking.OEDockingReturnCodeGetName(return_code)}."
                 )
                 continue
@@ -211,13 +262,13 @@ def _run_docking(
 
             # expand conformations
             for conformation in docked_mol.GetConfs():
-                docked_tautomers.append(oechem.OEGraphMol(conformation))
+                docked_conformations.append(oechem.OEGraphMol(conformation))
 
-        # sort all conformations of all tautomers by score
-        docked_tautomers.sort(key=score)
+        # sort all conformations of all tautomers and enantiomers by score
+        docked_conformations.sort(key=score)
 
         # keep number of conformations as specified by num_poses
-        docked_molecules += docked_tautomers[:num_poses]
+        docked_molecules += docked_conformations[:num_poses]
 
     if len(docked_molecules) == 0:
         # TODO: returning None when something goes wrong
@@ -243,7 +294,7 @@ def hybrid_docking(
         Number of docking poses to generate per molecule.
     Returns
     -------
-    docked_molecules: list of oechem.OEGraphMol
+    docked_molecules: list of oechem.OEGraphMol or None
         A list of OpenEye molecules holding the docked molecules.
     """
     from openeye import oedocking
@@ -269,7 +320,7 @@ def chemgauss_docking(
         Number of docking poses to generate per molecule.
     Returns
     -------
-    docked_molecules: list of oechem.OEGraphMol
+    docked_molecules: list of oechem.OEGraphMol or None
         A list of OpenEye molecules holding the docked molecules.
     """
     from openeye import oedocking

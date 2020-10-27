@@ -12,12 +12,72 @@ PACKAGE_ROOT = Path(__file__).parent
 class FromDistpatcherMixin:
     @classmethod
     def _from_dispatcher(cls, value, handler, handler_argname, prefix):
-        available_methods = [n[len(prefix) :] for n in cls.__dict__ if n.startswith(prefix)]
+        available_methods = [
+            n[len(prefix) :] for n in cls.__dict__ if n.startswith(prefix)
+        ]
         if handler not in available_methods:
             raise ValueError(
                 f"`{handler_argname}` must be one of: {', '.join(available_methods)}."
             )
         return getattr(cls, prefix + handler)(value)
+
+
+class LocalFileStorage:
+
+    """
+    Generate standardized paths for storing and reading data locally.
+    """
+
+    from appdirs import user_cache_dir
+
+    DIRECTORY = Path(user_cache_dir())
+
+    @staticmethod
+    def rcsb_structure_pdb(pdb_id, directory=DIRECTORY):
+        file_path = directory / f"rcsb_{pdb_id}.pdb"
+        return file_path
+
+    @staticmethod
+    def rcsb_ligand_sdf(pdb_id, chemical_id, chain, altloc, directory=DIRECTORY):
+        file_path = directory / f"rcsb_{pdb_id}_{chemical_id}_{chain}_{altloc}.sdf"
+        return file_path
+
+    @staticmethod
+    def rcsb_electron_density_mtz(pdb_id, directory=DIRECTORY):
+        file_path = directory / f"rcsb_{pdb_id}.mtz"
+        return file_path
+
+    @staticmethod
+    def klifs_ligand_mol2(structure_id, directory=DIRECTORY):
+        file_path = directory / f"klifs_{structure_id}_ligand.mol2"
+        return file_path
+
+    @staticmethod
+    def featurizer_result(featurizer_name, result_details, file_format, directory=DIRECTORY):
+        file_path = directory / f"kinoml_{featurizer_name}_{result_details}.{file_format}"
+        return file_path
+
+    @staticmethod
+    def pdb_smiles_json(directory=DIRECTORY):
+        file_path = directory / "pdb_smiles.json"
+        return file_path
+
+
+class FileDownloader:
+
+    """
+    Download and store files locally.
+    """
+
+    @staticmethod
+    def rcsb_structure_pdb(pdb_id):
+        url = f"https://files.rcsb.org/download/{pdb_id}.pdb"
+        download_file(url, LocalFileStorage.rcsb_structure_pdb(pdb_id))
+
+    @staticmethod
+    def rcsb_electron_density_mtz(pdb_id):
+        url = f"https://edmaps.rcsb.org/coefficients/{pdb_id}.mtz"
+        download_file(url, LocalFileStorage.rcsb_electron_density_mtz(pdb_id))
 
 
 def datapath(path: str) -> Path:
@@ -78,8 +138,8 @@ def download_file(url: str, path: str):
     import requests
 
     response = requests.get(url)
-    with open(path, "w") as write_file:
-        write_file.write(response.text)
+    with open(path, "wb") as write_file:
+        write_file.write(response.content)
         # TODO: check if successful, e.g. response.ok
 
     return

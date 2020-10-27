@@ -17,7 +17,7 @@ class SmilesLigand(BaseLigand):
 class FileLigand(BaseLigand):
     def __init__(self, path, metadata=None, name="", *args, **kwargs):
         super().__init__(name=name, metadata=metadata, *args, **kwargs)
-        if path.startswith("http"):
+        if str(path).startswith("http"):
             from appdirs import user_cache_dir
 
             # TODO: where to save, how to name
