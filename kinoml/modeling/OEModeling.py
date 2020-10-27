@@ -313,7 +313,9 @@ def _prepare_structure(
     electron_density: oegrid.OESkewGrid
         An OpenEye grid holding the electron density.
     loop_db: str or None
-        Path to OpenEye Spruce loop database.
+        Path to OpenEye Spruce loop database. You can request a copy at
+        https://www.eyesopen.com/database-downloads. A testing subset (3TPP) is available
+        at https://docs.eyesopen.com/toolkits/python/sprucetk/examples_make_design_units.html.
     ligand_name: str or None
         The name of the ligand located in the binding pocket of interest.
     cap_termini: bool

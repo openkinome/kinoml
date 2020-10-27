@@ -22,7 +22,12 @@ dependencies:
   - openeye-toolkits
   - xgboost
   - modeller
+  - pytorch_lightning
   #- cudatoolkit 10.2
+
+  # Development
+  - jupyterlab
+  - nglview
 
   # Testing
   - pytest
