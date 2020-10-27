@@ -2,7 +2,7 @@ import logging
 
 from .components import BaseProtein, BaseStructure
 from .sequences import Biosequence
-from ..utils import download_file
+from ..utils import download_file, APPDIR
 
 logger = logging.getLogger(__name__)
 
@@ -64,12 +64,21 @@ class ProteinStructure(BaseProtein, BaseStructure):
 
     @classmethod
     def from_file(cls, path, ext=None, **kwargs):
+
         from MDAnalysis import Universe
         from pathlib import Path
 
+        identifier = Path(path).stem  #  set id to be the file name
+
         u = Universe(path)
         p = Path(path)
-        return cls(name=p.name, metadata={"path": path}, universe=u, **kwargs)
+
+        return cls(
+            pname=p.name,
+            metadata={"path": path, "id": identifier},
+            universe=u,
+            **kwargs,
+        )
 
     @classmethod
     def from_sequence(cls, sequence, **kwargs):
@@ -85,11 +94,41 @@ class ProteinStructure(BaseProtein, BaseStructure):
 
     @classmethod
     def from_name(cls, identifier, **kwargs):
-        raise NotImplementedError
+        import requests
+        import tempfile
+        import MDAnalysis as mda
+        from pathlib import Path
+        from appdirs import user_cache_dir
+        
+        cached_path = Path(APPDIR.user_cache_dir)
+
+        path = f"{cached_path}/{identifier}.pdb"
+
+        url = f"https://files.rcsb.org/download/{identifier}.pdb"
+        response = requests.get(url)
+
+        with open(path, "wb") as pdb_file:  # saving the pdb to cache
+            pdb_file.write(response.content)
+
+        u = mda.Universe(path)
+
+        return cls(metadata={"path": path, "id": identifier}, universe=u, **kwargs)
 
     @property
     def sequence(self):
-        s = "".join([r.symbol for r in self.residues])
+        from MDAnalysis.lib.util import convert_aa_code
+
+        pdb_seq = []
+        three_l_codes = [convert_aa_code(i) for i in list(AminoAcidSequence.ALPHABET)]
+
+        for r in self.universe.residues:
+            if r.resname in three_l_codes:
+                pdb_seq.append(convert_aa_code(r.resname))
+            else:
+                continue
+
+        s = "".join(pdb_seq)
+
         return AminoAcidSequence(s)
 
 
