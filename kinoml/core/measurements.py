@@ -161,12 +161,17 @@ class pIC50Measurement(BaseMeasurement):
     ):
         import torch
 
-        return (1 + substrate_conc / michaelis_constant) * torch.exp(dG_over_KT) * inhibitor_conc
+        return -torch.log10(
+            (1 + substrate_conc / michaelis_constant)
+            * torch.exp(dG_over_KT)
+            * inhibitor_conc
+            * 1e-9
+        )
 
     def check(self):
         super().check()
-        msg = f"Values for {self.__class__.__name__} are expected to be in the [-20, 20] range."
-        assert (-20 <= self.values <= 20).all(), msg
+        msg = f"Values for {self.__class__.__name__} are expected to be in the [0, 15] range."
+        assert (0 <= self.values <= 15).all(), msg
 
 
 class pKiMeasurement(BaseMeasurement):
@@ -181,12 +186,12 @@ class pKiMeasurement(BaseMeasurement):
     def _observation_model_pytorch(dG_over_KT, inhibitor_conc=1e-6, **kwargs):
         import torch
 
-        return torch.exp(dG_over_KT) * inhibitor_conc
+        return -torch.log10(torch.exp(dG_over_KT) * inhibitor_conc * 1e-9)
 
     def check(self):
         super().check()
-        msg = f"Values for {self.__class__.__name__} are expected to be in the [-20, 20] range."
-        assert (-20 <= self.values <= 20).all(), msg
+        msg = f"Values for {self.__class__.__name__} are expected to be in the [0, 15] range."
+        assert (0 <= self.values <= 15).all(), msg
 
 
 class pKdMeasurement(BaseMeasurement):
@@ -210,12 +215,12 @@ class pKdMeasurement(BaseMeasurement):
     def _observation_model_pytorch(dG_over_KT, inhibitor_conc=1e-6, **kwargs):
         import torch
 
-        return torch.exp(dG_over_KT) * inhibitor_conc
+        return -torch.log10(torch.exp(dG_over_KT) * inhibitor_conc * 1e-9)
 
     def check(self):
         super().check()
-        msg = f"Values for {self.__class__.__name__} are expected to be in the [-20, 20] range."
-        assert (-20 <= self.values <= 20).all(), msg
+        msg = f"Values for {self.__class__.__name__} are expected to be in the [0, 15] range."
+        assert (0 <= self.values <= 15).all(), msg
 
 
 def null_observation_model(arg):

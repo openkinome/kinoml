@@ -17,7 +17,7 @@ dependencies:
   - openforcefield
   - mdanalysis
   - tqdm
-  - pytorch
+  - pytorch 1.6
   - torchvision
   - openeye-toolkits
   - modeller
@@ -29,8 +29,15 @@ dependencies:
   - codecov
 
   - pip:
+      - --find-links https://pytorch-geometric.com/whl/torch-1.6.0.html
       # PyTorch trees
       - https://github.com/ValentinFigue/Sklearn_PyTorch/archive/1b56a43e41de331ecdf73d08418f75bb34c9fa06.tar.gz
+      # Torch geometric
+      - torch_scatter==latest+cpu
+      - torch_sparse==latest+cpu
+      - torch_cluster==latest+cpu
+      - torch_spline_conv==latest+cpu
+      - torch-geometric
       # Docs
       - mkdocs==1.0.4
       # mkdocstrings master as of 20200302

@@ -198,10 +198,10 @@ class PadFeaturizer(BaseFeaturizer):
 
     def __init__(self, shape: Iterable[int], key: Hashable = "last", pad_with: int = 0):
         self.shape = shape
-        self.key = "last"
+        self.key = key
         self.pad_with = pad_with
 
-    def _featurize(self, system_or_array: System) -> np.ndarray:
+    def _featurize(self, system_or_array: Union[System, np.ndarray]) -> np.ndarray:
         if hasattr(system_or_array, "featurizations"):
             arraylike = np.asarray(system_or_array.featurizations[self.key])
         else:
@@ -253,3 +253,19 @@ class HashFeaturizer(BaseFeaturizer):
 class NullFeaturizer(BaseFeaturizer):
     def featurize(self, system, inplace: bool = True) -> object:
         return system
+
+
+class ScaleFeaturizer(BaseFeaturizer):
+    def __init__(self, key: Hashable = "last", **kwargs):
+        self.key = key
+        self.sklearn_options = kwargs
+
+    def _featurize(self, system_or_array: Union[System, np.ndarray]) -> np.ndarray:
+        from sklearn.preprocessing import scale
+
+        if hasattr(system_or_array, "featurizations"):
+            arraylike = np.asarray(system_or_array.featurizations[self.key])
+        else:
+            arraylike = system_or_array
+
+        return scale(arraylike, **self.sklearn_options)

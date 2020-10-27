@@ -3,8 +3,8 @@ Test kinoml.datasets.core
 """
 
 
-def test_basedatasetprovider():
-    from kinoml.datasets.core import BaseDatasetProvider
+def test_datasetprovider():
+    from kinoml.datasets.core import DatasetProvider
     from kinoml.core.systems import System
     from kinoml.core.components import MolecularComponent
     from kinoml.core.measurements import BaseMeasurement
@@ -16,6 +16,6 @@ def test_basedatasetprovider():
         BaseMeasurement(50, conditions=conditions, system=System([MolecularComponent()])),
         BaseMeasurement(30, conditions=conditions, system=System([MolecularComponent()])),
     ]
-    provider = BaseDatasetProvider(measurements=measurements, featurizers=[BaseFeaturizer()])
+    provider = DatasetProvider(measurements=measurements, featurizers=[BaseFeaturizer()])
     assert len(provider.conditions) == 1
     assert next(iter(provider.conditions)) == conditions
