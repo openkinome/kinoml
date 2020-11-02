@@ -30,7 +30,10 @@ class ObservationModelModule(pl.LightningModule):
     ):
         super().__init__()
         self.nn_model = nn_model
+        # observation model might be reassigned during training
+        # to deal with different datasets
         self.observation_model = observation_model
+        self.measurement_type_class = None
         self.optimizer = optimizer
         self.loss_function = loss_function
         if validate:
@@ -49,7 +52,7 @@ class ObservationModelModule(pl.LightningModule):
     def _standard_step(self, batch, batch_idx, **kwargs):
         x, y = batch
         predicted = self.forward(x)
-        loss = self.loss_function(predicted, y.view(*predicted.shape))
+        loss = self.loss_function(predicted, y.view_as(predicted))
         return predicted, loss
 
     def training_step(self, batch, batch_idx, **kwargs):
@@ -70,8 +73,12 @@ class ObservationModelModule(pl.LightningModule):
         self.log("MAE", self.metric_mae(predicted, observed))
         self.log("MSE", self.metric_mse(predicted, observed))
         self.log("RMSE", self.metric_rmse(predicted, observed))
-        plot = predicted_vs_observed(predicted, observed, with_metrics=False)
-        self.logger.experiment.add_figure("predicted_vs_observed", plot)
+
+        if self.measurement_type_class is not None:
+            plot = predicted_vs_observed(
+                predicted, observed, self.measurement_type_class, with_metrics=False
+            )
+            self.logger.experiment.add_figure("predicted_vs_observed", plot)
         return loss
 
     def configure_optimizers(self):

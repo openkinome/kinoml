@@ -145,26 +145,23 @@ class PercentageDisplacementMeasurement(BaseMeasurement):
 
     where $C$ is the standard concentration of 1 [M].
     """
+    RANGE = (0, 100)
 
     def check(self):
         super().check()
-        assert (0 <= self.values <= 100).all(), "One or more values are not in [0, 100]"
+        assert (
+            self.RANGE[0] <= self.values <= self.RANGE[1]
+        ).all(), "One or more values are not in [0, 100]"
 
     @staticmethod
-    def _observation_model_pytorch(
-        dG_over_KT, inhibitor_conc=1, standard_conc=1, **kwargs
-    ):
+    def _observation_model_pytorch(dG_over_KT, inhibitor_conc=1, standard_conc=1, **kwargs):
         import torch
 
-        return (100 * inhibitor_conc) / (
-            inhibitor_conc + (standard_conc * torch.exp(dG_over_KT))
-        )
+        return (100 * inhibitor_conc) / (inhibitor_conc + (standard_conc * torch.exp(dG_over_KT)))
         # return 100 * (1 / (1 + (torch.exp(dG_over_KT) * standard_conc) / inhibitor_conc))
 
     @staticmethod
-    def _observation_model_numpy(
-        dG_over_KT, inhibitor_conc=1, standard_conc=1, **kwargs
-    ):
+    def _observation_model_numpy(dG_over_KT, inhibitor_conc=1, standard_conc=1, **kwargs):
         r"""
         Return the observation model.
 
@@ -172,9 +169,7 @@ class PercentageDisplacementMeasurement(BaseMeasurement):
         F(\Delta g) = 100 * \frac{1}{1 + \frac{exp[\Delta g] * C[M]}{[I]}},
         $$
         """
-        return (100 * inhibitor_conc) / (
-            inhibitor_conc + (standard_conc * np.exp(dG_over_KT))
-        )
+        return (100 * inhibitor_conc) / (inhibitor_conc + (standard_conc * np.exp(dG_over_KT)))
         # return 100 * 1 / (1 + (np.exp(dG_over_KT) * standard_conc) / inhibitor_conc)
 
     _observation_model_xgboost = _observation_model_numpy
@@ -246,6 +241,7 @@ class pIC50Measurement(BaseMeasurement):
     \mathbf{F}_{pIC_{50}}(\Delta g) = - \frac{\Delta g + \ln\Big(\big(1+\frac{[S]}{K_m}\big)*C\Big)}{\ln(10)}.
     $$
     """
+    RANGE = (0, 15)
 
     @staticmethod
     def _observation_model_pytorch(
@@ -282,9 +278,7 @@ class pIC50Measurement(BaseMeasurement):
 
         """
         labels = dmatrix.get_label()
-        constant = (
-            np.log((1 + substrate_conc / michaelis_constant) * standard_conc) / LN10
-        )
+        constant = np.log((1 + substrate_conc / michaelis_constant) * standard_conc) / LN10
 
         grad = (labels + dG_over_KT / LN10 + constant) / LN10
         hess = np.full(grad.shape, 1 / (LN10 * LN10))
@@ -294,7 +288,7 @@ class pIC50Measurement(BaseMeasurement):
     def check(self):
         super().check()
         msg = f"Values for {self.__class__.__name__} are expected to be in the [0, 15] range."
-        assert (0 <= self.values <= 15).all(), msg
+        assert (self.RANGE[0] <= self.values <= self.RANGE[1]).all(), msg
 
 
 class pKiMeasurement(BaseMeasurement):
@@ -304,6 +298,8 @@ class pKiMeasurement(BaseMeasurement):
 
     We make the assumption that $K_i \approx K_d$ and therefore $\mathbf{F}_{pK_i} = \mathbf{F}_{pK_d}$.
     """
+
+    RANGE = (0, 15)
 
     @staticmethod
     def _observation_model_pytorch(dG_over_KT, standard_conc=1, **kwargs):
@@ -322,7 +318,7 @@ class pKiMeasurement(BaseMeasurement):
     def check(self):
         super().check()
         msg = f"Values for {self.__class__.__name__} are expected to be in the [0, 15] range."
-        assert (0 <= self.values <= 15).all(), msg
+        assert (self.RANGE[0] <= self.values <= self.RANGE[1]).all(), msg
 
 
 class pKdMeasurement(BaseMeasurement):
@@ -337,6 +333,7 @@ class pKdMeasurement(BaseMeasurement):
     $$
     where C given in molar [M] can be adapted if measurements were undertaken at different concentrations.
     """
+    RANGE = (0, 15)
 
     @staticmethod
     def _observation_model_pytorch(dG_over_KT, standard_conc=1, **kwargs):
@@ -355,7 +352,7 @@ class pKdMeasurement(BaseMeasurement):
     def check(self):
         super().check()
         msg = f"Values for {self.__class__.__name__} are expected to be in the [0, 15] range."
-        assert (0 <= self.values <= 15).all(), msg
+        assert (self.RANGE[0] <= self.values <= self.RANGE[1]).all(), msg
 
 
 def null_observation_model(arg):
