@@ -10,7 +10,7 @@ from ..core.measurements import null_observation_model as _null_observation_mode
 
 class PrefeaturizedTorchDataset(Dataset):
     def __init__(
-        self, systems, measurements, observation_model: callable = _null_observation_model,
+        self, systems, measurements, observation_model: callable = _null_observation_model
     ):
         assert len(systems) == len(measurements), "Systems and Measurements must match in size!"
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -93,7 +93,7 @@ class XyNpzTorchDataset(Dataset):
 
     def as_datamodule(self, observation_model=_null_observation_model, **kwargs):
         return LightningDataModuleAdapter(
-            dataset=self, observation_model=observation_model, dataloader_options=kwargs,
+            dataset=self, observation_model=observation_model, dataloader_options=kwargs
         )
 
 
