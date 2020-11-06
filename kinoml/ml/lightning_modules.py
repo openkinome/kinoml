@@ -12,6 +12,8 @@ from torch.utils.data import Dataset, DataLoader, SubsetRandomSampler
 import pytorch_lightning as pl
 from pytorch_lightning import metrics
 from sklearn.metrics import r2_score
+from sklearn.model_selection import KFold, train_test_split
+from torch.utils.data import dataset
 
 from ..core import measurements as measurement_types
 from ..core.measurements import null_observation_model as _null_observation_model
@@ -41,11 +43,7 @@ class ObservationModelModule(pl.LightningModule):
         self.metric_r2 = r2_score
         self.metric_mae = metrics.MeanAbsoluteError()
         self.metric_mse = metrics.MeanSquaredError()
-        # self.metric_rmse = RootMeanSquaredError()
-
-    @property
-    def measurement_type_class(self):
-        return getattr(measurement_types, self.observation_model.__qualname__.split(".")[0], None)
+        self.metric_rmse = RootMeanSquaredError()
 
     def forward(self, x, observation_model=_null_observation_model):
         delta_g = self.nn_model(x)
@@ -63,29 +61,50 @@ class ObservationModelModule(pl.LightningModule):
         self.log("train_loss", loss, on_step=False, on_epoch=True, logger=True)
         return loss
 
-    def validation_step(self, batch, batch_idx, dataloader_idx=0, **kwargs):
-        predicted, loss = self._standard_step(batch, batch_idx, **kwargs)
-        self.log("val_loss", loss, on_step=False, on_epoch=True, logger=True)
-        return loss
-
-    def test_step(self, batch, batch_idx, dataloader_idx=0, **kwargs):
+    def _common_validation_test_step(
+        self, batch, batch_idx, dataloader_idx=0, metric_prefix="val", **kwargs
+    ):
         predicted, loss = self._standard_step(batch, batch_idx, **kwargs)
         _, y = batch
         observed = y.view_as(predicted)
-        self.log("test_loss", loss)
-        self.log("R2", self.metric_r2(predicted, observed))
-        self.log("MAE", self.metric_mae(predicted, observed))
-        self.log("MSE", self.metric_mse(predicted, observed))
-        # self.log("RMSE", self.metric_rmse(predicted, observed))
+        self.log(f"{metric_prefix}_loss", loss, on_step=False, on_epoch=True, logger=True)
+        return {
+            "loss": loss,
+            "predicted": predicted,
+            "observed": observed,
+            "observation_model": batch.observation_model,
+        }
+
+    def _common_validation_test_epoch_end(self, output_results, metric_prefix="val"):
+        predicted = torch.cat([x["predicted"] for x in output_results])
+        observed = torch.cat([x["observed"] for x in output_results])
+        obsmodel = output_results[0]["observation_model"]
+
+        self.log(f"{metric_prefix}_R2", self.metric_r2(predicted, observed))
+        self.log(f"{metric_prefix}_MAE", self.metric_mae(predicted, observed))
+        self.log(f"{metric_prefix}_MSE", self.metric_mse(predicted, observed))
+        self.log(f"{metric_prefix}_RMSE", self.metric_rmse(predicted, observed))
 
         # FIXME: See if `batch` can also host the measurement class
         # or change the API to pass the classes around, not the staticmethods
-        if self.measurement_type_class is not None:
+        measurement_class = getattr(measurement_types, obsmodel.__qualname__.split(".")[0], None)
+        if measurement_class is not None:
             plot = predicted_vs_observed(
-                predicted, observed, self.measurement_type_class, with_metrics=False
+                predicted, observed, measurement_class, with_metrics=False
             )
-            self.logger.experiment.add_figure("predicted_vs_observed", plot)
-        return loss
+            self.logger.experiment.add_figure(f"{metric_prefix}_predicted_vs_observed", plot)
+
+    def validation_step(self, *args, **kwargs):
+        return self._common_validation_test_step(metric_prefix="val", *args, **kwargs)
+
+    def validation_epoch_end(self, *args, **kwargs):
+        return self._common_validation_test_epoch_end(metric_prefix="val", *args, **kwargs)
+
+    def test_step(self, *args, **kwargs):
+        return self._common_validation_test_step(metric_prefix="test", *args, **kwargs)
+
+    def test_epoch_end(self, *args, **kwargs):
+        return self._common_validation_test_epoch_end(metric_prefix="test", *args, **kwargs)
 
     def configure_optimizers(self):
         return self.optimizer
@@ -174,25 +193,25 @@ class MultiDataModule(pl.LightningDataModule):
         )
 
     def get_kfold(self, *args, **kwargs):
-        from sklearn.model_selection import KFold
 
         # Start with small datasets first to ensure they are seen before overfitting to larger ones
-        kfold = KFold(*args, **kwargs)
+        kfold = KFold3Way(*args, **kwargs)
         for dataset_index in self.dataset_indices_by_size(reverse=True):
             dataset = self.datasets[dataset_index]
-            train_val_indices = np.concatenate([dataset.indices["train"], dataset.indices["val"]])
-
+            all_indices = np.concatenate(
+                [dataset.indices["train"], dataset.indices["val"], dataset.indices["test"]]
+            )
             # Check splitting indices is the same as splitting on the dataset
-            for fold_index, (train_index, val_index) in enumerate(kfold.split(train_val_indices)):
+            for fold_index, (train_index, val_index, test_index) in enumerate(
+                kfold.split(all_indices)
+            ):
                 print(
                     f"DS #{dataset_index} {self.measurement_types[dataset_index]}, fold={fold_index}"
                 )
                 train_dl = self._build_dataloader(dataset_index=dataset_index, indices=train_index)
                 val_dl = self._build_dataloader(dataset_index=dataset_index, indices=val_index)
-                yield train_dl, val_dl
-
-            # Stop after first one for now
-            # break
+                test_dl = self._build_dataloader(dataset_index=dataset_index, indices=test_index)
+                yield train_dl, val_dl, test_dl
 
 
 class CrossValidateTrainer:
@@ -202,11 +221,14 @@ class CrossValidateTrainer:
         self.trainer_kwargs = kwargs
         self._models = []
         self._trainers = []
+        self._test_loaders = []
 
     def fit(self, model, datamodule):
         # .get_kfold() will provide nfolds * len(datamodule.datasets) iterations
         # but we reuse the first nfolds models across the datasets
-        for i, (train_loader, val_loader) in enumerate(datamodule.get_kfold(self.nfolds)):
+        for i, (train_loader, val_loader, test_loader) in enumerate(
+            datamodule.get_kfold(self.nfolds)
+        ):
             # This is the first (and maybe only) time we fit something
             # We want to keep them around in case we fit more datamodules (other measurement types)
             fold_index = i % self.nfolds
@@ -222,6 +244,7 @@ class CrossValidateTrainer:
                 fold_model = self._models[fold_index]
                 fold_trainer = self._trainers[fold_index]
 
+            self._test_loaders.append(test_loader)
             fold_trainer.fit(
                 fold_model,
                 train_dataloader=train_loader,
@@ -246,21 +269,27 @@ class CrossValidateTrainer:
         if "test_dataloaders" in kwargs:
             raise ValueError("`test_dataloaders` option not allowed. Provide custom datamodule.")
         datamodule = kwargs.pop("datamodule")
+
+        n_datasets = len(self._test_loaders) // self.nfolds
         results = []
-        for fold_index, (trainer, model) in enumerate(zip(self._trainers, self._models)):
-            model.observation_model = datamodule.observation_models[dataset_index]
+        for fold_index, test_dataloader in enumerate(
+            self._test_loaders[dataset_index::n_datasets]
+        ):
+            print(f"Test results for DS #{dataset_index} for fold {fold_index}")
+            trainer = self._trainers[fold_index]
+            model = self._models[fold_index]
             results.append(
                 trainer.test(
                     model=model,
-                    test_dataloaders=datamodule.test_dataloader(dataset_index=dataset_index),
+                    test_dataloaders=test_dataloader,
                     ckpt_path=trainer.checkpoint_callback.best_model_path,
-                )
+                )[0]
             )
 
         avg_results = {}
-        for key in results[0][0]:
-            astensor = np.array([r[key] for rr in results for r in rr])
-            avg_results[key] = {"mean": astensor.mean(), "std": astensor.std()}
+        for metric in results[0]:
+            astensor = np.array([fold_result[metric] for fold_result in results])
+            avg_results[metric] = {"mean": astensor.mean(), "std": astensor.std()}
         return avg_results
 
     def best_run(self):
@@ -344,3 +373,13 @@ class AttrList(list):
     def __call__(self, **kwargs):
         self.__dict__.update(kwargs)
         return self
+
+
+class KFold3Way(KFold):
+    def split(self, X, y=None, groups=None):
+        for train, test in super().split(X, y, groups):
+            # FIXME: This easy implementation does not guarantee
+            #        rotation over the train/validation subset
+            #        (e.g. val susbet can have repeated indices)
+            train, val = train_test_split(train, test_size=(1 / (self.n_splits - 1)))
+            yield train, val, test
