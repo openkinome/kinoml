@@ -154,14 +154,20 @@ class PercentageDisplacementMeasurement(BaseMeasurement):
         ).all(), "One or more values are not in [0, 100]"
 
     @staticmethod
-    def _observation_model_pytorch(dG_over_KT, inhibitor_conc=1, standard_conc=1, **kwargs):
+    def _observation_model_pytorch(
+        dG_over_KT, inhibitor_conc=1, standard_conc=1, **kwargs
+    ):
         import torch
 
-        return (100 * inhibitor_conc) / (inhibitor_conc + (standard_conc * torch.exp(dG_over_KT)))
+        return (100 * inhibitor_conc) / (
+            inhibitor_conc + (standard_conc * torch.exp(dG_over_KT))
+        )
         # return 100 * (1 / (1 + (torch.exp(dG_over_KT) * standard_conc) / inhibitor_conc))
 
     @staticmethod
-    def _observation_model_numpy(dG_over_KT, inhibitor_conc=1, standard_conc=1, **kwargs):
+    def _observation_model_numpy(
+        dG_over_KT, inhibitor_conc=1, standard_conc=1, **kwargs
+    ):
         r"""
         Return the observation model.
 
@@ -169,7 +175,9 @@ class PercentageDisplacementMeasurement(BaseMeasurement):
         F(\Delta g) = 100 * \frac{1}{1 + \frac{exp[\Delta g] * C[M]}{[I]}},
         $$
         """
-        return (100 * inhibitor_conc) / (inhibitor_conc + (standard_conc * np.exp(dG_over_KT)))
+        return (100 * inhibitor_conc) / (
+            inhibitor_conc + (standard_conc * np.exp(dG_over_KT))
+        )
         # return 100 * 1 / (1 + (np.exp(dG_over_KT) * standard_conc) / inhibitor_conc)
 
     _observation_model_xgboost = _observation_model_numpy
@@ -196,7 +204,7 @@ class PercentageDisplacementMeasurement(BaseMeasurement):
 
         grad = constant * difference * temp / (summation ** 2)
 
-        numerator = temp * summation - 2 * temp ** 2
+        numerator = temp * summation - 2 * (temp ** 2)
 
         hess = grad ** 2 + difference * constant * numerator / (summation ** 3)
 
@@ -275,9 +283,11 @@ class pIC50Measurement(BaseMeasurement):
                 Passed automatically by the xgboost loop
 
         """
-        constant = np.log((1 + substrate_conc / michaelis_constant) * standard_conc) / LN10
+        constant = (
+            np.log((1 + substrate_conc / michaelis_constant) * standard_conc) / LN10
+        )
 
-        grad = (labels + dG_over_KT / LN10 + constant) / LN10
+        grad = (labels + (dG_over_KT + constant) / LN10) / LN10
         hess = np.full(grad.shape, 1 / (LN10 * LN10))
 
         return grad, hess
