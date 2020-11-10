@@ -202,13 +202,16 @@ class PercentageDisplacementMeasurement(BaseMeasurement):
         summation = inhibitor_conc + temp
         difference = 100 * inhibitor_conc / summation - labels
 
-        grad = constant * difference * temp / (summation ** 2)
+        grad_loss = constant * difference * temp / (summation ** 2)
 
+        first_term = constant * temp / (summation ** 2)
         numerator = temp * summation - 2 * (temp ** 2)
 
-        hess = grad ** 2 + difference * constant * numerator / (summation ** 3)
+        hess_loss = first_term ** 2 + difference * constant * numerator / (
+            summation ** 3
+        )
 
-        return grad, hess
+        return grad_loss, hess_loss
 
 
 class pIC50Measurement(BaseMeasurement):
