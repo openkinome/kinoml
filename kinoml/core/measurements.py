@@ -176,7 +176,7 @@ class PercentageDisplacementMeasurement(BaseMeasurement):
 
     @staticmethod
     def _loss_adapter_xgboost__mse(
-        dG_over_KT, dmatrix, inhibitor_conc=1, standard_conc=1, **kwargs
+        labels, dG_over_KT, inhibitor_conc=1, standard_conc=1, **kwargs
     ):
         r"""
         Return the gradient and the hessian of the loss defined by
@@ -188,8 +188,6 @@ class PercentageDisplacementMeasurement(BaseMeasurement):
         See theory notes for more details.
         """
         # TODO Check if this is the right way of integrating the custom loss for xgboost.
-
-        labels = dmatrix.get_label()
 
         constant = -1 * 100 * inhibitor_conc
         temp = standard_conc * np.exp(dG_over_KT)
@@ -257,8 +255,8 @@ class pIC50Measurement(BaseMeasurement):
 
     @staticmethod
     def _loss_adapter_xgboost__mse(
+        labels,
         dG_over_KT,
-        dmatrix,
         substrate_conc=1e-6,
         michaelis_constant=1,
         standard_conc=1,
@@ -277,7 +275,6 @@ class pIC50Measurement(BaseMeasurement):
                 Passed automatically by the xgboost loop
 
         """
-        labels = dmatrix.get_label()
         constant = np.log((1 + substrate_conc / michaelis_constant) * standard_conc) / LN10
 
         grad = (labels + dG_over_KT / LN10 + constant) / LN10
@@ -311,7 +308,7 @@ class pKiMeasurement(BaseMeasurement):
     _observation_model_xgboost = _observation_model_pytorch
 
     @staticmethod
-    def _loss_adapter_xgboost__mse(dG_over_KT, dmatrix, standard_conc=1, **kwargs):
+    def _loss_adapter_xgboost__mse(labels, dG_over_KT, standard_conc=1, **kwargs):
         # TODO
         raise NotImplementedError
 
@@ -345,7 +342,7 @@ class pKdMeasurement(BaseMeasurement):
     _observation_model_xgboost = _observation_model_pytorch
 
     @staticmethod
-    def _loss_adapter_xgboost__mse(dG_over_KT, dmatrix, standard_conc=1, **kwargs):
+    def _loss_adapter_xgboost__mse(labels, dG_over_KT, standard_conc=1, **kwargs):
         # TODO
         raise NotImplementedError
 
