@@ -5,6 +5,7 @@ Training loops built with pytorch-lightning
 from copy import deepcopy
 from pathlib import Path
 from typing import List
+from collections import defaultdict
 
 import numpy as np
 import torch
@@ -221,7 +222,7 @@ class CrossValidateTrainer:
         self.trainer_kwargs = kwargs
         self._models = []
         self._trainers = []
-        self._test_loaders = []
+        self._dataloaders = defaultdict(list)
 
     def fit(self, model, datamodule):
         # .get_kfold() will provide nfolds * len(datamodule.datasets) iterations
@@ -244,7 +245,9 @@ class CrossValidateTrainer:
                 fold_model = self._models[fold_index]
                 fold_trainer = self._trainers[fold_index]
 
-            self._test_loaders.append(test_loader)
+            self._dataloaders["train"].append(train_loader)
+            self._dataloaders["test"].append(test_loader)
+            self._dataloaders["val"].append(val_loader)
             fold_trainer.fit(
                 fold_model,
                 train_dataloader=train_loader,
@@ -270,10 +273,10 @@ class CrossValidateTrainer:
             raise ValueError("`test_dataloaders` option not allowed. Provide custom datamodule.")
         datamodule = kwargs.pop("datamodule")
 
-        n_datasets = len(self._test_loaders) // self.nfolds
+        n_datasets = len(self._dataloaders["test"]) // self.nfolds
         results = []
         for fold_index, test_dataloader in enumerate(
-            self._test_loaders[dataset_index::n_datasets]
+            self._dataloaders["test"][dataset_index::n_datasets]
         ):
             print(f"Test results for DS #{dataset_index} for fold {fold_index}")
             trainer = self._trainers[fold_index]
@@ -303,6 +306,7 @@ class CrossValidateTrainer:
     def clear(self):
         self._models[:] = []
         self._trainers[:] = []
+        self._dataloaders[:] = []
 
 
 class ObservationModelDataLoader(DataLoader):

@@ -194,6 +194,7 @@ class PercentageDisplacementMeasurement(BaseMeasurement):
         dG_over_KT = dG_over_KT.astype("float64")
 
         constant = -1 * 100 * inhibitor_conc
+        # FIXME: Check these overflows for non-physical calcs
         temp = standard_conc * np.exp(dG_over_KT)
         summation = inhibitor_conc + temp
         difference = 100 * inhibitor_conc / summation - labels
