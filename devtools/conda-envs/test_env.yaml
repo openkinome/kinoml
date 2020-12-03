@@ -19,10 +19,11 @@ dependencies:
   - tqdm
   - pytorch 1.6
   - torchvision
+  - pytorch_geometric
   - openeye-toolkits
+  - pytorch-lightning
   - xgboost
   - modeller
-  - pytorch-lightning
   - watermark
   #- cudatoolkit 10.2
 
@@ -44,7 +45,6 @@ dependencies:
       - torch_sparse
       - torch_cluster
       - torch_spline_conv
-      - torch-geometric
       # Docs
       - mkdocs==1.0.4
       # mkdocstrings master as of 20200302
