@@ -15,12 +15,25 @@ on:
 
 jobs:
   test:
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.cfg.os }}
     strategy:
       fail-fast: false
       matrix:
-        os: [macOS-latest, ubuntu-latest]
-        python-version: [3.6, 3.7]
+        cfg:
+          - os: ubuntu-latest
+            python-version: "3.6"
+
+          - os: ubuntu-latest
+            python-version: "3.7"
+
+          - os: ubuntu-latest
+            python-version: "3.8"
+
+          - os: ubuntu-latest
+            python-version: "3.9"
+
+          - os: macOS-latest
+            python-version: "3.6"
 
     env:
       OE_LICENSE: ${{ github.workspace }}/oe_license.txt
@@ -31,7 +44,7 @@ jobs:
 
       - uses: conda-incubator/setup-miniconda@v2
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: ${{ matrix.cfg.python-version }}
           activate-environment: test
           channel-priority: true
           environment-file: devtools/conda-envs/test_env.yaml
@@ -53,9 +66,9 @@ jobs:
       - name: Patch openforcefield
         shell: bash -l {0}
         run: |
-          # We need this until https://github.com/openforcefield/openforcefield/pull/583 is merged
+          # We need this until openforcefield 0.9 is merged
           conda remove --force openforcefield
-          pip install -U https://github.com/openforcefield/openforcefield/archive/toolkit-inheritance.zip --no-deps
+          pip install -U https://github.com/openforcefield/openforcefield/archive/76571d2fccba227a80cb5477669d96d38f1ad6af.zip --no-deps
 
       - name: Decrypt and check OE license
         shell: bash -l {0}
@@ -91,7 +104,7 @@ jobs:
 
       - uses: conda-incubator/setup-miniconda@v2
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: "3.6"
           activate-environment: test
           channel-priority: true
           environment-file: devtools/conda-envs/test_env.yaml
@@ -118,9 +131,9 @@ jobs:
       - name: Patch openforcefield
         shell: bash -l {0}
         run: |
-          # We need this until https://github.com/openforcefield/openforcefield/pull/583 is merged
+          # We need this until openforcefield 0.9 is merged
           conda remove --force openforcefield
-          pip install -U https://github.com/openforcefield/openforcefield/archive/toolkit-inheritance.zip --no-deps
+          pip install -U https://github.com/openforcefield/openforcefield/archive/76571d2fccba227a80cb5477669d96d38f1ad6af.zip --no-deps
 
       - name: Install package
         shell: bash -l {0}
@@ -146,7 +159,7 @@ jobs:
 
       - uses: conda-incubator/setup-miniconda@v2
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: "3.6"
           activate-environment: test
           channel-priority: true
           environment-file: devtools/conda-envs/test_env.yaml
@@ -168,9 +181,9 @@ jobs:
       - name: Patch openforcefield
         shell: bash -l {0}
         run: |
-          # We need this until https://github.com/openforcefield/openforcefield/pull/583 is merged
+          # We need this until openforcefield 0.9 is merged
           conda remove --force openforcefield
-          pip install -U https://github.com/openforcefield/openforcefield/archive/toolkit-inheritance.zip --no-deps
+          pip install -U https://github.com/openforcefield/openforcefield/archive/76571d2fccba227a80cb5477669d96d38f1ad6af.zip --no-deps
 
       - name: Install package
         shell: bash -l {0}
