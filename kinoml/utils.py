@@ -1,7 +1,7 @@
 from pathlib import Path
 from itertools import zip_longest
 from collections import defaultdict
-from typing import Iterable, Callable, Any
+from typing import Iterable, Callable, Any, Type
 from contextlib import contextmanager
 
 from appdirs import AppDirs
@@ -202,3 +202,23 @@ def collapsible(fn, *args, **kwargs):
     acc.set_title(0, "View output")
     acc.selected_index = None
     return acc
+
+
+def fill_until_next_multiple(container, multiple_of: int, factory):
+    """
+    Fill `container` with instances of `factory` until its length
+    reaches the next multiple of `multiple_of`.
+
+    `container` gets modified in place and returned.
+    """
+    if isinstance(container, list):
+        action = container.append
+    elif isinstance(container, set):
+        action = container.add
+    else:
+        raise TypeError("`container` must be an instance of list or set")
+
+    for _ in range((multiple_of - (len(container) % multiple_of)) % multiple_of):
+        action(factory())
+
+    return container

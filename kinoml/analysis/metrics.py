@@ -13,19 +13,18 @@ def performance(
     TODO: Reimplement samples with scipy.stats.norm or with numpy.
 
     """
-    assert n_boot >= 2, "Number of bootstraps must be >= 2"
     assert 0.5 <= confidence < 1, "Confidence must be in [0.5, 1)"
-    assert 0 < sample_ratio < 1, "Sample ration must be in (0, 1)"
+    assert 0 < sample_ratio <= 1, "Sample ratio must be in (0, 1]"
 
     high = predicted.shape[0]
     size = int(sample_ratio * high)
-    bootstrapped = np.empty((4, n_boot))
     metrics = {
         "r2": r2_score,
         "mse": mean_squared_error,
         "mae": mean_absolute_error,
         "rmse": root_mean_squared_error,
     }
+    bootstrapped = np.empty((len(metrics), n_boot))
 
     for i in range(n_boot):
         rng = np.random.RandomState(_seed + i)
@@ -49,7 +48,7 @@ def performance(
         )
         if verbose:
             print(
-                f"{key.upper():>4s}: {mean:.2f}±{std:.2f} {100*confidence:.0f}CI=({low:.2f}, {high:.2f})"
+                f"{key.upper():>4s}: {mean:.4f}±{std:.4f} {100*confidence:.0f}CI=({low:.4f}, {high:.4f})"
             )
 
     return results

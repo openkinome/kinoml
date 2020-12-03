@@ -4,6 +4,7 @@ Training loops built with pytorch-lightning
 
 from copy import deepcopy
 from pathlib import Path
+from random import shuffle
 from typing import List
 from collections import defaultdict
 
@@ -15,6 +16,7 @@ from pytorch_lightning import metrics
 from sklearn.metrics import r2_score
 from sklearn.model_selection import KFold, train_test_split
 from torch.utils.data import dataset
+from IPython.display import display
 
 from ..core import measurements as measurement_types
 from ..core.measurements import null_observation_model as _null_observation_model
@@ -36,6 +38,7 @@ class ObservationModelModule(pl.LightningModule):
     ):
         super().__init__()
         self.nn_model = nn_model
+        self.validate = validate
         # observation model might be reassigned during training
         # to deal with different datasets
         self.optimizer = optimizer
@@ -45,6 +48,10 @@ class ObservationModelModule(pl.LightningModule):
         self.metric_mae = metrics.MeanAbsoluteError()
         self.metric_mse = metrics.MeanSquaredError()
         self.metric_rmse = RootMeanSquaredError()
+
+        if validate:
+            self.validation_step = self._disabled_validation_step
+            self.validation_epoch_end = self._disabled_validation_epoch_end
 
     def forward(self, x, observation_model=_null_observation_model):
         delta_g = self.nn_model(x)
@@ -93,12 +100,13 @@ class ObservationModelModule(pl.LightningModule):
             plot = predicted_vs_observed(
                 predicted, observed, measurement_class, with_metrics=False
             )
+            display(plot)
             self.logger.experiment.add_figure(f"{metric_prefix}_predicted_vs_observed", plot)
 
-    def validation_step(self, *args, **kwargs):
+    def _disabled_validation_step(self, *args, **kwargs):
         return self._common_validation_test_step(metric_prefix="val", *args, **kwargs)
 
-    def validation_epoch_end(self, *args, **kwargs):
+    def _disabled_validation_epoch_end(self, *args, **kwargs):
         return self._common_validation_test_epoch_end(metric_prefix="val", *args, **kwargs)
 
     def test_step(self, *args, **kwargs):
@@ -193,10 +201,10 @@ class MultiDataModule(pl.LightningDataModule):
             dataset_index=dataset_index, indices=self.datasets[dataset_index].indices["test"]
         )
 
-    def get_kfold(self, *args, **kwargs):
+    def get_kfold(self, nfolds=5, with_validation=True, shuffle=False, **kwargs):
 
         # Start with small datasets first to ensure they are seen before overfitting to larger ones
-        kfold = KFold3Way(*args, **kwargs)
+        kfold = KFold3Way(n_splits=nfolds, shuffle=shuffle, **kwargs)
         for dataset_index in self.dataset_indices_by_size(reverse=True):
             dataset = self.datasets[dataset_index]
             all_indices = np.concatenate(
@@ -204,7 +212,7 @@ class MultiDataModule(pl.LightningDataModule):
             )
             # Check splitting indices is the same as splitting on the dataset
             for fold_index, (train_index, val_index, test_index) in enumerate(
-                kfold.split(all_indices)
+                kfold.split(all_indices, with_validation=with_validation)
             ):
                 print(
                     f"DS #{dataset_index} {self.measurement_types[dataset_index]}, fold={fold_index}"
@@ -216,8 +224,10 @@ class MultiDataModule(pl.LightningDataModule):
 
 
 class CrossValidateTrainer:
-    def __init__(self, nfolds=5, *args, **kwargs):
+    def __init__(self, nfolds=5, with_validation=True, shuffle=False, *args, **kwargs):
         self.nfolds = nfolds
+        self.with_validation = with_validation
+        self.shuffle = shuffle
         self.trainer_args = args
         self.trainer_kwargs = kwargs
         self._models = []
@@ -228,7 +238,9 @@ class CrossValidateTrainer:
         # .get_kfold() will provide nfolds * len(datamodule.datasets) iterations
         # but we reuse the first nfolds models across the datasets
         for i, (train_loader, val_loader, test_loader) in enumerate(
-            datamodule.get_kfold(self.nfolds)
+            datamodule.get_kfold(
+                self.nfolds, with_validation=self.with_validation, shuffle=self.shuffle
+            )
         ):
             # This is the first (and maybe only) time we fit something
             # We want to keep them around in case we fit more datamodules (other measurement types)
@@ -239,7 +251,7 @@ class CrossValidateTrainer:
                 fold_trainer = pl.Trainer(
                     *deepcopy(self.trainer_args), **deepcopy(self.trainer_kwargs)
                 )
-                self._patch_paths_for_kfold(fold_trainer, i)
+                # self._patch_paths_for_kfold(fold_trainer, i)
                 self._trainers.append(fold_trainer)
             else:
                 fold_model = self._models[fold_index]
@@ -286,6 +298,7 @@ class CrossValidateTrainer:
                     model=model,
                     test_dataloaders=test_dataloader,
                     ckpt_path=trainer.checkpoint_callback.best_model_path,
+                    **kwargs,
                 )[0]
             )
 
@@ -380,10 +393,13 @@ class AttrList(list):
 
 
 class KFold3Way(KFold):
-    def split(self, X, y=None, groups=None):
+    def split(self, X, y=None, groups=None, with_validation=True):
         for train, test in super().split(X, y, groups):
-            # FIXME: This easy implementation does not guarantee
-            #        rotation over the train/validation subset
-            #        (e.g. val susbet can have repeated indices)
-            train, val = train_test_split(train, test_size=(1 / (self.n_splits - 1)))
+            if with_validation:
+                # FIXME: This easy implementation does not guarantee
+                #        rotation over the train/validation subset
+                #        (e.g. val susbet can have repeated indices)
+                train, val = train_test_split(train, test_size=(1 / (self.n_splits - 1)))
+            else:
+                val = np.array([])
             yield train, val, test

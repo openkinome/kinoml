@@ -73,8 +73,8 @@ class TorchDataset(PrefeaturizedTorchDataset):
 class XyNpzTorchDataset(Dataset):
     def __init__(self, npz):
         data = np.load(npz)
-        self.data_X = torch.as_tensor(data["X"], dtype=torch.float32)
-        self.data_y = torch.as_tensor(data["y"], dtype=torch.float32)
+        self.data_X = torch.as_tensor(data["X"])
+        self.data_y = torch.as_tensor(data["y"])
         if "idx_train" in data:
             self.indices = {
                 key[4:]: data[key] for key in ["idx_train", "idx_test", "idx_val"] if key in data

@@ -84,6 +84,10 @@ class BaseMeasurement:
             return method
 
     @staticmethod
+    def _observation_model_null(dG_over_KT):
+        return dG_over_KT
+
+    @staticmethod
     def _observation_model_pytorch(*args, **kwargs):
         raise NotImplementedError("Implement in your subclass!")
 
@@ -360,4 +364,11 @@ class pKdMeasurement(BaseMeasurement):
 
 
 def null_observation_model(arg):
+    import warnings
+
+    warnings.warn(
+        "`null_observation_model` is deprecated. "
+        "Use `<MeasurementType>.observation_model(backend='null')` instead",
+        DeprecationWarning,
+    )
     return arg
