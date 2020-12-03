@@ -1,7 +1,8 @@
 from pathlib import Path
 from itertools import zip_longest
 from collections import defaultdict
-from typing import Iterable, Callable, Any
+from typing import Iterable, Callable, Any, Type
+from contextlib import contextmanager
 
 from appdirs import AppDirs
 
@@ -18,6 +19,64 @@ class FromDistpatcherMixin:
                 f"`{handler_argname}` must be one of: {', '.join(available_methods)}."
             )
         return getattr(cls, prefix + handler)(value)
+
+
+class LocalFileStorage:
+
+    """
+    Generate standardized paths for storing and reading data locally.
+    """
+
+    from appdirs import user_cache_dir
+
+    DIRECTORY = Path(user_cache_dir())
+
+    @staticmethod
+    def rcsb_structure_pdb(pdb_id, directory=DIRECTORY):
+        file_path = directory / f"rcsb_{pdb_id}.pdb"
+        return file_path
+
+    @staticmethod
+    def rcsb_ligand_sdf(pdb_id, chemical_id, chain, altloc, directory=DIRECTORY):
+        file_path = directory / f"rcsb_{pdb_id}_{chemical_id}_{chain}_{altloc}.sdf"
+        return file_path
+
+    @staticmethod
+    def rcsb_electron_density_mtz(pdb_id, directory=DIRECTORY):
+        file_path = directory / f"rcsb_{pdb_id}.mtz"
+        return file_path
+
+    @staticmethod
+    def klifs_ligand_mol2(structure_id, directory=DIRECTORY):
+        file_path = directory / f"klifs_{structure_id}_ligand.mol2"
+        return file_path
+
+    @staticmethod
+    def featurizer_result(featurizer_name, result_details, file_format, directory=DIRECTORY):
+        file_path = directory / f"kinoml_{featurizer_name}_{result_details}.{file_format}"
+        return file_path
+
+    @staticmethod
+    def pdb_smiles_json(directory=DIRECTORY):
+        file_path = directory / "pdb_smiles.json"
+        return file_path
+
+
+class FileDownloader:
+
+    """
+    Download and store files locally.
+    """
+
+    @staticmethod
+    def rcsb_structure_pdb(pdb_id):
+        url = f"https://files.rcsb.org/download/{pdb_id}.pdb"
+        download_file(url, LocalFileStorage.rcsb_structure_pdb(pdb_id))
+
+    @staticmethod
+    def rcsb_electron_density_mtz(pdb_id):
+        url = f"https://edmaps.rcsb.org/coefficients/{pdb_id}.mtz"
+        download_file(url, LocalFileStorage.rcsb_electron_density_mtz(pdb_id))
 
 
 def datapath(path: str) -> Path:
@@ -63,6 +122,24 @@ class defaultdictwithargs(defaultdict):
         result = self.call(key)
         self[key] = result
         return result
+
+
+def download_file(url: str, path: str):
+    """
+    Download a file and save it locally.
+    Parameters
+    ----------
+    url: str
+        URL for downloading data.
+    path: str
+        Path to save downloaded data.
+    """
+    import requests
+
+    response = requests.get(url)
+    with open(path, "wb") as write_file:
+        write_file.write(response.content)
+        # TODO: check if successful, e.g. response.ok
 
 
 def seed_everything(seed=1234):
@@ -114,3 +191,34 @@ def watermark():
         print(check_output([conda, "info", "-s"], universal_newlines=True))
         print(check_output([conda, "list"], universal_newlines=True))
 
+
+def collapsible(fn, *args, **kwargs):
+    from ipywidgets import Output, Accordion
+
+    out = Output()
+    with out:
+        fn(*args, **kwargs)
+    acc = Accordion(children=[out])
+    acc.set_title(0, "View output")
+    acc.selected_index = None
+    return acc
+
+
+def fill_until_next_multiple(container, multiple_of: int, factory):
+    """
+    Fill `container` with instances of `factory` until its length
+    reaches the next multiple of `multiple_of`.
+
+    `container` gets modified in place and returned.
+    """
+    if isinstance(container, list):
+        action = container.append
+    elif isinstance(container, set):
+        action = container.add
+    else:
+        raise TypeError("`container` must be an instance of list or set")
+
+    for _ in range((multiple_of - (len(container) % multiple_of)) % multiple_of):
+        action(factory())
+
+    return container

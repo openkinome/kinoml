@@ -26,7 +26,7 @@ class BaseGrouper:
                 ms.group = key
         return dataset
 
-    def _assign(self, dataset):
+    def indices(self, dataset, **kwargs):
         raise NotImplementedError("Implement in your subclass")
 
 
@@ -49,7 +49,7 @@ class RandomGrouper(BaseGrouper):
         assert sum(ratios.values()) == 1, f"`ratios` must sum 1, but you provided {ratios}"
         self.ratios = ratios
 
-    def indices(self, dataset):
+    def indices(self, dataset, **kwargs):
         length = len(dataset)
         indices = list(range(length))
         random.shuffle(indices)
@@ -77,7 +77,7 @@ class CallableGrouper(BaseGrouper):
             iterator = tqdm(iterator)
 
         groups = defaultdict(list)
-        for i, measurement in itrator:
+        for i, measurement in iterator:
             key = self.function(measurement)
             groups[key].append(i)
         return groups
@@ -85,4 +85,3 @@ class CallableGrouper(BaseGrouper):
 
 class BaseFilter(BaseGrouper):
     pass
-

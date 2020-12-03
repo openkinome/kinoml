@@ -15,9 +15,18 @@ class MolecularComponent:
         return f"<{self.__class__.__name__} name={self.name}>"
 
 
+class BaseStructure(MolecularComponent):
+
+    def __init__(self, universe, *args, **kwargs):
+        super().__init__(self, *args, **kwargs)
+        self.universe = universe
+
+
 class BaseLigand(MolecularComponent):
     pass
 
 
 class BaseProtein(MolecularComponent):
     pass
+
+

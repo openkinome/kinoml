@@ -106,3 +106,6 @@ ENV/
 
 # MacOS
 .DS_Store
+
+# PyCharm
+.idea/

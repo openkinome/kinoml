@@ -7,23 +7,26 @@ from matplotlib import pyplot as plt
 from .metrics import performance
 
 
-def predicted_vs_observed(
-    predicted, observed, limits=(0, 15), title=None, with_metrics=True, **kwargs
-):
+def predicted_vs_observed(predicted, observed, measurement_type, with_metrics=True, **kwargs):
     plt.ioff()
     fig, ax = plt.subplots()
     ax.scatter(predicted, observed)
-    ax.set(xlim=limits, ylim=limits)
     ax.set_xlabel("Predicted")
     ax.set_ylabel("Observed")
 
-    x = np.linspace(limits[0], limits[1], 100)
-    ax.plot(x, x)
-    ax.set_aspect("equal", adjustable="box")
+    if measurement_type is not None:
+        limits = np.array(measurement_type.RANGE)
+        padded_limits = limits[0] - 0.05 * limits.max(), limits[1] + 0.05 * limits.max()
 
-    if title:
-        ax.set_title(title)
+        ax.set(xlim=padded_limits, ylim=padded_limits)
+
+        x = np.linspace(padded_limits[0], padded_limits[1], 100)
+        ax.plot(x, x)
+        ax.set_aspect("equal", adjustable="box")
+        ax.set_title(f"{predicted.shape[0]} {measurement_type.__name__}")
+
     if with_metrics:
         performance(predicted, observed, **kwargs)
+
     plt.close()
     return fig

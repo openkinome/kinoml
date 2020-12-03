@@ -7,7 +7,7 @@ import pandas as pd
 from .utils import KINOMEScanMapper
 from .core import KinomeScanDatasetProvider
 from ...core.proteins import AminoAcidSequence
-from ...core.ligands import Ligand
+from ...core.ligands import SmilesLigand
 from ...core.systems import ProteinLigandComplex
 from ...core.measurements import BaseMeasurement, PercentageDisplacementMeasurement
 from ...core.conditions import BaseConditions, AssayConditions
@@ -77,7 +77,8 @@ class PKIS2DatasetProvider(KinomeScanDatasetProvider):
         # Read in ligands
         ligands = []
         for smiles in df.index:
-            ligand = Ligand.from_smiles(smiles, name=smiles, allow_undefined_stereo=True)
+            # ligand = Ligand.from_smiles(smiles, name=smiles, allow_undefined_stereo=True)
+            ligand = SmilesLigand(smiles, name=smiles)
             ligands.append(ligand)
 
         lol = list(df.itertuples(index=False, name=None))  # FIXME: This might be dangerous
@@ -90,7 +91,7 @@ class PKIS2DatasetProvider(KinomeScanDatasetProvider):
                 value = lol[i][j]
                 if not value and value != 0:
                     continue  # this is a nan cell
-                key = (ligand.to_smiles(), kinase.sequence)
+                key = (ligand.smiles, kinase.sequence)
                 if key not in systems:
                     systems[key] = ProteinLigandComplex([kinase, ligand])
                 system = systems[key]

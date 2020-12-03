@@ -1,7 +1,8 @@
 import logging
 
-from .components import BaseProtein
+from .components import BaseProtein, BaseStructure
 from .sequences import Biosequence
+from ..utils import download_file, APPDIR
 
 logger = logging.getLogger(__name__)
 
@@ -17,7 +18,43 @@ class AminoAcidSequence(BaseProtein, Biosequence):
         Biosequence.__init__(self)
 
 
-class ProteinStructure(BaseProtein):
+class FileProtein(BaseProtein):
+    def __init__(
+        self, path, electron_density_path=None, metadata=None, name="", *args, **kwargs
+    ):
+        super().__init__(name=name, metadata=metadata, *args, **kwargs)
+        if str(path).startswith("http"):
+            from appdirs import user_cache_dir
+
+            # TODO: where to save, how to name
+            self.path = f"{user_cache_dir()}/{self.name}.{path.split('.')[-1]}"
+            download_file(path, self.path)
+        else:
+            self.path = path
+        self.electron_density_path = electron_density_path
+        if electron_density_path is not None:
+            if electron_density_path.starswith("http"):
+                from appdirs import user_cache_dir
+
+                # TODO: where to save, how to name
+                self.electron_density_path = (
+                    f"{user_cache_dir()}/{self.name}.{path.split('.')[-1]}"
+                )
+                download_file(path, self.path)
+
+
+class PDBProtein(FileProtein):
+
+    def __init__(self, pdb_id, path="", metadata=None, name="", *args, **kwargs):
+        super().__init__(path=path, metadata=metadata, name=name, *args, **kwargs)
+        from ..utils import LocalFileStorage
+
+        self.pdb_id = pdb_id
+        self.path = LocalFileStorage.rcsb_structure_pdb(pdb_id)
+        self.electron_density_path = LocalFileStorage.rcsb_electron_density_mtz(pdb_id)
+
+
+class ProteinStructure(BaseProtein, BaseStructure):
     """
     Structural representation of a protein
 
@@ -27,7 +64,21 @@ class ProteinStructure(BaseProtein):
 
     @classmethod
     def from_file(cls, path, ext=None, **kwargs):
-        raise NotImplementedError
+
+        from MDAnalysis import Universe
+        from pathlib import Path
+
+        identifier = Path(path).stem  #  set id to be the file name
+
+        u = Universe(path)
+        p = Path(path)
+
+        return cls(
+            pname=p.name,
+            metadata={"path": path, "id": identifier},
+            universe=u,
+            **kwargs,
+        )
 
     @classmethod
     def from_sequence(cls, sequence, **kwargs):
@@ -43,11 +94,41 @@ class ProteinStructure(BaseProtein):
 
     @classmethod
     def from_name(cls, identifier, **kwargs):
-        raise NotImplementedError
+        import requests
+        import tempfile
+        import MDAnalysis as mda
+        from pathlib import Path
+        from appdirs import user_cache_dir
+        
+        cached_path = Path(APPDIR.user_cache_dir)
+
+        path = f"{cached_path}/{identifier}.pdb"
+
+        url = f"https://files.rcsb.org/download/{identifier}.pdb"
+        response = requests.get(url)
+
+        with open(path, "wb") as pdb_file:  # saving the pdb to cache
+            pdb_file.write(response.content)
+
+        u = mda.Universe(path)
+
+        return cls(metadata={"path": path, "id": identifier}, universe=u, **kwargs)
 
     @property
     def sequence(self):
-        s = "".join([r.symbol for r in self.residues])
+        from MDAnalysis.lib.util import convert_aa_code
+
+        pdb_seq = []
+        three_l_codes = [convert_aa_code(i) for i in list(AminoAcidSequence.ALPHABET)]
+
+        for r in self.universe.residues:
+            if r.resname in three_l_codes:
+                pdb_seq.append(convert_aa_code(r.resname))
+            else:
+                continue
+
+        s = "".join(pdb_seq)
+
         return AminoAcidSequence(s)
 
 

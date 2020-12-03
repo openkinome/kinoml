@@ -22,10 +22,14 @@ jobs:
         os: [macOS-latest, ubuntu-latest]
         python-version: [3.6, 3.7]
 
+    env:
+      OE_LICENSE: ${{ github.workspace }}/oe_license.txt
+      MODELLER_LICENSE: ${{ secrets.MODELLER_LICENSE }}
+
     steps:
       - uses: actions/checkout@v2
 
-      - uses: goanpeca/setup-miniconda@v1
+      - uses: conda-incubator/setup-miniconda@v2
         with:
           python-version: ${{ matrix.python-version }}
           activate-environment: test
@@ -53,6 +57,14 @@ jobs:
           conda remove --force openforcefield
           pip install -U https://github.com/openforcefield/openforcefield/archive/toolkit-inheritance.zip --no-deps
 
+      - name: Decrypt and check OE license
+        shell: bash -l {0}
+        env:
+          OE_LICENSE_TEXT: ${{ secrets.OE_LICENSE }}
+        run: |
+          echo "${OE_LICENSE_TEXT}" > ${OE_LICENSE}
+          python -c "import openeye; assert openeye.OEChemIsLicensed()"
+
       - name: Install package
         shell: bash -l {0}
         run: |
@@ -77,7 +89,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - uses: goanpeca/setup-miniconda@v1
+      - uses: conda-incubator/setup-miniconda@v2
         with:
           python-version: ${{ matrix.python-version }}
           activate-environment: test
@@ -132,7 +144,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - uses: goanpeca/setup-miniconda@v1
+      - uses: conda-incubator/setup-miniconda@v2
         with:
           python-version: ${{ matrix.python-version }}
           activate-environment: test
