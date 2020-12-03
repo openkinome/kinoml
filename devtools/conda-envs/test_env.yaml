@@ -22,7 +22,7 @@ dependencies:
   - openeye-toolkits
   - xgboost
   - modeller
-  - pytorch_lightning
+  - pytorch-lightning
   - watermark
   #- cudatoolkit 10.2
 
@@ -57,4 +57,4 @@ dependencies:
       - prody==1.10.11
 ### After creating the environment, you will need to run these two commands to override lastest OFF with a dev version
 # conda remove --force openforcefield
-# pip install --no-deps https://github.com/openforcefield/openforcefield/archive/toolkit-inheritance.zip
+# pip install --no-deps https://github.com/openforcefield/openforcefield/archive/76571d2fccba227a80cb5477669d96d38f1ad6af.zip
