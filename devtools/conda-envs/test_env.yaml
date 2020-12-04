@@ -58,3 +58,4 @@ dependencies:
 ### After creating the environment, you will need to run these two commands to override lastest OFF with a dev version
 # conda remove --force openforcefield
 # pip install --no-deps https://github.com/openforcefield/openforcefield/archive/76571d2fccba227a80cb5477669d96d38f1ad6af.zip
+# jupyter labextension install @jupyter-widgets/jupyterlab-manager nglview-js-widgets @jupyterlab/toc plotlywidget jupyterlab-plotly
