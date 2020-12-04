@@ -289,7 +289,7 @@ class pIC50Measurement(BaseMeasurement):
         constant = np.log((1 + substrate_conc / michaelis_constant) * standard_conc) / LN10
 
         grad_loss = (labels + (dG_over_KT + constant) / LN10) / LN10
-        hess_loss = np.full(grad.shape, 1 / (LN10 * LN10))
+        hess_loss = np.full(grad_loss.shape, 1 / (LN10 * LN10))
 
         return grad_loss.astype("float32"), hess_loss.astype("float32")
 
@@ -328,7 +328,7 @@ class pKiMeasurement(BaseMeasurement):
         $$
         """
         grad_loss = (labels + (dG_over_KT + standard_conc) / LN10 ) / LN10
-        hess_loss = np.full(grad.shape, 1 / (LN10 * LN10))
+        hess_loss = np.full(grad_loss.shape, 1 / (LN10 * LN10))
 
         return grad_loss.astype("float32"), hess_loss.astype("float32")
 
@@ -371,7 +371,7 @@ class pKdMeasurement(BaseMeasurement):
         $$
         """
         grad_loss = (labels + (dG_over_KT + standard_conc) / LN10 ) / LN10
-        hess_loss = np.full(grad.shape, 1 / (LN10 * LN10))
+        hess_loss = np.full(grad_loss.shape, 1 / (LN10 * LN10))
 
         return grad_loss.astype("float32"), hess_loss.astype("float32")
 
