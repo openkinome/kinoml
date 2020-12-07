@@ -122,7 +122,7 @@ class ChEMBLDatasetProvider(MultiDatasetProvider):
 
                 MeasurementType = measurement_type_classes[measurement_type_key]
                 conditions = AssayConditions(pH=7)
-                system = ProteinLigandComplex([kinases[kinase_key], ligands[ligand_key]])
+                system = systems[system_key]
                 metadata = {
                     "unit": f"-log10({row['activities.standard_units']}E-9)",
                     "confidence": row["assays.confidence_score"],
@@ -132,7 +132,7 @@ class ChEMBLDatasetProvider(MultiDatasetProvider):
                 }
                 measurement = MeasurementType(
                     values=row["p_activities"],
-                    system=systems[system_key],
+                    system=system,
                     conditions=conditions,
                     metadata=metadata,
                 )
