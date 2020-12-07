@@ -3,32 +3,38 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
-class NeuralNetworkRegression(nn.Module):
+class _BaseModule(nn.Module):
+    @staticmethod
+    def estimate_input_shape(input_sample):
+        return input_sample.shape[1]
+
+
+class NeuralNetworkRegression(_BaseModule):
     """
     Builds a Pytorch model (a vanilla neural network) and a feed-forward pass.
 
     Parameters
     ----------
-        input_size : int, default=1024
-                Dimension of the input vector.
-        hidden_size : int, default=100
-                Number of units in the hidden layer.
-        output_size : int, default=1
-                Size of the last unit, representing delta_g_over_kt in our setting.
-        _activation : torch function, default: relu
-                The activation function used in the hidden (only!) layer of the network.
+    input_shape : int
+        Dimension of the input vector.
+    hidden_size : int, default=100
+        Number of units in the hidden layer.
+    output_size : int, default=1
+        Size of the last unit, representing delta_g_over_kt in our setting.
+    _activation : torch function, default: relu
+        The activation function used in the hidden (only!) layer of the network.
     """
 
-    def __init__(self, input_size=1024, hidden_size=100, output_size=1, activation=F.relu):
-        super(NeuralNetworkRegression, self).__init__()
+    def __init__(self, input_shape, hidden_size=100, output_size=1, activation=F.relu):
+        super().__init__()
 
         self._activation = activation
-        self.input_size = input_size
+        self.input_shape = input_shape
         self.hidden_size = hidden_size
         self.output_size = output_size
 
         # Fully connected layer
-        self.fully_connected_1 = nn.Linear(self.input_size, self.hidden_size)
+        self.fully_connected_1 = nn.Linear(self.input_shape, self.hidden_size)
         # Output
         self.fully_connected_out = nn.Linear(self.hidden_size, self.output_size)
 
@@ -40,7 +46,7 @@ class NeuralNetworkRegression(nn.Module):
         return self.fully_connected_out(x)
 
 
-class DenseNeuralNetworkRegression(nn.Module):
+class DenseNeuralNetworkRegression(_BaseModule):
     """
     Builds a Dense Neural Network and a feed-forward pass.
 
@@ -48,12 +54,15 @@ class DenseNeuralNetworkRegression(nn.Module):
         # TODO
     """
 
-    def __init__(self, input_dim: int = 512):
-        super(DNN, self).__init__()
-        self.input_dim = input_dim
-        self.fc1 = nn.Linear(self.input_dim, 350)  # fc1: 1st fully connected layer with 350 nodes
-        self.fc2 = nn.Linear(350, 200)  # fc2: 2nd fully connected layer with 200 nodes
-        self.dropout1 = nn.Dropout(0.2)  # dropout1: 1st dropout layer
+    def __init__(self, input_shape: int):
+        super().__init__()
+        self.input_shape = input_shape
+        # fc1: 1st fully connected layer with 350 nodes
+        self.fc1 = nn.Linear(self.input_shape, 350)
+        # fc2: 2nd fully connected layer with 200 nodes
+        self.fc2 = nn.Linear(350, 200)
+        # dropout1: 1st dropout layer
+        self.dropout1 = nn.Dropout(0.2)
         self.fc3 = nn.Linear(200, 100)
         self.dropout2 = nn.Dropout(0.2)
         self.fc4 = nn.Linear(100, 50)
@@ -76,30 +85,39 @@ class DenseNeuralNetworkRegression(nn.Module):
         return torch.sigmoid(x)
 
 
-class ConvolutionNeuralNetworkRegression(nn.Module):
+class ConvolutionNeuralNetworkRegression(_BaseModule):
     """
     Builds a Convolutional Neural Network and a feed-forward pass.
 
     Parameters
     ----------
-        nb_char : int, default=53
-                Expected number of possible characters
-                For SMILES characters, we assume 53.
-        max_length : int, default=256
-                Maximum length of SMILES, set to 256.
-        embedding_dim : int, default=200
-                Dimension of the embedding after convolution.
-        kernel_size : int, default=10
-                Size of the kernel for the convolution.
-        hidden_size : int, default=100
-                Number of units in the hidden layer.
-        output_size : int, default=1
-                Size of the last unit, representing delta_g_over_kt in our setting.
-        _activation : torch function, default: relu
-                The activation function used in the hidden (only!) layer of the network.
+    nb_char : int, default=53
+        Expected number of possible characters
+        For SMILES characters, we assume 53.
+    max_length : int, default=256
+        Maximum length of SMILES, set to 256.
+    embedding_dim : int, default=200
+        Dimension of the embedding after convolution.
+    kernel_size : int, default=10
+        Size of the kernel for the convolution.
+    hidden_size : int, default=100
+        Number of units in the hidden layer.
+    output_size : int, default=1
+        Size of the last unit, representing delta_g_over_kt in our setting.
+    activation : torch function, default: relu
+        The activation function used in the hidden (only!) layer of the network.
     """
 
-    def __init__(self, nb_char=53, max_length=256, embedding_dim=300, kernel_size=10, hidden_size=100, output_size=1, activation=F.relu):
+    def __init__(
+        self,
+        nb_char=53,
+        max_length=256,
+        embedding_dim=300,
+        kernel_size=10,
+        hidden_size=100,
+        output_size=1,
+        activation=F.relu,
+    ):
         super(ConvolutionNeuralNetworkRegression, self).__init__()
 
         self.nb_char = nb_char
@@ -110,8 +128,10 @@ class ConvolutionNeuralNetworkRegression(nn.Module):
         self.output_size = output_size
         self._activation = activation
 
-        self.convolution = nn.Conv1d(in_channels=self.nb_char, out_channels=self.embedding_dim, kernel_size=self.kernel_size)
-        self.temp = (self.max_length - self.kernel_size + 1)  * self.embedding_dim
+        self.convolution = nn.Conv1d(
+            in_channels=self.nb_char, out_channels=self.embedding_dim, kernel_size=self.kernel_size
+        )
+        self.temp = (self.max_length - self.kernel_size + 1) * self.embedding_dim
         self.fully_connected_1 = nn.Linear(self.temp, self.hidden_size)
         self.fully_connected_out = nn.Linear(self.hidden_size, self.output_size)
 
