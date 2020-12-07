@@ -43,14 +43,9 @@ class SingleLigandFeaturizer(BaseFeaturizer):
 
 
 class SmilesToLigandFeaturizer(SingleLigandFeaturizer):
-    _styles = ("openforcefield", "rdkit")
-
     def __init__(self, style="openforcefield"):
-        assert (
-            style in self._styles
-        ), f"`{self.__class__.__name__}.style` must be one of {self._styles}"
         self._style = style
-        self._get_smiles = getattr(self, f"_get_smiles_{style}")
+        self._build_ligand = getattr(self, f"_build_ligand_{style}")
 
     def _supports(self, system):
         super_checks = super()._supports(system)
@@ -66,18 +61,15 @@ class SmilesToLigandFeaturizer(SingleLigandFeaturizer):
             `Ligand` object
         """
         ligand = self._find_ligand(system, type_=SmilesLigand)
-        return self._get_smiles(ligand)
+        return self._build_ligand(ligand)
 
-    def _get_smiles_openforcefield(self, ligand):
-        return ligand.to_smiles()
+    def _build_ligand_openforcefield(self, ligand):
+        return Ligand.from_smiles(ligand.smiles, allow_undefined_stereo=True)
 
-    def _get_smiles_rdkit(self, ligand):
-        from rdkit.Chem import MolToSmiles
+    def _build_ligand_rdkit(self, ligand):
+        from rdkit.Chem import MolFromSmiles
 
-        return MolToSmiles(ligand)
-
-    def _get_smiles_metadata(self, ligand):
-        return ligand.metadata["smiles"]
+        return MolFromSmiles(ligand.smiles)
 
 
 class MorganFingerprintFeaturizer(SingleLigandFeaturizer):
