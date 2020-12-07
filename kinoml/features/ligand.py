@@ -49,6 +49,7 @@ class SmilesToLigandFeaturizer(SingleLigandFeaturizer):
             style in self._styles
         ), f"`{self.__class__.__name__}.style` must be one of {self._styles}"
         self._style = style
+        self._get_smiles = getattr(self, f"_get_smiles_{style}")
 
     def _supports(self, system):
         super_checks = super()._supports(system)
@@ -64,14 +65,18 @@ class SmilesToLigandFeaturizer(SingleLigandFeaturizer):
             `Ligand` object
         """
         ligand = self._find_ligand(system, type_=SmilesLigand)
-        if self._style == "openforcefield":
-            return Ligand.from_smiles(ligand.smiles, name=ligand.name)
-        elif self._style == "rdkit":
-            from rdkit.Chem import MolFromSmiles
+        return self._get_smiles(ligand)
 
-            return MolFromSmiles(ligand.smiles)
-        else:
-            raise ValueError(f"`{self.__class__.__name__}.style` must be one of {self._styles}")
+    def _get_smiles_openforcefield(self, ligand):
+        return ligand.to_smiles()
+
+    def _get_smiles_rdkit(self, ligand):
+        from rdkit.Chem import MolToSmiles
+
+        return MolToSmiles(ligand)
+
+    def _get_smiles_metadata(self, ligand):
+        return ligand.metadata["smiles"]
 
 
 class MorganFingerprintFeaturizer(SingleLigandFeaturizer):
@@ -135,6 +140,12 @@ class OneHotSMILESFeaturizer(BaseOneHotEncodingFeaturizer, SingleLigandFeaturize
         "LR$"  # single-char representation of Cl, Br, @@
     )
 
+    def __init__(self, style="openforcefield", *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._get_smiles = getattr(self, f"_get_smiles_{style}")
+
+        # TODO: Add canonicalization
+
     def _retrieve_sequence(self, system: System) -> str:
         """
         Get SMILES string from a `Ligand`-like component and postprocesses it.
@@ -143,7 +154,19 @@ class OneHotSMILESFeaturizer(BaseOneHotEncodingFeaturizer, SingleLigandFeaturize
         are replaced with single element symbols (`L`, `R` and `$` respectively).
         """
         ligand = self._find_ligand(system)
-        return ligand.to_smiles().replace("Cl", "L").replace("Br", "R").replace("@@", "$")
+        smiles = self._get_smiles(ligand)
+        return smiles.replace("Cl", "L").replace("Br", "R").replace("@@", "$")
+
+    def _get_smiles_openforcefield(self, ligand):
+        return ligand.to_smiles()
+
+    def _get_smiles_rdkit(self, ligand):
+        from rdkit.Chem import MolToSmiles
+
+        return MolToSmiles(ligand)
+
+    def _get_smiles_metadata(self, ligand):
+        return ligand.metadata["smiles"]
 
 
 class OneHotRawSMILESFeaturizer(OneHotSMILESFeaturizer):
