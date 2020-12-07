@@ -88,7 +88,7 @@ class BaseFeaturizer:
 
     @property
     def name(self):
-        return f"{self.__class__.__name__}"
+        return self.__class__.__name__
 
     def __repr__(self):
         return f"<{self.name}>"

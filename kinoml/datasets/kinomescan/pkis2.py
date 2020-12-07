@@ -94,8 +94,7 @@ class PKIS2DatasetProvider(KinomeScanDatasetProvider):
                 key = (ligand.smiles, kinase.sequence)
                 if key not in systems:
                     systems[key] = ProteinLigandComplex([kinase, ligand])
-                system = systems[key]
-                measurement = measurement_type(value, conditions=conditions, system=system)
+                measurement = measurement_type(value, conditions=conditions, system=systems[key])
                 measurements.append(measurement)
 
         return cls(measurements=measurements, **kwargs)
