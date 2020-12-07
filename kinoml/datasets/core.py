@@ -84,7 +84,10 @@ class DatasetProvider(BaseDatasetProvider):
     _raw_data = None
 
     def __init__(
-        self, measurements: Iterable[BaseMeasurement], *args, **kwargs,
+        self,
+        measurements: Iterable[BaseMeasurement],
+        *args,
+        **kwargs,
     ):
         types = {type(measurement) for measurement in measurements}
         assert (
@@ -94,6 +97,12 @@ class DatasetProvider(BaseDatasetProvider):
 
     def __len__(self):
         return len(self.measurements)
+
+    def __getitem__(self, subscript):
+        if isinstance(subscript, slice):
+            return self.__class__(self.measurements[subscript])
+        else:
+            return self.measurements[subscript]
 
     def __repr__(self) -> str:
         components = defaultdict(set)
