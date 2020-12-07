@@ -2,8 +2,9 @@
 Featurizers that mostly concern ligand-based models
 """
 from __future__ import annotations
-import numpy as np
 from functools import lru_cache
+
+import numpy as np
 
 from .core import BaseFeaturizer, BaseOneHotEncodingFeaturizer
 from ..core.systems import System
@@ -32,7 +33,7 @@ class SingleLigandFeaturizer(BaseFeaturizer):
                 ligand = component
                 break
         else:  # look in featurizations?
-            for key, feature in system_or_ligand.featurizations.items():
+            for feature in system_or_ligand.featurizations.values():
                 if isinstance(feature, type_):
                     ligand = feature
                     break
