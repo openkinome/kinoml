@@ -2,7 +2,8 @@ from pathlib import Path
 from itertools import zip_longest
 from collections import defaultdict
 from typing import Iterable, Callable, Any, Type
-from contextlib import contextmanager
+from importlib import import_module
+
 
 from appdirs import AppDirs
 
@@ -222,3 +223,23 @@ def fill_until_next_multiple(container, multiple_of: int, factory):
         action(factory())
 
     return container
+
+
+def import_object(import_path: str):
+    """
+    Import an object using its full import path
+
+    Parameters
+    ----------
+    import_path : str
+        Full import path to object, like `kinoml.core.measurements.MeasurementType`.
+
+    Returns
+    -------
+    object
+    """
+    if "." in import_path:
+        module_str, obj_str = import_path.rsplit(".", 1)
+        module = import_module(module_str)
+        return getattr(module, obj_str)
+    return import_module(import_path)
