@@ -18,10 +18,14 @@ class AminoAcidSequence(BaseProtein, Biosequence):
         Biosequence.__init__(self)
 
 
+class UniprotProtein(BaseProtein):
+    def __init__(self, uniprot_id, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.uniprot_id = uniprot_id
+
+
 class FileProtein(BaseProtein):
-    def __init__(
-        self, path, electron_density_path=None, metadata=None, name="", *args, **kwargs
-    ):
+    def __init__(self, path, electron_density_path=None, metadata=None, name="", *args, **kwargs):
         super().__init__(name=name, metadata=metadata, *args, **kwargs)
         if str(path).startswith("http"):
             from appdirs import user_cache_dir
@@ -44,7 +48,6 @@ class FileProtein(BaseProtein):
 
 
 class PDBProtein(FileProtein):
-
     def __init__(self, pdb_id, path="", metadata=None, name="", *args, **kwargs):
         super().__init__(path=path, metadata=metadata, name=name, *args, **kwargs)
         from ..utils import LocalFileStorage
@@ -99,7 +102,7 @@ class ProteinStructure(BaseProtein, BaseStructure):
         import MDAnalysis as mda
         from pathlib import Path
         from appdirs import user_cache_dir
-        
+
         cached_path = Path(APPDIR.user_cache_dir)
 
         path = f"{cached_path}/{identifier}.pdb"
