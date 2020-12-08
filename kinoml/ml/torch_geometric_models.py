@@ -33,7 +33,7 @@ class GraphConvolutionNeuralNetwork(nn.Module):
         self._activation = activation
 
         self.GraphConvLayer1 = GCNConv(self.nb_nodes_features, self.embedding_shape)
-        self.GraphConvLayer1 = GCNConv(self.embedding_shape, 1)
+        self.GraphConvLayer2 = GCNConv(self.embedding_shape, 1)
 
     def forward(self, data):
         x, edge_index = data.x, data.edge_index
