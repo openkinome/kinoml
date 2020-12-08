@@ -50,39 +50,51 @@ class DenseNeuralNetworkRegression(_BaseModule):
     """
     Builds a Dense Neural Network and a feed-forward pass.
 
-    Parameters:
-        # TODO
+    Parameters
+    ----------
+    input_shape : int
+        Dimension of the input vector.
+    hidden_shape : list
+        Number of units in each of the hidden layers.
+    output_shape : int, default=1
+        Size of the last unit, representing delta_g_over_kt in our setting.
+    dropout_percentage : float
+        The percentage of hidden to by dropped at random.
+    _activation : torch function, default: relu
+        The activation function used in the hidden (only!) layer of the network.
     """
 
-    def __init__(self, input_shape: int):
+    def __init__(self, input_shape, hidden_shape=[350, 200, 100, 50, 16],
+                output_shape=1, dropout_percentage=0.4, activation=F.relu):
         super().__init__()
+
         self.input_shape = input_shape
-        # fc1: 1st fully connected layer with 350 nodes
-        self.fc1 = nn.Linear(self.input_shape, 350)
-        # fc2: 2nd fully connected layer with 200 nodes
-        self.fc2 = nn.Linear(350, 200)
-        # dropout1: 1st dropout layer
-        self.dropout1 = nn.Dropout(0.2)
-        self.fc3 = nn.Linear(200, 100)
-        self.dropout2 = nn.Dropout(0.2)
-        self.fc4 = nn.Linear(100, 50)
-        self.fc5 = nn.Linear(50, 16)
-        self.fc6 = nn.Linear(16, 1)
+        self.hidden_shape = hidden_shape
+        self.output_shape = output_shape
+        self.dropout_percentage = dropout_percentage
+        self._activation = activation
+
+        self.fully_connected_1 = nn.Linear(self.input_shape, self.hidden_shape[0])
+        self.fully_connected_2 = nn.Linear(self.hidden_shape[0], self.hidden_shape[1])
+        self.fully_connected_3 = nn.Linear(self.hidden_shape[1], self.hidden_shape[2])
+        self.fully_connected_4 = nn.Linear(self.hidden_shape[2], self.hidden_shape[3])
+        self.fully_connected_5 = nn.Linear(self.hidden_shape[3], self.hidden_shape[4])
+        self.fully_connected_out = nn.Linear(self.hidden_shape[4], self.output_shape)
+
+        self.dropout = nn.Dropout(self.dropout_percentage)
 
     def forward(self, x):
         """
         Defines the foward pass for a given input 'x'
         """
-        # All activations are relu expect for the last layer which is a sigmoid
-        x = F.relu(self.fc1(x))
-        x = F.relu(self.fc2(x))
-        x = self.dropout1(x)
-        x = F.relu(self.fc3(x))
-        x = self.dropout2(x)
-        x = F.relu(self.fc4(x))
-        x = F.relu(self.fc5(x))
-        x = self.fc6(x)
-        return torch.sigmoid(x)
+        x = self._activation(self.fully_connected_1(x))
+        x = self._activation(self.fully_connected_2(x))
+        x = self.dropout(x)
+        x = self._activation(self.fully_connected_3(x))
+        x = self._activation(self.fully_connected_4(x))
+        x = self.dropout(x)
+        x = self._activation(self.fully_connected_5(x))
+        return self.fully_connected_out(x)
 
 
 class ConvolutionNeuralNetworkRegression(_BaseModule):
