@@ -17,26 +17,26 @@ class NeuralNetworkRegression(_BaseModule):
     ----------
     input_shape : int
         Dimension of the input vector.
-    hidden_size : int, default=100
+    hidden_shape : int, default=100
         Number of units in the hidden layer.
-    output_size : int, default=1
+    output_shape : int, default=1
         Size of the last unit, representing delta_g_over_kt in our setting.
     _activation : torch function, default: relu
         The activation function used in the hidden (only!) layer of the network.
     """
 
-    def __init__(self, input_shape, hidden_size=100, output_size=1, activation=F.relu):
+    def __init__(self, input_shape, hidden_shape=100, output_shape=1, activation=F.relu):
         super().__init__()
 
         self._activation = activation
         self.input_shape = input_shape
-        self.hidden_size = hidden_size
-        self.output_size = output_size
+        self.hidden_shape = hidden_shape
+        self.output_shape = output_shape
 
         # Fully connected layer
-        self.fully_connected_1 = nn.Linear(self.input_shape, self.hidden_size)
+        self.fully_connected_1 = nn.Linear(self.input_shape, self.hidden_shape)
         # Output
-        self.fully_connected_out = nn.Linear(self.hidden_size, self.output_size)
+        self.fully_connected_out = nn.Linear(self.hidden_shape, self.output_shape)
 
     def forward(self, x):
         """
@@ -96,13 +96,13 @@ class ConvolutionNeuralNetworkRegression(_BaseModule):
         For SMILES characters, we assume 53.
     max_length : int, default=256
         Maximum length of SMILES, set to 256.
-    embedding_dim : int, default=200
+    embedding_shape : int, default=200
         Dimension of the embedding after convolution.
-    kernel_size : int, default=10
+    kernel_shape : int, default=10
         Size of the kernel for the convolution.
-    hidden_size : int, default=100
+    hidden_shape : int, default=100
         Number of units in the hidden layer.
-    output_size : int, default=1
+    output_shape : int, default=1
         Size of the last unit, representing delta_g_over_kt in our setting.
     activation : torch function, default: relu
         The activation function used in the hidden (only!) layer of the network.
@@ -112,28 +112,28 @@ class ConvolutionNeuralNetworkRegression(_BaseModule):
         self,
         nb_char=53,
         max_length=256,
-        embedding_dim=300,
-        kernel_size=10,
-        hidden_size=100,
-        output_size=1,
+        embedding_shape=300,
+        kernel_shape=10,
+        hidden_shape=100,
+        output_shape=1,
         activation=F.relu,
     ):
         super(ConvolutionNeuralNetworkRegression, self).__init__()
 
         self.nb_char = nb_char
         self.max_length = max_length
-        self.embedding_dim = embedding_dim
-        self.kernel_size = kernel_size
-        self.hidden_size = hidden_size
-        self.output_size = output_size
+        self.embedding_shape = embedding_shape
+        self.kernel_shape = kernel_shape
+        self.hidden_shape = hidden_shape
+        self.output_shape = output_shape
         self._activation = activation
 
         self.convolution = nn.Conv1d(
-            in_channels=self.nb_char, out_channels=self.embedding_dim, kernel_size=self.kernel_size
+            in_channels=self.nb_char, out_channels=self.embedding_shape, kernel_size=self.kernel_shape
         )
-        self.temp = (self.max_length - self.kernel_size + 1) * self.embedding_dim
-        self.fully_connected_1 = nn.Linear(self.temp, self.hidden_size)
-        self.fully_connected_out = nn.Linear(self.hidden_size, self.output_size)
+        self.temp = (self.max_length - self.kernel_shape + 1) * self.embedding_shape
+        self.fully_connected_1 = nn.Linear(self.temp, self.hidden_shape)
+        self.fully_connected_out = nn.Linear(self.hidden_shape, self.output_shape)
 
     def forward(self, x):
         """
