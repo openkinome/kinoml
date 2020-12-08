@@ -63,13 +63,6 @@ jobs:
           conda info --all
           conda list
 
-      - name: Patch openforcefield
-        shell: bash -l {0}
-        run: |
-          # We need this until openforcefield 0.9 is merged
-          conda remove --force openforcefield
-          pip install -U https://github.com/openforcefield/openforcefield/archive/76571d2fccba227a80cb5477669d96d38f1ad6af.zip --no-deps
-
       - name: Decrypt and check OE license
         shell: bash -l {0}
         env:
