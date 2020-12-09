@@ -20,8 +20,6 @@ jobs:
       fail-fast: false
       matrix:
         cfg:
-          - os: ubuntu-latest
-            python-version: "3.6"
 
           - os: ubuntu-latest
             python-version: "3.7"
@@ -33,7 +31,7 @@ jobs:
             python-version: "3.9"
 
           - os: macOS-latest
-            python-version: "3.6"
+            python-version: "3.7"
 
     env:
       OE_LICENSE: ${{ github.workspace }}/oe_license.txt
@@ -97,7 +95,7 @@ jobs:
 
       - uses: conda-incubator/setup-miniconda@v2
         with:
-          python-version: "3.6"
+          python-version: "3.7"
           activate-environment: test
           channel-priority: true
           environment-file: devtools/conda-envs/test_env.yaml
@@ -145,7 +143,7 @@ jobs:
 
       - uses: conda-incubator/setup-miniconda@v2
         with:
-          python-version: "3.6"
+          python-version: "3.7"
           activate-environment: test
           channel-priority: true
           environment-file: devtools/conda-envs/test_env.yaml
