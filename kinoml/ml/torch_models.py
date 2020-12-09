@@ -64,8 +64,14 @@ class DenseNeuralNetworkRegression(_BaseModule):
         The activation function used in the hidden (only!) layer of the network.
     """
 
-    def __init__(self, input_shape, hidden_shape=[350, 200, 100, 50, 16],
-                output_shape=1, dropout_percentage=0.4, activation=F.relu):
+    def __init__(
+        self,
+        input_shape,
+        hidden_shape=(350, 200, 100, 50, 16),
+        output_shape=1,
+        dropout_percentage=0.4,
+        activation=F.relu,
+    ):
         super().__init__()
 
         self.input_shape = input_shape
@@ -141,7 +147,9 @@ class ConvolutionNeuralNetworkRegression(_BaseModule):
         self._activation = activation
 
         self.convolution = nn.Conv1d(
-            in_channels=self.nb_char, out_channels=self.embedding_shape, kernel_size=self.kernel_shape
+            in_channels=self.nb_char,
+            out_channels=self.embedding_shape,
+            kernel_size=self.kernel_shape,
         )
         self.temp = (self.max_length - self.kernel_shape + 1) * self.embedding_shape
         self.fully_connected_1 = nn.Linear(self.temp, self.hidden_shape)
