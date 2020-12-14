@@ -821,20 +821,18 @@ def smiles_from_pdb(ligand_ids: Iterable[str]) -> dict:
     ligands: dict
         Dictionary with PDB chemical identifier as keys and SMILES as values.
     """
+    import json
     import requests
-    from xml.etree import ElementTree
+    import urllib
 
     ligands = {}
-    url = f"https://www.rcsb.org/pdb/rest/describeHet?chemicalID={','.join(set(ligand_ids))}"
-    response = requests.get(url)
-    tree = ElementTree.fromstring(response.text)
-    for element in tree.findall(".//ligand"):
-        ligand_id = element.get("chemicalID")
-        if element.find("smiles") is not None:
-            smiles = element.find("smiles").text
-        else:
-            smiles = None
-        ligands[ligand_id] = smiles
+    base_url = "https://data.rcsb.org/graphql?query="
+    query = '{chem_comps(comp_ids:[' + \
+            ','.join(['"' + ligand_id + '"' for ligand_id in set(ligand_ids)]) + \
+            ']){chem_comp{id}rcsb_chem_comp_descriptor{SMILES}}}'
+    response = requests.get(base_url + urllib.parse.quote(query))
+    for ligand in json.loads(response.text)["data"]["chem_comps"]:
+        ligands[ligand["chem_comp"]["id"]] = ligand["rcsb_chem_comp_descriptor"]["SMILES"]
     return ligands
 
 
