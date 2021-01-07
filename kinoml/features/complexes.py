@@ -396,8 +396,17 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
         from ..utils import LocalFileStorage
 
         if not hasattr(system.protein, "klifs_kinase_id"):
-            raise NotImplementedError(
-                f"{self.__class__.__name__} requires a system with a protein having a 'klifs_kinase_id' attribute.")
+            if not hasattr(system.protein, "uniprot_id"):
+                raise NotImplementedError(
+                    f"{self.__class__.__name__} requires a system with a protein having a 'klifs_kinase_id' or " +
+                    "'uniprot_id' attribute.")
+            else:
+                logging.debug("Converting UniProt ID to KLIFS kinase ID ...")
+                remote = setup_remote()
+                kinase_ids = remote.kinases.all_kinases()["kinase.klifs_id"].to_list()
+                kinases = remote.kinases.by_kinase_klifs_id(kinase_ids)
+                system.protein.klifs_kinase_id = kinases[
+                    kinases["kinase.uniprot"] == system.protein.uniprot_id]["kinase.klifs_id"].iloc[0]
 
         if not hasattr(system.protein, "dfg"):
             system.protein.dfg = None
