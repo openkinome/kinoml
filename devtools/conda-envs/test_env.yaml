@@ -22,7 +22,7 @@ dependencies:
   - cpuonly  # replaces cudatoolkit 10.2.* in CI
   - pytorch-lightning
   - xgboost
-  - openeye-toolkits
+  - openeye-toolkits >=2020.2.0
   - modeller
   - watermark
   #- cudatoolkit 10.2

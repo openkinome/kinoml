@@ -198,101 +198,6 @@ def remove_non_protein(
     return selection
 
 
-def _OEFixBuiltLoopFragmentNumbers(protein):
-    """
-    Temporary fix, thanks to Jesper!
-    """
-    prev_fn = -1
-    # Checking for CA atoms, since this will avoid messing with the caps and built sidechains,
-    # since this is only a built loop problem
-    builtPred = oespruce.OEIsModeledAtom()
-    for atom in protein.GetAtoms(oechem.OEIsCAlpha()):
-        res = oechem.OEAtomGetResidue(atom)
-        fn = res.GetFragmentNumber()
-        if builtPred(atom) and prev_fn != -1:
-            for ra in oechem.OEGetResidueAtoms(atom):
-                r = oechem.OEAtomGetResidue(ra)
-                r.SetFragmentNumber(prev_fn)
-                oechem.OEAtomSetResidue(ra, r)
-        else:
-            prev_fn = fn
-
-
-def _OEFixWaterFragmentNumbers(solvent):
-    """
-    Temporary fix, thanks to Jesper!
-    """
-    fragment_counter = {}
-    for atom in solvent.GetAtoms(oechem.OEIsWater()):
-        res = oechem.OEAtomGetResidue(atom)
-        if res.GetInsertCode() != " ":
-            continue
-        if res.GetFragmentNumber() not in fragment_counter:
-            fragment_counter[res.GetFragmentNumber()] = 0
-        fragment_counter[res.GetFragmentNumber()] += 1
-    largest_solvent_fn_count = -1
-    largest_solvent_fn = -1
-    for fn in fragment_counter:
-        if fragment_counter[fn] > largest_solvent_fn_count:
-            largest_solvent_fn_count = fragment_counter[fn]
-            largest_solvent_fn = fn
-    if largest_solvent_fn < 0:
-        return
-    for atom in solvent.GetAtoms(oechem.OEIsWater(True)):
-        res = oechem.OEAtomGetResidue(atom)
-        res.SetFragmentNumber(largest_solvent_fn)
-        oechem.OEAtomSetResidue(atom, res)
-
-
-def _OEFixConnectionNH(protein):
-    """
-    Temporary fix, thanks to Jesper!
-    """
-    for atom in protein.GetAtoms(
-        oechem.OEAndAtom(oespruce.OEIsModeledAtom(), oechem.OEIsNitrogen())
-    ):
-        if oechem.OEGetPDBAtomIndex(atom) == oechem.OEPDBAtomName_N:
-            expected_h_count = 1
-            if oechem.OEGetResidueIndex(atom) == oechem.OEResidueIndex_PRO:
-                expected_h_count = 0
-            if atom.GetTotalHCount() != expected_h_count:
-                oechem.OESuppressHydrogens(atom)
-                atom.SetImplicitHCount(1)
-                oechem.OEAddExplicitHydrogens(protein, atom)
-                for nbr in atom.GetAtoms(oechem.OEIsHydrogen()):
-                    oechem.OESet3DHydrogenGeom(protein, nbr)
-
-
-def _OEFixLoopIssues(du):
-    """
-    Temporary fix, thanks to Jesper!
-    """
-    impl = du.GetImpl()
-    protein = impl.GetProtein()
-
-    _OEFixBuiltLoopFragmentNumbers(protein)
-    _OEFixConnectionNH(protein)
-
-    oechem.OEPDBOrderAtoms(protein)
-
-    solvent = impl.GetSolvent()
-    _OEFixWaterFragmentNumbers(solvent)
-
-
-def _OEFixMissingOXT(du):
-    """
-    Temporary fix, thanks to Jesper!
-    """
-    impl = du.GetImpl()
-    protein = impl.GetProtein()
-
-    for atom in protein.GetAtoms():
-        if "H'" in atom.GetName():
-            atom.SetAtomicNum(8)
-            atom.SetName("OXT")
-            atom.SetFormalCharge(-1)
-
-
 def _prepare_structure(
     structure: oechem.OEGraphMol,
     has_ligand: bool = False,
@@ -394,10 +299,6 @@ def _prepare_structure(
     else:
         # TODO: Returns None if something goes wrong
         return None
-
-    # fix loop issues and missing OXT
-    _OEFixLoopIssues(design_unit)
-    _OEFixMissingOXT(design_unit)
 
     return design_unit
 
