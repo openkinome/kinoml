@@ -355,7 +355,7 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
 
     Parameters
     ----------
-    loop_db: str
+    loop_db: str or None
         The path to the loop database used by OESpruce to model missing loops.
     shape_overlay: bool
         If a shape overlay should be performed for selecting a ligand template
@@ -396,7 +396,25 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
         from ..utils import LocalFileStorage
 
         if not hasattr(system.protein, "klifs_kinase_id"):
-            raise NotImplementedError(f"{self.__class__.__name__} requires a system with a protein having a 'klifs_kinase_id' attribute.")
+            raise NotImplementedError(
+                f"{self.__class__.__name__} requires a system with a protein having a 'klifs_kinase_id' attribute.")
+
+        if not hasattr(system.protein, "dfg"):
+            system.protein.dfg = None
+        else:
+            if system.protein.dfg not in ["in", "out", "out-like"]:
+                raise NotImplementedError(
+                    f"{self.__class__.__name__} requires a system with a protein having either no 'dfg' attribute" +
+                    "or a 'dfg' attribute with a KLIFS specific DFG conformation ('in', 'out' or 'out-like').")
+
+        if not hasattr(system.protein, "ac_helix"):
+            system.protein.ac_helix = None
+        else:
+            if system.protein.ac_helix not in ["in", "out", "out-like"]:
+                raise NotImplementedError(
+                    f"{self.__class__.__name__} requires a system with a protein having either no 'ac_helix' " +
+                    "attribute or an 'ac_helix' attribute with a KLIFS specific alpha C helix conformation " +
+                    "('in', 'out' or 'out-like').")
 
         if not hasattr(system.ligand, "smiles"):
             raise NotImplementedError(f"{self.__class__.__name__} requires a system with a ligand having a 'smiles' attribute.")
@@ -407,7 +425,10 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
 
         logging.debug("Searching ligand template ...")  # TODO: naming problem with co-crystallized ligand in hybrid docking, see above
         ligand_template = self._select_ligand_template(
-            system.protein.klifs_kinase_id, read_smiles(system.ligand.smiles), self.shape_overlay
+            system.protein.klifs_kinase_id,
+            read_smiles(system.ligand.smiles),
+            system.protein.dfg,
+            system.protein.ac_helix
         )
         logging.debug(f"Selected {ligand_template['structure.pdb_id']} as ligand template ...")
 
@@ -468,18 +489,26 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
 
         return kinase_ligand_complex  # TODO: MDAnalysis objects
 
-    def _select_ligand_template(self, klifs_kinase_id: int, ligand: oechem.OEGraphMol, shape_overlay: bool) -> pd.Series:
+    def _select_ligand_template(
+            self,
+            klifs_kinase_id: int,
+            ligand: oechem.OEGraphMol,
+            dfg: Union[str or None],
+            ac_helix: Union[str or None],
+    ) -> pd.Series:
         """
-        Select a kinase in complex with a ligand from KLIFS holding a ligand similar to the given SMILES and bound to
-        a kinase similar to the kinase of interest.
+        Select a kinase in complex with a ligand from KLIFS holding a ligand similar to the given SMILES, bound to
+        a kinase similar to the kinase of interest and in the given KLIFS kinase conformation.
         Parameters
         ----------
         klifs_kinase_id: int
             KLIFS kinase identifier.
         ligand: oechem.OEGraphMol
             An OpenEye molecule holding the ligand that should be docked.
-        shape_overlay: bool
-            If shape should be considered for identifying similar ligands.
+        dfg: str or None
+            The KLIFS DFG conformation the ligand template should bind to.
+        ac_helix: str or None
+            The KLIFS alpha C helix conformation the ligand template should bind to.
         Returns
         -------
         : pd.Series
@@ -493,6 +522,14 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
 
         logging.debug("Retrieve kinase structures from KLIFS for ligand template selection ...")
         structures = self._get_available_ligand_templates()
+
+        if dfg:
+            logging.debug(f"Filtering for ligands bound to a kinase in the DFG {dfg} conformation ...")
+            structures = structures[structures["structure.dfg"] == dfg]
+
+        if ac_helix:
+            logging.debug(f"Filtering for ligands bound to a kinase in the alpha C helix {dfg} conformation ...")
+            structures = structures[structures["structure.ac_helix"] == ac_helix]
 
         logging.debug("Storing SMILES in structures dataframe ...")
         structures = self._add_smiles_column(structures)
@@ -510,7 +547,7 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
                     structures["kinase.klifs_id"].isin([kinase_details["kinase.klifs_id"]])
                 ]
         else:
-            if shape_overlay:
+            if self.shape_overlay:
                 logging.debug("Filtering for most similar ligands according to their shape overlay ...")
                 structures = self._filter_for_similar_ligands_3d(ligand, structures)
             else:
