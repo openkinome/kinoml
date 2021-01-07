@@ -487,13 +487,12 @@ def klifs_kinase_from_uniprot_id(uniprot_id: str) -> pd.DataFrame:
     kinases: pd.Series
         KLIFS structure details.
     """
-    import klifs_utils
+    from opencadd.databases.klifs import setup_remote
 
-    kinase_names = klifs_utils.remote.kinases.kinase_names()
-    kinases = klifs_utils.remote.kinases.kinases_from_kinase_names(
-        list(kinase_names.name)
-    )
-    kinase = kinases[kinases.uniprot == uniprot_id].iloc[0]
+    remote = setup_remote()
+    kinase_ids = remote.kinases.all_kinases()["kinase.klifs_id"]
+    kinases = remote.kinases.by_kinase_klifs_id(list(kinase_ids))
+    kinase = kinases[kinases["kinase.uniprot"] == uniprot_id].iloc[0]
     return kinase
 
 
@@ -509,15 +508,15 @@ def get_klifs_ligand(structure_id: int) -> oechem.OEGraphMol:
     molecule: oechem.OEGraphMol
         An OpenEye molecule holding the orthosteric ligand.
     """
-    import klifs_utils
     from ..utils import LocalFileStorage
 
     file_path = LocalFileStorage.klifs_ligand_mol2(structure_id)
 
     if not file_path.is_file():
-        mol2_text = klifs_utils.remote.coordinates.ligand._ligand_mol2_text(
-            str(structure_id)
-        )
+        from opencadd.databases.klifs import setup_remote
+
+        remote = setup_remote()
+        mol2_text = remote.coordinates.to_text(str(structure_id), entity="ligand", extension="mol2")
         with open(file_path, "w") as wf:
             wf.write(mol2_text)
 
@@ -654,7 +653,7 @@ def generate_reasonable_conformations(
     tautomers = generate_tautomers(molecule)
     enantiomers = [generate_enantiomers(tautomer) for tautomer in tautomers]
     conformations_ensemble = [
-        generate_conformations(enantiomer, dense)
+        generate_conformations(enantiomer, dense=dense)
         for enantiomer in itertools.chain.from_iterable(enantiomers)
     ]
     return conformations_ensemble

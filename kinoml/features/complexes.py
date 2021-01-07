@@ -388,7 +388,7 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
         protein_ligand_complex: ProteinLigandComplex
             The same system but with docked ligand.
         """
-        import klifs_utils
+        from opencadd.databases.klifs import setup_remote
         from openeye import oechem
 
         from ..docking.OEDocking import create_hybrid_receptor, hybrid_docking
@@ -402,56 +402,55 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
             raise NotImplementedError(f"{self.__class__.__name__} requires a system with a ligand having a 'smiles' attribute.")
 
         logging.debug("Retrieving kinase details from KLIFS ...")
-        kinase_details = klifs_utils.remote.kinases.kinases_from_kinase_ids(
-            [system.protein.klifs_kinase_id]
-        ).iloc[0]
+        remote = setup_remote()
+        kinase_details = remote.kinases.by_kinase_klifs_id(system.protein.klifs_kinase_id).iloc[0]
 
         logging.debug("Searching ligand template ...")  # TODO: naming problem with co-crystallized ligand in hybrid docking, see above
         ligand_template = self._select_ligand_template(
             system.protein.klifs_kinase_id, read_smiles(system.ligand.smiles), self.shape_overlay
         )
-        logging.debug(f"Selected {ligand_template.pdb} as ligand template ...")
+        logging.debug(f"Selected {ligand_template['structure.pdb_id']} as ligand template ...")
 
         logging.debug("Searching kinase template ...")
-        if ligand_template.kinase_ID == system.protein.klifs_kinase_id:
+        if ligand_template["kinase.klifs_id"] == system.protein.klifs_kinase_id:
             protein_template = ligand_template
         else:
             protein_template = self._select_protein_template(
                 system.protein.klifs_kinase_id,
-                ligand_template.DFG,
-                ligand_template.aC_helix,
+                ligand_template["structure.dfg"],
+                ligand_template["structure.ac_helix"],
             )
-        logging.debug(f"Selected {protein_template.pdb} as kinase template ...")
+        logging.debug(f"Selected {protein_template['structure.pdb_id']} as kinase template ...")
 
         logging.debug(f"Adding attributes to BaseProtein ...")  # TODO: bad idea in a library
-        system.protein.pdb_id = protein_template.pdb
-        system.protein.path = LocalFileStorage.rcsb_structure_pdb(protein_template.pdb)
+        system.protein.pdb_id = protein_template["structure.pdb_id"]
+        system.protein.path = LocalFileStorage.rcsb_structure_pdb(protein_template["structure.pdb_id"])
         system.protein.electron_density_path = LocalFileStorage.rcsb_electron_density_mtz(
-            protein_template.pdb
+            protein_template["structure.pdb_id"]
         )
 
         logging.debug(f"Interpreting system ...")
         ligand, protein, electron_density = self._interpret_system(system)
 
-        logging.debug(f"Preparing kinase template structure of {protein_template.pdb} ...")
+        logging.debug(f"Preparing kinase template structure of {protein_template['structure.pdb_id']} ...")
         ligand_name = None
-        if protein_template.ligand != 0:
-            ligand_name = str(protein_template.ligand)
-        design_unit = self._get_design_unit(protein, protein_template.pdb, electron_density, ligand_name)
+        if protein_template["ligand.expo_id"] != 0:
+            ligand_name = str(protein_template["ligand.expo_id"])
+        design_unit = self._get_design_unit(protein, protein_template["structure.pdb_id"], electron_density, ligand_name)
 
         logging.debug("Extracting components ...")
         prepared_kinase, prepared_solvent = self._get_components(design_unit)[:2]
 
         logging.debug("Processing kinase domain ...")
-        processed_kinase_domain = self._process_kinase_domain(prepared_kinase, kinase_details.uniprot)
+        processed_kinase_domain = self._process_kinase_domain(prepared_kinase, kinase_details["kinase.uniprot"])
 
-        logging.debug(f"Preparing ligand template structure of {ligand_template.pdb} ...")
+        logging.debug(f"Preparing ligand template structure of {ligand_template['structure.pdb_id']} ...")
         prepared_ligand_template = self._prepare_ligand_template(ligand_template, processed_kinase_domain)
 
         logging.debug("Checking for co-crystallized ligand ...")
         if (
             compare_molecules(ligand, prepared_ligand_template)
-            and ligand_template.pdb == protein_template.pdb
+            and ligand_template["structure.pdb_id"] == protein_template["structure.pdb_id"]
         ):
             logging.debug(f"Found co-crystallized ligand ...")
             docking_pose = prepared_ligand_template
@@ -465,7 +464,7 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
             oechem.OEPerceiveResidues(docking_pose, oechem.OEPreserveResInfo_None)  # generate residue information
 
         logging.debug("Retrieving Featurizer results ...")
-        kinase_ligand_complex = self._get_featurizer_results(system, processed_kinase_domain, prepared_solvent, docking_pose, other_pdb_header_info=[("COMPND", f"\tKinase template: {protein_template.pdb}"), ("COMPND", f"\tLigand template: {ligand_template.pdb}")])
+        kinase_ligand_complex = self._get_featurizer_results(system, processed_kinase_domain, prepared_solvent, docking_pose, other_pdb_header_info=[("COMPND", f"\tKinase template: {protein_template['structure.pdb_id']}"), ("COMPND", f"\tLigand template: {ligand_template['structure.pdb_id']}")])
 
         return kinase_ligand_complex  # TODO: MDAnalysis objects
 
@@ -486,10 +485,11 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
         : pd.Series
             Details about selected kinase and co-crystallized ligand.
         """
-        import klifs_utils
+        from opencadd.databases.klifs import setup_remote
 
         logging.debug("Retrieve kinase information from KLIFS ...")
-        kinase_details = klifs_utils.remote.kinases.kinases_from_kinase_ids([klifs_kinase_id]).iloc[0]
+        remote = setup_remote()
+        kinase_details = remote.kinases.by_kinase_klifs_id(klifs_kinase_id).iloc[0]
 
         logging.debug("Retrieve kinase structures from KLIFS for ligand template selection ...")
         structures = self._get_available_ligand_templates()
@@ -498,16 +498,16 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
         structures = self._add_smiles_column(structures)
 
         logging.debug("Searching for identical co-crystallized ligands ...")
-        identical_ligands = self._get_identical_ligand_indices(ligand, structures.smiles)  # TODO: Takes surprisingly long
+        identical_ligands = self._get_identical_ligand_indices(ligand, structures["smiles"])  # TODO: Takes surprisingly long
 
         if len(identical_ligands) > 0:
             logging.debug("Found identical co-crystallized ligands ...")
             structures = structures.iloc[identical_ligands]
             logging.debug("Searching for matching KLIFS kinase id ...")
-            if structures.kinase_ID.isin([kinase_details.kinase_ID]).any():
+            if structures["kinase.klifs_id"].isin([kinase_details["kinase.klifs_id"]]).any():
                 logging.debug("Found matching KLIFS kinase id ...")
                 structures = structures[
-                    structures.kinase_ID.isin([kinase_details.kinase_ID])
+                    structures["kinase.klifs_id"].isin([kinase_details["kinase.klifs_id"]])
                 ]
         else:
             if shape_overlay:
@@ -518,7 +518,7 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
                 structures = self._filter_for_similar_ligands_2d(ligand, structures)
 
         logging.debug("Filtering for most similar kinase pockets ...")
-        structures = self._filter_for_similar_kinase_pockets(kinase_details.pocket, structures)
+        structures = self._filter_for_similar_kinase_pockets(kinase_details["kinase.pocket"], structures)
 
         logging.debug("Picking structure with highest KLIFS quality ...")
         structure_for_ligand = structures.iloc[0]
@@ -534,33 +534,32 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
         : pd.DataFrame
             A pandas dataframe containing information about available ligand templates.
         """
-        import klifs_utils
+        from opencadd.databases.klifs import setup_remote
 
         logging.debug("Retrieving available KLIFS entries ...")
-        kinase_ids = klifs_utils.remote.kinases.kinase_names().kinase_ID.to_list()
-        structures = klifs_utils.remote.structures.structures_from_kinase_ids(
-            kinase_ids
-        )
+        remote = setup_remote()
+        structures = remote.structures.all_structures()
 
         logging.debug("Filtering KLIFS entries ...")
-        structures = structures[structures["ligand"] != 0]  # orthosteric ligand
-        structures = structures.groupby("pdb").filter(
-            lambda x: len(set(x["ligand"])) == 1
+        structures = structures[structures["ligand.expo_id"] != "-"]  # orthosteric ligand
+        structures = structures.groupby("structure.pdb_id").filter(
+            lambda x: len(set(x["ligand.expo_id"])) == 1
         )  # single orthosteric ligand
         structures = structures[
-            structures.allosteric_ligand == 0
+            structures["ligand_allosteric.expo_id"] == "-"
             ]  # no allosteric ligand
-        structures = structures[structures.DFG != 'na']  # no missing kinase conformations
-        structures = structures[structures.aC_helix != 'na']
+        structures = structures[structures["structure.dfg"] != 'na']  # no missing kinase conformations
+        structures = structures[structures["structure.ac_helix"] != 'na']
 
-        logging.debug("Sorting KLIFS entries by quality score...")
+        logging.debug("Sorting KLIFS entries by quality ...")
         # keep entry with highest quality score (alt 'A' preferred over alt 'B', chain 'A' preferred over 'B')
         structures = structures.sort_values(
-            by=["alt", "chain", "quality_score"], ascending=[True, True, False]
+            by=["structure.qualityscore", "structure.resolution", "structure.chain", "structure.alternate_model"],
+            ascending=[False, True, True, True]
         )
 
         logging.debug("Filtering for highest quality KLIFS entry per PDB code ...")
-        structures = structures.groupby("pdb").head(1)
+        structures = structures.groupby("structure.pdb_id").head(1)
 
         return structures
 
@@ -593,7 +592,7 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
 
         logging.debug("Retrieving SMILES for unknown ligands ...")
         pdb_to_smiles.update(
-            smiles_from_pdb(set(structures.ligand) - set(pdb_to_smiles.keys()))
+            smiles_from_pdb(set(structures["ligand.expo_id"]) - set(pdb_to_smiles.keys()))
         )
 
         logging.debug("Saving local PDB SMILES dictionary ...")
@@ -602,7 +601,7 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
 
         logging.debug("Adding SMILES to DataFrame ...")
         smiles_column = []
-        for ligand_id in structures.ligand:
+        for ligand_id in structures["ligand.expo_id"]:
             if ligand_id in pdb_to_smiles.keys():
                 smiles_column.append(pdb_to_smiles[ligand_id])
             else:
@@ -610,7 +609,7 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
         structures["smiles"] = smiles_column
 
         logging.debug("Removing structures without a SMILES ...")
-        structures = structures[structures.smiles.notnull()]
+        structures = structures[structures["smiles"].notnull()]
 
         return structures
 
@@ -656,7 +655,7 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
         from ..modeling.OEModeling import get_klifs_ligand, generate_reasonable_conformations, overlay_molecules
 
         logging.debug("Retrieving resolved structures of orthosteric ligands ...")
-        complex_ligands = [get_klifs_ligand(structure_id) for structure_id in structures.structure_ID]
+        complex_ligands = [get_klifs_ligand(structure_id) for structure_id in structures["structure.klifs_id"]]
 
         logging.debug("Generating reasonable conformations of ligand of interest ...")
         conformations_ensemble = generate_reasonable_conformations(ligand)
@@ -670,7 +669,7 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
         overlay_score_threshold = max([score[1] for score in overlay_scores]) - 0.2
 
         logging.debug("Picking structures with most similar ligands ...")
-        structures = structures.iloc[[score[0] for score in overlay_scores if score[1] >= overlay_score_threshold ]]
+        structures = structures.iloc[[score[0] for score in overlay_scores if score[1] >= overlay_score_threshold]]
 
         return structures
 
@@ -700,23 +699,23 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
         ligand = Chem.MolFromSmiles(oechem.OEMolToSmiles(ligand))
 
         logging.debug("Converting SMILES to RDKit molecules ...")
-        rdkit_molecules = [Chem.MolFromSmiles(smiles) for smiles in structures.smiles]
+        rdkit_molecules = [Chem.MolFromSmiles(smiles) for smiles in structures["smiles"]]
 
         logging.debug("Adding RDKit molecules to dataframe...")
         structures["rdkit_molecules"] = rdkit_molecules
 
         logging.debug("Removing KLIFS entries without valid RDKit molecule ...")
-        structures = structures[structures.rdkit_molecules.notnull()]
+        structures = structures[structures["rdkit_molecules"].notnull()]
 
         logging.debug("Adding Feature Morgan fingerprint to dataframe...")
         pd.options.mode.chained_assignment = None  # otherwise next line would raise a warning
-        structures["rdkit_fingerprint"] = [AllChem.GetMorganFingerprint(rdkit_molecule, 2, useFeatures=True) for rdkit_molecule in structures.rdkit_molecules]
+        structures["rdkit_fingerprint"] = [AllChem.GetMorganFingerprint(rdkit_molecule, 2, useFeatures=True) for rdkit_molecule in structures["rdkit_molecules"]]
 
         logging.debug("Generating Feature Morgan fingerprint of ligand ...")
         ligand_fingerprint = AllChem.GetMorganFingerprint(ligand, 2, useFeatures=True)
 
         logging.debug("Calculating dice similarity between fingerprints ...")
-        fingerprint_similarities = [[i, DataStructs.DiceSimilarity(ligand_fingerprint, fingerprint)] for i, fingerprint in enumerate(structures.rdkit_fingerprint)]
+        fingerprint_similarities = [[i, DataStructs.DiceSimilarity(ligand_fingerprint, fingerprint)] for i, fingerprint in enumerate(structures["rdkit_fingerprint"])]
 
         # if maximal score is 0.87, threshold is set to 0.77
         fingerprint_similarity_threshold = max([similarity[1] for similarity in fingerprint_similarities]) - 0.1
@@ -744,7 +743,7 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
         from ..modeling.OEModeling import string_similarity
 
         logging.debug("Calculating string similarity between KLIFS pockets ...")
-        pocket_similarities = [string_similarity(structure_pocket, reference_pocket) for structure_pocket in structures.pocket]
+        pocket_similarities = [string_similarity(structure_pocket, reference_pocket) for structure_pocket in structures["structure.pocket"]]
 
         logging.debug("Adding pocket similarity to dataframe...")
         structures["pocket_similarity"] = pocket_similarities
@@ -753,7 +752,7 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
         pocket_similarity_threshold = max(pocket_similarities) - 0.1
 
         logging.debug("Picking structures with most similar kinase pockets ...")
-        structures = structures[structures.pocket_similarity >= pocket_similarity_threshold]
+        structures = structures[structures["pocket_similarity"] >= pocket_similarity_threshold]
 
         return structures
 
@@ -779,26 +778,25 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
         : pd.Series
             Details about the selected kinase structure.
         """
-        import klifs_utils
-
-        logging.debug("Retrieve kinase information from KLIFS ...")
-        kinase_details = klifs_utils.remote.kinases.kinases_from_kinase_ids([klifs_kinase_id]).iloc[0]
+        from opencadd.databases.klifs import setup_remote
 
         logging.debug("Retrieve kinase structures from KLIFS matching the kinase of interest ...")
-        structures = klifs_utils.remote.structures.structures_from_kinase_ids([kinase_details.kinase_ID])
+        remote = setup_remote()
+        structures = remote.structures.by_kinase_klifs_id(klifs_kinase_id)
 
         logging.debug("Filtering KLIFS structures to match given kinase conformation ...")
         if dfg is not None:
-            structures = structures[structures.DFG == dfg]
+            structures = structures[structures["structure.dfg"] == dfg]
         if alpha_c_helix is not None:
-            structures = structures[structures.aC_helix == alpha_c_helix]
+            structures = structures[structures["structure.ac_helix"] == alpha_c_helix]
 
         if len(structures) == 0:
             raise NotImplementedError("Would need homology modeling capability.")
         else:
             logging.debug("Picking structure with highest KLIFS quality score ...")
             structures = structures.sort_values(
-                by=["alt", "chain", "quality_score"], ascending=[True, True, False]
+                by=["structure.qualityscore", "structure.resolution", "structure.chain", "structure.alternate_model"],
+                ascending=[False, True, True, True]
             )
             protein_structure = structures.iloc[0]
 
@@ -896,7 +894,8 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
         Parameters
         ----------
         ligand_template: pd.Series
-            A data series containing entries 'pdb', 'chain', 'ligand' and 'alt'.
+            A data series containing entries 'structure.pdb_id', 'structure.chain', 'ligand.expo_id' and
+            'structure.alternate_model'.
         kinase_domain: oechem.OEGraphMol
             An OpenEye molecule holding the kinase domain the ligand template structure should be superposed to.
         Returns
@@ -909,23 +908,23 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
         from ..utils import FileDownloader
 
         logging.debug("Interpreting structure ...")
-        ligand_template_structure = PDBProtein(ligand_template.pdb)
+        ligand_template_structure = PDBProtein(ligand_template["structure.pdb_id"])
         if not ligand_template_structure.path.is_file():
             logging.debug(
-                f"Downloading PDB entry {ligand_template.pdb} ..."
+                f"Downloading PDB entry {ligand_template['structure.pdb_id']} ..."
             )
-            FileDownloader.rcsb_structure_pdb(ligand_template.pdb)
+            FileDownloader.rcsb_structure_pdb(["structure.pdb_id"])
         logging.debug("Reading structure ...")
         ligand_template_structure = read_molecules(ligand_template_structure.path)[0]
 
         logging.debug("Selecting chain ...")
-        ligand_template_structure = select_chain(ligand_template_structure, ligand_template.chain)
+        ligand_template_structure = select_chain(ligand_template_structure, ligand_template["structure.chain"])
 
         logging.debug("Selecting alternate location ...")
-        ligand_template_structure = select_altloc(ligand_template_structure, ligand_template.alt)
+        ligand_template_structure = select_altloc(ligand_template_structure, ligand_template["structure.alternate_model"])
 
         logging.debug("Removing everything but protein, water and ligand of interest ...")
-        ligand_template_structure = remove_non_protein(ligand_template_structure, exceptions=[ligand_template.ligand], remove_water=False)
+        ligand_template_structure = remove_non_protein(ligand_template_structure, exceptions=[ligand_template["ligand.expo_id"]], remove_water=False)
 
         logging.debug("Superposing structure on kinase domain ...")
         ligand_template_structure = superpose_proteins(kinase_domain, ligand_template_structure)
