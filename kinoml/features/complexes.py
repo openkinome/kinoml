@@ -787,16 +787,18 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
         : pd.DataFrame
             The input DataFrame filtered for KLIFS entries with most similar kinase pockets.
         """
-        from ..modeling.OEModeling import string_similarity
+        from ..modeling.OEModeling import sequence_similarity
 
         logging.debug("Calculating string similarity between KLIFS pockets ...")
-        pocket_similarities = [string_similarity(structure_pocket, reference_pocket) for structure_pocket in structures["structure.pocket"]]
+        pocket_similarities = [sequence_similarity(structure_pocket, reference_pocket) for structure_pocket in
+                               structures["structure.pocket"]]
 
         logging.debug("Adding pocket similarity to dataframe...")
         structures["pocket_similarity"] = pocket_similarities
 
-        # if maximal score is 0.87, threshold is set to 0.77
-        pocket_similarity_threshold = max(pocket_similarities) - 0.1
+        # if maximal possible score is 498, similarity threshold is corrected by 49.8
+        threshold_correction = sequence_similarity(reference_pocket, reference_pocket) / 10
+        pocket_similarity_threshold = max(pocket_similarities) - threshold_correction
 
         logging.debug("Picking structures with most similar kinase pockets ...")
         structures = structures[structures["pocket_similarity"] >= pocket_similarity_threshold]
