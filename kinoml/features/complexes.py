@@ -265,6 +265,7 @@ class OEHybridDockingFeaturizer(BaseFeaturizer):
         oechem.OEPlaceHydrogens(protein_ligand_complex)
 
         logging.debug("Updating residue identifiers ...")
+        oechem.OEPDBOrderAtoms(protein_ligand_complex)
         protein_ligand_complex = update_residue_identifiers(protein_ligand_complex)
 
         return protein_ligand_complex

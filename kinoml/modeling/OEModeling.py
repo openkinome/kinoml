@@ -768,7 +768,8 @@ def mutate_structure(
     target_structure: oechem.OEGraphMol, template_sequence: str
 ) -> oechem.OEGraphMol:
     """
-    Mutate a protein structure according to an amino acid sequence.
+    Mutate a protein structure according to an amino acid sequence. The provided protein structure should only contain
+    protein residues to prevent unexpected behavior.
     Parameters
     ----------
     target_structure: oechem.OEGraphMol
@@ -802,20 +803,18 @@ def mutate_structure(
             template_sequence_aligned, target_sequence_aligned
         ):
             if template_sequence_residue == "-":
-                # delete any non protein residue from target structure
+                # delete any residue from target structure not covered by target sequence
                 structure_residue = structure_residues.next()
-                if target_sequence_residue != "X":
-                    # delete
-                    for atom in structure_residue.GetAtoms():
-                        target_structure.DeleteAtom(atom)
-                    # break loop and reinitialize
-                    altered = True
-                    break
+                for atom in structure_residue.GetAtoms():
+                    target_structure.DeleteAtom(atom)
+                # break loop and reinitialize
+                altered = True
+                break
             else:
                 # compare amino acids
                 if target_sequence_residue != "-":
                     structure_residue = structure_residues.next()
-                    if target_sequence_residue not in ["X", template_sequence_residue]:
+                    if target_sequence_residue != template_sequence_residue:
                         # mutate
                         structure_residue = structure_residue.GetOEResidue()
                         three_letter_code = oechem.OEGetResidueName(
@@ -827,6 +826,8 @@ def mutate_structure(
                         # break loop and reinitialize
                         altered = True
                         break
+                # TODO: else -> missing residues important for e.g. isoforms,
+                #       make sure residues before and after gap are not connected
         # leave while loop if no changes were introduced
         if not altered:
             finished = True
