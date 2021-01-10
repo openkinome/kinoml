@@ -245,9 +245,11 @@ def _prepare_structure(
         )
 
     # remove existing OXT atoms, since they prevent proper capping
+    predicate = oechem.OEIsHetAtom()
     for atom in structure.GetAtoms():
-        if atom.GetName() == "OXT":
-            structure.DeleteAtom(atom)
+        if not predicate(atom):
+            if atom.GetName().strip() == "OXT":
+                structure.DeleteAtom(atom)
 
     # select primary alternate location
     alt_factory = oechem.OEAltLocationFactory(structure)
