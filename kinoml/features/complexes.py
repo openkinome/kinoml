@@ -183,6 +183,11 @@ class OEHybridDockingFeaturizer(BaseFeaturizer):
         design_unit.GetSolvent(solvent)
         design_unit.GetLigand(ligand)
 
+        # perceive residues to remove artifacts of other design units in the sequence of the protein
+        oechem.OEPerceiveResidues(protein)
+        oechem.OEPerceiveResidues(solvent)
+        oechem.OEPerceiveResidues(ligand)
+
         logging.debug(f"Number of component atoms: Protein - {protein.NumAtoms()}, Solvent - {solvent.NumAtoms()}, Ligand - {ligand.NumAtoms()}.")
         return protein, solvent, ligand
 
@@ -225,11 +230,9 @@ class OEHybridDockingFeaturizer(BaseFeaturizer):
 
         return protein_ligand_complex
 
-    @staticmethod
-    def _assemble_complex(protein: oechem.OEGraphMol, solvent: oechem.OEGraphMol, ligand: oechem.OEGraphMol) -> oechem.OEGraphMol:
+    def _assemble_complex(self, protein: oechem.OEGraphMol, solvent: oechem.OEGraphMol, ligand: oechem.OEGraphMol) -> oechem.OEGraphMol:
         """
-        Assemble components of a solvated protein-ligand complex into a single OpenEye molecule. Water molecules will
-        be checked for clashes with the ligand.
+        Assemble components of a solvated protein-ligand complex into a single OpenEye molecule.
         Parameters
         ----------
         protein: oechem.OEGraphMol
@@ -245,7 +248,7 @@ class OEHybridDockingFeaturizer(BaseFeaturizer):
         """
         from openeye import oechem
 
-        from ..modeling.OEModeling import clashing_atoms, update_residue_identifiers, split_molecule_components
+        from ..modeling.OEModeling import update_residue_identifiers, split_molecule_components
 
         protein_ligand_complex = oechem.OEGraphMol()
 
@@ -256,10 +259,11 @@ class OEHybridDockingFeaturizer(BaseFeaturizer):
         oechem.OEAddMols(protein_ligand_complex, ligand)
 
         logging.debug("Adding water molecules ...")
-        water_molecules = split_molecule_components(solvent)  # converts solvent molecule into a list of water molecules
-        for water_molecule in water_molecules:  # TODO: slow, move to cKDtrees
-            if not clashing_atoms(ligand, water_molecule):
-                oechem.OEAddMols(protein_ligand_complex, water_molecule)
+        # convert solvent molecule into a list of water molecules and check for clashes
+        waters = split_molecule_components(solvent)
+        for water in waters:
+            if not self._clashing_water(water, ligand, protein):
+                oechem.OEAddMols(protein_ligand_complex, water)
 
         logging.debug("Updating hydrogen positions ...")
         oechem.OEPlaceHydrogens(protein_ligand_complex)
@@ -269,6 +273,50 @@ class OEHybridDockingFeaturizer(BaseFeaturizer):
         protein_ligand_complex = update_residue_identifiers(protein_ligand_complex)
 
         return protein_ligand_complex
+
+    @staticmethod
+    def _clashing_water(
+            water: oechem.OEGraphMol,
+            ligand: oechem.OEGraphMol,
+            protein: oechem.OEGraphMol
+    ) -> bool:
+        """
+        Identify water molecules clashing with the ligand and newly modeled protein residues.
+        Parameters
+        ----------
+        water: oechem.OEGraphMol
+            An OpenEye molecule holding the water molecule.
+        ligand: oechem.OEGraphMol
+            An OpenEye molecule holding the ligand.
+        protein: oechem.OEGraphMol
+            An OpenEye molecule holding the protein.
+        Returns
+        -------
+         : bool
+            If water molecule is clashing with ligand or newly modeled protein residues.
+        """
+        from openeye import oechem, oespruce
+
+        from ..modeling.OEModeling import clashing_heavy_atoms
+
+        for atom in water.GetAtoms():
+            # experienced problems when preparing 4pmp
+            # making design units generated clashing waters that were not protonatable
+            if oechem.OEAtomGetResidue(atom).GetInsertCode() != " ":  # TODO: revisit water problem
+                logging.debug("Found ambiguous water molecule!")
+                return True
+            # check for clashes with newly placed ligand
+            if clashing_heavy_atoms(ligand, water):
+                logging.debug("Found water molecule clashing with ligand atoms!")
+                return True
+            # check for clashes with newly modeled protein residues
+            modeled_atoms = oechem.OEGraphMol()
+            oechem.OESubsetMol(modeled_atoms, protein, oespruce.OEIsModeledAtom(), True)
+            if clashing_heavy_atoms(modeled_atoms, water):
+                logging.debug("Found water molecule clashing with modeled atoms!")
+                return True
+
+        return False
 
     def _write_results(self, system: ProteinLigandComplex, solvated_protein: oechem.OEGraphMol, ligand: oechem.OEGraphMol, protein_ligand_complex: oechem.OEGraphMol, other_pdb_header_info: Union[None, List[Tuple[str, str]]]) -> Tuple[str, str]:
         """
@@ -907,19 +955,26 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
         from openeye import oechem
 
         from ..core.sequences import KinaseDomainAminoAcidSequence
-        from ..modeling.OEModeling import mutate_structure, renumber_structure, prepare_protein
+        from ..modeling.OEModeling import apply_deletions, apply_insertions, apply_mutations, renumber_structure, prepare_protein
 
         logging.debug(f"Retrieving kinase domain sequence details for UniProt entry {uniprot_id} ...")
         kinase_domain_sequence = KinaseDomainAminoAcidSequence.from_uniprot(uniprot_id)
 
-        logging.debug(f"Mutating kinase domain ...")
-        mutated_structure = mutate_structure(kinase_structure, kinase_domain_sequence)
+        logging.debug("Applying deletions to kinase domain ...")
+        kinase_structure = apply_deletions(kinase_structure, kinase_domain_sequence)
 
-        logging.debug(f"Renumbering residues ...")
-        residue_numbers = self._get_kinase_residue_numbers(mutated_structure, kinase_domain_sequence)
-        renumbered_structure = renumber_structure(mutated_structure, residue_numbers)
+        if self.loop_db:
+            logging.debug("Applying insertions to kinase domain ...")
+            kinase_structure = apply_insertions(kinase_structure, kinase_domain_sequence, self.loop_db)
 
-        logging.debug(f"Capping kinase domain ...")
+        logging.debug("Applying mutations to kinase domain ...")
+        kinase_structure = apply_mutations(kinase_structure, kinase_domain_sequence)
+
+        logging.debug("Renumbering residues ...")
+        residue_numbers = self._get_kinase_residue_numbers(kinase_structure, kinase_domain_sequence)
+        kinase_structure = renumber_structure(kinase_structure, residue_numbers)
+
+        logging.debug("Checking kinase domain sequence termini ...")
         real_termini = []
         if kinase_domain_sequence.metadata["true_N_terminus"]:
             if kinase_domain_sequence.metadata["begin"] == residue_numbers[0]:
@@ -929,7 +984,8 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
                 real_termini.append(residue_numbers[-1])
         if len(real_termini) == 0:
             real_termini = None
-        design_unit = prepare_protein(renumbered_structure, cap_termini=True, real_termini=real_termini)
+        logging.debug(f"Applying caps except for real termini {real_termini} ...")
+        design_unit = prepare_protein(kinase_structure, cap_termini=True, real_termini=real_termini)
 
         logging.debug("Extracting protein ...")
         processed_kinase_domain = oechem.OEGraphMol()

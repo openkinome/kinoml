@@ -244,12 +244,27 @@ def _prepare_structure(
             ]
         )
 
-    # set design unit options
+    # remove existing OXT atoms, since they prevent proper capping
+    for atom in structure.GetAtoms():
+        if atom.GetName() == "OXT":
+            structure.DeleteAtom(atom)
+
+    # select primary alternate location
+    alt_factory = oechem.OEAltLocationFactory(structure)
+    if alt_factory.GetGroupCount() != 0:
+        alt_factory.MakePrimaryAltMol(structure)
+
     structure_metadata = oespruce.OEStructureMetadata()
     design_unit_options = oespruce.OEMakeDesignUnitOptions()
+    # alignment options, only matches are important
+    design_unit_options.GetPrepOptions().GetBuildOptions().GetLoopBuilderOptions().SetSeqAlignMethod(1)
+    design_unit_options.GetPrepOptions().GetBuildOptions().GetLoopBuilderOptions().SetSeqAlignGapPenalty(-1)
+    design_unit_options.GetPrepOptions().GetBuildOptions().GetLoopBuilderOptions().SetSeqAlignExtendPenalty(0)
+    # capping options
     if cap_termini is False:
         design_unit_options.GetPrepOptions().GetBuildOptions().SetCapCTermini(False)
         design_unit_options.GetPrepOptions().GetBuildOptions().SetCapNTermini(False)
+    # provide path to loop database
     if loop_db is not None:
         from pathlib import Path
 
@@ -787,7 +802,141 @@ def get_sequence(structure: oechem.OEGraphMol) -> str:
     return sequence
 
 
-def mutate_structure(
+def apply_deletions(
+    target_structure: oechem.OEGraphMol, template_sequence: str
+) -> oechem.OEGraphMol:
+    """
+    Apply deletions to a protein structure according to an amino acid sequence. The provided protein structure should
+    only contain protein residues to prevent unexpected behavior.
+    Parameters
+    ----------
+    target_structure: oechem.OEGraphMol
+        An OpenEye molecule holding a protein structure for which deletions should be applied.
+    template_sequence: str
+        A template one letter amino acid sequence, which holds potential deletions when compared to the target
+        structure sequence.
+    Returns
+    -------
+     : oechem.OEGraphMol
+        An OpenEye molecule holding the protein structure with applied deletions.
+    """
+    from Bio import pairwise2
+
+    target_sequence = get_sequence(target_structure)
+    template_sequence_aligned, target_sequence_aligned = pairwise2.align.globalxs(
+        template_sequence, target_sequence, -1, 0
+    )[0][:2]
+    logging.debug(f"Template sequence:\n{template_sequence_aligned}")
+    logging.debug(f"Target sequence:\n{target_sequence_aligned}")
+    hierview = oechem.OEHierView(target_structure)
+    structure_residues = hierview.GetResidues()
+    structure_residue = False
+    # adjust target structure to match template sequence
+    for template_sequence_residue, target_sequence_residue in zip(
+            template_sequence_aligned, target_sequence_aligned
+    ):
+        # iterate over structure residues
+        if target_sequence_residue != "-":
+            structure_residue = structure_residues.next()
+        # delete any residue from target structure not covered by target sequence
+        if template_sequence_residue == "-" and structure_residue:
+            for atom in structure_residue.GetAtoms():
+                target_structure.DeleteAtom(atom)
+
+    return target_structure
+
+
+def apply_insertions(
+    target_structure: oechem.OEGraphMol,
+    template_sequence: str,
+    loop_db: str,
+) -> oechem.OEGraphMol:
+    """
+    Apply insertions to a protein structure according to an amino acid sequence. The provided protein structure should
+    only contain protein residues to prevent unexpected behavior.
+    Parameters
+    ----------
+    target_structure: oechem.OEGraphMol
+        An OpenEye molecule holding a protein structure for which insertions should be applied.
+    template_sequence: str
+        A template one letter amino acid sequence, which holds potential insertions when compared to the target
+        structure sequence.
+    loop_db: str
+        The path to the loop database used by OESpruce to model missing loops.
+    Returns
+    -------
+     : oechem.OEGraphMol
+        An OpenEye molecule holding the protein structure with applied insertions.
+    """
+    from pathlib import Path
+
+    from Bio import pairwise2
+
+    sidechain_options = oespruce.OESidechainBuilderOptions()
+    loop_options = oespruce.OELoopBuilderOptions()
+    loop_db = str(Path(loop_db).expanduser().resolve())
+    loop_options.SetLoopDBFilename(loop_db)
+    # the hierarchy view is more stable if reinitialized after each change
+    # https://docs.eyesopen.com/toolkits/python/oechemtk/biopolymers.html#a-hierarchy-view
+    finished = False
+    while not finished:
+        altered = False
+        # align template and target sequences
+        target_sequence = get_sequence(target_structure)
+        template_sequence_aligned, target_sequence_aligned = pairwise2.align.globalxs(
+            template_sequence, target_sequence, -1, 0
+        )[0][:2]
+        logging.debug(f"Template sequence:\n{template_sequence_aligned}")
+        logging.debug(f"Target sequence:\n{target_sequence_aligned}")
+        hierview = oechem.OEHierView(target_structure)
+        structure_residues = hierview.GetResidues()
+        gap_sequence = ""
+        gap_start = False
+        structure_residue = False
+        # adjust target structure to match template sequence
+        for template_sequence_residue, target_sequence_residue in zip(
+                template_sequence_aligned, target_sequence_aligned
+        ):
+            # check for gap and make sure missing sequence at N terminus is ignored
+            if target_sequence_residue == "-" and structure_residue:
+                # get last residue before gap and store gap sequence
+                gap_start = structure_residue.GetOEResidue()
+                gap_sequence += template_sequence_residue
+            # iterate over structure residues and check for gap end
+            if target_sequence_residue != "-":
+                structure_residue = structure_residues.next()
+                # existing gap_starts indicates gap end
+                if isinstance(gap_start, oechem.OEResidue):
+                    # get first residue after gap end
+                    gap_end = structure_residue.GetOEResidue()
+                    modeled_structure = oechem.OEMol()
+                    logging.debug(f"Trying to build loop {gap_sequence} " +
+                                  f"between residues {gap_start.GetResidueNumber()}" +
+                                  f" and {gap_end.GetResidueNumber()} ...")
+                    # build loop and reinitialize if successful
+                    if oespruce.OEBuildSingleLoop(
+                        modeled_structure,
+                        target_structure,
+                        gap_sequence,
+                        gap_start,
+                        gap_end,
+                        sidechain_options,
+                        loop_options
+                    ):
+                        # break loop and reinitialize
+                        target_structure = oechem.OEGraphMol(modeled_structure)
+                        altered = True
+                        break
+                    # TODO: else, make sure gap_start and gap_end are not connected,
+                    #       since this may indicate an isoform specific insertion
+        # leave while loop if no changes were introduced
+        if not altered:
+            finished = True
+
+    return target_structure
+
+
+def apply_mutations(
     target_structure: oechem.OEGraphMol, template_sequence: str
 ) -> oechem.OEGraphMol:
     """
@@ -798,11 +947,11 @@ def mutate_structure(
     target_structure: oechem.OEGraphMol
         An OpenEye molecule holding a protein structure to mutate.
     template_sequence: str
-        A template one letter amino acid sequence, which defines the sequence the target structure should be mutated
-        to. Protein residues not matching a template sequence will be either mutated or deleted.
+        A template one letter amino acid sequence, which holds potential mutations when compared to the target
+        structure sequence.
     Returns
     -------
-    mutated_structure: oechem.OEGraphMol
+     : oechem.OEGraphMol
         An OpenEye molecule holding the mutated protein structure.
     """
     from Bio import pairwise2
@@ -815,42 +964,38 @@ def mutate_structure(
         # align template and target sequences
         target_sequence = get_sequence(target_structure)
         template_sequence_aligned, target_sequence_aligned = pairwise2.align.globalxs(
-            template_sequence, target_sequence, -10, 0
+            template_sequence, target_sequence, -1, 0
         )[0][:2]
-        logging.debug(f"Template sequence:\n{template_sequence}")
-        logging.debug(f"Target sequence:\n{target_sequence}")
+        logging.debug(f"Template sequence:\n{template_sequence_aligned}")
+        logging.debug(f"Target sequence:\n{target_sequence_aligned}")
         hierview = oechem.OEHierView(target_structure)
         structure_residues = hierview.GetResidues()
         # adjust target structure to match template sequence
         for template_sequence_residue, target_sequence_residue in zip(
             template_sequence_aligned, target_sequence_aligned
         ):
-            if template_sequence_residue == "-":
-                # delete any residue from target structure not covered by target sequence
+            # check for mutations if no gap
+            if target_sequence_residue != "-":
                 structure_residue = structure_residues.next()
-                for atom in structure_residue.GetAtoms():
-                    target_structure.DeleteAtom(atom)
-                # break loop and reinitialize
-                altered = True
-                break
-            else:
-                # compare amino acids
-                if target_sequence_residue != "-":
-                    structure_residue = structure_residues.next()
+                if template_sequence_residue != "-":
                     if target_sequence_residue != template_sequence_residue:
-                        # mutate
+                        # mutate and reinitialize if successful
                         structure_residue = structure_residue.GetOEResidue()
                         three_letter_code = oechem.OEGetResidueName(
                             oechem.OEGetResidueIndexFromCode(template_sequence_residue)
                         )
-                        oespruce.OEMutateResidue(
+                        logging.debug("Trying to perform mutation " +
+                                      f"{structure_residue.GetName()}{structure_residue.GetResidueNumber()}" +
+                                      f"{three_letter_code} ...")
+                        if oespruce.OEMutateResidue(
                             target_structure, structure_residue, three_letter_code
-                        )
-                        # break loop and reinitialize
-                        altered = True
-                        break
-                # TODO: else -> missing residues important for e.g. isoforms,
-                #       make sure residues before and after gap are not connected
+                        ):
+                            logging.debug("Success!")
+                            # break loop and reinitialize
+                            altered = True
+                            break
+                        else:
+                            logging.debug("Fail!")
         # leave while loop if no changes were introduced
         if not altered:
             finished = True
@@ -1011,39 +1156,43 @@ def split_molecule_components(molecule: oechem.OEGraphMol) -> List[oechem.OEGrap
     return components
 
 
-def clashing_atoms(molecule1: oechem.OEGraphMol, molecule2: oechem.OEGraphMol) -> bool:
+def clashing_heavy_atoms(
+        molecule1: oechem.OEGraphMol,
+        molecule2: oechem.OEGraphMol,
+        cutoff: float = 1.5
+) -> bool:
     """
-    Evaluates if the atoms of two molecules are clashing.
+    Evaluates if the heavy atoms of two molecules are clashing.
     Parameters
     ----------
     molecule1: oechem.OEGraphMol
         An OpenEye molecule.
     molecule2: oechem.OEGraphMol
         An OpenEye molecule.
+    cutoff: float
+        The cutoff that defines an atom clash.
     Returns
     -------
     : bool
-        If any atoms of two molecules are clashing
+        If any atoms of two molecules are clashing.
     """
-    import math
+    from scipy.spatial import cKDTree
 
-    oechem.OEAssignCovalentRadii(molecule1)
-    oechem.OEAssignCovalentRadii(molecule2)
+    # select heavy atoms
+    heavy_atoms1, heavy_atoms2 = oechem.OEGraphMol(), oechem.OEGraphMol()
+    oechem.OESubsetMol(heavy_atoms1, molecule1, oechem.OEIsHeavy(), True)
+    oechem.OESubsetMol(heavy_atoms2, molecule2, oechem.OEIsHeavy(), True)
+    # get coordinates
     coordinates1_list = [
-        molecule1.GetCoords()[x] for x in sorted(molecule1.GetCoords().keys())
+        heavy_atoms1.GetCoords()[x] for x in sorted(heavy_atoms1.GetCoords().keys())
     ]
     coordinates2_list = [
-        molecule2.GetCoords()[x] for x in sorted(molecule2.GetCoords().keys())
+        heavy_atoms2.GetCoords()[x] for x in sorted(heavy_atoms2.GetCoords().keys())
     ]
-    for atom1, coordinates1 in zip(molecule1.GetAtoms(), coordinates1_list):
-        for atom2, coordinates2 in zip(molecule2.GetAtoms(), coordinates2_list):
-            clash_threshold = atom1.GetRadius() + atom2.GetRadius()
-            distance = math.sqrt(
-                sum(
-                    (coordinate1 - coordinate2) ** 2.0
-                    for coordinate1, coordinate2 in zip(coordinates1, coordinates2)
-                )
-            )
-            if distance <= clash_threshold:
-                return True
+    # get clashes
+    tree1 = cKDTree(coordinates1_list)
+    clashes = tree1.query_ball_point(coordinates2_list, cutoff)
+    if max([len(i) for i in clashes]) > 0:
+        return True
+
     return False
