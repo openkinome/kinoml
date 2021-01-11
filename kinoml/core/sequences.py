@@ -283,66 +283,130 @@ class RNASequence(Biosequence):
     _ACCESSION_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=nuccore&id={}&rettype=fasta&retmode=text"
 
 
-class KinaseDomainAminoAcidSequence(Biosequence):
-    """Biosequence for kinase domain amino acid sequences."""
-
-    ACCESSION_MAX_RETRIEVAL = None
+class AminoAcidSequence(Biosequence):
+    """Biosequence for amino acid sequences."""
 
     @classmethod
-    def from_uniprot(
-        cls,
-        *uniprot_ids: str,
-    ) -> Union[
-        "KinaseDomainAminoAcidSequence", Iterable["KinaseDomainAminoAcidSequence"], None
-    ]:
+    def from_uniprot(cls, uniprot_id: str) -> Biosequence:
         """
-        Retrieve kinase domain amino acid sequences of kinases defined by their Uniprot identifiers.
+        Retrieve an amino acid sequence defined by a UniProt identifier.
         Parameters
         ----------
-        uniprot_ids: str
-            Uniprot identifier(s). Multiple can be provided.
+        uniprot_id: str
+            The UniProt identifier.
         Returns
         -------
-        kinase_domain_sequences: list of KinaseDomainAminoAcidSequence
-            Retrieved kinase domain amino acid sequence(s).
+        amino_acid_sequence: Biosequence
+            Retrieved amino acid sequence.
+        """
+        response = cls.query_uniprot(uniprot_id)
+        sequence_details = cls.get_sequence_details_from_uniprot_response(response)
+
+        amino_acid_sequence = Biosequence(
+            sequence_details["sequence"],
+            name=sequence_details["name"],
+            metadata={
+                "uniprot_id": uniprot_id,
+                "begin": sequence_details["begin"],
+                "end": sequence_details["end"],
+                "true_N_terminus": sequence_details["true_N_terminus"],
+                "true_C_terminus": sequence_details["true_C_terminus"]
+            }
+        )
+        return amino_acid_sequence
+
+    @staticmethod
+    def query_uniprot(uniprot_id: str) -> dict:
+        """
+        Query Uniprot by a UniProt identifier.
+        Parameters
+        ----------
+        uniprot_id: str
+            The UniProt identifier.
+        Returns
+        -------
+        response: dict
+            The sequence information stored in a dictionary.
         """
         import requests
         import json
 
-        for uniprot_id in uniprot_ids:
-            # request data
-            response = requests.get(
-                f"https://www.ebi.ac.uk/proteins/api/proteins/{uniprot_id}"
-            )
-            protein = json.loads(response.text)
+        response = requests.get(f"https://www.ebi.ac.uk/proteins/api/proteins/{uniprot_id}")
+        response = json.loads(response.text)
 
-            # find protein kinase domains
-            for feature in protein["features"]:
-                if feature["type"] == "DOMAIN":
-                    if feature["description"] == "Protein kinase":
-                        # get kinase domain sequence details
-                        sequence = protein["sequence"]["sequence"]
-                        name = protein["id"]
-                        begin = int(feature["begin"])
-                        if begin == 1:
-                            true_N_terminus = True
-                        else:
-                            true_N_terminus = False
-                        end = int(feature["end"])
-                        if end == len(sequence):
-                            true_C_terminus = True
-                        else:
-                            true_C_terminus = False
-                        kinase_domain_sequence = sequence[begin - 1 : end]
+        return response
 
-        return cls(
-            kinase_domain_sequence,
-            name=name,
-            metadata={
-                "uniprot_id": uniprot_id,
-                "begin": begin,
-                "end": end,
-                "true_N_terminus": true_N_terminus,
-                "true_C_terminus": true_C_terminus,
-            },
-        )
+    @staticmethod
+    def get_sequence_details_from_uniprot_response(response):
+        """
+        Get sequence details from a UniProt query response.
+        Parameters
+        ----------
+        response: dict
+            The sequence information stored in a dictionary.
+        Returns
+        -------
+        sequence_details: dict
+            Sequence details filtered for key information
+            (sequence, name, begin, end, true_N_terminus, true_C_terminus).
+        """
+        sequence_details = {
+            "sequence": response["sequence"]["sequence"],
+            "name": response["id"],
+            "begin": 1,
+            "end": response["sequence"]["length"],
+            "true_N_terminus": True,
+            "true_C_terminus": True
+        }
+        return sequence_details
+
+
+class KinaseDomainAminoAcidSequence(AminoAcidSequence):
+    """Biosequence for kinase domain amino acid sequences."""
+
+    @staticmethod
+    def get_sequence_details_from_uniprot_response(response):
+        """
+        Get kinase domain sequence details from a UniProt query response.
+        Parameters
+        ----------
+        response: dict
+            The sequence information stored in a dictionary.
+        Returns
+        -------
+        sequence_details: dict
+            Kinase doamin sequence details filtered for key information
+            (sequence, name, begin, end, true_N_terminus, true_C_terminus).
+        """
+        kinase_domains = []
+
+        for feature in response["features"]:
+            if feature["type"] == "DOMAIN":
+                if feature["description"] == "Protein kinase":
+                    kinase_domains.append(feature)
+
+        if len(kinase_domains) > 1:
+            print("Found multiple kinase domains. Using first one.")
+
+        kinase_domain = kinase_domains[0]
+        name = response["id"]
+        sequence = response["sequence"]["sequence"]
+        begin = int(kinase_domain["begin"])
+        true_N_terminus = False
+        if begin == 1:
+            true_N_terminus = True
+        end = int(kinase_domain["end"])
+        true_C_terminus = False
+        if end == len(sequence):
+            true_C_terminus = True
+        kinase_domain_sequence = sequence[begin - 1: end]
+
+        sequence_details = {
+            "sequence": kinase_domain_sequence,
+            "name": name,
+            "begin": begin,
+            "end": end,
+            "true_N_terminus": true_N_terminus,
+            "true_C_terminus": true_C_terminus
+        }
+        return sequence_details
