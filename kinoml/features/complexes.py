@@ -10,7 +10,7 @@ from typing import Union, Tuple, Iterable, List
 from .core import BaseFeaturizer
 from ..core.ligands import FileLigand, SmilesLigand
 from ..core.proteins import FileProtein, PDBProtein
-from ..core.sequences import KinaseDomainAminoAcidSequence
+from ..core.sequences import Biosequence
 from ..core.systems import ProteinLigandComplex
 
 
@@ -440,6 +440,7 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
         from opencadd.databases.klifs import setup_remote
         from openeye import oechem
 
+        from ..core.sequences import KinaseDomainAminoAcidSequence
         from ..docking.OEDocking import create_hybrid_receptor, hybrid_docking
         from ..modeling.OEModeling import compare_molecules, read_smiles
         from ..utils import LocalFileStorage
@@ -520,8 +521,15 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
         logging.debug("Extracting components ...")
         prepared_kinase, prepared_solvent = self._get_components(design_unit)[:2]
 
+        if hasattr(system.protein, "sequence"):
+            logging.debug("Using kinase domain sequence from BaseProtein ...")
+            kinase_domain_sequence = system.protein.sequence
+        else:
+            logging.debug(f"Retrieving kinase domain sequence details for UniProt entry {kinase_details['kinase.uniprot']} ...")
+            kinase_domain_sequence = KinaseDomainAminoAcidSequence.from_uniprot(kinase_details["kinase.uniprot"])
+
         logging.debug("Processing kinase domain ...")
-        processed_kinase_domain = self._process_kinase_domain(prepared_kinase, kinase_details["kinase.uniprot"])
+        processed_kinase_domain = self._process_kinase_domain(prepared_kinase, kinase_domain_sequence)
 
         logging.debug(f"Preparing ligand template structure of {ligand_template['structure.pdb_id']} ...")
         prepared_ligand_template = self._prepare_ligand_template(ligand_template, processed_kinase_domain)
@@ -938,15 +946,15 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
 
         return design_unit
 
-    def _process_kinase_domain(self, kinase_structure: oechem.OEGraphMol, uniprot_id: str) -> oechem.OEGraphMol:
+    def _process_kinase_domain(self, kinase_structure: oechem.OEGraphMol, kinase_domain_sequence: Biosequence) -> oechem.OEGraphMol:
         """
         Process a kinase domain according to UniProt.
         Parameters
         ----------
         kinase_structure: oechem.OEGraphMol
             An OpenEye molecule holding the kinase structure to process.
-        uniprot_id: str
-            The UniProt identifier.
+        kinase_domain_sequence: Biosequence
+            The kinase domain sequence with associated metadata.
         Returns
         -------
         : oechem.OEGraphMol
@@ -954,11 +962,7 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
         """
         from openeye import oechem
 
-        from ..core.sequences import KinaseDomainAminoAcidSequence
         from ..modeling.OEModeling import apply_deletions, apply_insertions, apply_mutations, renumber_structure, prepare_protein
-
-        logging.debug(f"Retrieving kinase domain sequence details for UniProt entry {uniprot_id} ...")
-        kinase_domain_sequence = KinaseDomainAminoAcidSequence.from_uniprot(uniprot_id)
 
         logging.debug("Applying deletions to kinase domain ...")
         kinase_structure = apply_deletions(kinase_structure, kinase_domain_sequence)
@@ -993,7 +997,8 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
 
         return processed_kinase_domain
 
-    def _prepare_ligand_template(self, ligand_template: pd.Series, kinase_domain: oechem.OEGraphMol) -> oechem.OEGraphMol:
+    @staticmethod
+    def _prepare_ligand_template(ligand_template: pd.Series, kinase_domain: oechem.OEGraphMol) -> oechem.OEGraphMol:
         """
         Prepare a PDB structure containing the ligand template of interest.
         Parameters
@@ -1044,7 +1049,7 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
         return ligand_template_structure
 
     @staticmethod
-    def _get_kinase_residue_numbers(kinase_domain_structure: oechem.OEGraphMol, canonical_kinase_domain_sequence: KinaseDomainAminoAcidSequence) -> List[int]:
+    def _get_kinase_residue_numbers(kinase_domain_structure: oechem.OEGraphMol, canonical_kinase_domain_sequence: Biosequence) -> List[int]:
         """
         Get the canonical residue numbers of a kinase domain structure.
         Parameters
