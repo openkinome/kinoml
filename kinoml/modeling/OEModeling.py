@@ -198,6 +198,35 @@ def remove_non_protein(
     return selection
 
 
+def remove_expression_tags(structure):
+    """
+    Remove expression tags from a protein structure listed in the PDB header section "SEQADV".
+    Parameters
+    ----------
+    structure: oechem.OEGraphMol
+        An OpenEye molecule with associated PDB header section "SEQADV".
+    Returns
+    -------
+    structure: oechem.OEGraphMol
+        The OpenEye molecule without expression tags.
+    """
+    # retrieve "SEQADV" records from PDB header
+    pdb_data_pairs = oechem.OEGetPDBDataPairs(structure)
+    seqadv_records = [datapair.GetValue() for datapair in pdb_data_pairs if datapair.GetTag() == "SEQADV"]
+    expression_tags = [seqadv_record for seqadv_record in seqadv_records if "EXPRESSION TAG" in seqadv_record]
+
+    # remove expression tags
+    for expression_tag in expression_tags:
+        chain_id = expression_tag[10]
+        residue_name = expression_tag[6:9]
+        residue_id = int(expression_tag[12:16])
+        hier_view = oechem.OEHierView(structure)
+        hier_residue = hier_view.GetResidue(chain_id, residue_name, residue_id)
+        for atom in hier_residue.GetAtoms():
+            structure.DeleteAtom(atom)
+    return structure
+
+
 def _prepare_structure(
     structure: oechem.OEGraphMol,
     has_ligand: bool = False,

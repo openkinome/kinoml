@@ -927,7 +927,7 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
         """
         from openeye import oechem
 
-        from ..modeling.OEModeling import prepare_complex, prepare_protein
+        from ..modeling.OEModeling import remove_expression_tags, prepare_complex, prepare_protein
         from ..utils import LocalFileStorage
 
         design_unit_path = LocalFileStorage.featurizer_result(self.__class__.__name__, f"{design_unit_identifier}_design_unit", "oedu")
@@ -936,6 +936,8 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
             design_unit = oechem.OEDesignUnit()
             oechem.OEReadDesignUnit(str(design_unit_path), design_unit)
         else:
+            logging.debug("Removing expression tags ...")
+            protein_structure = remove_expression_tags(protein_structure)
             logging.debug("Generating design unit ...")
             if ligand_name is None:
                 design_unit = prepare_protein(protein_structure, self.loop_db, cap_termini=False)
