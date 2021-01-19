@@ -518,8 +518,13 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
             ligand_name = str(protein_template["ligand.expo_id"])
         design_unit = self._get_design_unit(protein, protein_template["structure.pdb_id"], electron_density, ligand_name)
 
-        logging.debug("Extracting components ...")
-        prepared_kinase, prepared_solvent = self._get_components(design_unit)[:2]
+        logging.debug(f"Preparing ligand template structure of {ligand_template['structure.pdb_id']} ...")
+        prepared_ligand_template = self._prepare_ligand_template(ligand_template)
+
+        logging.debug("Superposing kinase and ligand template ...")
+        prepared_kinase, prepared_solvent = self._superpose_templates(
+            design_unit, prepared_ligand_template, ligand_template
+        )
 
         if hasattr(system.protein, "sequence"):
             logging.debug("Using kinase domain sequence from BaseProtein ...")
@@ -531,8 +536,11 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
         logging.debug("Processing kinase domain ...")
         processed_kinase_domain = self._process_kinase_domain(prepared_kinase, kinase_domain_sequence)
 
-        logging.debug(f"Preparing ligand template structure of {ligand_template['structure.pdb_id']} ...")
-        prepared_ligand_template = self._prepare_ligand_template(ligand_template, processed_kinase_domain)
+        logging.debug("Extracting ligand ...")
+        split_options = oechem.OESplitMolComplexOptions()
+        prepared_ligand_template = list(oechem.OEGetMolComplexComponents(
+            prepared_ligand_template, split_options, split_options.GetLigandFilter())
+        )[0]
 
         logging.debug("Checking for co-crystallized ligand ...")
         if (
@@ -1000,7 +1008,7 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
         return processed_kinase_domain
 
     @staticmethod
-    def _prepare_ligand_template(ligand_template: pd.Series, kinase_domain: oechem.OEGraphMol) -> oechem.OEGraphMol:
+    def _prepare_ligand_template(ligand_template: pd.Series) -> oechem.OEGraphMol:
         """
         Prepare a PDB structure containing the ligand template of interest.
         Parameters
@@ -1008,15 +1016,14 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
         ligand_template: pd.Series
             A data series containing entries 'structure.pdb_id', 'structure.chain', 'ligand.expo_id' and
             'structure.alternate_model'.
-        kinase_domain: oechem.OEGraphMol
-            An OpenEye molecule holding the kinase domain the ligand template structure should be superposed to.
         Returns
         -------
         : oechem.OEGraphMol
-            An OpenEye molecule holding the prepared ligand structure.
+            An OpenEye molecule holding the prepared ligand template structure.
         """
         from openeye import oechem
-        from ..modeling.OEModeling import read_molecules, select_chain, select_altloc, remove_non_protein, superpose_proteins
+
+        from ..modeling.OEModeling import read_molecules, select_chain, select_altloc, remove_non_protein
         from ..utils import FileDownloader
 
         logging.debug("Interpreting structure ...")
@@ -1033,22 +1040,75 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
         ligand_template_structure = select_chain(ligand_template_structure, ligand_template["structure.chain"])
 
         logging.debug("Selecting alternate location ...")
-        ligand_template_structure = select_altloc(ligand_template_structure, ligand_template["structure.alternate_model"])
+        ligand_template_structure = select_altloc(
+            ligand_template_structure, ligand_template["structure.alternate_model"]
+        )
 
         logging.debug("Removing everything but protein, water and ligand of interest ...")
-        ligand_template_structure = remove_non_protein(ligand_template_structure, exceptions=[ligand_template["ligand.expo_id"]], remove_water=False)
-
-        logging.debug("Superposing structure on kinase domain ...")
-        ligand_template_structure = superpose_proteins(kinase_domain, ligand_template_structure)
+        ligand_template_structure = remove_non_protein(
+            ligand_template_structure, exceptions=[ligand_template["ligand.expo_id"]], remove_water=False
+        )
 
         logging.debug("Adding hydrogens ...")
         oechem.OEPlaceHydrogens(ligand_template_structure)
-        split_options = oechem.OESplitMolComplexOptions()
-
-        logging.debug("Extracting ligand ...")
-        ligand_template_structure = list(oechem.OEGetMolComplexComponents(ligand_template_structure, split_options, split_options.GetLigandFilter()))[0]
 
         return ligand_template_structure
+
+    @staticmethod
+    def _superpose_templates(
+        design_unit: oechem.OEDesignUnit,
+        ligand_template_structure: oechem.OEGraphMol,
+        ligand_template: pd.Series
+    ) -> Tuple[oechem.OEGraphMol, oechem.OEGraphMol]:
+        """
+        Superpose the kinase domain from the design unit to the given ligand template structure. The superposed kinase
+        domain will be returned with kinase domain and solvent separated.
+        Parameters
+        ----------
+        design_unit: oechem.OEDesignUnit
+            The OpenEye design unit containing the kinase domain.
+        ligand_template_structure: oechem.OEGraphMol
+            An OpenEye molecule holding the ligand template structure.
+        ligand_template: pd.Series
+            A data series containing entries 'structure.chain' and 'structure.klifs_id'.
+        Returns
+        -------
+        kinase_domain: oechem.OEGraphMol
+            The superposed kinase domain without solvent.
+        solvent: oechem.OEGraphMol
+            The solvent of the superposed kinase domain.
+        """
+
+        from opencadd.databases.klifs import setup_remote
+        from openeye import oechem
+
+        from ..modeling.OEModeling import superpose_proteins
+
+        logging.debug("Extracting protein and solvent ...")
+        solvated_kinase_domain = oechem.OEGraphMol()
+        design_unit.GetComponents(
+            solvated_kinase_domain, oechem.OEDesignUnitComponents_Protein | oechem.OEDesignUnitComponents_Solvent
+        )
+        # perceive residues to remove artifacts of other design units in the sequence of the protein
+        oechem.OEPerceiveResidues(solvated_kinase_domain)
+
+        logging.debug("Retrieving KLIFS kinase pocket residues ...")
+        remote = setup_remote()
+        pocket = remote.coordinates.to_dataframe(ligand_template["structure.klifs_id"], entity="pocket")
+        pocket_residues = set(pocket["residue.name"] + pocket["residue.id"])
+
+        logging.debug("Superposing structure on kinase domain ...")
+        solvated_kinase_domain = superpose_proteins(
+            ligand_template_structure, solvated_kinase_domain, pocket_residues, ligand_template["structure.chain"]
+        )
+
+        logging.debug("Separating solvent from kinase domain ...")
+        kinase_domain, solvent = oechem.OEGraphMol(), oechem.OEGraphMol()
+        oechem.OESplitMolComplex(
+            oechem.OEGraphMol(), kinase_domain, solvent, oechem.OEGraphMol(), solvated_kinase_domain
+        )
+
+        return kinase_domain, solvent
 
     @staticmethod
     def _get_kinase_residue_numbers(kinase_domain_structure: oechem.OEGraphMol, canonical_kinase_domain_sequence: Biosequence) -> List[int]:

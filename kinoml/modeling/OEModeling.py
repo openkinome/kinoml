@@ -1072,16 +1072,24 @@ def renumber_structure(
 
 
 def superpose_proteins(
-    reference_protein: oechem.OEGraphMol, fit_protein: oechem.OEGraphMol
+    reference_protein: oechem.OEGraphMol, fit_protein: oechem.OEGraphMol,
+    residues: Iterable = tuple(), chain_id: str = " ", insertion_code: str = " "
 ) -> oechem.OEGraphMol:
     """
-    Superpose a protein structure onto a reference protein.
+    Superpose a protein structure onto a reference protein. The superposition
+    can be customized to consider only the specified residues.
     Parameters
     ----------
     reference_protein: oechem.OEGraphMol
         An OpenEye molecule holding a protein structure which will be used as reference during superposition.
     fit_protein: oechem.OEGraphMol
         An OpenEye molecule holding a protein structure which will be superposed onto the reference protein.
+    residues: Tuple of str
+        Residues that should be used during superposition in format "GLY123".
+    chain_id: str
+        Chain identifier for residues that should be used during superposition.
+    insertion_code: str
+        Insertion code for residues that should be used during superposition.
     Returns
     -------
     superposed_protein: oechem.OEGraphMol
@@ -1092,7 +1100,12 @@ def superpose_proteins(
 
     # set superposition method
     options = oespruce.OESuperpositionOptions()
-    options.SetSuperpositionType(oespruce.OESuperpositionType_Global)
+    if len(residues) == 0:
+        options.SetSuperpositionType(oespruce.OESuperpositionType_Global)
+    else:
+        options.SetSuperpositionType(oespruce.OESuperpositionType_Site)
+        for residue in residues:
+            options.AddSiteResidue(f"{residue[:3]}:{residue[3:]}:{insertion_code}:{chain_id}")
 
     # perform superposition
     superposition = oespruce.OEStructuralSuperposition(
