@@ -440,7 +440,7 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
         from opencadd.databases.klifs import setup_remote
         from openeye import oechem
 
-        from ..core.sequences import KinaseDomainAminoAcidSequence
+        from ..core.sequences import AminoAcidSequence
         from ..docking.OEDocking import create_hybrid_receptor, hybrid_docking
         from ..modeling.OEModeling import compare_molecules, read_smiles
         from ..utils import LocalFileStorage
@@ -531,7 +531,7 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
             kinase_domain_sequence = system.protein.sequence
         else:
             logging.debug(f"Retrieving kinase domain sequence details for UniProt entry {kinase_details['kinase.uniprot']} ...")
-            kinase_domain_sequence = KinaseDomainAminoAcidSequence.from_uniprot(kinase_details["kinase.uniprot"])
+            kinase_domain_sequence = AminoAcidSequence.from_uniprot(kinase_details["kinase.uniprot"])
 
         logging.debug("Processing kinase domain ...")
         processed_kinase_domain = self._process_kinase_domain(prepared_kinase, kinase_domain_sequence)
@@ -1111,14 +1111,14 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
         return kinase_domain, solvent
 
     @staticmethod
-    def _get_kinase_residue_numbers(kinase_domain_structure: oechem.OEGraphMol, canonical_kinase_domain_sequence: Biosequence) -> List[int]:
+    def _get_kinase_residue_numbers(kinase_domain_structure: oechem.OEGraphMol, kinase_domain_sequence: Biosequence) -> List[int]:
         """
         Get the canonical residue numbers of a kinase domain structure.
         Parameters
         ----------
         kinase_domain_structure: oechem.OEGraphMol
             The kinase domain structure.
-        canonical_kinase_domain_sequence: KinaseDomainAminoAcidSequence
+        kinase_domain_sequence: Biosequence
             The canonical kinase domain sequence.
         Returns
         -------
@@ -1133,14 +1133,14 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
 
         logging.debug("Aligning sequences ...")
         template_sequence, target_sequence = pairwise2.align.globalxs(
-            canonical_kinase_domain_sequence, target_sequence, -10, 0
+            kinase_domain_sequence, target_sequence, -10, 0
         )[0][:2]
         logging.debug(f"Template sequence:\n{template_sequence}")
         logging.debug(f"Target sequence:\n{target_sequence}")
 
         logging.debug("Generating residue numbers ...")
         residue_numbers = []
-        residue_number = canonical_kinase_domain_sequence.metadata["begin"]
+        residue_number = kinase_domain_sequence.metadata["begin"]
         for template_sequence_residue, target_sequence_residue in zip(
             template_sequence, target_sequence
         ):
