@@ -1181,41 +1181,59 @@ def update_residue_identifiers(
     structure: oechem.OEGraphMol
         The OpenEye molecule structure with updated atom and residue ids.
     """
-    # update residue ids
+    # perceive residues to prevent wrong assignment
+    preserved_info = (
+            oechem.OEPreserveResInfo_ResidueNumber
+            | oechem.OEPreserveResInfo_ResidueName
+            | oechem.OEPreserveResInfo_HetAtom
+            | oechem.OEPreserveResInfo_AtomName
+            | oechem.OEPreserveResInfo_FragmentNumber
+            | oechem.OEPreserveResInfo_ChainID
+    )
+    oechem.OEPerceiveResidues(structure, preserved_info)
+
+    # update residue ids of protein and set all chain ids to A
     residue_number = 0
     hierarchical_view = oechem.OEHierView(structure)
     for hv_residue in hierarchical_view.GetResidues():
         residue = hv_residue.GetOEResidue()
         residue.SetChainID("A")
-        if not residue.IsHetAtom() and keep_protein_residue_ids:
-            if (
-                residue.GetName() == "NME"
-                and residue.GetResidueNumber() == residue_number
-            ):
-                # NME residues may have same id as preceding residue
-                residue_number += 1
+        if not residue.IsHetAtom():
+            if keep_protein_residue_ids:
+                if residue.GetName() == "NME":
+                    # NME residues may have same id as preceding residue
+                    residue_number += 1
+                else:
+                    # catch protein residue id if those should not be touched
+                    residue_number = residue.GetResidueNumber()
             else:
-                # catch protein residue id if those should not be touched
-                residue_number = residue.GetResidueNumber()
+                residue_number += 1
+            residue.SetResidueNumber(residue_number)
+            for atom in hv_residue.GetAtoms():
+                oechem.OEAtomSetResidue(atom, residue)
 
-        else:
-            # change residue id
+    # update residue id of everything but protein and water
+    hierarchical_view = oechem.OEHierView(structure)
+    for hv_residue in hierarchical_view.GetResidues():
+        residue = hv_residue.GetOEResidue()
+        if residue.IsHetAtom() and residue.GetName() != "HOH":
             residue_number += 1
-        residue.SetResidueNumber(residue_number)
-        for atom in hv_residue.GetAtoms():
-            oechem.OEAtomSetResidue(atom, residue)
+            residue.SetResidueNumber(residue_number)
+            for atom in hv_residue.GetAtoms():
+                oechem.OEAtomSetResidue(atom, residue)
 
-    # update residue identifiers, except atom names, residue ids,
-    # residue names, fragment number, chain id and record type
-    preserved_info = (
-        oechem.OEPreserveResInfo_ResidueNumber
-        | oechem.OEPreserveResInfo_ResidueName
-        | oechem.OEPreserveResInfo_HetAtom
-        | oechem.OEPreserveResInfo_AtomName
-        | oechem.OEPreserveResInfo_FragmentNumber
-        | oechem.OEPreserveResInfo_ChainID
-    )
-    oechem.OEPerceiveResidues(structure, preserved_info)
+    # update residue ids of water
+    hierarchical_view = oechem.OEHierView(structure)
+    for hv_residue in hierarchical_view.GetResidues():
+        residue = hv_residue.GetOEResidue()
+        if residue.GetName() == "HOH":
+            residue_number += 1
+            residue.SetResidueNumber(residue_number)
+            for atom in hv_residue.GetAtoms():
+                oechem.OEAtomSetResidue(atom, residue)
+
+    # order residues and atoms
+    oechem.OEPDBOrderAtoms(structure)
 
     return structure
 

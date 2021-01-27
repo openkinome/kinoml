@@ -218,10 +218,19 @@ class OEHybridDockingFeaturizer(BaseFeaturizer):
         design_unit.GetLigand(ligand)
 
         # perceive residues to remove artifacts of other design units in the sequence of the protein
-        # preserve chain ID to allow deletion of chains in OEKLIFSKinaseApoFeaturizer._process_kinase_domain method
-        oechem.OEPerceiveResidues(protein, oechem.OEPreserveResInfo_ChainID)
-        oechem.OEPerceiveResidues(solvent, oechem.OEPreserveResInfo_ChainID)
-        oechem.OEPerceiveResidues(ligand, oechem.OEPreserveResInfo_ChainID)
+        # preserve certain properties to assure correct behavior of the pipeline,
+        # e.g. deletion of chains in OEKLIFSKinaseApoFeaturizer._process_kinase_domain method
+        preserved_info = (
+                oechem.OEPreserveResInfo_ResidueNumber
+                | oechem.OEPreserveResInfo_ResidueName
+                | oechem.OEPreserveResInfo_HetAtom
+                | oechem.OEPreserveResInfo_AtomName
+                | oechem.OEPreserveResInfo_FragmentNumber
+                | oechem.OEPreserveResInfo_ChainID
+        )
+        oechem.OEPerceiveResidues(protein, preserved_info)
+        oechem.OEPerceiveResidues(solvent, preserved_info)
+        oechem.OEPerceiveResidues(ligand, preserved_info)
 
         logging.debug(
             "Number of component atoms: " +
@@ -276,7 +285,6 @@ class OEHybridDockingFeaturizer(BaseFeaturizer):
         oechem.OEPlaceHydrogens(assembled_components)
 
         logging.debug("Updating residue identifiers ...")
-        oechem.OEPDBOrderAtoms(assembled_components)
         assembled_components = update_residue_identifiers(assembled_components)
 
         return assembled_components
