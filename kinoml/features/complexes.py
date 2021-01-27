@@ -218,9 +218,10 @@ class OEHybridDockingFeaturizer(BaseFeaturizer):
         design_unit.GetLigand(ligand)
 
         # perceive residues to remove artifacts of other design units in the sequence of the protein
-        oechem.OEPerceiveResidues(protein)
-        oechem.OEPerceiveResidues(solvent)
-        oechem.OEPerceiveResidues(ligand)
+        # preserve chain ID to allow deletion of chains in OEKLIFSKinaseApoFeaturizer._process_kinase_domain method
+        oechem.OEPerceiveResidues(protein, oechem.OEPreserveResInfo_ChainID)
+        oechem.OEPerceiveResidues(solvent, oechem.OEPreserveResInfo_ChainID)
+        oechem.OEPerceiveResidues(ligand, oechem.OEPreserveResInfo_ChainID)
 
         logging.debug(
             "Number of component atoms: " +
@@ -518,7 +519,11 @@ class OEKLIFSKinaseApoFeaturizer(OEHybridDockingFeaturizer):
         prepared_kinase, prepared_solvent = self._get_components(design_unit)[:-1]
 
         logging.debug("Processing kinase domain ...")
-        processed_kinase_domain = self._process_kinase_domain(prepared_kinase, system.protein.sequence)
+        processed_kinase_domain = self._process_kinase_domain(
+            prepared_kinase,
+            system.protein.sequence,
+            kinase_details["structure.chain"]
+        )
 
         logging.debug("Assembling components ...")
         solvated_kinase = self._assemble_components(processed_kinase_domain, prepared_solvent, None)
@@ -793,7 +798,8 @@ class OEKLIFSKinaseApoFeaturizer(OEHybridDockingFeaturizer):
     def _process_kinase_domain(
         self,
         kinase_structure: oechem.OEGraphMol,
-        kinase_domain_sequence: Biosequence
+        kinase_domain_sequence: Biosequence,
+        chain_id: Union[str, None] = None
     ) -> oechem.OEGraphMol:
         """
         Process a kinase domain according to UniProt.
@@ -803,6 +809,8 @@ class OEKLIFSKinaseApoFeaturizer(OEHybridDockingFeaturizer):
             An OpenEye molecule holding the kinase structure to process.
         kinase_domain_sequence: Biosequence
             The kinase domain sequence with associated metadata.
+        chain_id: str or None
+            The chain of the kinase. Other chains will be deleted.
         Returns
         -------
         : oechem.OEGraphMol
@@ -811,12 +819,17 @@ class OEKLIFSKinaseApoFeaturizer(OEHybridDockingFeaturizer):
         from openeye import oechem
 
         from ..modeling.OEModeling import (
+            select_chain,
             apply_deletions,
             apply_insertions,
             apply_mutations,
             renumber_structure,
             prepare_protein
         )
+
+        if chain_id:
+            logging.debug(f"Deleting all chains but {chain_id} ...")
+            kinase_structure = select_chain(kinase_structure, chain_id)
 
         logging.debug("Applying deletions to kinase domain ...")
         kinase_structure = apply_deletions(kinase_structure, kinase_domain_sequence)
@@ -1008,7 +1021,11 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEKLIFSKinaseApoFeaturizer):
         )[0]
 
         logging.debug("Processing kinase domain ...")
-        processed_kinase_domain = self._process_kinase_domain(prepared_kinase, system.protein.sequence)
+        processed_kinase_domain = self._process_kinase_domain(
+            prepared_kinase,
+            system.protein.sequence,
+            protein_template["structure.chain"]
+        )
 
         logging.debug("Checking for co-crystallized ligand ...")
         if (
