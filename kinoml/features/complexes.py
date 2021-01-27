@@ -271,15 +271,8 @@ class OEHybridDockingFeaturizer(BaseFeaturizer):
             if not self._clashing_water(water, ligand, protein):
                 oechem.OEAddMols(assembled_components, water)
 
-        logging.debug("Updating hydrogen positions of water molecules ...")
-        options = oechem.OEPlaceHydrogensOptions()
-        # exclude everything but water from protonation
-        options.SetBypassPredicate(
-            oechem.OENotAtom(
-                oechem.OEIsWater()
-            )
-        )
-        oechem.OEPlaceHydrogens(assembled_components, options)
+        logging.debug("Updating hydrogen positions of assembled components ...")
+        oechem.OEPlaceHydrogens(assembled_components)
 
         logging.debug("Updating residue identifiers ...")
         oechem.OEPDBOrderAtoms(assembled_components)
