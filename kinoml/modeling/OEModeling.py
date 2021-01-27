@@ -213,13 +213,18 @@ def remove_expression_tags(structure):
     # retrieve "SEQADV" records from PDB header
     pdb_data_pairs = oechem.OEGetPDBDataPairs(structure)
     seqadv_records = [datapair.GetValue() for datapair in pdb_data_pairs if datapair.GetTag() == "SEQADV"]
-    expression_tags = [seqadv_record for seqadv_record in seqadv_records if "EXPRESSION TAG" in seqadv_record]
+    labels = ["EXPRESSION TAG", "CLONING ARTIFACT"]
+    artifacts = [
+        seqadv_record
+        for seqadv_record in seqadv_records
+        if any(label in seqadv_record for label in labels)
+    ]
 
     # remove expression tags
-    for expression_tag in expression_tags:
-        chain_id = expression_tag[10]
-        residue_name = expression_tag[6:9]
-        residue_id = int(expression_tag[12:16])
+    for artifact in artifacts:
+        chain_id = artifact[10]
+        residue_name = artifact[6:9]
+        residue_id = int(artifact[12:16])
         hier_view = oechem.OEHierView(structure)
         hier_residue = hier_view.GetResidue(chain_id, residue_name, residue_id)
         for atom in hier_residue.GetAtoms():
