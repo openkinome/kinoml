@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Union, Iterable
+from typing import Iterable
 
 from .components import MolecularComponent
 from .ligands import BaseLigand
@@ -65,22 +65,14 @@ class System:
         )
 
 
-class ProteinLigandComplex(System):
+class Protein(System):
     """
-    A system with at least one protein and one ligand
+    A system with at least one protein
     """
-
-    @property
-    def ligand(self):
-        return list(self._components_by_type(BaseLigand))[0]
 
     @property
     def protein(self):
         return list(self._components_by_type(BaseProtein))[0]
-
-    @property
-    def ligands(self):
-        return list(self._components_by_type(BaseLigand))
 
     @property
     def proteins(self):
@@ -88,11 +80,41 @@ class ProteinLigandComplex(System):
 
     def check(self):  # this is a requirement
         super().check()
-        assert len(list(self.ligands)) >= 1 and len(list(self.proteins)) >= 1, (
-            "A ProteinLigandComplex must specify at least one Ligand and one Protein. "
+        assert len(list(self.proteins)) >= 1, (
+            "A Protein must specify at least one protein. "
             f"Current contents: {self}."
         )
 
-    # Bonus perks!
-    def dock(self):
-        raise NotImplementedError
+
+class Ligand(System):
+    """
+    A system with at least one ligand
+    """
+
+    @property
+    def ligand(self):
+        return list(self._components_by_type(BaseLigand))[0]
+
+    @property
+    def ligands(self):
+        return list(self._components_by_type(BaseLigand))
+
+    def check(self):  # this is a requirement
+        super().check()
+        assert len(list(self.ligands)) >= 1, (
+            "A Ligand must specify at least one ligand. "
+            f"Current contents: {self}."
+        )
+
+
+class ProteinLigandComplex(Protein, Ligand):
+    """
+    A system with at least one protein and one ligand
+    """
+
+    def check(self):  # this is a requirement
+        super().check()
+        assert len(list(self.ligands)) >= 1 and len(list(self.proteins)) >= 1, (
+            "A ProteinLigandComplex must specify at least one ligand and one protein. "
+            f"Current contents: {self}."
+        )

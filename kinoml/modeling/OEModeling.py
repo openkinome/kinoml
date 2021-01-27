@@ -233,6 +233,8 @@ def _prepare_structure(
     electron_density: Union[oegrid.OESkewGrid, None] = None,
     loop_db: Union[str, None] = None,
     ligand_name: Union[str, None] = None,
+    chain_id: Union[str, None] = None,
+    alternate_location: Union[str, None] = None,
     cap_termini: bool = True,
     real_termini: Union[List[int], None] = None,
 ) -> Union[oechem.OEDesignUnit, None]:
@@ -252,6 +254,11 @@ def _prepare_structure(
         at https://docs.eyesopen.com/toolkits/python/sprucetk/examples_make_design_units.html.
     ligand_name: str or None
         The name of the ligand located in the binding pocket of interest.
+    chain_id: str or None
+        The chain id of interest. If chain id is None, best chain will be selected according to OESpruce.
+    alternate_location: str or None
+        The alternate location of interest. If alternate location is None, best alternate location will be selected
+        according to OEChem.
     cap_termini: bool
         If termini should be capped with ACE and NME.
     real_termini: list of int or None
@@ -264,7 +271,7 @@ def _prepare_structure(
     """
 
     def _has_residue_number(atom, residue_numbers=real_termini):
-        """Return True if atom matches any given residue number."""
+        """Returns True if atom matches any given residue number."""
         residue = oechem.OEAtomGetResidue(atom)
         return any(
             [
@@ -273,17 +280,22 @@ def _prepare_structure(
             ]
         )
 
+    def _contains_chain(design_unit, chain_id):
+        """Returns True if design_unit contains protein residues with given chain ID."""
+        protein = oechem.OEGraphMol()
+        design_unit.GetProtein(protein)
+        hier_view = oechem.OEHierView(protein)
+        for hier_chain in hier_view.GetChains():
+            if hier_chain.GetChainID() == chain_id:
+                return True
+        return False
+
     # remove existing OXT atoms, since they prevent proper capping
     predicate = oechem.OEIsHetAtom()
     for atom in structure.GetAtoms():
         if not predicate(atom):
             if atom.GetName().strip() == "OXT":
                 structure.DeleteAtom(atom)
-
-    # select primary alternate location
-    alt_factory = oechem.OEAltLocationFactory(structure)
-    if alt_factory.GetGroupCount() != 0:
-        alt_factory.MakePrimaryAltMol(structure)
 
     structure_metadata = oespruce.OEStructureMetadata()
     design_unit_options = oespruce.OEMakeDesignUnitOptions()
@@ -319,14 +331,6 @@ def _prepare_structure(
                     structure, structure_metadata, design_unit_options
                 )
             )
-            # filter design units for ligand of interest
-            if ligand_name is not None:
-                design_units = [
-                    design_unit
-                    for design_unit in design_units
-                    if ligand_name in design_unit.GetTitle()
-                ]
-
         else:
             design_units = list(
                 oespruce.OEMakeDesignUnits(
@@ -340,9 +344,34 @@ def _prepare_structure(
             )
         )
 
+    # filter design units for ligand of interest
+    if ligand_name is not None:
+        design_units = [
+            design_unit
+            for design_unit in design_units
+            if ligand_name in design_unit.GetTitle()
+        ]
+
+    # filter design units for alternate location of interest
+    if alternate_location is not None:
+        design_units = [
+            design_unit
+            for design_unit in design_units
+            if f"alt{alternate_location}" in design_unit.GetTitle()
+        ]
+
+    # filter design units for chain of interest
+    if chain_id is not None:
+        design_units = [
+            design_unit
+            for design_unit in design_units
+            if _contains_chain(design_unit, chain_id)
+        ]
+
     if len(design_units) >= 1:
         design_unit = design_units[0]
     else:
+        print("No design unit found!")
         # TODO: Returns None if something goes wrong
         return None
 
@@ -354,6 +383,8 @@ def prepare_complex(
     electron_density: Union[oegrid.OESkewGrid, None] = None,
     loop_db: Union[str, None] = None,
     ligand_name: Union[str, None] = None,
+    chain_id: Union[str, None] = None,
+    alternate_location: Union[str, None] = None,
     cap_termini: bool = True,
     real_termini: Union[List[int], None] = None,
 ) -> Union[oechem.OEDesignUnit, None]:
@@ -369,6 +400,11 @@ def prepare_complex(
         Path to OpenEye Spruce loop database.
     ligand_name: str or None
         The name of the ligand located in the binding pocket of interest.
+    chain_id: str or None
+        The chain id of interest. If chain id is None, best chain will be selected according to OESpruce.
+    alternate_location: str or None
+        The alternate location of interest. If alternate location is None, best alternate location will be selected
+        according to OEChem.
     cap_termini: bool
         If termini should be capped with ACE and NME.
     real_termini: list of int or None
@@ -385,6 +421,8 @@ def prepare_complex(
         electron_density=electron_density,
         loop_db=loop_db,
         ligand_name=ligand_name,
+        chain_id=chain_id,
+        alternate_location=alternate_location,
         cap_termini=cap_termini,
         real_termini=real_termini,
     )
@@ -393,6 +431,8 @@ def prepare_complex(
 def prepare_protein(
     protein: oechem.OEGraphMol,
     loop_db: Union[str, None] = None,
+    chain_id: Union[str, None] = None,
+    alternate_location: Union[str, None] = None,
     cap_termini: bool = True,
     real_termini: Union[List[int], None] = None,
 ) -> Union[oechem.OEDesignUnit, None]:
@@ -404,6 +444,11 @@ def prepare_protein(
         An OpenEye molecule holding a structure with protein.
     loop_db: str
         Path to OpenEye Spruce loop database.
+    chain_id: str or None
+        The chain id of interest. If chain id is None, best chain will be selected according to OESpruce.
+    alternate_location: str or None
+        The alternate location of interest. If alternate location is None, best alternate location will be selected
+        according to OEChem.
     cap_termini: bool
         If termini should be capped with ACE and NME.
     real_termini: list of int or None
@@ -417,6 +462,8 @@ def prepare_protein(
     return _prepare_structure(
         structure=protein,
         loop_db=loop_db,
+        chain_id=chain_id,
+        alternate_location=alternate_location,
         cap_termini=cap_termini,
         real_termini=real_termini,
     )
