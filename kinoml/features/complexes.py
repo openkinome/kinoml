@@ -488,6 +488,7 @@ class OEKLIFSKinaseApoFeaturizer(OEHybridDockingFeaturizer):
         if hasattr(system.protein, "pdb_id"):
             kinase_details = self._select_kinase_structure_by_pdb_id(
                 system.protein.pdb_id,
+                system.protein.klifs_kinase_id,
                 system.protein.chain_id,
                 system.protein.alternate_location
             )
@@ -582,8 +583,8 @@ class OEKLIFSKinaseApoFeaturizer(OEHybridDockingFeaturizer):
                 protein.chain_id = None
             if not hasattr(protein, "alternate_location"):
                 protein.alternate_location = None
-            # if pdb id is given, query KLIFS by pdb
-            if hasattr(protein, "pdb_id"):
+            # if pdb id is given but no klifs kinase id, query KLIFS by pdb
+            if hasattr(protein, "pdb_id") and not hasattr(protein, "klifs_kinase_id"):
                 structures = remote.structures.by_structure_pdb_id(
                     protein.pdb_id,
                     protein.alternate_location,
@@ -639,6 +640,7 @@ class OEKLIFSKinaseApoFeaturizer(OEHybridDockingFeaturizer):
     @staticmethod
     def _select_kinase_structure_by_pdb_id(
         pdb_id: str,
+        klifs_kinase_id: int,
         chain_id: Union[str, None] = None,
         alternate_location: Union[str, None] = None,
     ):
@@ -648,6 +650,8 @@ class OEKLIFSKinaseApoFeaturizer(OEHybridDockingFeaturizer):
         ----------
         pdb_id: int
             The PDB identifier.
+        klifs_kinase_id: int
+            KLIFS kinase identifier.
         chain_id: str or None
             The chain of interest.
         alternate_location: str or None
@@ -662,6 +666,7 @@ class OEKLIFSKinaseApoFeaturizer(OEHybridDockingFeaturizer):
         logging.debug("Retrieve kinase structures from KLIFS matching the pdb of interest ...")
         remote = setup_remote()
         structures = remote.structures.by_structure_pdb_id(pdb_id, alternate_location, chain_id)
+        structures = structures[structures["kinase.klifs_id"] == klifs_kinase_id]
 
         if len(structures) == 0:
             raise NotImplementedError(f"No structure found for PDB ID {pdb_id}, chain {chain_id} " +
@@ -825,15 +830,15 @@ class OEKLIFSKinaseApoFeaturizer(OEHybridDockingFeaturizer):
         : oechem.OEGraphMol
             An OpenEye molecule holding the processed kinase structure.
         """
-        from openeye import oechem
 
         from ..modeling.OEModeling import (
             select_chain,
+            assign_caps,
             apply_deletions,
             apply_insertions,
             apply_mutations,
-            renumber_structure,
-            prepare_protein
+            delete_partial_residues,
+            renumber_structure
         )
 
         if chain_id:
@@ -843,12 +848,15 @@ class OEKLIFSKinaseApoFeaturizer(OEHybridDockingFeaturizer):
         logging.debug("Applying deletions to kinase domain ...")
         kinase_structure = apply_deletions(kinase_structure, kinase_domain_sequence)
 
+        logging.debug("Applying mutations to kinase domain ...")
+        kinase_structure = apply_mutations(kinase_structure, kinase_domain_sequence)
+
+        logging.debug("Deleting residues with missing side chain atoms ...")
+        kinase_structure = delete_partial_residues(kinase_structure)
+
         if self.loop_db:
             logging.debug("Applying insertions to kinase domain ...")
             kinase_structure = apply_insertions(kinase_structure, kinase_domain_sequence, self.loop_db)
-
-        logging.debug("Applying mutations to kinase domain ...")
-        kinase_structure = apply_mutations(kinase_structure, kinase_domain_sequence)
 
         logging.debug("Renumbering residues ...")
         residue_numbers = self._get_kinase_residue_numbers(kinase_structure, kinase_domain_sequence)
@@ -864,12 +872,9 @@ class OEKLIFSKinaseApoFeaturizer(OEHybridDockingFeaturizer):
                 real_termini.append(residue_numbers[-1])
         if len(real_termini) == 0:
             real_termini = None
-        logging.debug(f"Applying caps except for real termini {real_termini} ...")
-        design_unit = prepare_protein(kinase_structure, cap_termini=True, real_termini=real_termini)
 
-        logging.debug("Extracting protein ...")
-        processed_kinase_domain = oechem.OEGraphMol()
-        design_unit.GetProtein(processed_kinase_domain)
+        logging.debug(f"Assigning caps except for real termini {real_termini} ...")
+        processed_kinase_domain = assign_caps(kinase_structure, real_termini)
 
         return processed_kinase_domain
 

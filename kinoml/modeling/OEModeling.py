@@ -232,6 +232,57 @@ def remove_expression_tags(structure):
     return structure
 
 
+def assign_caps(
+    structure: oechem.OEGraphMol,
+    real_termini: Union[Iterable[int] or None] = None
+) -> oechem.OEGraphMol:
+    """
+    Cap N and C termini of the given input structure. Real termini can be protected from capping by providing the
+    corresponding residue ids.
+    Parameters
+    ----------
+    structure: oechem.OEGraphMol
+        The OpenEye molecule holding the protein structure to cap.
+    real_termini: iterable of int or None
+        The biologically relevant real termini that shpuld be prevented from capping.
+    Returns
+    -------
+    structure: oechem.GraphMol
+        The OpenEye molecule holding the capped structure.
+    """
+
+    def _has_residue_number(atom, residue_numbers=real_termini):
+        """Returns True if atom matches any given residue number."""
+        residue = oechem.OEAtomGetResidue(atom)
+        return any(
+            [
+                True if residue.GetResidueNumber() == residue_number else False
+                for residue_number in residue_numbers
+            ]
+        )
+
+    # remove existing OXT atoms from non real termini, since they can prevent proper capping
+    predicate = oechem.OEIsHetAtom()
+    for atom in structure.GetAtoms():
+        if not predicate(atom):
+            if atom.GetName().strip() == "OXT":
+                if real_termini:
+                    # exclude real termini from deletion of OXT atoms
+                    residue = oechem.OEAtomGetResidue(atom)
+                    if not residue.GetResidueNumber() in real_termini:
+                        structure.DeleteAtom(atom)
+                else:
+                    structure.DeleteAtom(atom)
+
+    # cap all termini but biologically real termini
+    if real_termini:
+        oespruce.OECapTermini(structure, oechem.PyAtomPredicate(_has_residue_number))
+    else:
+        oespruce.OECapTermini(structure)
+
+    return structure
+
+
 def _prepare_structure(
     structure: oechem.OEGraphMol,
     has_ligand: bool = False,
@@ -275,16 +326,6 @@ def _prepare_structure(
         units.
     """
 
-    def _has_residue_number(atom, residue_numbers=real_termini):
-        """Returns True if atom matches any given residue number."""
-        residue = oechem.OEAtomGetResidue(atom)
-        return any(
-            [
-                True if residue.GetResidueNumber() == residue_number else False
-                for residue_number in residue_numbers
-            ]
-        )
-
     def _contains_chain(design_unit, chain_id):
         """Returns True if design_unit contains protein residues with given chain ID."""
         protein = oechem.OEGraphMol()
@@ -295,12 +336,9 @@ def _prepare_structure(
                 return True
         return False
 
-    # remove existing OXT atoms, since they prevent proper capping
-    predicate = oechem.OEIsHetAtom()
-    for atom in structure.GetAtoms():
-        if not predicate(atom):
-            if atom.GetName().strip() == "OXT":
-                structure.DeleteAtom(atom)
+    # assign ACE and NME caps except for real termini
+    if cap_termini:
+        structure = assign_caps(structure, real_termini)
 
     structure_metadata = oespruce.OEStructureMetadata()
     design_unit_options = oespruce.OEMakeDesignUnitOptions()
@@ -308,10 +346,9 @@ def _prepare_structure(
     design_unit_options.GetPrepOptions().GetBuildOptions().GetLoopBuilderOptions().SetSeqAlignMethod(1)
     design_unit_options.GetPrepOptions().GetBuildOptions().GetLoopBuilderOptions().SetSeqAlignGapPenalty(-1)
     design_unit_options.GetPrepOptions().GetBuildOptions().GetLoopBuilderOptions().SetSeqAlignExtendPenalty(0)
-    # capping options
-    if cap_termini is False:
-        design_unit_options.GetPrepOptions().GetBuildOptions().SetCapCTermini(False)
-        design_unit_options.GetPrepOptions().GetBuildOptions().SetCapNTermini(False)
+    # capping options, capping done separately
+    design_unit_options.GetPrepOptions().GetBuildOptions().SetCapCTermini(False)
+    design_unit_options.GetPrepOptions().GetBuildOptions().SetCapNTermini(False)
     # provide path to loop database
     if loop_db is not None:
         from pathlib import Path
@@ -320,13 +357,6 @@ def _prepare_structure(
         design_unit_options.GetPrepOptions().GetBuildOptions().GetLoopBuilderOptions().SetLoopDBFilename(
             loop_db
         )
-
-    # cap all termini but biologically real termini
-    if real_termini is not None and cap_termini is True:
-        oespruce.OECapTermini(structure, oechem.PyAtomPredicate(_has_residue_number))
-        # already capped, preserve biologically real termini
-        design_unit_options.GetPrepOptions().GetBuildOptions().SetCapCTermini(False)
-        design_unit_options.GetPrepOptions().GetBuildOptions().SetCapNTermini(False)
 
     # make design units
     if has_ligand:
@@ -952,6 +982,7 @@ def apply_insertions(
         An OpenEye molecule holding the protein structure with applied insertions.
     """
     from pathlib import Path
+    import re
 
     from Bio import pairwise2
 
@@ -959,62 +990,46 @@ def apply_insertions(
     loop_options = oespruce.OELoopBuilderOptions()
     loop_db = str(Path(loop_db).expanduser().resolve())
     loop_options.SetLoopDBFilename(loop_db)
-    # the hierarchy view is more stable if reinitialized after each change
-    # https://docs.eyesopen.com/toolkits/python/oechemtk/biopolymers.html#a-hierarchy-view
-    finished = False
-    while not finished:
-        altered = False
-        # align template and target sequences
-        target_sequence = get_sequence(target_structure)
-        template_sequence_aligned, target_sequence_aligned = pairwise2.align.globalxs(
-            template_sequence, target_sequence, -1, 0
-        )[0][:2]
-        logging.debug(f"Template sequence:\n{template_sequence_aligned}")
-        logging.debug(f"Target sequence:\n{target_sequence_aligned}")
-        hierview = oechem.OEHierView(target_structure)
-        structure_residues = hierview.GetResidues()
-        gap_sequence = ""
-        gap_start = False
-        structure_residue = False
-        # adjust target structure to match template sequence
-        for template_sequence_residue, target_sequence_residue in zip(
-                template_sequence_aligned, target_sequence_aligned
+    # align template and target sequences
+    target_sequence = get_sequence(target_structure)
+    template_sequence_aligned, target_sequence_aligned = pairwise2.align.globalxs(
+        template_sequence, target_sequence, -1, 0
+    )[0][:2]
+    logging.debug(f"Template sequence:\n{template_sequence_aligned}")
+    logging.debug(f"Target sequence:\n{target_sequence_aligned}")
+    hierview = oechem.OEHierView(target_structure)
+    structure_residues = list(hierview.GetResidues())
+    gaps = re.finditer("[^-][-]+[^-]", target_sequence_aligned)
+    for gap in gaps:
+        gap_start = gap.start() - target_sequence_aligned[:gap.start() + 1].count("-")
+        start_residue = structure_residues[gap_start]
+        end_residue = structure_residues[gap_start + 1]
+        gap_sequence = template_sequence_aligned[gap.start() + 1:gap.end() - 1]
+        modeled_structure = oechem.OEMol()
+        logging.debug(f"Trying to build loop {gap_sequence} " +
+                      f"between residues {start_residue.GetResidueNumber()}" +
+                      f" and {end_residue.GetResidueNumber()} ...")
+        # build loop and reinitialize if successful
+        if oespruce.OEBuildSingleLoop(
+                modeled_structure,
+                target_structure,
+                gap_sequence,
+                start_residue.GetOEResidue(),
+                end_residue.GetOEResidue(),
+                sidechain_options,
+                loop_options
         ):
-            # check for gap and make sure missing sequence at N terminus is ignored
-            if target_sequence_residue == "-" and structure_residue:
-                # get last residue before gap and store gap sequence
-                gap_start = structure_residue.GetOEResidue()
-                gap_sequence += template_sequence_residue
-            # iterate over structure residues and check for gap end
-            if target_sequence_residue != "-":
-                structure_residue = structure_residues.next()
-                # existing gap_starts indicates gap end
-                if isinstance(gap_start, oechem.OEResidue):
-                    # get first residue after gap end
-                    gap_end = structure_residue.GetOEResidue()
-                    modeled_structure = oechem.OEMol()
-                    logging.debug(f"Trying to build loop {gap_sequence} " +
-                                  f"between residues {gap_start.GetResidueNumber()}" +
-                                  f" and {gap_end.GetResidueNumber()} ...")
-                    # build loop and reinitialize if successful
-                    if oespruce.OEBuildSingleLoop(
-                        modeled_structure,
-                        target_structure,
-                        gap_sequence,
-                        gap_start,
-                        gap_end,
-                        sidechain_options,
-                        loop_options
-                    ):
-                        # break loop and reinitialize
-                        target_structure = oechem.OEGraphMol(modeled_structure)
-                        altered = True
-                        break
-                    # TODO: else, make sure gap_start and gap_end are not connected,
-                    #       since this may indicate an isoform specific insertion
-        # leave while loop if no changes were introduced
-        if not altered:
-            finished = True
+            # break loop and reinitialize
+            # the hierarchy view is more stable if reinitialized after each change
+            # https://docs.eyesopen.com/toolkits/python/oechemtk/biopolymers.html#a-hierarchy-view
+            logging.debug("Successfully built loop!")
+            target_structure = oechem.OEGraphMol(modeled_structure)
+            hierview = oechem.OEHierView(target_structure)
+            structure_residues = list(hierview.GetResidues())
+        else:
+            logging.debug("Failed building loop!")
+            # TODO: else, make sure gap_start and gap_end are not connected,
+            #       since this may indicate an isoform specific insertion
 
     return target_structure
 
@@ -1063,22 +1078,24 @@ def apply_mutations(
                 if template_sequence_residue != "-":
                     if target_sequence_residue != template_sequence_residue:
                         # mutate and reinitialize if successful
-                        structure_residue = structure_residue.GetOEResidue()
+                        oeresidue = structure_residue.GetOEResidue()
                         three_letter_code = oechem.OEGetResidueName(
                             oechem.OEGetResidueIndexFromCode(template_sequence_residue)
                         )
                         logging.debug("Trying to perform mutation " +
-                                      f"{structure_residue.GetName()}{structure_residue.GetResidueNumber()}" +
+                                      f"{oeresidue.GetName()}{oeresidue.GetResidueNumber()}" +
                                       f"{three_letter_code} ...")
                         if oespruce.OEMutateResidue(
-                            target_structure, structure_residue, three_letter_code
+                            target_structure, oeresidue, three_letter_code
                         ):
-                            logging.debug("Success!")
+                            logging.debug("Successfully mutated residue!")
                             # break loop and reinitialize
                             altered = True
                             break
                         else:
-                            logging.debug("Fail!")
+                            logging.debug("Mutation failed! Deleting residue ...")
+                            for atom in structure_residue.GetAtoms():
+                                target_structure.DeleteAtom(atom)
         # leave while loop if no changes were introduced
         if not altered:
             finished = True
@@ -1089,6 +1106,42 @@ def apply_mutations(
     oechem.OEPerceiveResidues(target_structure, oechem.OEPreserveResInfo_All)
 
     return target_structure
+
+
+def delete_partial_residues(structure: oechem.OEGraphMol) -> oechem.OEGraphMol:
+    """
+    Delete residues with missing side chain atoms.
+    Parameters
+    ----------
+    structure: oechem.OEGraphMol
+        An OpenEye molecule holding a protein structure.
+    Returns
+    -------
+    structure: oechem.OEGraphMol
+        An OpenEye molecule holding only residues with completely modeled side chains.
+    """
+    # try to build missing sidechains
+    oespruce.OEBuildSidechains(structure)
+
+    # find residues with missing sidechain atoms
+    incomplete_residues = oespruce.OEGetPartialResidues(structure)
+
+    # delete atoms
+    for incomplete_residue in incomplete_residues:
+        logging.debug(
+            f"Deleting residue {incomplete_residue.GetName()}"
+            f"{incomplete_residue.GetResidueNumber()}"
+        )
+        hier_view = oechem.OEHierView(structure)
+        structure_residue = hier_view.GetResidue(
+            incomplete_residue.GetChainID(),
+            incomplete_residue.GetName(),
+            incomplete_residue.GetResidueNumber()
+        )
+        for atom in structure_residue.GetAtoms():
+            structure.DeleteAtom(atom)
+
+    return structure
 
 
 def renumber_structure(
@@ -1239,6 +1292,18 @@ def update_residue_identifiers(
 
     # order residues and atoms
     oechem.OEPDBOrderAtoms(structure)
+
+    # update residue identifiers, except atom names, residue ids,
+    # residue names, fragment number, chain id and record type
+    preserved_info = (
+            oechem.OEPreserveResInfo_ResidueNumber
+            | oechem.OEPreserveResInfo_ResidueName
+            | oechem.OEPreserveResInfo_HetAtom
+            | oechem.OEPreserveResInfo_AtomName
+            | oechem.OEPreserveResInfo_FragmentNumber
+            | oechem.OEPreserveResInfo_ChainID
+    )
+    oechem.OEPerceiveResidues(structure, preserved_info)
 
     return structure
 
