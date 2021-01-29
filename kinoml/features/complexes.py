@@ -217,6 +217,12 @@ class OEHybridDockingFeaturizer(BaseFeaturizer):
         design_unit.GetSolvent(solvent)
         design_unit.GetLigand(ligand)
 
+        # delete protein atoms with no name (found in prepared protein of 4ll0)
+        for atom in protein.GetAtoms():
+            if not atom.GetName().strip():
+                logging.debug("Deleting unknown atom ...")
+                protein.DeleteAtom(atom)
+
         # perceive residues to remove artifacts of other design units in the sequence of the protein
         # preserve certain properties to assure correct behavior of the pipeline,
         # e.g. deletion of chains in OEKLIFSKinaseApoFeaturizer._process_kinase_domain method
