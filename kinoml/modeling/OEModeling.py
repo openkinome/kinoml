@@ -933,8 +933,11 @@ def apply_deletions(
      : oechem.OEGraphMol
         An OpenEye molecule holding the protein structure with applied deletions.
     """
+    import re
+
     from Bio import pairwise2
 
+    # align template and target sequences
     target_sequence = get_sequence(target_structure)
     template_sequence_aligned, target_sequence_aligned = pairwise2.align.globalxs(
         template_sequence, target_sequence, -1, 0
@@ -942,18 +945,17 @@ def apply_deletions(
     logging.debug(f"Template sequence:\n{template_sequence_aligned}")
     logging.debug(f"Target sequence:\n{target_sequence_aligned}")
     hierview = oechem.OEHierView(target_structure)
-    structure_residues = hierview.GetResidues()
-    structure_residue = False
-    # adjust target structure to match template sequence
-    for template_sequence_residue, target_sequence_residue in zip(
-            template_sequence_aligned, target_sequence_aligned
-    ):
-        # iterate over structure residues
-        if target_sequence_residue != "-":
-            structure_residue = structure_residues.next()
-        # delete any residue from target structure not covered by target sequence
-        if template_sequence_residue == "-" and structure_residue:
-            for atom in structure_residue.GetAtoms():
+    structure_residues = list(hierview.GetResidues())
+    insertions = re.finditer("[^-][-]+[^-]", template_sequence_aligned)
+    for insertion in insertions:
+        insertion_start = insertion.start() - target_sequence_aligned[:insertion.start() + 1].count("-")
+        insertion_end = insertion.end() - target_sequence_aligned[:insertion.end() + 1].count("-")
+        insertion_residues = structure_residues[insertion_start:insertion_end]
+        logging.debug(f"Deleting residues {insertion_residues[0].GetResidueNumber()}-"
+                      f"{insertion_residues[-1].GetResidueNumber()} ...")
+        # delete atoms
+        for insertion_residue in insertion_residues:
+            for atom in insertion_residue.GetAtoms():
                 target_structure.DeleteAtom(atom)
 
     return target_structure
@@ -986,50 +988,59 @@ def apply_insertions(
 
     from Bio import pairwise2
 
-    sidechain_options = oespruce.OESidechainBuilderOptions()
-    loop_options = oespruce.OELoopBuilderOptions()
-    loop_db = str(Path(loop_db).expanduser().resolve())
-    loop_options.SetLoopDBFilename(loop_db)
-    # align template and target sequences
-    target_sequence = get_sequence(target_structure)
-    template_sequence_aligned, target_sequence_aligned = pairwise2.align.globalxs(
-        template_sequence, target_sequence, -1, 0
-    )[0][:2]
-    logging.debug(f"Template sequence:\n{template_sequence_aligned}")
-    logging.debug(f"Target sequence:\n{target_sequence_aligned}")
-    hierview = oechem.OEHierView(target_structure)
-    structure_residues = list(hierview.GetResidues())
-    gaps = re.finditer("[^-][-]+[^-]", target_sequence_aligned)
-    for gap in gaps:
-        gap_start = gap.start() - target_sequence_aligned[:gap.start() + 1].count("-")
-        start_residue = structure_residues[gap_start]
-        end_residue = structure_residues[gap_start + 1]
-        gap_sequence = template_sequence_aligned[gap.start() + 1:gap.end() - 1]
-        modeled_structure = oechem.OEMol()
-        logging.debug(f"Trying to build loop {gap_sequence} " +
-                      f"between residues {start_residue.GetResidueNumber()}" +
-                      f" and {end_residue.GetResidueNumber()} ...")
-        # build loop and reinitialize if successful
-        if oespruce.OEBuildSingleLoop(
-                modeled_structure,
-                target_structure,
-                gap_sequence,
-                start_residue.GetOEResidue(),
-                end_residue.GetOEResidue(),
-                sidechain_options,
-                loop_options
-        ):
-            # break loop and reinitialize
-            # the hierarchy view is more stable if reinitialized after each change
-            # https://docs.eyesopen.com/toolkits/python/oechemtk/biopolymers.html#a-hierarchy-view
-            logging.debug("Successfully built loop!")
-            target_structure = oechem.OEGraphMol(modeled_structure)
-            hierview = oechem.OEHierView(target_structure)
-            structure_residues = list(hierview.GetResidues())
-        else:
-            logging.debug("Failed building loop!")
-            # TODO: else, make sure gap_start and gap_end are not connected,
-            #       since this may indicate an isoform specific insertion
+    # the hierarchy view is more stable if reinitialized after each change
+    # https://docs.eyesopen.com/toolkits/python/oechemtk/biopolymers.html#a-hierarchy-view
+    finished = False
+    while not finished:
+        altered = False
+        sidechain_options = oespruce.OESidechainBuilderOptions()
+        loop_options = oespruce.OELoopBuilderOptions()
+        loop_db = str(Path(loop_db).expanduser().resolve())
+        loop_options.SetLoopDBFilename(loop_db)
+        # align template and target sequences
+        target_sequence = get_sequence(target_structure)
+        template_sequence_aligned, target_sequence_aligned = pairwise2.align.globalxs(
+            template_sequence, target_sequence, -1, 0
+        )[0][:2]
+        logging.debug(f"Template sequence:\n{template_sequence_aligned}")
+        logging.debug(f"Target sequence:\n{target_sequence_aligned}")
+        hierview = oechem.OEHierView(target_structure)
+        structure_residues = list(hierview.GetResidues())
+        gaps = re.finditer("[^-][-]+[^-]", target_sequence_aligned)
+        for gap in gaps:
+            gap_start = gap.start() - target_sequence_aligned[:gap.start() + 1].count("-")
+            start_residue = structure_residues[gap_start]
+            end_residue = structure_residues[gap_start + 1]
+            gap_sequence = template_sequence_aligned[gap.start() + 1:gap.end() - 1]
+            modeled_structure = oechem.OEMol()
+            logging.debug(f"Trying to build loop {gap_sequence} " +
+                          f"between residues {start_residue.GetResidueNumber()}" +
+                          f" and {end_residue.GetResidueNumber()} ...")
+            # build loop and reinitialize if successful
+            if oespruce.OEBuildSingleLoop(
+                    modeled_structure,
+                    target_structure,
+                    gap_sequence,
+                    start_residue.GetOEResidue(),
+                    end_residue.GetOEResidue(),
+                    sidechain_options,
+                    loop_options
+            ):
+                # break loop and reinitialize
+                # the hierarchy view is more stable if reinitialized after each change
+                # https://docs.eyesopen.com/toolkits/python/oechemtk/biopolymers.html#a-hierarchy-view
+                logging.debug("Successfully built loop!")
+                target_structure = oechem.OEGraphMol(modeled_structure)
+                # break loop and reinitialize
+                altered = True
+                break
+            else:
+                logging.debug("Failed building loop!")
+                # TODO: else, make sure gap_start and gap_end are not connected,
+                #       since this may indicate an isoform specific insertion
+        # leave while loop if no changes were introduced
+        if not altered:
+            finished = True
 
     return target_structure
 
@@ -1094,8 +1105,11 @@ def apply_mutations(
                             break
                         else:
                             logging.debug("Mutation failed! Deleting residue ...")
-                            for atom in structure_residue.GetAtoms():
-                                target_structure.DeleteAtom(atom)
+                            # deleting atoms via structure_residue.GetAtoms()
+                            # results in segmentation fault for 2itv
+                            for atom in target_structure.GetAtoms():
+                                if oechem.OEAtomGetResidue(atom) == oeresidue:
+                                    target_structure.DeleteAtom(atom)
         # leave while loop if no changes were introduced
         if not altered:
             finished = True
