@@ -1,5 +1,5 @@
 import logging
-from typing import List, Set, Union, Iterable
+from typing import List, Set, Union, Iterable, Tuple
 
 from openeye import oechem, oegrid, oespruce
 import pandas as pd
@@ -327,12 +327,33 @@ def _prepare_structure(
     """
 
     def _contains_chain(design_unit, chain_id):
-        """Returns True if design_unit contains protein residues with given chain ID."""
-        protein = oechem.OEGraphMol()
-        design_unit.GetProtein(protein)
-        hier_view = oechem.OEHierView(protein)
+        """Returns True if the design unit contains protein residues with given chain ID."""
+        all_components = oechem.OEGraphMol()
+        design_unit.GetComponents(all_components, oechem.OEDesignUnitComponents_All)
+        hier_view = oechem.OEHierView(all_components)
         for hier_chain in hier_view.GetChains():
             if hier_chain.GetChainID() == chain_id:
+                return True
+        return False
+
+    def _contains_resname(design_unit, resname):
+        """Returns True if the design unit contains a residue with given residue name."""
+        all_components = oechem.OEGraphMol()
+        design_unit.GetComponents(all_components, oechem.OEDesignUnitComponents_All)
+        hier_view = oechem.OEHierView(all_components)
+        for hier_residue in hier_view.GetResidues():
+            if hier_residue.GetResidueName() == resname:
+                return True
+        return False
+
+    def _contains_alternate_location(design_unit, alternate_location):
+        """Returns True if the design unit contains a residue with the given alternate location."""
+        all_components = oechem.OEGraphMol()
+        design_unit.GetComponents(all_components, oechem.OEDesignUnitComponents_All)
+        hier_view = oechem.OEHierView(all_components)
+        for hier_residue in hier_view.GetResidues():
+            oe_residue = hier_residue.GetOEResidue()
+            if oe_residue.GetAlternateLocation() == alternate_location:
                 return True
         return False
 
@@ -340,10 +361,15 @@ def _prepare_structure(
     if cap_termini:
         structure = assign_caps(structure, real_termini)
 
+    # delete loose protein residues
+    structure = delete_loose_residues(structure)
+
     structure_metadata = oespruce.OEStructureMetadata()
     design_unit_options = oespruce.OEMakeDesignUnitOptions()
     # alignment options, only matches are important
-    design_unit_options.GetPrepOptions().GetBuildOptions().GetLoopBuilderOptions().SetSeqAlignMethod(1)
+    design_unit_options.GetPrepOptions().GetBuildOptions().GetLoopBuilderOptions().SetSeqAlignMethod(
+        oechem.OESeqAlignmentMethod_Identity
+    )
     design_unit_options.GetPrepOptions().GetBuildOptions().GetLoopBuilderOptions().SetSeqAlignGapPenalty(-1)
     design_unit_options.GetPrepOptions().GetBuildOptions().GetLoopBuilderOptions().SetSeqAlignExtendPenalty(0)
     # capping options, capping done separately
@@ -384,7 +410,7 @@ def _prepare_structure(
         design_units = [
             design_unit
             for design_unit in design_units
-            if ligand_name in design_unit.GetTitle()
+            if _contains_resname(design_unit, ligand_name)
         ]
 
     # filter design units for alternate location of interest
@@ -392,7 +418,7 @@ def _prepare_structure(
         design_units = [
             design_unit
             for design_unit in design_units
-            if f"alt{alternate_location}" in design_unit.GetTitle()
+            if _contains_alternate_location(design_unit, alternate_location)
         ]
 
     # filter design units for chain of interest
@@ -915,6 +941,97 @@ def get_sequence(structure: oechem.OEGraphMol) -> str:
     return sequence
 
 
+def get_structure_sequence_alignment(
+    structure: oechem.OEGraphMol, sequence: str
+) -> Tuple[str, str]:
+    """
+    Generate an alignment between a protein structure and an amino acid sequence. The provided protein structure should
+    only contain protein residues to prevent unexpected behavior. Also, this alignment only works for highly similar
+    sequences, i.e. only few mutations, deletions and insertions.
+    Parameters
+    ----------
+    structure: oechem.OEGraphMol
+        An OpenEye molecule holding a protein structure.
+    sequence: str
+        A one letter amino acid sequence.
+    Returns
+    -------
+     structure_sequence_aligned: str
+        The aligned protein structure sequence with gaps denoted as "-".
+    sequence_aligned: str
+        The aligned amino acid sequence with gaps denoted as "-".
+    """
+    import re
+
+    from Bio import pairwise2
+
+    def _connected_residues(residue1, residue2):
+        """Check if OEResidues are connected."""
+        for atom1 in residue1.GetAtoms():
+            for atom2 in residue2.GetAtoms():
+                if atom1.GetBond(atom2):
+                    return True
+        return False
+
+    # align template and target sequences
+    target_sequence = get_sequence(structure)
+    sequence_aligned, structure_sequence_aligned = pairwise2.align.globalxs(
+        sequence,
+        target_sequence,
+        open=-1,
+        extend=0
+    )[0][:2]
+
+    # correct alignments involving gaps
+    hierview = oechem.OEHierView(structure)
+    structure_residues = list(hierview.GetResidues())
+    gaps = re.finditer("[^-][-]+[^-]", structure_sequence_aligned)
+    for gap in gaps:
+        gap_start = gap.start() - structure_sequence_aligned[:gap.start() + 1].count("-")
+        start_residue = structure_residues[gap_start - 1]
+        end_residue = structure_residues[gap_start]
+        gap_sequence = sequence_aligned[gap.start():gap.end() - 2]
+        # check for connected residues, which could indicate are wrong alignment
+        # e.g. ABEDEFG     ABEDEFG
+        #      ABE--FG <-> AB--EFG
+        if _connected_residues(structure_residues[gap_start],
+                               structure_residues[gap_start + 1]):
+            # check if gap involves last residue but is connected
+            if gap.end() == len(structure_sequence_aligned):
+                structure_sequence_aligned = (
+                        structure_sequence_aligned[:gap.start() + 1] +
+                        gap.group()[1:][::-1] +
+                        structure_sequence_aligned[gap.end():]
+                )
+            else:
+                # check two ways to invert gap
+                if not _connected_residues(structure_residues[gap_start - 1],
+                                           structure_residues[gap_start]):
+                    structure_sequence_aligned = (
+                            structure_sequence_aligned[:gap.start()] +
+                            gap.group()[:-1][::-1] +
+                            structure_sequence_aligned[gap.end() - 1:]
+                    )
+                elif not _connected_residues(structure_residues[gap_start + 1],
+                                             structure_residues[gap_start + 2]):
+                    structure_sequence_aligned = (
+                            structure_sequence_aligned[:gap.start() + 1] +
+                            gap.group()[1:][::-1] +
+                            structure_sequence_aligned[gap.end():]
+                    )
+                else:
+                    logging.debug(
+                        f"Alignment contains insertion with sequence {gap_sequence}" +
+                        f"between bonded residues {start_residue.GetResidueNumber()}" +
+                        f" and {end_residue.GetResidueNumber()}, " +
+                        "keeping original alignment ..."
+                    )
+                    continue
+            logging.debug("Correcting sequence gap ...")
+
+    return structure_sequence_aligned, sequence_aligned
+
+
 def apply_deletions(
     target_structure: oechem.OEGraphMol, template_sequence: str
 ) -> oechem.OEGraphMol:
@@ -935,13 +1052,9 @@ def apply_deletions(
     """
     import re
 
-    from Bio import pairwise2
-
     # align template and target sequences
-    target_sequence = get_sequence(target_structure)
-    template_sequence_aligned, target_sequence_aligned = pairwise2.align.globalxs(
-        template_sequence, target_sequence, -1, 0
-    )[0][:2]
+    target_sequence_aligned, template_sequence_aligned = get_structure_sequence_alignment(
+        target_structure, template_sequence)
     logging.debug(f"Template sequence:\n{template_sequence_aligned}")
     logging.debug(f"Target sequence:\n{target_sequence_aligned}")
     hierview = oechem.OEHierView(target_structure)
@@ -986,27 +1099,24 @@ def apply_insertions(
     from pathlib import Path
     import re
 
-    from Bio import pairwise2
-
+    sidechain_options = oespruce.OESidechainBuilderOptions()
+    loop_options = oespruce.OELoopBuilderOptions()
+    loop_db = str(Path(loop_db).expanduser().resolve())
+    loop_options.SetLoopDBFilename(loop_db)
     # the hierarchy view is more stable if reinitialized after each change
     # https://docs.eyesopen.com/toolkits/python/oechemtk/biopolymers.html#a-hierarchy-view
     finished = False
     while not finished:
         altered = False
-        sidechain_options = oespruce.OESidechainBuilderOptions()
-        loop_options = oespruce.OELoopBuilderOptions()
-        loop_db = str(Path(loop_db).expanduser().resolve())
-        loop_options.SetLoopDBFilename(loop_db)
         # align template and target sequences
-        target_sequence = get_sequence(target_structure)
-        template_sequence_aligned, target_sequence_aligned = pairwise2.align.globalxs(
-            template_sequence, target_sequence, -1, 0
-        )[0][:2]
+        target_sequence_aligned, template_sequence_aligned = get_structure_sequence_alignment(
+            target_structure, template_sequence)
         logging.debug(f"Template sequence:\n{template_sequence_aligned}")
         logging.debug(f"Target sequence:\n{target_sequence_aligned}")
         hierview = oechem.OEHierView(target_structure)
         structure_residues = list(hierview.GetResidues())
-        gaps = re.finditer("[^-][-]+[^-]", target_sequence_aligned)
+        gaps = list(re.finditer("[^-][-]+[^-]", target_sequence_aligned))
+        gaps = sorted(gaps, key=lambda match: len(match.group()))
         for gap in gaps:
             gap_start = gap.start() - target_sequence_aligned[:gap.start() + 1].count("-")
             start_residue = structure_residues[gap_start]
@@ -1027,8 +1137,6 @@ def apply_insertions(
                     loop_options
             ):
                 # break loop and reinitialize
-                # the hierarchy view is more stable if reinitialized after each change
-                # https://docs.eyesopen.com/toolkits/python/oechemtk/biopolymers.html#a-hierarchy-view
                 logging.debug("Successfully built loop!")
                 target_structure = oechem.OEGraphMol(modeled_structure)
                 # break loop and reinitialize
@@ -1036,8 +1144,6 @@ def apply_insertions(
                 break
             else:
                 logging.debug("Failed building loop!")
-                # TODO: else, make sure gap_start and gap_end are not connected,
-                #       since this may indicate an isoform specific insertion
         # leave while loop if no changes were introduced
         if not altered:
             finished = True
@@ -1063,18 +1169,14 @@ def apply_mutations(
      : oechem.OEGraphMol
         An OpenEye molecule holding the mutated protein structure.
     """
-    from Bio import pairwise2
-
     # the hierarchy view is more stable if reinitialized after each change
     # https://docs.eyesopen.com/toolkits/python/oechemtk/biopolymers.html#a-hierarchy-view
     finished = False
     while not finished:
         altered = False
         # align template and target sequences
-        target_sequence = get_sequence(target_structure)
-        template_sequence_aligned, target_sequence_aligned = pairwise2.align.globalxs(
-            template_sequence, target_sequence, -1, 0
-        )[0][:2]
+        target_sequence_aligned, template_sequence_aligned = get_structure_sequence_alignment(
+            target_structure, template_sequence)
         logging.debug(f"Template sequence:\n{template_sequence_aligned}")
         logging.debug(f"Target sequence:\n{target_sequence_aligned}")
         hierview = oechem.OEHierView(target_structure)
@@ -1154,6 +1256,56 @@ def delete_partial_residues(structure: oechem.OEGraphMol) -> oechem.OEGraphMol:
         )
         for atom in structure_residue.GetAtoms():
             structure.DeleteAtom(atom)
+
+    return structure
+
+
+def delete_loose_residues(structure: oechem.OEGraphMol) -> oechem.OEGraphMol:
+    """
+    Delete residues that are not bonded to any other residue.
+    Parameters
+    ----------
+    structure: oechem.OEGraphMol
+        An OpenEye molecule holding with possibly loose residues.
+    Returns
+    -------
+    structure: oechem.OEGraphMol
+        An OpenEye molecule holding without loose residues.
+    """
+    # iterate over protein residues
+    # defined by C alpha atoms that are not hetero atoms
+    for atom in structure.GetAtoms(
+        oechem.OEAndAtom(
+            oechem.OEIsCAlpha(), oechem.OENotAtom(
+                oechem.OEIsHetAtom()
+            )
+        )
+    ):
+        connected_residues = 0
+        # get neighboring backbone atoms
+        for connected_atom in atom.GetAtoms(
+            oechem.OEIsBackboneAtom()
+        ):
+            # get neighboring backbone carbon or  nitrogen atoms that are not C alpha atoms
+            # which will be from the neighboring residues
+            for _ in connected_atom.GetAtoms(
+                oechem.OEOrAtom(
+                    oechem.OEIsNitrogen(),
+                    oechem.OEAndAtom(
+                        oechem.OEIsCarbon(),
+                        oechem.OENotAtom(
+                            oechem.OEIsCAlpha()
+                        )  
+                    )
+                )
+            ):
+                connected_residues += 1
+        # delete residues with less than 1 neighbor
+        if connected_residues < 1:
+            residue = oechem.OEAtomGetResidue(atom)
+            logging.debug(f"Deleting loose residue {residue.GetName()}{residue.GetResidueNumber()}...")
+            for residue_atom in structure.GetAtoms(oechem.OEAtomIsInResidue(residue)):
+                structure.DeleteAtom(residue_atom)
 
     return structure
 

@@ -844,6 +844,7 @@ class OEKLIFSKinaseApoFeaturizer(OEHybridDockingFeaturizer):
             apply_insertions,
             apply_mutations,
             delete_partial_residues,
+            delete_loose_residues,
             renumber_structure
         )
 
@@ -859,6 +860,9 @@ class OEKLIFSKinaseApoFeaturizer(OEHybridDockingFeaturizer):
 
         logging.debug("Deleting residues with missing side chain atoms ...")
         kinase_structure = delete_partial_residues(kinase_structure)
+
+        logging.debug("Deleting loose residues ...")
+        kinase_structure = delete_loose_residues(kinase_structure)
 
         if self.loop_db:
             logging.debug("Applying insertions to kinase domain ...")
@@ -902,16 +906,11 @@ class OEKLIFSKinaseApoFeaturizer(OEHybridDockingFeaturizer):
         residue_number: list of int
             A list of canonical residue numbers in the same order as the residues in the given kinase domain structure.
         """
-        from Bio import pairwise2
-        from kinoml.modeling.OEModeling import get_sequence
-
-        logging.debug("Getting sequence of given kinase domain ...")
-        target_sequence = get_sequence(kinase_domain_structure)
+        from kinoml.modeling.OEModeling import get_structure_sequence_alignment
 
         logging.debug("Aligning sequences ...")
-        template_sequence, target_sequence = pairwise2.align.globalxs(
-            kinase_domain_sequence, target_sequence, -10, 0
-        )[0][:2]
+        target_sequence, template_sequence = get_structure_sequence_alignment(
+            kinase_domain_structure, kinase_domain_sequence)
         logging.debug(f"Template sequence:\n{template_sequence}")
         logging.debug(f"Target sequence:\n{target_sequence}")
 
