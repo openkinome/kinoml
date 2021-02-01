@@ -845,6 +845,7 @@ class OEKLIFSKinaseApoFeaturizer(OEHybridDockingFeaturizer):
             apply_mutations,
             delete_partial_residues,
             delete_loose_residues,
+            delete_loose_tails,
             renumber_structure
         )
 
@@ -863,6 +864,9 @@ class OEKLIFSKinaseApoFeaturizer(OEHybridDockingFeaturizer):
 
         logging.debug("Deleting loose residues ...")
         kinase_structure = delete_loose_residues(kinase_structure)
+
+        logging.debug("Deleting loose tails ...")
+        kinase_structure = delete_loose_tails(kinase_structure, kinase_domain_sequence)
 
         if self.loop_db:
             logging.debug("Applying insertions to kinase domain ...")

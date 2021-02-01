@@ -1105,8 +1105,7 @@ def apply_insertions(
     loop_options.SetLoopDBFilename(loop_db)
     # the hierarchy view is more stable if reinitialized after each change
     # https://docs.eyesopen.com/toolkits/python/oechemtk/biopolymers.html#a-hierarchy-view
-    finished = False
-    while not finished:
+    while True:
         altered = False
         # align template and target sequences
         target_sequence_aligned, template_sequence_aligned = get_structure_sequence_alignment(
@@ -1146,7 +1145,7 @@ def apply_insertions(
                 logging.debug("Failed building loop!")
         # leave while loop if no changes were introduced
         if not altered:
-            finished = True
+            break
 
     return target_structure
 
@@ -1171,8 +1170,7 @@ def apply_mutations(
     """
     # the hierarchy view is more stable if reinitialized after each change
     # https://docs.eyesopen.com/toolkits/python/oechemtk/biopolymers.html#a-hierarchy-view
-    finished = False
-    while not finished:
+    while True:
         altered = False
         # align template and target sequences
         target_sequence_aligned, template_sequence_aligned = get_structure_sequence_alignment(
@@ -1214,7 +1212,7 @@ def apply_mutations(
                                     target_structure.DeleteAtom(atom)
         # leave while loop if no changes were introduced
         if not altered:
-            finished = True
+            break
     # OEMutateResidue doesn't build sidechains and doesn't add hydrogens automatically
     oespruce.OEBuildSidechains(target_structure)
     oechem.OEPlaceHydrogens(target_structure)
@@ -1308,6 +1306,57 @@ def delete_loose_residues(structure: oechem.OEGraphMol) -> oechem.OEGraphMol:
                 structure.DeleteAtom(residue_atom)
 
     return structure
+
+
+def delete_loose_tails(
+    target_structure: oechem.OEGraphMol, template_sequence: str
+) -> oechem.OEGraphMol:
+    """
+    Delete protein atoms that are part of a loose tail, i.e. protein structure segments that are at the end or the
+    beginning of the structure with 3 or less residues.
+    Parameters
+    ----------
+    target_structure: oechem.OEGraphMol
+        An OpenEye molecule holding the protein structure with potential loose tails.
+    template_sequence: str
+        The sequence of the complete protein.
+    Return
+    -----
+    : oechem.ORGraphMol
+        An OpenEye molecule holding the protein structure without loose tails.
+    """
+    import re
+
+    # deleting loose tails may generate new loose tails
+    # the hierarchy view is more stable if reinitialized after each change
+    # https://docs.eyesopen.com/toolkits/python/oechemtk/biopolymers.html#a-hierarchy-view
+    while True:
+        altered = False
+        # align template and target sequences
+        target_sequence_aligned, template_sequence_aligned = get_structure_sequence_alignment(
+            target_structure, template_sequence)
+        logging.debug(f"Template sequence:\n{template_sequence_aligned}")
+        logging.debug(f"Target sequence:\n{target_sequence_aligned}")
+        hierview = oechem.OEHierView(target_structure)
+        structure_residues = list(hierview.GetResidues())
+        # short tails at N terminus
+        tails = list(re.finditer("(^[-]*)(?P<tail>[^-]{1,3})[-]", target_sequence_aligned))
+        # short tails at C terminus
+        tails += list(re.finditer("[-](?P<tail>[^-]{1,3})([-]*$)", target_sequence_aligned))
+        for tail in tails:
+            tail_start = tail.start("tail") - target_sequence_aligned[:tail.start("tail")].count("-")
+            tail_end = tail_start + len(tail.group("tail"))
+            logging.debug(f"Deleting residues of loose tail {tail.group('tail')}")
+            # delete atoms of loose tail residues
+            for residue in structure_residues[tail_start:tail_end]:
+                for atom in residue.GetAtoms():
+                    target_structure.DeleteAtom(atom)
+            altered = True
+        if not altered:
+            # break loop and reinitialize
+            break
+
+    return target_structure
 
 
 def renumber_structure(
