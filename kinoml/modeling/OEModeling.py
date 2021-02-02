@@ -1059,12 +1059,13 @@ def apply_deletions(
     logging.debug(f"Target sequence:\n{target_sequence_aligned}")
     hierview = oechem.OEHierView(target_structure)
     structure_residues = list(hierview.GetResidues())
-    insertions = re.finditer("[^-][-]+[^-]", template_sequence_aligned)
+    insertions = re.finditer("[^-]{2}[-]+[^-]{2}", template_sequence_aligned)
     for insertion in insertions:
-        insertion_start = insertion.start() - target_sequence_aligned[:insertion.start() + 1].count("-")
-        insertion_end = insertion.end() - target_sequence_aligned[:insertion.end() + 1].count("-")
+        insertion_start = insertion.start() - target_sequence_aligned[:insertion.start()].count("-")
+        insertion_end = insertion.end() - target_sequence_aligned[:insertion.end()].count("-")
         insertion_residues = structure_residues[insertion_start:insertion_end]
-        logging.debug(f"Deleting residues {insertion_residues[0].GetResidueNumber()}-"
+        logging.debug(f"Found insertion! Deleting residues "
+                      f"{insertion_residues[0].GetResidueNumber()}-"
                       f"{insertion_residues[-1].GetResidueNumber()} ...")
         # delete atoms
         for insertion_residue in insertion_residues:
