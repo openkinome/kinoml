@@ -357,10 +357,6 @@ def _prepare_structure(
                 return True
         return False
 
-    # assign ACE and NME caps except for real termini
-    if cap_termini:
-        structure = assign_caps(structure, real_termini)
-
     # delete loose protein residues
     structure = delete_loose_residues(structure)
 
@@ -435,6 +431,12 @@ def _prepare_structure(
         print("No design unit found!")
         # TODO: Returns None if something goes wrong
         return None
+
+    # assign ACE and NME caps except for real termini
+    if cap_termini:
+        impl = design_unit.GetImpl()
+        protein = impl.GetProtein()
+        assign_caps(protein, real_termini)
 
     return design_unit
 
