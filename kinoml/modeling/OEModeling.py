@@ -346,17 +346,6 @@ def _prepare_structure(
                 return True
         return False
 
-    def _contains_alternate_location(design_unit, alternate_location):
-        """Returns True if the design unit contains a residue with the given alternate location."""
-        all_components = oechem.OEGraphMol()
-        design_unit.GetComponents(all_components, oechem.OEDesignUnitComponents_All)
-        hier_view = oechem.OEHierView(all_components)
-        for hier_residue in hier_view.GetResidues():
-            oe_residue = hier_residue.GetOEResidue()
-            if oe_residue.GetAlternateLocation() == alternate_location:
-                return True
-        return False
-
     # delete loose protein residues
     structure = delete_loose_residues(structure)
 
@@ -414,7 +403,7 @@ def _prepare_structure(
         design_units = [
             design_unit
             for design_unit in design_units
-            if _contains_alternate_location(design_unit, alternate_location)
+            if f"alt{alternate_location}" in design_unit.GetTitle()
         ]
 
     # filter design units for chain of interest
