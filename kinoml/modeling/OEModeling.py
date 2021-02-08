@@ -280,6 +280,11 @@ def assign_caps(
     else:
         oespruce.OECapTermini(structure)
 
+    # add hydrogen to newly modeled atoms
+    options = oechem.OEPlaceHydrogensOptions()
+    options.SetBypassPredicate(oechem.OENotAtom(oespruce.OEIsModeledAtom()))
+    oechem.OEPlaceHydrogens(structure, options)
+
     return structure
 
 
@@ -1164,6 +1169,11 @@ def apply_insertions(
         if not altered:
             break
 
+    # add hydrogen to newly modeled residues
+    options = oechem.OEPlaceHydrogensOptions()
+    options.SetBypassPredicate(oechem.OENotAtom(oespruce.OEIsModeledAtom()))
+    oechem.OEPlaceHydrogens(target_structure, options)
+
     return target_structure
 
 
@@ -1230,9 +1240,12 @@ def apply_mutations(
         # leave while loop if no changes were introduced
         if not altered:
             break
-    # OEMutateResidue doesn't build sidechains and doesn't add hydrogens automatically
+    # OEMutateResidue doesn't always build side chains
+    # and doesn't add hydrogen automatically
     oespruce.OEBuildSidechains(target_structure)
-    oechem.OEPlaceHydrogens(target_structure)
+    options = oechem.OEPlaceHydrogensOptions()
+    options.SetBypassPredicate(oechem.OENotAtom(oespruce.OEIsModeledAtom()))
+    oechem.OEPlaceHydrogens(target_structure, options)
     # update residue information
     oechem.OEPerceiveResidues(target_structure, oechem.OEPreserveResInfo_All)
 
