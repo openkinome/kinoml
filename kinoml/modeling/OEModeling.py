@@ -1013,7 +1013,7 @@ def get_structure_sequence_alignment(
                 else:
                     logging.debug(
                         f"Alignment contains insertion with sequence {gap_sequence}" +
-                        f"between bonded residues {start_residue.GetResidueNumber()}" +
+                        f" between bonded residues {start_residue.GetResidueNumber()}" +
                         f" and {end_residue.GetResidueNumber()}, " +
                         "keeping original alignment ..."
                     )
@@ -1091,6 +1091,24 @@ def apply_insertions(
     from pathlib import Path
     import re
 
+    def _disconnect_residues(protein, residue1, residue2):
+        """Break the bond connecting two protein residues."""
+        _is_backbone = oechem.OEIsBackboneAtom()
+        for atom in residue1.GetAtoms():
+            if _is_backbone(atom):
+                for bond in atom.GetBonds():
+                    bonded_atoms = [bond.GetBgn(), bond.GetEnd()]
+                    for bonded_atom in bonded_atoms:
+                        bonded_residue = oechem.OEAtomGetResidue(bonded_atom)
+                        if bonded_residue.GetResidueNumber() == residue2.GetResidueNumber():
+                            logging.debug(
+                                "Breaking bond between residues " +
+                                f"{residue1.GetResidueNumber()} and " +
+                                f"{residue2.GetResidueNumber()}"
+                            )
+                            protein.DeleteBond(bond)
+        return protein
+
     sidechain_options = oespruce.OESidechainBuilderOptions()
     loop_options = oespruce.OELoopBuilderOptions()
     loop_db = str(Path(loop_db).expanduser().resolve())
@@ -1135,6 +1153,13 @@ def apply_insertions(
                 break
             else:
                 logging.debug("Failed building loop!")
+                # break bond between residues next to insertion
+                # may happen if an isoform specific insertion failed
+                target_structure = _disconnect_residues(
+                    target_structure,
+                    start_residue,
+                    end_residue
+                )
         # leave while loop if no changes were introduced
         if not altered:
             break
