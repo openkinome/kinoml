@@ -1050,7 +1050,7 @@ def apply_deletions(
     logging.debug(f"Target sequence:\n{target_sequence_aligned}")
     hierview = oechem.OEHierView(target_structure)
     structure_residues = list(hierview.GetResidues())
-    insertions = re.finditer("[^-]{2}[-]+[^-]{2}", template_sequence_aligned)
+    insertions = re.finditer("^[-]+|[^-]{2}[-]+[^-]{2}|[-]+$", template_sequence_aligned)
     for insertion in insertions:
         insertion_start = insertion.start() - target_sequence_aligned[:insertion.start()].count("-")
         insertion_end = insertion.end() - target_sequence_aligned[:insertion.end()].count("-")
