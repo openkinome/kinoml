@@ -721,7 +721,9 @@ class OEKLIFSKinaseApoFeaturizer(OEHybridDockingFeaturizer):
             structures = structures[structures["structure.ac_helix"] == alpha_c_helix]
 
         if len(structures) == 0:
-            raise NotImplementedError("Would need homology modeling capability.")
+            raise NotImplementedError(
+                f"No structure available in DFG {dfg}/alpha C helix {alpha_c_helix} conformation."
+            )
         else:
             logging.debug("Picking structure with highest KLIFS quality score ...")
             structures = structures.sort_values(
@@ -910,7 +912,7 @@ class OEKLIFSKinaseApoFeaturizer(OEHybridDockingFeaturizer):
         residue_number: list of int
             A list of canonical residue numbers in the same order as the residues in the given kinase domain structure.
         """
-        from kinoml.modeling.OEModeling import get_structure_sequence_alignment
+        from ..modeling.OEModeling import get_structure_sequence_alignment
 
         logging.debug("Aligning sequences ...")
         target_sequence, template_sequence = get_structure_sequence_alignment(
@@ -1493,7 +1495,17 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEKLIFSKinaseApoFeaturizer):
             solvated_kinase_domain, oechem.OEDesignUnitComponents_Protein | oechem.OEDesignUnitComponents_Solvent
         )
         # perceive residues to remove artifacts of other design units in the sequence of the protein
-        oechem.OEPerceiveResidues(solvated_kinase_domain)
+        # preserve certain properties to assure correct behavior of the pipeline,
+        # e.g. deletion of chains in OEKLIFSKinaseApoFeaturizer._process_kinase_domain method
+        preserved_info = (
+                oechem.OEPreserveResInfo_ResidueNumber
+                | oechem.OEPreserveResInfo_ResidueName
+                | oechem.OEPreserveResInfo_HetAtom
+                | oechem.OEPreserveResInfo_AtomName
+                | oechem.OEPreserveResInfo_FragmentNumber
+                | oechem.OEPreserveResInfo_ChainID
+        )
+        oechem.OEPerceiveResidues(solvated_kinase_domain, preserved_info)
 
         logging.debug("Retrieving KLIFS kinase pocket residues ...")
         remote = setup_remote()

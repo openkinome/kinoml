@@ -1174,6 +1174,9 @@ def apply_insertions(
     options.SetBypassPredicate(oechem.OENotAtom(oespruce.OEIsModeledAtom()))
     oechem.OEPlaceHydrogens(target_structure, options)
 
+    # order residues and atoms
+    oechem.OEPDBOrderAtoms(target_structure)
+
     return target_structure
 
 
