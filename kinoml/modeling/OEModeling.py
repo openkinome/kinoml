@@ -1437,7 +1437,7 @@ def superpose_proteins(
         An OpenEye molecule holding a protein structure which will be used as reference during superposition.
     fit_protein: oechem.OEGraphMol
         An OpenEye molecule holding a protein structure which will be superposed onto the reference protein.
-    residues: Tuple of str
+    residues: Iterable of str
         Residues that should be used during superposition in format "GLY123".
     chain_id: str
         Chain identifier for residues that should be used during superposition.
@@ -1487,23 +1487,23 @@ def update_residue_identifiers(
     structure: oechem.OEGraphMol
         The OpenEye molecule structure with updated atom and residue ids.
     """
-    # perceive residues to prevent wrong assignment
+    # update residue identifiers, except for residue number,
+    # residue names, atom names, chain id, record type and insert code
     preserved_info = (
             oechem.OEPreserveResInfo_ResidueNumber
             | oechem.OEPreserveResInfo_ResidueName
-            | oechem.OEPreserveResInfo_HetAtom
             | oechem.OEPreserveResInfo_AtomName
-            | oechem.OEPreserveResInfo_FragmentNumber
             | oechem.OEPreserveResInfo_ChainID
+            | oechem.OEPreserveResInfo_HetAtom
+            | oechem.OEPreserveResInfo_InsertCode
     )
     oechem.OEPerceiveResidues(structure, preserved_info)
 
-    # update residue ids of protein and set all chain ids to A
+    # update protein
     residue_number = 0
     hierarchical_view = oechem.OEHierView(structure)
     for hv_residue in hierarchical_view.GetResidues():
         residue = hv_residue.GetOEResidue()
-        residue.SetChainID("A")
         if not residue.IsHetAtom():
             if keep_protein_residue_ids:
                 if residue.GetName() == "NME":
@@ -1514,42 +1514,48 @@ def update_residue_identifiers(
                     residue_number = residue.GetResidueNumber()
             else:
                 residue_number += 1
-            residue.SetResidueNumber(residue_number)
+            # apply changes to each atom
             for atom in hv_residue.GetAtoms():
+                residue = oechem.OEAtomGetResidue(atom)
+                residue.SetChainID("A")
+                residue.SetResidueNumber(residue_number)
                 oechem.OEAtomSetResidue(atom, residue)
 
-    # update residue id of everything but protein and water
-    hierarchical_view = oechem.OEHierView(structure)
+    # update all hetero atoms but water
     for hv_residue in hierarchical_view.GetResidues():
         residue = hv_residue.GetOEResidue()
-        if residue.IsHetAtom() and residue.GetName() != "HOH":
+        if residue.IsHetAtom() and residue.GetName().strip() != "HOH":
             residue_number += 1
-            residue.SetResidueNumber(residue_number)
+            # apply changes to each atom
             for atom in hv_residue.GetAtoms():
+                residue = oechem.OEAtomGetResidue(atom)
+                residue.SetChainID("A")
+                residue.SetResidueNumber(residue_number)
                 oechem.OEAtomSetResidue(atom, residue)
 
-    # update residue ids of water
-    hierarchical_view = oechem.OEHierView(structure)
+    # update water
     for hv_residue in hierarchical_view.GetResidues():
         residue = hv_residue.GetOEResidue()
-        if residue.GetName() == "HOH":
+        if residue.IsHetAtom() and residue.GetName().strip() == "HOH":
             residue_number += 1
-            residue.SetResidueNumber(residue_number)
+            # apply changes to each atom
             for atom in hv_residue.GetAtoms():
+                residue = oechem.OEAtomGetResidue(atom)
+                residue.SetChainID("A")
+                residue.SetResidueNumber(residue_number)
                 oechem.OEAtomSetResidue(atom, residue)
 
-    # order residues and atoms
+    # order atoms into PDB order
     oechem.OEPDBOrderAtoms(structure)
 
-    # update residue identifiers, except atom names, residue ids,
-    # residue names, fragment number, chain id and record type
+    # update residue identifiers, except for residue number,
+    # residue names, atom names, chain id and record type
     preserved_info = (
             oechem.OEPreserveResInfo_ResidueNumber
             | oechem.OEPreserveResInfo_ResidueName
-            | oechem.OEPreserveResInfo_HetAtom
             | oechem.OEPreserveResInfo_AtomName
-            | oechem.OEPreserveResInfo_FragmentNumber
             | oechem.OEPreserveResInfo_ChainID
+            | oechem.OEPreserveResInfo_HetAtom
     )
     oechem.OEPerceiveResidues(structure, preserved_info)
 

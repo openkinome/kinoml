@@ -229,14 +229,14 @@ class OEHybridDockingFeaturizer(BaseFeaturizer):
         preserved_info = (
                 oechem.OEPreserveResInfo_ResidueNumber
                 | oechem.OEPreserveResInfo_ResidueName
-                | oechem.OEPreserveResInfo_HetAtom
                 | oechem.OEPreserveResInfo_AtomName
-                | oechem.OEPreserveResInfo_FragmentNumber
                 | oechem.OEPreserveResInfo_ChainID
+                | oechem.OEPreserveResInfo_HetAtom
+                | oechem.OEPreserveResInfo_InsertCode
         )
         oechem.OEPerceiveResidues(protein, preserved_info)
-        oechem.OEPerceiveResidues(solvent, preserved_info)
-        oechem.OEPerceiveResidues(ligand, preserved_info)
+        oechem.OEPerceiveResidues(solvent)
+        oechem.OEPerceiveResidues(ligand)
 
         logging.debug(
             "Number of component atoms: " +
@@ -1494,18 +1494,6 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEKLIFSKinaseApoFeaturizer):
         design_unit.GetComponents(
             solvated_kinase_domain, oechem.OEDesignUnitComponents_Protein | oechem.OEDesignUnitComponents_Solvent
         )
-        # perceive residues to remove artifacts of other design units in the sequence of the protein
-        # preserve certain properties to assure correct behavior of the pipeline,
-        # e.g. deletion of chains in OEKLIFSKinaseApoFeaturizer._process_kinase_domain method
-        preserved_info = (
-                oechem.OEPreserveResInfo_ResidueNumber
-                | oechem.OEPreserveResInfo_ResidueName
-                | oechem.OEPreserveResInfo_HetAtom
-                | oechem.OEPreserveResInfo_AtomName
-                | oechem.OEPreserveResInfo_FragmentNumber
-                | oechem.OEPreserveResInfo_ChainID
-        )
-        oechem.OEPerceiveResidues(solvated_kinase_domain, preserved_info)
 
         logging.debug("Retrieving KLIFS kinase pocket residues ...")
         remote = setup_remote()
@@ -1522,5 +1510,19 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEKLIFSKinaseApoFeaturizer):
         oechem.OESplitMolComplex(
             oechem.OEGraphMol(), kinase_domain, solvent, oechem.OEGraphMol(), solvated_kinase_domain
         )
+
+        # perceive residues to remove artifacts of other design units in the sequence of the protein
+        # preserve certain properties to assure correct behavior of the pipeline,
+        # e.g. deletion of chains in OEKLIFSKinaseApoFeaturizer._process_kinase_domain method
+        preserved_info = (
+                oechem.OEPreserveResInfo_ResidueNumber
+                | oechem.OEPreserveResInfo_ResidueName
+                | oechem.OEPreserveResInfo_AtomName
+                | oechem.OEPreserveResInfo_ChainID
+                | oechem.OEPreserveResInfo_HetAtom
+                | oechem.OEPreserveResInfo_InsertCode
+        )
+        oechem.OEPerceiveResidues(kinase_domain, preserved_info)
+        oechem.OEPerceiveResidues(solvent)
 
         return kinase_domain, solvent
