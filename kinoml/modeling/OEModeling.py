@@ -912,7 +912,7 @@ def smiles_from_pdb(ligand_ids: Iterable[str]) -> dict:
 def get_sequence(structure: oechem.OEGraphMol) -> str:
     """
     Get the amino acid sequence with one letter characters of an OpenEye molecule holding a protein structure. All
-    residues not perceived as amino acid will receive the character 'X'.
+    residues not perceived as standard amino acid will receive the character 'X'.
     Parameters
     ----------
     structure: oechem.OEGraphMol
@@ -924,11 +924,12 @@ def get_sequence(structure: oechem.OEGraphMol) -> str:
     """
     sequence = []
     hv = oechem.OEHierView(structure)
-    for residue in hv.GetResidues():
-        if oechem.OEIsStandardProteinResidue(residue):
+    for hier_residue in hv.GetResidues():
+        residue = hier_residue.GetOEResidue()
+        if oechem.OEIsStandardProteinResidue(residue) and not residue.IsHetAtom():
             sequence.append(
                 oechem.OEGetAminoAcidCode(
-                    oechem.OEGetResidueIndex(residue.GetResidueName())
+                    oechem.OEGetResidueIndex(residue.GetName().strip())
                 )
             )
         else:
