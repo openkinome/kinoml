@@ -269,7 +269,7 @@ class OEHybridDockingFeaturizer(BaseFeaturizer):
         """
         from openeye import oechem
 
-        from ..modeling.OEModeling import update_residue_identifiers, split_molecule_components
+        from ..modeling.OEModeling import update_residue_identifiers
 
         assembled_components = oechem.OEGraphMol()
 
@@ -281,11 +281,8 @@ class OEHybridDockingFeaturizer(BaseFeaturizer):
             oechem.OEAddMols(assembled_components, ligand)
 
         logging.debug("Adding water molecules ...")
-        # convert solvent molecule into a list of water molecules and check for clashes
-        waters = split_molecule_components(solvent)
-        for water in waters:
-            if not self._clashing_water(water, ligand, protein):
-                oechem.OEAddMols(assembled_components, water)
+        filtered_solvent = self._remove_clashing_water(solvent, ligand, protein)
+        oechem.OEAddMols(assembled_components, filtered_solvent)
 
         logging.debug("Updating hydrogen positions of assembled components ...")
         oechem.OEPlaceHydrogens(assembled_components)
@@ -296,29 +293,42 @@ class OEHybridDockingFeaturizer(BaseFeaturizer):
         return assembled_components
 
     @staticmethod
-    def _clashing_water(
-        water: oechem.OEGraphMol,
+    def _remove_clashing_water(
+        solvent: oechem.OEGraphMol,
         ligand: Union[oechem.OEGraphMol, None],
         protein: oechem.OEGraphMol
-    ) -> bool:
+    ) -> oechem.OEGraphMol:
         """
-        Identify water molecules clashing with a ligand and newly modeled protein residues.
+        Remove water molecules clashing with a ligand or newly modeled protein residues.
+
         Parameters
         ----------
-        water: oechem.OEGraphMol
-            An OpenEye molecule holding the water molecule.
+        solvent: oechem.OEGraphMol
+            An OpenEye molecule holding the water molecules.
         ligand: oechem.OEGraphMol or None
             An OpenEye molecule holding the ligand or None.
         protein: oechem.OEGraphMol
             An OpenEye molecule holding the protein.
+
         Returns
         -------
-         : bool
-            If water molecule is clashing with newly modeled protein residues or a ligand if given.
+         : oechem.OEGraphMol
+            An OpenEye molecule holding water molecules not clashing with the ligand or newly modeled protein residues.
         """
         from openeye import oechem, oespruce
+        from scipy.spatial import cKDTree
 
-        from ..modeling.OEModeling import clashing_heavy_atoms
+        from ..modeling.OEModeling import get_atom_coordinates, split_molecule_components
+
+        if ligand is not None:
+            ligand_heavy_atoms = oechem.OEGraphMol()
+            oechem.OESubsetMol(
+                ligand_heavy_atoms,
+                ligand,
+                oechem.OEIsHeavy()
+            )
+            ligand_heavy_atom_coordinates = get_atom_coordinates(ligand_heavy_atoms)
+            ligand_heavy_atoms_tree = cKDTree(ligand_heavy_atom_coordinates)
 
         modeled_heavy_atoms = oechem.OEGraphMol()
         oechem.OESubsetMol(
@@ -327,27 +337,41 @@ class OEHybridDockingFeaturizer(BaseFeaturizer):
             oechem.OEAndAtom(
                 oespruce.OEIsModeledAtom(),
                 oechem.OEIsHeavy()
-            ),
-            True
+            )
         )
-        for atom in water.GetAtoms():
+        modeled_heavy_atoms_tree = None
+        if modeled_heavy_atoms.NumAtoms() > 0:
+            modeled_heavy_atom_coordinates = get_atom_coordinates(modeled_heavy_atoms)
+            modeled_heavy_atoms_tree = cKDTree(modeled_heavy_atom_coordinates)
+
+        filtered_solvent = oechem.OEGraphMol()
+        waters = split_molecule_components(solvent)
+        # iterate over water molecules and check for clashes
+        for water in waters:
+            water_oxygen_atom = water.GetAtoms(oechem.OEIsOxygen()).next()
             # experienced problems when preparing 4pmp
             # making design units generated clashing waters that were not protonatable
-            if oechem.OEAtomGetResidue(atom).GetInsertCode() != " ":  # TODO: revisit water problem
+            # TODO: revisit this behavior
+            if oechem.OEAtomGetResidue(water_oxygen_atom).GetInsertCode() != " ":
                 logging.debug("Found ambiguous water molecule!")
-                return True
+                continue
+            water_oxygen_coordinates = water.GetCoords()[water_oxygen_atom.GetIdx()]
             # check for clashes with newly placed ligand
             if ligand is not None:
-                if clashing_heavy_atoms(ligand, water):
+                clashes = ligand_heavy_atoms_tree.query_ball_point(water_oxygen_coordinates, 1.5)
+                if len(clashes) > 0:
                     logging.debug("Found water molecule clashing with ligand atoms!")
-                    return True
+                    continue
             # check for clashes with newly modeled protein residues
-            if modeled_heavy_atoms.NumAtoms() > 0:
-                if clashing_heavy_atoms(modeled_heavy_atoms, water):
+            if modeled_heavy_atoms_tree:
+                clashes = modeled_heavy_atoms_tree.query_ball_point(water_oxygen_coordinates, 1.5)
+                if len(clashes) > 0:
                     logging.debug("Found water molecule clashing with modeled atoms!")
-                    return True
+                    continue
+            # water molecule is not clashy, add to filtered solvent
+            oechem.OEAddMols(filtered_solvent, water)
 
-        return False
+        return filtered_solvent
 
     def _update_pdb_header(
         self,
@@ -845,6 +869,7 @@ class OEKLIFSKinaseApoFeaturizer(OEHybridDockingFeaturizer):
             apply_deletions,
             apply_insertions,
             apply_mutations,
+            delete_clashing_sidechains,
             delete_partial_residues,
             delete_loose_residues,
             delete_loose_tails,
@@ -860,6 +885,9 @@ class OEKLIFSKinaseApoFeaturizer(OEHybridDockingFeaturizer):
 
         logging.debug("Applying mutations to kinase domain ...")
         kinase_structure = apply_mutations(kinase_structure, kinase_domain_sequence)
+
+        logging.debug(f"Deleting clashing side chains ...")  # e.g. 2j5f, 4wd5
+        kinase_structure = delete_clashing_sidechains(kinase_structure)
 
         logging.debug("Deleting residues with missing side chain atoms ...")
         kinase_structure = delete_partial_residues(kinase_structure)

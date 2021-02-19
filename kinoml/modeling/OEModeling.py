@@ -3,6 +3,7 @@ from typing import List, Set, Union, Iterable, Tuple
 
 from openeye import oechem, oegrid, oespruce
 import pandas as pd
+from scipy.spatial import cKDTree
 
 
 def read_smiles(smiles: str) -> oechem.OEGraphMol:
@@ -1393,6 +1394,108 @@ def delete_loose_tails(
     return target_structure
 
 
+def delete_clashing_sidechains(
+    protein: oechem.OEGraphMol,
+    cutoff: float = 2.0
+) -> oechem.OEGraphMol:
+    """
+    Delete side chains that are clashing with other atoms of the given protein structure. Structures containing
+    non-protein residues may lead to unexpected behavior.
+
+    Parameters
+    ----------
+    protein: oechem.OEGraphMol
+        An OpenEye molecule holding a protein structure.
+    cutoff: float
+        The distance cutoff that is used for defining a heavy atom clash.
+
+    Returns
+    -------
+    : oechem.OEGraphMol
+        An OpenEye molecule holding the protein structure without clashing side chains.
+    """
+    # get all protein heavy atoms and create KD tree for querying
+    protein_heavy_atoms = oechem.OEGraphMol()
+    oechem.OESubsetMol(
+        protein_heavy_atoms,
+        protein,
+        oechem.OEIsHeavy()
+        )
+    protein_heavy_atom_coordinates = get_atom_coordinates(protein_heavy_atoms)
+    protein_heavy_atom_tree = cKDTree(protein_heavy_atom_coordinates)
+    # create a list of side chain components
+    # two cysteine side chains connected via a disulfide bond
+    # are considered a single side chain component
+    sidechain_heavy_atoms = oechem.OEGraphMol()
+    oechem.OESubsetMol(
+        sidechain_heavy_atoms,
+        protein_heavy_atoms,
+        oechem.OENotAtom(
+            oechem.OEIsBackboneAtom()
+        )
+    )
+    sidechain_components = split_molecule_components(sidechain_heavy_atoms)
+    # iterate over side chains and check for clashes
+    for sidechain_component in sidechain_components:
+        sidechain_coordinates = get_atom_coordinates(sidechain_component)
+        sidechain_tree = cKDTree(sidechain_coordinates)
+        clashes = protein_heavy_atom_tree.query_ball_tree(sidechain_tree, cutoff)
+        residue_ids = set(
+            [
+                oechem.OEAtomGetResidue(atom).GetResidueNumber()
+                for atom in sidechain_component.GetAtoms()
+            ]
+        )
+        proline = 0
+        atom_sample = sidechain_component.GetAtoms().next()
+        residue_name = oechem.OEAtomGetResidue(atom_sample).GetName().strip()
+        if residue_name == "PRO":
+            proline = 1
+        # check if more atoms are within cutoff than number of side chain atoms
+        # plus 1 for each CA atom and plus 1 for proline
+        if len([x for x in clashes if len(x) > 0]) > \
+                sidechain_component.NumAtoms() + len(residue_ids) + proline:
+            logging.debug(
+                f"Deleting clashing side chains with residue ids {residue_ids} ..."
+            )
+            # delete atoms
+            for residue_id in residue_ids:
+                for atom in protein.GetAtoms(
+                    oechem.OEAndAtom(
+                        oechem.OEHasResidueNumber(residue_id),
+                        oechem.OENotAtom(
+                            oechem.OEIsBackboneAtom()
+                        )
+                    )
+                ):
+                    protein.DeleteAtom(atom)
+
+    return protein
+
+
+def get_atom_coordinates(molecule: oechem.OEGraphMol) -> List[Tuple[float, float, float]]:
+    """
+    Retrieve the atom coordinates of an OpenEye molecule.
+
+    Parameters
+    ----------
+    molecule: oechem.OEGraphMol
+        An OpenEye molecule for which the coordinates should be retrieved.
+
+    Returns
+    -------
+
+    : list of tuple of float
+        The coordinates of the given molecule atoms.
+    """
+    coordinates_dict = molecule.GetCoords()
+    # get atom coordinates in order of atom indices
+    coordinates = [
+        coordinates_dict[key] for key in sorted(coordinates_dict.keys())
+    ]
+    return coordinates
+
+
 def renumber_structure(
     target_structure: oechem.OEGraphMol, residue_numbers: List[int]
 ) -> oechem.OEGraphMol:
@@ -1588,45 +1691,3 @@ def split_molecule_components(molecule: oechem.OEGraphMol) -> List[oechem.OEGrap
         components.append(component)
 
     return components
-
-
-def clashing_heavy_atoms(
-        molecule1: oechem.OEGraphMol,
-        molecule2: oechem.OEGraphMol,
-        cutoff: float = 1.5
-) -> bool:
-    """
-    Evaluates if the heavy atoms of two molecules are clashing.
-    Parameters
-    ----------
-    molecule1: oechem.OEGraphMol
-        An OpenEye molecule.
-    molecule2: oechem.OEGraphMol
-        An OpenEye molecule.
-    cutoff: float
-        The cutoff that defines an atom clash.
-    Returns
-    -------
-    : bool
-        If any atoms of two molecules are clashing.
-    """
-    from scipy.spatial import cKDTree
-
-    # select heavy atoms
-    heavy_atoms1, heavy_atoms2 = oechem.OEGraphMol(), oechem.OEGraphMol()
-    oechem.OESubsetMol(heavy_atoms1, molecule1, oechem.OEIsHeavy(), True)
-    oechem.OESubsetMol(heavy_atoms2, molecule2, oechem.OEIsHeavy(), True)
-    # get coordinates
-    coordinates1_list = [
-        heavy_atoms1.GetCoords()[x] for x in sorted(heavy_atoms1.GetCoords().keys())
-    ]
-    coordinates2_list = [
-        heavy_atoms2.GetCoords()[x] for x in sorted(heavy_atoms2.GetCoords().keys())
-    ]
-    # get clashes
-    tree1 = cKDTree(coordinates1_list)
-    clashes = tree1.query_ball_point(coordinates2_list, cutoff)
-    if max([len(i) for i in clashes]) > 0:
-        return True
-
-    return False
