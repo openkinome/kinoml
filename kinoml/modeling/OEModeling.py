@@ -163,9 +163,9 @@ def select_altloc(molecule, altloc_id):
 
 
 def remove_non_protein(
-    molecule: oechem.OEGraphMol,
-    exceptions: Union[None, List[str]] = None,
-    remove_water: bool = False,
+        molecule: oechem.OEGraphMol,
+        exceptions: Union[None, List[str]] = None,
+        remove_water: bool = False,
 ) -> oechem.OEGraphMol:
     """
     Remove non-protein atoms from an OpenEye molecule.
@@ -234,8 +234,8 @@ def remove_expression_tags(structure):
 
 
 def assign_caps(
-    structure: oechem.OEGraphMol,
-    real_termini: Union[Iterable[int] or None] = None
+        structure: oechem.OEGraphMol,
+        real_termini: Union[Iterable[int] or None] = None
 ) -> oechem.OEGraphMol:
     """
     Cap N and C termini of the given input structure. Real termini can be protected from capping by providing the
@@ -290,15 +290,15 @@ def assign_caps(
 
 
 def _prepare_structure(
-    structure: oechem.OEGraphMol,
-    has_ligand: bool = False,
-    electron_density: Union[oegrid.OESkewGrid, None] = None,
-    loop_db: Union[str, None] = None,
-    ligand_name: Union[str, None] = None,
-    chain_id: Union[str, None] = None,
-    alternate_location: Union[str, None] = None,
-    cap_termini: bool = True,
-    real_termini: Union[List[int], None] = None,
+        structure: oechem.OEGraphMol,
+        has_ligand: bool = False,
+        electron_density: Union[oegrid.OESkewGrid, None] = None,
+        loop_db: Union[str, None] = None,
+        ligand_name: Union[str, None] = None,
+        chain_id: Union[str, None] = None,
+        alternate_location: Union[str, None] = None,
+        cap_termini: bool = True,
+        real_termini: Union[List[int], None] = None,
 ) -> Union[oechem.OEDesignUnit, None]:
     """
     Prepare an OpenEye molecule holding a protein ligand complex for docking.
@@ -437,14 +437,14 @@ def _prepare_structure(
 
 
 def prepare_complex(
-    protein_ligand_complex: oechem.OEGraphMol,
-    electron_density: Union[oegrid.OESkewGrid, None] = None,
-    loop_db: Union[str, None] = None,
-    ligand_name: Union[str, None] = None,
-    chain_id: Union[str, None] = None,
-    alternate_location: Union[str, None] = None,
-    cap_termini: bool = True,
-    real_termini: Union[List[int], None] = None,
+        protein_ligand_complex: oechem.OEGraphMol,
+        electron_density: Union[oegrid.OESkewGrid, None] = None,
+        loop_db: Union[str, None] = None,
+        ligand_name: Union[str, None] = None,
+        chain_id: Union[str, None] = None,
+        alternate_location: Union[str, None] = None,
+        cap_termini: bool = True,
+        real_termini: Union[List[int], None] = None,
 ) -> Union[oechem.OEDesignUnit, None]:
     """
     Prepare an OpenEye molecule holding a protein ligand complex for docking.
@@ -487,12 +487,12 @@ def prepare_complex(
 
 
 def prepare_protein(
-    protein: oechem.OEGraphMol,
-    loop_db: Union[str, None] = None,
-    chain_id: Union[str, None] = None,
-    alternate_location: Union[str, None] = None,
-    cap_termini: bool = True,
-    real_termini: Union[List[int], None] = None,
+        protein: oechem.OEGraphMol,
+        loop_db: Union[str, None] = None,
+        chain_id: Union[str, None] = None,
+        alternate_location: Union[str, None] = None,
+        cap_termini: bool = True,
+        real_termini: Union[List[int], None] = None,
 ) -> Union[oechem.OEDesignUnit, None]:
     """
     Prepare an OpenEye molecule holding a protein structure for docking.
@@ -608,10 +608,10 @@ def generate_tautomers(molecule: oechem.OEGraphMol) -> List[oechem.OEGraphMol]:
 
 
 def generate_enantiomers(
-    molecule: oechem.OEGraphMol,
-    max_centers: int = 12,
-    force_flip: bool = False,
-    enumerate_nitrogens: bool = True,
+        molecule: oechem.OEGraphMol,
+        max_centers: int = 12,
+        force_flip: bool = False,
+        enumerate_nitrogens: bool = True,
 ) -> List[oechem.OEGraphMol]:
     """
     Generate enantiomers of a given molecule.
@@ -642,7 +642,9 @@ def generate_enantiomers(
 
 
 def generate_conformations(
-    molecule: oechem.OEGraphMol, max_conformations: int = 1000, dense: bool = False
+        molecule: oechem.OEGraphMol,
+        max_conformations: int = 1000,
+        dense: bool = False
 ) -> oechem.OEMol:
     """
     Generate conformations of a given molecule.
@@ -685,7 +687,8 @@ def generate_conformations(
 
 
 def generate_reasonable_conformations(
-    molecule: oechem.OEGraphMol, dense: bool = False,
+        molecule: oechem.OEGraphMol,
+        dense: bool = False,
 ) -> List[oechem.OEMol]:
     """
     Generate conformations of reasonable enantiomers and tautomers of a given molecule.
@@ -712,8 +715,8 @@ def generate_reasonable_conformations(
 
 
 def optimize_poses(
-    docking_poses: List[oechem.OEGraphMol],
-    protein: Union[oechem.OEMolBase, oechem.OEGraphMol],
+        docking_poses: List[oechem.OEGraphMol],
+        protein: Union[oechem.OEMolBase, oechem.OEGraphMol],
 ) -> List[oechem.OEGraphMol]:
     """
     Optimize the torsions of docking poses in a protein binding site.
@@ -750,9 +753,9 @@ def optimize_poses(
 
 
 def overlay_molecules(
-    reference_molecule: oechem.OEGraphMol,
-    fit_molecule: oechem.OEMol,
-    return_overlay: bool = True,
+        reference_molecule: oechem.OEGraphMol,
+        fit_molecule: oechem.OEMol,
+        return_overlay: bool = True,
 ) -> (int, List[oechem.OEGraphMol]):
     """
     Overlay two molecules and calculate TanimotoCombo score.
@@ -818,7 +821,8 @@ def generate_isomeric_smiles_representations(molecule: oechem.OEGraphMol) -> Set
 
 
 def compare_molecules(
-    molecule1: oechem.OEGraphMol, molecule2: oechem.OEGraphMol
+        molecule1: oechem.OEGraphMol,
+        molecule2: oechem.OEGraphMol
 ) -> bool:
     """
     Compare two OpenEye molecules.
@@ -940,7 +944,8 @@ def get_sequence(structure: oechem.OEGraphMol) -> str:
 
 
 def get_structure_sequence_alignment(
-    structure: oechem.OEGraphMol, sequence: str
+        structure: oechem.OEGraphMol,
+        sequence: str
 ) -> Tuple[str, str]:
     """
     Generate an alignment between a protein structure and an amino acid sequence. The provided protein structure should
@@ -1031,7 +1036,8 @@ def get_structure_sequence_alignment(
 
 
 def apply_deletions(
-    target_structure: oechem.OEGraphMol, template_sequence: str
+        target_structure: oechem.OEGraphMol,
+        template_sequence: str
 ) -> oechem.OEGraphMol:
     """
     Apply deletions to a protein structure according to an amino acid sequence. The provided protein structure should
@@ -1074,9 +1080,9 @@ def apply_deletions(
 
 
 def apply_insertions(
-    target_structure: oechem.OEGraphMol,
-    template_sequence: str,
-    loop_db: str,
+        target_structure: oechem.OEGraphMol,
+        template_sequence: str,
+        loop_db: str,
 ) -> oechem.OEGraphMol:
     """
     Apply insertions to a protein structure according to an amino acid sequence. The provided protein structure should
@@ -1183,7 +1189,8 @@ def apply_insertions(
 
 
 def apply_mutations(
-    target_structure: oechem.OEGraphMol, template_sequence: str
+        target_structure: oechem.OEGraphMol,
+        template_sequence: str
 ) -> oechem.OEGraphMol:
     """
     Mutate a protein structure according to an amino acid sequence. The provided protein structure should only contain
@@ -1213,7 +1220,7 @@ def apply_mutations(
         structure_residues = hierview.GetResidues()
         # adjust target structure to match template sequence
         for template_sequence_residue, target_sequence_residue in zip(
-            template_sequence_aligned, target_sequence_aligned
+                template_sequence_aligned, target_sequence_aligned
         ):
             # check for mutations if no gap
             if target_sequence_residue != "-":
@@ -1229,7 +1236,7 @@ def apply_mutations(
                                       f"{oeresidue.GetName()}{oeresidue.GetResidueNumber()}" +
                                       f"{three_letter_code} ...")
                         if oespruce.OEMutateResidue(
-                            target_structure, oeresidue, three_letter_code
+                                target_structure, oeresidue, three_letter_code
                         ):
                             logging.debug("Successfully mutated residue!")
                             # break loop and reinitialize
@@ -1308,29 +1315,29 @@ def delete_loose_residues(structure: oechem.OEGraphMol) -> oechem.OEGraphMol:
     # iterate over protein residues
     # defined by C alpha atoms that are not hetero atoms
     for atom in structure.GetAtoms(
-        oechem.OEAndAtom(
-            oechem.OEIsCAlpha(), oechem.OENotAtom(
-                oechem.OEIsHetAtom()
+            oechem.OEAndAtom(
+                oechem.OEIsCAlpha(), oechem.OENotAtom(
+                    oechem.OEIsHetAtom()
+                )
             )
-        )
     ):
         connected_residues = 0
         # get neighboring backbone atoms
         for connected_atom in atom.GetAtoms(
-            oechem.OEIsBackboneAtom()
+                oechem.OEIsBackboneAtom()
         ):
             # get neighboring backbone carbon or  nitrogen atoms that are not C alpha atoms
             # which will be from the neighboring residues
             for _ in connected_atom.GetAtoms(
-                oechem.OEOrAtom(
-                    oechem.OEIsNitrogen(),
-                    oechem.OEAndAtom(
-                        oechem.OEIsCarbon(),
-                        oechem.OENotAtom(
-                            oechem.OEIsCAlpha()
-                        )  
+                    oechem.OEOrAtom(
+                        oechem.OEIsNitrogen(),
+                        oechem.OEAndAtom(
+                            oechem.OEIsCarbon(),
+                            oechem.OENotAtom(
+                                oechem.OEIsCAlpha()
+                            )
+                        )
                     )
-                )
             ):
                 connected_residues += 1
         # delete residues with less than 1 neighbor
@@ -1344,7 +1351,8 @@ def delete_loose_residues(structure: oechem.OEGraphMol) -> oechem.OEGraphMol:
 
 
 def delete_loose_tails(
-    target_structure: oechem.OEGraphMol, template_sequence: str
+        target_structure: oechem.OEGraphMol,
+        template_sequence: str
 ) -> oechem.OEGraphMol:
     """
     Delete protein atoms that are part of a loose tail, i.e. protein structure segments that are at the end or the
@@ -1395,8 +1403,8 @@ def delete_loose_tails(
 
 
 def delete_clashing_sidechains(
-    protein: oechem.OEGraphMol,
-    cutoff: float = 2.0
+        protein: oechem.OEGraphMol,
+        cutoff: float = 2.0
 ) -> oechem.OEGraphMol:
     """
     Delete side chains that are clashing with other atoms of the given protein structure. Structures containing
@@ -1420,7 +1428,7 @@ def delete_clashing_sidechains(
         protein_heavy_atoms,
         protein,
         oechem.OEIsHeavy()
-        )
+    )
     protein_heavy_atom_coordinates = get_atom_coordinates(protein_heavy_atoms)
     protein_heavy_atom_tree = cKDTree(protein_heavy_atom_coordinates)
     # create a list of side chain components
@@ -1461,12 +1469,12 @@ def delete_clashing_sidechains(
             # delete atoms
             for residue_id in residue_ids:
                 for atom in protein.GetAtoms(
-                    oechem.OEAndAtom(
-                        oechem.OEHasResidueNumber(residue_id),
-                        oechem.OENotAtom(
-                            oechem.OEIsBackboneAtom()
+                        oechem.OEAndAtom(
+                            oechem.OEHasResidueNumber(residue_id),
+                            oechem.OENotAtom(
+                                oechem.OEIsBackboneAtom()
+                            )
                         )
-                    )
                 ):
                     protein.DeleteAtom(atom)
 
@@ -1497,7 +1505,7 @@ def get_atom_coordinates(molecule: oechem.OEGraphMol) -> List[Tuple[float, float
 
 
 def renumber_structure(
-    target_structure: oechem.OEGraphMol, residue_numbers: List[int]
+        target_structure: oechem.OEGraphMol, residue_numbers: List[int]
 ) -> oechem.OEGraphMol:
     """
     Renumber the residues of a protein structure according to the given list of residue numbers.
@@ -1529,8 +1537,11 @@ def renumber_structure(
 
 
 def superpose_proteins(
-    reference_protein: oechem.OEGraphMol, fit_protein: oechem.OEGraphMol,
-    residues: Iterable = tuple(), chain_id: str = " ", insertion_code: str = " "
+        reference_protein: oechem.OEGraphMol,
+        fit_protein: oechem.OEGraphMol,
+        residues: Iterable = tuple(),
+        chain_id: str = " ",
+        insertion_code: str = " "
 ) -> oechem.OEGraphMol:
     """
     Superpose a protein structure onto a reference protein. The superposition
@@ -1574,7 +1585,8 @@ def superpose_proteins(
 
 
 def update_residue_identifiers(
-    structure: oechem.OEGraphMol, keep_protein_residue_ids: bool = True
+        structure: oechem.OEGraphMol,
+        keep_protein_residue_ids: bool = True
 ) -> oechem.OEGraphMol:
     """
     Updates the atom, residue and chain ids of the given molecular structure. All residues become part of chain A. Atom
