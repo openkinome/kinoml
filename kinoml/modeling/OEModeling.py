@@ -1,5 +1,5 @@
 import logging
-from typing import List, Set, Union, Iterable, Tuple
+from typing import List, Set, Union, Iterable, Tuple, Dict
 
 from openeye import oechem, oegrid, oespruce
 import pandas as pd
@@ -199,38 +199,73 @@ def remove_non_protein(
     return selection
 
 
-def remove_expression_tags(structure):
+def delete_residue(
+        structure: oechem.OEGraphMol,
+        chain_id: str,
+        residue_name: str,
+        residue_id: int
+) -> oechem.OEGraphMol:
     """
-    Remove expression tags from a protein structure listed in the PDB header section "SEQADV".
+    Delete a residue from an OpenEye molecule.
+
+    Parameters
+    ---------
+    structure: oechem.OEGraphMol
+        An OpenEye molecule with residue information.
+    chain_id: str
+        The chain id of the residue
+    residue_name: str
+        The residue name in three letter code.
+    residue_id: int
+        The residue id.
+
+    Returns
+    -------
+    : oechem.OEGraphMol
+        The OpenEye molecule without the residue.
+    """
+    hier_view = oechem.OEHierView(structure)
+    hier_residue = hier_view.GetResidue(chain_id, residue_name, residue_id)
+    for atom in hier_residue.GetAtoms():
+        structure.DeleteAtom(atom)
+
+    return structure
+
+
+def get_expression_tags(structure) -> List[Dict]:
+    """
+    Get the chain id, residue name and residue id of residues in expression tags from a protein structure listed in the
+    PDB header section "SEQADV".
     Parameters
     ----------
     structure: oechem.OEGraphMol
         An OpenEye molecule with associated PDB header section "SEQADV".
     Returns
     -------
-    structure: oechem.OEGraphMol
-        The OpenEye molecule without expression tags.
+    : list of dict
+        The chain id, residue name and residue id of residues in the expression tags.
     """
     # retrieve "SEQADV" records from PDB header
     pdb_data_pairs = oechem.OEGetPDBDataPairs(structure)
     seqadv_records = [datapair.GetValue() for datapair in pdb_data_pairs if datapair.GetTag() == "SEQADV"]
     labels = ["EXPRESSION TAG", "CLONING ARTIFACT"]
-    artifacts = [
+    expression_tag_labels = [
         seqadv_record
         for seqadv_record in seqadv_records
         if any(label in seqadv_record for label in labels)
     ]
+    # collect expression tag residue information
+    expression_tag_residues = []
+    for label in expression_tag_labels:
+        expression_tag_residues.append(
+            {
+                "chain_id": label[10],
+                "residue_name": label[6:9],
+                "residue_id": int(label[12:16])
+            }
+        )
 
-    # remove expression tags
-    for artifact in artifacts:
-        chain_id = artifact[10]
-        residue_name = artifact[6:9]
-        residue_id = int(artifact[12:16])
-        hier_view = oechem.OEHierView(structure)
-        hier_residue = hier_view.GetResidue(chain_id, residue_name, residue_id)
-        for atom in hier_residue.GetAtoms():
-            structure.DeleteAtom(atom)
-    return structure
+    return expression_tag_residues
 
 
 def assign_caps(

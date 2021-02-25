@@ -509,6 +509,7 @@ class OEKLIFSKinaseApoFeaturizer(OEHybridDockingFeaturizer):
         protein: Protein
             The same system but prepared.
         """
+        from ..modeling.OEModeling import get_expression_tags, delete_residue
         from ..utils import LocalFileStorage
 
         logging.debug("Interpreting kinase of interest ...")
@@ -551,11 +552,21 @@ class OEKLIFSKinaseApoFeaturizer(OEHybridDockingFeaturizer):
             electron_density=electron_density,
             ligand_name=kinase_details["ligand.expo_id"],
             chain_id=kinase_details["structure.chain"],
-            alternate_location=system.protein.chain_id  # KLIFS buggy, allow only user defined
+            alternate_location=kinase_details["structure.alternate_model"]
         )
 
         logging.debug("Extracting kinase and solvent from design unit ...")
         prepared_kinase, prepared_solvent = self._get_components(design_unit)[:-1]
+
+        logging.debug("Deleting expression tags ...")
+        expression_tags = get_expression_tags(kinase_structure)
+        for expression_tag in expression_tags:
+            prepared_kinase = delete_residue(
+                prepared_kinase,
+                chain_id=expression_tag["chain_id"],
+                residue_name=expression_tag["residue_name"],
+                residue_id=expression_tag["residue_id"]
+            )
 
         logging.debug("Processing kinase domain ...")
         processed_kinase_domain = self._process_kinase_domain(
@@ -578,7 +589,12 @@ class OEKLIFSKinaseApoFeaturizer(OEHybridDockingFeaturizer):
         logging.debug("Writing results ...")
         protein_path = self._write_results(
             solvated_kinase,
-            f"{kinase_details['kinase.klifs_name']}_{kinase_details['structure.pdb_id']}",
+            "_".join([
+                f"{kinase_details['kinase.klifs_name']}",
+                f"{kinase_details['structure.pdb_id']}",
+                f"chain{kinase_details['structure.chain']}",
+                f"altloc{kinase_details['structure.alternate_model']}"
+            ]),
             None
         )[0]
 
@@ -603,18 +619,18 @@ class OEKLIFSKinaseApoFeaturizer(OEHybridDockingFeaturizer):
         remote = setup_remote()
 
         # identify kinase of interest and get KLIFS kinase ID and UniProt ID if not provided
-        if any([
+        if sum([
             hasattr(protein, "klifs_kinase_id"),
             hasattr(protein, "uniprot_id"),
             hasattr(protein, "pdb_id")
-        ]):
+        ]) == 1:
             # add chain_id and alternate_location attributes if not present
             if not hasattr(protein, "chain_id"):
                 protein.chain_id = None
             if not hasattr(protein, "alternate_location"):
                 protein.alternate_location = None
-            # if pdb id is given but no klifs kinase id, query KLIFS by pdb
-            if hasattr(protein, "pdb_id") and not hasattr(protein, "klifs_kinase_id"):
+            # if pdb id is given, query KLIFS by pdb
+            if hasattr(protein, "pdb_id"):
                 structures = remote.structures.by_structure_pdb_id(
                     protein.pdb_id,
                     protein.alternate_location,
@@ -763,9 +779,9 @@ class OEKLIFSKinaseApoFeaturizer(OEHybridDockingFeaturizer):
         protein_structure: oechem.OEGraphMol,
         structure_identifier: str,
         electron_density: Union[oegrid.OESkewGrid, None] = None,
-        ligand_name: Union[str, None] = None,
-        chain_id: Union[str, None] = None,
-        alternate_location: Union[str, None] = None
+        ligand_name: str = "-",
+        chain_id: str = "-",
+        alternate_location: str = "-"
     ) -> oechem.OEDesignUnit:
         """
         Get an OpenEye design unit from a protein ligand complex.
@@ -777,11 +793,11 @@ class OEKLIFSKinaseApoFeaturizer(OEHybridDockingFeaturizer):
             A unique identifier describing the structure to prepare.
         electron_density: oegrid.OESkewGrid or None
             An OpenEye grid holding the electron density of the protein ligand complex.
-        ligand_name: str or None
+        ligand_name: str
             Residue name of the ligand in complex with the protein structure.
-        chain_id: str or None
+        chain_id: str
             The chain of interest.
-        alternate_location: str or None
+        alternate_location: str
             The alternate location of interest.
         Returns
         -------
@@ -790,36 +806,29 @@ class OEKLIFSKinaseApoFeaturizer(OEHybridDockingFeaturizer):
         """
         from openeye import oechem
 
-        from ..modeling.OEModeling import remove_expression_tags, prepare_complex, prepare_protein
+        from ..modeling.OEModeling import prepare_complex, prepare_protein
         from ..utils import LocalFileStorage
 
-        # generate unique design unit identifier for local storage of design units
-        design_unit_identifier = f"{structure_identifier}"
-        if ligand_name:
-            if ligand_name == '-':
-                ligand_name = None
-            else:
-                design_unit_identifier += f"_{ligand_name}"
-        if chain_id:
-            design_unit_identifier += f"_chain{chain_id}"
-        if alternate_location:
-            if alternate_location == "-":
-                alternate_location = None
-            else:
-                design_unit_identifier += f"_altloc{alternate_location}"
-
+        # generate unique design unit name
         design_unit_path = LocalFileStorage.featurizer_result(
-            self.__class__.__name__, f"{design_unit_identifier}_design_unit", "oedu"
+            self.__class__.__name__,
+            "_".join([
+                structure_identifier,
+                f"ligand{ligand_name}",
+                f"chain{chain_id}",
+                f"altloc{alternate_location}"
+            ]),
+            "oedu"
         )
         if design_unit_path.is_file():
             logging.debug("Reading design unit from file ...")
             design_unit = oechem.OEDesignUnit()
             oechem.OEReadDesignUnit(str(design_unit_path), design_unit)
         else:
-            logging.debug("Removing expression tags ...")
-            protein_structure = remove_expression_tags(protein_structure)
             logging.debug("Generating design unit ...")
-            if ligand_name is None:
+            if alternate_location == "-":
+                alternate_location = None
+            if ligand_name == "-":
                 design_unit = prepare_protein(
                     protein_structure,
                     loop_db=self.loop_db,
@@ -835,7 +844,8 @@ class OEKLIFSKinaseApoFeaturizer(OEHybridDockingFeaturizer):
                     chain_id=chain_id,
                     alternate_location=alternate_location,
                     ligand_name=ligand_name,
-                    cap_termini=False)
+                    cap_termini=False
+                )
             logging.debug("Writing design unit ...")
             oechem.OEWriteDesignUnit(str(design_unit_path), design_unit)
 
@@ -1007,7 +1017,7 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEKLIFSKinaseApoFeaturizer):
         from openeye import oechem
 
         from ..docking.OEDocking import create_hybrid_receptor, hybrid_docking
-        from ..modeling.OEModeling import compare_molecules, read_smiles
+        from ..modeling.OEModeling import compare_molecules, read_smiles, get_expression_tags, delete_residue
         from ..utils import LocalFileStorage
 
         logging.debug("Interpreting kinase kinase of interest ...")
@@ -1056,7 +1066,7 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEKLIFSKinaseApoFeaturizer):
             electron_density=electron_density,
             ligand_name=protein_template["ligand.expo_id"],
             chain_id=protein_template["structure.chain"],
-            alternate_location=system.protein.alternate_location  # KLIFS buggy, allow only user defined
+            alternate_location=protein_template["structure.alternate_model"]
         )
 
         logging.debug(f"Preparing ligand template structure of {ligand_template['structure.pdb_id']} ...")
@@ -1066,6 +1076,16 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEKLIFSKinaseApoFeaturizer):
         prepared_kinase, prepared_solvent = self._superpose_templates(
             design_unit, prepared_ligand_template, ligand_template
         )
+
+        logging.debug("Deleting expression tags ...")
+        expression_tags = get_expression_tags(kinase_structure)
+        for expression_tag in expression_tags:
+            prepared_kinase = delete_residue(
+                prepared_kinase,
+                chain_id=expression_tag["chain_id"],
+                residue_name=expression_tag["residue_name"],
+                residue_id=expression_tag["residue_id"]
+            )
 
         logging.debug("Extracting ligand ...")
         split_options = oechem.OESplitMolComplexOptions()
@@ -1111,7 +1131,12 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEKLIFSKinaseApoFeaturizer):
         logging.debug("Writing results ...")
         protein_path, ligand_path = self._write_results(
             solvated_kinase,
-            system.protein.name,
+            "_".join([
+                f"{protein_template['kinase.klifs_name']}",
+                f"{protein_template['structure.pdb_id']}",
+                f"chain{protein_template['structure.chain']}",
+                f"altloc{protein_template['structure.alternate_model']}"
+            ]),
             system.ligand.name
         )
 
@@ -1335,7 +1360,10 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEKLIFSKinaseApoFeaturizer):
         logging.debug("Overlaying molecules ...")
         overlay_scores = []
         for conformations in conformations_ensemble:
-            overlay_scores += [[i, overlay_molecules(complex_ligand, conformations, False)] for i, complex_ligand in enumerate(complex_ligands)]
+            overlay_scores += [
+                [i, overlay_molecules(complex_ligand, conformations, False)]
+                for i, complex_ligand in enumerate(complex_ligands)
+            ]
 
         # if maximal score is 1.73, threshold is set to 1.53
         overlay_score_threshold = max([score[1] for score in overlay_scores]) - 0.2
