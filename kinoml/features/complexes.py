@@ -552,7 +552,7 @@ class OEKLIFSKinaseApoFeaturizer(OEHybridDockingFeaturizer):
             electron_density=electron_density,
             ligand_name=kinase_details["ligand.expo_id"],
             chain_id=kinase_details["structure.chain"],
-            alternate_location=kinase_details["structure.alternate_model"]
+            alternate_location=system.protein.alternate_location  # KLIFS alternate locations buggy, e.g. 3cs9
         )
 
         logging.debug("Extracting kinase and solvent from design unit ...")
@@ -593,7 +593,7 @@ class OEKLIFSKinaseApoFeaturizer(OEHybridDockingFeaturizer):
                 f"{kinase_details['kinase.klifs_name']}",
                 f"{kinase_details['structure.pdb_id']}",
                 f"chain{kinase_details['structure.chain']}",
-                f"altloc{kinase_details['structure.alternate_model']}"
+                f"altloc{system.protein.alternate_location}"  # KLIFS alternate locations buggy, e.g. 3cs9
             ]),
             None
         )[0]
@@ -619,11 +619,11 @@ class OEKLIFSKinaseApoFeaturizer(OEHybridDockingFeaturizer):
         remote = setup_remote()
 
         # identify kinase of interest and get KLIFS kinase ID and UniProt ID if not provided
-        if sum([
+        if any([
             hasattr(protein, "klifs_kinase_id"),
             hasattr(protein, "uniprot_id"),
             hasattr(protein, "pdb_id")
-        ]) == 1:
+        ]):
             # add chain_id and alternate_location attributes if not present
             if not hasattr(protein, "chain_id"):
                 protein.chain_id = None
@@ -1066,7 +1066,7 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEKLIFSKinaseApoFeaturizer):
             electron_density=electron_density,
             ligand_name=protein_template["ligand.expo_id"],
             chain_id=protein_template["structure.chain"],
-            alternate_location=protein_template["structure.alternate_model"]
+            alternate_location=system.protein.alternate_location  # KLIFS alternate locations buggy, e.g. 3cs9
         )
 
         logging.debug(f"Preparing ligand template structure of {ligand_template['structure.pdb_id']} ...")
@@ -1135,7 +1135,7 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEKLIFSKinaseApoFeaturizer):
                 f"{protein_template['kinase.klifs_name']}",
                 f"{protein_template['structure.pdb_id']}",
                 f"chain{protein_template['structure.chain']}",
-                f"altloc{protein_template['structure.alternate_model']}"
+                f"altloc{system.protein.alternate_location}"  # KLIFS alternate locations buggy, e.g. 3cs9
             ]),
             system.ligand.name
         )
