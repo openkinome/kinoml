@@ -629,6 +629,8 @@ class OEKLIFSKinaseApoFeaturizer(OEHybridDockingFeaturizer):
                 protein.chain_id = None
             if not hasattr(protein, "alternate_location"):
                 protein.alternate_location = None
+            if protein.alternate_location == "-":
+                protein.alternate_location = None
             # if pdb id is given, query KLIFS by pdb
             if hasattr(protein, "pdb_id"):
                 structures = remote.structures.by_structure_pdb_id(
@@ -779,9 +781,9 @@ class OEKLIFSKinaseApoFeaturizer(OEHybridDockingFeaturizer):
         protein_structure: oechem.OEGraphMol,
         structure_identifier: str,
         electron_density: Union[oegrid.OESkewGrid, None] = None,
-        ligand_name: str = "-",
-        chain_id: str = "-",
-        alternate_location: str = "-"
+        ligand_name: Union[str, None] = None,
+        chain_id: Union[str, None] = None,
+        alternate_location: Union[str, None] = None
     ) -> oechem.OEDesignUnit:
         """
         Get an OpenEye design unit from a protein ligand complex.
@@ -793,11 +795,11 @@ class OEKLIFSKinaseApoFeaturizer(OEHybridDockingFeaturizer):
             A unique identifier describing the structure to prepare.
         electron_density: oegrid.OESkewGrid or None
             An OpenEye grid holding the electron density of the protein ligand complex.
-        ligand_name: str
+        ligand_name: str or None
             Residue name of the ligand in complex with the protein structure.
-        chain_id: str
+        chain_id: str or None
             The chain of interest.
-        alternate_location: str
+        alternate_location: str or None
             The alternate location of interest.
         Returns
         -------
@@ -826,9 +828,7 @@ class OEKLIFSKinaseApoFeaturizer(OEHybridDockingFeaturizer):
             oechem.OEReadDesignUnit(str(design_unit_path), design_unit)
         else:
             logging.debug("Generating design unit ...")
-            if alternate_location == "-":
-                alternate_location = None
-            if ligand_name == "-":
+            if ligand_name is None:
                 design_unit = prepare_protein(
                     protein_structure,
                     loop_db=self.loop_db,
