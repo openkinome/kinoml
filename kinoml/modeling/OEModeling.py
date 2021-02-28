@@ -387,6 +387,13 @@ def _prepare_structure(
                 return True
         return False
 
+    # select alternate location
+    if alternate_location:
+        altloc_factory = oechem.OEAltLocationFactory(structure)
+        for atom in altloc_factory.GetAltAtoms():
+            altloc_factory.SetAlt(atom, alternate_location)
+        altloc_factory.MakeCurrentAltMol(structure)
+
     # delete loose protein residues
     structure = delete_loose_residues(structure)
 
@@ -433,22 +440,16 @@ def _prepare_structure(
 
     # filter design units for ligand of interest
     if ligand_name is not None:
+        logging.debug(f"Filtering design units for ligand with name {ligand_name} ...")
         design_units = [
             design_unit
             for design_unit in design_units
             if _contains_resname(design_unit, ligand_name)
         ]
 
-    # filter design units for alternate location of interest
-    if alternate_location is not None:
-        design_units = [
-            design_unit
-            for design_unit in design_units
-            if f"alt{alternate_location}" in design_unit.GetTitle()
-        ]
-
     # filter design units for chain of interest
     if chain_id is not None:
+        logging.debug(f"Filtering design units for chain with ID {chain_id} ...")
         design_units = [
             design_unit
             for design_unit in design_units
