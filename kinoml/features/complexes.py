@@ -811,6 +811,9 @@ class OEKLIFSKinaseApoFeaturizer(OEHybridDockingFeaturizer):
         from ..modeling.OEModeling import prepare_complex, prepare_protein
         from ..utils import LocalFileStorage
 
+        if ligand_name == "-":
+            ligand_name = None
+
         # generate unique design unit name
         design_unit_path = LocalFileStorage.featurizer_result(
             self.__class__.__name__,
