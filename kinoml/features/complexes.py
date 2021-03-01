@@ -638,7 +638,7 @@ class OEKLIFSKinaseApoFeaturizer(OEHybridDockingFeaturizer):
                     protein.alternate_location,
                     protein.chain_id
                 )
-                protein.klifs_kinase_id = structures["kinase.klifs_id"][0]
+                protein.klifs_kinase_id = structures["kinase.klifs_id"].iloc[0]
             # if KLIFS kinase ID is not given, query by UniProt ID
             if not hasattr(protein, "klifs_kinase_id"):
                 logging.debug("Converting UniProt ID to KLIFS kinase ID ...")
