@@ -1496,7 +1496,7 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEKLIFSKinaseApoFeaturizer):
             logging.debug(
                 f"Downloading PDB entry {ligand_template['structure.pdb_id']} ..."
             )
-            FileDownloader.rcsb_structure_pdb(["structure.pdb_id"])
+            FileDownloader.rcsb_structure_pdb(ligand_template["structure.pdb_id"])
         logging.debug("Reading structure ...")
         ligand_template_structure = read_molecules(ligand_template_structure.path)[0]
 
@@ -1582,6 +1582,6 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEKLIFSKinaseApoFeaturizer):
                 | oechem.OEPreserveResInfo_InsertCode
         )
         oechem.OEPerceiveResidues(kinase_domain, preserved_info)
-        oechem.OEPerceiveResidues(solvent)
+        oechem.OEPerceiveResidues(solvent, preserved_info)
 
         return kinase_domain, solvent
