@@ -387,18 +387,13 @@ def _prepare_structure(
                 return True
         return False
 
-    # select alternate location
-    if alternate_location:
-        altloc_factory = oechem.OEAltLocationFactory(structure)
-        for atom in altloc_factory.GetAltAtoms():
-            altloc_factory.SetAlt(atom, alternate_location)
-        altloc_factory.MakeCurrentAltMol(structure)
-
     # delete loose protein residues
     structure = delete_loose_residues(structure)
 
     structure_metadata = oespruce.OEStructureMetadata()
     design_unit_options = oespruce.OEMakeDesignUnitOptions()
+    # also consider alternate locations outside binding pocket, important for later filtering
+    design_unit_options.GetPrepOptions().GetEnumerateSitesOptions().SetCollapseNonSiteAlts(False)
     # alignment options, only matches are important
     design_unit_options.GetPrepOptions().GetBuildOptions().GetLoopBuilderOptions().SetSeqAlignMethod(
         oechem.OESeqAlignmentMethod_Identity
@@ -454,6 +449,15 @@ def _prepare_structure(
             design_unit
             for design_unit in design_units
             if _contains_chain(design_unit, chain_id)
+        ]
+
+    # filter design units for alternate location of interest
+    if alternate_location is not None:
+        logging.debug(f"Filtering design units for alternate location {alternate_location} ...")
+        design_units = [
+            design_unit
+            for design_unit in design_units
+            if f"alt{alternate_location}" in design_unit.GetTitle()
         ]
 
     if len(design_units) >= 1:
