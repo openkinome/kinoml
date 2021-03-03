@@ -235,7 +235,7 @@ class OEHybridDockingFeaturizer(BaseFeaturizer):
                 | oechem.OEPreserveResInfo_InsertCode
         )
         oechem.OEPerceiveResidues(protein, preserved_info)
-        oechem.OEPerceiveResidues(solvent)
+        oechem.OEPerceiveResidues(solvent, preserved_info)
         oechem.OEPerceiveResidues(ligand)
 
         logging.debug(
