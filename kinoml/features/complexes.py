@@ -182,15 +182,16 @@ class OEHybridDockingFeaturizer(BaseFeaturizer):
             self.__class__.__name__,
             f"{design_unit_identifier}_design_unit", "oedu"
         )  # TODO: the file name needs to be unique
-        if design_unit_path.is_file():
-            logging.debug("Reading design unit from file ...")
-            design_unit = oechem.OEDesignUnit()
-            oechem.OEReadDesignUnit(str(design_unit_path), design_unit)
-        else:
+        if not design_unit_path.is_file():
             logging.debug("Generating design unit ...")
             design_unit = prepare_complex(complex_structure, electron_density, self.loop_db)
             logging.debug("Writing design unit ...")
             oechem.OEWriteDesignUnit(str(design_unit_path), design_unit)
+        # re-reading design unit helps proper capping of e.g. 2itz
+        # TODO: revisit, report bug
+        logging.debug("Reading design unit from file ...")
+        design_unit = oechem.OEDesignUnit()
+        oechem.OEReadDesignUnit(str(design_unit_path), design_unit)
 
         return design_unit
 
@@ -825,11 +826,7 @@ class OEKLIFSKinaseApoFeaturizer(OEHybridDockingFeaturizer):
             ]),
             "oedu"
         )
-        if design_unit_path.is_file():
-            logging.debug("Reading design unit from file ...")
-            design_unit = oechem.OEDesignUnit()
-            oechem.OEReadDesignUnit(str(design_unit_path), design_unit)
-        else:
+        if not design_unit_path.is_file():
             logging.debug("Generating design unit ...")
             if ligand_name is None:
                 design_unit = prepare_protein(
@@ -851,6 +848,11 @@ class OEKLIFSKinaseApoFeaturizer(OEHybridDockingFeaturizer):
                 )
             logging.debug("Writing design unit ...")
             oechem.OEWriteDesignUnit(str(design_unit_path), design_unit)
+        # re-reading design unit helps proper capping of e.g. 2itz
+        # TODO: revisit, report bug
+        logging.debug("Reading design unit from file ...")
+        design_unit = oechem.OEDesignUnit()
+        oechem.OEReadDesignUnit(str(design_unit_path), design_unit)
 
         return design_unit
 
