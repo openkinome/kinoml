@@ -287,6 +287,19 @@ class OEHybridDockingFeaturizer(BaseFeaturizer):
 
         logging.debug("Updating hydrogen positions of assembled components ...")
         oechem.OEPlaceHydrogens(assembled_components)
+        # keep tyrosine protonated, e.g. 6tg1 chain B
+        predicate = oechem.OEAndAtom(
+            oechem.OEAtomMatchResidue(["TYR:.*:.*:.*:.*"]),
+            oechem.OEHasFormalCharge(-1)
+        )
+        for atom in assembled_components.GetAtoms(predicate):
+            logging.debug(
+                f"{atom.GetName()}, {atom.GetFormalCharge()}, {atom.GetImplicitHCount()}, {atom.GetExplicitHCount()}")
+            atom.SetFormalCharge(0)
+            atom.SetImplicitHCount(1)
+            logging.debug(
+                f"{atom.GetName()}, {atom.GetFormalCharge()}, {atom.GetImplicitHCount()}, {atom.GetExplicitHCount()}")
+        oechem.OEAddExplicitHydrogens(assembled_components)
 
         logging.debug("Updating residue identifiers ...")
         assembled_components = update_residue_identifiers(assembled_components)
