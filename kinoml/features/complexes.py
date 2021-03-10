@@ -831,7 +831,6 @@ class OEKLIFSKinaseApoFeaturizer(OEHybridDockingFeaturizer):
             if ligand_name is None:
                 design_unit = prepare_protein(
                     protein_structure,
-                    loop_db=self.loop_db,
                     chain_id=chain_id,
                     alternate_location=alternate_location,
                     cap_termini=False
@@ -840,7 +839,6 @@ class OEKLIFSKinaseApoFeaturizer(OEHybridDockingFeaturizer):
                 design_unit = prepare_complex(
                     protein_structure,
                     electron_density=electron_density,
-                    loop_db=self.loop_db,
                     chain_id=chain_id,
                     alternate_location=alternate_location,
                     ligand_name=ligand_name,
@@ -901,11 +899,11 @@ class OEKLIFSKinaseApoFeaturizer(OEHybridDockingFeaturizer):
         logging.debug("Applying mutations to kinase domain ...")
         kinase_structure = apply_mutations(kinase_structure, kinase_domain_sequence)
 
-        logging.debug(f"Deleting clashing side chains ...")  # e.g. 2j5f, 4wd5
-        kinase_structure = delete_clashing_sidechains(kinase_structure)
-
-        logging.debug("Deleting residues with missing side chain atoms ...")
+        logging.debug("Deleting residues with missing atoms ...")
         kinase_structure = delete_partial_residues(kinase_structure)
+
+        logging.debug(f"Deleting residues with clashing side chains ...")  # e.g. 2j5f, 4wd5
+        kinase_structure = delete_clashing_sidechains(kinase_structure)
 
         logging.debug("Deleting loose residues ...")
         kinase_structure = delete_loose_residues(kinase_structure)

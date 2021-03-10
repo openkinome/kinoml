@@ -1325,7 +1325,8 @@ def delete_partial_residues(structure: oechem.OEGraphMol) -> oechem.OEGraphMol:
     # delete atoms
     for incomplete_residue in incomplete_residues:
         logging.debug(
-            f"Deleting residue {incomplete_residue.GetName()}"
+            "Deleting protein residue with incomplete sidechain "
+            f"{incomplete_residue.GetName()}"
             f"{incomplete_residue.GetResidueNumber()}"
         )
         hier_view = oechem.OEHierView(structure)
@@ -1336,6 +1337,22 @@ def delete_partial_residues(structure: oechem.OEGraphMol) -> oechem.OEGraphMol:
         )
         for atom in structure_residue.GetAtoms():
             structure.DeleteAtom(atom)
+
+    # spruce sometimes creates protein residues consisting of water atoms, e.g. 2hz0 chain B
+    # spruce does not always delete residues with missing backbone atoms, e.g. 3qrj chain B
+    # TODO: submit bug report
+    backbone_atom_names = {"C", "CA", "N"}
+    hier_view = oechem.OEHierView(structure)
+    for hier_residue in hier_view.GetResidues():
+        atom_names = set([atom.GetName().strip() for atom in hier_residue.GetAtoms()])
+        if len(backbone_atom_names.difference(atom_names)) > 0:
+            logging.debug(
+                "Deleting protein residue with incomplete backbone "
+                f"{hier_residue.GetResidueName()}"
+                f"{hier_residue.GetResidueNumber()} ..."
+            )
+            for atom in hier_residue.GetAtoms():
+                structure.DeleteAtom(atom)
 
     return structure
 
