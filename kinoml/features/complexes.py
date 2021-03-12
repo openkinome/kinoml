@@ -893,8 +893,7 @@ class OEKLIFSKinaseApoFeaturizer(OEHybridDockingFeaturizer):
             apply_mutations,
             delete_clashing_sidechains,
             delete_partial_residues,
-            delete_loose_residues,
-            delete_loose_tails,
+            delete_short_protein_segments,
             renumber_structure
         )
 
@@ -902,23 +901,20 @@ class OEKLIFSKinaseApoFeaturizer(OEHybridDockingFeaturizer):
             logging.debug(f"Deleting all chains but {chain_id} ...")
             kinase_structure = select_chain(kinase_structure, chain_id)
 
-        logging.debug("Applying deletions to kinase domain ...")
-        kinase_structure = apply_deletions(kinase_structure, kinase_domain_sequence)
-
-        logging.debug("Applying mutations to kinase domain ...")
-        kinase_structure = apply_mutations(kinase_structure, kinase_domain_sequence)
-
         logging.debug(f"Deleting residues with clashing side chains ...")  # e.g. 2j5f, 4wd5
         kinase_structure = delete_clashing_sidechains(kinase_structure)
 
         logging.debug("Deleting residues with missing atoms ...")
         kinase_structure = delete_partial_residues(kinase_structure)
 
-        logging.debug("Deleting loose residues ...")
-        kinase_structure = delete_loose_residues(kinase_structure)
+        logging.debug("Deleting loose protein segments ...")
+        kinase_structure = delete_short_protein_segments(kinase_structure)
 
-        logging.debug("Deleting loose tails ...")
-        kinase_structure = delete_loose_tails(kinase_structure, kinase_domain_sequence)
+        logging.debug("Applying deletions to kinase domain ...")
+        kinase_structure = apply_deletions(kinase_structure, kinase_domain_sequence)
+
+        logging.debug("Applying mutations to kinase domain ...")
+        kinase_structure = apply_mutations(kinase_structure, kinase_domain_sequence)
 
         if self.loop_db:
             logging.debug("Applying insertions to kinase domain ...")
