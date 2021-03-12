@@ -293,8 +293,9 @@ class OEHybridDockingFeaturizer(BaseFeaturizer):
             oechem.OEHasFormalCharge(-1)
         )
         for atom in assembled_components.GetAtoms(predicate):
-            atom.SetFormalCharge(0)
-            atom.SetImplicitHCount(1)
+            if atom.GetName().strip() == "OH":
+                atom.SetFormalCharge(0)
+                atom.SetImplicitHCount(1)
         oechem.OEAddExplicitHydrogens(assembled_components)
 
         logging.debug("Updating residue identifiers ...")
