@@ -457,6 +457,12 @@ class OEHybridDockingFeaturizer(BaseFeaturizer):
                 "pdb")
             write_molecules([structure], complex_path)
 
+            complex_path = LocalFileStorage.featurizer_result(
+                self.__class__.__name__,
+                f"{protein_name}_{ligand_name}_complex",
+                "oeb")
+            write_molecules([structure], complex_path)
+
             logging.debug("Splitting components")
             solvated_protein = remove_non_protein(structure, remove_water=False)
             split_options = oechem.OESplitMolComplexOptions()
@@ -471,6 +477,12 @@ class OEHybridDockingFeaturizer(BaseFeaturizer):
                 "pdb")
             write_molecules([solvated_protein], protein_path)
 
+            protein_path = LocalFileStorage.featurizer_result(
+                self.__class__.__name__,
+                f"{protein_name}_{ligand_name}_protein",
+                "oeb")
+            write_molecules([solvated_protein], protein_path)
+
             logging.debug("Writing ligand ...")
             ligand_path = LocalFileStorage.featurizer_result(
                 self.__class__.__name__,
@@ -483,6 +495,12 @@ class OEHybridDockingFeaturizer(BaseFeaturizer):
                 self.__class__.__name__,
                 f"{protein_name}_protein",
                 "pdb")
+            write_molecules([structure], protein_path)
+
+            protein_path = LocalFileStorage.featurizer_result(
+                self.__class__.__name__,
+                f"{protein_name}_protein",
+                "oeb")
             write_molecules([structure], protein_path)
 
             ligand_path = None
