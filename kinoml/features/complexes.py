@@ -1101,7 +1101,10 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEKLIFSKinaseApoFeaturizer):
 
         logging.debug("Superposing kinase and ligand template ...")
         prepared_kinase, prepared_solvent = self._superpose_templates(
-            design_unit, prepared_ligand_template, ligand_template
+            design_unit,
+            prepared_ligand_template,
+            ligand_template,
+            protein_template["structure.chain"]
         )
 
         logging.debug("Deleting expression tags ...")
@@ -1123,8 +1126,7 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEKLIFSKinaseApoFeaturizer):
         logging.debug("Processing kinase domain ...")
         processed_kinase_domain = self._process_kinase_domain(
             prepared_kinase,
-            system.protein.sequence,
-            protein_template["structure.chain"]
+            system.protein.sequence
         )
 
         logging.debug("Checking for co-crystallized ligand ...")
@@ -1546,7 +1548,8 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEKLIFSKinaseApoFeaturizer):
     def _superpose_templates(
         design_unit: oechem.OEDesignUnit,
         ligand_template_structure: oechem.OEGraphMol,
-        ligand_template: pd.Series
+        ligand_template: pd.Series,
+        chain_id: Union[str, None],
     ) -> Tuple[oechem.OEGraphMol, oechem.OEGraphMol]:
         """
         Superpose the kinase domain from the design unit to the given ligand template structure. The superposed kinase
@@ -1559,6 +1562,8 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEKLIFSKinaseApoFeaturizer):
             An OpenEye molecule holding the ligand template structure.
         ligand_template: pd.Series
             A data series containing entries 'structure.chain' and 'structure.klifs_id'.
+        chain_id: str or None
+            The chain of the kinase. Other chains will be deleted.
         Returns
         -------
         kinase_domain: oechem.OEGraphMol
@@ -1570,13 +1575,16 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEKLIFSKinaseApoFeaturizer):
         from opencadd.databases.klifs import setup_remote
         from openeye import oechem
 
-        from ..modeling.OEModeling import superpose_proteins
+        from ..modeling.OEModeling import superpose_proteins, select_chain
 
         logging.debug("Extracting protein and solvent ...")
         solvated_kinase_domain = oechem.OEGraphMol()
         design_unit.GetComponents(
             solvated_kinase_domain, oechem.OEDesignUnitComponents_Protein | oechem.OEDesignUnitComponents_Solvent
         )
+        if chain_id:
+            logging.debug(f"Deleting all chains but {chain_id} ...")
+            solvated_kinase_domain = select_chain(solvated_kinase_domain, chain_id)
 
         logging.debug("Retrieving KLIFS kinase pocket residues ...")
         remote = setup_remote()
