@@ -1,6 +1,6 @@
 import logging
 
-from openforcefield.topology import Molecule
+from openff.toolkit.topology import Molecule
 
 from .components import BaseLigand
 from ..utils import download_file
@@ -55,16 +55,8 @@ class Ligand(BaseLigand, Molecule):
         cls, smiles, name=None, allow_undefined_stereo=True, **kwargs
     ):  # pylint: disable=arguments-differ
         """
-        Same as `openforcefield.topology.Molecule`, but adding
+        Same as `openff.toolkit.topology.Molecule`, but adding
         information about the original SMILES to `.metadata` dict.
-
-        !!! todo
-            Inheritance from these methods in OFF is broken because they
-            delegate directly to the underlying toolkits, and type is
-            lost on the way, so we will always obtain an
-            openforcefield.topology.Molecule, no matter what.
-
-            PR #583 has been submitted to patch upstream
         """
         self = super().from_smiles(smiles, allow_undefined_stereo=allow_undefined_stereo, **kwargs)
         if name is None:
