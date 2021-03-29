@@ -5,6 +5,7 @@ from __future__ import annotations
 from functools import lru_cache
 
 import numpy as np
+import rdkit
 
 from .core import BaseFeaturizer, BaseOneHotEncodingFeaturizer
 from ..core.systems import System
