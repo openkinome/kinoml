@@ -10,6 +10,65 @@ from .core import BaseFeaturizer, BaseOneHotEncodingFeaturizer
 from ..core.systems import System
 from ..core.ligands import BaseLigand, SmilesLigand, Ligand
 
+ALL_ATOMIC_SYMBOLS = [
+    'C',
+    'N',
+    'O',
+    'S',
+    'F',
+    'Si',
+    'P',
+    'Cl',
+    'Br',
+    'Mg',
+    'Na',
+    'Ca',
+    'Fe',
+    'As',
+    'Al',
+    'I',
+    'B',
+    'V',
+    'K',
+    'Tl',
+    'Yb',
+    'Sb',
+    'Sn',
+    'Ag',
+    'Pd',
+    'Co',
+    'Se',
+    'Ti',
+    'Zn',
+    'H',
+    'Li',
+    'Ge',
+    'Cu',
+    'Au',
+    'Ni',
+    'Cd',
+    'In',
+    'Mn',
+    'Zr',
+    'Cr',
+    'Pt',
+    'Hg',
+    'Pb',
+    'Unknown'
+]
+
+SIZE_OF_RING = [3, 4, 5, 6, 7, 8, 9, 10]
+
+HYBRIZIDATION_TYPES = [
+    rdkit.Chem.rdchem.HybridizationType.OTHER, # OTHER
+    rdkit.Chem.rdchem.HybridizationType.S, # S
+    rdkit.Chem.rdchem.HybridizationType.SP, # SP
+    rdkit.Chem.rdchem.HybridizationType.SP2, # SP2
+    rdkit.Chem.rdchem.HybridizationType.SP3, # SP2
+    rdkit.Chem.rdchem.HybridizationType.SP3D, # SP3D
+    rdkit.Chem.rdchem.HybridizationType.SP3D2, # SP3D2
+    rdkit.Chem.rdchem.HybridizationType.UNSPECIFIED # UNSPECIFIED
+]
 
 class SingleLigandFeaturizer(BaseFeaturizer):
     """
@@ -211,27 +270,71 @@ class GraphLigandFeaturizer(SingleLigandFeaturizer):
         return connectivity_graph, per_atom_features
 
     @staticmethod
-    def _per_atom_features(atom: rdkit.Chem.Atom) -> tuple:
+    def _per_atom_features(atom):
         """
-        Computes desired features for each rdkit atom in the graph.
+        Computes desired features for each atom in the molecular graph.
 
-        Parameters:
-            atom: rdkit atom to extract features from
-        Returns:
-            Atomic number, number of neighbors, valence,
-            atomic mass, formal charge, number of implicit hydrogens,
-            bool (if atom is in a ring), bool (if atom is aromatic), number of radical electrons
+        Parameters
+        ----------
+            atom: atom to extract features from
+
+        Returns
+        -------
+        tuple of atomic features (all 17 included by default).
+
+            atomic_number : int
+                the atomic number.
+            atomic_symbol : array
+                the one-hot encoded atomic symbol from `ALL_ATOMIC_SYMBOLS`.
+            degree : int
+                the degree of the atom in the molecule (number of neighbors).
+            total_degree : int
+                the degree of the atom in the molecule including hydrogens.
+            explicit_valence : int
+                the explicit valence of the atom.
+            implicit_valence : int
+                the number of implicit Hs on the atom.
+            total_valence : int
+                the total valence (explicit + implicit) of the atom.
+            atomic_mass : float
+                the atomic mass.
+            formal_charge : int
+                the formal charge of atom.
+            explicit_h : int
+                the number of explicit hydrogens.
+            implicit_h : int
+                the total number of implicit hydrogens on the atom.
+            total_h : int
+                the total number of Hs (explicit and implicit) on the atom.
+            ring : bool
+                if the atom is part of a ring.
+            ring_size : array
+                if the atom if part of a ring of size determined by `SIZE_OF_RING`.
+            aromatic : bool
+                    if atom is aromatic
+            radical_electrons : int
+                number of radical electrons
+            hybridization_type : array
+                the one-hot enocded hybridization type from `HYBRIZIDATION_TYPES`.
         """
         return (
             atom.GetAtomicNum(),
+            atom.GetSymbol(), # TODO : one-hot encode
             atom.GetDegree(),
+            atom.GetTotalDegree(), # TODO : ignore if molecule has H
             atom.GetExplicitValence(),
+            atom.GetImplicitValence(), # TODO : ignore if molecule has H
+            atom.GetTotalValence(),
             atom.GetMass(),
             atom.GetFormalCharge(),
+            atom.GetNumExplicitHs(),
             atom.GetNumImplicitHs(),
+            atom.GetTotalNumHs(),
             atom.IsInRing(),
+            atom.IsInRingSize(), # TODO : one-hot encode
             atom.GetIsAromatic(),
             atom.GetNumRadicalElectrons(),
+            atom.GetHybridization(), # TODO : one-hot encode
         )
 
     @staticmethod
