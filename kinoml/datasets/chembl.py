@@ -7,6 +7,7 @@ import random
 from tempfile import TemporaryDirectory
 from zipfile import ZipFile
 from pathlib import Path
+import os
 
 import pandas as pd
 from tqdm.auto import tqdm
@@ -31,7 +32,7 @@ class ChEMBLDatasetProvider(MultiDatasetProvider):
     def from_source(
         cls,
         filename="https://github.com/openkinome/datascripts/releases/download/v0.1/activities-chembl27.zip",
-        measurement_types=("IC50", "Ki", "Kd"),
+        measurement_types=("pIC50", "pKi", "pKd"),
         sample=None,
         **kwargs,
     ):
@@ -39,7 +40,7 @@ class ChEMBLDatasetProvider(MultiDatasetProvider):
         Create a MultiDatasetProvider out of the raw data contained in the zip file
 
         Parameters:
-            filename: URL to a zipped CSV file containing activities from ChEMBL,
+            filename: path or URL to a zipped CSV file containing activities from ChEMBL,
                 using schema detailed below.
 
         !!! note
@@ -47,16 +48,20 @@ class ChEMBLDatasetProvider(MultiDatasetProvider):
               to be different across experiments.
 
         !!! todo
-            - Versioning for different openkinome/datascripts releases
+            - Versioning for different openkinome/kinodata releases
         """
-        csv_filename = "activities-chembl27.csv"
+        csv_filename = os.path.splitext(os.path.basename(filename))[0] + ".csv"
         cached_path = Path(APPDIR.user_cache_dir) / "chembl" / csv_filename
         if not cached_path.is_file():
+            if os.path.isfile(filename):
+                open_handle = lambda path: open(path, "rb")
+            else:  # it is url
+                open_handle = urlopen
             # Download zipped CSV and load it with pandas
-            with urlopen(filename) as response, TemporaryDirectory() as tmpdir:
+            with open_handle(filename) as f, TemporaryDirectory() as tmpdir:
                 tmpzip = Path(tmpdir) / "chembl.zip"
-                with open(tmpzip, "wb") as f:
-                    shutil.copyfileobj(response, f)
+                with open(tmpzip, "wb") as out:
+                    shutil.copyfileobj(f, out)
                 with ZipFile(tmpzip) as zf:
                     zf.extractall(tmpdir)
                 cached_path.parent.mkdir(parents=True, exist_ok=True)
@@ -64,30 +69,10 @@ class ChEMBLDatasetProvider(MultiDatasetProvider):
 
         df = pd.read_csv(cached_path)
 
-        # Filter out extremely large or small values
-        # FIXME: Consider dynamic range of each assay instead of filtering out
-        # add a new column with -log10 of the activities
-        activities = df["activities.standard_value"]
-        df = df[(1e6 >= activities) & (activities > 1e-6)]
-
-        # we also convert nM to M by multiplying times 1E-9
-        df = df.assign(p_activities=-pd.np.log10(df["activities.standard_value"] * 1e-9))
-
-        # drop NAs _and_ infinities
-        with pd.option_context("mode.use_inf_as_na", True):
-            df = df.dropna(
-                subset=[
-                    "compound_structures.canonical_smiles",
-                    "activities.standard_value",
-                    "p_activities",
-                ]
-            )
-            # DROP outside range [1e-6, 1E6]
-
         measurement_type_classes = {
-            "IC50": pIC50Measurement,
-            "Ki": pKiMeasurement,
-            "Kd": pKdMeasurement,
+            "pIC50": pIC50Measurement,
+            "pKi": pKiMeasurement,
+            "pKd": pKdMeasurement,
         }
         measurements = []
         systems = {}
@@ -127,11 +112,11 @@ class ChEMBLDatasetProvider(MultiDatasetProvider):
                     "unit": f"-log10({row['activities.standard_units']}E-9)",
                     "confidence": row["assays.confidence_score"],
                     "chembl_activity": row["activities.activity_id"],
-                    "chembl_document": row["docs.doc_id"],
+                    "chembl_document": row["docs.chembl_id"],
                     "year": row["docs.year"],
                 }
                 measurement = MeasurementType(
-                    values=row["p_activities"],
+                    values=row["activities.standard_value"],
                     system=system,
                     conditions=conditions,
                     metadata=metadata,
