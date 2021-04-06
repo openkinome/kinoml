@@ -96,6 +96,7 @@ jobs:
           yml: ./.codecov.yml
 
   lint-format:
+    name: Lint & format checks
     runs-on: ubuntu-18.04
 
     steps:
@@ -103,11 +104,13 @@ jobs:
 
       - uses: conda-incubator/setup-miniconda@v2
         with:
+          installer-url: https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-Linux-x86_64.sh
           python-version: "3.7"
           activate-environment: test
           channel-priority: true
           environment-file: devtools/conda-envs/test_env.yaml
           auto-activate-base: false
+          use-mamba: true
 
       - name: Additional info about the build
         shell: bash
@@ -125,7 +128,7 @@ jobs:
       - name: Install linter / formatter
         shell: bash -l {0}
         run: |
-          conda install pylint black
+          mamba install pylint black
 
       - name: Install package
         shell: bash -l {0}
@@ -144,6 +147,7 @@ jobs:
           black --check -l 99 kinoml/ --exclude kinoml/_version.py
 
   mkdocs:
+    name: Docs
     runs-on: ubuntu-18.04
 
     steps:
@@ -151,11 +155,13 @@ jobs:
 
       - uses: conda-incubator/setup-miniconda@v2
         with:
+          installer-url: https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-Linux-x86_64.sh
           python-version: "3.7"
           activate-environment: test
           channel-priority: true
           environment-file: devtools/conda-envs/test_env.yaml
           auto-activate-base: false
+          use-mamba: true
 
       - name: Additional info about the build
         shell: bash
