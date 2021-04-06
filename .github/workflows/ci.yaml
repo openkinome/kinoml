@@ -89,6 +89,7 @@ jobs:
 
       - name: CodeCov
         uses: codecov/codecov-action@v1
+        always()
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           file: ./coverage.xml
@@ -182,7 +183,7 @@ jobs:
           python -m pip install --no-deps .
 
       - name: Build docs
-        shell: bash
+        shell: bash -l {0}
         run: |
           # Required to load docstrings sample module inside docs/
           export PYTHONPATH=$(pwd)
