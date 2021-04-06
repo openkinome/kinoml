@@ -41,7 +41,7 @@ class System:
         """
         Generates a readable name out of the components names
         """
-        return " & ".join([c.name for c in self.components])
+        return " & ".join([str(c.name) for c in self.components])
 
     @property
     def weight(self) -> float:
