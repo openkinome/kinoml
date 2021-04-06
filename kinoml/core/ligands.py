@@ -1,5 +1,4 @@
 import logging
-
 from openff.toolkit.topology import Molecule
 
 from .components import BaseLigand
@@ -37,7 +36,7 @@ class PDBLigand(FileLigand):
         download_file(f"https://files.rcsb.org/ligands/view/{pdb_id}_ideal.sdf", self.path)
 
 
-class Ligand(BaseLigand, Molecule):
+class OpenForceFieldLigand(BaseLigand, Molecule):
 
     """
     Small molecule object based on the OpenForceField toolkit.
@@ -72,3 +71,59 @@ class Ligand(BaseLigand, Molecule):
     def _initialize_from_dict(self, molecule_dict):
         super()._initialize_from_dict(molecule_dict)
         self.metadata = molecule_dict["metadata"].copy()
+
+
+# Alias OpenForceFieldLigand to Ligand
+Ligand = OpenForceFieldLigand
+
+
+class OpenForceFieldLikeLigand(BaseLigand):
+    def __init__(self, molecule, metadata=None, name="", *args, **kwargs):
+        super().__init__(name=name, metadata=metadata)
+        self._molecule = molecule
+
+    def __getattr__(self, attr):
+        return getattr(self._molecule, attr)
+
+    @classmethod
+    def from_smiles(cls, smiles, name=None, **kwargs):
+        raise NotImplementedError("Use `OpenForceFieldLigand` or implement API in a subclass")
+
+    def to_rdkit(self):
+        raise NotImplementedError("Use `OpenForceFieldLigand` or implement API in a subclass")
+
+    def to_smiles(self):
+        raise NotImplementedError("Use `OpenForceFieldLigand` or implement API in a subclass")
+
+
+class RDKitLigand(OpenForceFieldLikeLigand):
+
+    """
+    Wrapper for RDKit molecules using some parts of the OpenForceField API
+
+    !!! todo
+        Everything in this class
+    """
+
+    @classmethod
+    def from_smiles(cls, smiles, name=None, **kwargs):  # pylint: disable=arguments-differ
+        """"""
+        from rdkit.Chem import MolFromSmiles
+
+        molecule = MolFromSmiles(smiles)
+        if name is None:
+            name = smiles
+        return cls(molecule, name=name, metadata={"smiles": smiles})
+
+    def to_rdkit(self):
+        return self._molecule
+
+    def to_smiles(self):
+        """
+        Return canonicalized SMILES
+
+        More info: https://www.rdkit.org/docs/GettingStartedInPython.html#writing-molecules
+        """
+        from rdkit.Chem import MolToSmiles
+
+        return MolToSmiles(self._molecule)

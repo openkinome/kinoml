@@ -5,7 +5,7 @@ import pytest
 import numpy as np
 
 from kinoml.core.systems import System
-from kinoml.core.ligands import Ligand
+from kinoml.core.ligands import Ligand, RDKitLigand
 from kinoml.features.ligand import (
     SingleLigandFeaturizer,
     MorganFingerprintFeaturizer,
@@ -14,11 +14,12 @@ from kinoml.features.ligand import (
 )
 
 
-def test_single_ligand_featurizer():
-    ligand1 = Ligand.from_smiles("CCCC")
+@pytest.mark.parametrize("LigandClass", [Ligand, RDKitLigand])
+def test_single_ligand_featurizer(LigandClass):
+    ligand1 = LigandClass.from_smiles("CCCC")
     single_ligand_system = System(components=[ligand1])
     featurizer = SingleLigandFeaturizer()
-    featurizer.featurize(single_ligand_system)
+    featurizer.supports(single_ligand_system)
 
     ligand2 = Ligand.from_smiles("COCC")
     double_ligand_system = System(components=[ligand1, ligand2])
@@ -31,11 +32,11 @@ def test_single_ligand_featurizer():
     [
         (
             "C",
-            "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001",
+            "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
         ),
         (
             "B",
-            "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000",
+            "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
         ),
     ],
 )
@@ -44,11 +45,12 @@ def test_ligand_MorganFingerprintFeaturizer(smiles, solution):
     OFFTK _will_ add hydrogens to all ingested SMILES, and export a canonicalized output,
     so the representation you get might not be the one you expect if you compute it directly.
     """
-    ligand = Ligand.from_smiles(smiles)
+    ligand = RDKitLigand.from_smiles(smiles)
     system = System([ligand])
     featurizer = MorganFingerprintFeaturizer(radius=2, nbits=512)
-    fingerprint = featurizer.featurize(system)
-    solution_array = np.array(list(map(int, solution)))
+    featurizer.featurize(system)
+    fingerprint = system.featurizations[featurizer.name]
+    solution_array = np.array(list(map(int, solution)), dtype="uint8")
     assert (fingerprint == solution_array).all()
 
 
@@ -64,11 +66,13 @@ def test_ligand_OneHotSMILESFeaturizer(smiles, solution):
     """
     OFFTK _will_ add hydrogens to all ingested SMILES, and export a canonicalized output,
     so the representation you get might not be the one you expect if you compute it directly.
+    That's why we use RDKitLigand here.
     """
-    ligand = Ligand.from_smiles(smiles)
+    ligand = RDKitLigand.from_smiles(smiles)
     system = System([ligand])
     featurizer = OneHotSMILESFeaturizer()
-    matrix = featurizer.featurize(system)
+    featurizer.featurize(system)
+    matrix = system.featurizations[featurizer.name]
     assert matrix.shape == solution.T.shape
     assert (matrix == solution.T).all()
 
@@ -76,18 +80,37 @@ def test_ligand_OneHotSMILESFeaturizer(smiles, solution):
 @pytest.mark.parametrize(
     "smiles, solution",
     [
-        ("C", (np.array([[0]]), np.array([[6, 0, 0]]))),
-        ("CC", (np.array([[0, 1], [1, 0]]), np.array([[6, 1, 1], [6, 1, 1]]))),
+        (
+            "C",
+            (
+                np.array([[0]]),
+                [(6, "C", 0, 4, 0, 4, 4, 12.011, 0, 0, 4, 4, False, 0, False, 0, 4)],
+            ),
+        ),
+        (
+            "CC",
+            (
+                np.array([[0, 1], [1, 0]]),
+                np.array(
+                    [
+                        (6, "C", 1, 4, 1, 3, 4, 12.011, 0, 0, 3, 3, False, 0, False, 0, 4),
+                        (6, "C", 1, 4, 1, 3, 4, 12.011, 0, 0, 3, 3, False, 0, False, 0, 4),
+                    ]
+                ),
+            ),
+        ),
     ],
 )
 def test_ligand_GraphLigandFeaturizer(smiles, solution):
     """
     OFFTK _will_ add hydrogens to all ingested SMILES, and export a canonicalized output,
     so the representation you get might not be the one you expect if you compute it directly.
+    That's why we use RDKitLigand here.
     """
-    ligand = Ligand.from_smiles(smiles)
+    ligand = RDKitLigand.from_smiles(smiles)
     system = System([ligand])
     featurizer = GraphLigandFeaturizer()
-    graph = featurizer.featurize(system)
-    assert np.array_equal(graph[1], solution[1])
-    assert np.array_equal(graph[0], solution[0])
+    featurizer.featurize(system)
+    graph = system.featurizations[featurizer.name]
+    assert (graph[0] == solution[0]).all()  # connectivity
+    assert (graph[1] == solution[1]).all()  # features
