@@ -4,10 +4,23 @@ Defines the Kinase class
 
 """
 
-class Kinase(object):
 
-    def __init__(self, pdb, chain, kinase_id, name, struct_id, ligand, pocket_seq,
-                 numbering, key_res, dihedrals, distances, mean_dist):
+class Kinase(object):
+    def __init__(
+        self,
+        pdb,
+        chain,
+        kinase_id,
+        name,
+        struct_id,
+        ligand,
+        pocket_seq,
+        numbering,
+        key_res,
+        dihedrals,
+        distances,
+        mean_dist,
+    ):
         """This script defines a Kinase class of which any kinase can be represented as an object with the
         following parameters:
 

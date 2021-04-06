@@ -6,9 +6,7 @@ from typing import Union
 class Alignment:
     """Alignment representation of protein sequences"""
 
-    def __init__(
-        self, metadata=None, alignment=None, alignment_file_path=None, *args, **kwargs
-    ):
+    def __init__(self, metadata=None, alignment=None, alignment_file_path=None, *args, **kwargs):
 
         from appdirs import user_cache_dir
 

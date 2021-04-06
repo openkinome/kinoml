@@ -246,9 +246,7 @@ def _run_docking(
             docked_mol = oechem.OEMol()
 
             # dock molecule
-            return_code = dock.DockMultiConformerMolecule(
-                docked_mol, conformations, num_poses
-            )
+            return_code = dock.DockMultiConformerMolecule(docked_mol, conformations, num_poses)
             if return_code != oedocking.OEDockingReturnCode_Success:
                 # TODO: Maybe something for logging
                 print(

@@ -16,7 +16,6 @@ class MolecularComponent:
 
 
 class BaseStructure(MolecularComponent):
-
     def __init__(self, universe, *args, **kwargs):
         super().__init__(self, *args, **kwargs)
         self.universe = universe
@@ -28,5 +27,3 @@ class BaseLigand(MolecularComponent):
 
 class BaseProtein(MolecularComponent):
     pass
-
-

@@ -327,7 +327,7 @@ class pKiMeasurement(BaseMeasurement):
         L(y, \hat y) = \frac{1}{2} * (y - F(\hat y)) ** 2.
         $$
         """
-        grad_loss = (labels + (dG_over_KT + standard_conc) / LN10 ) / LN10
+        grad_loss = (labels + (dG_over_KT + standard_conc) / LN10) / LN10
         hess_loss = np.full(grad_loss.shape, 1 / (LN10 * LN10))
 
         return grad_loss.astype("float32"), hess_loss.astype("float32")
@@ -370,7 +370,7 @@ class pKdMeasurement(BaseMeasurement):
         L(y, \hat y) = \frac{1}{2} * (y - F(\hat y)) ** 2.
         $$
         """
-        grad_loss = (labels + (dG_over_KT + standard_conc) / LN10 ) / LN10
+        grad_loss = (labels + (dG_over_KT + standard_conc) / LN10) / LN10
         hess_loss = np.full(grad_loss.shape, 1 / (LN10 * LN10))
 
         return grad_loss.astype("float32"), hess_loss.astype("float32")

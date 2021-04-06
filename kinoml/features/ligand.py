@@ -12,64 +12,65 @@ from ..core.systems import System
 from ..core.ligands import BaseLigand, SmilesLigand, Ligand
 
 ALL_ATOMIC_SYMBOLS = [
-    'C',
-    'N',
-    'O',
-    'S',
-    'F',
-    'Si',
-    'P',
-    'Cl',
-    'Br',
-    'Mg',
-    'Na',
-    'Ca',
-    'Fe',
-    'As',
-    'Al',
-    'I',
-    'B',
-    'V',
-    'K',
-    'Tl',
-    'Yb',
-    'Sb',
-    'Sn',
-    'Ag',
-    'Pd',
-    'Co',
-    'Se',
-    'Ti',
-    'Zn',
-    'H',
-    'Li',
-    'Ge',
-    'Cu',
-    'Au',
-    'Ni',
-    'Cd',
-    'In',
-    'Mn',
-    'Zr',
-    'Cr',
-    'Pt',
-    'Hg',
-    'Pb',
-    'Unknown'
+    "C",
+    "N",
+    "O",
+    "S",
+    "F",
+    "Si",
+    "P",
+    "Cl",
+    "Br",
+    "Mg",
+    "Na",
+    "Ca",
+    "Fe",
+    "As",
+    "Al",
+    "I",
+    "B",
+    "V",
+    "K",
+    "Tl",
+    "Yb",
+    "Sb",
+    "Sn",
+    "Ag",
+    "Pd",
+    "Co",
+    "Se",
+    "Ti",
+    "Zn",
+    "H",
+    "Li",
+    "Ge",
+    "Cu",
+    "Au",
+    "Ni",
+    "Cd",
+    "In",
+    "Mn",
+    "Zr",
+    "Cr",
+    "Pt",
+    "Hg",
+    "Pb",
+    "Unknown",
 ]
 
 SIZE_OF_RING = [3, 4, 5, 6, 7, 8, 9, 10]
 
 HYBRIZIDATION_TYPES = [
-    rdkit.Chem.rdchem.HybridizationType.OTHER, # OTHER
-    rdkit.Chem.rdchem.HybridizationType.S, # S
-    rdkit.Chem.rdchem.HybridizationType.SP, # SP
-    rdkit.Chem.rdchem.HybridizationType.SP2, # SP2
-    rdkit.Chem.rdchem.HybridizationType.SP3, # SP2
-    rdkit.Chem.rdchem.HybridizationType.SP3D, # SP3D
-    rdkit.Chem.rdchem.HybridizationType.SP3D2, # SP3D2
-    rdkit.Chem.rdchem.HybridizationType.UNSPECIFIED # UNSPECIFIED
+    rdkit.Chem.rdchem.HybridizationType.OTHER,  # OTHER
+    rdkit.Chem.rdchem.HybridizationType.S,  # S
+    rdkit.Chem.rdchem.HybridizationType.SP,  # SP
+    rdkit.Chem.rdchem.HybridizationType.SP2,  # SP2
+    rdkit.Chem.rdchem.HybridizationType.SP3,  # SP2
+    rdkit.Chem.rdchem.HybridizationType.SP3D,  # SP3D
+    rdkit.Chem.rdchem.HybridizationType.SP3D2,  # SP3D2
+    rdkit.Chem.rdchem.HybridizationType.UNSPECIFIED,  # UNSPECIFIED
 ]
+
 
 class SingleLigandFeaturizer(BaseFeaturizer):
     """
@@ -320,11 +321,11 @@ class GraphLigandFeaturizer(SingleLigandFeaturizer):
         """
         return (
             atom.GetAtomicNum(),
-            atom.GetSymbol(), # TODO : one-hot encode
+            atom.GetSymbol(),  # TODO : one-hot encode
             atom.GetDegree(),
-            atom.GetTotalDegree(), # TODO : ignore if molecule has H
+            atom.GetTotalDegree(),  # TODO : ignore if molecule has H
             atom.GetExplicitValence(),
-            atom.GetImplicitValence(), # TODO : ignore if molecule has H
+            atom.GetImplicitValence(),  # TODO : ignore if molecule has H
             atom.GetTotalValence(),
             atom.GetMass(),
             atom.GetFormalCharge(),
@@ -332,10 +333,10 @@ class GraphLigandFeaturizer(SingleLigandFeaturizer):
             atom.GetNumImplicitHs(),
             atom.GetTotalNumHs(),
             atom.IsInRing(),
-            atom.IsInRingSize(), # TODO : one-hot encode
+            atom.IsInRingSize(),  # TODO : one-hot encode
             atom.GetIsAromatic(),
             atom.GetNumRadicalElectrons(),
-            atom.GetHybridization(), # TODO : one-hot encode
+            atom.GetHybridization(),  # TODO : one-hot encode
         )
 
     @staticmethod

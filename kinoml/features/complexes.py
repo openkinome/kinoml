@@ -29,6 +29,7 @@ class OEHybridDockingFeaturizer(BaseFeaturizer):
     loop_db: str
         The path to the loop database used by OESpruce to model missing loops.
     """
+
     from openeye import oechem, oegrid
 
     def __init__(self, loop_db: Union[str, None] = None):
@@ -60,22 +61,32 @@ class OEHybridDockingFeaturizer(BaseFeaturizer):
         design_unit = self._get_design_unit(protein, system.protein.name, electron_density)
 
         logging.debug("Extracting components ...")
-        prepared_protein, prepared_solvent, prepared_ligand = self._get_components(design_unit)  # TODO: rename prepared_ligand
+        prepared_protein, prepared_solvent, prepared_ligand = self._get_components(
+            design_unit
+        )  # TODO: rename prepared_ligand
 
         logging.debug("Creating hybrid receptor ...")
-        hybrid_receptor = create_hybrid_receptor(prepared_protein, prepared_ligand)  # TODO: takes quite long, should save this somehow
+        hybrid_receptor = create_hybrid_receptor(
+            prepared_protein, prepared_ligand
+        )  # TODO: takes quite long, should save this somehow
 
         logging.debug("Performing docking ...")
         docking_pose = hybrid_docking(hybrid_receptor, [ligand])[0]
-        oechem.OEPerceiveResidues(docking_pose, oechem.OEPreserveResInfo_None)  # generate residue information
+        oechem.OEPerceiveResidues(
+            docking_pose, oechem.OEPreserveResInfo_None
+        )  # generate residue information
 
         logging.debug("Retrieving Featurizer results ...")
-        protein_ligand_complex = self._get_featurizer_results(system, prepared_protein, prepared_solvent, docking_pose)
+        protein_ligand_complex = self._get_featurizer_results(
+            system, prepared_protein, prepared_solvent, docking_pose
+        )
 
         return protein_ligand_complex
 
     @staticmethod
-    def _interpret_system(system: ProteinLigandComplex) -> Tuple[oechem.OEGraphMol, oechem.OEGraphMol, Union[oegrid.OESkewGrid, None]]:
+    def _interpret_system(
+        system: ProteinLigandComplex,
+    ) -> Tuple[oechem.OEGraphMol, oechem.OEGraphMol, Union[oegrid.OESkewGrid, None]]:
         """
         Interpret the given system components and retrieve OpenEye objects holding ligand, protein and electron density.
         Parameters
@@ -127,7 +138,12 @@ class OEHybridDockingFeaturizer(BaseFeaturizer):
 
         return ligand, protein, electron_density
 
-    def _get_design_unit(self, complex_structure: oechem.OEGraphMol, design_unit_identifier: str, electron_density: Union[oegrid.OESkewGrid, None]) -> oechem.OEDesignUnit:
+    def _get_design_unit(
+        self,
+        complex_structure: oechem.OEGraphMol,
+        design_unit_identifier: str,
+        electron_density: Union[oegrid.OESkewGrid, None],
+    ) -> oechem.OEDesignUnit:
         """
         Get an OpenEye design unit from a protein ligand complex.
         Parameters
@@ -148,7 +164,9 @@ class OEHybridDockingFeaturizer(BaseFeaturizer):
         from ..modeling.OEModeling import prepare_complex
         from ..utils import LocalFileStorage
 
-        design_unit_path = LocalFileStorage.featurizer_result(self.__class__.__name__, f"{design_unit_identifier}_design_unit", "oedu")  # TODO: the file name needs to be unique
+        design_unit_path = LocalFileStorage.featurizer_result(
+            self.__class__.__name__, f"{design_unit_identifier}_design_unit", "oedu"
+        )  # TODO: the file name needs to be unique
         if design_unit_path.is_file():
             logging.debug("Reading design unit from file ...")
             design_unit = oechem.OEDesignUnit()
@@ -162,7 +180,9 @@ class OEHybridDockingFeaturizer(BaseFeaturizer):
         return design_unit
 
     @staticmethod
-    def _get_components(design_unit: oechem.OEDesignUnit) -> Tuple[oechem.OEGraphMol(), oechem.OEGraphMol(), oechem.OEGraphMol()]:
+    def _get_components(
+        design_unit: oechem.OEDesignUnit,
+    ) -> Tuple[oechem.OEGraphMol(), oechem.OEGraphMol(), oechem.OEGraphMol()]:
         """
         Get protein, solvent and ligand components from an OpenEye design unit.
         Parameters
@@ -183,10 +203,19 @@ class OEHybridDockingFeaturizer(BaseFeaturizer):
         design_unit.GetSolvent(solvent)
         design_unit.GetLigand(ligand)
 
-        logging.debug(f"Number of component atoms: Protein - {protein.NumAtoms()}, Solvent - {solvent.NumAtoms()}, Ligand - {ligand.NumAtoms()}.")
+        logging.debug(
+            f"Number of component atoms: Protein - {protein.NumAtoms()}, Solvent - {solvent.NumAtoms()}, Ligand - {ligand.NumAtoms()}."
+        )
         return protein, solvent, ligand
 
-    def _get_featurizer_results(self, system: ProteinLigandComplex, protein: oechem.OEGraphMol, solvent: oechem.OEGraphMol, docking_pose: oechem.OEGraphMol, other_pdb_header_info: Union[None, List[Tuple[str, str]]] = None) -> ProteinLigandComplex:
+    def _get_featurizer_results(
+        self,
+        system: ProteinLigandComplex,
+        protein: oechem.OEGraphMol,
+        solvent: oechem.OEGraphMol,
+        docking_pose: oechem.OEGraphMol,
+        other_pdb_header_info: Union[None, List[Tuple[str, str]]] = None,
+    ) -> ProteinLigandComplex:
         """
         Get results from the Featurizer.
         Parameters
@@ -214,19 +243,25 @@ class OEHybridDockingFeaturizer(BaseFeaturizer):
         solvated_protein = remove_non_protein(protein_ligand_complex, remove_water=False)
 
         logging.debug("Writing results ...")
-        solvated_protein_path, ligand_path = self._write_results(system, solvated_protein, docking_pose, protein_ligand_complex, other_pdb_header_info=other_pdb_header_info)
+        solvated_protein_path, ligand_path = self._write_results(
+            system,
+            solvated_protein,
+            docking_pose,
+            protein_ligand_complex,
+            other_pdb_header_info=other_pdb_header_info,
+        )
 
         logging.debug("Generating new system components ...")
         file_protein = FileProtein(path=solvated_protein_path)
         file_ligand = FileLigand(path=ligand_path)
-        protein_ligand_complex = ProteinLigandComplex(
-            components=[file_protein, file_ligand]
-        )
+        protein_ligand_complex = ProteinLigandComplex(components=[file_protein, file_ligand])
 
         return protein_ligand_complex
 
     @staticmethod
-    def _assemble_complex(protein: oechem.OEGraphMol, solvent: oechem.OEGraphMol, ligand: oechem.OEGraphMol) -> oechem.OEGraphMol:
+    def _assemble_complex(
+        protein: oechem.OEGraphMol, solvent: oechem.OEGraphMol, ligand: oechem.OEGraphMol
+    ) -> oechem.OEGraphMol:
         """
         Assemble components of a solvated protein-ligand complex into a single OpenEye molecule. Water molecules will
         be checked for clashes with the ligand.
@@ -245,7 +280,11 @@ class OEHybridDockingFeaturizer(BaseFeaturizer):
         """
         from openeye import oechem
 
-        from ..modeling.OEModeling import clashing_atoms, update_residue_identifiers, split_molecule_components
+        from ..modeling.OEModeling import (
+            clashing_atoms,
+            update_residue_identifiers,
+            split_molecule_components,
+        )
 
         protein_ligand_complex = oechem.OEGraphMol()
 
@@ -256,7 +295,9 @@ class OEHybridDockingFeaturizer(BaseFeaturizer):
         oechem.OEAddMols(protein_ligand_complex, ligand)
 
         logging.debug("Adding water molecules ...")
-        water_molecules = split_molecule_components(solvent)  # converts solvent molecule into a list of water molecules
+        water_molecules = split_molecule_components(
+            solvent
+        )  # converts solvent molecule into a list of water molecules
         for water_molecule in water_molecules:  # TODO: slow, move to cKDtrees
             if not clashing_atoms(ligand, water_molecule):
                 oechem.OEAddMols(protein_ligand_complex, water_molecule)
@@ -269,7 +310,14 @@ class OEHybridDockingFeaturizer(BaseFeaturizer):
 
         return protein_ligand_complex
 
-    def _write_results(self, system: ProteinLigandComplex, solvated_protein: oechem.OEGraphMol, ligand: oechem.OEGraphMol, protein_ligand_complex: oechem.OEGraphMol, other_pdb_header_info: Union[None, List[Tuple[str, str]]]) -> Tuple[str, str]:
+    def _write_results(
+        self,
+        system: ProteinLigandComplex,
+        solvated_protein: oechem.OEGraphMol,
+        ligand: oechem.OEGraphMol,
+        protein_ligand_complex: oechem.OEGraphMol,
+        other_pdb_header_info: Union[None, List[Tuple[str, str]]],
+    ) -> Tuple[str, str]:
         """
         Write the docking results from the Featurizer and retrieve the paths to protein and ligand.
         Parameters
@@ -294,22 +342,47 @@ class OEHybridDockingFeaturizer(BaseFeaturizer):
         from ..utils import LocalFileStorage
 
         logging.debug("Writing protein ...")
-        protein = self._update_pdb_header(solvated_protein, protein_name=system.protein.name, solvent_clashing_ligand_name=system.ligand.name, ligand_name="", other_pdb_header_info=other_pdb_header_info)
-        protein_path = LocalFileStorage.featurizer_result(self.__class__.__name__, f"{system.protein.name}_{system.ligand.name}_protein", "pdb")
+        protein = self._update_pdb_header(
+            solvated_protein,
+            protein_name=system.protein.name,
+            solvent_clashing_ligand_name=system.ligand.name,
+            ligand_name="",
+            other_pdb_header_info=other_pdb_header_info,
+        )
+        protein_path = LocalFileStorage.featurizer_result(
+            self.__class__.__name__, f"{system.protein.name}_{system.ligand.name}_protein", "pdb"
+        )
         write_molecules([protein], protein_path)
 
         logging.debug("Writing ligand ...")
-        ligand_path = LocalFileStorage.featurizer_result(self.__class__.__name__, f"{system.protein.name}_{system.ligand.name}_ligand", "sdf")
+        ligand_path = LocalFileStorage.featurizer_result(
+            self.__class__.__name__, f"{system.protein.name}_{system.ligand.name}_ligand", "sdf"
+        )
         write_molecules([ligand], ligand_path)
 
         logging.debug("Writing protein ligand complex ...")
-        protein_ligand_complex = self._update_pdb_header(protein_ligand_complex, protein_name=system.protein.name, solvent_clashing_ligand_name=system.ligand.name, ligand_name=system.ligand.name, other_pdb_header_info=other_pdb_header_info)
-        complex_path = LocalFileStorage.featurizer_result(self.__class__.__name__, f"{system.protein.name}_{system.ligand.name}_complex", "pdb")
+        protein_ligand_complex = self._update_pdb_header(
+            protein_ligand_complex,
+            protein_name=system.protein.name,
+            solvent_clashing_ligand_name=system.ligand.name,
+            ligand_name=system.ligand.name,
+            other_pdb_header_info=other_pdb_header_info,
+        )
+        complex_path = LocalFileStorage.featurizer_result(
+            self.__class__.__name__, f"{system.protein.name}_{system.ligand.name}_complex", "pdb"
+        )
         write_molecules([protein_ligand_complex], complex_path)
 
         return protein_path, ligand_path
 
-    def _update_pdb_header(self, structure: oechem.OEGraphMol, protein_name: str, solvent_clashing_ligand_name: str, ligand_name: str, other_pdb_header_info: Union[None, List[Tuple[str, str]]]) -> oechem.OEGraphMol:
+    def _update_pdb_header(
+        self,
+        structure: oechem.OEGraphMol,
+        protein_name: str,
+        solvent_clashing_ligand_name: str,
+        ligand_name: str,
+        other_pdb_header_info: Union[None, List[Tuple[str, str]]],
+    ) -> oechem.OEGraphMol:
         """
         Stores information about Featurizer, protein, solvent and ligand in the PDB header COMPND section in the
         given OpenEye molecule.
@@ -336,7 +409,11 @@ class OEHybridDockingFeaturizer(BaseFeaturizer):
         oechem.OEClearPDBData(structure)
         oechem.OESetPDBData(structure, "COMPND", f"\tFeaturizer: {self.__class__.__name__}")
         oechem.OEAddPDBData(structure, "COMPND", f"\tProtein: {protein_name}")
-        oechem.OEAddPDBData(structure, "COMPND", f"\tSolvent: Removed water clashing with {solvent_clashing_ligand_name}")
+        oechem.OEAddPDBData(
+            structure,
+            "COMPND",
+            f"\tSolvent: Removed water clashing with {solvent_clashing_ligand_name}",
+        )
         oechem.OEAddPDBData(structure, "COMPND", f"\tLigand: {ligand_name}")
         if other_pdb_header_info is not None:
             for section, information in other_pdb_header_info:
@@ -366,9 +443,7 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
     import pandas as pd
     from openeye import oechem, oegrid
 
-    def __init__(
-        self, loop_db: Union[str, None] = None, shape_overlay: bool = False
-    ):
+    def __init__(self, loop_db: Union[str, None] = None, shape_overlay: bool = False):
         super().__init__(loop_db)
         self.loop_db = loop_db
         self.shape_overlay = shape_overlay
@@ -396,17 +471,23 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
         from ..utils import LocalFileStorage
 
         if not hasattr(system.protein, "klifs_kinase_id"):
-            raise NotImplementedError(f"{self.__class__.__name__} requires a system with a protein having a 'klifs_kinase_id' attribute.")
+            raise NotImplementedError(
+                f"{self.__class__.__name__} requires a system with a protein having a 'klifs_kinase_id' attribute."
+            )
 
         if not hasattr(system.ligand, "smiles"):
-            raise NotImplementedError(f"{self.__class__.__name__} requires a system with a ligand having a 'smiles' attribute.")
+            raise NotImplementedError(
+                f"{self.__class__.__name__} requires a system with a ligand having a 'smiles' attribute."
+            )
 
         logging.debug("Retrieving kinase details from KLIFS ...")
         kinase_details = klifs_utils.remote.kinases.kinases_from_kinase_ids(
             [system.protein.klifs_kinase_id]
         ).iloc[0]
 
-        logging.debug("Searching ligand template ...")  # TODO: naming problem with co-crystallized ligand in hybrid docking, see above
+        logging.debug(
+            "Searching ligand template ..."
+        )  # TODO: naming problem with co-crystallized ligand in hybrid docking, see above
         ligand_template = self._select_ligand_template(
             system.protein.klifs_kinase_id, read_smiles(system.ligand.smiles), self.shape_overlay
         )
@@ -437,16 +518,22 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
         ligand_name = None
         if protein_template.ligand != 0:
             ligand_name = str(protein_template.ligand)
-        design_unit = self._get_design_unit(protein, protein_template.pdb, electron_density, ligand_name)
+        design_unit = self._get_design_unit(
+            protein, protein_template.pdb, electron_density, ligand_name
+        )
 
         logging.debug("Extracting components ...")
         prepared_kinase, prepared_solvent = self._get_components(design_unit)[:2]
 
         logging.debug("Processing kinase domain ...")
-        processed_kinase_domain = self._process_kinase_domain(prepared_kinase, kinase_details.uniprot)
+        processed_kinase_domain = self._process_kinase_domain(
+            prepared_kinase, kinase_details.uniprot
+        )
 
         logging.debug(f"Preparing ligand template structure of {ligand_template.pdb} ...")
-        prepared_ligand_template = self._prepare_ligand_template(ligand_template, processed_kinase_domain)
+        prepared_ligand_template = self._prepare_ligand_template(
+            ligand_template, processed_kinase_domain
+        )
 
         logging.debug("Checking for co-crystallized ligand ...")
         if (
@@ -462,14 +549,27 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
             )
             logging.debug("Performing docking ...")
             docking_pose = hybrid_docking(hybrid_receptor, [ligand])[0]
-            oechem.OEPerceiveResidues(docking_pose, oechem.OEPreserveResInfo_None)  # generate residue information
+            oechem.OEPerceiveResidues(
+                docking_pose, oechem.OEPreserveResInfo_None
+            )  # generate residue information
 
         logging.debug("Retrieving Featurizer results ...")
-        kinase_ligand_complex = self._get_featurizer_results(system, processed_kinase_domain, prepared_solvent, docking_pose, other_pdb_header_info=[("COMPND", f"\tKinase template: {protein_template.pdb}"), ("COMPND", f"\tLigand template: {ligand_template.pdb}")])
+        kinase_ligand_complex = self._get_featurizer_results(
+            system,
+            processed_kinase_domain,
+            prepared_solvent,
+            docking_pose,
+            other_pdb_header_info=[
+                ("COMPND", f"\tKinase template: {protein_template.pdb}"),
+                ("COMPND", f"\tLigand template: {ligand_template.pdb}"),
+            ],
+        )
 
         return kinase_ligand_complex  # TODO: MDAnalysis objects
 
-    def _select_ligand_template(self, klifs_kinase_id: int, ligand: oechem.OEGraphMol, shape_overlay: bool) -> pd.Series:
+    def _select_ligand_template(
+        self, klifs_kinase_id: int, ligand: oechem.OEGraphMol, shape_overlay: bool
+    ) -> pd.Series:
         """
         Select a kinase in complex with a ligand from KLIFS holding a ligand similar to the given SMILES and bound to
         a kinase similar to the kinase of interest.
@@ -489,7 +589,9 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
         import klifs_utils
 
         logging.debug("Retrieve kinase information from KLIFS ...")
-        kinase_details = klifs_utils.remote.kinases.kinases_from_kinase_ids([klifs_kinase_id]).iloc[0]
+        kinase_details = klifs_utils.remote.kinases.kinases_from_kinase_ids(
+            [klifs_kinase_id]
+        ).iloc[0]
 
         logging.debug("Retrieve kinase structures from KLIFS for ligand template selection ...")
         structures = self._get_available_ligand_templates()
@@ -498,7 +600,9 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
         structures = self._add_smiles_column(structures)
 
         logging.debug("Searching for identical co-crystallized ligands ...")
-        identical_ligands = self._get_identical_ligand_indices(ligand, structures.smiles)  # TODO: Takes surprisingly long
+        identical_ligands = self._get_identical_ligand_indices(
+            ligand, structures.smiles
+        )  # TODO: Takes surprisingly long
 
         if len(identical_ligands) > 0:
             logging.debug("Found identical co-crystallized ligands ...")
@@ -506,15 +610,17 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
             logging.debug("Searching for matching KLIFS kinase id ...")
             if structures.kinase_ID.isin([kinase_details.kinase_ID]).any():
                 logging.debug("Found matching KLIFS kinase id ...")
-                structures = structures[
-                    structures.kinase_ID.isin([kinase_details.kinase_ID])
-                ]
+                structures = structures[structures.kinase_ID.isin([kinase_details.kinase_ID])]
         else:
             if shape_overlay:
-                logging.debug("Filtering for most similar ligands according to their shape overlay ...")
+                logging.debug(
+                    "Filtering for most similar ligands according to their shape overlay ..."
+                )
                 structures = self._filter_for_similar_ligands_3d(ligand, structures)
             else:
-                logging.debug("Filtering for most similar ligands according to their fingerprints ...")
+                logging.debug(
+                    "Filtering for most similar ligands according to their fingerprints ..."
+                )
                 structures = self._filter_for_similar_ligands_2d(ligand, structures)
 
         logging.debug("Filtering for most similar kinase pockets ...")
@@ -538,20 +644,16 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
 
         logging.debug("Retrieving available KLIFS entries ...")
         kinase_ids = klifs_utils.remote.kinases.kinase_names().kinase_ID.to_list()
-        structures = klifs_utils.remote.structures.structures_from_kinase_ids(
-            kinase_ids
-        )
+        structures = klifs_utils.remote.structures.structures_from_kinase_ids(kinase_ids)
 
         logging.debug("Filtering KLIFS entries ...")
         structures = structures[structures["ligand"] != 0]  # orthosteric ligand
         structures = structures.groupby("pdb").filter(
             lambda x: len(set(x["ligand"])) == 1
         )  # single orthosteric ligand
-        structures = structures[
-            structures.allosteric_ligand == 0
-            ]  # no allosteric ligand
-        structures = structures[structures.DFG != 'na']  # no missing kinase conformations
-        structures = structures[structures.aC_helix != 'na']
+        structures = structures[structures.allosteric_ligand == 0]  # no allosteric ligand
+        structures = structures[structures.DFG != "na"]  # no missing kinase conformations
+        structures = structures[structures.aC_helix != "na"]
 
         logging.debug("Sorting KLIFS entries by quality score...")
         # keep entry with highest quality score (alt 'A' preferred over alt 'B', chain 'A' preferred over 'B')
@@ -592,9 +694,7 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
             pdb_to_smiles = {}
 
         logging.debug("Retrieving SMILES for unknown ligands ...")
-        pdb_to_smiles.update(
-            smiles_from_pdb(set(structures.ligand) - set(pdb_to_smiles.keys()))
-        )
+        pdb_to_smiles.update(smiles_from_pdb(set(structures.ligand) - set(pdb_to_smiles.keys())))
 
         logging.debug("Saving local PDB SMILES dictionary ...")
         with open(LocalFileStorage.pdb_smiles_json(), "w") as wf:
@@ -615,7 +715,9 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
         return structures
 
     @staticmethod
-    def _get_identical_ligand_indices(ligand: oechem.OEGraphMol, smiles_iterable: Iterable[str]) -> List[int]:
+    def _get_identical_ligand_indices(
+        ligand: oechem.OEGraphMol, smiles_iterable: Iterable[str]
+    ) -> List[int]:
         """
         Get the indices of the SMILES matching the given ligand.
         Parameters
@@ -639,7 +741,9 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
         return identical_ligand_indices
 
     @staticmethod
-    def _filter_for_similar_ligands_3d(ligand: oechem.OEGraphMol, structures: pd.DataFrame) -> pd.DataFrame:
+    def _filter_for_similar_ligands_3d(
+        ligand: oechem.OEGraphMol, structures: pd.DataFrame
+    ) -> pd.DataFrame:
         """
         Filter KLIFS structures for similar ligands according to a shape overlay.
         Parameters
@@ -653,10 +757,16 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
         : pd.DataFrame
             The input DataFrame filtered for KLIFS entries with most similar ligands.
         """
-        from ..modeling.OEModeling import get_klifs_ligand, generate_reasonable_conformations, overlay_molecules
+        from ..modeling.OEModeling import (
+            get_klifs_ligand,
+            generate_reasonable_conformations,
+            overlay_molecules,
+        )
 
         logging.debug("Retrieving resolved structures of orthosteric ligands ...")
-        complex_ligands = [get_klifs_ligand(structure_id) for structure_id in structures.structure_ID]
+        complex_ligands = [
+            get_klifs_ligand(structure_id) for structure_id in structures.structure_ID
+        ]
 
         logging.debug("Generating reasonable conformations of ligand of interest ...")
         conformations_ensemble = generate_reasonable_conformations(ligand)
@@ -664,18 +774,25 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
         logging.debug("Overlaying molecules ...")
         overlay_scores = []
         for conformations in conformations_ensemble:
-            overlay_scores += [[i, overlay_molecules(complex_ligand, conformations, False)] for i, complex_ligand in enumerate(complex_ligands)]
+            overlay_scores += [
+                [i, overlay_molecules(complex_ligand, conformations, False)]
+                for i, complex_ligand in enumerate(complex_ligands)
+            ]
 
         # if maximal score is 1.73, threshold is set to 1.53
         overlay_score_threshold = max([score[1] for score in overlay_scores]) - 0.2
 
         logging.debug("Picking structures with most similar ligands ...")
-        structures = structures.iloc[[score[0] for score in overlay_scores if score[1] >= overlay_score_threshold ]]
+        structures = structures.iloc[
+            [score[0] for score in overlay_scores if score[1] >= overlay_score_threshold]
+        ]
 
         return structures
 
     @staticmethod
-    def _filter_for_similar_ligands_2d(ligand: oechem.OEGraphMol, structures: pd.DataFrame) -> pd.DataFrame:
+    def _filter_for_similar_ligands_2d(
+        ligand: oechem.OEGraphMol, structures: pd.DataFrame
+    ) -> pd.DataFrame:
         """
         Filter KLIFS structures for similar ligands according to a fingerprint comparison.
         Parameters
@@ -710,19 +827,33 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
 
         logging.debug("Adding Feature Morgan fingerprint to dataframe...")
         pd.options.mode.chained_assignment = None  # otherwise next line would raise a warning
-        structures["rdkit_fingerprint"] = [AllChem.GetMorganFingerprint(rdkit_molecule, 2, useFeatures=True) for rdkit_molecule in structures.rdkit_molecules]
+        structures["rdkit_fingerprint"] = [
+            AllChem.GetMorganFingerprint(rdkit_molecule, 2, useFeatures=True)
+            for rdkit_molecule in structures.rdkit_molecules
+        ]
 
         logging.debug("Generating Feature Morgan fingerprint of ligand ...")
         ligand_fingerprint = AllChem.GetMorganFingerprint(ligand, 2, useFeatures=True)
 
         logging.debug("Calculating dice similarity between fingerprints ...")
-        fingerprint_similarities = [[i, DataStructs.DiceSimilarity(ligand_fingerprint, fingerprint)] for i, fingerprint in enumerate(structures.rdkit_fingerprint)]
+        fingerprint_similarities = [
+            [i, DataStructs.DiceSimilarity(ligand_fingerprint, fingerprint)]
+            for i, fingerprint in enumerate(structures.rdkit_fingerprint)
+        ]
 
         # if maximal score is 0.87, threshold is set to 0.77
-        fingerprint_similarity_threshold = max([similarity[1] for similarity in fingerprint_similarities]) - 0.1
+        fingerprint_similarity_threshold = (
+            max([similarity[1] for similarity in fingerprint_similarities]) - 0.1
+        )
 
         logging.debug("Picking structures with most similar ligands ...")
-        structures = structures.iloc[[similarity[0] for similarity in fingerprint_similarities if similarity[1] >= fingerprint_similarity_threshold]]
+        structures = structures.iloc[
+            [
+                similarity[0]
+                for similarity in fingerprint_similarities
+                if similarity[1] >= fingerprint_similarity_threshold
+            ]
+        ]
 
         return structures
 
@@ -744,7 +875,10 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
         from ..modeling.OEModeling import string_similarity
 
         logging.debug("Calculating string similarity between KLIFS pockets ...")
-        pocket_similarities = [string_similarity(structure_pocket, reference_pocket) for structure_pocket in structures.pocket]
+        pocket_similarities = [
+            string_similarity(structure_pocket, reference_pocket)
+            for structure_pocket in structures.pocket
+        ]
 
         logging.debug("Adding pocket similarity to dataframe...")
         structures["pocket_similarity"] = pocket_similarities
@@ -782,10 +916,14 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
         import klifs_utils
 
         logging.debug("Retrieve kinase information from KLIFS ...")
-        kinase_details = klifs_utils.remote.kinases.kinases_from_kinase_ids([klifs_kinase_id]).iloc[0]
+        kinase_details = klifs_utils.remote.kinases.kinases_from_kinase_ids(
+            [klifs_kinase_id]
+        ).iloc[0]
 
         logging.debug("Retrieve kinase structures from KLIFS matching the kinase of interest ...")
-        structures = klifs_utils.remote.structures.structures_from_kinase_ids([kinase_details.kinase_ID])
+        structures = klifs_utils.remote.structures.structures_from_kinase_ids(
+            [kinase_details.kinase_ID]
+        )
 
         logging.debug("Filtering KLIFS structures to match given kinase conformation ...")
         if dfg is not None:
@@ -804,7 +942,13 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
 
         return protein_structure
 
-    def _get_design_unit(self, protein_structure: oechem.OEGraphMol, design_unit_identifier: str, electron_density: Union[oegrid.OESkewGrid, None] = None, ligand_name: Union[str, None] = None) -> oechem.OEDesignUnit:
+    def _get_design_unit(
+        self,
+        protein_structure: oechem.OEGraphMol,
+        design_unit_identifier: str,
+        electron_density: Union[oegrid.OESkewGrid, None] = None,
+        ligand_name: Union[str, None] = None,
+    ) -> oechem.OEDesignUnit:
         """
         Get an OpenEye design unit from a protein ligand complex.
         Parameters
@@ -827,7 +971,9 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
         from ..modeling.OEModeling import prepare_complex, prepare_protein
         from ..utils import LocalFileStorage
 
-        design_unit_path = LocalFileStorage.featurizer_result(self.__class__.__name__, f"{design_unit_identifier}_design_unit", "oedu")
+        design_unit_path = LocalFileStorage.featurizer_result(
+            self.__class__.__name__, f"{design_unit_identifier}_design_unit", "oedu"
+        )
         if design_unit_path.is_file():
             logging.debug("Reading design unit from file ...")
             design_unit = oechem.OEDesignUnit()
@@ -837,13 +983,21 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
             if ligand_name is None:
                 design_unit = prepare_protein(protein_structure, self.loop_db, cap_termini=False)
             else:
-                design_unit = prepare_complex(protein_structure, electron_density, self.loop_db, ligand_name=ligand_name, cap_termini=False)
+                design_unit = prepare_complex(
+                    protein_structure,
+                    electron_density,
+                    self.loop_db,
+                    ligand_name=ligand_name,
+                    cap_termini=False,
+                )
             logging.debug("Writing design unit ...")
             oechem.OEWriteDesignUnit(str(design_unit_path), design_unit)
 
         return design_unit
 
-    def _process_kinase_domain(self, kinase_structure: oechem.OEGraphMol, uniprot_id: str) -> oechem.OEGraphMol:
+    def _process_kinase_domain(
+        self, kinase_structure: oechem.OEGraphMol, uniprot_id: str
+    ) -> oechem.OEGraphMol:
         """
         Process a kinase domain according to UniProt.
         Parameters
@@ -862,14 +1016,18 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
         from ..core.sequences import KinaseDomainAminoAcidSequence
         from ..modeling.OEModeling import mutate_structure, renumber_structure, prepare_protein
 
-        logging.debug(f"Retrieving kinase domain sequence details for UniProt entry {uniprot_id} ...")
+        logging.debug(
+            f"Retrieving kinase domain sequence details for UniProt entry {uniprot_id} ..."
+        )
         kinase_domain_sequence = KinaseDomainAminoAcidSequence.from_uniprot(uniprot_id)
 
         logging.debug(f"Mutating kinase domain ...")
         mutated_structure = mutate_structure(kinase_structure, kinase_domain_sequence)
 
         logging.debug(f"Renumbering residues ...")
-        residue_numbers = self._get_kinase_residue_numbers(mutated_structure, kinase_domain_sequence)
+        residue_numbers = self._get_kinase_residue_numbers(
+            mutated_structure, kinase_domain_sequence
+        )
         renumbered_structure = renumber_structure(mutated_structure, residue_numbers)
 
         logging.debug(f"Capping kinase domain ...")
@@ -882,7 +1040,9 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
                 real_termini.append(residue_numbers[-1])
         if len(real_termini) == 0:
             real_termini = None
-        design_unit = prepare_protein(renumbered_structure, cap_termini=True, real_termini=real_termini)
+        design_unit = prepare_protein(
+            renumbered_structure, cap_termini=True, real_termini=real_termini
+        )
 
         logging.debug("Extracting protein ...")
         processed_kinase_domain = oechem.OEGraphMol()
@@ -890,7 +1050,9 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
 
         return processed_kinase_domain
 
-    def _prepare_ligand_template(self, ligand_template: pd.Series, kinase_domain: oechem.OEGraphMol) -> oechem.OEGraphMol:
+    def _prepare_ligand_template(
+        self, ligand_template: pd.Series, kinase_domain: oechem.OEGraphMol
+    ) -> oechem.OEGraphMol:
         """
         Prepare a PDB structure containing the ligand template of interest.
         Parameters
@@ -905,15 +1067,19 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
             An OpenEye molecule holding the prepared ligand structure.
         """
         from openeye import oechem
-        from ..modeling.OEModeling import read_molecules, select_chain, select_altloc, remove_non_protein, superpose_proteins
+        from ..modeling.OEModeling import (
+            read_molecules,
+            select_chain,
+            select_altloc,
+            remove_non_protein,
+            superpose_proteins,
+        )
         from ..utils import FileDownloader
 
         logging.debug("Interpreting structure ...")
         ligand_template_structure = PDBProtein(ligand_template.pdb)
         if not ligand_template_structure.path.is_file():
-            logging.debug(
-                f"Downloading PDB entry {ligand_template.pdb} ..."
-            )
+            logging.debug(f"Downloading PDB entry {ligand_template.pdb} ...")
             FileDownloader.rcsb_structure_pdb(ligand_template.pdb)
         logging.debug("Reading structure ...")
         ligand_template_structure = read_molecules(ligand_template_structure.path)[0]
@@ -925,7 +1091,9 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
         ligand_template_structure = select_altloc(ligand_template_structure, ligand_template.alt)
 
         logging.debug("Removing everything but protein, water and ligand of interest ...")
-        ligand_template_structure = remove_non_protein(ligand_template_structure, exceptions=[ligand_template.ligand], remove_water=False)
+        ligand_template_structure = remove_non_protein(
+            ligand_template_structure, exceptions=[ligand_template.ligand], remove_water=False
+        )
 
         logging.debug("Superposing structure on kinase domain ...")
         ligand_template_structure = superpose_proteins(kinase_domain, ligand_template_structure)
@@ -935,12 +1103,19 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
         split_options = oechem.OESplitMolComplexOptions()
 
         logging.debug("Extracting ligand ...")
-        ligand_template_structure = list(oechem.OEGetMolComplexComponents(ligand_template_structure, split_options, split_options.GetLigandFilter()))[0]
+        ligand_template_structure = list(
+            oechem.OEGetMolComplexComponents(
+                ligand_template_structure, split_options, split_options.GetLigandFilter()
+            )
+        )[0]
 
         return ligand_template_structure
 
     @staticmethod
-    def _get_kinase_residue_numbers(kinase_domain_structure: oechem.OEGraphMol, canonical_kinase_domain_sequence: KinaseDomainAminoAcidSequence) -> List[int]:
+    def _get_kinase_residue_numbers(
+        kinase_domain_structure: oechem.OEGraphMol,
+        canonical_kinase_domain_sequence: KinaseDomainAminoAcidSequence,
+    ) -> List[int]:
         """
         Get the canonical residue numbers of a kinase domain structure.
         Parameters

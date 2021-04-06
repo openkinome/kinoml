@@ -4,8 +4,8 @@ Draft to show how modeling classes can be implemented in KinoML
 
 from ..core.proteins import ProteinStructure
 
-class ProteinAtomCount:
 
+class ProteinAtomCount:
     def __init__(self, atom_names=None):
         self.atom_names = atom_names
 

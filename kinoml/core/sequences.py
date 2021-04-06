@@ -181,9 +181,7 @@ class Biosequence(str):
 
         # Reverse alphabetical order (substitutions will come first)
         mutated = self
-        for mutation in sorted(
-            mutations, key=lambda m: mutation_count[m], reverse=True
-        ):
+        for mutation in sorted(mutations, key=lambda m: mutation_count[m], reverse=True):
             if None in (mutation, mutation_types[mutation]):
                 continue
             operation = getattr(mutated, f"_mutate_with_{mutation_types[mutation]}")
@@ -292,9 +290,7 @@ class KinaseDomainAminoAcidSequence(Biosequence):
     def from_uniprot(
         cls,
         *uniprot_ids: str,
-    ) -> Union[
-        "KinaseDomainAminoAcidSequence", Iterable["KinaseDomainAminoAcidSequence"], None
-    ]:
+    ) -> Union["KinaseDomainAminoAcidSequence", Iterable["KinaseDomainAminoAcidSequence"], None]:
         """
         Retrieve kinase domain amino acid sequences of kinases defined by their Uniprot identifiers.
         Parameters
@@ -311,9 +307,7 @@ class KinaseDomainAminoAcidSequence(Biosequence):
 
         for uniprot_id in uniprot_ids:
             # request data
-            response = requests.get(
-                f"https://www.ebi.ac.uk/proteins/api/proteins/{uniprot_id}"
-            )
+            response = requests.get(f"https://www.ebi.ac.uk/proteins/api/proteins/{uniprot_id}")
             protein = json.loads(response.text)
 
             # find protein kinase domains

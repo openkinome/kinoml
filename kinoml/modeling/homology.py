@@ -44,9 +44,7 @@ class HomologyModel:  #  TODO inherent a Base class?
 
         return hits
 
-    def get_sequence(
-        self, identifier: str, kinase: bool = True, backend: str = "uniprot"
-    ):
+    def get_sequence(self, identifier: str, kinase: bool = True, backend: str = "uniprot"):
         """
         Retrieve a sequence based on an identifier code
         Parameters
@@ -71,10 +69,12 @@ class HomologyModel:  #  TODO inherent a Base class?
         if kinase:
             try:
                 from_method = getattr(KinaseDomainAminoAcidSequence, f"from_{backend}")
-                
+
             except AttributeError:
                 # TODO implement ncbi backend
-                raise NotImplementedError(f"Backend {backend} not supported. Please choose from ['uniprot', 'ncbi']")
+                raise NotImplementedError(
+                    f"Backend {backend} not supported. Please choose from ['uniprot', 'ncbi']"
+                )
 
             else:
                 sequence = from_method(identifier)

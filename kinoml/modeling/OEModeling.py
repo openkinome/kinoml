@@ -364,9 +364,7 @@ def _prepare_structure(
     if has_ligand:
         if electron_density is None:
             design_units = list(
-                oespruce.OEMakeDesignUnits(
-                    structure, structure_metadata, design_unit_options
-                )
+                oespruce.OEMakeDesignUnits(structure, structure_metadata, design_unit_options)
             )
             # filter design units for ligand of interest
             if ligand_name is not None:
@@ -384,9 +382,7 @@ def _prepare_structure(
             )
     else:
         design_units = list(
-            oespruce.OEMakeBioDesignUnits(
-                structure, structure_metadata, design_unit_options
-            )
+            oespruce.OEMakeBioDesignUnits(structure, structure_metadata, design_unit_options)
         )
 
     if len(design_units) >= 1:
@@ -490,9 +486,7 @@ def klifs_kinase_from_uniprot_id(uniprot_id: str) -> pd.DataFrame:
     import klifs_utils
 
     kinase_names = klifs_utils.remote.kinases.kinase_names()
-    kinases = klifs_utils.remote.kinases.kinases_from_kinase_names(
-        list(kinase_names.name)
-    )
+    kinases = klifs_utils.remote.kinases.kinases_from_kinase_names(list(kinase_names.name))
     kinase = kinases[kinases.uniprot == uniprot_id].iloc[0]
     return kinase
 
@@ -515,9 +509,7 @@ def get_klifs_ligand(structure_id: int) -> oechem.OEGraphMol:
     file_path = LocalFileStorage.klifs_ligand_mol2(structure_id)
 
     if not file_path.is_file():
-        mol2_text = klifs_utils.remote.coordinates.ligand._ligand_mol2_text(
-            str(structure_id)
-        )
+        mol2_text = klifs_utils.remote.coordinates.ligand._ligand_mol2_text(str(structure_id))
         with open(file_path, "w") as wf:
             wf.write(mol2_text)
 
@@ -549,9 +541,7 @@ def generate_tautomers(molecule: oechem.OEGraphMol) -> List[oechem.OEGraphMol]:
     pKa_norm = True
     tautomers = [
         oechem.OEGraphMol(tautomer)
-        for tautomer in oequacpac.OEGetReasonableTautomers(
-            molecule, tautomer_options, pKa_norm
-        )
+        for tautomer in oequacpac.OEGetReasonableTautomers(molecule, tautomer_options, pKa_norm)
     ]
     return tautomers
 
@@ -583,9 +573,7 @@ def generate_enantiomers(
 
     enantiomers = [
         oechem.OEGraphMol(enantiomer)
-        for enantiomer in oeomega.OEFlipper(
-            molecule, max_centers, force_flip, enumerate_nitrogens
-        )
+        for enantiomer in oeomega.OEFlipper(molecule, max_centers, force_flip, enumerate_nitrogens)
     ]
     return enantiomers
 
@@ -627,7 +615,8 @@ def generate_conformations(
 
 
 def generate_reasonable_conformations(
-    molecule: oechem.OEGraphMol, dense: bool = False,
+    molecule: oechem.OEGraphMol,
+    dense: bool = False,
 ) -> List[oechem.OEMol]:
     """
     Generate conformations of reasonable enantiomers and tautomers of a given molecule.
@@ -759,9 +748,7 @@ def generate_isomeric_smiles_representations(molecule: oechem.OEGraphMol) -> Set
     return smiles_set
 
 
-def compare_molecules(
-    molecule1: oechem.OEGraphMol, molecule2: oechem.OEGraphMol
-) -> bool:
+def compare_molecules(molecule1: oechem.OEGraphMol, molecule2: oechem.OEGraphMol) -> bool:
     """
     Compare two OpenEye molecules.
     Parameters
@@ -849,9 +836,7 @@ def get_sequence(structure: oechem.OEGraphMol) -> str:
     for residue in hv.GetResidues():
         if oechem.OEIsStandardProteinResidue(residue):
             sequence.append(
-                oechem.OEGetAminoAcidCode(
-                    oechem.OEGetResidueIndex(residue.GetResidueName())
-                )
+                oechem.OEGetAminoAcidCode(oechem.OEGetResidueIndex(residue.GetResidueName()))
             )
         else:
             sequence.append("X")
@@ -952,9 +937,7 @@ def renumber_structure(
     """
     import copy
 
-    renumbered_structure = copy.deepcopy(
-        target_structure
-    )  # don't touch input structure
+    renumbered_structure = copy.deepcopy(target_structure)  # don't touch input structure
     hierview = oechem.OEHierView(renumbered_structure)
     structure_residues = hierview.GetResidues()
     for residue_number, structure_residue in zip(residue_numbers, structure_residues):
@@ -1023,10 +1006,7 @@ def update_residue_identifiers(
         residue = hv_residue.GetOEResidue()
         residue.SetChainID("A")
         if not residue.IsHetAtom() and keep_protein_residue_ids:
-            if (
-                residue.GetName() == "NME"
-                and residue.GetResidueNumber() == residue_number
-            ):
+            if residue.GetName() == "NME" and residue.GetResidueNumber() == residue_number:
                 # NME residues may have same id as preceding residue
                 residue_number += 1
             else:
@@ -1100,12 +1080,8 @@ def clashing_atoms(molecule1: oechem.OEGraphMol, molecule2: oechem.OEGraphMol) -
 
     oechem.OEAssignCovalentRadii(molecule1)
     oechem.OEAssignCovalentRadii(molecule2)
-    coordinates1_list = [
-        molecule1.GetCoords()[x] for x in sorted(molecule1.GetCoords().keys())
-    ]
-    coordinates2_list = [
-        molecule2.GetCoords()[x] for x in sorted(molecule2.GetCoords().keys())
-    ]
+    coordinates1_list = [molecule1.GetCoords()[x] for x in sorted(molecule1.GetCoords().keys())]
+    coordinates2_list = [molecule2.GetCoords()[x] for x in sorted(molecule2.GetCoords().keys())]
     for atom1, coordinates1 in zip(molecule1.GetAtoms(), coordinates1_list):
         for atom2, coordinates2 in zip(molecule2.GetAtoms(), coordinates2_list):
             clash_threshold = atom1.GetRadius() + atom2.GetRadius()
