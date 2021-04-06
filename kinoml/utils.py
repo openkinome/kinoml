@@ -171,7 +171,7 @@ def watermark():
     from IPython import get_ipython
     from watermark import WaterMark
     from distutils.spawn import find_executable
-    from subprocess import check_output
+    from subprocess import run
 
     print("Watermark")
     print("---------")
@@ -182,15 +182,37 @@ def watermark():
         print()
         print("nvidia-smi")
         print("----------")
-        print(check_output([nvidiasmi], universal_newlines=True))
+        result = run([nvidiasmi], capture_output=True)
+        stdout = result.stdout.decode("utf-8").strip()
+        if stdout:
+            print("stdout:", stdout, sep="\n")
+        stderr = result.stderr.decode("utf-8").strip()
+        if stderr:
+            print("stderr:", stderr, sep="\n")
 
     conda = find_executable("conda")
     if conda:
         print()
-        print("conda")
-        print("-----")
-        print(check_output([conda, "info", "-s"], universal_newlines=True))
-        print(check_output([conda, "list"], universal_newlines=True))
+        print("conda info")
+        print("----------")
+        result = run([conda, "info", "-s"], capture_output=True)
+        stdout = result.stdout.decode("utf-8").strip()
+        if stdout:
+            print(stdout, sep="\n")
+        stderr = result.stderr.decode("utf-8").strip()
+        if stderr:
+            print("stderr:", stderr, sep="\n")
+
+        print()
+        print("conda list")
+        print("----------")
+        result = run([conda, "list"], capture_output=True)
+        stdout = result.stdout.decode("utf-8").strip()
+        if stdout:
+            print(stdout, sep="\n")
+        stderr = result.stderr.decode("utf-8").strip()
+        if stderr:
+            print("stderr:", stderr, sep="\n")
 
 
 def collapsible(fn, *args, **kwargs):
