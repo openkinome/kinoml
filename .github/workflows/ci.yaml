@@ -15,23 +15,26 @@ on:
 
 jobs:
   test:
-    runs-on: ${{ matrix.cfg.os }}
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        cfg:
-
-          - os: ubuntu-latest
+        include:
+          - name: Linux, Python 3.7
+            os: ubuntu-latest
             python-version: "3.7"
+            conda-installer: https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-Linux-x86_64.sh
 
-          - os: ubuntu-latest
-            python-version: "3.8"
-
-          - os: ubuntu-latest
+          - name: Linux, Python 3.9
+            os: ubuntu-latest
             python-version: "3.9"
+            conda-installer: https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-Linux-x86_64.sh
 
-          - os: macOS-latest
+          - name: MacOS, Python 3.7
+            os: macOS-latest
             python-version: "3.7"
+            conda-installer: https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-MacOSX-x86_64.sh
+
 
     env:
       OE_LICENSE: ${{ github.workspace }}/oe_license.txt
@@ -42,11 +45,14 @@ jobs:
 
       - uses: conda-incubator/setup-miniconda@v2
         with:
-          python-version: ${{ matrix.cfg.python-version }}
+          installer-url: ${{ matrix.conda-installer }}
+          python-version: ${{ matrix.python-version }}
           activate-environment: test
           channel-priority: true
           environment-file: devtools/conda-envs/test_env.yaml
           auto-activate-base: false
+          use-mamba: true
+          channels: conda-forge
 
       - name: Additional info about the build
         shell: bash
@@ -60,6 +66,7 @@ jobs:
         run: |
           conda info --all
           conda list
+          mamba --version
 
       - name: Decrypt and check OE license
         shell: bash -l {0}
