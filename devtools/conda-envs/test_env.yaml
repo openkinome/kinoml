@@ -1,9 +1,6 @@
 name: test
 channels:
-  - pytorch
   - conda-forge
-  - defaults
-  - omnia
   - openeye
   - salilab
 dependencies:
@@ -14,18 +11,16 @@ dependencies:
   - requests
   - pint
   - appdirs
-  - openforcefield >=0.8.1
   - mdanalysis
   - tqdm
-  - pytorch 1.6.* *cpu*
-  - torchvision 0.7.* *cpu*
-  - cpuonly  # replaces cudatoolkit 10.2.* in CI
+  - openff-toolkit >=0.9
+  - pytorch 1.7.*
+  - torchvision
   - pytorch-lightning
   - xgboost
   - openeye-toolkits
   - modeller
   - watermark
-  #- cudatoolkit 10.2
 
   # Development
   - jupyterlab
