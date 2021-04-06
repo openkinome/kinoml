@@ -1,21 +1,55 @@
 name: test
 channels:
+  - conda-forge
+  - openeye
+  - salilab
 dependencies:
   # Base depends
   - python
   - pip
+  - pandas
+  - requests
+  - pint
+  - appdirs
+  - mdanalysis
+  - tqdm
+  - openff-toolkit >=0.9
+  - pytorch 1.7.*
+  - torchvision
+  - pytorch-lightning
+  - xgboost
+  - openeye-toolkits >=2020
+  - modeller
+  - watermark
+
+  # Development
+  - jupyterlab
+  - nglview
 
   # Testing
   - pytest
   - pytest-cov
   - codecov
 
-  # Docs
   - pip:
-    - mkdocs==1.0.4
-    # mkdocstrings master as of 20200302
-    - https://github.com/pawamoy/mkdocstrings/archive/8e8d604ba95363c140841c84535d2350d7ebbfe3.zip
-    - mkdocs-material
-    - mkdocs-minify-plugin
-    - mkdocs-git-revision-date-localized-plugin
-    - pymdown-extensions
+      # Torch geometric
+      - --find-links https://pytorch-geometric.com/whl/torch-1.6.0+cpu.html
+      - torch-geometric
+      - torch-scatter
+      - torch-sparse
+      - torch-cluster
+      - torch-spline-conv
+      # PyTorch trees
+      - https://github.com/ValentinFigue/Sklearn_PyTorch/archive/1b56a43e41de331ecdf73d08418f75bb34c9fa06.tar.gz
+      # Docs
+      - mkdocs==1.0.4
+      # mkdocstrings master as of 20200302
+      - https://github.com/pawamoy/mkdocstrings/archive/8e8d604ba95363c140841c84535d2350d7ebbfe3.tar.gz
+      - mkdocs-material==4.6.3
+      - mkdocs-minify-plugin==0.2.3
+      - mkdocs-git-revision-date-localized-plugin==0.5.0
+      - pymdown-extensions==6.3
+      - https://github.com/volkamerlab/klifs_utils/archive/master.tar.gz
+      - prody==1.10.11
+### After creating the environment, you will need to run these this to enable jupyter-lab widgets
+# jupyter labextension install @jupyter-widgets/jupyterlab-manager nglview-js-widgets @jupyterlab/toc

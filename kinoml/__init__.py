@@ -1,6 +1,6 @@
 """
-KinoML
-Machine Learning for kinase modeling
+KinoML is a structure-informed machine learning library
+with a focus on kinase modeling
 """
 
 # Handle versioneer

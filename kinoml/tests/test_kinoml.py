@@ -3,8 +3,7 @@ Unit and regression test for the kinoml package.
 """
 
 # Import package, test suite, and other packages as needed
-import kinoml
-import pytest
+import kinoml  # pylint: disable=unused-import
 import sys
 
 

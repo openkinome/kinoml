@@ -6,22 +6,53 @@ repo_name: openkinome/kinoml
 
 # Edit below for the menus
 nav:
-  - Home: index.md
-  - Getting started: getting_started.md
-  - Developers:
-    - API Reference: api.md
-    - How to write docs: howtodocs.md
-
+  - Usage guide:
+      - Home: index.md
+      - Installation: install.md
+      - Getting started: getting_started.md
+  - Tutorials:
+      - Example 1: tutorials/example.md
+  - Development guide:
+      - Base concepts: developers/api_concepts.md
+      - How to write docs: developers/api_docs.md
+  - API Reference:
+      - kinoml: api/__init__.md
+      - analysis: api/analysis/__init__.md
+      - core:
+          - components: api/core/components.md
+          - conditions: api/core/conditions.md
+          - ligands: api/core/ligands.md
+          - measurements: api/core/measurements.md
+          - proteins: api/core/proteins.md
+          - sequences: api/core/sequences.md
+          - systems: api/core/systems.md
+      - datasets:
+          - core: api/datasets/core.md
+          - kinomescan:
+              - pkis2: api/datasets/kinomescan/pkis2.md
+              - utils: api/datasets/kinomescan/utils.md
+      - docking: api/docking/__init__.md
+      - features: api/features/__init__.md
+      - ml: api/ml/__init__.md
+      - modeling: api/modeling/__init__.md
+      - optimize: api/optimize/__init__.md
+      - workflows: api/workflows/__init__.md
+      - utils: api/utils.md
 
 # Do not modify below this line unless you _know_ what you are doing
 theme:
-  name: "material"
+  name: material
+  logo:
+    icon: bubble_chart
+  favicon: assets/images/custom_favicon.png
+  feature:
+    tabs: true
 
 extra_css:
-  - css/custom.css
+  - assets/css/custom.css
 
 extra_javascript:
-  - 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML'
+  - "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML"
 
 markdown_extensions:
   - admonition

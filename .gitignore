@@ -103,3 +103,9 @@ ENV/
 
 # VS Code
 .vscode/
+
+# MacOS
+.DS_Store
+
+# PyCharm
+.idea/
