@@ -14,7 +14,7 @@ from ..core.ligands import BaseLigand, SmilesLigand, OpenForceFieldLikeLigand, O
 
 class SingleLigandFeaturizer(BaseFeaturizer):
     """
-    Provides a minimally useful `._supports()` method for all Ligand-like featurizers.
+    Provides a minimally useful ``._supports()`` method for all Ligand-like featurizers.
     """
 
     def __init__(self, *args, **kwargs):
@@ -59,10 +59,10 @@ class SmilesToLigandFeaturizer(SingleLigandFeaturizer):
     @lru_cache(maxsize=1000)
     def _featurize(self, system: System) -> np.ndarray:
         """
-        Featurizes a `SmilesLigand` component and builds a `Ligand` object
+        Featurizes a ``SmilesLigand`` component and builds a ``Ligand`` object
 
         Returns:
-            `Ligand` object
+            ``Ligand`` object
         """
         ligand = self._find_ligand(system, type_=SmilesLigand)
         return self._build_ligand(ligand)
@@ -86,10 +86,10 @@ class MorganFingerprintFeaturizer(SingleLigandFeaturizer):
 
     def _featurize(self, system: System) -> np.ndarray:
         """
-        Featurizes a `System` as a Morgan Fingerprint using RDKit
+        Featurizes a ``System`` as a Morgan Fingerprint using RDKit
 
         Returns:
-            Morgan fingerprint of radius `radius` of molecule,
+            Morgan fingerprint of radius ``radius`` of molecule,
             with shape `nbits`.
         """
         ligand = self._find_ligand(system)
@@ -109,7 +109,7 @@ class MorganFingerprintFeaturizer(SingleLigandFeaturizer):
 class OneHotSMILESFeaturizer(BaseOneHotEncodingFeaturizer, SingleLigandFeaturizer):
 
     """
-    One-hot encodes a `Ligand` from a canonical SMILES representation.
+    One-hot encodes a ``Ligand`` from a canonical SMILES representation.
 
     Attributes:
         DICTIONARY: Defines the character-integer mapping of the one-hot encoding.
@@ -130,8 +130,8 @@ class OneHotSMILESFeaturizer(BaseOneHotEncodingFeaturizer, SingleLigandFeaturize
         """
         Get SMILES string from a `Ligand`-like component and postprocesses it.
 
-        Double element symbols (such as `Cl`, `Br` for atoms and `@@` for chirality)
-        are replaced with single element symbols (`L`, `R` and `$` respectively).
+        Double element symbols (such as `Cl`, ``Br`` for atoms and ``@@`` for chirality)
+        are replaced with single element symbols (`L`, ``R`` and ``$`` respectively).
         """
         ligand = self._find_ligand(system)
         smiles = ligand.to_smiles()
@@ -143,8 +143,8 @@ class OneHotRawSMILESFeaturizer(OneHotSMILESFeaturizer):
         """
         Get SMILES string from a `Ligand`-like component and postprocesses it.
 
-        Double element symbols (such as `Cl`, `Br` for atoms and `@@` for chirality)
-        are replaced with single element symbols (`L`, `R` and `$` respectively).
+        Double element symbols (such as `Cl`, ``Br`` for atoms and ``@@`` for chirality)
+        are replaced with single element symbols (`L`, ``R`` and ``$`` respectively).
         """
         ligand = self._find_ligand(system)
         return ligand.metadata["smiles"].replace("Cl", "L").replace("Br", "R").replace("@@", "$")
@@ -156,12 +156,12 @@ class GraphLigandFeaturizer(SingleLigandFeaturizer):
     Creates a graph representation of a `Ligand`-like component.
     Each node (atom) is decorated with several RDKit descriptors
 
-    Check ``self._per_atom_features`` for details.
+    Check ```self._per_atom_features``` for details.
 
     Parameters:
-        per_atom_features: function that takes a `RDKit.Chem.Atom` object
+        per_atom_features: function that takes a ``RDKit.Chem.Atom`` object
             and returns a number of features. It defaults to the internal
-            `._per_atom_features` method.
+            ``._per_atom_features`` method.
         max_in_ring_size: whether the atom belongs to a ring of this size
     """
 
@@ -285,7 +285,7 @@ class GraphLigandFeaturizer(SingleLigandFeaturizer):
             ring : bool
                 if the atom is part of a ring.
             ring_size : array
-                if the atom if part of a ring of size determined by range(3, `max_in_ring_size` + 1).
+                if the atom if part of a ring of size determined by range(3, ``max_in_ring_size`` + 1).
             aromatic : bool
                     if atom is aromatic
             radical_electrons : int

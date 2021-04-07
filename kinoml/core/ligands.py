@@ -40,9 +40,6 @@ class OpenForceFieldLigand(BaseLigand, Molecule):
 
     """
     Small molecule object based on the OpenForceField toolkit.
-
-    !!! todo
-        Everything in this class
     """
 
     def __init__(self, metadata=None, name="", *args, **kwargs):
@@ -55,7 +52,7 @@ class OpenForceFieldLigand(BaseLigand, Molecule):
     ):  # pylint: disable=arguments-differ
         """
         Same as `openff.toolkit.topology.Molecule`, but adding
-        information about the original SMILES to `.metadata` dict.
+        information about the original SMILES to ``.metadata`` dict.
         """
         self = super().from_smiles(smiles, allow_undefined_stereo=allow_undefined_stereo, **kwargs)
         if name is None:
@@ -87,13 +84,13 @@ class OpenForceFieldLikeLigand(BaseLigand):
 
     @classmethod
     def from_smiles(cls, smiles, name=None, **kwargs):
-        raise NotImplementedError("Use `OpenForceFieldLigand` or implement API in a subclass")
+        raise NotImplementedError("Use ``OpenForceFieldLigand`` or implement API in a subclass")
 
     def to_rdkit(self):
-        raise NotImplementedError("Use `OpenForceFieldLigand` or implement API in a subclass")
+        raise NotImplementedError("Use ``OpenForceFieldLigand`` or implement API in a subclass")
 
     def to_smiles(self):
-        raise NotImplementedError("Use `OpenForceFieldLigand` or implement API in a subclass")
+        raise NotImplementedError("Use ``OpenForceFieldLigand`` or implement API in a subclass")
 
 
 class RDKitLigand(OpenForceFieldLikeLigand):
@@ -101,8 +98,9 @@ class RDKitLigand(OpenForceFieldLikeLigand):
     """
     Wrapper for RDKit molecules using some parts of the OpenForceField API
 
-    !!! todo
-        Everything in this class
+    .. warning::
+
+        Implement other parts of the OFF Molecule API
     """
 
     @classmethod

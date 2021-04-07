@@ -1,19 +1,46 @@
-# KinoML
+```{admonition} Warning!
+:class: warning
 
-Structure-informed machine learning for kinase modeling
+This is module is undergoing heavy development. None of the API calls are final. This software is provided without any guarantees of correctness, you will likely encounter bugs.
 
-<!-- The following block is possible thanks to the admonitions plugin -->
-<!-- https://squidfunk.github.io/mkdocs-material/extensions/admonition/ -->
-!!! warning
+If you are interested in this code, please wait for the official release to use it. In the mean time, to stay informed of development progress you are encouraged to:
 
-    This is module is undergoing heavy development. None of the API calls are final. This software is provided without any guarantees of correctness, you will likely encounter bugs.
+- Subscribe for new releases (use `Watch> Releases only` on GitHub)
+- Check out the [Github repository](https://github.com/openkinome/kinoml).
 
-    If you are interested in this code, please wait for the official release to use it. In the mean time, to stay informed of development progress you are encouraged to:
+```
 
-    * Subscribe for new releases (use `Watch> Releases only` on GitHub)
-    * Check out the [Github repository](https://github.com/openkinome/kinoml).
+# OpenKinome & KinoML
 
+The [OpenKinome](https://openkinome.org) initiative aims to leverage the increasingly available bioactivity data and scalable computational resources to perform kinase-centric drug design in the context of structure-informed machine learning and free energy calculations. `KinoML` is the main library supporting these efforts.
 
-# What is KinoML?
+Do you want to know more about OpenKinome ecosystem? Check its [website](https://openkinome.org).
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis facilisis consequat arcu eu tristique. Sed ut diam accumsan, iaculis leo vitae, laoreet arcu. Vivamus vel aliquam risus. Aenean magna massa, dictum ac lobortis in, porttitor at tortor. Curabitur et massa nec elit placerat fermentum. Morbi bibendum mi in felis eleifend mattis. Nullam sagittis augue at sagittis egestas. Curabitur suscipit id dolor eget feugiat. Etiam enim nunc, lobortis vitae porttitor non, suscipit eget metus. Aliquam tempor ipsum mauris, et eleifend turpis tincidunt pharetra. Mauris ex turpis, consequat sed tellus ut, dictum fringilla nunc. Donec vitae placerat orci, sed tempus elit.
+<!-- Notify Sphinx about the TOC -->
+
+```{toctree}
+:caption: User guide
+:maxdepth: 1
+:hidden:
+
+getting_started
+install
+```
+
+```{toctree}
+:caption: Tutorials
+:maxdepth: 1
+:hidden:
+
+tutorials/example
+```
+
+```{toctree}
+:caption: Developers
+:maxdepth: 1
+:hidden:
+
+developers/api_concepts
+developers/api_docs
+API Reference <api/kinoml/index>
+```

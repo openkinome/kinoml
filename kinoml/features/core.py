@@ -1,8 +1,8 @@
 """
-Featurizers can transform a `kinoml.core.system.System` object and produce
+Featurizers can transform a ``kinoml.core.system.System`` object and produce
 new representations of the molecular entities and their associated measurements.
 
-All `Featurizer` objects inherit from `BaseFeaturizer` and reimplement `._featurize`
+All ``Featurizer`` objects inherit from ``BaseFeaturizer`` and reimplement `._featurize`
 and `._supports`, if needed.
 """
 from __future__ import annotations
@@ -52,7 +52,7 @@ class BaseFeaturizer:
         """
         Check if these systems are supported by this featurizer.
 
-        Do NOT reimplement in subclass. Check `._supports()` instead.
+        Do NOT reimplement in subclass. Check ``._supports()`` instead.
 
         Parameters:
             systems: systems to be checked (by type, contained attributes, etc)
@@ -62,7 +62,7 @@ class BaseFeaturizer:
             True if all systems are compatible, False otherwise
 
         Raises:
-            `ValueError` if `._supports()` fails and `raise_errors` is `True`.
+            ``ValueError`` if ``._supports()`` fails and ``raise_errors`` is `True`.
         """
         for system in systems:
             if not self._supports(system):
@@ -124,7 +124,7 @@ class Pipeline(BaseFeaturizer):
             True if all systems are compatible with all featurizers, False otherwise
 
         Raises:
-            `ValueError` if `f.supports()` fails and `raise_errors` is `True`.
+            ``ValueError`` if ``f.supports()`` fails and ``raise_errors`` is `True`.
         """
         return all(
             f.supports(s, raise_errors=raise_errors) for f in self.featurizers for s in systems
@@ -187,7 +187,7 @@ class PadFeaturizer(BaseFeaturizer):
     """
     Pads features of a given system to a desired size or length.
 
-    This class wraps `numpy.pad` with `mode=constant`, auto-calculating
+    This class wraps ``numpy.pad`` with `mode=constant`, auto-calculating
     the needed additions to match the requested shape.
 
     Parameters:

@@ -229,10 +229,10 @@ def collapsible(fn, *args, **kwargs):
 
 def fill_until_next_multiple(container, multiple_of: int, factory):
     """
-    Fill `container` with instances of `factory` until its length
+    Fill ``container`` with instances of ``factory`` until its length
     reaches the next multiple of `multiple_of`.
 
-    `container` gets modified in place and returned.
+    ``container`` gets modified in place and returned.
     """
     if isinstance(container, list):
         action = container.append

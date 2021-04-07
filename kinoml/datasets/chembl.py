@@ -24,7 +24,7 @@ from ..utils import APPDIR
 class ChEMBLDatasetProvider(MultiDatasetProvider):
 
     """
-    This provider relies heavily on `openkinome/datascripts` data ingestion
+    This provider relies heavily on ``openkinome/datascripts`` data ingestion
     pipelines. It will load ChEMBL activities from its Releases page
     """
 
@@ -43,12 +43,10 @@ class ChEMBLDatasetProvider(MultiDatasetProvider):
             filename: path or URL to a zipped CSV file containing activities from ChEMBL,
                 using schema detailed below.
 
-        !!! note
+        ```{note}
             - ChEMBL aggregates data from lots of sources, so conditions are guaranteed
               to be different across experiments.
-
-        !!! todo
-            - Versioning for different openkinome/kinodata releases
+        ```
         """
         csv_filename = os.path.splitext(os.path.basename(filename))[0] + ".csv"
         cached_path = Path(APPDIR.user_cache_dir) / "chembl" / csv_filename

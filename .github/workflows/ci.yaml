@@ -185,16 +185,12 @@ jobs:
       - name: Build docs
         shell: bash -l {0}
         run: |
-          # Required to load docstrings sample module inside docs/
-          export PYTHONPATH=$(pwd)
-          mkdocs build
+          cd docs
+          env SPHINXOPTS="-j2" make html
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./site
-        # We want to test docs building in PR, but we we
-        # will only deploy if we are on / have merged to master
-        # Whitelist api for PR #8
-        if: github.ref == 'master' || github.head_ref == 'api'
+          publish_dir: ./docs/_build/html
+        if: github.ref == 'master'

@@ -1,7 +1,9 @@
 """
 Example models for TensorFlow
 
-!!! Note: This code is not currently in use.
+.. note::
+
+    This code is not currently in use.
 """
 
 import tensorflow as tf

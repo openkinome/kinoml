@@ -61,7 +61,8 @@ class ProteinStructure(BaseProtein, BaseStructure):
     """
     Structural representation of a protein
 
-    !!! todo
+    .. warning::
+
         This is probably going to be redone, so do not invest too much
     """
 
@@ -138,7 +139,7 @@ class ProteinStructure(BaseProtein, BaseStructure):
 class Kinase(ProteinStructure):
 
     """
-    Extends `Protein` to provide kinase-specific methods of
+    Extends ``Protein`` to provide kinase-specific methods of
     instantiation.
     """
 

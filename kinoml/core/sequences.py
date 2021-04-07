@@ -14,7 +14,8 @@ class Biosequence(str):
     Base class for string representations of biological polymers
     (nucleic acids, peptides, proteins...)
 
-    !!! todo
+    .. warning::
+
         How to handle several mutations at the same time, while
         keeping indices relevant (after a deletion, a replacement
         or insertion position might be wrong).
@@ -26,9 +27,9 @@ class Biosequence(str):
 
     def __new__(cls, value, name="", metadata=None, *args, **kwargs):
         """
-        We are subclassing `str` to:
+        We are subclassing ``str`` to:
 
-        - provide a `.metadata` dict
+        - provide a ``.metadata`` dict
         - validate input is part of the allowed alphabet
         """
         diff = set(value).difference(cls.ALPHABET)
@@ -147,10 +148,10 @@ class Biosequence(str):
 
         Parameters:
             mutations: Mutations to be applied. Indices are always 1-indexed. It can be one of:
-                (1) substitution, like `C234T` (C at position 234 will be replaced by T);
-                (2) deletion, like `L746-A750del` (delete everything between L at position 746
+                (1) substitution, like ``C234T`` (C at position 234 will be replaced by T);
+                (2) deletion, like ``L746-A750del`` (delete everything between L at position 746
                     A at position 750, bounds not included);
-                (3) insertion, like `1151Tins` (insert a T after position 1151)
+                (3) insertion, like ``1151Tins`` (insert a T after position 1151)
             raise_errors: Raise ValueError if one of the mutations is not supported.
 
         Returns:
@@ -193,7 +194,7 @@ class Biosequence(str):
     @staticmethod
     def _type_mutation(mutation, raise_errors=True):
         """
-        Guess which kind of operation `mutation` is asking for.
+        Guess which kind of operation ``mutation`` is asking for.
         """
         if "ins" in mutation:
             return "insertion"
@@ -206,7 +207,7 @@ class Biosequence(str):
 
     def _mutate_with_substitution(self, mutation: str) -> "Biosequence":
         """
-        Given `XYYYZ`, replace element `X` at position `YYY` with `Z`.
+        Given `XYYYZ`, replace element ``X`` at position ``YYY`` with `Z`.
 
         Parameters:
             mutation: Replacement to apply. It must be formatted as
@@ -228,8 +229,8 @@ class Biosequence(str):
 
     def _mutate_with_deletion(self, mutation: str) -> "Biosequence":
         """
-        Given `AXXX-BYYYdel`, delete everything between elements `A` and `B` at positions
-        `XXX` and `YYY`, respectively. `A` and `B` will still be part of the resulting sequence.
+        Given `AXXX-BYYYdel`, delete everything between elements ``A`` and ``B`` at positions
+        ``XXX`` and `YYY`, respectively. ``A`` and ``B`` will still be part of the resulting sequence.
 
         Parameters:
             mutation: Replacement to apply. It must be formatted as
@@ -248,7 +249,7 @@ class Biosequence(str):
 
     def _mutate_with_insertion(self, mutation: str) -> "Biosequence":
         """
-        Given `XXXAdel`, insert element `A` at position `XXX`.
+        Given `XXXAdel`, insert element ``A`` at position `XXX`.
 
         Parameters:
             mutation: Insertion to apply. It must be formatted as

@@ -3,6 +3,10 @@ from sklearn.metrics import r2_score, mean_squared_error, mean_absolute_error
 
 
 def root_mean_squared_error(*args, **kwargs):
+    """
+    Returns the square-root of ``scikit-learn``'s ``mean_squared_error`` metric.
+    All arguments are forwarded to that function.
+    """
     return np.sqrt(mean_squared_error(*args, **kwargs))
 
 
@@ -10,7 +14,37 @@ def performance(
     predicted, observed, verbose=True, n_boot=100, confidence=0.95, sample_ratio=0.8, _seed=1234
 ):
     """
-    TODO: Reimplement samples with scipy.stats.norm or with numpy.
+    Measure the predicted vs observed performance with different metrics (R2, MSE, MAE, RMSE).
+
+    Parameters
+    ----------
+    predicted : array-like
+        Data points predicted by the model.
+    observed : array-like
+        Observed data points, as available in the dataset.
+    verbose : bool, optional=True
+        Whether to print results to stdout.
+    n_boot : int, optional=100
+        Number of bootstrap iterations. Set to ``1`` to disable
+        bootstrapping.
+    confidence : float, optional=0.95
+        Confidence interval, relative to 1. Default is 95%.
+    sample_ratio : float, optional=0.8
+        Proportion of data to sample in each iteration.
+    _seed : int, optional=1234
+        Random seed. Each bootstrap iteration gets a different seed
+        based on this initial one.
+
+    Returns
+    -------
+    results : dict of tuple
+        This dictionary contains one item per metric (see above),
+        with a 4-element tuple each: mean, standard deviation, and lower and
+        upper bounds for the confidence interval.
+
+    Note
+    ----
+    **TODO**: Reimplement samples with ``scipy.stats.norm`` or with ``numpy``.
 
     """
     assert 0.5 <= confidence < 1, "Confidence must be in [0.5, 1)"

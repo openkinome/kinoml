@@ -25,7 +25,7 @@ class KINOMEScanMapper:
     Parameters:
         raw_datasheet: Raw CSV file with the DiscoverX information
         use_cache: Whether to read the data from cache if possible. Set to
-            `False` to ignore existing caches and rewrite them.
+            ``False`` to ignore existing caches and rewrite them.
 
     """
 

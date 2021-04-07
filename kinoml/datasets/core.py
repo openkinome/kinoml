@@ -120,21 +120,22 @@ class DatasetProvider(BaseDatasetProvider):
     def from_source(cls, filename=None, **kwargs):
         """
         Parse CSV/raw file to object model. This method is responsible of generating
-        the objects for `self.data` and `self.measurements`, if relevant.
-        Additional kwargs will be passed to `__init__`
+        the objects for ```self.data``` and ``self.measurements``, if relevant.
+        Additional kwargs will be passed to ``__init__``
         """
         raise NotImplementedError
 
     def featurize(self, *featurizers: Iterable[BaseFeaturizer], processes=1, chunksize=1):
         """
-        Given a collection of `kinoml.features.core.BaseFeaturizers`, apply them
-        to the systems present in the `self.measurements`.
+        Given a collection of ``kinoml.features.core.BaseFeaturizers``, apply them
+        to the systems present in the ``self.measurements``.
 
         Parameters:
             featurizers: Featurization schemes that will be applied to the systems,
                 in a stacked way.
 
-        !!! todo
+        .. warning::
+
             * This function can be easily parallelized, and is often the bottleneck!
             * Shall we modify the system in place (default now), return the modified copy or store it?
         """
@@ -158,7 +159,7 @@ class DatasetProvider(BaseDatasetProvider):
         if invalid:
             logger.warning(
                 "There were %d systems that could not be featurized! "
-                "Check `system.featurizations['failed']` for more info.",
+                "Check ``system.featurizations['failed']`` for more info.",
                 invalid,
             )
         return systems
@@ -186,27 +187,26 @@ class DatasetProvider(BaseDatasetProvider):
         Generate a clean <style>.data.Dataset object for further steps
         in the pipeline (model building, etc).
 
-        !!! Note
+        .. warning::
+
             This step is lossy because the resulting objects will no longer
             hold chemical data. Operations depending on such information,
             must be performed first.
 
-        __Examples__
-
-        ```python
+        Examples
+        --------
         >>> provider = DatasetProvider()
         >>> provider.featurize()  # optional
         >>> splitter = TimeSplitter()
         >>> split_indices = splitter.split(provider.data)
         >>> dataset = provider.to_dataset("pytorch")  # .featurize() under the hood
         >>> X_train, X_test, y_train, y_test = train_test_split(dataset, split_indices)
-        ```
         """
         raise NotImplementedError
 
     def to_dataframe(self, *args, **kwargs):
         """
-        Generates a `pandas.DataFrame` containing information on the systems
+        Generates a ``pandas.DataFrame`` containing information on the systems
         and their measurements
 
         Returns:
@@ -290,7 +290,7 @@ class DatasetProvider(BaseDatasetProvider):
 
     def split_by_groups(self) -> dict:
         """
-        If a `kinoml.datasets.groups` class has been applied to this instance,
+        If a ``kinoml.datasets.groups`` class has been applied to this instance,
         this method will create more DatasetProvider instances, one per group.
 
 

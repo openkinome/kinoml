@@ -23,8 +23,9 @@ class BaseMeasurement:
         system: Molecular entities measured, contained in a System object
         strict: Whether to perform sanity checks at initialization.
 
-    !!! todo
-        Investigate possible uses for `pint`
+    .. warning::
+
+        Investigate possible uses for ``pint``
     """
 
     def __init__(

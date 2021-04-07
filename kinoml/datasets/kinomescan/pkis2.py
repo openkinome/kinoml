@@ -54,7 +54,8 @@ class PKIS2DatasetProvider(KinomeScanDatasetProvider):
             measurement_type: which type of measurement was taken for each pair
             conditions: experimental conditions of the assay
 
-        !!! todo
+        .. warning::
+
             - Investigate lazy access and object generation
             - Review accuracy of item access by indices (correlative order?)
         """
