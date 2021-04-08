@@ -1,13 +1,8 @@
 """
 Creates DatasetProvider objects from ChEMBL activity data
 """
-from urllib.request import urlopen
-import shutil
 import random
-from tempfile import TemporaryDirectory
-from zipfile import ZipFile
-from pathlib import Path
-import os
+
 
 import pandas as pd
 from tqdm.auto import tqdm
@@ -18,20 +13,19 @@ from ..core.proteins import AminoAcidSequence
 from ..core.ligands import SmilesLigand
 from ..core.systems import ProteinLigandComplex
 from ..core.measurements import pIC50Measurement, pKiMeasurement, pKdMeasurement
-from ..utils import APPDIR
 
 
 class ChEMBLDatasetProvider(MultiDatasetProvider):
 
     """
-    This provider relies heavily on ``openkinome/datascripts`` data ingestion
-    pipelines. It will load ChEMBL activities from its Releases page
+    This provider relies heavily on ``openkinome/kinodata`` data ingestion
+    pipelines. It will load ChEMBL activities from its Releases page.
     """
 
     @classmethod
     def from_source(
         cls,
-        filename="https://github.com/openkinome/datascripts/releases/download/v0.1/activities-chembl27.zip",
+        path_or_url="https://github.com/openkinome/datascripts/releases/download/v0.2/activities-chembl28_v0.2.zip",
         measurement_types=("pIC50", "pKi", "pKd"),
         sample=None,
         **kwargs,
@@ -39,32 +33,25 @@ class ChEMBLDatasetProvider(MultiDatasetProvider):
         """
         Create a MultiDatasetProvider out of the raw data contained in the zip file
 
-        Parameters:
-            filename: path or URL to a zipped CSV file containing activities from ChEMBL,
-                using schema detailed below.
+        Parameters
+        ----------
+        path_or_url : str, optional
+            path or URL to a (zipped) CSV file containing activities from ChEMBL,
+            using schema detailed below.
+        measurement_types : tuple of str, optional
+            Which measurement types must be imported from the CSV. By default, all
+            three (pIC50, pKi, pKd) will be loaded, but you can choose a subset (
+            e.g. ``("pIC50",)``).
+        sample : int, optional=None
+            If set to larger than zero, load only N data points from the dataset.
 
-        ```{note}
-            - ChEMBL aggregates data from lots of sources, so conditions are guaranteed
-              to be different across experiments.
-        ```
+        Note
+        ----
+        ChEMBL aggregates data from lots of sources, so conditions are guaranteed
+        to be different across experiments.
+
         """
-        csv_filename = os.path.splitext(os.path.basename(filename))[0] + ".csv"
-        cached_path = Path(APPDIR.user_cache_dir) / "chembl" / csv_filename
-        if not cached_path.is_file():
-            if os.path.isfile(filename):
-                open_handle = lambda path: open(path, "rb")
-            else:  # it is url
-                open_handle = urlopen
-            # Download zipped CSV and load it with pandas
-            with open_handle(filename) as f, TemporaryDirectory() as tmpdir:
-                tmpzip = Path(tmpdir) / "chembl.zip"
-                with open(tmpzip, "wb") as out:
-                    shutil.copyfileobj(f, out)
-                with ZipFile(tmpzip) as zf:
-                    zf.extractall(tmpdir)
-                cached_path.parent.mkdir(parents=True, exist_ok=True)
-                shutil.copyfile(Path(tmpdir) / csv_filename, cached_path)
-
+        cached_path = cls._download_to_cache_or_retrieve(path_or_url)
         df = pd.read_csv(cached_path)
 
         measurement_type_classes = {

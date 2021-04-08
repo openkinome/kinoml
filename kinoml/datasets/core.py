@@ -5,6 +5,10 @@ from functools import wraps
 from operator import attrgetter
 from collections import defaultdict, Counter
 import multiprocessing
+from urllib.request import urlopen
+import shutil
+from pathlib import Path
+import os
 
 import numpy as np
 import pandas as pd
@@ -12,6 +16,7 @@ from tqdm.auto import tqdm
 
 from ..core.measurements import BaseMeasurement
 from ..features.core import BaseFeaturizer
+from ..utils import APPDIR
 
 logger = logging.getLogger(__name__)
 
@@ -307,6 +312,23 @@ class DatasetProvider(BaseDatasetProvider):
     @property
     def conditions(self):
         return {ms.conditions for ms in self.measurements}
+
+    @classmethod
+    def _download_to_cache_or_retrieve(
+        cls,
+        path_or_url,
+    ):
+        filename = os.path.basename(path_or_url)
+        cached_path = Path(APPDIR.user_cache_dir) / cls.__name__ / filename
+        if not cached_path.is_file():  # file is not available on user cache
+            if os.path.isfile(path_or_url):  # local file
+                open_handle = lambda path: open(path, "rb")
+            else:  # online url
+                open_handle = urlopen
+            cached_path.parent.mkdir(parents=True, exist_ok=True)
+            with open_handle(path_or_url) as f, open(cached_path, "wb") as dest:
+                shutil.copyfileobj(f, dest)
+        return cached_path
 
 
 class MultiDatasetProvider(DatasetProvider):
