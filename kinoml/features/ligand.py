@@ -1,15 +1,23 @@
 """
 Featurizers that mostly concern ligand-based models
 """
+
 from __future__ import annotations
 from functools import lru_cache
+from typing import Union
 
 import numpy as np
 import rdkit
 
 from .core import BaseFeaturizer, BaseOneHotEncodingFeaturizer
 from ..core.systems import System
-from ..core.ligands import BaseLigand, SmilesLigand, OpenForceFieldLikeLigand, OpenForceFieldLigand
+from ..core.ligands import (
+    BaseLigand,
+    RDKitLigand,
+    SmilesLigand,
+    OpenForceFieldLikeLigand,
+    OpenForceFieldLigand,
+)
 
 
 class SingleLigandFeaturizer(BaseFeaturizer):
@@ -17,22 +25,41 @@ class SingleLigandFeaturizer(BaseFeaturizer):
     Provides a minimally useful ``._supports()`` method for all Ligand-like featurizers.
     """
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    _COMPATIBLE_LIGAND_TYPES = (BaseLigand,)
 
     def _supports(self, system: System) -> bool:
         """
         Check that exactly one ligand is present in the System
         """
         super_checks = super()._supports(system)
-        ligands = [c for c in system.components if isinstance(c, BaseLigand)]
+        ligands = [c for c in system.components if isinstance(c, self._COMPATIBLE_LIGAND_TYPES)]
         return all([super_checks, len(ligands) == 1])
 
     def _find_ligand(
         self,
         system_or_ligand: Union[System, BaseLigand],
-        type_=(OpenForceFieldLigand, OpenForceFieldLikeLigand),
+        type_=None,
     ):
+        """
+        Find a ligand-like component in the input object given
+        to the featurizer.
+
+        Parameters
+        ----------
+        system_or_ligand
+            The input object to be featurized. It can be either a
+            ``System``, in which case we will look for ligand-like
+            objects in the components list or in the featurizations
+            dictionary. It can also be a ``Ligand``-like object,
+            which will be returned immediately.
+        type_ : type or tuple of types, optional
+            Check for specific subtypes of ligand objects. Some
+            featurizers only accept Smiles, some only RDKit molecules,
+            etc. By default, it will check against the class attribute
+            ``_COMPATIBLE_LIGAND_TYPES``.
+        """
+        if type_ is None:
+            type_ = self._COMPATIBLE_LIGAND_TYPES
         if isinstance(system_or_ligand, type_):
             return system_or_ligand
         # we only return the first ligand found for now
@@ -51,33 +78,56 @@ class SingleLigandFeaturizer(BaseFeaturizer):
 
 
 class SmilesToLigandFeaturizer(SingleLigandFeaturizer):
-    def _supports(self, system):
-        super_checks = super()._supports(system)
-        ligands = [c for c in system.components if isinstance(c, SmilesLigand)]
-        return all([super_checks, len(ligands) == 1])
+    """
+    Given a ``System`` containing a ``SmilesLigand`` type,
+    promote it to either ``RDKitLigand`` or ``OpenForceFieldLigand``.
+
+    Parameters
+    ----------
+    ligand_type : str, optional=rdkit
+        If ``openforcefield``, returns ``OpenForceFieldLigand``.
+        If ``rdkit``, returns ``RDKitLigand``.
+    """
+
+    _COMPATIBLE_LIGAND_TYPES = (SmilesLigand,)
+
+    def __init__(self, ligand_type: str = "rdkit", *args, **kwargs):
+        super().__init__(self, *args, **kwargs)
+        if ligand_type == "rdkit":
+            self._LigandType = RDKitLigand
+        elif ligand_type == "openforcefield":
+            self._LigandType = OpenForceFieldLigand
+        else:
+            raise ValueError(
+                f"Ligand type `{ligand_type}` is not one of ['rkdit', 'openforcefield']"
+            )
 
     @lru_cache(maxsize=1000)
-    def _featurize(self, system: System) -> np.ndarray:
+    def _featurize(self, system: System) -> Union[RDKitLigand, OpenForceFieldLigand]:
         """
-        Featurizes a ``SmilesLigand`` component and builds a ``Ligand`` object
-
-        Returns:
-            ``Ligand`` object
+        Returns
+        -------
+        ``RDKitLigand`` or ``OpenForceFieldLigand`` object
         """
-        ligand = self._find_ligand(system, type_=SmilesLigand)
-        return self._build_ligand(ligand)
+        return self._LigandType.from_smiles(self._find_ligand(system).to_smiles())
 
 
 class MorganFingerprintFeaturizer(SingleLigandFeaturizer):
 
     """
-    Featurizes a `kinoml.core.ligand.Ligand`-like component
-    using Morgan fingerprints bitvectors
+    Given a ``System`` containing one ``OpenForceFieldLikeLigand`
+    component, convert it to RDKit molecule and generate
+    the Morgan fingerprints bitvectors.
 
-    Parameters:
-        radius: Morgan fingerprint neighborhood radius
-        nbits: Length of the resulting bit vector
+    Parameters
+    ----------
+    radius : int, optional=2
+        Morgan fingerprint neighborhood radius
+    nbits : int, optional=512
+        Length of the resulting bit vector
     """
+
+    _COMPATIBLE_LIGAND_TYPES = (OpenForceFieldLigand, OpenForceFieldLikeLigand)
 
     def __init__(self, radius: int = 2, nbits: int = 512, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -85,23 +135,15 @@ class MorganFingerprintFeaturizer(SingleLigandFeaturizer):
         self.nbits = nbits
 
     def _featurize(self, system: System) -> np.ndarray:
-        """
-        Featurizes a ``System`` as a Morgan Fingerprint using RDKit
-
-        Returns:
-            Morgan fingerprint of radius ``radius`` of molecule,
-            with shape `nbits`.
-        """
-        ligand = self._find_ligand(system)
+        ligand = self._find_ligand(system).to_rdkit()
         return self._featurize_ligand(ligand)
 
     @lru_cache(maxsize=1000)
-    def _featurize_ligand(self, ligand):
+    def _featurize_ligand(self, ligand: rdkit.Chem.Mol) -> np.ndarray:
         from rdkit.Chem.AllChem import GetMorganFingerprintAsBitVect as Morgan
 
         # FIXME: Check whether OFF uses canonical smiles internally, or not
         # otherwise, we should force that behaviour ourselves!
-        ligand = ligand.to_rdkit()
         fp = Morgan(ligand, radius=self.radius, nBits=self.nbits)
         return np.asarray(fp, dtype="uint8")
 
@@ -111,10 +153,14 @@ class OneHotSMILESFeaturizer(BaseOneHotEncodingFeaturizer, SingleLigandFeaturize
     """
     One-hot encodes a ``Ligand`` from a canonical SMILES representation.
 
-    Attributes:
-        DICTIONARY: Defines the character-integer mapping of the one-hot encoding.
+    Attributes
+    ----------
+    ALPHABET : str
+        Defines the character-integer mapping (as a sequence)
+        of the one-hot encoding.
     """
 
+    _COMPATIBLE_LIGAND_TYPES = (OpenForceFieldLigand, OpenForceFieldLikeLigand)
     ALPHABET = (
         "BCFHIKNOPSUVWY"  # atoms
         "acegilnosru"  # aromatic atoms
@@ -139,6 +185,8 @@ class OneHotSMILESFeaturizer(BaseOneHotEncodingFeaturizer, SingleLigandFeaturize
 
 
 class OneHotRawSMILESFeaturizer(OneHotSMILESFeaturizer):
+    _COMPATIBLE_LIGAND_TYPES = (OpenForceFieldLigand, OpenForceFieldLikeLigand)
+
     def _retrieve_sequence(self, system: System) -> str:
         """
         Get SMILES string from a `Ligand`-like component and postprocesses it.
@@ -215,6 +263,7 @@ class GraphLigandFeaturizer(SingleLigandFeaturizer):
     ]
 
     HYBRIZIDATION_TYPES = {}
+    _COMPATIBLE_LIGAND_TYPES = (OpenForceFieldLigand, OpenForceFieldLikeLigand)
 
     def __init__(
         self, per_atom_features: callable = None, max_in_ring_size: int = 10, *args, **kwargs
@@ -233,7 +282,7 @@ class GraphLigandFeaturizer(SingleLigandFeaturizer):
             - Graph connectivity of the molecule with shape (2, n_edges)
             - Feature matrix with shape (n_atoms, n_features)
         """
-        ligand = self._find_ligand(system)
+        ligand = self._find_ligand(system).to_rdkit()
         connectivity_graph = self._connectivity_COO_format(ligand)
         per_atom_features = np.array(
             [

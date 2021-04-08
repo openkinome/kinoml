@@ -22,6 +22,9 @@ class BaseFeaturizer:
 
     _SUPPORTED_TYPES = (System,)
 
+    def __init__(self, *args, **kwargs):
+        pass
+
     def featurize(self, system, inplace: bool = True) -> object:
         """
         Given an system (compatible with `_SUPPORTED_TYPES`), apply
