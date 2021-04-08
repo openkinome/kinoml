@@ -7,12 +7,6 @@ from ..utils import download_file
 logger = logging.getLogger(__name__)
 
 
-class SmilesLigand(BaseLigand):
-    def __init__(self, smiles, metadata=None, name="", *args, **kwargs):
-        BaseLigand.__init__(self, name=name, metadata=metadata)
-        self.smiles = smiles
-
-
 class FileLigand(BaseLigand):
     def __init__(self, path, metadata=None, name="", *args, **kwargs):
         super().__init__(name=name, metadata=metadata, *args, **kwargs)
@@ -80,6 +74,8 @@ class OpenForceFieldLikeLigand(BaseLigand):
         self._molecule = molecule
 
     def __getattr__(self, attr):
+        if attr in {"__getstate__", "__setstate__"}:
+            return super().__getattr__(self, attr)
         return getattr(self._molecule, attr)
 
     @classmethod
@@ -125,3 +121,16 @@ class RDKitLigand(OpenForceFieldLikeLigand):
         from rdkit.Chem import MolToSmiles
 
         return MolToSmiles(self._molecule)
+
+
+class SmilesLigand(OpenForceFieldLikeLigand):
+    @classmethod
+    def from_smiles(cls, smiles, name=None, **kwargs):  # pylint: disable=arguments-differ
+        """"""
+        return cls(smiles, name=name or smiles, metadata={"smiles": smiles})
+
+    def to_rdkit(self):
+        return RDKitLigand.from_smiles(self._molecule).to_rdkit()
+
+    def to_smiles(self):
+        return RDKitLigand.from_smiles(self._molecule).to_smiles()
