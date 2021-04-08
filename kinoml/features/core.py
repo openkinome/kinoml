@@ -7,7 +7,7 @@ and `._supports`, if needed.
 """
 from __future__ import annotations
 from copy import deepcopy
-from typing import Hashable
+from typing import Hashable, Iterable, Union
 import hashlib
 
 import numpy as np
