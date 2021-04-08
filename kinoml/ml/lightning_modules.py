@@ -396,9 +396,6 @@ class KFold3Way(KFold):
     def split(self, X, y=None, groups=None, with_validation=True):
         for train, test in super().split(X, y, groups):
             if with_validation:
-                # FIXME: This easy implementation does not guarantee
-                #        rotation over the train/validation subset
-                #        (e.g. val susbet can have repeated indices)
                 train, val = train_test_split(train, test_size=(1 / (self.n_splits - 1)))
             else:
                 val = np.array([])
