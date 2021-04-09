@@ -26,7 +26,7 @@ class AminoAcidSequence(BaseProtein, Biosequence):
 
     def __init__(self, sequence, name="", *args, **kwargs):
         BaseProtein.__init__(self, name=name, *args, **kwargs)
-        Biosequence.__init__(self, sequence)
+        Biosequence.__init__(self)
 
 
 class UniprotProtein(BaseProtein):

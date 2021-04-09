@@ -153,13 +153,13 @@ class OpenForceFieldLikeLigand(BaseLigand):
         """
         raise NotImplementedError("Use ``OpenForceFieldLigand`` or implement API in a subclass")
 
-    def to_rdkit(self) -> rdkit.Mol:
+    def to_rdkit(self) -> rdkit.Chem.Mol:
         """
         Export Molecule to RDKit ``Mol``
 
         Returns
         -------
-        rdkit.Mol
+        rdkit.Chem.Mol
         """
         raise NotImplementedError("Use ``OpenForceFieldLigand`` or implement API in a subclass")
 
@@ -211,14 +211,14 @@ class RDKitLigand(OpenForceFieldLikeLigand):
             name = smiles
         return cls(molecule, name=name, metadata={"smiles": smiles})
 
-    def to_rdkit(self) -> rdkit.Mol:
+    def to_rdkit(self) -> rdkit.Chem.Mol:
         """
         Return the underlying RDKit ``Mol`` object, with no further
         modifications.
 
         Returns
         -------
-        rdkit.Mol
+        rdkit.Chem.Mol
         """
         return self._molecule
 
@@ -265,13 +265,13 @@ class SmilesLigand(OpenForceFieldLikeLigand):
         """
         return cls(smiles, name=name or smiles, metadata={"smiles": smiles})
 
-    def to_rdkit(self) -> rdkit.Mol:
+    def to_rdkit(self) -> rdkit.Chem.Mol:
         """
         Export this SMILES string as an RDKit ``Mol``.
 
         Returns
         -------
-        rdkit.Mol
+        rdkit.Chem.Mol
         """
         return RDKitLigand.from_smiles(self._molecule).to_rdkit()
 

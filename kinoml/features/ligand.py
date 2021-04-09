@@ -396,7 +396,7 @@ class GraphLigandFeaturizer(SingleLigandFeaturizer):
 
         Parameters
         ----------
-        mol: rdkit.Mol
+        mol: rdkit.Chem.Mol
             rdkit molecule to extract bonds from
 
         Returns
