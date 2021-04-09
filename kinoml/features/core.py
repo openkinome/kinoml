@@ -1,13 +1,13 @@
 """
-Featurizers can transform a `kinoml.core.system.System` object and produce
+Featurizers can transform a ``kinoml.core.system.System`` object and produce
 new representations of the molecular entities and their associated measurements.
 
-All `Featurizer` objects inherit from `BaseFeaturizer` and reimplement `._featurize`
+All ``Featurizer`` objects inherit from ``BaseFeaturizer`` and reimplement `._featurize`
 and `._supports`, if needed.
 """
 from __future__ import annotations
 from copy import deepcopy
-from typing import Hashable
+from typing import Hashable, Iterable, Union
 import hashlib
 
 import numpy as np
@@ -22,14 +22,28 @@ class BaseFeaturizer:
 
     _SUPPORTED_TYPES = (System,)
 
+    def __init__(self, *args, **kwargs):
+        pass
+
     def featurize(self, system, inplace: bool = True) -> object:
         """
-        Given an system (compatible with `_SUPPORTED_TYPES`), apply
+        Given an system (compatible with ``_SUPPORTED_TYPES``), apply
         the featurization scheme implemented in this class.
 
-        Parameters:
-            data: This is the data system to be transformed
-            inplace: Whether to modify the system directly or operate on a copy.
+        Parameters
+        ----------
+        system : System
+            This is System object that will be transformed
+        inplace: bool, optional
+            Whether to modify the System directly or operate on a copy.
+
+        Returns
+        -------
+        system: System
+            The same system that was passed in, unless ``inplace`` is False.
+            The returned System will have an extra entry in the ``.featurizations``
+            dictionary, containing the featurized object (either a new System
+            or an array-like object) undera key named after ``.name``.
         """
         if not inplace:
             system = deepcopy(system)
@@ -40,11 +54,20 @@ class BaseFeaturizer:
         return system
 
     def __call__(self, *args, **kwargs):
+        """
+        You can also call the instance directly. This forwards to
+        ``.featurize()``.
+        """
         return self.featurize(*args, **kwargs)
 
     def _featurize(self, system: System) -> object:
         """
         Implement this method to do the actual work for `self.featurize()`.
+
+        Parameters
+        ----------
+        system: System
+            The System to be featurized. Sometimes it will
         """
         raise NotImplementedError("Implement in your subclass")
 
@@ -52,7 +75,7 @@ class BaseFeaturizer:
         """
         Check if these systems are supported by this featurizer.
 
-        Do NOT reimplement in subclass. Check `._supports()` instead.
+        Do NOT reimplement in subclass. Check ``._supports()`` instead.
 
         Parameters:
             systems: systems to be checked (by type, contained attributes, etc)
@@ -62,7 +85,7 @@ class BaseFeaturizer:
             True if all systems are compatible, False otherwise
 
         Raises:
-            `ValueError` if `._supports()` fails and `raise_errors` is `True`.
+            ``ValueError`` if ``._supports()`` fails and ``raise_errors`` is `True`.
         """
         for system in systems:
             if not self._supports(system):
@@ -97,11 +120,15 @@ class BaseFeaturizer:
 class Pipeline(BaseFeaturizer):
 
     """
-    Featurizer-compatible class that provides a way to stack
-    featurizers together
+    Given a list of featurizers, apply them sequentially
+    on the systems (e.g. featurizer A returns X, and X is
+    taken by featurizer B, which returns Y).
 
-    Parameters:
-        featurizers: featurizers to stack. They must be compatible!
+    Parameters
+    ----------
+    featurizers: list of BaseFeaturizer
+        Featurizers to stack. They must be compatible with
+        each other!
     """
 
     def __init__(self, featurizers: Iterable[BaseFeaturizer]):
@@ -116,15 +143,21 @@ class Pipeline(BaseFeaturizer):
         """
         Check if these systems are supported by all featurizers.
 
-        Parameters:
-            systems: systems to be checked (by type, contained attributes, etc)
-            raise_errors: if True, raise `ValueError`.
+        Parameters
+        ----------
+        systems : list of System
+            systems to be checked (by type, contained attributes, etc)
+        raise_errors : bool, optional=False
+            If True, raise ``ValueError``
 
-        Returns:
+        Returns
+        -------
+        bool:
             True if all systems are compatible with all featurizers, False otherwise
 
-        Raises:
-            `ValueError` if `f.supports()` fails and `raise_errors` is `True`.
+        Raises
+        ------
+        ``ValueError`` if ``f.supports()`` fails and ``raise_errors`` is ``True``.
         """
         return all(
             f.supports(s, raise_errors=raise_errors) for f in self.featurizers for s in systems
@@ -136,6 +169,20 @@ class Pipeline(BaseFeaturizer):
 
 
 class Concatenated(Pipeline):
+    """
+    Given a list of featurizers, apply them sequentially and concatenate
+    the result (e.g. featurizer A returns X, and featurizer B returns Y;
+    the output is XY).
+
+    Parameters
+    ----------
+    featurizers : list of BaseFeaturizer
+        These should take a System or array, but return only arrays
+        so the can be concatenated.
+    axis : int, optional=0
+        On which axis to concatenate
+    """
+
     def __init__(self, featurizers: Iterable[BaseFeaturizer], axis=0):
         self.featurizers = featurizers
         self.axis = axis
@@ -170,12 +217,16 @@ class BaseOneHotEncodingFeaturizer(BaseFeaturizer):
         """
         One-hot encode a sequence of characters, given a dictionary
 
-        Parameters:
-            sequence : str
-            dictionary: Mapping of each character to their position in the alphabet
+        Parameters
+        ----------
+        sequence : str
+        dictionary : dict
+            Mapping of each character to their position in the alphabet
 
-        Returns:
-            One-hot encoded matrix with shape (len(dictionary), len(sequence))
+        Returns
+        -------
+        array-like
+            One-hot encoded matrix with shape ``(len(dictionary), len(sequence))``
         """
         ohe_matrix = np.zeros((len(dictionary), len(sequence)))
         for i, character in enumerate(sequence):
@@ -187,13 +238,17 @@ class PadFeaturizer(BaseFeaturizer):
     """
     Pads features of a given system to a desired size or length.
 
-    This class wraps `numpy.pad` with `mode=constant`, auto-calculating
+    This class wraps ``numpy.pad`` with `mode=constant`, auto-calculating
     the needed additions to match the requested shape.
 
-    Parameters:
-        shape: the desired size of the transformed features
-        key: element to retrieve from `System.featurizations`
-        pad_with: value to fill the array-like features with
+    Parameters
+    ----------
+    shape : tuple of int
+        The desired size of the transformed features
+    key : hashable
+        element to retrieve from ``System.featurizations``
+    pad_with : int
+        value to fill the array-like features with
     """
 
     def __init__(self, shape: Iterable[int], key: Hashable = "last", pad_with: int = 0):
@@ -221,7 +276,7 @@ class HashFeaturizer(BaseFeaturizer):
     Hash an attribute of the protein, such as the name or id.
 
     Parameters
-    ==========
+    ----------
     attribute : str or tuple
         Attribute(s) in the target object that will be hashed
     normalize : bool, default=True
@@ -256,6 +311,10 @@ class NullFeaturizer(BaseFeaturizer):
 
 
 class ScaleFeaturizer(BaseFeaturizer):
+    """
+    WIP
+    """
+
     def __init__(self, key: Hashable = "last", **kwargs):
         self.key = key
         self.sklearn_options = kwargs

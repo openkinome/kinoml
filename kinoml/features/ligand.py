@@ -1,38 +1,65 @@
 """
 Featurizers that mostly concern ligand-based models
 """
+
 from __future__ import annotations
 from functools import lru_cache
+from typing import Union
 
 import numpy as np
 import rdkit
 
 from .core import BaseFeaturizer, BaseOneHotEncodingFeaturizer
 from ..core.systems import System
-from ..core.ligands import BaseLigand, SmilesLigand, OpenForceFieldLikeLigand, OpenForceFieldLigand
+from ..core.ligands import (
+    BaseLigand,
+    RDKitLigand,
+    SmilesLigand,
+    OpenForceFieldLikeLigand,
+    OpenForceFieldLigand,
+)
 
 
 class SingleLigandFeaturizer(BaseFeaturizer):
     """
-    Provides a minimally useful `._supports()` method for all Ligand-like featurizers.
+    Provides a minimally useful ``._supports()`` method for all Ligand-like featurizers.
     """
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    _COMPATIBLE_LIGAND_TYPES = (BaseLigand,)
 
     def _supports(self, system: System) -> bool:
         """
         Check that exactly one ligand is present in the System
         """
         super_checks = super()._supports(system)
-        ligands = [c for c in system.components if isinstance(c, BaseLigand)]
+        ligands = [c for c in system.components if isinstance(c, self._COMPATIBLE_LIGAND_TYPES)]
         return all([super_checks, len(ligands) == 1])
 
     def _find_ligand(
         self,
         system_or_ligand: Union[System, BaseLigand],
-        type_=(OpenForceFieldLigand, OpenForceFieldLikeLigand),
+        type_=None,
     ):
+        """
+        Find a ligand-like component in the input object given
+        to the featurizer.
+
+        Parameters
+        ----------
+        system_or_ligand
+            The input object to be featurized. It can be either a
+            ``System``, in which case we will look for ligand-like
+            objects in the components list or in the featurizations
+            dictionary. It can also be a ``Ligand``-like object,
+            which will be returned immediately.
+        type_ : type or tuple of types, optional
+            Check for specific subtypes of ligand objects. Some
+            featurizers only accept Smiles, some only RDKit molecules,
+            etc. By default, it will check against the class attribute
+            ``_COMPATIBLE_LIGAND_TYPES``.
+        """
+        if type_ is None:
+            type_ = self._COMPATIBLE_LIGAND_TYPES
         if isinstance(system_or_ligand, type_):
             return system_or_ligand
         # we only return the first ligand found for now
@@ -51,33 +78,56 @@ class SingleLigandFeaturizer(BaseFeaturizer):
 
 
 class SmilesToLigandFeaturizer(SingleLigandFeaturizer):
-    def _supports(self, system):
-        super_checks = super()._supports(system)
-        ligands = [c for c in system.components if isinstance(c, SmilesLigand)]
-        return all([super_checks, len(ligands) == 1])
+    """
+    Given a ``System`` containing a ``SmilesLigand`` type,
+    promote it to either ``RDKitLigand`` or ``OpenForceFieldLigand``.
+
+    Parameters
+    ----------
+    ligand_type : str, optional=rdkit
+        If ``openforcefield``, returns ``OpenForceFieldLigand``.
+        If ``rdkit``, returns ``RDKitLigand``.
+    """
+
+    _COMPATIBLE_LIGAND_TYPES = (SmilesLigand,)
+
+    def __init__(self, ligand_type: str = "rdkit", *args, **kwargs):
+        super().__init__(self, *args, **kwargs)
+        if ligand_type == "rdkit":
+            self._LigandType = RDKitLigand
+        elif ligand_type == "openforcefield":
+            self._LigandType = OpenForceFieldLigand
+        else:
+            raise ValueError(
+                f"Ligand type `{ligand_type}` is not one of ['rkdit', 'openforcefield']"
+            )
 
     @lru_cache(maxsize=1000)
-    def _featurize(self, system: System) -> np.ndarray:
+    def _featurize(self, system: System) -> Union[RDKitLigand, OpenForceFieldLigand]:
         """
-        Featurizes a `SmilesLigand` component and builds a `Ligand` object
-
-        Returns:
-            `Ligand` object
+        Returns
+        -------
+        ``RDKitLigand`` or ``OpenForceFieldLigand`` object
         """
-        ligand = self._find_ligand(system, type_=SmilesLigand)
-        return self._build_ligand(ligand)
+        return self._LigandType.from_smiles(self._find_ligand(system).to_smiles())
 
 
 class MorganFingerprintFeaturizer(SingleLigandFeaturizer):
 
     """
-    Featurizes a `kinoml.core.ligand.Ligand`-like component
-    using Morgan fingerprints bitvectors
+    Given a ``System`` containing one ``OpenForceFieldLikeLigand``
+    component, convert it to RDKit molecule and generate
+    the Morgan fingerprints bitvectors.
 
-    Parameters:
-        radius: Morgan fingerprint neighborhood radius
-        nbits: Length of the resulting bit vector
+    Parameters
+    ----------
+    radius : int, optional=2
+        Morgan fingerprint neighborhood radius
+    nbits : int, optional=512
+        Length of the resulting bit vector
     """
+
+    _COMPATIBLE_LIGAND_TYPES = (OpenForceFieldLigand, OpenForceFieldLikeLigand)
 
     def __init__(self, radius: int = 2, nbits: int = 512, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -85,23 +135,15 @@ class MorganFingerprintFeaturizer(SingleLigandFeaturizer):
         self.nbits = nbits
 
     def _featurize(self, system: System) -> np.ndarray:
-        """
-        Featurizes a `System` as a Morgan Fingerprint using RDKit
-
-        Returns:
-            Morgan fingerprint of radius `radius` of molecule,
-            with shape `nbits`.
-        """
-        ligand = self._find_ligand(system)
+        ligand = self._find_ligand(system).to_rdkit()
         return self._featurize_ligand(ligand)
 
     @lru_cache(maxsize=1000)
-    def _featurize_ligand(self, ligand):
+    def _featurize_ligand(self, ligand: rdkit.Chem.Mol) -> np.ndarray:
         from rdkit.Chem.AllChem import GetMorganFingerprintAsBitVect as Morgan
 
         # FIXME: Check whether OFF uses canonical smiles internally, or not
         # otherwise, we should force that behaviour ourselves!
-        ligand = ligand.to_rdkit()
         fp = Morgan(ligand, radius=self.radius, nBits=self.nbits)
         return np.asarray(fp, dtype="uint8")
 
@@ -109,12 +151,16 @@ class MorganFingerprintFeaturizer(SingleLigandFeaturizer):
 class OneHotSMILESFeaturizer(BaseOneHotEncodingFeaturizer, SingleLigandFeaturizer):
 
     """
-    One-hot encodes a `Ligand` from a canonical SMILES representation.
+    One-hot encodes a ``Ligand`` from a canonical SMILES representation.
 
-    Attributes:
-        DICTIONARY: Defines the character-integer mapping of the one-hot encoding.
+    Attributes
+    ----------
+    ALPHABET : str
+        Defines the character-integer mapping (as a sequence)
+        of the one-hot encoding.
     """
 
+    _COMPATIBLE_LIGAND_TYPES = (OpenForceFieldLigand, OpenForceFieldLikeLigand)
     ALPHABET = (
         "BCFHIKNOPSUVWY"  # atoms
         "acegilnosru"  # aromatic atoms
@@ -130,8 +176,8 @@ class OneHotSMILESFeaturizer(BaseOneHotEncodingFeaturizer, SingleLigandFeaturize
         """
         Get SMILES string from a `Ligand`-like component and postprocesses it.
 
-        Double element symbols (such as `Cl`, `Br` for atoms and `@@` for chirality)
-        are replaced with single element symbols (`L`, `R` and `$` respectively).
+        Double element symbols (such as `Cl`, ``Br`` for atoms and ``@@`` for chirality)
+        are replaced with single element symbols (`L`, ``R`` and ``$`` respectively).
         """
         ligand = self._find_ligand(system)
         smiles = ligand.to_smiles()
@@ -139,12 +185,22 @@ class OneHotSMILESFeaturizer(BaseOneHotEncodingFeaturizer, SingleLigandFeaturize
 
 
 class OneHotRawSMILESFeaturizer(OneHotSMILESFeaturizer):
+    """
+    Like ``OneHotSMILESFeaturizer``, but instead of using ``ligand.to_smiles()``
+    to obtain the canonical SMILES from the ligand, it relies on the stored ``metadata``
+    provenance information (most possibly the original SMILES contained in the dataset).
+
+    This should only be used for debugging purposes.
+    """
+
+    _COMPATIBLE_LIGAND_TYPES = (OpenForceFieldLigand, OpenForceFieldLikeLigand)
+
     def _retrieve_sequence(self, system: System) -> str:
         """
         Get SMILES string from a `Ligand`-like component and postprocesses it.
 
-        Double element symbols (such as `Cl`, `Br` for atoms and `@@` for chirality)
-        are replaced with single element symbols (`L`, `R` and `$` respectively).
+        Double element symbols (such as `Cl`, ``Br`` for atoms and ``@@`` for chirality)
+        are replaced with single element symbols (`L`, ``R`` and ``$`` respectively).
         """
         ligand = self._find_ligand(system)
         return ligand.metadata["smiles"].replace("Cl", "L").replace("Br", "R").replace("@@", "$")
@@ -156,16 +212,18 @@ class GraphLigandFeaturizer(SingleLigandFeaturizer):
     Creates a graph representation of a `Ligand`-like component.
     Each node (atom) is decorated with several RDKit descriptors
 
-    Check ``self._per_atom_features`` for details.
+    Check ```self._per_atom_features``` for details.
 
-    Parameters:
-        per_atom_features: function that takes a `RDKit.Chem.Atom` object
-            and returns a number of features. It defaults to the internal
-            `._per_atom_features` method.
-        max_in_ring_size: whether the atom belongs to a ring of this size
+    Parameters
+    ----------
+    per_atom_features : callable
+        function that takes a ``RDKit.Chem.Atom`` object
+        and returns a number of features. It defaults to the internal
+        ``._per_atom_features`` method.
+    max_in_ring_size : int, optional=10
+        Maximum ring size for testing whether an atom belongs to a
+        ring or not.
     """
-
-    from rdkit.Chem.rdchem import HybridizationType
 
     ALL_ATOMIC_SYMBOLS = [
         "C",
@@ -213,8 +271,7 @@ class GraphLigandFeaturizer(SingleLigandFeaturizer):
         "Pb",
         "Unknown",
     ]
-
-    HYBRIZIDATION_TYPES = {}
+    _COMPATIBLE_LIGAND_TYPES = (OpenForceFieldLigand, OpenForceFieldLikeLigand)
 
     def __init__(
         self, per_atom_features: callable = None, max_in_ring_size: int = 10, *args, **kwargs
@@ -228,12 +285,15 @@ class GraphLigandFeaturizer(SingleLigandFeaturizer):
         """
         Featurizes ligands contained in a System as a labeled graph.
 
-        Returns:
+        Returns
+        -------
+        tuple
             A two-tuple with:
-            - Graph connectivity of the molecule with shape (2, n_edges)
-            - Feature matrix with shape (n_atoms, n_features)
+
+            - Graph connectivity of the molecule with shape ``(2, n_edges)``
+            - Feature matrix with shape ``(n_atoms, n_features)``
         """
-        ligand = self._find_ligand(system)
+        ligand = self._find_ligand(system).to_rdkit()
         connectivity_graph = self._connectivity_COO_format(ligand)
         per_atom_features = np.array(
             [
@@ -285,14 +345,18 @@ class GraphLigandFeaturizer(SingleLigandFeaturizer):
             ring : bool
                 if the atom is part of a ring.
             ring_size : array
-                if the atom if part of a ring of size determined by range(3, `max_in_ring_size` + 1).
+                if the atom if part of a ring of size determined by range(3, ``max_in_ring_size`` + 1).
             aromatic : bool
                     if atom is aromatic
             radical_electrons : int
                 number of radical electrons
             hybridization_type : array
-                the one-hot encoded hybridization type from `HYBRIZIDATION_TYPES`.
+                the one-hot encoded hybridization type from
+                ``rdkit.Chem.rdchem.HybridizationType``.
         """
+        # Test whether an atom belongs to a given ring size
+        # We try from smaller to larger (starting at 3)
+        # and store the maximum value that returns True
         ring_size = 0
         for ring_size_probe in range(3, max_in_ring_size + 1):
             if atom.IsInRingSize(ring_size_probe):
@@ -315,6 +379,13 @@ class GraphLigandFeaturizer(SingleLigandFeaturizer):
             ring_size,  # TODO : one-hot encode
             atom.GetIsAromatic(),
             atom.GetNumRadicalElectrons(),
+            # We use the .real attribute of the hybridization type
+            # This Enum uses complex numbers to encode the different
+            # types. `.name` will give you the type string, and `.real`
+            # will give you the position in the enum object.
+            # There's a total of 8 possible values. You can check them
+            # with `rdkit.Chem.rdchem.HybridizationType.names` and/or
+            # `rdkit.Chem.rdchem.HybridizationType.values`
             atom.GetHybridization().real,  # TODO : one-hot encode
         )
 
@@ -323,10 +394,15 @@ class GraphLigandFeaturizer(SingleLigandFeaturizer):
         """
         Returns the connectivity of the molecular graph in COO format.
 
-        Parameters:
-            mol: rdkit molecule to extract bonds from
-        Returns:
-            array: graph connectivity in COO format with shape [2, num_edges]
+        Parameters
+        ----------
+        mol: rdkit.Chem.Mol
+            rdkit molecule to extract bonds from
+
+        Returns
+        -------
+        array
+            graph connectivity in COO format with shape ``[2, num_edges]``
         """
 
         row, col = [], []

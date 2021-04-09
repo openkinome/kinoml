@@ -1,10 +1,11 @@
 """
 Training loops built with pytorch-lightning
+
+WIP
 """
 
 from copy import deepcopy
 from pathlib import Path
-from random import shuffle
 from typing import List
 from collections import defaultdict
 
@@ -15,7 +16,6 @@ import pytorch_lightning as pl
 from pytorch_lightning import metrics
 from sklearn.metrics import r2_score
 from sklearn.model_selection import KFold, train_test_split
-from torch.utils.data import dataset
 from IPython.display import display
 
 from ..core import measurements as measurement_types
@@ -24,11 +24,16 @@ from ..analysis.plots import predicted_vs_observed
 
 
 class RootMeanSquaredError(metrics.MeanSquaredError):
+    """WIP"""
+
     def compute(self):
+        """WIP"""
         return torch.sqrt(super().compute())
 
 
 class ObservationModelModule(pl.LightningModule):
+    """WIP"""
+
     def __init__(
         self,
         nn_model,
@@ -54,17 +59,20 @@ class ObservationModelModule(pl.LightningModule):
             self.validation_epoch_end = self._disabled_validation_epoch_end
 
     def forward(self, x, observation_model=_null_observation_model):
+        """WIP"""
         delta_g = self.nn_model(x)
         prediction = observation_model(delta_g)
         return prediction
 
     def _standard_step(self, batch, batch_idx, **kwargs):
+        """WIP"""
         x, y = batch
         predicted = self.forward(x, observation_model=batch.observation_model)
         loss = self.loss_function(predicted, y.view_as(predicted))
         return predicted, loss
 
     def training_step(self, batch, batch_idx, **kwargs):
+        """WIP"""
         predicted, loss = self._standard_step(batch, batch_idx, **kwargs)
         self.log("train_loss", loss, on_step=False, on_epoch=True, logger=True)
         return loss
@@ -72,6 +80,7 @@ class ObservationModelModule(pl.LightningModule):
     def _common_validation_test_step(
         self, batch, batch_idx, dataloader_idx=0, metric_prefix="val", **kwargs
     ):
+        """WIP"""
         predicted, loss = self._standard_step(batch, batch_idx, **kwargs)
         _, y = batch
         observed = y.view_as(predicted)
@@ -84,6 +93,7 @@ class ObservationModelModule(pl.LightningModule):
         }
 
     def _common_validation_test_epoch_end(self, output_results, metric_prefix="val"):
+        """WIP"""
         predicted = torch.cat([x["predicted"] for x in output_results])
         observed = torch.cat([x["observed"] for x in output_results])
         obsmodel = output_results[0]["observation_model"]
@@ -104,22 +114,29 @@ class ObservationModelModule(pl.LightningModule):
             self.logger.experiment.add_figure(f"{metric_prefix}_predicted_vs_observed", plot)
 
     def _disabled_validation_step(self, *args, **kwargs):
+        """WIP"""
         return self._common_validation_test_step(metric_prefix="val", *args, **kwargs)
 
     def _disabled_validation_epoch_end(self, *args, **kwargs):
+        """WIP"""
         return self._common_validation_test_epoch_end(metric_prefix="val", *args, **kwargs)
 
     def test_step(self, *args, **kwargs):
+        """WIP"""
         return self._common_validation_test_step(metric_prefix="test", *args, **kwargs)
 
     def test_epoch_end(self, *args, **kwargs):
+        """WIP"""
         return self._common_validation_test_epoch_end(metric_prefix="test", *args, **kwargs)
 
     def configure_optimizers(self):
+        """WIP"""
         return self.optimizer
 
 
 class MultiDataModule(pl.LightningDataModule):
+    """WIP"""
+
     def __init__(
         self,
         datasets: List[Dataset],
@@ -147,24 +164,29 @@ class MultiDataModule(pl.LightningDataModule):
         self.setup()
 
     def dataset_indices_by_size(self, reverse=False):
+        """WIP"""
         return sorted(
             range(len(self.datasets)), key=lambda i: len(self.datasets[i]), reverse=reverse
         )
 
     @property
     def active_dataset(self):
+        """WIP"""
         return self.datasets[self.active_dataset_index]
 
     @property
     def active_dataset_index(self):
+        """WIP"""
         return self._active_dataset_index
 
     @active_dataset_index.setter
     def active_dataset_index(self, value):
+        """WIP"""
         assert 0 <= value < len(self.datasets), f"`value` must be in (0, {len(self.datasets)}"
         self._active_dataset_index = value
 
     def _build_dataloader(self, dataset_index=None, indices=None):
+        """WIP"""
         if dataset_index is None:
             dataset_index = self.active_dataset_index
 
@@ -179,11 +201,13 @@ class MultiDataModule(pl.LightningDataModule):
         return dl
 
     def train_dataloader(self, dataset_index=None):
+        """WIP"""
         return self._build_dataloader(
             dataset_index=dataset_index, indices=self.datasets[dataset_index].indices["train"]
         )
 
     def val_dataloader(self, dataset_index=None):
+        """WIP"""
         # return [
         #     self._build_dataloader(dataset_index=i, indices=self.datasets[i].indices["val"])
         #     for i in range(len(self.datasets))
@@ -193,6 +217,7 @@ class MultiDataModule(pl.LightningDataModule):
         )
 
     def test_dataloader(self, dataset_index=None):
+        """WIP"""
         # return [
         #     self._build_dataloader(dataset_index=i, indices=self.datasets[i].indices["test"])
         #     for i in range(len(self.datasets))
@@ -202,6 +227,7 @@ class MultiDataModule(pl.LightningDataModule):
         )
 
     def get_kfold(self, nfolds=5, with_validation=True, shuffle=False, **kwargs):
+        """WIP"""
 
         # Start with small datasets first to ensure they are seen before overfitting to larger ones
         kfold = KFold3Way(n_splits=nfolds, shuffle=shuffle, **kwargs)
@@ -224,6 +250,8 @@ class MultiDataModule(pl.LightningDataModule):
 
 
 class CrossValidateTrainer:
+    """WIP"""
+
     def __init__(self, nfolds=5, with_validation=True, shuffle=False, *args, **kwargs):
         self.nfolds = nfolds
         self.with_validation = with_validation
@@ -235,6 +263,7 @@ class CrossValidateTrainer:
         self._dataloaders = defaultdict(list)
 
     def fit(self, model, datamodule):
+        """WIP"""
         # .get_kfold() will provide nfolds * len(datamodule.datasets) iterations
         # but we reuse the first nfolds models across the datasets
         for i, (train_loader, val_loader, test_loader) in enumerate(
@@ -267,6 +296,7 @@ class CrossValidateTrainer:
             )
 
     def _patch_paths_for_kfold(self, fold_trainer, fold):
+        """WIP"""
         # Patch filepaths so it contains info about the fold
         # fold_trainer.logger.log_dir += f"/fold_{fold}"
         fold_trainer.logger.experiment.log_dir += f"/fold_{fold}"
@@ -279,6 +309,7 @@ class CrossValidateTrainer:
             Path(path).mkdir(parents=True, exist_ok=True)
 
     def test(self, dataset_index=0, **kwargs):
+        """WIP"""
         if "model" in kwargs:
             raise ValueError("`model` option not allowed. Will use internally stored ones.")
         if "test_dataloaders" in kwargs:
@@ -309,6 +340,7 @@ class CrossValidateTrainer:
         return avg_results
 
     def best_run(self):
+        """WIP"""
         best_index = 0
         best_score = np.inf
         for i, subtrainer in enumerate(self._trainers):
@@ -317,12 +349,15 @@ class CrossValidateTrainer:
         return self._trainers[best_index]
 
     def clear(self):
+        """WIP"""
         self._models[:] = []
         self._trainers[:] = []
         self._dataloaders[:] = []
 
 
 class ObservationModelDataLoader(DataLoader):
+    """WIP"""
+
     def __init__(self, observation_model=_null_observation_model, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.observation_model = observation_model
@@ -333,6 +368,8 @@ class ObservationModelDataLoader(DataLoader):
 
 
 class _IterWithObsModel:
+    """WIP"""
+
     def __init__(self, iterator, observation_model):
         self.iterator = iterator
         self.observation_model = observation_model
@@ -393,12 +430,12 @@ class AttrList(list):
 
 
 class KFold3Way(KFold):
+    """WIP"""
+
     def split(self, X, y=None, groups=None, with_validation=True):
+        """WIP"""
         for train, test in super().split(X, y, groups):
             if with_validation:
-                # FIXME: This easy implementation does not guarantee
-                #        rotation over the train/validation subset
-                #        (e.g. val susbet can have repeated indices)
                 train, val = train_test_split(train, test_size=(1 / (self.n_splits - 1)))
             else:
                 val = np.array([])

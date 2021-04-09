@@ -1,7 +1,7 @@
 """
-kinase_model.py
 Defines the Kinase class
 
+[WIP]
 """
 
 

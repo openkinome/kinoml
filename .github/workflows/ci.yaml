@@ -153,6 +153,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
 
       - uses: conda-incubator/setup-miniconda@v2
         with:
@@ -185,16 +187,13 @@ jobs:
       - name: Build docs
         shell: bash -l {0}
         run: |
-          # Required to load docstrings sample module inside docs/
-          export PYTHONPATH=$(pwd)
-          mkdocs build
+          cd docs
+          make clean
+          SPHINXOPTS="-W -T --keep-going" make html
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./site
-        # We want to test docs building in PR, but we we
-        # will only deploy if we are on / have merged to master
-        # Whitelist api for PR #8
-        if: github.ref == 'master' || github.head_ref == 'api'
+          publish_dir: ./docs/_build/html
+        if: github.ref == 'master'

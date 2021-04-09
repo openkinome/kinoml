@@ -1,3 +1,13 @@
+"""
+Each Measurement object can store a ``conditions``
+attribute which should contain one of the classes
+here defined.
+
+For example, experimental measurements can have an
+``AssayConditions`` object specifying the variables
+involved in the experiment, like pH.
+"""
+
 from typing import Union
 import json
 
@@ -10,9 +20,10 @@ class BaseConditions:
     for all attributes. Do NOT modify private attributes or
     hashing will break.
 
-    Parameters:
-        strict: Whether to perform sanity checks at initialization.
-
+    Parameters
+    ----------
+    strict : bool, optional=True
+        Whether to perform safety checks at initialization.
     """
 
     def __init__(self, strict: bool = True):
@@ -24,10 +35,19 @@ class BaseConditions:
         Perform some checks for valid values
         """
 
-    def _properties(self, classname=True):
+    def _properties(self, classname: bool = True) -> dict:
         """
         Return a dictionary with the classname and all defined properties.
         Used for equality comparisons in subclasses.
+
+        Parameters
+        ----------
+        classname : bool, optional=True
+            Whether to include the name of the instance class
+
+        Returns
+        -------
+        dict
         """
         props = {"classname": self.__class__.__name__} if classname else {}
         for name in dir(self):
@@ -56,8 +76,10 @@ class AssayConditions(BaseConditions):
     Contains information about the experimental conditions
     of a given assay.
 
-    Parameters:
-        pH: Acidity conditions
+    Parameters
+    ----------
+    pH : int or float, optional=7.0
+        Acidity conditions
     """
 
     def __init__(self, pH: Union[int, float] = 7.0, *args, **kwargs):

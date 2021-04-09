@@ -1,6 +1,15 @@
+"""
+``System`` objects define a collection of related
+``MolecularComponent`` instances. They are normally
+attached to a ``Measurement``, and, in the context
+of a machine learning exercise, will be featurized
+with different classes found under ``kinoml.features``.
+Featurization turns a ``System`` into a tensor-like
+object, like Numpy arrays.
+"""
 from __future__ import annotations
 
-from typing import Union, Iterable
+from typing import Iterable
 
 from .components import MolecularComponent
 from .ligands import BaseLigand
@@ -10,13 +19,24 @@ from .proteins import BaseProtein
 class System:
 
     """
-    System objects host one or more MolecularComponent objects,
-    and, optionally, a measurement.
+    System objects host one or more MolecularComponent.
 
-    Parameters:
-        components: Molecular entities defining this system
-        measurement: Optional measurement for this system.
-        strict: Whether to perform sanity checks (default) or not.
+    Parameters
+    ----------
+    components : list of MolecularComponent
+        Molecular entities defining this system
+    strict: bool, optional=True
+        Whether to perform sanity checks (default) or not.
+
+    Attributes
+    ----------
+    featurizations : dict
+        This dictionary will store the different featurization
+        steps a ``System`` is submitted to. The keys for this
+        dictionary are usually the *name* of the featurizer
+        class. Additionally, a ``Pipeline`` might define
+        a ``last`` key, indicating that particular object
+        was the final result of a chain of featurizers.
     """
 
     def __init__(
@@ -33,6 +53,9 @@ class System:
             self.check()
 
     def _components_by_type(self, type_):
+        """
+        Yield MolecularComponent objects of a given type only
+        """
         for component in self.components:
             if isinstance(component, type_):
                 yield component

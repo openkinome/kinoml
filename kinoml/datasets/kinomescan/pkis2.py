@@ -18,24 +18,23 @@ class PKIS2DatasetProvider(KinomeScanDatasetProvider):
 
     """
     Loads PKIS2 dataset as provided in _Progress towards a public chemogenomic set
-    for protein kinases and a call for contributions_[^1].
+    for protein kinases and a call for contributions [1][].
 
-    [^1]: DOI: 10.1371/journal.pone.0181585
+    [1]: DOI: 10.1371/journal.pone.0181585
 
     It will build a dataframe where the SMILES-representation of ligands are the index
     and the columns are the kinase names. To map between KINOMEscan kinase names and
     actual sequences, helper object `kinoml.datatasets.kinomescan.utils.KINOMEScanMapper`
     is instantiated as a class attribute.
 
-    __Examples__
-
-    ```python
+    Examples
+    --------
     >>> from kinoml.datasets.kinomescan.pkis2 import PKIS2DatasetProvider
     >>> provider = PKIS2DatasetProvider.from_source()
     >>> system = provider.systems[0]
-    >>> print(f"% displacement for kinase={system.protein.name} and ligand={system.ligand.to_smiles()} is {system.measurement}")
+    >>> print(f"% displacement for kinase={system.protein.name} and "
+    >>>        "ligand={system.ligand.to_smiles()} is {system.measurement}")
 
-    ```
     """
 
     @classmethod
@@ -49,14 +48,21 @@ class PKIS2DatasetProvider(KinomeScanDatasetProvider):
         """
         Create a DatasetProvider out of the raw data in a file
 
-        Parameters:
-            filename: CSV file with the protein-ligand measurements
-            measurement_type: which type of measurement was taken for each pair
-            conditions: experimental conditions of the assay
+        Parameters
+        ----------
+        filename : str
+            CSV file with the protein-ligand measurements
+        measurement_type : BaseMeasurement
+            Which type of measurement was taken for each protein-ligand pair
+        conditions : BaseConditions
+            Experimental conditions of the assay
 
-        !!! todo
-            - Investigate lazy access and object generation
-            - Review accuracy of item access by indices (correlative order?)
+        Note
+        ----
+        TODO:
+
+        - Investigate lazy access and object generation
+        - Review accuracy of item access by indices (correlative order?)
         """
         df = cls._read_dataframe(filename)
         df = df[df.index.notna()]
@@ -77,8 +83,9 @@ class PKIS2DatasetProvider(KinomeScanDatasetProvider):
         # Read in ligands
         ligands = []
         for smiles in df.index:
-            # ligand = Ligand.from_smiles(smiles, name=smiles, allow_undefined_stereo=True)
-            ligand = SmilesLigand(smiles, name=smiles)
+            # We only read the SMILES for now. Promoting to full-fledged objects
+            # can be done through featurizers (see SmilesToLigandFeaturizer)
+            ligand = SmilesLigand.from_smiles(smiles, name=smiles)
             ligands.append(ligand)
 
         lol = list(df.itertuples(index=False, name=None))  # FIXME: This might be dangerous
@@ -91,7 +98,7 @@ class PKIS2DatasetProvider(KinomeScanDatasetProvider):
                 value = lol[i][j]
                 if not value and value != 0:
                     continue  # this is a nan cell
-                key = (ligand.smiles, kinase.sequence)
+                key = (ligand.to_smiles(), kinase.sequence)
                 if key not in systems:
                     systems[key] = ProteinLigandComplex([kinase, ligand])
                 measurement = measurement_type(value, conditions=conditions, system=systems[key])
