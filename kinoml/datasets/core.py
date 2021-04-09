@@ -1,3 +1,7 @@
+"""
+Base classes for ``DatasetProvider``-like objects
+"""
+
 import logging
 from typing import Iterable
 from copy import deepcopy
@@ -81,9 +85,16 @@ class DatasetProvider(BaseDatasetProvider):
     """
     Base object for all DatasetProvider classes.
 
-    Parameters:
-        measurements: A DatasetProvider holds a list of `kinoml.core.measurements.BaseMeasurement`
-            objects (or any of its subclasses). They must be of the same type!
+    Parameters
+    ----------
+    measurements: list of BaseMeasurement
+        A DatasetProvider holds a list of ``kinoml.core.measurements.BaseMeasurement``
+        objects (or any of its subclasses). They must be of the same type!
+
+    Note
+    ----
+    All measurements must be of the same type! If they are not, consider
+    using ``MultiDatasetProvider`` instead.
     """
 
     _raw_data = None
@@ -125,8 +136,10 @@ class DatasetProvider(BaseDatasetProvider):
     def from_source(cls, filename=None, **kwargs):
         """
         Parse CSV/raw file to object model. This method is responsible of generating
-        the objects for ```self.data``` and ``self.measurements``, if relevant.
-        Additional kwargs will be passed to ``__init__``
+        the objects for ``self.measurements``, if relevant. Additional kwargs will be
+        passed to ``__init__``.
+
+        You must define this in your subclass.
         """
         raise NotImplementedError
 
@@ -135,11 +148,15 @@ class DatasetProvider(BaseDatasetProvider):
         Given a collection of ``kinoml.features.core.BaseFeaturizers``, apply them
         to the systems present in the ``self.measurements``.
 
-        Parameters:
-            featurizers: Featurization schemes that will be applied to the systems,
-                in a stacked way.
+        Parameters
+        ----------
+        featurizers : list of BaseFeaturizer
+            Featurization schemes that will be applied to the systems,
+            in a stacked way.
 
-        .. warning::
+        Note
+        ----
+        TODO:
 
             * This function can be easily parallelized, and is often the bottleneck!
             * Shall we modify the system in place (default now), return the modified copy or store it?
@@ -176,15 +193,21 @@ class DatasetProvider(BaseDatasetProvider):
             for featurizer in featurizers:
                 featurizer.featurize(system, inplace=True)
             system.featurizations["last"] = system.featurizations[featurizers[-1].name]
-        except Exception as exc:
+        except Exception as exc:  # TODO probably not ideal
             system.featurizations["failed"] = [featurizers, exc]
         return system.featurizations
 
     def clear_featurizations(self):
+        """
+        Clear all the featurization dictionaries present in the systems contained here
+        """
         for system in self.systems:
             system.featurizations.clear()
 
     def featurized_systems(self, key="last"):
+        """
+        Return the ``key`` featurized objects from all systems.
+        """
         return [ms.system.featurizations[key] for ms in self.measurements]
 
     def _to_dataset(self, style="pytorch"):
@@ -214,8 +237,9 @@ class DatasetProvider(BaseDatasetProvider):
         Generates a ``pandas.DataFrame`` containing information on the systems
         and their measurements
 
-        Returns:
-            pandas.DataFrame
+        Returns
+        -------
+        pandas.DataFrame
         """
         if not self.systems:
             return pd.DataFrame()
@@ -232,6 +256,10 @@ class DatasetProvider(BaseDatasetProvider):
         return pd.DataFrame.from_records(records, columns=columns)
 
     def to_pytorch(self, featurizer=None, **kwargs):
+        """
+        Export dataset to a PyTorch-compatible object, via adapters
+        found in ``kinoml.torch_datasets``.
+        """
         from .torch_datasets import TorchDataset, PrefeaturizedTorchDataset
 
         if featurizer is not None:
@@ -249,6 +277,9 @@ class DatasetProvider(BaseDatasetProvider):
         )
 
     def to_xgboost(self, **kwargs):
+        """
+        Export dataset to a ``DMatrix`` object, native to the XGBoost framework
+        """
         from xgboost import DMatrix
 
         dmatrix = DMatrix(self.to_numpy(**kwargs))
@@ -259,8 +290,32 @@ class DatasetProvider(BaseDatasetProvider):
     def to_tensorflow(self, *args, **kwargs):
         raise NotImplementedError
 
-    def to_numpy(self, **kwargs):
-        return np.asarray(self.featurized_systems()), self.measurements_as_array(**kwargs)
+    def to_numpy(self, featurization_key="last", **kwargs):
+        """
+        Export dataset to a tuple of two Numpy arrays of same shape:
+
+        * ``X``: the featurized systems
+        * ``y``: the measurements values
+
+        Parameters
+        ----------
+        featurization_key : str, optional="last"
+            Which featurization present in the systems will be taken
+            to build the ``X`` array. Usually, ``last`` as provided
+            by a ``Pipeline`` object.
+        kwargs : optional,
+            Dict that will be forwarded to ``.measurements_as_array``,
+            which will build the ``y`` array.
+
+        Returns
+        -------
+        2-tuple of np.array
+            X, y
+        """
+        return (
+            np.asarray(self.featurized_systems(key=featurization_key)),
+            self.measurements_as_array(**kwargs),
+        )
 
     def observation_model(self, **kwargs):
         """
@@ -298,7 +353,10 @@ class DatasetProvider(BaseDatasetProvider):
         If a ``kinoml.datasets.groups`` class has been applied to this instance,
         this method will create more DatasetProvider instances, one per group.
 
-
+        Returns
+        -------
+        dict
+            Maps group key to sub-datasets
         """
         groups = defaultdict(list)
         for measurement in self.measurements:
@@ -310,14 +368,25 @@ class DatasetProvider(BaseDatasetProvider):
         return datasets
 
     @property
-    def conditions(self):
+    def conditions(self) -> set:
         return {ms.conditions for ms in self.measurements}
 
     @classmethod
-    def _download_to_cache_or_retrieve(
-        cls,
-        path_or_url,
-    ):
+    def _download_to_cache_or_retrieve(cls, path_or_url) -> str:
+        """
+        Helper function to either download files to the usercache, or
+        retrieve an already cached copy.
+
+        Parameters
+        ----------
+        path_or_url : str or Path-like
+            File path or URL pointing to the required file
+
+        Returns
+        -------
+        str
+            The path of the (downloaded) file in cache
+        """
         filename = os.path.basename(path_or_url)
         cached_path = Path(APPDIR.user_cache_dir) / cls.__name__ / filename
         if not cached_path.is_file():  # file is not available on user cache
@@ -328,10 +397,31 @@ class DatasetProvider(BaseDatasetProvider):
             cached_path.parent.mkdir(parents=True, exist_ok=True)
             with open_handle(path_or_url) as f, open(cached_path, "wb") as dest:
                 shutil.copyfileobj(f, dest)
-        return cached_path
+        return str(cached_path)
 
 
 class MultiDatasetProvider(DatasetProvider):
+    """
+    Adapter class that is able to expose a DatasetProvider-like
+    interface to a collection of Measurements of different types.
+
+    The different types are split into individual DatasetProvider
+    objects, stored under ``.providers``.
+
+    The rest of the API works around that list to provide
+    similar functionality as the original, single-type DatasetProvider,
+    but in plural.
+
+    Parameters
+    ----------
+    measurements: list of BaseMeasurement
+        A MultiDatasetProvider holds a list of
+        ``kinoml.core.measurements.BaseMeasurement`` objects
+        (or any of its subclasses). Unlike ``DatasetProvider``,
+        the measurements here can be of different types, but they
+        will be grouped together in different sub-datasets.
+    """
+
     def __init__(self, measurements: Iterable[BaseMeasurement], *args, **kwargs):
         by_type = defaultdict(list)
         for measurement in measurements:
@@ -345,9 +435,17 @@ class MultiDatasetProvider(DatasetProvider):
         self.providers = providers
 
     def observation_models(self, **kwargs):
+        """
+        List of observation models present in this dataset,
+        one per provider (measurement type)
+        """
         return [p.observation_model(**kwargs) for p in self.providers]
 
     def loss_adapters(self, **kwargs):
+        """
+        List of observation models present in this dataset,
+        one per provider (measurement type)
+        """
         return [p.loss_adapter(**kwargs) for p in self.providers]
 
     def observation_model(self, **kwargs):
@@ -359,17 +457,28 @@ class MultiDatasetProvider(DatasetProvider):
     @property
     def measurements(self):
         """
-        Note that right now we are flattening the list for API compatibility.
-        With a flattened list:
-        >>> lengths = [len(p) for p in providers]
-        >>> first = self.measurements[:lengths[0]]
-        >>> second = self.measurements[lengths[0]:lengths[0] + lengths[1]]
-        With several lists:
-        >>> first, second = self.measurements
+        Flattened list of all measurements present across all providers.
+
+        Use ``.indices_by_provider()`` to obtain the corresponding slices
+        to each provider.
         """
         return [ms for prov in self.providers for ms in prov.measurements]
 
-    def indices_by_provider(self):
+    def indices_by_provider(self) -> dict:
+        """
+        Return a dict mapping each ``provider`` type to their
+        correlative indices in a hypothetically concatenated
+        dataset.
+
+        For example, if a ``MultiDatasetProvider`` contains
+        50 measurements of type A, and 25 measurements of
+        type B, this would return ``{"A": slice(0, 50), "B": slice(50, 75)}``.
+
+        Note
+        ----
+        ``slice`` objects can be passed directly to item access syntax, like
+        ``list[slice(a, b)]``.
+        """
         indices = {}
         offset = 0
         for p in self.providers:
@@ -378,6 +487,11 @@ class MultiDatasetProvider(DatasetProvider):
         return indices
 
     def to_dataframe(self, *args, **kwargs):
+        """
+        Concatenate all the providers into a single DataFrame for easier visualization.
+
+        Check ``DatasetProvider.to_dataframe()`` for more details.
+        """
         columns = ["Systems", "n_components", "Measurement", "MeasurementType"]
         records = []
         for provider in self.providers:
@@ -395,12 +509,24 @@ class MultiDatasetProvider(DatasetProvider):
         return pd.DataFrame.from_records(records, columns=columns)
 
     def to_numpy(self, **kwargs):
+        """
+        List of Numpy-native arrays, as generated by each ``provider.to_numpy(...)``
+        method. Check ``DatasetProvider.to_numpy`` docstring for more details.
+        """
         return [p.to_numpy(**kwargs) for p in self.providers]
 
     def to_pytorch(self, **kwargs):
+        """
+        List of Numpy-native arrays, as generated by each ``provider.to_pytorch(...)``
+        method. Check ``DatasetProvider.to_pytorch`` docstring for more details.
+        """
         return [p.to_pytorch(**kwargs) for p in self.providers]
 
     def to_xgboost(self, **kwargs):
+        """
+        List of Numpy-native arrays, as generated by each ``provider.to_xgboost(...)``
+        method. Check ``DatasetProvider.to_xgboost`` docstring for more details.
+        """
         return [p.to_xgboost(**kwargs) for p in self.providers]
 
     def __repr__(self) -> str:

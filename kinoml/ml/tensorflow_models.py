@@ -14,12 +14,14 @@ from tensorflow.keras.layers import Dense, Flatten
 def DNN(input_dim):
     """
     DNN builds and compiles a TF model (a Deep Neural Network) that takes as input 'input_dim'
+
     Parameters
-    ==========
+    ----------
     input_dim : tuple of int
         Expected shape of the input data
+
     Returns
-    =======
+    -------
     model : tf.keras.models.Sequential
     """
     model = tf.keras.models.Sequential(

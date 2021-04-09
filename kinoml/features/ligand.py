@@ -185,6 +185,14 @@ class OneHotSMILESFeaturizer(BaseOneHotEncodingFeaturizer, SingleLigandFeaturize
 
 
 class OneHotRawSMILESFeaturizer(OneHotSMILESFeaturizer):
+    """
+    Like ``OneHotSMILESFeaturizer``, but instead of using ``ligand.to_smiles()``
+    to obtain the canonical SMILES from the ligand, it relies on the stored ``metadata``
+    provenance information (most possibly the original SMILES contained in the dataset).
+
+    This should only be used for debugging purposes.
+    """
+
     _COMPATIBLE_LIGAND_TYPES = (OpenForceFieldLigand, OpenForceFieldLikeLigand)
 
     def _retrieve_sequence(self, system: System) -> str:
@@ -206,14 +214,16 @@ class GraphLigandFeaturizer(SingleLigandFeaturizer):
 
     Check ```self._per_atom_features``` for details.
 
-    Parameters:
-        per_atom_features: function that takes a ``RDKit.Chem.Atom`` object
-            and returns a number of features. It defaults to the internal
-            ``._per_atom_features`` method.
-        max_in_ring_size: whether the atom belongs to a ring of this size
+    Parameters
+    ----------
+    per_atom_features : callable
+        function that takes a ``RDKit.Chem.Atom`` object
+        and returns a number of features. It defaults to the internal
+        ``._per_atom_features`` method.
+    max_in_ring_size : int, optional=10
+        Maximum ring size for testing whether an atom belongs to a
+        ring or not.
     """
-
-    from rdkit.Chem.rdchem import HybridizationType
 
     ALL_ATOMIC_SYMBOLS = [
         "C",
@@ -261,8 +271,6 @@ class GraphLigandFeaturizer(SingleLigandFeaturizer):
         "Pb",
         "Unknown",
     ]
-
-    HYBRIZIDATION_TYPES = {}
     _COMPATIBLE_LIGAND_TYPES = (OpenForceFieldLigand, OpenForceFieldLikeLigand)
 
     def __init__(
@@ -342,6 +350,9 @@ class GraphLigandFeaturizer(SingleLigandFeaturizer):
             hybridization_type : array
                 the one-hot encoded hybridization type from `HYBRIZIDATION_TYPES`.
         """
+        # Test whether an atom belongs to a given ring size
+        # We try from smaller to larger (starting at 3)
+        # and store the maximum value that returns True
         ring_size = 0
         for ring_size_probe in range(3, max_in_ring_size + 1):
             if atom.IsInRingSize(ring_size_probe):
@@ -364,6 +375,13 @@ class GraphLigandFeaturizer(SingleLigandFeaturizer):
             ring_size,  # TODO : one-hot encode
             atom.GetIsAromatic(),
             atom.GetNumRadicalElectrons(),
+            # We use the .real attribute of the hybridization type
+            # This Enum uses complex numbers to encode the different
+            # types. `.name` will give you the type string, and `.real`
+            # will give you the position in the enum object.
+            # There's a total of 8 possible values. You can check them
+            # with `rdkit.Chem.rdchem.HybridizationType.names` and/or
+            # `rdkit.Chem.rdchem.HybridizationType.values`
             atom.GetHybridization().real,  # TODO : one-hot encode
         )
 
@@ -372,10 +390,14 @@ class GraphLigandFeaturizer(SingleLigandFeaturizer):
         """
         Returns the connectivity of the molecular graph in COO format.
 
-        Parameters:
-            mol: rdkit molecule to extract bonds from
-        Returns:
-            array: graph connectivity in COO format with shape [2, num_edges]
+        Parameters
+        ----------
+        mol: rdkit.Mol
+            rdkit molecule to extract bonds from
+        Returns
+        -------
+        array
+            graph connectivity in COO format with shape ``[2, num_edges]``
         """
 
         row, col = [], []

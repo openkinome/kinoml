@@ -1,7 +1,11 @@
+"""
+Sequence-like objects to build MolecularComponents and others.
+"""
 from string import ascii_letters
 from collections import Counter
 import logging
 import re
+import json
 from typing import Union, Iterable
 
 import requests
@@ -303,9 +307,6 @@ class KinaseDomainAminoAcidSequence(Biosequence):
         kinase_domain_sequences: list of KinaseDomainAminoAcidSequence
             Retrieved kinase domain amino acid sequence(s).
         """
-        import requests
-        import json
-
         for uniprot_id in uniprot_ids:
             # request data
             response = requests.get(f"https://www.ebi.ac.uk/proteins/api/proteins/{uniprot_id}")
@@ -330,14 +331,14 @@ class KinaseDomainAminoAcidSequence(Biosequence):
                             true_C_terminus = False
                         kinase_domain_sequence = sequence[begin - 1 : end]
 
-        return cls(
-            kinase_domain_sequence,
-            name=name,
-            metadata={
-                "uniprot_id": uniprot_id,
-                "begin": begin,
-                "end": end,
-                "true_N_terminus": true_N_terminus,
-                "true_C_terminus": true_C_terminus,
-            },
-        )
+            yield cls(
+                kinase_domain_sequence,
+                name=name,
+                metadata={
+                    "uniprot_id": uniprot_id,
+                    "begin": begin,
+                    "end": end,
+                    "true_N_terminus": true_N_terminus,
+                    "true_C_terminus": true_C_terminus,
+                },
+            )

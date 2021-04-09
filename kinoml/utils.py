@@ -1,3 +1,6 @@
+"""
+Miscellaneous utilities
+"""
 from pathlib import Path
 from itertools import zip_longest
 from collections import defaultdict
@@ -7,6 +10,7 @@ from importlib import import_module
 
 from appdirs import AppDirs
 
+# This is the cache directory for KinoML
 APPDIR = AppDirs(appname="kinoml", appauthor="openkinome")
 PACKAGE_ROOT = Path(__file__).parent
 
@@ -82,12 +86,19 @@ class FileDownloader:
 
 def datapath(path: str) -> Path:
     """
-    Return absolute path to a file contained in this package's `data`.
+    Return absolute path to a file contained in this package's ``data``
+    directory.
 
-    Parameters:
-        path: Relative path to file in `data`.
-    Returns:
-        Absolute path
+    Parameters
+    ----------
+    path : str
+        Relative path to file in `data`.
+
+    Returns
+    -------
+    path pathlib.Path
+        Absolute path to the file in the KinoML data directory.
+        Existence is not checked or guaranteed.
     """
     return PACKAGE_ROOT / "data" / path
 
@@ -97,11 +108,15 @@ def grouper(iterable: Iterable, n: int, fillvalue: Any = None) -> Iterable:
     Given an iterable, consume it in n-sized groups,
     filling it with fillvalue if needed.
 
-    Parameters:
-        iterable: list, tuple, str or anything that can be grouped
-        n: size of the group
-        fillvalue: last group will be padded with this object until
-            `len(group)==n`
+    Parameters
+    ----------
+    iterable : list, tuple, str or iterable
+        Something that can be split in sub-items and grouped.
+    n : int
+        Size of the group
+    fillvalue : object
+        Last group will be padded with this object until
+        ``len(group)==n``
     """
     args = [iter(iterable)] * n
     return zip_longest(*args, fillvalue=fillvalue)
@@ -111,8 +126,10 @@ class defaultdictwithargs(defaultdict):
     """
     A defaultdict that will create new values based on the missing value
 
-    Parameters:
-        call: Factory to be called on missing key
+    Parameters
+    ----------
+    call: class or callable
+        Factory to be called on missing key
     """
 
     def __init__(self, call: Callable):
@@ -128,6 +145,7 @@ class defaultdictwithargs(defaultdict):
 def download_file(url: str, path: str):
     """
     Download a file and save it locally.
+
     Parameters
     ----------
     url: str
@@ -144,6 +162,14 @@ def download_file(url: str, path: str):
 
 
 def seed_everything(seed=1234):
+    """
+    Fix the random number generator seed in several pieces
+    of the Python runtime: Python itself, NumPy, Torch.
+
+    Parameters
+    ----------
+    seed : int, optional=1234
+    """
     import random
     import os
 
@@ -168,6 +194,19 @@ def seed_everything(seed=1234):
 
 
 def watermark():
+    """
+    Check and log versions and environment details of the execution
+    context. We currently check for:
+
+    - Whatever ``watermark`` (the library) returns
+    - The output of ``nvidia-smi``, if available
+    - The output of ``conda info``, if available
+    - The output of ``conda list``, if available
+
+    Note
+    ----
+    This assumes you are running the function inside a Jupyter notebook.
+    """
     from IPython import get_ipython
     from watermark import WaterMark
     from distutils.spawn import find_executable
@@ -215,12 +254,26 @@ def watermark():
             print("stderr:", stderr, sep="\n")
 
 
-def collapsible(fn, *args, **kwargs):
+def collapsible(function, *args, **kwargs):
+    """
+    An IPython widget that can collapse its contents.
+
+    Parameters
+    ----------
+    function : callable
+        A function that generates some kind of output
+        (print, plots, etc). Args and kwargs will be
+        forwarded here.
+
+    Returns
+    -------
+    ipywidgets.Accordion
+    """
     from ipywidgets import Output, Accordion
 
     out = Output()
     with out:
-        fn(*args, **kwargs)
+        function(*args, **kwargs)
     acc = Accordion(children=[out])
     acc.set_title(0, "View output")
     acc.selected_index = None
@@ -233,6 +286,22 @@ def fill_until_next_multiple(container, multiple_of: int, factory):
     reaches the next multiple of `multiple_of`.
 
     ``container`` gets modified in place and returned.
+
+    Parameters
+    ----------
+    container : list or set
+        Extendable container
+    multiple_of : int
+        The final size of container will match the next multiple
+        of this number.
+    factory : callable
+        This callable will be run to produce the filler elements
+        used to extend ``container``
+
+    Returns
+    -------
+    container
+        Modified in place
     """
     if isinstance(container, list):
         action = container.append

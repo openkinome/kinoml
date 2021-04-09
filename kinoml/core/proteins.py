@@ -1,3 +1,6 @@
+"""
+``MolecularComponent`` objects that represent protein-like entities.
+"""
 import logging
 
 from .components import BaseProtein, BaseStructure
@@ -8,23 +11,44 @@ logger = logging.getLogger(__name__)
 
 
 class AminoAcidSequence(BaseProtein, Biosequence):
-    """Biosequence that only allows proteinic aminoacids"""
+    """Biosequence that only allows proteinic aminoacids
+
+    Parameters
+    ----------
+    sequence : str
+        The FASTA sequence for this protein (one-letter symbols)
+    name : str, optional
+        Free-text identifier for the sequence
+    """
 
     ALPHABET = "ACDEFGHIKLMNPQRSTVWY"
     _ACCESSION_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=protein&id={}&rettype=fasta&retmode=text"
 
     def __init__(self, sequence, name="", *args, **kwargs):
         BaseProtein.__init__(self, name=name, *args, **kwargs)
-        Biosequence.__init__(self)
+        Biosequence.__init__(self, sequence)
 
 
 class UniprotProtein(BaseProtein):
+    """
+    A protein represented by its UniProt ID, uniquely.
+
+    Parameters
+    ----------
+    uniprot_id : str
+        Uniprot ID for this protein
+    """
+
     def __init__(self, uniprot_id, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.uniprot_id = uniprot_id
 
 
 class FileProtein(BaseProtein):
+    """
+    @schallerdavid: docstrings pending
+    """
+
     def __init__(self, path, electron_density_path=None, metadata=None, name="", *args, **kwargs):
         super().__init__(name=name, metadata=metadata, *args, **kwargs)
         if str(path).startswith("http"):
@@ -48,6 +72,10 @@ class FileProtein(BaseProtein):
 
 
 class PDBProtein(FileProtein):
+    """
+    @schallerdavid: docstrings pending
+    """
+
     def __init__(self, pdb_id, path="", metadata=None, name="", *args, **kwargs):
         super().__init__(path=path, metadata=metadata, name=name, *args, **kwargs)
         from ..utils import LocalFileStorage
@@ -61,9 +89,9 @@ class ProteinStructure(BaseProtein, BaseStructure):
     """
     Structural representation of a protein
 
-    .. warning::
-
-        This is probably going to be redone, so do not invest too much
+    Note
+    ---
+    This is probably going to be redone, so do not invest too much
     """
 
     @classmethod
@@ -141,6 +169,10 @@ class Kinase(ProteinStructure):
     """
     Extends ``Protein`` to provide kinase-specific methods of
     instantiation.
+
+    Note
+    ----
+    TODO: Define role vs those objects under ``kinoml.core.kinase``
     """
 
     @classmethod

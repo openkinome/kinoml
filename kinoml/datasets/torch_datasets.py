@@ -1,14 +1,37 @@
+"""
+Helper classes to convert between DatasetProvider objects and
+Dataset-like objects native to the PyTorch ecosystem
+"""
 from functools import lru_cache
 
 import numpy as np
 import torch
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import TorchDataset as _NativeTorchDataset, DataLoader as _DataLoader
 import pytorch_lightning as pl
 
 from ..core.measurements import null_observation_model as _null_observation_model
 
 
-class PrefeaturizedTorchDataset(Dataset):
+class PrefeaturizedTorchDataset(_NativeTorchDataset):
+    """
+    Exposes the ``X``, ``y`` (systems and measurements, respectively)
+    arrays exported by ``DatasetProvider`` using the API expected
+    by Torch DataLoaders.
+
+    Parameters
+    ----------
+    systems : array-like
+        X vectors, as exported from featurized systems in DatasetProvider
+    measurements : array-like
+        y vectors, as exported from the measurement values contained in a
+        DatasetProvider
+    observation_model : callable, optional
+        A function that adapts the predicted ``y`` to the observed ``y``
+        values. Useful to combine measurement types in the same model, if
+        they are mathematically related. Normally provided by the
+        ``Measurement`` type class.
+    """
+
     def __init__(
         self, systems, measurements, observation_model: callable = _null_observation_model
     ):
@@ -28,18 +51,45 @@ class PrefeaturizedTorchDataset(Dataset):
         return len(self.systems)
 
     def as_dataloader(self, **kwargs):
-        return DataLoader(dataset=self, **kwargs)
+        """
+        Build a PyTorch DataLoader view of this Dataset
+        """
+        return _DataLoader(dataset=self, **kwargs)
 
-    def estimate_input_size(self):
+    def estimate_input_size(self) -> int:
+        """
+        Estimate the input size for a model, using
+        the first dimension of the ``X`` vector shape.
+        """
         return self.systems[0].shape
 
 
 class TorchDataset(PrefeaturizedTorchDataset):
+    """
+    Same purpose as ``PrefeaturizedTorchDataset``, but
+    instead of taking arrays in, it takes the non-featurized
+    ``System`` and ``Measurement``objects, and applies a
+    ``featurizer`` on the fly upon access (e.g. during training).
+
+    Parameters
+    ----------
+    systems : list of kinoml.core.systems.System
+    measurements : list of kinoml.core.measurements.BaseMeasurement
+    featurizer : callable
+        A function that takes a ``System`` and returns an array-like
+        object.
+    observation_model : callable, optional
+        A function that adapts the predicted ``y`` to the observed ``y``
+        values. Useful to combine measurement types in the same model, if
+        they are mathematically related. Normally provided by the
+        ``Measurement`` type class.
+    """
+
     def __init__(
         self,
         systems,
         measurements,
-        featurizer=None,
+        featurizer,
         observation_model: callable = _null_observation_model,
     ):
         super().__init__(systems, measurements, observation_model=observation_model)
@@ -71,6 +121,19 @@ class TorchDataset(PrefeaturizedTorchDataset):
 
 
 class XyNpzTorchDataset(Dataset):
+    """
+    Load ``X`` and ``y`` arrays from a NPZ file present in disk.
+    These files must expose at least two keys: ``X`` and ``y``.
+    It can also contain three more: ``idx_train``, ``idx_test``
+    and ``idx_val``, which correspond to the indices of the
+    training, test and validation subsets.
+
+    Parameters
+    ----------
+    npz : str
+        Path to a NPZ file with the keys exposed above.
+    """
+
     def __init__(self, npz):
         data = np.load(npz)
         self.data_X = torch.as_tensor(data["X"])

@@ -60,7 +60,7 @@ class DenseNeuralNetworkRegression(_BaseModule):
         Size of the last unit, representing delta_g_over_kt in our setting.
     dropout_percentage : float
         The percentage of hidden to by dropped at random.
-    _activation : torch function, default: relu
+    _activation : torch function, default=relu
         The activation function used in the hidden (only!) layer of the network.
     """
 
@@ -122,7 +122,7 @@ class ConvolutionNeuralNetworkRegression(_BaseModule):
         Number of units in the hidden layer.
     output_shape : int, default=1
         Size of the last unit, representing delta_g_over_kt in our setting.
-    activation : torch function, default: relu
+    activation : torch function, default=relu
         The activation function used in the hidden (only!) layer of the network.
     """
 

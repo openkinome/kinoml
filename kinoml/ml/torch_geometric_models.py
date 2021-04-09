@@ -21,11 +21,13 @@ class GraphConvolutionNeuralNetwork(nn.Module):
         Dimension of latent vector.
     output_shape : int, default=1
         Size of the last unit, representing delta_g_over_kt in our setting.
-    _activation : torch function, default: relu
+    _activation : torch function, default=relu
         The activation function used in the hidden (only!) layer of the network.
     """
 
-    def __init__(self, nb_nodes_features=9, embedding_shape=100, activation=F.relu):
+    def __init__(
+        self, nb_nodes_features=9, embedding_shape=100, output_shape=1, activation=F.relu
+    ):
         super().__init__()
         self.nb_nodes_features = nb_nodes_features
         self.embedding_shape = embedding_shape
@@ -33,7 +35,7 @@ class GraphConvolutionNeuralNetwork(nn.Module):
         self._activation = activation
 
         self.GraphConvLayer1 = GCNConv(self.nb_nodes_features, self.embedding_shape)
-        self.GraphConvLayer2 = GCNConv(self.embedding_shape, 1)
+        self.GraphConvLayer2 = GCNConv(self.embedding_shape, self.output_shape)
 
     def forward(self, data):
         x, edge_index = data.x, data.edge_index
