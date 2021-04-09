@@ -153,6 +153,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
 
       - uses: conda-incubator/setup-miniconda@v2
         with:
@@ -187,7 +189,7 @@ jobs:
         run: |
           cd docs
           make clean
-          SPHINXOPTS="-j2 -W -T --keep-going" make html
+          SPHINXOPTS="-W -T --keep-going" make html
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
