@@ -1,7 +1,7 @@
 import logging
 from typing import List, Set, Union, Iterable
 
-from openeye import oechem, oegrid, oespruce
+from openeye import oechem, oegrid, oespruce, oequacpac, oeomega, oeshape
 import pandas as pd
 
 
@@ -155,9 +155,6 @@ def select_altloc(molecule, altloc_id):
     selection: oechem.OEGraphMol
         An OpenEye molecule holding the selected alternate location.
     """
-    # External libraries
-    from openeye import oechem
-
     # do not change input mol
     selection = molecule.CreateCopy()
 
@@ -555,8 +552,6 @@ def generate_tautomers(molecule: oechem.OEGraphMol) -> List[oechem.OEGraphMol]:
     tautomers: list of oechem.OEGraphMol
         A list of OpenEye molecules holding the tautomers.
     """
-    from openeye import oechem, oequacpac
-
     tautomer_options = oequacpac.OETautomerOptions()
     tautomer_options.SetMaxTautomersGenerated(4096)
     tautomer_options.SetMaxTautomersToReturn(16)
@@ -596,8 +591,6 @@ def generate_enantiomers(
     enantiomers: list of oechem.OEGraphMol
         A list of OpenEye molecules holding the enantiomers.
     """
-    from openeye import oechem, oeomega
-
     enantiomers = [
         oechem.OEGraphMol(enantiomer)
         for enantiomer in oeomega.OEFlipper(molecule, max_centers, force_flip, enumerate_nitrogens)
@@ -625,8 +618,6 @@ def generate_conformations(
     conformations: oechem.OEMol
         An OpenEye multi-conformer molecule holding the generated conformations.
     """
-    from openeye import oechem, oeomega
-
     if dense:
         omega_options = oeomega.OEOmegaOptions(oeomega.OEOmegaSampling_Dense)
     else:
@@ -717,7 +708,7 @@ def overlay_molecules(
     reference_molecule: oechem.OEGraphMol,
     fit_molecule: oechem.OEMol,
     return_overlay: bool = True,
-) -> (int, List[oechem.OEGraphMol]):
+) -> Union[int, List[oechem.OEGraphMol]]:
     """
     Overlay two molecules and calculate TanimotoCombo score.
 
@@ -735,8 +726,6 @@ def overlay_molecules(
         : int or int and list of oechem.OEGraphMol
         The TanimotoCombo score of the best overlay and the overlay if score_only is set False.
     """
-    from openeye import oechem, oeshape
-
     prep = oeshape.OEOverlapPrep()
     prep.Prep(reference_molecule)
 
@@ -908,6 +897,8 @@ def mutate_structure(
     mutated_structure: oechem.OEGraphMol
         An OpenEye molecule holding the mutated protein structure.
     """
+    # pylint: disable=next-method-called
+
     from Bio import pairwise2
 
     # the hierarchy view is more stable if reinitialized after each change

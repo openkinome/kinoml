@@ -7,9 +7,12 @@ from functools import lru_cache
 import numpy as np
 import torch
 from torch.utils.data import TorchDataset as _NativeTorchDataset, DataLoader as _DataLoader
-import pytorch_lightning as pl
 
 from ..core.measurements import null_observation_model as _null_observation_model
+
+# Disable false positive lint with torch.tensor
+# see https://github.com/pytorch/pytorch/issues/24807
+# pylint: disable=not-callable
 
 
 class PrefeaturizedTorchDataset(_NativeTorchDataset):
@@ -120,7 +123,7 @@ class TorchDataset(PrefeaturizedTorchDataset):
         return X, y
 
 
-class XyNpzTorchDataset(Dataset):
+class XyNpzTorchDataset(_NativeTorchDataset):
     """
     Load ``X`` and ``y`` arrays from a NPZ file present in disk.
     These files must expose at least two keys: ``X`` and ``y``.

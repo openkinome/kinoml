@@ -2,10 +2,8 @@
 Implementation of some Deep Neural Networks in Pytorch using Pytorch Geometric.
 """
 
-import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import torch_geometric
 from torch_geometric.nn import GCNConv
 
 

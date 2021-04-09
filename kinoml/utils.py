@@ -4,7 +4,7 @@ Miscellaneous utilities
 from pathlib import Path
 from itertools import zip_longest
 from collections import defaultdict
-from typing import Iterable, Callable, Any, Type
+from typing import Iterable, Callable, Any
 from importlib import import_module
 
 

@@ -4,10 +4,7 @@ Base classes for ``DatasetProvider``-like objects
 
 import logging
 from typing import Iterable
-from copy import deepcopy
-from functools import wraps
-from operator import attrgetter
-from collections import defaultdict, Counter
+from collections import defaultdict
 import multiprocessing
 from urllib.request import urlopen
 import shutil

@@ -6,7 +6,6 @@ WIP
 
 from copy import deepcopy
 from pathlib import Path
-from random import shuffle
 from typing import List
 from collections import defaultdict
 
@@ -17,7 +16,6 @@ import pytorch_lightning as pl
 from pytorch_lightning import metrics
 from sklearn.metrics import r2_score
 from sklearn.model_selection import KFold, train_test_split
-from torch.utils.data import dataset
 from IPython.display import display
 
 from ..core import measurements as measurement_types

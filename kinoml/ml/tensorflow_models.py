@@ -6,9 +6,7 @@ Example models for TensorFlow
     This code is not currently in use.
 """
 
-import tensorflow as tf
-from tensorflow.keras import Model
-from tensorflow.keras.layers import Dense, Flatten
+import tensorflow as tf  # pylint: disable=import-error
 
 
 def DNN(input_dim):

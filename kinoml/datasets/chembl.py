@@ -7,7 +7,7 @@ import random
 import pandas as pd
 from tqdm.auto import tqdm
 
-from .core import MultiDatasetProvider, ProteinLigandDatasetProvider
+from .core import MultiDatasetProvider
 from ..core.conditions import AssayConditions
 from ..core.proteins import AminoAcidSequence
 from ..core.ligands import SmilesLigand
