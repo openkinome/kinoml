@@ -115,7 +115,7 @@ class SmilesToLigandFeaturizer(SingleLigandFeaturizer):
 class MorganFingerprintFeaturizer(SingleLigandFeaturizer):
 
     """
-    Given a ``System`` containing one ``OpenForceFieldLikeLigand`
+    Given a ``System`` containing one ``OpenForceFieldLikeLigand``
     component, convert it to RDKit molecule and generate
     the Morgan fingerprints bitvectors.
 
@@ -285,10 +285,13 @@ class GraphLigandFeaturizer(SingleLigandFeaturizer):
         """
         Featurizes ligands contained in a System as a labeled graph.
 
-        Returns:
+        Returns
+        -------
+        tuple
             A two-tuple with:
-            - Graph connectivity of the molecule with shape (2, n_edges)
-            - Feature matrix with shape (n_atoms, n_features)
+
+            - Graph connectivity of the molecule with shape ``(2, n_edges)``
+            - Feature matrix with shape ``(n_atoms, n_features)``
         """
         ligand = self._find_ligand(system).to_rdkit()
         connectivity_graph = self._connectivity_COO_format(ligand)
@@ -348,7 +351,8 @@ class GraphLigandFeaturizer(SingleLigandFeaturizer):
             radical_electrons : int
                 number of radical electrons
             hybridization_type : array
-                the one-hot encoded hybridization type from `HYBRIZIDATION_TYPES`.
+                the one-hot encoded hybridization type from
+                ``rdkit.Chem.rdchem.HybridizationType``.
         """
         # Test whether an atom belongs to a given ring size
         # We try from smaller to larger (starting at 3)
@@ -394,6 +398,7 @@ class GraphLigandFeaturizer(SingleLigandFeaturizer):
         ----------
         mol: rdkit.Mol
             rdkit molecule to extract bonds from
+
         Returns
         -------
         array

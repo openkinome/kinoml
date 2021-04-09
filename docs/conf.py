@@ -39,7 +39,7 @@ extensions = [
     "sphinx_copybutton",
     # "notfound.extension",
     "myst_parser",
-    "sphinxcontrib.httpdomain",
+    # "sphinxcontrib.httpdomain",
     "autoapi.extension",
     "nbsphinx",
     "sphinx_last_updated_by_git",
@@ -60,7 +60,11 @@ sphinxemoji_style = "twemoji"
 autoapi_dirs = ["../kinoml"]
 autoapi_root = "api"
 autoapi_add_toctree_entry = False
-autoapi_ignore = ["*migrations*", "_version*"]
+autoapi_ignore = [
+    "*migrations*",
+    "_version*",
+    "*tests*",
+]
 autoapi_options = [
     "members",
     "undoc-members",
@@ -70,6 +74,7 @@ autoapi_options = [
     "special-members",
     "imported-members",
 ]
+autoapi_keep_files = False
 
 # Napoleon settings
 napoleon_google_docstring = True
@@ -157,7 +162,13 @@ html_theme_options = {
 }
 
 # globaltoc seems it's not added by default
-html_sidebars = {"**": ["globaltoc.html", "localtoc.html", "searchbox.html"]}
+html_sidebars = {
+    "**": [
+        "globaltoc.html",
+        "localtoc.html",
+        "searchbox.html",
+    ]
+}
 
 
 # Add any paths that contain custom static files (such as style sheets) here,
@@ -181,3 +192,13 @@ myst_enable_extensions = [
     "smartquotes",
     "substitution",
 ]
+
+myst_update_mathjax = False
+mathjax_config = {
+    "tex2jax": {
+        "inlineMath": [["\\(", "\\)"]],
+        "displayMath": [["\\[", "\\]"]],
+        "processRefs": False,
+        "processEnvironments": False,
+    }
+}

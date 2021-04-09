@@ -20,6 +20,7 @@ dependencies:
   - xgboost
   - openeye-toolkits >=2020
   - modeller
+  - biotite
   - watermark
 
   # Development

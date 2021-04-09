@@ -1,3 +1,4 @@
+"""WIP"""
 from ..core.proteins import ProteinStructure
 from ..core.sequences import KinaseDomainAminoAcidSequence
 from .alignment import Alignment
@@ -21,6 +22,7 @@ class HomologyModel:  #  TODO inherent a Base class?
     ):
         """
         Retrieve a template structure from PDB from a BLAST search
+
         Parameters
         ----------
         sequence: str
@@ -47,6 +49,7 @@ class HomologyModel:  #  TODO inherent a Base class?
     def get_sequence(self, identifier: str, kinase: bool = True, backend: str = "uniprot"):
         """
         Retrieve a sequence based on an identifier code
+
         Parameters
         ----------
         identifier: str
@@ -96,6 +99,7 @@ class HomologyModel:  #  TODO inherent a Base class?
     ):
         """
         Generate homology model(s) based on a template and alignment with MODELLER
+
         Parameters
         ----------
         template_system: ProteinStructure
@@ -107,11 +111,8 @@ class HomologyModel:  #  TODO inherent a Base class?
             sequences must be the same as present in template_system and target_sequence
         num_models: int
             The number of homology models to generate. default = 100
-        ligand: bool
+        ligand: bool, optional=False
             Specify whether to include a bound ligand present in the template structure.
-            (Default: False)
-        Returns
-        -------
         """
 
         from modeller import log, environ

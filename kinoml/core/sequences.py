@@ -18,11 +18,11 @@ class Biosequence(str):
     Base class for string representations of biological polymers
     (nucleic acids, peptides, proteins...)
 
-    .. warning::
-
-        How to handle several mutations at the same time, while
-        keeping indices relevant (after a deletion, a replacement
-        or insertion position might be wrong).
+    Note
+    ----
+    How to handle several mutations at the same time, while
+    keeping indices relevant (after a deletion, a replacement
+    or insertion position might be wrong).
     """
 
     ALPHABET = set(ascii_letters)
@@ -59,22 +59,22 @@ class Biosequence(str):
         """
         Get FASTA sequence from an online NCBI identifier
 
-        Parameters:
-            accessions: NCBI identifier. Multiple can be provided!
+        Parameters
+        ----------
+        accessions : str
+            NCBI identifier. Multiple can be provided!
 
-        Returns:
-            Retrieved biosequence(s)
+        Returns
+        -------
+        Retrieved biosequence(s)
 
-        __Examples__
-
-        ```python
+        Examples
+        --------
         >>> sequence = AminoAcidSequence.from_ncbi("AAC05299.1")
         >>> print(sequence[:10])
         MSVNSEKSSS
         >>> print(sequence.name)
         AAC05299.1 serine kinase SRPK2 [Homo sapiens]
-
-        ```
         """
         if cls._ACCESSION_URL is None:
             raise NotImplementedError
@@ -113,23 +113,27 @@ class Biosequence(str):
         """
         Slice a sequence using biological notation
 
-        Parameters:
-            start: Starting element and 1-indexed position; e.g. C123
-            stop: Ending element and 1-indexed position; e.g. T234
-                This will be included in the resulting sequence
-            check: Whether to test if the existing elements correspond
-                to those specified in the bounds
+        Parameters
+        ----------
+        start : str
+            Starting element and 1-indexed position; e.g. C123
+        stop : str
+            Ending element and 1-indexed position; e.g. T234
+            This will be included in the resulting sequence
+        check : bool, optional=True
+            Whether to test if the existing elements correspond
+            to those specified in the bounds
 
-        Returns:
+        Returns
+        -------
+        Biosequence
             Substring corresponding to [start, end]. Right bound is included!
 
-        __Examples__
-
-        ```python
+        Examples
+        --------
         >>> s = Biosequence("ATCGTHCTCH")
         >>> s.cut("T2", "T8")
         "TCGTHCT"
-        ```
         """
         start_res, start_pos = start[0], int(start[1:])
         stop_res, stop_pos = stop[0], int(stop[1:])
@@ -150,20 +154,24 @@ class Biosequence(str):
         """
         Apply a mutation on the sequence using biological notation.
 
-        Parameters:
-            mutations: Mutations to be applied. Indices are always 1-indexed. It can be one of:
-                (1) substitution, like ``C234T`` (C at position 234 will be replaced by T);
-                (2) deletion, like ``L746-A750del`` (delete everything between L at position 746
-                    A at position 750, bounds not included);
-                (3) insertion, like ``1151Tins`` (insert a T after position 1151)
-            raise_errors: Raise ValueError if one of the mutations is not supported.
+        Parameters
+        ----------
+        mutations : str
+            Mutations to be applied. Indices are always 1-indexed. It can be one of:
+            (1) substitution, like ``C234T`` (C at position 234 will be replaced by T);
+            (2) deletion, like ``L746-A750del`` (delete everything between L at position 746
+            A at position 750, bounds not included);
+            (3) insertion, like ``1151Tins`` (insert a T after position 1151)
+        raise_errors : bool, optional=True
+            Raise ``ValueError`` if one of the mutations is not supported.
 
-        Returns:
+        Returns
+        -------
+        Biosequence
             The edited sequence
 
-        Examples:
-
-        ```python
+        Examples
+        --------
         >>> s = Biosequence("ATCGTHCTCH")
         >>> s.mutate("C3P")
         "ATPGTHCTCH"
@@ -171,8 +179,6 @@ class Biosequence(str):
         "ATTHCTCH"
         >>> s.mutate("5Tins")
         "ATCGTTHCTCH"
-
-        ```
         """
         # We can only handle one insertion or deletion at once now
         mutation_types = {m: self._type_mutation(m, raise_errors) for m in mutations}
@@ -211,13 +217,17 @@ class Biosequence(str):
 
     def _mutate_with_substitution(self, mutation: str) -> "Biosequence":
         """
-        Given `XYYYZ`, replace element ``X`` at position ``YYY`` with `Z`.
+        Given ``XYYYZ``, replace element ``X`` at position ``YYY`` with ``Z``.
 
-        Parameters:
-            mutation: Replacement to apply. It must be formatted as
-                `[existing element][1-indexed position][new element]`
+        Parameters
+        ----------
+        mutation : str
+            Replacement to apply. It must be formatted as
+            ``[existing element][1-indexed position][new element]``
 
-        Returns:
+        Returns
+        -------
+        Biosequence
             Replaced sequence
         """
         # replacement: e.g. C1156Y
@@ -233,14 +243,18 @@ class Biosequence(str):
 
     def _mutate_with_deletion(self, mutation: str) -> "Biosequence":
         """
-        Given `AXXX-BYYYdel`, delete everything between elements ``A`` and ``B`` at positions
-        ``XXX`` and `YYY`, respectively. ``A`` and ``B`` will still be part of the resulting sequence.
+        Given ``AXXX-BYYYdel``, delete everything between elements ``A`` and ``B`` at positions
+        ``XXX`` and ``YYY``, respectively. ``A`` and ``B`` will still be part of the resulting sequence.
 
-        Parameters:
-            mutation: Replacement to apply. It must be formatted as
-            `[starting element][1-indexed starting position]-[ending element][1-indexed ending position]del`
+        Parameters
+        ----------
+        mutation : str
+            Replacement to apply. It must be formatted as
+            ``[starting element][1-indexed starting position]-[ending element][1-indexed ending position]del``
 
-        Returns:
+        Returns
+        -------
+        Biosequence
             Edited sequence
         """
         # deletion: e.g. L746-A750del
@@ -253,13 +267,17 @@ class Biosequence(str):
 
     def _mutate_with_insertion(self, mutation: str) -> "Biosequence":
         """
-        Given `XXXAdel`, insert element ``A`` at position `XXX`.
+        Given ``XXXAdel``, insert element ``A`` at position ``XXX``.
 
-        Parameters:
-            mutation: Insertion to apply. It must be formatted as
-            `[1-indexed insert position][element to be inserted]ins`
+        Parameters
+        -----------
+        mutation : str
+            Insertion to apply. It must be formatted as
+            ``[1-indexed insert position][element to be inserted]ins``
 
-        Returns:
+        Returns
+        -------
+        Biosequence
             Edited sequence
         """
         # insertion: e.g. 1151Tins
@@ -298,10 +316,12 @@ class KinaseDomainAminoAcidSequence(Biosequence):
     ) -> Union["KinaseDomainAminoAcidSequence", Iterable["KinaseDomainAminoAcidSequence"], None]:
         """
         Retrieve kinase domain amino acid sequences of kinases defined by their Uniprot identifiers.
+
         Parameters
         ----------
         uniprot_ids: str
             Uniprot identifier(s). Multiple can be provided.
+
         Returns
         -------
         kinase_domain_sequences: list of KinaseDomainAminoAcidSequence

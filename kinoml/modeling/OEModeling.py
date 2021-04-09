@@ -8,10 +8,12 @@ import pandas as pd
 def read_smiles(smiles: str) -> oechem.OEGraphMol:
     """
     Read molecule from a smiles string.
+
     Parameters
     ----------
     smiles: str
         Smiles string.
+
     Returns
     -------
     molecule: oechem.OEGraphMol
@@ -31,10 +33,12 @@ def read_smiles(smiles: str) -> oechem.OEGraphMol:
 def read_molecules(path: str) -> List[oechem.OEGraphMol]:
     """
     Read molecules from a file.
+
     Parameters
     ----------
     path: str
         Path to molecule file.
+
     Returns
     -------
     molecules: list of oechem.OEGraphMol
@@ -64,10 +68,12 @@ def read_molecules(path: str) -> List[oechem.OEGraphMol]:
 def read_electron_density(path: str) -> Union[oegrid.OESkewGrid, None]:
     """
     Read electron density from a file.
+
     Parameters
     ----------
     path: str
         Path to electron density file.
+
     Returns
     -------
     electron_density: oegrid.OESkewGrid or None
@@ -88,6 +94,7 @@ def read_electron_density(path: str) -> Union[oegrid.OESkewGrid, None]:
 def write_molecules(molecules: List[oechem.OEGraphMol], path: str):
     """
     Save molecules to file.
+
     Parameters
     ----------
     molecules: list of oechem.OEGraphMol
@@ -107,12 +114,14 @@ def write_molecules(molecules: List[oechem.OEGraphMol], path: str):
 def select_chain(molecule, chain_id):
     """
     Select a chain from an OpenEye molecule.
+
     Parameters
     ----------
     molecule: oechem.OEGraphMol
         An OpenEye molecule holding a molecular structure.
     chain_id: str
         Chain identifier.
+
     Returns
     -------
     selection: oechem.OEGraphMol
@@ -133,12 +142,14 @@ def select_chain(molecule, chain_id):
 def select_altloc(molecule, altloc_id):
     """
     Select an alternate location from an OpenEye molecule.
+
     Parameters
     ----------
     molecule: oechem.OEGraphMol
         An OpenEye molecule holding a molecular structure.
     altloc_id: str
         Alternate location identifier.
+
     Returns
     -------
     selection: oechem.OEGraphMol
@@ -168,6 +179,7 @@ def remove_non_protein(
 ) -> oechem.OEGraphMol:
     """
     Remove non-protein atoms from an OpenEye molecule.
+
     Parameters
     ----------
     molecule: oechem.OEGraphMol
@@ -176,6 +188,7 @@ def remove_non_protein(
         Exceptions that should not be removed.
     remove_water: bool
         If water should be removed.
+
     Returns
     -------
     selection: oechem.OEGraphMol
@@ -304,6 +317,7 @@ def _prepare_structure(
 ) -> Union[oechem.OEDesignUnit, None]:
     """
     Prepare an OpenEye molecule holding a protein ligand complex for docking.
+
     Parameters
     ----------
     structure: oechem.OEGraphMol
@@ -322,11 +336,12 @@ def _prepare_structure(
         If termini should be capped with ACE and NME.
     real_termini: list of int or None
         Residue numbers of biologically real termini will not be capped with ACE and NME.
+
     Returns
     -------
     design_unit: oechem.OEDesignUnit or None
-        An OpenEye design unit holding the prepared structure with the highest quality among all identified design
-        units.
+        An OpenEye design unit holding the prepared structure with the
+        highest quality among all identified design units.
     """
 
     def _has_residue_number(atom, residue_numbers=real_termini):
@@ -408,6 +423,7 @@ def prepare_complex(
 ) -> Union[oechem.OEDesignUnit, None]:
     """
     Prepare an OpenEye molecule holding a protein ligand complex for docking.
+
     Parameters
     ----------
     protein_ligand_complex: oechem.OEGraphMol
@@ -422,6 +438,7 @@ def prepare_complex(
         If termini should be capped with ACE and NME.
     real_termini: list of int or None
         Residue numbers of biologically real termini will not be capped with ACE and NME.
+
     Returns
     -------
     design_unit: oechem.OEDesignUnit or None
@@ -447,6 +464,7 @@ def prepare_protein(
 ) -> Union[oechem.OEDesignUnit, None]:
     """
     Prepare an OpenEye molecule holding a protein structure for docking.
+
     Parameters
     ----------
     protein: oechem.OEGraphMol
@@ -457,6 +475,7 @@ def prepare_protein(
         If termini should be capped with ACE and NME.
     real_termini: list of int or None
         Residue numbers of biologically real termini will not be capped with ACE and NME.
+
     Returns
     -------
     design_unit: oechem.OEDesignUnit or None
@@ -474,10 +493,12 @@ def prepare_protein(
 def klifs_kinase_from_uniprot_id(uniprot_id: str) -> pd.DataFrame:
     """
     Retrieve KLIFS kinase details about the kinase matching the given Uniprot ID.
+
     Parameters
     ----------
     uniprot_id: str
         Uniprot identifier.
+
     Returns
     -------
     kinases: pd.Series
@@ -494,10 +515,12 @@ def klifs_kinase_from_uniprot_id(uniprot_id: str) -> pd.DataFrame:
 def get_klifs_ligand(structure_id: int) -> oechem.OEGraphMol:
     """
     Retrieve orthosteric ligand from KLIFS.
+
     Parameters
     ----------
     structure_id: int
         KLIFS structure identifier.
+
     Returns
     -------
     molecule: oechem.OEGraphMol
@@ -521,10 +544,12 @@ def get_klifs_ligand(structure_id: int) -> oechem.OEGraphMol:
 def generate_tautomers(molecule: oechem.OEGraphMol) -> List[oechem.OEGraphMol]:
     """
     Generate reasonable tautomers of a given molecule.
+
     Parameters
     ----------
     molecule: oechem.OEGraphMol
         An OpenEye molecule.
+
     Returns
     -------
     tautomers: list of oechem.OEGraphMol
@@ -554,6 +579,7 @@ def generate_enantiomers(
 ) -> List[oechem.OEGraphMol]:
     """
     Generate enantiomers of a given molecule.
+
     Parameters
     ----------
     molecule: oechem.OEGraphMol
@@ -564,6 +590,7 @@ def generate_enantiomers(
         If specified stereo centers should be ignored.
     enumerate_nitrogens: bool
         If nitrogens with invertible pyramidal geometry should be enumerated.
+
     Returns
     -------
     enantiomers: list of oechem.OEGraphMol
@@ -583,6 +610,7 @@ def generate_conformations(
 ) -> oechem.OEMol:
     """
     Generate conformations of a given molecule.
+
     Parameters
     ----------
     molecule: oechem.OEGraphMol
@@ -591,6 +619,7 @@ def generate_conformations(
         Maximal number of conformations to generate.
     dense: bool
         If densely sampled conformers should be generated. Will overwrite max_conformations settings.
+
     Returns
     -------
     conformations: oechem.OEMol
@@ -620,12 +649,14 @@ def generate_reasonable_conformations(
 ) -> List[oechem.OEMol]:
     """
     Generate conformations of reasonable enantiomers and tautomers of a given molecule.
+
     Parameters
     ----------
     molecule: oechem.ORGraphMol
         An OpenEye molecule.
     dense: bool
         If densely sampled conformers should be generated.
+
     Returns
     -------
     conformations_ensemble: list of oechem.OEMol
@@ -648,12 +679,14 @@ def optimize_poses(
 ) -> List[oechem.OEGraphMol]:
     """
     Optimize the torsions of docking poses in a protein binding site.
+
     Parameters
     ----------
     docking_poses: list of oechem.OEGraphMol
         The docking poses to optimize.
     protein: oechem.OEGraphMol or oechem.MolBase
         The OpenEye molecule holding a protein structure.
+
     Returns
     -------
     optimized_docking_poses: list of oechem.OEGraphMol
@@ -687,6 +720,7 @@ def overlay_molecules(
 ) -> (int, List[oechem.OEGraphMol]):
     """
     Overlay two molecules and calculate TanimotoCombo score.
+
     Parameters
     ----------
     reference_molecule: oechem.OEGraphMol
@@ -695,6 +729,7 @@ def overlay_molecules(
         An OpenEye multi-conformer molecule holding the fit molecule for overlay.
     return_overlay: bool
         If the best scored overlay of molecules should be returned.
+
     Returns
     -------
         : int or int and list of oechem.OEGraphMol
@@ -726,10 +761,12 @@ def overlay_molecules(
 def generate_isomeric_smiles_representations(molecule: oechem.OEGraphMol) -> Set[str]:
     """
     Generate reasonable isomeric smiles of a given OpenEye molecule.
+
     Parameters
     ----------
     molecule: oechem.OEGraphMol
         An OpenEye molecule.
+
     Returns
     -------
     smiles_set: set of str
@@ -751,12 +788,14 @@ def generate_isomeric_smiles_representations(molecule: oechem.OEGraphMol) -> Set
 def compare_molecules(molecule1: oechem.OEGraphMol, molecule2: oechem.OEGraphMol) -> bool:
     """
     Compare two OpenEye molecules.
+
     Parameters
     ----------
     molecule1: oechem.OEGraphMol
         The first OpenEye molecule.
     molecule2: oechem.OEGraphMol
         The second OpenEye molecule.
+
     Returns
     -------
     : bool
@@ -774,12 +813,14 @@ def compare_molecules(molecule1: oechem.OEGraphMol, molecule2: oechem.OEGraphMol
 def string_similarity(string1: str, string2: str) -> float:
     """
     Compare the characters of two strings.
+
     Parameters
     ----------
     string1: str
         The first string.
     string2: str
         The second string.
+
     Returns
     -------
         : float
@@ -792,10 +833,12 @@ def string_similarity(string1: str, string2: str) -> float:
 def smiles_from_pdb(ligand_ids: Iterable[str]) -> dict:
     """
     Retrieve SMILES of molecules defined by their PDB chemical identifier.
+
     Parameters
     ----------
     ligand_ids: iterable of str
         Iterable of PDB chemical identifiers.
+
     Returns
     -------
     ligands: dict
@@ -822,10 +865,12 @@ def get_sequence(structure: oechem.OEGraphMol) -> str:
     """
     Get the amino acid sequence with one letter characters of an OpenEye molecule holding a protein structure. All
     residues not perceived as amino acid will receive the character 'X'.
+
     Parameters
     ----------
     structure: oechem.OEGraphMol
         An OpenEye molecule holding a protein structure.
+
     Returns
     -------
     sequence: str
@@ -849,6 +894,7 @@ def mutate_structure(
 ) -> oechem.OEGraphMol:
     """
     Mutate a protein structure according to an amino acid sequence.
+
     Parameters
     ----------
     target_structure: oechem.OEGraphMol
@@ -856,6 +902,7 @@ def mutate_structure(
     template_sequence: str
         A template one letter amino acid sequence, which defines the sequence the target structure should be mutated
         to. Protein residues not matching a template sequence will be either mutated or deleted.
+
     Returns
     -------
     mutated_structure: oechem.OEGraphMol
@@ -924,12 +971,14 @@ def renumber_structure(
 ) -> oechem.OEGraphMol:
     """
     Renumber the residues of a protein structure according to the given list of residue numbers.
+
     Parameters
     ----------
     target_structure: oechem.OEGraphMol
         An OpenEye molecule holding the protein structure to renumber.
     residue_numbers: list of int
         A list of residue numbers matching the order of the target structure.
+
     Returns
     -------
     renumbered_structure: oechem.OEGraphMol
@@ -954,12 +1003,14 @@ def superpose_proteins(
 ) -> oechem.OEGraphMol:
     """
     Superpose a protein structure onto a reference protein.
+
     Parameters
     ----------
     reference_protein: oechem.OEGraphMol
         An OpenEye molecule holding a protein structure which will be used as reference during superposition.
     fit_protein: oechem.OEGraphMol
         An OpenEye molecule holding a protein structure which will be superposed onto the reference protein.
+
     Returns
     -------
     superposed_protein: oechem.OEGraphMol
@@ -988,12 +1039,14 @@ def update_residue_identifiers(
     Updates the atom, residue and chain ids of the given molecular structure. All residues become part of chain A. Atom
     ids will start from 1. Residue will start from 1, except protein residue ids are fixed. This is especially useful,
     if molecules were merged, which can result in overlapping atom and residue ids as well as separate chains.
+
     Parameters
     ----------
     structure: oechem.OEGraphMol
         The OpenEye molecule structure for updating atom and residue ids.
     keep_protein_residue_ids: bool
         If the protein residues should be kept.
+
     Returns
     -------
     structure: oechem.OEGraphMol
@@ -1038,10 +1091,12 @@ def update_residue_identifiers(
 def split_molecule_components(molecule: oechem.OEGraphMol) -> List[oechem.OEGraphMol]:
     """
     Split an OpenEye Molecule into its bonded components.
+
     Parameters
     ----------
     molecule: oechem.OEGraphMol
         An OpenEye molecule holding multiple components.
+
     Returns
     -------
     : list of oechem.OEGraphMol
@@ -1065,12 +1120,14 @@ def split_molecule_components(molecule: oechem.OEGraphMol) -> List[oechem.OEGrap
 def clashing_atoms(molecule1: oechem.OEGraphMol, molecule2: oechem.OEGraphMol) -> bool:
     """
     Evaluates if the atoms of two molecules are clashing.
+
     Parameters
     ----------
     molecule1: oechem.OEGraphMol
         An OpenEye molecule.
     molecule2: oechem.OEGraphMol
         An OpenEye molecule.
+
     Returns
     -------
     : bool

@@ -370,7 +370,7 @@ class pIC50Measurement(ObservationModelMeasurement):
 class pKiMeasurement(ObservationModelMeasurement):
 
     r"""
-    Measurement where the value(s) come from K_i_ experiments
+    Measurement where the value(s) come from $K_i$ experiments
 
     We make the assumption that $K_i \approx K_d$ and therefore
 
