@@ -6,7 +6,7 @@ from functools import lru_cache
 
 import numpy as np
 import torch
-from torch.utils.data import TorchDataset as _NativeTorchDataset, DataLoader as _DataLoader
+from torch.utils.data import Dataset as _NativeTorchDataset, DataLoader as _DataLoader
 
 from ..core.measurements import null_observation_model as _null_observation_model
 
