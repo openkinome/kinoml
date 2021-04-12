@@ -5,7 +5,6 @@
   <head>
     <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
 
-    <meta property="article:modified_time" content="2021-04-07T09:28:18+00:00" />
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   <meta name="lang:clipboard.copy" content="Copy to clipboard">
@@ -36,46 +35,47 @@
     </style>
   
 
-  <link rel="stylesheet" href="_static/stylesheets/application.css"/>
-  <link rel="stylesheet" href="_static/stylesheets/application-palette.css"/>
-  <link rel="stylesheet" href="_static/stylesheets/application-fixes.css"/>
+  <link rel="stylesheet" href="../../../../_static/stylesheets/application.css"/>
+  <link rel="stylesheet" href="../../../../_static/stylesheets/application-palette.css"/>
+  <link rel="stylesheet" href="../../../../_static/stylesheets/application-fixes.css"/>
   
-  <link rel="stylesheet" href="_static/fonts/material-icons.css"/>
+  <link rel="stylesheet" href="../../../../_static/fonts/material-icons.css"/>
   
   <meta name="theme-color" content="#3f51b5">
-  <script src="_static/javascripts/modernizr.js"></script>
+  <script src="../../../../_static/javascripts/modernizr.js"></script>
   
   
-    <link rel="apple-touch-icon" href="_static/images/custom_favicon.png"/>
+    <link rel="apple-touch-icon" href="../../../../_static/images/custom_favicon.png"/>
   
   
-    <title>OpenKinome &amp; KinoML &#8212; KinoML 0.1 documentation</title>
-    <link rel="stylesheet" href="_static/material.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" type="text/css" href="_static/twemoji.css" />
-    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
-    <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
-    <link rel="stylesheet" type="text/css" href="_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
-    <link rel="stylesheet" type="text/css" href="_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" />
-    <link rel="stylesheet" type="text/css" href="_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
-    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
-    <script src="_static/doctools.js"></script>
-    <script src="_static/language_data.js"></script>
+    <title>kinoml.ml.torch_loops &#8212; KinoML 0.1 documentation</title>
+    <link rel="stylesheet" href="../../../../_static/material.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/twemoji.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
+    <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/jquery.js"></script>
+    <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
+    <script src="../../../../_static/language_data.js"></script>
     <script src="https://twemoji.maxcdn.com/v/latest/twemoji.min.js"></script>
-    <script src="_static/twemoji.js"></script>
-    <script src="_static/clipboard.min.js"></script>
-    <script src="_static/copybutton.js"></script>
+    <script src="../../../../_static/twemoji.js"></script>
+    <script src="../../../../_static/clipboard.min.js"></script>
+    <script src="../../../../_static/copybutton.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
-    <link rel="shortcut icon" href="_static/custom_favicon.png"/>
-    <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Getting started" href="getting_started.html" />
+    <link rel="shortcut icon" href="../../../../_static/custom_favicon.png"/>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="kinoml.ml.torch_models" href="../torch_models/index.html" />
+    <link rel="prev" title="kinoml.ml.torch_geometric_models" href="../torch_geometric_models/index.html" />
   
-    <link rel="apple-touch-icon" href="_static/images/custom_favicon.png"/>
+    <link rel="apple-touch-icon" href="../../../../_static/images/custom_favicon.png"/>
   
    
 
@@ -94,12 +94,12 @@
   <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer">
   <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search">
   <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
-  <a href="#index" tabindex="1" class="md-skip"> Skip to content </a>
+  <a href="#api/kinoml/ml/torch_loops/index" tabindex="1" class="md-skip"> Skip to content </a>
   <header class="md-header" data-md-component="header">
   <nav class="md-header-nav md-grid">
     <div class="md-flex navheader">
       <div class="md-flex__cell md-flex__cell--shrink">
-        <a href="#" title="KinoML 0.1 documentation"
+        <a href="../../../../index.html" title="KinoML 0.1 documentation"
            class="md-header-nav__button md-logo">
           
             <i class="md-icon">&#xe6dd</i>
@@ -112,7 +112,7 @@
       <div class="md-flex__cell md-flex__cell--stretch">
         <div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
           <span class="md-header-nav__topic">KinoML</span>
-          <span class="md-header-nav__topic"> OpenKinome &amp; KinoML </span>
+          <span class="md-header-nav__topic"> kinoml.ml.torch_loops </span>
         </div>
       </div>
       <div class="md-flex__cell md-flex__cell--shrink">
@@ -121,7 +121,7 @@
 <div class="md-search" data-md-component="search" role="dialog">
   <label class="md-search__overlay" for="__search"></label>
   <div class="md-search__inner" role="search">
-    <form class="md-search__form" action="search.html" method="GET" name="search">
+    <form class="md-search__form" action="../../../../search.html" method="GET" name="search">
       <input type="text" class="md-search__input" name="q" placeholder="Search"
              autocapitalize="off" autocomplete="off" spellcheck="false"
              data-md-component="query" data-md-state="active">
@@ -170,26 +170,21 @@
   
   <div class="md-container">
     
-
-<div class="md-hero" data-md-component="hero">
-  <div class="md-hero__inner md-grid">
-    <p>Structure-informed machine learning for kinase modeling</p>
-  </div>
-</div>
-
     
     
   <nav class="md-tabs" data-md-component="tabs">
     <div class="md-tabs__inner md-grid">
       <ul class="md-tabs__list">
             
-            <li class="md-tabs__item"><a href="#" class="md-tabs__link">User guide</a></li>
+            <li class="md-tabs__item"><a href="../../../../index.html" class="md-tabs__link">User guide</a></li>
             
-            <li class="md-tabs__item"><a href="developers/api_concepts.html" class="md-tabs__link">Developers</a></li>
+            <li class="md-tabs__item"><a href="../../../../developers/api_concepts.html" class="md-tabs__link">Developers</a></li>
             
-            <li class="md-tabs__item"><a href="api/kinoml/index.html" class="md-tabs__link">API Reference</a></li>
+            <li class="md-tabs__item"><a href="../../index.html" class="md-tabs__link">API Reference</a></li>
             
             <li class="md-tabs__item"><a href="https://openkinome.org" class="md-tabs__link">OpenKinome</a></li>
+          <li class="md-tabs__item"><a href="../../index.html" class="md-tabs__link"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml</span></code></a></li>
+          <li class="md-tabs__item"><a href="../index.html" class="md-tabs__link"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.ml</span></code></a></li>
       </ul>
     </div>
   </nav>
@@ -201,12 +196,12 @@
               <div class="md-sidebar__inner">
                 <nav class="md-nav md-nav--primary" data-md-level="0">
   <label class="md-nav__title md-nav__title--site" for="__drawer">
-    <a href="#" title="KinoML 0.1 documentation" class="md-nav__button md-logo">
+    <a href="../../../../index.html" title="KinoML 0.1 documentation" class="md-nav__button md-logo">
       
         <i class="md-icon">&#xe6dd</i>
       
     </a>
-    <a href="#"
+    <a href="../../../../index.html"
        title="KinoML 0.1 documentation">KinoML</a>
   </label>
     <div class="md-nav__source">
@@ -236,14 +231,14 @@
     <li class="md-nav__item">
     
     
-      <a href="getting_started.html" class="md-nav__link">Getting started</a>
+      <a href="../../../../getting_started.html" class="md-nav__link">Getting started</a>
       
     
     </li>
     <li class="md-nav__item">
     
     
-      <a href="install.html" class="md-nav__link">Installation</a>
+      <a href="../../../../install.html" class="md-nav__link">Installation</a>
       
     
     </li>
@@ -255,7 +250,7 @@
     <li class="md-nav__item">
     
     
-      <a href="tutorials/example.html" class="md-nav__link">Tutorial 1</a>
+      <a href="../../../../tutorials/example.html" class="md-nav__link">Tutorial 1</a>
       
     
     </li>
@@ -267,22 +262,43 @@
     <li class="md-nav__item">
     
     
-      <a href="developers/api_concepts.html" class="md-nav__link">Base concepts in our API</a>
+      <a href="../../../../developers/api_concepts.html" class="md-nav__link">Base concepts in our API</a>
       
     
     </li>
     <li class="md-nav__item">
     
     
-      <a href="developers/api_docs.html" class="md-nav__link">How to write docs with Sphinx, MyST and Material Theme</a>
+      <a href="../../../../developers/api_docs.html" class="md-nav__link">How to write docs with Sphinx, MyST and Material Theme</a>
       
     
     </li>
     <li class="md-nav__item">
     
     
-      <a href="api/kinoml/index.html" class="md-nav__link">API Reference</a>
+      <a href="../../index.html" class="md-nav__link">API Reference</a>
+      <ul class="md-nav__list"> 
+    <li class="md-nav__item">
+    
+    
+      <a href="../../index.html#subpackages" class="md-nav__link">Subpackages</a>
       
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="../../index.html#submodules" class="md-nav__link">Submodules</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="../../index.html#package-contents" class="md-nav__link">Package Contents</a>
+      
+    
+    </li></ul>
     
     </li>
   </ul>
@@ -297,9 +313,19 @@
               <div class="md-sidebar__inner">
                 
 <nav class="md-nav md-nav--secondary">
+    <label class="md-nav__title" for="__toc">Contents</label>
   <ul class="md-nav__list" data-md-scrollfix="">
+        <li class="md-nav__item"><a href="#api-kinoml-ml-torch-loops-index--page-root" class="md-nav__link"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.ml.torch_loops</span></code></a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#module-contents" class="md-nav__link">Module Contents</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#kinoml.ml.torch_loops.multi_measurement_training_loop" class="md-nav__link">multi_measurement_training_loop</a>
+        </li></ul>
+            </nav>
+        </li></ul>
+            </nav>
+        </li>
     
-<li class="md-nav__item"><a class="md-nav__extra_link" href="_sources/index.md.txt">Show Source</a> </li>
 
 <li id="searchbox" class="md-nav__item"></li>
 
@@ -312,26 +338,48 @@
         <div class="md-content">
           <article class="md-content__inner md-typeset" role="main">
             
-  <div class="warning admonition">
-<p class="admonition-title">Warning!</p>
-<p>This is module is undergoing heavy development. None of the API calls are final. This software is provided without any guarantees of correctness, you will likely encounter bugs.</p>
-<p>If you are interested in this code, please wait for the official release to use it. In the mean time, to stay informed of development progress you are encouraged to:</p>
-<ul class="simple">
-<li><p>Subscribe for new releases (use <code class="docutils literal notranslate"><span class="pre">Watch&gt;</span> <span class="pre">Releases</span> <span class="pre">only</span></code> on GitHub)</p></li>
-<li><p>Check out the <a class="reference external" href="https://github.com/openkinome/kinoml">Github repository</a>.</p></li>
+  <section id="module-kinoml.ml.torch_loops">
+<span id="kinoml-ml-torch-loops"></span><h1 id="api-kinoml-ml-torch-loops-index--page-root"><a class="reference internal" href="#api-kinoml-ml-torch-loops-index--page-root" title="kinoml.ml.torch_loops"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.ml.torch_loops</span></code></a><a class="headerlink" href="#api-kinoml-ml-torch-loops-index--page-root" title="Permalink to this headline">¶</a></h1>
+<p>WIP</p>
+<section id="module-contents">
+<h2 id="module-contents">Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="kinoml.ml.torch_loops.multi_measurement_training_loop">
+<code class="sig-prename descclassname">kinoml.ml.torch_loops.</code><code class="sig-name descname">multi_measurement_training_loop</code><span class="sig-paren">(</span><em class="sig-param">dataloaders</em>, <em class="sig-param">observation_models</em>, <em class="sig-param">model</em>, <em class="sig-param">optimizer</em>, <em class="sig-param">loss_function</em>, <em class="sig-param">epochs=100</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.torch_loops.multi_measurement_training_loop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Standard training loop with multiple dataloaders and observation models.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataloaders</strong> – dict of str -&gt; torch.utils.data.DataLoader
+key must refer to the measurement type present in the dataloader</p></li>
+<li><p><strong>observation_models</strong> – dict of str -&gt; callable
+keys must be the same as in dataloaders, and point to pytorch-compatible callables
+that convert delta_over_kt to the corresponding measurement_type</p></li>
+<li><p><strong>model</strong> – torch.nn.Model
+instance of the model to train</p></li>
+<li><p><strong>optimizer</strong> – torch.optim.Optimizer
+instance of the optimization engine</p></li>
+<li><p><strong>loss_function</strong> – torch.nn.modules._Loss
+instance of the loss function to apply (e.g. MSELoss())</p></li>
+<li><p><strong>epochs</strong> – int
+number of iterations the loop will run</p></li>
 </ul>
-</div>
-<section id="openkinome-kinoml">
-<h1 id="index--page-root">OpenKinome &amp; KinoML<a class="headerlink" href="#index--page-root" title="Permalink to this headline">¶</a></h1>
-<p>The <a class="reference external" href="https://openkinome.org">OpenKinome</a> initiative aims to leverage the increasingly available bioactivity data and scalable computational resources to perform kinase-centric drug design in the context of structure-informed machine learning and free energy calculations. <code class="docutils literal notranslate"><span class="pre">KinoML</span></code> is the main library supporting these efforts.</p>
-<p>Do you want to know more about OpenKinome ecosystem? Check its <a class="reference external" href="https://openkinome.org">website</a>.</p>
-<!-- Notify Sphinx about the TOC -->
-<div class="toctree-wrapper compound">
-</div>
-<div class="toctree-wrapper compound">
-</div>
-<div class="toctree-wrapper compound">
-</div>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>torch.nn.Model</dt><dd><p>The trained model (same instance as provided in parameters)</p>
+</dd>
+<dt>loss_timeseries: list of float</dt><dd><p>Cumulative loss per epoch</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>model</p>
+</dd>
+</dl>
+</dd></dl>
+</section>
 </section>
 
 
@@ -344,13 +392,26 @@
     <div class="md-footer-nav">
       <nav class="md-footer-nav__inner md-grid">
           
+            <a href="../torch_geometric_models/index.html" title="kinoml.ml.torch_geometric_models"
+               class="md-flex md-footer-nav__link md-footer-nav__link--prev"
+               rel="prev">
+              <div class="md-flex__cell md-flex__cell--shrink">
+                <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
+              </div>
+              <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+                <span class="md-flex__ellipsis">
+                  <span
+                      class="md-footer-nav__direction"> Previous </span> <code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.ml.torch_geometric_models</span></code> </span>
+              </div>
+            </a>
           
-            <a href="getting_started.html" title="Getting started"
+          
+            <a href="../torch_models/index.html" title="kinoml.ml.torch_models"
                class="md-flex md-footer-nav__link md-footer-nav__link--next"
                rel="next">
             <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title"><span
                 class="md-flex__ellipsis"> <span
-                class="md-footer-nav__direction"> Next </span> Getting started </span>
+                class="md-footer-nav__direction"> Next </span> <code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.ml.torch_models</span></code> </span>
             </div>
             <div class="md-flex__cell md-flex__cell--shrink"><i
                 class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
@@ -367,9 +428,6 @@
               &#169; Copyright 2021, OpenKinome.
               
           </div>
-            Last updated on
-              Apr 07, 2021.
-            <br/>
             Created using
             <a href="http://www.sphinx-doc.org/">Sphinx</a> 2.4.4.
              and
@@ -379,7 +437,7 @@
       </div>
     </div>
   </footer>
-  <script src="_static/javascripts/application.js"></script>
+  <script src="../../../../_static/javascripts/application.js"></script>
   <script>app.initialize({version: "1.0.4", url: {base: ".."}})</script>
   </body>
 </html>

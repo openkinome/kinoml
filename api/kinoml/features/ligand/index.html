@@ -1,0 +1,733 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="lang:clipboard.copy" content="Copy to clipboard">
+  <meta name="lang:clipboard.copied" content="Copied to clipboard">
+  <meta name="lang:search.language" content="en">
+  <meta name="lang:search.pipeline.stopwords" content="True">
+  <meta name="lang:search.pipeline.trimmer" content="True">
+  <meta name="lang:search.result.none" content="No matching documents">
+  <meta name="lang:search.result.one" content="1 matching document">
+  <meta name="lang:search.result.other" content="# matching documents">
+  <meta name="lang:search.tokenizer" content="[\s\-]+">
+
+  
+    <link href="https://fonts.gstatic.com/" rel="preconnect" crossorigin>
+    <link href="https://fonts.googleapis.com/css?family=Roboto+Mono:400,500,700|Roboto:300,400,400i,700&display=fallback" rel="stylesheet">
+
+    <style>
+      body,
+      input {
+        font-family: "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif
+      }
+
+      code,
+      kbd,
+      pre {
+        font-family: "Roboto Mono", "Courier New", Courier, monospace
+      }
+    </style>
+  
+
+  <link rel="stylesheet" href="../../../../_static/stylesheets/application.css"/>
+  <link rel="stylesheet" href="../../../../_static/stylesheets/application-palette.css"/>
+  <link rel="stylesheet" href="../../../../_static/stylesheets/application-fixes.css"/>
+  
+  <link rel="stylesheet" href="../../../../_static/fonts/material-icons.css"/>
+  
+  <meta name="theme-color" content="#3f51b5">
+  <script src="../../../../_static/javascripts/modernizr.js"></script>
+  
+  
+    <link rel="apple-touch-icon" href="../../../../_static/images/custom_favicon.png"/>
+  
+  
+    <title>kinoml.features.ligand &#8212; KinoML 0.1 documentation</title>
+    <link rel="stylesheet" href="../../../../_static/material.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/twemoji.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
+    <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/jquery.js"></script>
+    <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
+    <script src="../../../../_static/language_data.js"></script>
+    <script src="https://twemoji.maxcdn.com/v/latest/twemoji.min.js"></script>
+    <script src="../../../../_static/twemoji.js"></script>
+    <script src="../../../../_static/clipboard.min.js"></script>
+    <script src="../../../../_static/copybutton.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
+    <link rel="shortcut icon" href="../../../../_static/custom_favicon.png"/>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="kinoml.features.protein" href="../protein/index.html" />
+    <link rel="prev" title="kinoml.features.klifs" href="../klifs/index.html" />
+  
+    <link rel="apple-touch-icon" href="../../../../_static/images/custom_favicon.png"/>
+  
+   
+
+  </head>
+  <body dir=ltr
+        data-md-color-primary=#3f51b5 data-md-color-accent=blue>
+  
+  <svg class="md-svg">
+    <defs data-children-count="0">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" width="416" height="448" viewBox="0 0 416 448" id="__github"><path fill="currentColor" d="M160 304q0 10-3.125 20.5t-10.75 19T128 352t-18.125-8.5-10.75-19T96 304t3.125-20.5 10.75-19T128 256t18.125 8.5 10.75 19T160 304zm160 0q0 10-3.125 20.5t-10.75 19T288 352t-18.125-8.5-10.75-19T256 304t3.125-20.5 10.75-19T288 256t18.125 8.5 10.75 19T320 304zm40 0q0-30-17.25-51T296 232q-10.25 0-48.75 5.25Q229.5 240 208 240t-39.25-2.75Q130.75 232 120 232q-29.5 0-46.75 21T56 304q0 22 8 38.375t20.25 25.75 30.5 15 35 7.375 37.25 1.75h42q20.5 0 37.25-1.75t35-7.375 30.5-15 20.25-25.75T360 304zm56-44q0 51.75-15.25 82.75-9.5 19.25-26.375 33.25t-35.25 21.5-42.5 11.875-42.875 5.5T212 416q-19.5 0-35.5-.75t-36.875-3.125-38.125-7.5-34.25-12.875T37 371.5t-21.5-28.75Q0 312 0 260q0-59.25 34-99-6.75-20.5-6.75-42.5 0-29 12.75-54.5 27 0 47.5 9.875t47.25 30.875Q171.5 96 212 96q37 0 70 8 26.25-20.5 46.75-30.25T376 64q12.75 25.5 12.75 54.5 0 21.75-6.75 42 34 40 34 99.5z"/></svg>
+      
+    </defs>
+  </svg>
+  
+  <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer">
+  <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search">
+  <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
+  <a href="#api/kinoml/features/ligand/index" tabindex="1" class="md-skip"> Skip to content </a>
+  <header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid">
+    <div class="md-flex navheader">
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <a href="../../../../index.html" title="KinoML 0.1 documentation"
+           class="md-header-nav__button md-logo">
+          
+            <i class="md-icon">&#xe6dd</i>
+          
+        </a>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <label class="md-icon md-icon--menu md-header-nav__button" for="__drawer"></label>
+      </div>
+      <div class="md-flex__cell md-flex__cell--stretch">
+        <div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
+          <span class="md-header-nav__topic">KinoML</span>
+          <span class="md-header-nav__topic"> kinoml.features.ligand </span>
+        </div>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <label class="md-icon md-icon--search md-header-nav__button" for="__search"></label>
+        
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" action="../../../../search.html" method="GET" name="search">
+      <input type="text" class="md-search__input" name="q" placeholder="Search"
+             autocapitalize="off" autocomplete="off" spellcheck="false"
+             data-md-component="query" data-md-state="active">
+      <label class="md-icon md-search__icon" for="__search"></label>
+      <button type="reset" class="md-icon md-search__icon" data-md-component="reset" tabindex="-1">
+        &#xE5CD;
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="result">
+          <div class="md-search-result__meta">
+            Type to start searching
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+      </div>
+      
+        <div class="md-flex__cell md-flex__cell--shrink">
+          <div class="md-header-nav__source">
+            <a href="https://github.com/openkinome/kinoml/" title="Go to repository" class="md-source" data-md-source="github">
+
+    <div class="md-source__icon">
+      <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24" width="28" height="28">
+        <use xlink:href="#__github" width="24" height="24"></use>
+      </svg>
+    </div>
+  
+  <div class="md-source__repository">
+    KinoML
+  </div>
+</a>
+          </div>
+        </div>
+      
+      
+    </div>
+  </nav>
+</header>
+
+  
+  <div class="md-container">
+    
+    
+    
+  <nav class="md-tabs" data-md-component="tabs">
+    <div class="md-tabs__inner md-grid">
+      <ul class="md-tabs__list">
+            
+            <li class="md-tabs__item"><a href="../../../../index.html" class="md-tabs__link">User guide</a></li>
+            
+            <li class="md-tabs__item"><a href="../../../../developers/api_concepts.html" class="md-tabs__link">Developers</a></li>
+            
+            <li class="md-tabs__item"><a href="../../index.html" class="md-tabs__link">API Reference</a></li>
+            
+            <li class="md-tabs__item"><a href="https://openkinome.org" class="md-tabs__link">OpenKinome</a></li>
+          <li class="md-tabs__item"><a href="../../index.html" class="md-tabs__link"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml</span></code></a></li>
+          <li class="md-tabs__item"><a href="../index.html" class="md-tabs__link"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.features</span></code></a></li>
+      </ul>
+    </div>
+  </nav>
+    <main class="md-main">
+      <div class="md-main__inner md-grid" data-md-component="container">
+        
+          <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+            <div class="md-sidebar__scrollwrap">
+              <div class="md-sidebar__inner">
+                <nav class="md-nav md-nav--primary" data-md-level="0">
+  <label class="md-nav__title md-nav__title--site" for="__drawer">
+    <a href="../../../../index.html" title="KinoML 0.1 documentation" class="md-nav__button md-logo">
+      
+        <i class="md-icon">&#xe6dd</i>
+      
+    </a>
+    <a href="../../../../index.html"
+       title="KinoML 0.1 documentation">KinoML</a>
+  </label>
+    <div class="md-nav__source">
+      <a href="https://github.com/openkinome/kinoml/" title="Go to repository" class="md-source" data-md-source="github">
+
+    <div class="md-source__icon">
+      <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24" width="28" height="28">
+        <use xlink:href="#__github" width="24" height="24"></use>
+      </svg>
+    </div>
+  
+  <div class="md-source__repository">
+    KinoML
+  </div>
+</a>
+    </div>
+  
+  
+
+  
+  <ul class="md-nav__list">
+    <li class="md-nav__item">
+    
+      <span class="md-nav__link caption"><span class="caption-text">User guide</span></span>
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="../../../../getting_started.html" class="md-nav__link">Getting started</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="../../../../install.html" class="md-nav__link">Installation</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+      <span class="md-nav__link caption"><span class="caption-text">Tutorials</span></span>
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="../../../../tutorials/example.html" class="md-nav__link">Tutorial 1</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+      <span class="md-nav__link caption"><span class="caption-text">Developers</span></span>
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="../../../../developers/api_concepts.html" class="md-nav__link">Base concepts in our API</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="../../../../developers/api_docs.html" class="md-nav__link">How to write docs with Sphinx, MyST and Material Theme</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="../../index.html" class="md-nav__link">API Reference</a>
+      <ul class="md-nav__list"> 
+    <li class="md-nav__item">
+    
+    
+      <a href="../../index.html#subpackages" class="md-nav__link">Subpackages</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="../../index.html#submodules" class="md-nav__link">Submodules</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="../../index.html#package-contents" class="md-nav__link">Package Contents</a>
+      
+    
+    </li></ul>
+    
+    </li>
+  </ul>
+  
+
+</nav>
+              </div>
+            </div>
+          </div>
+          <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+            <div class="md-sidebar__scrollwrap">
+              <div class="md-sidebar__inner">
+                
+<nav class="md-nav md-nav--secondary">
+    <label class="md-nav__title" for="__toc">Contents</label>
+  <ul class="md-nav__list" data-md-scrollfix="">
+        <li class="md-nav__item"><a href="#api-kinoml-features-ligand-index--page-root" class="md-nav__link"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.features.ligand</span></code></a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#module-contents" class="md-nav__link">Module Contents</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#kinoml.features.ligand.SingleLigandFeaturizer" class="md-nav__link">SingleLigandFeaturizer</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#kinoml.features.ligand.SingleLigandFeaturizer._COMPATIBLE_LIGAND_TYPES" class="md-nav__link">_COMPATIBLE_LIGAND_TYPES</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.features.ligand.SingleLigandFeaturizer._supports" class="md-nav__link">_supports</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.features.ligand.SingleLigandFeaturizer._find_ligand" class="md-nav__link">_find_ligand</a>
+        </li></ul>
+            </nav>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.features.ligand.SmilesToLigandFeaturizer" class="md-nav__link">SmilesToLigandFeaturizer</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#kinoml.features.ligand.SmilesToLigandFeaturizer._COMPATIBLE_LIGAND_TYPES" class="md-nav__link">_COMPATIBLE_LIGAND_TYPES</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.features.ligand.SmilesToLigandFeaturizer._featurize" class="md-nav__link">_featurize</a>
+        </li></ul>
+            </nav>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.features.ligand.MorganFingerprintFeaturizer" class="md-nav__link">MorganFingerprintFeaturizer</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#kinoml.features.ligand.MorganFingerprintFeaturizer._COMPATIBLE_LIGAND_TYPES" class="md-nav__link">_COMPATIBLE_LIGAND_TYPES</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.features.ligand.MorganFingerprintFeaturizer._featurize" class="md-nav__link">_featurize</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.features.ligand.MorganFingerprintFeaturizer._featurize_ligand" class="md-nav__link">_featurize_ligand</a>
+        </li></ul>
+            </nav>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.features.ligand.OneHotSMILESFeaturizer" class="md-nav__link">OneHotSMILESFeaturizer</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#kinoml.features.ligand.OneHotSMILESFeaturizer.ALPHABET" class="md-nav__link">ALPHABET</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.features.ligand.OneHotSMILESFeaturizer._COMPATIBLE_LIGAND_TYPES" class="md-nav__link">_COMPATIBLE_LIGAND_TYPES</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.features.ligand.OneHotSMILESFeaturizer._retrieve_sequence" class="md-nav__link">_retrieve_sequence</a>
+        </li></ul>
+            </nav>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.features.ligand.OneHotRawSMILESFeaturizer" class="md-nav__link">OneHotRawSMILESFeaturizer</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#kinoml.features.ligand.OneHotRawSMILESFeaturizer._COMPATIBLE_LIGAND_TYPES" class="md-nav__link">_COMPATIBLE_LIGAND_TYPES</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.features.ligand.OneHotRawSMILESFeaturizer._retrieve_sequence" class="md-nav__link">_retrieve_sequence</a>
+        </li></ul>
+            </nav>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.features.ligand.GraphLigandFeaturizer" class="md-nav__link">GraphLigandFeaturizer</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#kinoml.features.ligand.GraphLigandFeaturizer.ALL_ATOMIC_SYMBOLS" class="md-nav__link">ALL_ATOMIC_SYMBOLS</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.features.ligand.GraphLigandFeaturizer._COMPATIBLE_LIGAND_TYPES" class="md-nav__link">_COMPATIBLE_LIGAND_TYPES</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.features.ligand.GraphLigandFeaturizer._featurize" class="md-nav__link">_featurize</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.features.ligand.GraphLigandFeaturizer._per_atom_features" class="md-nav__link">_per_atom_features</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.features.ligand.GraphLigandFeaturizer._connectivity_COO_format" class="md-nav__link">_connectivity_COO_format</a>
+        </li></ul>
+            </nav>
+        </li></ul>
+            </nav>
+        </li></ul>
+            </nav>
+        </li>
+    
+
+<li id="searchbox" class="md-nav__item"></li>
+
+  </ul>
+</nav>
+              </div>
+            </div>
+          </div>
+        
+        <div class="md-content">
+          <article class="md-content__inner md-typeset" role="main">
+            
+  <section id="module-kinoml.features.ligand">
+<span id="kinoml-features-ligand"></span><h1 id="api-kinoml-features-ligand-index--page-root"><a class="reference internal" href="#api-kinoml-features-ligand-index--page-root" title="kinoml.features.ligand"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.features.ligand</span></code></a><a class="headerlink" href="#api-kinoml-features-ligand-index--page-root" title="Permalink to this headline">¶</a></h1>
+<p>Featurizers that mostly concern ligand-based models</p>
+<section id="module-contents">
+<h2 id="module-contents">Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="kinoml.features.ligand.SingleLigandFeaturizer">
+<em class="property">class </em><code class="sig-prename descclassname">kinoml.features.ligand.</code><code class="sig-name descname">SingleLigandFeaturizer</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.ligand.SingleLigandFeaturizer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../core/index.html#kinoml.features.core.BaseFeaturizer" title="kinoml.features.core.BaseFeaturizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.features.core.BaseFeaturizer</span></code></a></p>
+<p>Provides a minimally useful <code class="docutils literal notranslate"><span class="pre">._supports()</span></code> method for all Ligand-like featurizers.</p>
+<dl class="attribute">
+<dt id="kinoml.features.ligand.SingleLigandFeaturizer._COMPATIBLE_LIGAND_TYPES">
+<code class="sig-name descname">_COMPATIBLE_LIGAND_TYPES</code><a class="headerlink" href="#kinoml.features.ligand.SingleLigandFeaturizer._COMPATIBLE_LIGAND_TYPES" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="method">
+<dt id="kinoml.features.ligand.SingleLigandFeaturizer._supports">
+<code class="sig-name descname">_supports</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">system: System</em><span class="sig-paren">)</span> → bool<a class="headerlink" href="#kinoml.features.ligand.SingleLigandFeaturizer._supports" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check that exactly one ligand is present in the System</p>
+</dd></dl>
+<dl class="method">
+<dt id="kinoml.features.ligand.SingleLigandFeaturizer._find_ligand">
+<code class="sig-name descname">_find_ligand</code><span class="sig-paren">(</span><em class="sig-param">self, system_or_ligand: Union[System, BaseLigand], type_=None</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.ligand.SingleLigandFeaturizer._find_ligand" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find a ligand-like component in the input object given
+to the featurizer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>system_or_ligand</strong> – The input object to be featurized. It can be either a
+<code class="docutils literal notranslate"><span class="pre">System</span></code>, in which case we will look for ligand-like
+objects in the components list or in the featurizations
+dictionary. It can also be a <code class="docutils literal notranslate"><span class="pre">Ligand</span></code>-like object,
+which will be returned immediately.</p></li>
+<li><p><strong>type_</strong> (<em>type</em><em> or </em><em>tuple of types</em><em>, </em><em>optional</em>) – Check for specific subtypes of ligand objects. Some
+featurizers only accept Smiles, some only RDKit molecules,
+etc. By default, it will check against the class attribute
+<code class="docutils literal notranslate"><span class="pre">_COMPATIBLE_LIGAND_TYPES</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+</dd></dl>
+<dl class="class">
+<dt id="kinoml.features.ligand.SmilesToLigandFeaturizer">
+<em class="property">class </em><code class="sig-prename descclassname">kinoml.features.ligand.</code><code class="sig-name descname">SmilesToLigandFeaturizer</code><span class="sig-paren">(</span><em class="sig-param">ligand_type: str = 'rdkit'</em>, <em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.ligand.SmilesToLigandFeaturizer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#kinoml.features.ligand.SingleLigandFeaturizer" title="kinoml.features.ligand.SingleLigandFeaturizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.features.ligand.SingleLigandFeaturizer</span></code></a></p>
+<p>Given a <code class="docutils literal notranslate"><span class="pre">System</span></code> containing a <code class="docutils literal notranslate"><span class="pre">SmilesLigand</span></code> type,
+promote it to either <code class="docutils literal notranslate"><span class="pre">RDKitLigand</span></code> or <code class="docutils literal notranslate"><span class="pre">OpenForceFieldLigand</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>ligand_type</strong> (<em>str</em><em>, </em><em>optional=rdkit</em>) – If <code class="docutils literal notranslate"><span class="pre">openforcefield</span></code>, returns <code class="docutils literal notranslate"><span class="pre">OpenForceFieldLigand</span></code>.
+If <code class="docutils literal notranslate"><span class="pre">rdkit</span></code>, returns <code class="docutils literal notranslate"><span class="pre">RDKitLigand</span></code>.</p>
+</dd>
+</dl>
+<dl class="attribute">
+<dt id="kinoml.features.ligand.SmilesToLigandFeaturizer._COMPATIBLE_LIGAND_TYPES">
+<code class="sig-name descname">_COMPATIBLE_LIGAND_TYPES</code><a class="headerlink" href="#kinoml.features.ligand.SmilesToLigandFeaturizer._COMPATIBLE_LIGAND_TYPES" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="method">
+<dt id="kinoml.features.ligand.SmilesToLigandFeaturizer._featurize">
+<code class="sig-name descname">_featurize</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">system: System</em><span class="sig-paren">)</span> → Union[RDKitLigand, OpenForceFieldLigand]<a class="headerlink" href="#kinoml.features.ligand.SmilesToLigandFeaturizer._featurize" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">RDKitLigand</span></code> or <code class="docutils literal notranslate"><span class="pre">OpenForceFieldLigand</span></code> object</p>
+</dd>
+</dl>
+</dd></dl>
+</dd></dl>
+<dl class="class">
+<dt id="kinoml.features.ligand.MorganFingerprintFeaturizer">
+<em class="property">class </em><code class="sig-prename descclassname">kinoml.features.ligand.</code><code class="sig-name descname">MorganFingerprintFeaturizer</code><span class="sig-paren">(</span><em class="sig-param">radius: int = 2</em>, <em class="sig-param">nbits: int = 512</em>, <em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.ligand.MorganFingerprintFeaturizer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#kinoml.features.ligand.SingleLigandFeaturizer" title="kinoml.features.ligand.SingleLigandFeaturizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.features.ligand.SingleLigandFeaturizer</span></code></a></p>
+<p>Given a <code class="docutils literal notranslate"><span class="pre">System</span></code> containing one <code class="docutils literal notranslate"><span class="pre">OpenForceFieldLikeLigand</span></code>
+component, convert it to RDKit molecule and generate
+the Morgan fingerprints bitvectors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>radius</strong> (<em>int</em><em>, </em><em>optional=2</em>) – Morgan fingerprint neighborhood radius</p></li>
+<li><p><strong>nbits</strong> (<em>int</em><em>, </em><em>optional=512</em>) – Length of the resulting bit vector</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="attribute">
+<dt id="kinoml.features.ligand.MorganFingerprintFeaturizer._COMPATIBLE_LIGAND_TYPES">
+<code class="sig-name descname">_COMPATIBLE_LIGAND_TYPES</code><a class="headerlink" href="#kinoml.features.ligand.MorganFingerprintFeaturizer._COMPATIBLE_LIGAND_TYPES" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="method">
+<dt id="kinoml.features.ligand.MorganFingerprintFeaturizer._featurize">
+<code class="sig-name descname">_featurize</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">system: System</em><span class="sig-paren">)</span> → np.ndarray<a class="headerlink" href="#kinoml.features.ligand.MorganFingerprintFeaturizer._featurize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implement this method to do the actual work for <cite>self.featurize()</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>system</strong> (<a class="reference internal" href="../../core/systems/index.html#kinoml.core.systems.System" title="kinoml.core.systems.System"><em>System</em></a>) – The System to be featurized. Sometimes it will</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="method">
+<dt id="kinoml.features.ligand.MorganFingerprintFeaturizer._featurize_ligand">
+<code class="sig-name descname">_featurize_ligand</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">ligand: rdkit.Chem.Mol</em><span class="sig-paren">)</span> → np.ndarray<a class="headerlink" href="#kinoml.features.ligand.MorganFingerprintFeaturizer._featurize_ligand" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+</dd></dl>
+<dl class="class">
+<dt id="kinoml.features.ligand.OneHotSMILESFeaturizer">
+<em class="property">class </em><code class="sig-prename descclassname">kinoml.features.ligand.</code><code class="sig-name descname">OneHotSMILESFeaturizer</code><span class="sig-paren">(</span><em class="sig-param">dictionary: dict = None</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.ligand.OneHotSMILESFeaturizer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../core/index.html#kinoml.features.core.BaseOneHotEncodingFeaturizer" title="kinoml.features.core.BaseOneHotEncodingFeaturizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.features.core.BaseOneHotEncodingFeaturizer</span></code></a>, <a class="reference internal" href="#kinoml.features.ligand.SingleLigandFeaturizer" title="kinoml.features.ligand.SingleLigandFeaturizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.features.ligand.SingleLigandFeaturizer</span></code></a></p>
+<p>One-hot encodes a <code class="docutils literal notranslate"><span class="pre">Ligand</span></code> from a canonical SMILES representation.</p>
+<dl class="attribute">
+<dt id="kinoml.features.ligand.OneHotSMILESFeaturizer.ALPHABET">
+<code class="sig-name descname">ALPHABET</code><a class="headerlink" href="#kinoml.features.ligand.OneHotSMILESFeaturizer.ALPHABET" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the character-integer mapping (as a sequence)
+of the one-hot encoding.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="attribute">
+<dt id="kinoml.features.ligand.OneHotSMILESFeaturizer._COMPATIBLE_LIGAND_TYPES">
+<code class="sig-name descname">_COMPATIBLE_LIGAND_TYPES</code><a class="headerlink" href="#kinoml.features.ligand.OneHotSMILESFeaturizer._COMPATIBLE_LIGAND_TYPES" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="attribute">
+<dt>
+<code class="sig-name descname">ALPHABET</code><em class="property"> = BCFHIKNOPSUVWYacegilnosru-=#1234567890.*()/+@:[]%\LR$</em></dt>
+<dd></dd></dl>
+<dl class="method">
+<dt id="kinoml.features.ligand.OneHotSMILESFeaturizer._retrieve_sequence">
+<code class="sig-name descname">_retrieve_sequence</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">system: System</em><span class="sig-paren">)</span> → str<a class="headerlink" href="#kinoml.features.ligand.OneHotSMILESFeaturizer._retrieve_sequence" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get SMILES string from a <cite>Ligand</cite>-like component and postprocesses it.</p>
+<p>Double element symbols (such as <cite>Cl</cite>, <code class="docutils literal notranslate"><span class="pre">Br</span></code> for atoms and <code class="docutils literal notranslate"><span class="pre">@@</span></code> for chirality)
+are replaced with single element symbols (<cite>L</cite>, <code class="docutils literal notranslate"><span class="pre">R</span></code> and <code class="docutils literal notranslate"><span class="pre">$</span></code> respectively).</p>
+</dd></dl>
+</dd></dl>
+<dl class="class">
+<dt id="kinoml.features.ligand.OneHotRawSMILESFeaturizer">
+<em class="property">class </em><code class="sig-prename descclassname">kinoml.features.ligand.</code><code class="sig-name descname">OneHotRawSMILESFeaturizer</code><span class="sig-paren">(</span><em class="sig-param">dictionary: dict = None</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.ligand.OneHotRawSMILESFeaturizer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#kinoml.features.ligand.OneHotSMILESFeaturizer" title="kinoml.features.ligand.OneHotSMILESFeaturizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.features.ligand.OneHotSMILESFeaturizer</span></code></a></p>
+<p>Like <code class="docutils literal notranslate"><span class="pre">OneHotSMILESFeaturizer</span></code>, but instead of using <code class="docutils literal notranslate"><span class="pre">ligand.to_smiles()</span></code>
+to obtain the canonical SMILES from the ligand, it relies on the stored <code class="docutils literal notranslate"><span class="pre">metadata</span></code>
+provenance information (most possibly the original SMILES contained in the dataset).</p>
+<p>This should only be used for debugging purposes.</p>
+<dl class="attribute">
+<dt id="kinoml.features.ligand.OneHotRawSMILESFeaturizer._COMPATIBLE_LIGAND_TYPES">
+<code class="sig-name descname">_COMPATIBLE_LIGAND_TYPES</code><a class="headerlink" href="#kinoml.features.ligand.OneHotRawSMILESFeaturizer._COMPATIBLE_LIGAND_TYPES" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="method">
+<dt id="kinoml.features.ligand.OneHotRawSMILESFeaturizer._retrieve_sequence">
+<code class="sig-name descname">_retrieve_sequence</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">system: System</em><span class="sig-paren">)</span> → str<a class="headerlink" href="#kinoml.features.ligand.OneHotRawSMILESFeaturizer._retrieve_sequence" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get SMILES string from a <cite>Ligand</cite>-like component and postprocesses it.</p>
+<p>Double element symbols (such as <cite>Cl</cite>, <code class="docutils literal notranslate"><span class="pre">Br</span></code> for atoms and <code class="docutils literal notranslate"><span class="pre">@@</span></code> for chirality)
+are replaced with single element symbols (<cite>L</cite>, <code class="docutils literal notranslate"><span class="pre">R</span></code> and <code class="docutils literal notranslate"><span class="pre">$</span></code> respectively).</p>
+</dd></dl>
+</dd></dl>
+<dl class="class">
+<dt id="kinoml.features.ligand.GraphLigandFeaturizer">
+<em class="property">class </em><code class="sig-prename descclassname">kinoml.features.ligand.</code><code class="sig-name descname">GraphLigandFeaturizer</code><span class="sig-paren">(</span><em class="sig-param">per_atom_features: callable = None</em>, <em class="sig-param">max_in_ring_size: int = 10</em>, <em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.ligand.GraphLigandFeaturizer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#kinoml.features.ligand.SingleLigandFeaturizer" title="kinoml.features.ligand.SingleLigandFeaturizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.features.ligand.SingleLigandFeaturizer</span></code></a></p>
+<p>Creates a graph representation of a <cite>Ligand</cite>-like component.
+Each node (atom) is decorated with several RDKit descriptors</p>
+<p>Check <code class="docutils literal notranslate"><span class="pre">`self._per_atom_features`</span></code> for details.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>per_atom_features</strong> (<em>callable</em>) – function that takes a <code class="docutils literal notranslate"><span class="pre">RDKit.Chem.Atom</span></code> object
+and returns a number of features. It defaults to the internal
+<code class="docutils literal notranslate"><span class="pre">._per_atom_features</span></code> method.</p></li>
+<li><p><strong>max_in_ring_size</strong> (<em>int</em><em>, </em><em>optional=10</em>) – Maximum ring size for testing whether an atom belongs to a
+ring or not.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="attribute">
+<dt id="kinoml.features.ligand.GraphLigandFeaturizer.ALL_ATOMIC_SYMBOLS">
+<code class="sig-name descname">ALL_ATOMIC_SYMBOLS</code><em class="property"> = ['C', 'N', 'O', 'S', 'F', 'Si', 'P', 'Cl', 'Br', 'Mg', 'Na', 'Ca', 'Fe', 'As', 'Al', 'I', 'B', 'V', 'K', 'Tl', 'Yb', 'Sb', 'Sn', 'Ag', 'Pd', 'Co', 'Se', 'Ti', 'Zn', 'H', 'Li', 'Ge', 'Cu', 'Au', 'Ni', 'Cd', 'In', 'Mn', 'Zr', 'Cr', 'Pt', 'Hg', 'Pb', 'Unknown']</em><a class="headerlink" href="#kinoml.features.ligand.GraphLigandFeaturizer.ALL_ATOMIC_SYMBOLS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="attribute">
+<dt id="kinoml.features.ligand.GraphLigandFeaturizer._COMPATIBLE_LIGAND_TYPES">
+<code class="sig-name descname">_COMPATIBLE_LIGAND_TYPES</code><a class="headerlink" href="#kinoml.features.ligand.GraphLigandFeaturizer._COMPATIBLE_LIGAND_TYPES" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="method">
+<dt id="kinoml.features.ligand.GraphLigandFeaturizer._featurize">
+<code class="sig-name descname">_featurize</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">system: System</em><span class="sig-paren">)</span> → tuple<a class="headerlink" href="#kinoml.features.ligand.GraphLigandFeaturizer._featurize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Featurizes ligands contained in a System as a labeled graph.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><p>A two-tuple with:</p>
+<ul class="simple">
+<li><p>Graph connectivity of the molecule with shape <code class="docutils literal notranslate"><span class="pre">(2,</span> <span class="pre">n_edges)</span></code></p></li>
+<li><p>Feature matrix with shape <code class="docutils literal notranslate"><span class="pre">(n_atoms,</span> <span class="pre">n_features)</span></code></p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="method">
+<dt id="kinoml.features.ligand.GraphLigandFeaturizer._per_atom_features">
+<em class="property">static </em><code class="sig-name descname">_per_atom_features</code><span class="sig-paren">(</span><em class="sig-param">atom</em>, <em class="sig-param">max_in_ring_size: int = 10</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.ligand.GraphLigandFeaturizer._per_atom_features" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes desired features for each atom in the molecular graph.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>atom</strong> (<em>atom to extract features from</em>) – </p></li>
+<li><p><strong>max_in_ring_size</strong> (<em>whether the atom belongs to a ring of this size</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>atomic_number<span class="classifier">int</span></dt><dd><p>the atomic number.</p>
+</dd>
+<dt>atomic_symbol<span class="classifier">array</span></dt><dd><p>the one-hot encoded atomic symbol from <cite>ALL_ATOMIC_SYMBOLS</cite>.</p>
+</dd>
+<dt>degree<span class="classifier">int</span></dt><dd><p>the degree of the atom in the molecule (number of neighbors).</p>
+</dd>
+<dt>total_degree<span class="classifier">int</span></dt><dd><p>the degree of the atom in the molecule including hydrogens.</p>
+</dd>
+<dt>explicit_valence<span class="classifier">int</span></dt><dd><p>the explicit valence of the atom.</p>
+</dd>
+<dt>implicit_valence<span class="classifier">int</span></dt><dd><p>the number of implicit Hs on the atom.</p>
+</dd>
+<dt>total_valence<span class="classifier">int</span></dt><dd><p>the total valence (explicit + implicit) of the atom.</p>
+</dd>
+<dt>atomic_mass<span class="classifier">float</span></dt><dd><p>the atomic mass.</p>
+</dd>
+<dt>formal_charge<span class="classifier">int</span></dt><dd><p>the formal charge of atom.</p>
+</dd>
+<dt>explicit_h<span class="classifier">int</span></dt><dd><p>the number of explicit hydrogens.</p>
+</dd>
+<dt>implicit_h<span class="classifier">int</span></dt><dd><p>the total number of implicit hydrogens on the atom.</p>
+</dd>
+<dt>total_h<span class="classifier">int</span></dt><dd><p>the total number of Hs (explicit and implicit) on the atom.</p>
+</dd>
+<dt>ring<span class="classifier">bool</span></dt><dd><p>if the atom is part of a ring.</p>
+</dd>
+<dt>ring_size<span class="classifier">array</span></dt><dd><p>if the atom if part of a ring of size determined by range(3, <code class="docutils literal notranslate"><span class="pre">max_in_ring_size</span></code> + 1).</p>
+</dd>
+<dt>aromatic<span class="classifier">bool</span></dt><dd><p>if atom is aromatic</p>
+</dd>
+<dt>radical_electrons<span class="classifier">int</span></dt><dd><p>number of radical electrons</p>
+</dd>
+<dt>hybridization_type<span class="classifier">array</span></dt><dd><p>the one-hot encoded hybridization type from
+<code class="docutils literal notranslate"><span class="pre">rdkit.Chem.rdchem.HybridizationType</span></code>.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>tuple of atomic features (all 17 included by default)</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="method">
+<dt id="kinoml.features.ligand.GraphLigandFeaturizer._connectivity_COO_format">
+<em class="property">static </em><code class="sig-name descname">_connectivity_COO_format</code><span class="sig-paren">(</span><em class="sig-param">mol: rdkit.Chem.rdchem.Mol</em><span class="sig-paren">)</span> → np.array<a class="headerlink" href="#kinoml.features.ligand.GraphLigandFeaturizer._connectivity_COO_format" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the connectivity of the molecular graph in COO format.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>mol</strong> (<em>rdkit.Chem.Mol</em>) – rdkit molecule to extract bonds from</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>graph connectivity in COO format with shape <code class="docutils literal notranslate"><span class="pre">[2,</span> <span class="pre">num_edges]</span></code></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>array</p>
+</dd>
+</dl>
+</dd></dl>
+</dd></dl>
+</section>
+</section>
+
+
+          </article>
+        </div>
+      </div>
+    </main>
+  </div>
+  <footer class="md-footer">
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid">
+          
+            <a href="../klifs/index.html" title="kinoml.features.klifs"
+               class="md-flex md-footer-nav__link md-footer-nav__link--prev"
+               rel="prev">
+              <div class="md-flex__cell md-flex__cell--shrink">
+                <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
+              </div>
+              <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+                <span class="md-flex__ellipsis">
+                  <span
+                      class="md-footer-nav__direction"> Previous </span> <code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.features.klifs</span></code> </span>
+              </div>
+            </a>
+          
+          
+            <a href="../protein/index.html" title="kinoml.features.protein"
+               class="md-flex md-footer-nav__link md-footer-nav__link--next"
+               rel="next">
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title"><span
+                class="md-flex__ellipsis"> <span
+                class="md-footer-nav__direction"> Next </span> <code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.features.protein</span></code> </span>
+            </div>
+            <div class="md-flex__cell md-flex__cell--shrink"><i
+                class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
+            </div>
+          
+        </a>
+        
+      </nav>
+    </div>
+    <div class="md-footer-meta md-typeset">
+      <div class="md-footer-meta__inner md-grid">
+        <div class="md-footer-copyright">
+          <div class="md-footer-copyright__highlight">
+              &#169; Copyright 2021, OpenKinome.
+              
+          </div>
+            Created using
+            <a href="http://www.sphinx-doc.org/">Sphinx</a> 2.4.4.
+             and
+            <a href="https://github.com/bashtage/sphinx-material/">Material for
+              Sphinx</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+  <script src="../../../../_static/javascripts/application.js"></script>
+  <script>app.initialize({version: "1.0.4", url: {base: ".."}})</script>
+  </body>
+</html>
