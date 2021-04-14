@@ -12,6 +12,7 @@ from ..core.ligands import FileLigand, SmilesLigand
 from ..core.proteins import FileProtein, PDBProtein
 from ..core.sequences import KinaseDomainAminoAcidSequence
 from ..core.systems import ProteinLigandComplex
+from ..datasets.core import DatasetProvider
 
 
 class OEHybridDockingFeaturizer(BaseFeaturizer):
@@ -38,7 +39,9 @@ class OEHybridDockingFeaturizer(BaseFeaturizer):
     _SUPPORTED_TYPES = (ProteinLigandComplex,)
 
     @lru_cache(maxsize=100)
-    def _featurize(self, system: ProteinLigandComplex) -> ProteinLigandComplex:
+    def _featurize(
+        self, system: ProteinLigandComplex, dataset: DatasetProvider, inplace: bool = True
+    ) -> ProteinLigandComplex:
         """
         Perform hybrid docking with the OpenEye toolkit and thoughtful defaults.
 
@@ -46,6 +49,12 @@ class OEHybridDockingFeaturizer(BaseFeaturizer):
         ----------
         system: ProteinLigandComplex
             A system object holding protein and ligand information.
+        dataset : DatasetProvider
+            The full DatasetProvider which the System belongs to. Useful
+            if the featurizer needs to compute a global property (e.g.
+            one-hot encoding needs the maximum length)
+        inplace: bool, optional
+            Whether to modify the System directly or operate on a copy.
 
         Returns
         -------
@@ -472,7 +481,7 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
     _SUPPORTED_TYPES = (ProteinLigandComplex,)
 
     @lru_cache(maxsize=100)
-    def _featurize(self, system: ProteinLigandComplex) -> ProteinLigandComplex:
+    def _featurize(self, system: ProteinLigandComplex, dataset) -> ProteinLigandComplex:
         """
         Perform hybrid docking in kinases using the OpenEye toolkit, the KLIFS database and thoughtful defaults.
         Parameters

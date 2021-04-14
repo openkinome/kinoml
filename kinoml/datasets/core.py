@@ -166,7 +166,9 @@ class DatasetProvider(BaseDatasetProvider):
         with multiprocessing.Pool(processes=processes) as pool:
             new_featurizations = list(
                 tqdm(
-                    pool.imap(self._featurize_one, ((featurizers, s) for s in systems), chunksize),
+                    pool.imap(
+                        self._featurize_one, ((featurizers, s, self) for s in systems), chunksize
+                    ),
                     total=len(systems),
                 )
             )
@@ -184,11 +186,11 @@ class DatasetProvider(BaseDatasetProvider):
         return systems
 
     @staticmethod
-    def _featurize_one(featurizers_and_system):
-        featurizers, system = featurizers_and_system
+    def _featurize_one(featurizers_and_system_and_dataset):
+        featurizers, system, dataset = featurizers_and_system_and_dataset
         try:
             for featurizer in featurizers:
-                featurizer.featurize(system, inplace=True)
+                featurizer.featurize(system, dataset=dataset, inplace=True)
             system.featurizations["last"] = system.featurizations[featurizers[-1].name]
         except Exception as exc:  # TODO probably not ideal
             system.featurizations["failed"] = [featurizers, exc]

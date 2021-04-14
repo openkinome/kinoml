@@ -7,6 +7,8 @@ and `._supports`, if needed.
 """
 from __future__ import annotations
 from copy import deepcopy
+from ..datasets.core import DatasetProvider
+from ..core.systems import System
 from typing import Hashable, Iterable, Union
 import hashlib
 
@@ -25,7 +27,7 @@ class BaseFeaturizer:
     def __init__(self, *args, **kwargs):
         pass
 
-    def featurize(self, system, inplace: bool = True) -> object:
+    def featurize(self, system: System, dataset: DatasetProvider, inplace: bool = True) -> object:
         """
         Given an system (compatible with ``_SUPPORTED_TYPES``), apply
         the featurization scheme implemented in this class.
@@ -34,6 +36,10 @@ class BaseFeaturizer:
         ----------
         system : System
             This is System object that will be transformed
+        dataset : DatasetProvider
+            The full DatasetProvider which the System belongs to. Useful
+            if the featurizer needs to compute a global property (e.g.
+            one-hot encoding needs the maximum length)
         inplace: bool, optional
             Whether to modify the System directly or operate on a copy.
 
@@ -48,7 +54,7 @@ class BaseFeaturizer:
         if not inplace:
             system = deepcopy(system)
         self.supports(system)
-        features = self._featurize(system)
+        features = self._featurize(system, dataset)
         # TODO: Define self.id() to provide a unique key per class name and chosen init args
         system.featurizations[self.name] = features
         return system
@@ -60,7 +66,7 @@ class BaseFeaturizer:
         """
         return self.featurize(*args, **kwargs)
 
-    def _featurize(self, system: System) -> object:
+    def _featurize(self, system: System, dataset: DatasetProvider, inplace: bool = True) -> object:
         """
         Implement this method to do the actual work for `self.featurize()`.
 
@@ -134,9 +140,9 @@ class Pipeline(BaseFeaturizer):
     def __init__(self, featurizers: Iterable[BaseFeaturizer]):
         self.featurizers = featurizers
 
-    def _featurize(self, system_or_array):
+    def _featurize(self, system_or_array, dataset: DatasetProvider, inplace: bool = True):
         for featurizer in self.featurizers:
-            system_or_array = featurizer._featurize(system_or_array)
+            system_or_array = featurizer._featurize(system_or_array, dataset)
         return system_or_array
 
     def supports(self, *systems: System, raise_errors: bool = False) -> bool:
@@ -187,7 +193,7 @@ class Concatenated(Pipeline):
         self.featurizers = featurizers
         self.axis = axis
 
-    def _featurize(self, system_or_array):
+    def _featurize(self, system_or_array, dataset: DatasetProvider, inplace: bool = True):
         features = [f._featurize(system_or_array) for f in self.featurizers]
         return np.concatenate(features, axis=self.axis)
 
@@ -202,7 +208,7 @@ class BaseOneHotEncodingFeaturizer(BaseFeaturizer):
         if not self.dictionary:
             raise ValueError("This featurizer requires a populated dictionary!")
 
-    def _featurize(self, system: System):
+    def _featurize(self, system: System, dataset: DatasetProvider, inplace: bool = True):
         sequence = self._retrieve_sequence(system)
         return self.one_hot_encode(sequence, self.dictionary)
 
@@ -256,7 +262,12 @@ class PadFeaturizer(BaseFeaturizer):
         self.key = key
         self.pad_with = pad_with
 
-    def _featurize(self, system_or_array: Union[System, np.ndarray]) -> np.ndarray:
+    def _featurize(
+        self,
+        system_or_array: Union[System, np.ndarray],
+        dataset: DatasetProvider,
+        inplace: bool = True,
+    ) -> np.ndarray:
         if hasattr(system_or_array, "featurizations"):
             arraylike = np.asarray(system_or_array.featurizations[self.key])
         else:
@@ -288,7 +299,7 @@ class HashFeaturizer(BaseFeaturizer):
         self.attributes = attributes
         self.normalize = normalize
 
-    def _featurize(self, system):
+    def _featurize(self, system: System, dataset: DatasetProvider, inplace: bool = True):
         """
         Featurizes a component using the hash of the chosen attribute.
 
@@ -306,7 +317,7 @@ class HashFeaturizer(BaseFeaturizer):
 
 
 class NullFeaturizer(BaseFeaturizer):
-    def featurize(self, system, inplace: bool = True) -> object:
+    def featurize(self, system: System, dataset: DatasetProvider, inplace: bool = True) -> object:
         return system
 
 
@@ -319,7 +330,12 @@ class ScaleFeaturizer(BaseFeaturizer):
         self.key = key
         self.sklearn_options = kwargs
 
-    def _featurize(self, system_or_array: Union[System, np.ndarray]) -> np.ndarray:
+    def _featurize(
+        self,
+        system_or_array: Union[System, np.ndarray],
+        dataset: DatasetProvider,
+        inplace: bool = True,
+    ) -> np.ndarray:
         from sklearn.preprocessing import scale
 
         if hasattr(system_or_array, "featurizations"):

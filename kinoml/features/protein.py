@@ -8,6 +8,7 @@ from collections import Counter
 from .core import BaseFeaturizer, BaseOneHotEncodingFeaturizer
 from ..core.systems import System
 from ..core.proteins import AminoAcidSequence
+from ..datasets.core import DatasetProvider
 
 
 class AminoAcidCompositionFeaturizer(BaseFeaturizer):
@@ -22,13 +23,15 @@ class AminoAcidCompositionFeaturizer(BaseFeaturizer):
     for k in _counter.keys():
         _counter[k] = 0
 
-    def _featurize(self, system: System) -> np.array:
+    def _featurize(
+        self, system: System, dataset: DatasetProvider, inplace: bool = True
+    ) -> np.array:
         """
         Featurizes a protein using the residue count in the sequence
 
         Parameters
         ----------
-        system: System
+        system : System
 
         Returns
         -------

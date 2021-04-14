@@ -10,6 +10,7 @@ import numpy as np
 import rdkit
 
 from .core import BaseFeaturizer, BaseOneHotEncodingFeaturizer
+from ..datasets.core import DatasetProvider
 from ..core.systems import System
 from ..core.ligands import (
     BaseLigand,
@@ -103,7 +104,9 @@ class SmilesToLigandFeaturizer(SingleLigandFeaturizer):
             )
 
     @lru_cache(maxsize=1000)
-    def _featurize(self, system: System) -> Union[RDKitLigand, OpenForceFieldLigand]:
+    def _featurize(
+        self, system: System, dataset: DatasetProvider, inplace: bool = True
+    ) -> Union[RDKitLigand, OpenForceFieldLigand]:
         """
         Returns
         -------
@@ -134,7 +137,9 @@ class MorganFingerprintFeaturizer(SingleLigandFeaturizer):
         self.radius = radius
         self.nbits = nbits
 
-    def _featurize(self, system: System) -> np.ndarray:
+    def _featurize(
+        self, system: System, dataset: DatasetProvider, inplace: bool = True
+    ) -> np.ndarray:
         ligand = self._find_ligand(system).to_rdkit()
         return self._featurize_ligand(ligand)
 
@@ -281,7 +286,7 @@ class GraphLigandFeaturizer(SingleLigandFeaturizer):
         self.max_in_ring_size = max_in_ring_size
 
     @lru_cache(maxsize=1000)
-    def _featurize(self, system: System) -> tuple:
+    def _featurize(self, system: System, dataset: DatasetProvider, inplace: bool = True) -> tuple:
         """
         Featurizes ligands contained in a System as a labeled graph.
 
