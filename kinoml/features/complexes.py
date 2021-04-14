@@ -481,13 +481,23 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
     _SUPPORTED_TYPES = (ProteinLigandComplex,)
 
     @lru_cache(maxsize=100)
-    def _featurize(self, system: ProteinLigandComplex, dataset) -> ProteinLigandComplex:
+    def _featurize(
+        self, system: ProteinLigandComplex, dataset: DatasetProvider, inplace: bool = True
+    ) -> ProteinLigandComplex:
         """
         Perform hybrid docking in kinases using the OpenEye toolkit, the KLIFS database and thoughtful defaults.
+
         Parameters
         ----------
         system: ProteinLigandComplex
             A system object holding protein and ligand information.
+        dataset : DatasetProvider
+            The full DatasetProvider which the System belongs to. Useful
+            if the featurizer needs to compute a global property (e.g.
+            one-hot encoding needs the maximum length)
+        inplace: bool, optional
+            Whether to modify the System directly or operate on a copy.
+
         Returns
         -------
         protein_ligand_complex: ProteinLigandComplex

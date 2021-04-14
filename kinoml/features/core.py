@@ -74,6 +74,12 @@ class BaseFeaturizer:
         ----------
         system: System
             The System to be featurized. Sometimes it will
+        dataset : DatasetProvider
+            The full DatasetProvider which the System belongs to. Useful
+            if the featurizer needs to compute a global property (e.g.
+            one-hot encoding needs the maximum length)
+        inplace: bool, optional
+            Whether to modify the System directly or operate on a copy.
         """
         raise NotImplementedError("Implement in your subclass")
 
@@ -141,6 +147,22 @@ class Pipeline(BaseFeaturizer):
         self.featurizers = featurizers
 
     def _featurize(self, system_or_array, dataset: DatasetProvider, inplace: bool = True):
+        """
+        Given a list of featurizers, apply them sequentially
+        on the systems/arrays (e.g. featurizer A returns X, and X is
+        taken by featurizer B, which returns Y).
+
+        Parameters
+        ----------
+        system: System
+            The System to be featurized. Sometimes it will
+        dataset : DatasetProvider
+            The full DatasetProvider which the System belongs to. Useful
+            if the featurizer needs to compute a global property (e.g.
+            one-hot encoding needs the maximum length)
+        inplace: bool, optional
+            Whether to modify the System directly or operate on a copy.
+        """
         for featurizer in self.featurizers:
             system_or_array = featurizer._featurize(system_or_array, dataset)
         return system_or_array
@@ -176,7 +198,7 @@ class Pipeline(BaseFeaturizer):
 
 class Concatenated(Pipeline):
     """
-    Given a list of featurizers, apply them sequentially and concatenate
+    Given a list of featurizers, apply them serially and concatenate
     the result (e.g. featurizer A returns X, and featurizer B returns Y;
     the output is XY).
 
@@ -194,6 +216,22 @@ class Concatenated(Pipeline):
         self.axis = axis
 
     def _featurize(self, system_or_array, dataset: DatasetProvider, inplace: bool = True):
+        """
+        Given a list of featurizers, apply them serially and concatenate
+        the result (e.g. featurizer A returns X, and featurizer B returns Y;
+        the output is XY).
+
+        Parameters
+        ----------
+        system: System
+            The System to be featurized. Sometimes it will
+        dataset : DatasetProvider
+            The full DatasetProvider which the System belongs to. Useful
+            if the featurizer needs to compute a global property (e.g.
+            one-hot encoding needs the maximum length)
+        inplace: bool, optional
+            Whether to modify the System directly or operate on a copy.
+        """
         features = [f._featurize(system_or_array) for f in self.featurizers]
         return np.concatenate(features, axis=self.axis)
 
@@ -209,6 +247,18 @@ class BaseOneHotEncodingFeaturizer(BaseFeaturizer):
             raise ValueError("This featurizer requires a populated dictionary!")
 
     def _featurize(self, system: System, dataset: DatasetProvider, inplace: bool = True):
+        """
+        Parameters
+        ----------
+        system: System
+            The System to be featurized. Sometimes it will
+        dataset : DatasetProvider
+            The full DatasetProvider which the System belongs to. Useful
+            if the featurizer needs to compute a global property (e.g.
+            one-hot encoding needs the maximum length)
+        inplace: bool, optional
+            Whether to modify the System directly or operate on a copy.
+        """
         sequence = self._retrieve_sequence(system)
         return self.one_hot_encode(sequence, self.dictionary)
 
@@ -268,6 +318,18 @@ class PadFeaturizer(BaseFeaturizer):
         dataset: DatasetProvider,
         inplace: bool = True,
     ) -> np.ndarray:
+        """
+        Parameters
+        ----------
+        system: System
+            The System to be featurized. Sometimes it will
+        dataset : DatasetProvider
+            The full DatasetProvider which the System belongs to. Useful
+            if the featurizer needs to compute a global property (e.g.
+            one-hot encoding needs the maximum length)
+        inplace: bool, optional
+            Whether to modify the System directly or operate on a copy.
+        """
         if hasattr(system_or_array, "featurizations"):
             arraylike = np.asarray(system_or_array.featurizations[self.key])
         else:
@@ -303,7 +365,20 @@ class HashFeaturizer(BaseFeaturizer):
         """
         Featurizes a component using the hash of the chosen attribute.
 
-        Returns:
+        Parameters
+        ----------
+        system: System
+            The System to be featurized. Sometimes it will
+        dataset : DatasetProvider
+            The full DatasetProvider which the System belongs to. Useful
+            if the featurizer needs to compute a global property (e.g.
+            one-hot encoding needs the maximum length)
+        inplace: bool, optional
+            Whether to modify the System directly or operate on a copy.
+
+        Returns
+        -------
+        array
             Sha256'd attribute
         """
         inputdata = system
@@ -336,6 +411,22 @@ class ScaleFeaturizer(BaseFeaturizer):
         dataset: DatasetProvider,
         inplace: bool = True,
     ) -> np.ndarray:
+        """
+        Parameters
+        ----------
+        system: System
+            The System to be featurized. Sometimes it will
+        dataset : DatasetProvider
+            The full DatasetProvider which the System belongs to. Useful
+            if the featurizer needs to compute a global property (e.g.
+            one-hot encoding needs the maximum length)
+        inplace: bool, optional
+            Whether to modify the System directly or operate on a copy.
+
+        Returns
+        -------
+        array
+        """
         from sklearn.preprocessing import scale
 
         if hasattr(system_or_array, "featurizations"):

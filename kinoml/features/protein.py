@@ -31,7 +31,14 @@ class AminoAcidCompositionFeaturizer(BaseFeaturizer):
 
         Parameters
         ----------
-        system : System
+        system: System
+            The System to be featurized. Sometimes it will
+        dataset : DatasetProvider
+            The full DatasetProvider which the System belongs to. Useful
+            if the featurizer needs to compute a global property (e.g.
+            one-hot encoding needs the maximum length)
+        inplace: bool, optional
+            Whether to modify the System directly or operate on a copy.
 
         Returns
         -------

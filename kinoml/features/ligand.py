@@ -108,6 +108,17 @@ class SmilesToLigandFeaturizer(SingleLigandFeaturizer):
         self, system: System, dataset: DatasetProvider, inplace: bool = True
     ) -> Union[RDKitLigand, OpenForceFieldLigand]:
         """
+        Parameters
+        ----------
+        system: System
+            The System to be featurized. Sometimes it will
+        dataset : DatasetProvider
+            The full DatasetProvider which the System belongs to. Useful
+            if the featurizer needs to compute a global property (e.g.
+            one-hot encoding needs the maximum length)
+        inplace: bool, optional
+            Whether to modify the System directly or operate on a copy.
+
         Returns
         -------
         ``RDKitLigand`` or ``OpenForceFieldLigand`` object
@@ -140,6 +151,22 @@ class MorganFingerprintFeaturizer(SingleLigandFeaturizer):
     def _featurize(
         self, system: System, dataset: DatasetProvider, inplace: bool = True
     ) -> np.ndarray:
+        """
+        Parameters
+        ----------
+        system: System
+            The System to be featurized. Sometimes it will
+        dataset : DatasetProvider
+            The full DatasetProvider which the System belongs to. Useful
+            if the featurizer needs to compute a global property (e.g.
+            one-hot encoding needs the maximum length)
+        inplace: bool, optional
+            Whether to modify the System directly or operate on a copy.
+
+        Returns
+        -------
+        array
+        """
         ligand = self._find_ligand(system).to_rdkit()
         return self._featurize_ligand(ligand)
 
@@ -289,6 +316,17 @@ class GraphLigandFeaturizer(SingleLigandFeaturizer):
     def _featurize(self, system: System, dataset: DatasetProvider, inplace: bool = True) -> tuple:
         """
         Featurizes ligands contained in a System as a labeled graph.
+
+        Parameters
+        ----------
+        system: System
+            The System to be featurized. Sometimes it will
+        dataset : DatasetProvider
+            The full DatasetProvider which the System belongs to. Useful
+            if the featurizer needs to compute a global property (e.g.
+            one-hot encoding needs the maximum length)
+        inplace: bool, optional
+            Whether to modify the System directly or operate on a copy.
 
         Returns
         -------
