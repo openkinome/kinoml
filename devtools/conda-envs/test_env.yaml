@@ -34,7 +34,7 @@ dependencies:
 
   - pip:
       # Torch geometric
-      - --find-links https://pytorch-geometric.com/whl/torch-1.6.0+cpu.html
+      - --find-links https://pytorch-geometric.com/whl/torch-1.7.0+cpu.html
       - torch-geometric
       - torch-scatter
       - torch-sparse
