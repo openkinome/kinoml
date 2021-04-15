@@ -22,6 +22,10 @@ from ..utils import APPDIR
 logger = logging.getLogger(__name__)
 
 
+class FeaturizationError(Exception):
+    """Error raised if a featurization process could not finish successfully"""
+
+
 class BaseDatasetProvider:
     """
     API specification for dataset providers
@@ -177,10 +181,15 @@ class DatasetProvider(BaseDatasetProvider):
             system.featurizations.update(featurizations)
 
         invalid = sum(1 for system in systems if "failed" in system.featurizations)
-        if invalid:
+        if invalid == len(systems):
+            raise FeaturizationError(
+                "No system could be correctly featurized. "
+                "Check `system.featurizations['failed']` for more info"
+            )
+        elif invalid:
             logger.warning(
                 "There were %d systems that could not be featurized! "
-                "Check ``system.featurizations['failed']`` for more info.",
+                "Check `system.featurizations['failed']` for more info.",
                 invalid,
             )
         return systems
