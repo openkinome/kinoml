@@ -167,15 +167,18 @@ class DatasetProvider(BaseDatasetProvider):
             # .supports() will test for system type, type of components, type of measurement, etc
             featurizer.supports(next(iter(systems)), raise_errors=True)
 
-        with multiprocessing.Pool(processes=processes) as pool:
-            new_featurizations = list(
-                tqdm(
-                    pool.imap(
-                        self._featurize_one, ((featurizers, s, self) for s in systems), chunksize
-                    ),
-                    total=len(systems),
+        if processes > 1:
+            with multiprocessing.Pool(processes=processes) as pool:
+                new_featurizations = list(
+                    tqdm(
+                        pool.imap(
+                            self._featurize_one, ((featurizers, s) for s in systems), chunksize
+                        ),
+                        total=len(systems),
+                    )
                 )
-            )
+        else:
+            new_featurizations = [self._featurize_one(featurizers, s) for s in tqdm(systems)]
 
         for system, featurizations in zip(systems, new_featurizations):
             system.featurizations.update(featurizations)
