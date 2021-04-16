@@ -357,27 +357,32 @@ class OEHybridDockingFeaturizer(BaseFeaturizer):
 
         filtered_solvent = oechem.OEGraphMol()
         waters = split_molecule_components(solvent)
-        # iterate over water molecules and check for clashes
+        # iterate over water molecules and check for clashes and ambiguous water molecules
         for water in waters:
-            water_oxygen_atom = water.GetAtoms(oechem.OEIsOxygen()).next()
+            try:
+                water_oxygen_atom = water.GetAtoms(oechem.OEIsOxygen()).next()
+            except StopIteration:
+                # experienced lonely water hydrogens for 2v7a after mutating PTR393 to TYR
+                logging.debug("Removing water molecule without oxygen!")
+                continue
             # experienced problems when preparing 4pmp
             # making design units generated clashing waters that were not protonatable
             # TODO: revisit this behavior
             if oechem.OEAtomGetResidue(water_oxygen_atom).GetInsertCode() != " ":
-                logging.debug("Found ambiguous water molecule!")
+                logging.debug("Removing ambiguous water molecule!")
                 continue
             water_oxygen_coordinates = water.GetCoords()[water_oxygen_atom.GetIdx()]
             # check for clashes with newly placed ligand
             if ligand is not None:
                 clashes = ligand_heavy_atoms_tree.query_ball_point(water_oxygen_coordinates, 1.5)
                 if len(clashes) > 0:
-                    logging.debug("Found water molecule clashing with ligand atoms!")
+                    logging.debug("Removing water molecule clashing with ligand atoms!")
                     continue
             # check for clashes with newly modeled protein residues
             if modeled_heavy_atoms_tree:
                 clashes = modeled_heavy_atoms_tree.query_ball_point(water_oxygen_coordinates, 1.5)
                 if len(clashes) > 0:
-                    logging.debug("Found water molecule clashing with modeled atoms!")
+                    logging.debug("Removing water molecule clashing with modeled atoms!")
                     continue
             # water molecule is not clashy, add to filtered solvent
             oechem.OEAddMols(filtered_solvent, water)
