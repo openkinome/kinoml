@@ -104,26 +104,22 @@ class SmilesToLigandFeaturizer(SingleLigandFeaturizer):
             )
 
     @lru_cache(maxsize=1000)
-    def _featurize(
-        self, system: System, dataset: DatasetProvider, inplace: bool = True
-    ) -> Union[RDKitLigand, OpenForceFieldLigand]:
+    def _featurize(self, systems: System) -> Union[RDKitLigand, OpenForceFieldLigand]:
         """
         Parameters
         ----------
         system: System
-            The System to be featurized. Sometimes it will
-        dataset : DatasetProvider
-            The full DatasetProvider which the System belongs to. Useful
-            if the featurizer needs to compute a global property (e.g.
-            one-hot encoding needs the maximum length)
-        inplace: bool, optional
-            Whether to modify the System directly or operate on a copy.
+            The System to be featurized.
 
         Returns
         -------
         ``RDKitLigand`` or ``OpenForceFieldLigand`` object
         """
-        return self._LigandType.from_smiles(self._find_ligand(system).to_smiles())
+        results = []
+        for system in systems:
+            result = self._LigandType.from_smiles(self._find_ligand(system).to_smiles())
+            results.append(result)
+        return results
 
 
 class MorganFingerprintFeaturizer(SingleLigandFeaturizer):
@@ -148,27 +144,22 @@ class MorganFingerprintFeaturizer(SingleLigandFeaturizer):
         self.radius = radius
         self.nbits = nbits
 
-    def _featurize(
-        self, system: System, dataset: DatasetProvider, inplace: bool = True
-    ) -> np.ndarray:
+    def _featurize(self, systems: System) -> np.ndarray:
         """
         Parameters
         ----------
         system: System
-            The System to be featurized. Sometimes it will
-        dataset : DatasetProvider
-            The full DatasetProvider which the System belongs to. Useful
-            if the featurizer needs to compute a global property (e.g.
-            one-hot encoding needs the maximum length)
-        inplace: bool, optional
-            Whether to modify the System directly or operate on a copy.
+            The System to be featurized.
 
         Returns
         -------
         array
         """
-        ligand = self._find_ligand(system).to_rdkit()
-        return self._featurize_ligand(ligand)
+        results = []
+        for system in systems:
+            ligand = self._find_ligand(system).to_rdkit()
+            results.append(self._featurize_ligand(ligand))
+        return results
 
     @lru_cache(maxsize=1000)
     def _featurize_ligand(self, ligand: rdkit.Chem.Mol) -> np.ndarray:
@@ -312,21 +303,14 @@ class GraphLigandFeaturizer(SingleLigandFeaturizer):
         self.per_atom_features = per_atom_features or self._per_atom_features
         self.max_in_ring_size = max_in_ring_size
 
-    @lru_cache(maxsize=1000)
-    def _featurize(self, system: System, dataset: DatasetProvider, inplace: bool = True) -> tuple:
+    def _featurize(self, systems: System) -> tuple:
         """
         Featurizes ligands contained in a System as a labeled graph.
 
         Parameters
         ----------
         system: System
-            The System to be featurized. Sometimes it will
-        dataset : DatasetProvider
-            The full DatasetProvider which the System belongs to. Useful
-            if the featurizer needs to compute a global property (e.g.
-            one-hot encoding needs the maximum length)
-        inplace: bool, optional
-            Whether to modify the System directly or operate on a copy.
+            The System to be featurized.
 
         Returns
         -------
@@ -336,16 +320,19 @@ class GraphLigandFeaturizer(SingleLigandFeaturizer):
             - Graph connectivity of the molecule with shape ``(2, n_edges)``
             - Feature matrix with shape ``(n_atoms, n_features)``
         """
-        ligand = self._find_ligand(system).to_rdkit()
-        connectivity_graph = self._connectivity_COO_format(ligand)
-        per_atom_features = np.array(
-            [
-                self._per_atom_features(a, max_in_ring_size=self.max_in_ring_size)
-                for a in ligand.GetAtoms()
-            ]
-        )
+        results = []
+        for system in systems:
+            ligand = self._find_ligand(system).to_rdkit()
+            connectivity_graph = self._connectivity_COO_format(ligand)
+            per_atom_features = np.array(
+                [
+                    self._per_atom_features(a, max_in_ring_size=self.max_in_ring_size)
+                    for a in ligand.GetAtoms()
+                ]
+            )
 
-        return connectivity_graph, per_atom_features
+            results.append([connectivity_graph, per_atom_features])
+        return results
 
     @staticmethod
     def _per_atom_features(atom, max_in_ring_size: int = 10):

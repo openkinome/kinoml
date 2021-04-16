@@ -32,7 +32,7 @@ class BaseDatasetProvider:
     """
 
     @classmethod
-    def from_source(cls, filename=None, **kwargs):
+    def from_source(cls, path_or_url=None, **kwargs):
         """
         Parse CSV/raw files to object model.
         """
@@ -91,6 +91,8 @@ class DatasetProvider(BaseDatasetProvider):
     measurements: list of BaseMeasurement
         A DatasetProvider holds a list of ``kinoml.core.measurements.BaseMeasurement``
         objects (or any of its subclasses). They must be of the same type!
+    metadata : dict
+        Extra information for provenance
 
     Note
     ----
@@ -100,17 +102,13 @@ class DatasetProvider(BaseDatasetProvider):
 
     _raw_data = None
 
-    def __init__(
-        self,
-        measurements: Iterable[BaseMeasurement],
-        *args,
-        **kwargs,
-    ):
+    def __init__(self, measurements: Iterable[BaseMeasurement], metadata: dict = None):
         types = {type(measurement) for measurement in measurements}
         assert (
             len(types) == 1
         ), f"Dataset providers can only allow one type of measurement! You provided: {types}"
         self.measurements = measurements
+        self.metadata = metadata or {}
 
     def __len__(self):
         return len(self.measurements)
@@ -134,7 +132,7 @@ class DatasetProvider(BaseDatasetProvider):
         )
 
     @classmethod
-    def from_source(cls, filename=None, **kwargs):
+    def from_source(cls, path_or_url=None, **kwargs):
         """
         Parse CSV/raw file to object model. This method is responsible of generating
         the objects for ``self.measurements``, if relevant. Additional kwargs will be
@@ -144,15 +142,15 @@ class DatasetProvider(BaseDatasetProvider):
         """
         raise NotImplementedError
 
-    def featurize(self, *featurizers: Iterable[BaseFeaturizer], processes=1, chunksize=1):
+    def featurize(self, featurizer: BaseFeaturizer):
         """
         Given a collection of ``kinoml.features.core.BaseFeaturizers``, apply them
         to the systems present in the ``self.measurements``.
 
         Parameters
         ----------
-        featurizers : list of BaseFeaturizer
-            Featurization schemes that will be applied to the systems,
+        featurizer : BaseFeaturizer
+            Featurization scheme that will be applied to the systems,
             in a stacked way.
 
         Note
@@ -163,25 +161,10 @@ class DatasetProvider(BaseDatasetProvider):
             * Shall we modify the system in place (default now), return the modified copy or store it?
         """
         systems = self.systems
-        for featurizer in featurizers:
-            # .supports() will test for system type, type of components, type of measurement, etc
-            featurizer.supports(next(iter(systems)), raise_errors=True)
-
-        if processes > 1:
-            with multiprocessing.Pool(processes=processes) as pool:
-                new_featurizations = list(
-                    tqdm(
-                        pool.imap(
-                            self._featurize_one, ((featurizers, s) for s in systems), chunksize
-                        ),
-                        total=len(systems),
-                    )
-                )
-        else:
-            new_featurizations = [self._featurize_one(featurizers, s) for s in tqdm(systems)]
-
-        for system, featurizations in zip(systems, new_featurizations):
-            system.featurizations.update(featurizations)
+        featurizer.supports(next(iter(systems)), raise_errors=True)
+        featurizer.featurize(tuple(systems))
+        for system in systems:
+            system.featurizations["last"] = system.featurizations[featurizer.name]
 
         invalid = sum(1 for system in systems if "failed" in system.featurizations)
         if invalid == len(systems):
@@ -196,17 +179,6 @@ class DatasetProvider(BaseDatasetProvider):
                 invalid,
             )
         return systems
-
-    @staticmethod
-    def _featurize_one(featurizers_and_system_and_dataset):
-        featurizers, system, dataset = featurizers_and_system_and_dataset
-        try:
-            for featurizer in featurizers:
-                featurizer.featurize(system, dataset=dataset, inplace=True)
-            system.featurizations["last"] = system.featurizations[featurizers[-1].name]
-        except Exception as exc:  # TODO probably not ideal
-            system.featurizations["failed"] = [featurizers, exc]
-        return system.featurizations
 
     def clear_featurizations(self):
         """
@@ -396,17 +368,16 @@ class DatasetProvider(BaseDatasetProvider):
         Returns
         -------
         str
-            The path of the (downloaded) file in cache
+            If provided argument is a file, the same path, right away
+            If it was a URL, it will be the (downloaded) cached file path
         """
+        if os.path.isfile(path_or_url):
+            return str(path_or_url)
         filename = os.path.basename(path_or_url)
         cached_path = Path(APPDIR.user_cache_dir) / cls.__name__ / filename
         if not cached_path.is_file():  # file is not available on user cache
-            if os.path.isfile(path_or_url):  # local file
-                open_handle = lambda path: open(path, "rb")
-            else:  # online url
-                open_handle = urlopen
             cached_path.parent.mkdir(parents=True, exist_ok=True)
-            with open_handle(path_or_url) as f, open(cached_path, "wb") as dest:
+            with urlopen(path_or_url) as f, open(cached_path, "wb") as dest:
                 shutil.copyfileobj(f, dest)
         return str(cached_path)
 
@@ -433,7 +404,7 @@ class MultiDatasetProvider(DatasetProvider):
         will be grouped together in different sub-datasets.
     """
 
-    def __init__(self, measurements: Iterable[BaseMeasurement], *args, **kwargs):
+    def __init__(self, measurements: Iterable[BaseMeasurement], metadata: dict = None):
         by_type = defaultdict(list)
         for measurement in measurements:
             by_type[type(measurement)].append(measurement)
@@ -444,6 +415,7 @@ class MultiDatasetProvider(DatasetProvider):
                 providers.append(DatasetProvider(typed_measurements))
 
         self.providers = providers
+        self.metadata = metadata or {}
 
     def observation_models(self, **kwargs):
         """
