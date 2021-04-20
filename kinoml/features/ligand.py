@@ -363,30 +363,49 @@ class GraphLigandFeaturizer(SingleLigandFeaturizer):
                 ring_size = ring_size_probe
 
         return (
-            atom.GetAtomicNum(),
-            atom.GetSymbol(),  # TODO : one-hot encode
-            atom.GetDegree(),
-            atom.GetTotalDegree(),  # TODO : ignore if molecule has H
-            atom.GetExplicitValence(),
-            atom.GetImplicitValence(),  # TODO : ignore if molecule has H
-            atom.GetTotalValence(),
-            atom.GetMass(),
+            # Same properties as the one used in potentialnet
+            # 1. Chemical element, one-hot encoded
+            BaseOneHotEncodingFeaturizer.one_hot_encode([atom.GetAtomicNum()], ALL_ATOMIC_SYMBOLS),
+            # 2. Formal charge
             atom.GetFormalCharge(),
-            atom.GetNumExplicitHs(),
-            atom.GetNumImplicitHs(),
-            atom.GetTotalNumHs(),
-            atom.IsInRing(),
-            ring_size,  # TODO : one-hot encode
+            # 3. Hybridization, one-hot encoded
+            BaseOneHotEncodingFeaturizer.one_hot_encode([atom.GetHybridization().real], rdkit.Chem.rdchem.HybridizationType.names),
+            # 4. Aromaticity
             atom.GetIsAromatic(),
+            # 5. Total numbers of bonds
+            atom.GetDegree(),
+            # 6. Total number of hydrogens
+            atom.GetTotalNumHs(),
+            # 7. Number of implicit hydrogens
+            atom.GetNumImplicitHs(),
+            # 8. Number of radical electrons
             atom.GetNumRadicalElectrons(),
-            # We use the .real attribute of the hybridization type
-            # This Enum uses complex numbers to encode the different
-            # types. `.name` will give you the type string, and `.real`
-            # will give you the position in the enum object.
-            # There's a total of 8 possible values. You can check them
-            # with `rdkit.Chem.rdchem.HybridizationType.names` and/or
-            # `rdkit.Chem.rdchem.HybridizationType.values`
-            atom.GetHybridization().real,  # TODO : one-hot encode
+
+            ## Others
+            #atom.GetAtomicNum(),
+            #atom.GetSymbol(),  # TODO : one-hot encode
+            #atom.GetDegree(),
+            #atom.GetTotalDegree(),  # TODO : ignore if molecule has H
+            #atom.GetExplicitValence(),
+            #atom.GetImplicitValence(),  # TODO : ignore if molecule has H
+            #atom.GetTotalValence(),
+            #atom.GetMass(),
+            #atom.GetFormalCharge(),
+            #atom.GetNumExplicitHs(),
+            #atom.GetNumImplicitHs(),
+            #atom.GetTotalNumHs(),
+            #atom.IsInRing(),
+            #ring_size,  # TODO : one-hot encode
+            #atom.GetIsAromatic(),
+            #atom.GetNumRadicalElectrons(),
+            ## We use the .real attribute of the hybridization type
+            ## This Enum uses complex numbers to encode the different
+            ## types. `.name` will give you the type string, and `.real`
+            ## will give you the position in the enum object.
+            ## There's a total of 8 possible values. You can check them
+            ## with `rdkit.Chem.rdchem.HybridizationType.names` and/or
+            ## `rdkit.Chem.rdchem.HybridizationType.values`
+            #atom.GetHybridization().real,  # TODO : one-hot encode
         )
 
     @staticmethod
