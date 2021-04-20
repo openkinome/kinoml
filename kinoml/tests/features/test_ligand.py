@@ -142,4 +142,4 @@ def test_ligand_GraphLigandFeaturizer_RDKit(smiles, solution):
     featurizer.featurize(system)
     graph = system.featurizations[featurizer.name]
     assert (graph[0] == solution[0]).all()  # connectivity
-    assert (graph[1] == solution[1]).all()  # features
+    assert graph[1] == solution[1]  # features
