@@ -120,7 +120,7 @@ def test_ligand_OneHotSMILESFeaturizer_RDKit(smiles, solution):
             "CC",
             (
                 np.array([[0, 1], [1, 0]]),
-                np.array(
+                (
                     [
                         (6, "C", 1, 4, 1, 3, 4, 12.011, 0, 0, 3, 3, False, 0, False, 0, 4),
                         (6, "C", 1, 4, 1, 3, 4, 12.011, 0, 0, 3, 3, False, 0, False, 0, 4),
@@ -142,4 +142,9 @@ def test_ligand_GraphLigandFeaturizer_RDKit(smiles, solution):
     featurizer.featurize(system)
     graph = system.featurizations[featurizer.name]
     assert (graph[0] == solution[0]).all()  # connectivity
-    assert graph[1] == solution[1]  # features
+    for atom_g, atom_s in zip(graph[1], solution[1]):  # features
+        for feature_g, feature_s in zip(atom_g, atom_s):
+            try:
+                assert feature_g == feature_s
+            except ValueError:
+                assert (feature_g == feature_s).all()
