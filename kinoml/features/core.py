@@ -213,21 +213,25 @@ class BaseOneHotEncodingFeaturizer(BaseFeaturizer):
         raise NotImplementedError
 
     @staticmethod
-    def one_hot_encode(sequence: str, dictionary: dict) -> np.ndarray:
+    def one_hot_encode(sequence: Iterable, dictionary: Union[dict, list]) -> np.ndarray:
         """
         One-hot encode a sequence of characters, given a dictionary
 
         Parameters
         ----------
-        sequence : str
-        dictionary : dict
-            Mapping of each character to their position in the alphabet
+        sequence : Iterable
+        dictionary : dict or list
+            Mapping of each character to their position in the alphabet. If list
+            is given, it will be enumerated into a dict.
 
         Returns
         -------
         array-like
             One-hot encoded matrix with shape ``(len(dictionary), len(sequence))``
         """
+        if not isinstance(dictionary, dict):
+            dictionary = {value: index for (index, value) in enumerate(dictionary)}
+
         ohe_matrix = np.zeros((len(dictionary), len(sequence)))
         for i, character in enumerate(sequence):
             ohe_matrix[dictionary[character], i] = 1
