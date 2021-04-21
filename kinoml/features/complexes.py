@@ -12,7 +12,6 @@ from ..core.ligands import FileLigand, SmilesLigand
 from ..core.proteins import FileProtein, PDBProtein
 from ..core.sequences import KinaseDomainAminoAcidSequence
 from ..core.systems import ProteinLigandComplex
-from ..datasets.core import DatasetProvider
 
 
 class OEHybridDockingFeaturizer(BaseFeaturizer):

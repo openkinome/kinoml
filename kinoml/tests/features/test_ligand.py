@@ -25,14 +25,14 @@ def test_single_ligand_featurizer(LigandClass):
     ligand2 = LigandClass.from_smiles("COCC")
     double_ligand_system = System(components=[ligand1, ligand2])
     with pytest.raises(ValueError):
-        featurizer.featurize(double_ligand_system)
+        featurizer.featurize([double_ligand_system])
 
 
 def test_SmilesToLigandFeaturizer_rdkit():
     ligand = SmilesLigand.from_smiles("CCCCC")
     system = System([ligand])
     featurizer = SmilesToLigandFeaturizer(ligand_type="rdkit")
-    featurizer.featurize(system)
+    featurizer.featurize([system])
     molecule = system.featurizations[featurizer.name]
     assert type(molecule) == RDKitLigand
 
@@ -41,7 +41,7 @@ def test_SmilesToLigandFeaturizer_rdkit():
     ligand = SmilesLigand.from_smiles("CCCCC")
     system = System([ligand])
     featurizer = SmilesToLigandFeaturizer(ligand_type="openforcefield")
-    featurizer.featurize(system)
+    featurizer.featurize([system])
     molecule = system.featurizations[featurizer.name]
     assert type(molecule) == OpenForceFieldLigand
 
@@ -51,7 +51,7 @@ def test_SmilesToLigandFeaturizer_fails():
     system = System([ligand])
     featurizer = SmilesToLigandFeaturizer(ligand_type="openforcefield")
     with pytest.raises(ValueError):
-        featurizer.featurize(system)
+        featurizer.featurize([system])
         molecule = system.featurizations[featurizer.name]
         assert type(molecule) == OpenForceFieldLigand
 
@@ -77,7 +77,7 @@ def test_ligand_MorganFingerprintFeaturizer_RDKit(smiles, solution):
     ligand = RDKitLigand.from_smiles(smiles)
     system = System([ligand])
     featurizer = MorganFingerprintFeaturizer(radius=2, nbits=512)
-    featurizer.featurize(system)
+    featurizer.featurize([system])
     fingerprint = system.featurizations[featurizer.name]
     solution_array = np.array(list(map(int, solution)), dtype="uint8")
     assert (fingerprint == solution_array).all()
@@ -100,7 +100,7 @@ def test_ligand_OneHotSMILESFeaturizer_RDKit(smiles, solution):
     ligand = RDKitLigand.from_smiles(smiles)
     system = System([ligand])
     featurizer = OneHotSMILESFeaturizer()
-    featurizer.featurize(system)
+    featurizer.featurize([system])
     matrix = system.featurizations[featurizer.name]
     assert matrix.shape == solution.T.shape
     assert (matrix == solution.T).all()
@@ -139,7 +139,7 @@ def test_ligand_GraphLigandFeaturizer_RDKit(smiles, solution):
     ligand = RDKitLigand.from_smiles(smiles)
     system = System([ligand])
     featurizer = GraphLigandFeaturizer()
-    featurizer.featurize(system)
+    featurizer.featurize([system])
     graph = system.featurizations[featurizer.name]
     assert (graph[0] == solution[0]).all()  # connectivity
     assert (graph[1] == solution[1]).all()  # features

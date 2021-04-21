@@ -6,9 +6,7 @@ All ``Featurizer`` objects inherit from ``BaseFeaturizer`` and reimplement `._fe
 and `._supports`, if needed.
 """
 from __future__ import annotations
-from copy import deepcopy
 from typing import Hashable, Iterable, Union
-from functools import lru_cache
 import hashlib
 
 import numpy as np
@@ -75,15 +73,21 @@ class BaseFeaturizer:
 
         Do NOT reimplement in subclass. Check ``._supports()`` instead.
 
-        Parameters:
-            systems: systems to be checked (by type, contained attributes, etc)
-            raise_errors: if True, raise `ValueError`.
+        Parameters
+        ----------
+        systems : list of System
+            Systems to be checked (by type, contained attributes, etc)
+        raise_errors: bool, optional=True
+            if True, raise `ValueError` if errors were found
 
-        Returns:
+        Returns
+        -------
+        bool
             True if all systems are compatible, False otherwise
 
-        Raises:
-            ``ValueError`` if ``._supports()`` fails and ``raise_errors`` is `True`.
+        Raises
+        ------
+        ``ValueError`` if ``._supports()`` fails and ``raise_errors`` is `True`.
         """
         for system in systems:
             if not self._supports(system):
