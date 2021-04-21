@@ -4,13 +4,12 @@ Featurizers that mostly concern ligand-based models
 
 from __future__ import annotations
 from functools import lru_cache
-from typing import Union
+from typing import Union, Iterable
 
 import numpy as np
 import rdkit
 
 from .core import BaseFeaturizer, BaseOneHotEncodingFeaturizer
-from ..datasets.core import DatasetProvider
 from ..core.systems import System
 from ..core.ligands import (
     BaseLigand,
@@ -104,12 +103,12 @@ class SmilesToLigandFeaturizer(SingleLigandFeaturizer):
             )
 
     @lru_cache(maxsize=1000)
-    def _featurize(self, systems: System) -> Union[RDKitLigand, OpenForceFieldLigand]:
+    def _featurize(self, systems: Iterable[System]) -> Union[RDKitLigand, OpenForceFieldLigand]:
         """
         Parameters
         ----------
-        system: System
-            The System to be featurized.
+        system : list of System
+            The Systems to be featurized.
 
         Returns
         -------
@@ -144,16 +143,16 @@ class MorganFingerprintFeaturizer(SingleLigandFeaturizer):
         self.radius = radius
         self.nbits = nbits
 
-    def _featurize(self, systems: System) -> np.ndarray:
+    def _featurize(self, systems: Iterable[System]) -> Iterable[np.ndarray]:
         """
         Parameters
         ----------
-        system: System
-            The System to be featurized.
+        systems : list of System
+            The Systems to be featurized.
 
         Returns
         -------
-        array
+        list of array
         """
         results = []
         for system in systems:
@@ -224,6 +223,11 @@ class OneHotRawSMILESFeaturizer(OneHotSMILESFeaturizer):
 
         Double element symbols (such as `Cl`, ``Br`` for atoms and ``@@`` for chirality)
         are replaced with single element symbols (`L`, ``R`` and ``$`` respectively).
+
+        Parameters
+        ----------
+        system : System
+            The system being featurized
         """
         ligand = self._find_ligand(system)
         return ligand.metadata["smiles"].replace("Cl", "L").replace("Br", "R").replace("@@", "$")
@@ -303,19 +307,19 @@ class GraphLigandFeaturizer(SingleLigandFeaturizer):
         self.per_atom_features = per_atom_features or self._per_atom_features
         self.max_in_ring_size = max_in_ring_size
 
-    def _featurize(self, systems: System) -> tuple:
+    def _featurize(self, systems: Iterable[System]) -> tuple:
         """
         Featurizes ligands contained in a System as a labeled graph.
 
         Parameters
         ----------
-        system: System
-            The System to be featurized.
+        systems : list of System
+            The Systems to be featurized.
 
         Returns
         -------
-        tuple
-            A two-tuple with:
+        list of tuple
+            List of two-tuples (one per system) with:
 
             - Graph connectivity of the molecule with shape ``(2, n_edges)``
             - Feature matrix with shape ``(n_atoms, n_features)``

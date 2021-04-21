@@ -64,7 +64,7 @@ class BaseFeaturizer:
 
         Parameters
         ----------
-        systems: System
+        systems: list of System
             The Systems to be featurized.
         """
         raise NotImplementedError("Implement in your subclass")
@@ -132,7 +132,7 @@ class Pipeline(BaseFeaturizer):
     def __init__(self, featurizers: Iterable[BaseFeaturizer]):
         self.featurizers = featurizers
 
-    def _featurize(self, systems_or_arrays):
+    def _featurize(self, systems_or_arrays: Iterable[Union[System, np.ndarray]]):
         """
         Given a list of featurizers, apply them sequentially
         on the systems/arrays (e.g. featurizer A returns X, and X is
@@ -140,14 +140,8 @@ class Pipeline(BaseFeaturizer):
 
         Parameters
         ----------
-        system: System
-            The System to be featurized. Sometimes it will
-        dataset : DatasetProvider
-            The full DatasetProvider which the System belongs to. Useful
-            if the featurizer needs to compute a global property (e.g.
-            one-hot encoding needs the maximum length)
-        inplace: bool, optional
-            Whether to modify the System directly or operate on a copy.
+        systems_or_arrays: list of System or array-like
+            The Systems (or arrays) to be featurized.
         """
         for featurizer in self.featurizers:
             systems_or_arrays = featurizer._featurize(systems_or_arrays)
@@ -201,7 +195,7 @@ class Concatenated(Pipeline):
         self.featurizers = featurizers
         self.axis = axis
 
-    def _featurize(self, systems_or_arrays):
+    def _featurize(self, systems_or_arrays: Iterable[Union[System, np.ndarray]]):
         """
         Given a list of featurizers, apply them serially and concatenate
         the result (e.g. featurizer A returns X, and featurizer B returns Y;
@@ -209,8 +203,8 @@ class Concatenated(Pipeline):
 
         Parameters
         ----------
-        systems: System
-            The System to be featurized. Sometimes it will
+        systems_or_arrays: list of System or array-like
+            The Systems (or arrays) to be featurized.
         """
         features = [f._featurize(systems_or_arrays) for f in self.featurizers]
         return np.concatenate(features, axis=self.axis)
@@ -226,18 +220,12 @@ class BaseOneHotEncodingFeaturizer(BaseFeaturizer):
         if not self.dictionary:
             raise ValueError("This featurizer requires a populated dictionary!")
 
-    def _featurize(self, systems: System):
+    def _featurize(self, systems: Iterable[System]):
         """
         Parameters
         ----------
-        system: System
-            The System to be featurized. Sometimes it will
-        dataset : DatasetProvider
-            The full DatasetProvider which the System belongs to. Useful
-            if the featurizer needs to compute a global property (e.g.
-            one-hot encoding needs the maximum length)
-        inplace: bool, optional
-            Whether to modify the System directly or operate on a copy.
+        systems: list of System
+            The Systems to be featurized.
         """
         matrices = []
         for system in systems:
@@ -297,12 +285,12 @@ class PadFeaturizer(BaseFeaturizer):
         self.key = key
         self.pad_with = pad_with
 
-    def _featurize(self, systems_or_arrays: Union[System, np.ndarray]) -> np.ndarray:
+    def _featurize(self, systems_or_arrays: Iterable[Union[System, np.ndarray]]) -> np.ndarray:
         """
         Parameters
         ----------
-        system: System
-            The System to be featurized.
+        systems_or_arrays: list of System or array-like
+            The Systems (or arrays) to be featurized.
         """
         if hasattr(systems_or_arrays[0], "featurizations"):
             arraylikes = [np.asarray(sa.featurizations[self.key]) for sa in systems_or_arrays]
@@ -341,19 +329,19 @@ class HashFeaturizer(BaseFeaturizer):
         self.attributes = attributes
         self.normalize = normalize
 
-    def _featurize(self, systems: System):
+    def _featurize(self, systems: Iterable[System]):
         """
         Featurizes a component using the hash of the chosen attribute.
 
         Parameters
         ----------
-        system: System
-            The System to be featurized.
+        systems : list of System
+            The Systems to be featurized.
 
         Returns
         -------
-        array
-            Sha256'd attribute
+        list of array
+            Sha256'd attributes
         """
         results = []
         denominator = 2 ** 256 if self.normalize else 1
@@ -369,7 +357,7 @@ class HashFeaturizer(BaseFeaturizer):
 
 
 class NullFeaturizer(BaseFeaturizer):
-    def featurize(self, systems: System) -> object:
+    def featurize(self, systems: Iterable[System]) -> Iterable[System]:
         return systems
 
 
@@ -386,12 +374,12 @@ class ScaleFeaturizer(BaseFeaturizer):
         """
         Parameters
         ----------
-        system: System
+        systems_or_arrays: list of System or array-like
             The System to be featurized.
 
         Returns
         -------
-        array
+        list of array-like
         """
         from sklearn.preprocessing import scale
 

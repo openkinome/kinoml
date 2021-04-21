@@ -4,11 +4,11 @@ Featurizers that mostly concern protein-based models
 from __future__ import annotations
 import numpy as np
 from collections import Counter
+from typing import Iterable
 
 from .core import BaseFeaturizer, BaseOneHotEncodingFeaturizer
 from ..core.systems import System
 from ..core.proteins import AminoAcidSequence
-from ..datasets.core import DatasetProvider
 
 
 class AminoAcidCompositionFeaturizer(BaseFeaturizer):
@@ -23,9 +23,7 @@ class AminoAcidCompositionFeaturizer(BaseFeaturizer):
     for k in _counter.keys():
         _counter[k] = 0
 
-    def _featurize(
-        self, system: System, dataset: DatasetProvider, inplace: bool = True
-    ) -> np.array:
+    def _featurize(self, systems: Iterable[System]) -> np.array:
         """
         Featurizes a protein using the residue count in the sequence
 
@@ -33,22 +31,19 @@ class AminoAcidCompositionFeaturizer(BaseFeaturizer):
         ----------
         system: System
             The System to be featurized. Sometimes it will
-        dataset : DatasetProvider
-            The full DatasetProvider which the System belongs to. Useful
-            if the featurizer needs to compute a global property (e.g.
-            one-hot encoding needs the maximum length)
-        inplace: bool, optional
-            Whether to modify the System directly or operate on a copy.
 
         Returns
         -------
-        array
+        list of array
             The count of amino acid in the binding site.
         """
-        count = self._counter.copy()
-        count.update(system.protein.sequence)
-        sorted_count = sorted(count.items(), key=lambda kv: kv[0])
-        return np.array([number for aminoacid, number in sorted_count])
+        results = []
+        for system in systems:
+            count = self._counter.copy()
+            count.update(system.protein.sequence)
+            sorted_count = sorted(count.items(), key=lambda kv: kv[0])
+            results.append(np.array([number for aminoacid, number in sorted_count]))
+        return results
 
 
 class OneHotEncodedSequenceFeaturizer(BaseOneHotEncodingFeaturizer):
