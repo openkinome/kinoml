@@ -112,8 +112,71 @@ def test_ligand_OneHotSMILESFeaturizer_RDKit(smiles, solution):
         (
             "C",
             (
-                np.array([[0]]),
-                [(6, "C", 0, 4, 0, 4, 4, 12.011, 0, 0, 4, 4, False, 0, False, 0, 4)],
+                np.array([]),
+                np.array(
+                    [
+                        [
+                            1.0,  # start of OHE'datom.GetSymbol()
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # end of OHE'd atom.GetSymbol()
+                            0.0,  # atom.GetFormalCharge()
+                            0.0,  # start of OHE'd atom.GetHybridization().name
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            1.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # end of OHE'd atom.GetHybridization().name
+                            0.0,  # atom.GetIsAromatic()
+                            0.0,  # atom.GetDegree()
+                            4.0,  # atom.GetTotalNumHs()
+                            4.0,  # atom.GetNumImplicitHs()
+                            0.0,  # atom.GetNumRadicalElectrons()
+                        ]
+                    ]
+                ),
             ),
         ),
         (
@@ -122,8 +185,126 @@ def test_ligand_OneHotSMILESFeaturizer_RDKit(smiles, solution):
                 np.array([[0, 1], [1, 0]]),
                 np.array(
                     [
-                        (6, "C", 1, 4, 1, 3, 4, 12.011, 0, 0, 3, 3, False, 0, False, 0, 4),
-                        (6, "C", 1, 4, 1, 3, 4, 12.011, 0, 0, 3, 3, False, 0, False, 0, 4),
+                        [  # First carbon
+                            1.0,  # start of OHE'datom.GetSymbol()
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # end of OHE'd atom.GetSymbol()
+                            0.0,  # atom.GetFormalCharge()
+                            0.0,  # start of OHE'd atom.GetHybridization().name
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            1.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # end of OHE'd atom.GetHybridization().name
+                            0.0,  # atom.GetIsAromatic()
+                            1.0,  # atom.GetDegree()
+                            3.0,  # atom.GetTotalNumHs()
+                            3.0,  # atom.GetNumImplicitHs()
+                            0.0,  # atom.GetNumRadicalElectrons()
+                        ],
+                        [  # Second carbon
+                            1.0,  # start of OHE'datom.GetSymbol()
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # end of OHE'd atom.GetSymbol()
+                            0.0,  # atom.GetFormalCharge()
+                            0.0,  # start of OHE'd atom.GetHybridization().name
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            1.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # end of OHE'd atom.GetHybridization().name
+                            0.0,  # atom.GetIsAromatic()
+                            1.0,  # atom.GetDegree()
+                            3.0,  # atom.GetTotalNumHs()
+                            3.0,  # atom.GetNumImplicitHs()
+                            0.0,  # atom.GetNumRadicalElectrons()
+                        ],
                     ]
                 ),
             ),
@@ -138,8 +319,7 @@ def test_ligand_GraphLigandFeaturizer_RDKit(smiles, solution):
     """
     ligand = RDKitLigand.from_smiles(smiles)
     system = System([ligand])
-    featurizer = GraphLigandFeaturizer()
-    featurizer.featurize([system])
-    graph = system.featurizations[featurizer.name]
-    assert (graph[0] == solution[0]).all()  # connectivity
-    assert (graph[1] == solution[1]).all()  # features
+    GraphLigandFeaturizer().featurize([system])
+    connectivity, features = system.featurizations["last"]
+    assert (connectivity == solution[0]).all()
+    assert features == pytest.approx(solution[1])
