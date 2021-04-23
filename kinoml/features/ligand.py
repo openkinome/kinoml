@@ -103,22 +103,22 @@ class SmilesToLigandFeaturizer(SingleLigandFeaturizer):
             )
 
     @lru_cache(maxsize=1000)
-    def _featurize(self, systems: Iterable[System]) -> Union[RDKitLigand, OpenForceFieldLigand]:
+    def _featurize_one(
+        self, system: Iterable[System], options: dict
+    ) -> RDKitLigand | OpenForceFieldLigand:
         """
         Parameters
         ----------
-        system : list of System
-            The Systems to be featurized.
+        system : System
+            The System to be featurized.
+        options : dict
+            Unused
 
         Returns
         -------
         ``RDKitLigand`` or ``OpenForceFieldLigand`` object
         """
-        results = []
-        for system in systems:
-            result = self._LigandType.from_smiles(self._find_ligand(system).to_smiles())
-            results.append(result)
-        return results
+        return self._LigandType.from_smiles(self._find_ligand(system).to_smiles())
 
 
 class MorganFingerprintFeaturizer(SingleLigandFeaturizer):
@@ -143,29 +143,25 @@ class MorganFingerprintFeaturizer(SingleLigandFeaturizer):
         self.radius = radius
         self.nbits = nbits
 
-    def _featurize(self, systems: Iterable[System]) -> Iterable[np.ndarray]:
+    @lru_cache(maxsize=1000)
+    def _featurize_one(self, system: System, options: dict) -> np.ndarray:
         """
         Parameters
         ----------
-        systems : list of System
-            The Systems to be featurized.
+        system : System
+            The System to be featurized.
+        options : dict
+            Unused
 
         Returns
         -------
-        list of array
+        array
         """
-        results = []
-        for system in systems:
-            ligand = self._find_ligand(system).to_rdkit()
-            results.append(self._featurize_ligand(ligand))
-        return results
-
-    @lru_cache(maxsize=1000)
-    def _featurize_ligand(self, ligand: rdkit.Chem.Mol) -> np.ndarray:
         from rdkit.Chem.AllChem import GetMorganFingerprintAsBitVect as Morgan
 
         # FIXME: Check whether OFF uses canonical smiles internally, or not
         # otherwise, we should force that behaviour ourselves!
+        ligand = self._find_ligand(system).to_rdkit()
         fp = Morgan(ligand, radius=self.radius, nBits=self.nbits)
         return np.asarray(fp, dtype="uint8")
 
@@ -300,21 +296,20 @@ class GraphLigandFeaturizer(SingleLigandFeaturizer):
     ]
     _COMPATIBLE_LIGAND_TYPES = (OpenForceFieldLigand, OpenForceFieldLikeLigand)
 
-    def __init__(
-        self, per_atom_features: callable = None, max_in_ring_size: int = 10, *args, **kwargs
-    ):
+    def __init__(self, max_in_ring_size: int = 10, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.per_atom_features = per_atom_features or self._per_atom_features
         self.max_in_ring_size = max_in_ring_size
 
-    def _featurize(self, systems: Iterable[System]) -> tuple:
+    def _featurize_one(self, system: System, options: dict) -> tuple:
         """
         Featurizes ligands contained in a System as a labeled graph.
 
         Parameters
         ----------
-        systems : list of System
-            The Systems to be featurized.
+        system : System
+            The System to be featurized.
+        options : dict
+            Unused
 
         Returns
         -------
@@ -324,19 +319,16 @@ class GraphLigandFeaturizer(SingleLigandFeaturizer):
             - Graph connectivity of the molecule with shape ``(2, n_edges)``
             - Feature matrix with shape ``(n_atoms, n_features)``
         """
-        results = []
-        for system in systems:
-            ligand = self._find_ligand(system).to_rdkit()
-            connectivity_graph = self._connectivity_COO_format(ligand)
-            per_atom_features = np.array(
-                [
-                    self._per_atom_features(a, max_in_ring_size=self.max_in_ring_size)
-                    for a in ligand.GetAtoms()
-                ]
-            )
+        ligand = self._find_ligand(system).to_rdkit()
+        connectivity_graph = self._connectivity_COO_format(ligand)
+        per_atom_features = np.array(
+            [
+                self._per_atom_features(a, max_in_ring_size=self.max_in_ring_size)
+                for a in ligand.GetAtoms()
+            ]
+        )
 
-            results.append([connectivity_graph, per_atom_features])
-        return results
+        return connectivity_graph, per_atom_features
 
     @staticmethod
     def _per_atom_features(atom, max_in_ring_size: int = 10):
@@ -345,12 +337,16 @@ class GraphLigandFeaturizer(SingleLigandFeaturizer):
 
         Parameters
         ----------
-            atom: atom to extract features from
-            max_in_ring_size: whether the atom belongs to a ring of this size
+        atom : rdkit.Chem.Atom
+            atom to extract features from
+        max_in_ring_size : int, optional=10
+            whether the atom belongs to a ring of this size
 
         Returns
         -------
-        tuple of atomic features (all 17 included by default).
+        tuple of scalars or vectors
+
+            Atomic features (all 17 included by default):
 
             atomic_number : int
                 the atomic number.
@@ -438,7 +434,6 @@ class GraphLigandFeaturizer(SingleLigandFeaturizer):
         array
             graph connectivity in COO format with shape ``[2, num_edges]``
         """
-
         row, col = [], []
 
         for bond in mol.GetBonds():

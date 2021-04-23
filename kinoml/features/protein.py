@@ -23,7 +23,7 @@ class AminoAcidCompositionFeaturizer(BaseFeaturizer):
     for k in _counter.keys():
         _counter[k] = 0
 
-    def _featurize(self, systems: Iterable[System]) -> np.array:
+    def _featurize_one(self, system: System, options: dict) -> np.array:
         """
         Featurizes a protein using the residue count in the sequence
 
@@ -31,19 +31,18 @@ class AminoAcidCompositionFeaturizer(BaseFeaturizer):
         ----------
         system: System
             The System to be featurized. Sometimes it will
+        options : dict
+            Unused
 
         Returns
         -------
         list of array
             The count of amino acid in the binding site.
         """
-        results = []
-        for system in systems:
-            count = self._counter.copy()
-            count.update(system.protein.sequence)
-            sorted_count = sorted(count.items(), key=lambda kv: kv[0])
-            results.append(np.array([number for aminoacid, number in sorted_count]))
-        return results
+        count = self._counter.copy()
+        count.update(system.protein.sequence)
+        sorted_count = sorted(count.items(), key=lambda kv: kv[0])
+        return np.array([number for _, number in sorted_count])
 
 
 class OneHotEncodedSequenceFeaturizer(BaseOneHotEncodingFeaturizer):

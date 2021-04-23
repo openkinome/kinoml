@@ -38,7 +38,7 @@ class OEHybridDockingFeaturizer(BaseFeaturizer):
     _SUPPORTED_TYPES = (ProteinLigandComplex,)
 
     @lru_cache(maxsize=100)
-    def _featurize(self, systems: Iterable[ProteinLigandComplex]) -> ProteinLigandComplex:
+    def _featurize_one(self, system: ProteinLigandComplex, options: dict) -> ProteinLigandComplex:
         """
         Perform hybrid docking with the OpenEye toolkit and thoughtful defaults.
 
@@ -46,6 +46,8 @@ class OEHybridDockingFeaturizer(BaseFeaturizer):
         ----------
         systems: iterable of ProteinLigandComplex
             A list of System objects holding protein and ligand information.
+        options : dict
+            Unused
 
         Returns
         -------
@@ -56,35 +58,31 @@ class OEHybridDockingFeaturizer(BaseFeaturizer):
 
         from ..docking.OEDocking import create_hybrid_receptor, hybrid_docking
 
-        protein_ligand_complexes = []
-        for system in systems:
-            logging.debug("Interpreting system ...")
-            ligand, protein, electron_density = self._interpret_system(system)
+        logging.debug("Interpreting system ...")
+        ligand, protein, electron_density = self._interpret_system(system)
 
-            logging.debug("Preparing protein ligand complex ...")
-            design_unit = self._get_design_unit(protein, system.protein.name, electron_density)
+        logging.debug("Preparing protein ligand complex ...")
+        design_unit = self._get_design_unit(protein, system.protein.name, electron_density)
 
-            logging.debug("Extracting components ...")
-            # TODO: rename prepared_ligand
-            prepared_protein, prepared_solvent, prepared_ligand = self._get_components(design_unit)
+        logging.debug("Extracting components ...")
+        # TODO: rename prepared_ligand
+        prepared_protein, prepared_solvent, prepared_ligand = self._get_components(design_unit)
 
-            logging.debug("Creating hybrid receptor ...")
-            # TODO: takes quite long, should save this somehow
-            hybrid_receptor = create_hybrid_receptor(prepared_protein, prepared_ligand)
+        logging.debug("Creating hybrid receptor ...")
+        # TODO: takes quite long, should save this somehow
+        hybrid_receptor = create_hybrid_receptor(prepared_protein, prepared_ligand)
 
-            logging.debug("Performing docking ...")
-            docking_pose = hybrid_docking(hybrid_receptor, [ligand])[0]
-            oechem.OEPerceiveResidues(
-                docking_pose, oechem.OEPreserveResInfo_None
-            )  # generate residue information
+        logging.debug("Performing docking ...")
+        docking_pose = hybrid_docking(hybrid_receptor, [ligand])[0]
+        # generate residue information
+        oechem.OEPerceiveResidues(docking_pose, oechem.OEPreserveResInfo_None)
 
-            logging.debug("Retrieving Featurizer results ...")
-            protein_ligand_complex = self._get_featurizer_results(
-                system, prepared_protein, prepared_solvent, docking_pose
-            )
+        logging.debug("Retrieving Featurizer results ...")
+        protein_ligand_complex = self._get_featurizer_results(
+            system, prepared_protein, prepared_solvent, docking_pose
+        )
 
-            protein_ligand_complexes.append(protein_ligand_complex)
-        return protein_ligand_complexes
+        return protein_ligand_complex
 
     @staticmethod
     def _interpret_system(
@@ -473,14 +471,16 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
     _SUPPORTED_TYPES = (ProteinLigandComplex,)
 
     @lru_cache(maxsize=100)
-    def _featurize(self, systems: Iterable[ProteinLigandComplex]) -> ProteinLigandComplex:
+    def _featurize_one(self, system: ProteinLigandComplex, options: dict) -> ProteinLigandComplex:
         """
         Perform hybrid docking in kinases using the OpenEye toolkit, the KLIFS database and thoughtful defaults.
 
         Parameters
         ----------
-        systems : iterable of ProteinLigandComplex
-            A list of System objects holding protein and ligand information.
+        system : ProteinLigandComplex
+            A System objects holding protein and ligand information.
+        options : dict
+            Unused
 
         Returns
         -------
@@ -494,106 +494,102 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
         from ..modeling.OEModeling import compare_molecules, read_smiles
         from ..utils import LocalFileStorage
 
-        kinase_ligand_complexes = []
-        for system in systems:
-            if not hasattr(system.protein, "klifs_kinase_id"):
-                raise NotImplementedError(
-                    f"{self.__class__.__name__} requires a system with a protein having a 'klifs_kinase_id' attribute."
-                )
+        if not hasattr(system.protein, "klifs_kinase_id"):
+            raise NotImplementedError(
+                f"{self.__class__.__name__} requires a system with a protein having a 'klifs_kinase_id' attribute."
+            )
 
-            if not hasattr(system.ligand, "smiles"):
-                raise NotImplementedError(
-                    f"{self.__class__.__name__} requires a system with a ligand having a 'smiles' attribute."
-                )
+        if not hasattr(system.ligand, "smiles"):
+            raise NotImplementedError(
+                f"{self.__class__.__name__} requires a system with a ligand having a 'smiles' attribute."
+            )
 
-            logging.debug("Retrieving kinase details from KLIFS ...")
-            kinase_details = klifs_utils.remote.kinases.kinases_from_kinase_ids(
-                [system.protein.klifs_kinase_id]
-            ).iloc[0]
+        logging.debug("Retrieving kinase details from KLIFS ...")
+        kinase_details = klifs_utils.remote.kinases.kinases_from_kinase_ids(
+            [system.protein.klifs_kinase_id]
+        ).iloc[0]
 
-            # TODO: naming problem with co-crystallized ligand in hybrid docking, see above
-            logging.debug("Searching ligand template ...")
-            ligand_template = self._select_ligand_template(
+        # TODO: naming problem with co-crystallized ligand in hybrid docking, see above
+        logging.debug("Searching ligand template ...")
+        ligand_template = self._select_ligand_template(
+            system.protein.klifs_kinase_id,
+            read_smiles(system.ligand.smiles),
+            self.shape_overlay,
+        )
+        logging.debug(f"Selected {ligand_template.pdb} as ligand template ...")
+
+        logging.debug("Searching kinase template ...")
+        if ligand_template.kinase_ID == system.protein.klifs_kinase_id:
+            protein_template = ligand_template
+        else:
+            protein_template = self._select_protein_template(
                 system.protein.klifs_kinase_id,
-                read_smiles(system.ligand.smiles),
-                self.shape_overlay,
+                ligand_template.DFG,
+                ligand_template.aC_helix,
             )
-            logging.debug(f"Selected {ligand_template.pdb} as ligand template ...")
+        logging.debug(f"Selected {protein_template.pdb} as kinase template ...")
 
-            logging.debug("Searching kinase template ...")
-            if ligand_template.kinase_ID == system.protein.klifs_kinase_id:
-                protein_template = ligand_template
-            else:
-                protein_template = self._select_protein_template(
-                    system.protein.klifs_kinase_id,
-                    ligand_template.DFG,
-                    ligand_template.aC_helix,
-                )
-            logging.debug(f"Selected {protein_template.pdb} as kinase template ...")
+        logging.debug(f"Adding attributes to BaseProtein ...")  # TODO: bad idea in a library
+        system.protein.pdb_id = protein_template.pdb
+        system.protein.path = LocalFileStorage.rcsb_structure_pdb(protein_template.pdb)
+        system.protein.electron_density_path = LocalFileStorage.rcsb_electron_density_mtz(
+            protein_template.pdb
+        )
 
-            logging.debug(f"Adding attributes to BaseProtein ...")  # TODO: bad idea in a library
-            system.protein.pdb_id = protein_template.pdb
-            system.protein.path = LocalFileStorage.rcsb_structure_pdb(protein_template.pdb)
-            system.protein.electron_density_path = LocalFileStorage.rcsb_electron_density_mtz(
-                protein_template.pdb
+        logging.debug(f"Interpreting system ...")
+        ligand, protein, electron_density = self._interpret_system(system)
+
+        logging.debug(f"Preparing kinase template structure of {protein_template.pdb} ...")
+        ligand_name = None
+        if protein_template.ligand != 0:
+            ligand_name = str(protein_template.ligand)
+        design_unit = self._get_design_unit(
+            protein, protein_template.pdb, electron_density, ligand_name
+        )
+
+        logging.debug("Extracting components ...")
+        prepared_kinase, prepared_solvent = self._get_components(design_unit)[:2]
+
+        logging.debug("Processing kinase domain ...")
+        processed_kinase_domain = self._process_kinase_domain(
+            prepared_kinase, kinase_details.uniprot
+        )
+
+        logging.debug(f"Preparing ligand template structure of {ligand_template.pdb} ...")
+        prepared_ligand_template = self._prepare_ligand_template(
+            ligand_template, processed_kinase_domain
+        )
+
+        logging.debug("Checking for co-crystallized ligand ...")
+        if (
+            compare_molecules(ligand, prepared_ligand_template)
+            and ligand_template.pdb == protein_template.pdb
+        ):
+            logging.debug(f"Found co-crystallized ligand ...")
+            docking_pose = prepared_ligand_template
+        else:
+            logging.debug(f"Creating artificial hybrid receptor ...")
+            hybrid_receptor = create_hybrid_receptor(
+                processed_kinase_domain, prepared_ligand_template
             )
+            logging.debug("Performing docking ...")
+            docking_pose = hybrid_docking(hybrid_receptor, [ligand])[0]
+            oechem.OEPerceiveResidues(
+                docking_pose, oechem.OEPreserveResInfo_None
+            )  # generate residue information
 
-            logging.debug(f"Interpreting system ...")
-            ligand, protein, electron_density = self._interpret_system(system)
-
-            logging.debug(f"Preparing kinase template structure of {protein_template.pdb} ...")
-            ligand_name = None
-            if protein_template.ligand != 0:
-                ligand_name = str(protein_template.ligand)
-            design_unit = self._get_design_unit(
-                protein, protein_template.pdb, electron_density, ligand_name
-            )
-
-            logging.debug("Extracting components ...")
-            prepared_kinase, prepared_solvent = self._get_components(design_unit)[:2]
-
-            logging.debug("Processing kinase domain ...")
-            processed_kinase_domain = self._process_kinase_domain(
-                prepared_kinase, kinase_details.uniprot
-            )
-
-            logging.debug(f"Preparing ligand template structure of {ligand_template.pdb} ...")
-            prepared_ligand_template = self._prepare_ligand_template(
-                ligand_template, processed_kinase_domain
-            )
-
-            logging.debug("Checking for co-crystallized ligand ...")
-            if (
-                compare_molecules(ligand, prepared_ligand_template)
-                and ligand_template.pdb == protein_template.pdb
-            ):
-                logging.debug(f"Found co-crystallized ligand ...")
-                docking_pose = prepared_ligand_template
-            else:
-                logging.debug(f"Creating artificial hybrid receptor ...")
-                hybrid_receptor = create_hybrid_receptor(
-                    processed_kinase_domain, prepared_ligand_template
-                )
-                logging.debug("Performing docking ...")
-                docking_pose = hybrid_docking(hybrid_receptor, [ligand])[0]
-                oechem.OEPerceiveResidues(
-                    docking_pose, oechem.OEPreserveResInfo_None
-                )  # generate residue information
-
-            logging.debug("Retrieving Featurizer results ...")
-            kinase_ligand_complex = self._get_featurizer_results(
-                system,
-                processed_kinase_domain,
-                prepared_solvent,
-                docking_pose,
-                other_pdb_header_info=[
-                    ("COMPND", f"\tKinase template: {protein_template.pdb}"),
-                    ("COMPND", f"\tLigand template: {ligand_template.pdb}"),
-                ],
-            )
-            kinase_ligand_complexes.append(kinase_ligand_complex)
-
-        return kinase_ligand_complexes  # TODO: MDAnalysis objects
+        logging.debug("Retrieving Featurizer results ...")
+        kinase_ligand_complex = self._get_featurizer_results(
+            system,
+            processed_kinase_domain,
+            prepared_solvent,
+            docking_pose,
+            other_pdb_header_info=[
+                ("COMPND", f"\tKinase template: {protein_template.pdb}"),
+                ("COMPND", f"\tLigand template: {ligand_template.pdb}"),
+            ],
+        )
+        return kinase_ligand_complex  # TODO: MDAnalysis objects
 
     def _select_ligand_template(
         self, klifs_kinase_id: int, ligand: oechem.OEGraphMol, shape_overlay: bool

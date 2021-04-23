@@ -6,12 +6,15 @@ All ``Featurizer`` objects inherit from ``BaseFeaturizer`` and reimplement `._fe
 and `._supports`, if needed.
 """
 from __future__ import annotations
-from typing import Hashable, Iterable, Union
+from typing import Callable, Hashable, Iterable, Sequence
 import hashlib
+from multiprocessing import Pool
+from functools import partial
 
 import numpy as np
 
 from ..core.systems import System
+from ..utils import Hashabledict
 
 
 class BaseFeaturizer:
@@ -24,29 +27,40 @@ class BaseFeaturizer:
     def __init__(self, *args, **kwargs):
         pass
 
-    def featurize(self, systems: Iterable[System]) -> object:
+    def featurize(self, systems: Iterable[System], processes=1, chunksize=None) -> object:
         """
         Given some systems (compatible with ``_SUPPORTED_TYPES``), apply
         the featurization scheme implemented in this class.
+
+        First, ``self.supports()`` will check whether the systems are compatible
+        with the featurization scheme. We assume all of them are equal, so only
+        the first one will be checked. Then, the Systems are passed to
+        ``self._featurize`` to handle the actual leg-work.
 
         Parameters
         ----------
         systems : list of System
             This is the collection of System objects that will be transformed
+        processes : int, optional=1
+            Number of processors to use. If 1, ``multiprocessing`` will not be
+            used at all.
+        chunksize :  int, optional=None
+            See https://stackoverflow.com/a/54032744/3407590.
 
         Returns
         -------
-        system: System
-            The same system that was passed in, unless ``inplace`` is False.
-            The returned System will have an extra entry in the ``.featurizations``
+        systems : list of System
+            The same systems that were passed in.
+            The returned Systems will have an extra entry in the ``.featurizations``
             dictionary, containing the featurized object (either a new System
-            or an array-like object) undera key named after ``.name``.
+            or an array-like object) under a key named after ``.name``.
         """
         self.supports(systems[0])
-        features = self._featurize(tuple(systems))
+        features = self._featurize(systems)
+
         # TODO: Define self.id() to provide a unique key per class name and chosen init args
         for system, feature in zip(systems, features):
-            system.featurizations[self.name] = feature
+            system.featurizations[self.name] = system.featurizations["last"] = feature
         return systems
 
     def __call__(self, *args, **kwargs):
@@ -56,14 +70,75 @@ class BaseFeaturizer:
         """
         return self.featurize(*args, **kwargs)
 
-    def _featurize(self, systems: Iterable[System]) -> object:
+    def _featurize(self, systems: Iterable[System], processes=1, chunksize=None):
         """
-        Implement this method to do the actual work for `self.featurize()`.
+        Some global properties can be optionally computed with
+        ``self._featurize_options()``. This returns a dictionary that will
+        be passed to ``self._featurize_one``, the method responsible of
+        featurizing each System object. This part will be automatically parallelized
+        if ``processes != 1``.
 
         Parameters
         ----------
-        systems: list of System
-            The Systems to be featurized.
+        systems : list of System
+            This is the collection of System objects that will be transformed
+        processes : int, optional=1
+            Number of processors to use. If 1, ``multiprocessing`` will not be
+            used at all.
+        chunksize :  int, optional=None
+            See https://stackoverflow.com/a/54032744/3407590.
+
+        Returns
+        -------
+        features : list of System or array-like
+        """
+        featurization_options = Hashabledict(self._featurize_options(systems) or {})
+
+        if processes == 1:
+            features = [self._featurize_one(s, options=featurization_options) for s in systems]
+        else:
+            func = partial(self._featurize_one, options=featurization_options)
+            with Pool(processes=processes) as pool:
+                features = pool.map(func, systems, chunksize)
+
+        return features
+
+    def _featurize_options(self, systems: Iterable[System]) -> dict | None:
+        """
+        Computes properties that depend on a collection of System objects,
+        which might be needed to featurize a single system later (e.g.
+        maximum length of a feature that needs to be padded).
+
+        Parameters
+        ----------
+        systems : list of System
+            The Systems that will be eventually featurized.
+
+        Returns
+        -------
+        dict[str, object]
+            Keyword arguments computed out of the list of Systems. Some
+            featurizers require this dynamically computed set of options.
+        """
+        return None
+
+    def _featurize_one(self, system: System, options: dict) -> object:
+        """
+        Implement this method to do the actual leg-work for `self.featurize()`.
+        It takes a single System object and some options (see ``self._featurize_options``)
+        and returns either a new System object or an array-like object.
+
+        Parameters
+        ----------
+        system : System
+            The System to be featurized.
+        options : dict
+            Keyword arguments for this featurizer, usually computed by
+            ``self._featurize_options``.
+
+        Returns
+        -------
+        System or array-like
         """
         raise NotImplementedError("Implement in your subclass")
 
@@ -136,7 +211,7 @@ class Pipeline(BaseFeaturizer):
     def __init__(self, featurizers: Iterable[BaseFeaturizer]):
         self.featurizers = featurizers
 
-    def _featurize(self, systems_or_arrays: Iterable[Union[System, np.ndarray]]):
+    def _featurize(self, systems: Iterable[System], processes=1, chunksize=None):
         """
         Given a list of featurizers, apply them sequentially
         on the systems/arrays (e.g. featurizer A returns X, and X is
@@ -144,12 +219,25 @@ class Pipeline(BaseFeaturizer):
 
         Parameters
         ----------
-        systems_or_arrays: list of System or array-like
-            The Systems (or arrays) to be featurized.
+        systems : list of System
+            This is the collection of System objects that will be transformed
+        processes : int, optional=1
+            Number of processors to use. If 1, ``multiprocessing`` will not be
+            used at all.
+        chunksize :  int, optional=None
+            See https://stackoverflow.com/a/54032744/3407590.
+
+        Returns
+        -------
+        features : list of System or array-like
         """
         for featurizer in self.featurizers:
-            systems_or_arrays = featurizer._featurize(systems_or_arrays)
-        return systems_or_arrays
+            system_or_array = featurizer._featurize(
+                systems,
+                processes=processes,
+                chunksize=chunksize,
+            )
+        return system_or_array
 
     def supports(self, *systems: System, raise_errors: bool = False) -> bool:
         """
@@ -199,7 +287,7 @@ class Concatenated(Pipeline):
         self.featurizers = featurizers
         self.axis = axis
 
-    def _featurize(self, systems_or_arrays: Iterable[Union[System, np.ndarray]]):
+    def _featurize(self, systems: Iterable[System], processes=1, chunksize=None):
         """
         Given a list of featurizers, apply them serially and concatenate
         the result (e.g. featurizer A returns X, and featurizer B returns Y;
@@ -210,7 +298,10 @@ class Concatenated(Pipeline):
         systems_or_arrays: list of System or array-like
             The Systems (or arrays) to be featurized.
         """
-        features = [f._featurize(systems_or_arrays) for f in self.featurizers]
+        features = [
+            f._featurize(systems, processes=processes, chunksize=chunksize)
+            for f in self.featurizers
+        ]
         return np.concatenate(features, axis=self.axis)
 
 
@@ -224,18 +315,23 @@ class BaseOneHotEncodingFeaturizer(BaseFeaturizer):
         if not self.dictionary:
             raise ValueError("This featurizer requires a populated dictionary!")
 
-    def _featurize(self, systems: Iterable[System]):
+    def _featurize_one(self, system: System, options: dict) -> np.ndarray:
         """
+        One hot encode one system.
+
         Parameters
         ----------
-        systems: list of System
-            The Systems to be featurized.
+        system : System
+            The System to be featurized.
+        options : dict
+            Unused
+
+        Returns
+        -------
+        array
         """
-        matrices = []
-        for system in systems:
-            sequence = self._retrieve_sequence(system)
-            matrices.append(self.one_hot_encode(sequence, self.dictionary))
-        return matrices
+        sequence = self._retrieve_sequence(system)
+        return self.one_hot_encode(sequence, self.dictionary)
 
     def _retrieve_sequence(self, system: System):
         """
@@ -244,21 +340,23 @@ class BaseOneHotEncodingFeaturizer(BaseFeaturizer):
         raise NotImplementedError
 
     @staticmethod
-    def one_hot_encode(sequence: str, dictionary: dict) -> np.ndarray:
+    def one_hot_encode(sequence: Iterable, dictionary: dict | Sequence) -> np.ndarray:
         """
         One-hot encode a sequence of characters, given a dictionary
-
         Parameters
         ----------
-        sequence : str
-        dictionary : dict
-            Mapping of each character to their position in the alphabet
-
+        sequence : Iterable
+        dictionary : dict or sequuence-like
+            Mapping of each character to their position in the alphabet. If
+            a sequence-like is given, it will be enumerated into a dict.
         Returns
         -------
         array-like
             One-hot encoded matrix with shape ``(len(dictionary), len(sequence))``
         """
+        if not isinstance(dictionary, dict):
+            dictionary = {value: index for (index, value) in enumerate(dictionary)}
+
         ohe_matrix = np.zeros((len(dictionary), len(sequence)))
         for i, character in enumerate(sequence):
             ohe_matrix[dictionary[character], i] = 1
@@ -269,7 +367,7 @@ class PadFeaturizer(BaseFeaturizer):
     """
     Pads features of a given system to a desired size or length.
 
-    This class wraps ``numpy.pad`` with `mode=constant`, auto-calculating
+    This class wraps ``numpy.pad`` with ``mode=constant``, auto-calculating
     the needed additions to match the requested shape.
 
     Parameters
@@ -289,30 +387,53 @@ class PadFeaturizer(BaseFeaturizer):
         self.key = key
         self.pad_with = pad_with
 
-    def _featurize(self, systems_or_arrays: Iterable[Union[System, np.ndarray]]) -> np.ndarray:
+    def _get_array(self, system_or_array: System | np.ndarray) -> np.ndarray:
+        if hasattr(system_or_array, "featurizations"):
+            return np.asarray(system_or_array.featurizations[self.key])
+        else:
+            return system_or_array
+
+    def _featurize_options(self, systems: Iterable[System]) -> dict | None:
+        """
+        Compute the largest shape in the input arrays
+
+        Parameters
+        ----------
+        systems : list of System
+
+        Returns
+        -------
+        dict
+            A dictionary containing a single key ``shape``
+            with the largest shape found.
+        """
+        if self.shape == "auto":
+            arraylikes = [self._get_array(s) for s in systems]
+            return {"shape": max(a.shape for a in arraylikes)}
+
+    def _featurize_one(self, system: System, options: dict) -> np.ndarray:
         """
         Parameters
         ----------
-        systems_or_arrays: list of System or array-like
-            The Systems (or arrays) to be featurized.
+        system: System or array-like
+            The System (or array) to be featurized.
+        options: dict
+            Must contain a key ``shape`` with the expected final shape
+            of the systems.
+
+        Returns
+        -------
+        array
         """
-        if hasattr(systems_or_arrays[0], "featurizations"):
-            arraylikes = [np.asarray(sa.featurizations[self.key]) for sa in systems_or_arrays]
-        else:
-            arraylikes = systems_or_arrays
-
-        shape = max(a.shape for a in arraylikes) if self.shape == "auto" else self.shape
-
-        padded = []
-        for arraylike in arraylikes:
-            pads = []
-            for current_size, requested_size in zip(arraylike.shape, shape):
-                assert (
-                    requested_size >= current_size
-                ), f"{requested_size} is smaller than {current_size}!"
-                pads.append([0, requested_size - current_size])
-            padded.append(np.pad(arraylike, pads, mode="constant", constant_values=self.pad_with))
-        return padded
+        shape = options.get("shape", self.shape)
+        arraylike = self._get_array(system)
+        pads = []
+        for current_size, requested_size in zip(arraylike.shape, shape):
+            assert (
+                requested_size >= current_size
+            ), f"{requested_size} is smaller than {current_size}!"
+            pads.append([0, requested_size - current_size])
+        return np.pad(arraylike, pads, mode="constant", constant_values=self.pad_with)
 
 
 class HashFeaturizer(BaseFeaturizer):
@@ -322,73 +443,74 @@ class HashFeaturizer(BaseFeaturizer):
 
     Parameters
     ----------
-    attribute : str or tuple
-        Attribute(s) in the target object that will be hashed
+    getter : callable, optional
+        A function or lambda that takes a System and returns
+        a string to be hashed. Default value will return
+        whatever ``system.featurizations["last"]`` contains,
+        as a string
     normalize : bool, default=True
         Normalizes the hash to obtain a value in the unit interval
     """
 
-    def __init__(self, attributes, normalize=True, *args, **kwargs):
+    def __init__(self, getter: Callable[[System], str] = None, normalize=True, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.attributes = attributes
+        self.getter = getter or self._getter
         self.normalize = normalize
+        self.denominator = 2 ** 256 if normalize else 1
 
-    def _featurize(self, systems: Iterable[System]):
+    @staticmethod
+    def _getter(system):
+        return str(system.featurizations["last"])
+
+    def _featurize_one(self, system: System, options: dict) -> np.ndarray:
         """
         Featurizes a component using the hash of the chosen attribute.
 
         Parameters
         ----------
-        systems : list of System
-            The Systems to be featurized.
-
-        Returns
-        -------
-        list of array
-            Sha256'd attributes
-        """
-        results = []
-        denominator = 2 ** 256 if self.normalize else 1
-        for system in systems:
-            inputdata = system
-            for attr in self.attributes:
-                inputdata = getattr(inputdata, attr)
-
-            h = hashlib.sha256(inputdata.encode(encoding="UTF-8"))
-            result = np.reshape(int(h.hexdigest(), base=16) / denominator, (1,))
-            results.append(result)
-        return results
-
-
-class NullFeaturizer(BaseFeaturizer):
-    def featurize(self, systems: Iterable[System]) -> Iterable[System]:
-        return systems
-
-
-class ScaleFeaturizer(BaseFeaturizer):
-    """
-    WIP
-    """
-
-    def __init__(self, key: Hashable = "last", **kwargs):
-        self.key = key
-        self.sklearn_options = kwargs
-
-    def _featurize(self, systems_or_arrays: Iterable[Union[System, np.ndarray]]) -> np.ndarray:
-        """
-        Parameters
-        ----------
-        systems_or_arrays: list of System or array-like
+        system : System
             The System to be featurized.
 
         Returns
         -------
-        list of array-like
+        array
+            Sha256'd attribute
         """
-        from sklearn.preprocessing import scale
+        inputdata = self.getter(system)
 
-        if hasattr(systems_or_arrays[0], "featurizations"):
-            arraylikes = [np.asarray(sa.featurizations[self.key]) for sa in systems_or_arrays]
-        else:
-            arraylikes = systems_or_arrays
-        return [scale(arr, **self.sklearn_options) for arr in arraylikes]
+        h = hashlib.sha256(inputdata.encode(encoding="UTF-8"))
+        return np.array(int(h.hexdigest(), base=16) / self.denominator)
+
+
+class NullFeaturizer(BaseFeaturizer):
+    def _featurize(self, systems: Iterable[System], processes=1, chunksize=None) -> object:
+        return systems
+
+
+class CallableFeaturizer(BaseFeaturizer):
+    """
+    Apply an arbitrary callable to a System.
+
+    Parameters
+    ----------
+    func : callable
+        Must take a System and return a System or array.
+    """
+
+    def __init__(self, func: Callable[[System], System | np.array]):
+        self.callable = func
+
+    def _featurize_one(self, system: System | np.ndarray, options: dict) -> np.ndarray:
+        """
+        Parameters
+        ----------
+        system: System or array-like
+            The System (or array) to be featurized.
+        options : dict
+            Unused
+
+        Returns
+        -------
+        array-like
+        """
+        return self.callable(system)
