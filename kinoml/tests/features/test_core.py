@@ -15,6 +15,7 @@ from kinoml.features.core import (
     HashFeaturizer,
     NullFeaturizer,
     CallableFeaturizer,
+    ClearFeaturizations,
 )
 
 
@@ -77,6 +78,8 @@ def test_PadFeaturizer():
     for s in systems:
         assert s.featurizations["last"].shape == (53, 3)
 
+    return systems
+
 
 def test_HashFeaturizer():
     system = LigandSystem([SmilesLigand.from_smiles("CCC")])
@@ -104,3 +107,36 @@ def test_CallableFeaturizer():
 
     for s in systems:
         assert s.featurizations["last"].shape
+
+
+def test_ClearFeaturizations_keeplast():
+    from kinoml.features.ligand import OneHotSMILESFeaturizer
+
+    systems = (
+        System([RDKitLigand.from_smiles("C")]),
+        System([RDKitLigand.from_smiles("CC")]),
+        System([RDKitLigand.from_smiles("CCC")]),
+    )
+    OneHotSMILESFeaturizer().featurize(systems)
+    PadFeaturizer().featurize(systems)
+    ClearFeaturizations().featurize(systems)
+
+    for s in systems:
+        assert len(s.featurizations) == 1
+        assert "last" in s.featurizations
+
+
+def test_ClearFeaturizations_removeall():
+    from kinoml.features.ligand import OneHotSMILESFeaturizer
+
+    systems = (
+        System([RDKitLigand.from_smiles("C")]),
+        System([RDKitLigand.from_smiles("CC")]),
+        System([RDKitLigand.from_smiles("CCC")]),
+    )
+    OneHotSMILESFeaturizer().featurize(systems)
+    PadFeaturizer().featurize(systems)
+    ClearFeaturizations(keys=tuple(), style="keep").featurize(systems)
+
+    for s in systems:
+        assert not s.featurizations

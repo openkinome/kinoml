@@ -57,10 +57,7 @@ class BaseFeaturizer:
         """
         self.supports(systems[0])
         features = self._featurize(systems)
-
-        # TODO: Define self.id() to provide a unique key per class name and chosen init args
-        for system, feature in zip(systems, features):
-            system.featurizations[self.name] = system.featurizations["last"] = feature
+        systems = self._post_featurize(systems, features)
         return systems
 
     def __call__(self, *args, **kwargs):
@@ -141,6 +138,30 @@ class BaseFeaturizer:
         System or array-like
         """
         raise NotImplementedError("Implement in your subclass")
+
+    def _post_featurize(
+        self, systems: Iterable[System], features: Iterable[System | np.array]
+    ) -> Iterable[System]:
+        """
+        Run after featurizing all systems. You shouldn't need to redefine this method
+
+        Parameters
+        ----------
+        systems : list of System
+            The systems being featurized
+        features : list of System or array
+            The features returned by ``self._featurize``
+
+        Returns
+        -------
+        systems
+            The same systems as passed, but with ``.featurizations`` extended with
+            the calculated features in two entries: the featurizer name and ``last``.
+        """
+        # TODO: Define self.id() to provide a unique key per class name and chosen init args
+        for system, feature in zip(systems, features):
+            system.featurizations[self.name] = system.featurizations["last"] = feature
+        return systems
 
     def supports(self, *systems: System, raise_errors: bool = True) -> bool:
         """
@@ -514,3 +535,43 @@ class CallableFeaturizer(BaseFeaturizer):
         array-like
         """
         return self.callable(system)
+
+
+class ClearFeaturizations(BaseFeaturizer):
+    """
+    Remove keys from the ``.featurizations`` dictionary in each
+    ``System`` object. By default, it will remove all keys
+    that are not ``last``.
+
+    Parameters
+    ----------
+    keys : tuple of str, optional=("last",)
+        Which keys to keep or remove, depending on ``style``.
+    style : str, optional="keep"
+        Whether to ``keep`` or ``remove`` the entries passed as ``keys``.
+    """
+
+    def __init__(self, keys=("last",), style="keep"):
+        assert style in ("keep", "remove"), "`style` must be `keep` or `remove`"
+        self.keys = keys
+        self.style = style
+
+    def _featurize_one(self, system: System, options: dict) -> System:
+        if self.style == "keep":
+            to_remove = [k for k in system.featurizations.keys() if k not in self.keys]
+        else:
+            to_remove = self.keys
+
+        for key in to_remove:
+            system.featurizations.pop(key, None)
+
+        return system
+
+    def _post_featurize(
+        self, systems: Iterable[System], features: Iterable[System | np.array]
+    ) -> Iterable[System]:
+        """
+        Bypass the automated population of the ``.featurizations`` dict
+        in each System
+        """
+        return systems

@@ -62,9 +62,6 @@ class BaseDatasetProvider:
     def featurize(self, *featurizers: Iterable[BaseFeaturizer]):
         raise NotImplementedError
 
-    def clear_featurizations(self):
-        raise NotImplementedError
-
     def featurized_systems(self, key="last"):
         raise NotImplementedError
 
@@ -179,13 +176,6 @@ class DatasetProvider(BaseDatasetProvider):
                 invalid,
             )
         return systems
-
-    def clear_featurizations(self):
-        """
-        Clear all the featurization dictionaries present in the systems contained here
-        """
-        for system in self.systems:
-            system.featurizations.clear()
 
     def featurized_systems(self, key="last"):
         """
