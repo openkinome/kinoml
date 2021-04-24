@@ -543,7 +543,7 @@ class OEKLIFSKinaseApoFeaturizer(OEHybridDockingFeaturizer):
         protein: Protein
             The same system but prepared.
         """
-        from ..modeling.OEModeling import get_expression_tags, delete_residue
+        from ..modeling.OEModeling import get_expression_tags, delete_residue, select_chain
         from ..utils import LocalFileStorage
 
         logging.debug("Interpreting kinase of interest ...")
@@ -591,6 +591,9 @@ class OEKLIFSKinaseApoFeaturizer(OEHybridDockingFeaturizer):
 
         logging.debug("Extracting kinase and solvent from design unit ...")
         prepared_kinase, prepared_solvent = self._get_components(design_unit)[:-1]
+
+        logging.debug("Selecting chain of solvent ...")
+        prepared_solvent = select_chain(prepared_solvent, kinase_details["structure.chain"])
 
         logging.debug("Deleting expression tags ...")
         expression_tags = get_expression_tags(kinase_structure)
@@ -1049,7 +1052,13 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEKLIFSKinaseApoFeaturizer):
         from openeye import oechem
 
         from ..docking.OEDocking import create_hybrid_receptor, hybrid_docking
-        from ..modeling.OEModeling import compare_molecules, read_smiles, get_expression_tags, delete_residue
+        from ..modeling.OEModeling import (
+            compare_molecules,
+            read_smiles,
+            get_expression_tags,
+            delete_residue,
+            select_chain
+        )
         from ..utils import LocalFileStorage
 
         logging.debug("Interpreting kinase kinase of interest ...")
@@ -1111,6 +1120,9 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEKLIFSKinaseApoFeaturizer):
             ligand_template,
             protein_template["structure.chain"]
         )
+
+        logging.debug("Selecting chain of solvent ...")
+        prepared_solvent = select_chain(prepared_solvent, protein_template["structure.chain"])
 
         logging.debug("Deleting expression tags ...")
         expression_tags = get_expression_tags(kinase_structure)
