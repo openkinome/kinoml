@@ -1164,12 +1164,13 @@ def apply_insertions(
 
     sidechain_options = oespruce.OESidechainBuilderOptions()
     loop_options = oespruce.OELoopBuilderOptions()
+    loop_options.SetOptimizationMaxLoops(5)
     loop_db = str(Path(loop_db).expanduser().resolve())
     loop_options.SetLoopDBFilename(loop_db)
     # the hierarchy view is more stable if reinitialized after each change
     # https://docs.eyesopen.com/toolkits/python/oechemtk/biopolymers.html#a-hierarchy-view
     while True:
-        altered = False
+        reinitialize = False
         # align template and target sequences
         target_sequence_aligned, template_sequence_aligned = get_structure_sequence_alignment(
             target_structure, template_sequence)
@@ -1184,13 +1185,13 @@ def apply_insertions(
             start_residue = structure_residues[gap_start]
             end_residue = structure_residues[gap_start + 1]
             gap_sequence = template_sequence_aligned[gap.start() + 1:gap.end() - 1]
-            modeled_structure = oechem.OEMol()
+            loop_conformations = oechem.OEMol()
             logging.debug(f"Trying to build loop {gap_sequence} " +
                           f"between residues {start_residue.GetResidueNumber()}" +
                           f" and {end_residue.GetResidueNumber()} ...")
             # build loop and reinitialize if successful
             if oespruce.OEBuildSingleLoop(
-                    modeled_structure,
+                    loop_conformations,
                     target_structure,
                     gap_sequence,
                     start_residue.GetOEResidue(),
@@ -1198,23 +1199,46 @@ def apply_insertions(
                     sidechain_options,
                     loop_options
             ):
-                # break loop and reinitialize
-                logging.debug("Successfully built loop!")
-                target_structure = oechem.OEGraphMol(modeled_structure)
-                # break loop and reinitialize
-                altered = True
+                logging.debug("Successfully built loop conformations!")
+                for i, loop_conformation in enumerate(loop_conformations.GetConfs()):
+                    # loop modeling from OESpruce can lead to ring penetration, e.g. 3bel
+                    # the next step tries to fix those issues
+                    logging.debug("Deleting newly modeled side chains with severe clashes ...")
+                    loop_conformation = oechem.OEGraphMol(loop_conformation)
+                    loop_conformation = delete_clashing_sidechains(loop_conformation)
+                    oespruce.OEBuildSidechains(loop_conformation)
+                    clashes = len(oespruce.OEGetPartialResidues(loop_conformation))
+                    if clashes == 0:
+                        # break conformation evaluation
+                        target_structure = loop_conformation
+                        reinitialize = True
+                        break
+                    logging.debug(
+                        f"Generated loop conformation {i} contains not fixable severe clashes, trying next!"
+                    )
+            if reinitialize:
+                # break and reinitialize
                 break
             else:
-                logging.debug("Failed building loop!")
-                # break bond between residues next to insertion
-                # may happen if an isoform specific insertion failed
-                target_structure = _disconnect_residues(
-                    target_structure,
-                    start_residue,
-                    end_residue
-                )
-        # leave while loop if no changes were introduced
-        if not altered:
+                # increase number of loops to optimize
+                if loop_options.GetOptimizationMaxLoops() == 5:
+                    logging.debug("Increasing number of loops to optimize to 25!")
+                    loop_options.SetOptimizationMaxLoops(25)
+                    # break and reinitialize
+                    reinitialize = True
+                    break
+                else:
+                    loop_options.SetOptimizationMaxLoops(5)
+                    logging.debug("Failed building loop without clashes, skipping insertion!")
+                    # break bond between residues next to insertion
+                    # important if an isoform specific insertion failed
+                    target_structure = _disconnect_residues(
+                        target_structure,
+                        start_residue,
+                        end_residue
+                    )
+        # leave while loop
+        if not reinitialize:
             break
 
     # add hydrogen to newly modeled residues
