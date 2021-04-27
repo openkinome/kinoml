@@ -227,6 +227,14 @@ class Pipeline(BaseFeaturizer):
     featurizers: list of BaseFeaturizer
         Featurizers to stack. They must be compatible with
         each other!
+
+    Note
+    ----
+    While ``Pipeline`` is a subclass of ``BaseFeaturizer``,
+    it should be considered a special case of such. It indeed
+    shares the same API but the implementation details of
+    ``._featurize()`` are slightly different. It acts as a
+    wrapper around individual ``Featurizer`` objects.
     """
 
     def __init__(self, featurizers: Iterable[BaseFeaturizer]):
@@ -253,11 +261,12 @@ class Pipeline(BaseFeaturizer):
         features : list of System or array-like
         """
         for featurizer in self.featurizers:
-            system_or_array = featurizer._featurize(
+            system_or_array = featurizer.featurize(
                 systems,
                 processes=processes,
                 chunksize=chunksize,
             )
+
         return system_or_array
 
     def supports(self, *systems: System, raise_errors: bool = False) -> bool:
@@ -302,13 +311,21 @@ class Concatenated(Pipeline):
         so the can be concatenated.
     axis : int, optional=0
         On which axis to concatenate
+
+    Note
+    ----
+    While ``Concatenated`` is a subclass of ``BaseFeaturizer``,
+    it should be considered a special case of such. It indeed
+    shares the same API but the implementation details of
+    ``._featurize()`` are slightly different. It acts as a
+    wrapper around individual ``Featurizer`` objects.
     """
 
     def __init__(self, featurizers: Iterable[BaseFeaturizer], axis=0):
         self.featurizers = featurizers
         self.axis = axis
 
-    def _featurize(self, systems: Iterable[System], processes=1, chunksize=None):
+    def _featurize(self, systems: Iterable[System], processes=1, chunksize=None) -> np.ndarray:
         """
         Given a list of featurizers, apply them serially and concatenate
         the result (e.g. featurizer A returns X, and featurizer B returns Y;
@@ -316,11 +333,16 @@ class Concatenated(Pipeline):
 
         Parameters
         ----------
-        systems_or_arrays: list of System or array-like
+        systems: list of System or array-like
             The Systems (or arrays) to be featurized.
+
+        Returns
+        -------
+        np.ndarray
+            Concatenated arrays along specified ``axis``.
         """
         features = [
-            f._featurize(systems, processes=processes, chunksize=chunksize)
+            f.featurize(systems, processes=processes, chunksize=chunksize)
             for f in self.featurizers
         ]
         return np.concatenate(features, axis=self.axis)
