@@ -399,7 +399,9 @@ class GraphLigandFeaturizer(SingleLigandFeaturizer):
                 # 4. Aromaticity
                 atom.GetIsAromatic(),
                 # 5. Total numbers of bonds
-                atom.GetDegree(),
+                *BaseOneHotEncodingFeaturizer.one_hot_encode(
+                    [atom.GetDegree()], [_ for _ in range(11)]
+                ).flatten(),
                 # 6. Total number of hydrogens
                 atom.GetTotalNumHs(),
                 # 7. Number of implicit hydrogens

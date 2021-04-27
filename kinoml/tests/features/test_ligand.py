@@ -170,7 +170,17 @@ def test_ligand_OneHotSMILESFeaturizer_RDKit(smiles, solution):
                             0.0,  # .
                             0.0,  # end of OHE'd atom.GetHybridization().name
                             0.0,  # atom.GetIsAromatic()
-                            0.0,  # atom.GetDegree()
+                            1.0,  # start of OHE'd atom.GetDegree()
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # end of OHE'd atom.GetDegree()
                             4.0,  # atom.GetTotalNumHs()
                             4.0,  # atom.GetNumImplicitHs()
                             0.0,  # atom.GetNumRadicalElectrons()
@@ -240,7 +250,17 @@ def test_ligand_OneHotSMILESFeaturizer_RDKit(smiles, solution):
                             0.0,  # .
                             0.0,  # end of OHE'd atom.GetHybridization().name
                             0.0,  # atom.GetIsAromatic()
-                            1.0,  # atom.GetDegree()
+                            0.0,  # start of OHE'd atom.GetDegree()
+                            1.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # end of OHE'd atom.GetDegree()
                             3.0,  # atom.GetTotalNumHs()
                             3.0,  # atom.GetNumImplicitHs()
                             0.0,  # atom.GetNumRadicalElectrons()
@@ -300,7 +320,17 @@ def test_ligand_OneHotSMILESFeaturizer_RDKit(smiles, solution):
                             0.0,  # .
                             0.0,  # end of OHE'd atom.GetHybridization().name
                             0.0,  # atom.GetIsAromatic()
-                            1.0,  # atom.GetDegree()
+                            0.0,  # start of OHE'd atom.GetDegree()
+                            1.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # .
+                            0.0,  # end of OHE'd atom.GetDegree()
                             3.0,  # atom.GetTotalNumHs()
                             3.0,  # atom.GetNumImplicitHs()
                             0.0,  # atom.GetNumRadicalElectrons()
