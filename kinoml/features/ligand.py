@@ -326,8 +326,6 @@ class GraphLigandFeaturizer(SingleLigandFeaturizer):
         """
         Computes desired features for each atom in the molecular graph.
 
-        TODO: Update this docstring
-
         Parameters
         ----------
         atom: rdkit.Chem.Atom
@@ -335,42 +333,28 @@ class GraphLigandFeaturizer(SingleLigandFeaturizer):
 
         Returns
         -------
-        tuple of atomic features (all 17 included by default).
-            atomic_number : int
-                the atomic number.
+        tuple of atomic features.
             atomic_symbol : array
                 the one-hot encoded atomic symbol from `ALL_ATOMIC_SYMBOLS`.
-            degree : int
-                the degree of the atom in the molecule (number of neighbors).
-            total_degree : int
-                the degree of the atom in the molecule including hydrogens.
-            explicit_valence : int
-                the explicit valence of the atom.
-            implicit_valence : int
-                the number of implicit Hs on the atom.
-            total_valence : int
-                the total valence (explicit + implicit) of the atom.
-            atomic_mass : float
-                the atomic mass.
             formal_charge : int
                 the formal charge of atom.
-            explicit_h : int
-                the number of explicit hydrogens.
-            implicit_h : int
-                the total number of implicit hydrogens on the atom.
-            total_h : int
-                the total number of Hs (explicit and implicit) on the atom.
-            ring : bool
-                if the atom is part of a ring.
-            ring_size : array
-                if the atom if part of a ring of size determined by range(3, ``max_in_ring_size`` + 1).
-            aromatic : bool
-                    if atom is aromatic
-            radical_electrons : int
-                number of radical electrons
             hybridization_type : array
                 the one-hot encoded hybridization type from
                 ``rdkit.Chem.rdchem.HybridizationType``.
+            aromatic : bool
+                if atom is aromatic.
+            degree : array
+                the one-hot encoded degree of the atom in the molecule.
+            total_h : int
+                the total number of hydrogens on the atom (implicit and explicit).
+            implicit_h : int
+                the number of implicit hydrogens on the atom.
+            radical_electrons : int
+                the number of radical electrons.
+
+        Notes
+        -----
+        The atomic features are the same as in PotentialNet.
         """
         # # Test whether an atom belongs to a given ring size
         # # We try from smaller to larger (starting at 3)
@@ -384,7 +368,6 @@ class GraphLigandFeaturizer(SingleLigandFeaturizer):
         # and iterated with the * unpacking operator --
         return np.array(
             [
-                # Same properties as the one used in potentialnet
                 # 1. Chemical element, one-hot encoded
                 *BaseOneHotEncodingFeaturizer.one_hot_encode(
                     [atom.GetSymbol()], self.ALL_ATOMIC_SYMBOLS
@@ -398,7 +381,7 @@ class GraphLigandFeaturizer(SingleLigandFeaturizer):
                 ).flatten(),
                 # 4. Aromaticity
                 atom.GetIsAromatic(),
-                # 5. Total numbers of bonds
+                # 5. Total numbers of bonds, one-hot encoded
                 *BaseOneHotEncodingFeaturizer.one_hot_encode(
                     [atom.GetDegree()], [_ for _ in range(11)]
                 ).flatten(),
