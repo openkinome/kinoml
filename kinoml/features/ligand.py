@@ -354,16 +354,10 @@ class GraphLigandFeaturizer(SingleLigandFeaturizer):
 
         Notes
         -----
-        The atomic features are the same as in PotentialNet.
-        """
-        # # Test whether an atom belongs to a given ring size
-        # # We try from smaller to larger (starting at 3)
-        # # and store the maximum value that returns True
-        # ring_size = 0
-        # for ring_size_probe in range(3, self.max_in_ring_size + 1):
-        #     if atom.IsInRingSize(ring_size_probe):
-        #         ring_size = ring_size_probe
+        The atomic features are the same as in PotentialNet [1]_.
 
+        .. [1] https://doi.org/10.1021/acscentsci.8b00507
+        """
         # Return flattened array; notice how the OHE'd matrices are flattened
         # and iterated with the * unpacking operator --
         return np.array(
@@ -383,7 +377,7 @@ class GraphLigandFeaturizer(SingleLigandFeaturizer):
                 atom.GetIsAromatic(),
                 # 5. Total numbers of bonds, one-hot encoded
                 *BaseOneHotEncodingFeaturizer.one_hot_encode(
-                    [atom.GetDegree()], [_ for _ in range(11)]
+                    [atom.GetDegree()], list(range(11))
                 ).flatten(),
                 # 6. Total number of hydrogens
                 atom.GetTotalNumHs(),
