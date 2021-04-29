@@ -261,13 +261,13 @@ class Pipeline(BaseFeaturizer):
         features : list of System or array-like
         """
         for featurizer in self.featurizers:
-            system_or_array = featurizer.featurize(
+            systems = featurizer.featurize(
                 systems,
                 processes=processes,
                 chunksize=chunksize,
             )
 
-        return system_or_array
+        return [s.featurizations["last"] for s in systems]
 
     def supports(self, *systems: System, raise_errors: bool = False) -> bool:
         """
@@ -341,11 +341,17 @@ class Concatenated(Pipeline):
         np.ndarray
             Concatenated arrays along specified ``axis``.
         """
-        features = [
-            f.featurize(systems, processes=processes, chunksize=chunksize)
-            for f in self.featurizers
-        ]
-        return np.concatenate(features, axis=self.axis)
+        # Concatenation expects a list of features to be concatenated
+        # Each list of features comes from a different pipeline
+        # Within a list, we find one feature (array) for each system
+        # We need to end up with a single array!
+        list_of_features = []
+        for featurizer in self.featurizers:
+            systems = featurizer.featurize(systems)
+            features = [s.featurizations["last"] for s in systems]
+            list_of_features.append(features)
+
+        return np.concatenate(list_of_features, axis=self.axis)
 
 
 class BaseOneHotEncodingFeaturizer(BaseFeaturizer):
