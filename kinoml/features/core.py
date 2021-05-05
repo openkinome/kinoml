@@ -6,6 +6,7 @@ All ``Featurizer`` objects inherit from ``BaseFeaturizer`` and reimplement `._fe
 and `._supports`, if needed.
 """
 from __future__ import annotations
+from collections import defaultdict
 from typing import Callable, Hashable, Iterable, Sequence
 import hashlib
 from multiprocessing import Pool
@@ -237,8 +238,9 @@ class Pipeline(BaseFeaturizer):
     wrapper around individual ``Featurizer`` objects.
     """
 
-    def __init__(self, featurizers: Iterable[BaseFeaturizer]):
+    def __init__(self, featurizers: Iterable[BaseFeaturizer], shortname=None):
         self.featurizers = featurizers
+        self._shortname = shortname
 
     def _featurize(self, systems: Iterable[System], processes=1, chunksize=None):
         """
@@ -295,7 +297,18 @@ class Pipeline(BaseFeaturizer):
 
     @property
     def name(self):
+        if self._shortname:
+            return (
+                f"{self.__class__.__name__}(name='{self.shortname}', "
+                f"[{', '.join([f.name for f in self.featurizers])}])"
+            )
         return f"{self.__class__.__name__}([{', '.join([f.name for f in self.featurizers])}])"
+
+    @property
+    def shortname(self):
+        if self._shortname is not None:
+            return self._shortname
+        return self.__class__.__name__
 
 
 class Concatenated(Pipeline):
@@ -308,9 +321,14 @@ class Concatenated(Pipeline):
     ----------
     featurizers : list of BaseFeaturizer
         These should take a System or array, but return only arrays
-        so the can be concatenated.
-    axis : int, optional=0
-        On which axis to concatenate
+        so they can be concatenated. Note that the arrays must
+        have the same number of dimensions. If that is not the case,
+        you will need to reshape one of them using ``CallableFeaturizer``
+        and a lambda function that relies on ``np.reshape`` or similar.
+    axis : int, optional=1
+        On which axis to concatenate. By default, it will concatenate
+        on axis ``1``, which means that the features in each pipeline
+        will be concatenated.
 
     Note
     ----
@@ -321,8 +339,8 @@ class Concatenated(Pipeline):
     wrapper around individual ``Featurizer`` objects.
     """
 
-    def __init__(self, featurizers: Iterable[BaseFeaturizer], axis=0):
-        self.featurizers = featurizers
+    def __init__(self, featurizers: Iterable[BaseFeaturizer], shortname=None, axis=1):
+        super().__init__(featurizers=featurizers, shortname=shortname)
         self.axis = axis
 
     def _featurize(self, systems: Iterable[System], processes=1, chunksize=None) -> np.ndarray:
@@ -352,6 +370,102 @@ class Concatenated(Pipeline):
             list_of_features.append(features)
 
         return np.concatenate(list_of_features, axis=self.axis)
+
+
+class TupleOfArrays(Pipeline):
+    """
+    Given a list of featurizers, apply them serially and return
+    the result directly as a flattened tuple of the arrays, for
+    each system. E.g; given one system, featurizer A returns X,
+    and featurizer B returns Y, Z; the output is a tuple of X, Y, Z).
+
+    The final result will be tuple of tuples.
+
+    Parameters
+    ----------
+    featurizers : list of BaseFeaturizer
+        These should take a System or array, but return only arrays
+        so they can be concatenated. Note that the arrays must
+        have the same number of dimensions. If that is not the case,
+        you will need to reshape one of them using ``CallableFeaturizer``
+        and a lambda function that relies on ``np.reshape`` or similar.
+
+    Note
+    ----
+    While ``TupleOfArrays`` is a subclass of ``BaseFeaturizer``,
+    it should be considered a special case of such. It indeed
+    shares the same API but the implementation details of
+    ``._featurize()`` are slightly different. It acts as a
+    wrapper around individual ``Featurizer`` objects.
+    """
+
+    def _featurize(self, systems: Iterable[System], processes=1, chunksize=None) -> np.ndarray:
+        """
+        Given a list of featurizers, apply them serially and build a
+        flat tuple out of the results.
+
+        Parameters
+        ----------
+        systems: list of System or array-like
+            The Systems (or arrays) to be featurized.
+
+        Returns
+        -------
+        tuple of (of tuples) arraylike
+            If the last featurizer is returning a single array,
+            the shape of the object will be (N_systems,). If
+            the last featurizer returns more than one array,
+            it will be (N_systems, M_returned_objects).
+        """
+        list_of_systems = []
+        for _ in systems:
+            list_of_systems.append([])
+
+        features_per_system = 0
+        for featurizer in self.featurizers:
+            # Run a pipeline
+            systems = featurizer.featurize(systems)
+
+            # Get the current "last" before the next pipeline runs
+            # We need to store it in list_of_systems
+            # list of systems will have shape (N_systems, n_featurizers)
+            for i, system in enumerate(systems):
+                features = system.featurizations["last"]
+                if isinstance(features, dict):
+                    if i == 0:
+                        features_per_system += len(features)
+                    for array in features.values():
+                        assert isinstance(
+                            array, np.ndarray
+                        ), f"Array {array} is not a ndarray type!"
+                        list_of_systems[i].append(array)
+                elif isinstance(features, (tuple, list)):
+                    if i == 0:
+                        features_per_system += len(features)
+                    for array in features:
+                        assert isinstance(
+                            array, np.ndarray
+                        ), f"Array {array} is not a ndarray type!"
+                        list_of_systems[i].append(array)
+                elif isinstance(features, np.ndarray):
+                    if i == 0:
+                        features_per_system += 1
+                    # no extra dimension needed when
+                    # the returned object is a single array
+                    list_of_systems[i].append(features)
+                else:
+                    raise ValueError(
+                        f"Obtained features ({features}) is not recognized. It must "
+                        "be ndarray, or a tuple/list/dict of ndarray"
+                    )
+
+        assert len(list_of_systems) == len(
+            systems
+        ), f"Number of feature tuples ({len(list_of_systems)}) do not match systems ({len(systems)}!"
+        assert (
+            len(list_of_systems[0]) == features_per_system
+        ), f"Number of features per system ({len(list_of_systems[0])}) do not match number of expected ({features_per_system})!"
+        return list_of_systems
 
 
 class BaseOneHotEncodingFeaturizer(BaseFeaturizer):
@@ -542,12 +656,23 @@ class CallableFeaturizer(BaseFeaturizer):
 
     Parameters
     ----------
-    func : callable
-        Must take a System and return a System or array.
+    func : callable or str or None
+        Must take a System and return a System or array. If
+        ``str`` it will be ``eval``'d into a callable. If None,
+        the default callable will return ``system.featurizations["last"]``
+        for each system.
     """
 
-    def __init__(self, func: Callable[[System], System | np.array]):
+    def __init__(self, func: Callable[[System], System | np.array] | str = None):
+        if func is None:
+            func = self._default_func
+        elif isinstance(func, str):
+            func = eval(func)  # pylint: disable=eval-used
         self.callable = func
+
+    @staticmethod
+    def _default_func(system, options):
+        return system.featurizations["last"]
 
     def _featurize_one(self, system: System | np.ndarray, options: dict) -> np.ndarray:
         """

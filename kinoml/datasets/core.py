@@ -181,7 +181,7 @@ class DatasetProvider(BaseDatasetProvider):
         """
         Return the ``key`` featurized objects from all systems.
         """
-        return [ms.system.featurizations[key] for ms in self.measurements]
+        return tuple(ms.system.featurizations[key] for ms in self.measurements)
 
     def _to_dataset(self, style="pytorch"):
         """
@@ -263,7 +263,7 @@ class DatasetProvider(BaseDatasetProvider):
     def to_tensorflow(self, *args, **kwargs):
         raise NotImplementedError
 
-    def to_numpy(self, featurization_key="last", **kwargs):
+    def to_numpy(self, featurization_key="last", y_dtype="float32", **kwargs):
         """
         Export dataset to a tuple of two Numpy arrays of same shape:
 
@@ -276,6 +276,8 @@ class DatasetProvider(BaseDatasetProvider):
             Which featurization present in the systems will be taken
             to build the ``X`` array. Usually, ``last`` as provided
             by a ``Pipeline`` object.
+        y_dtype, np.dtype or str, optional="float32"
+            Coerce Y array to this dtype
         kwargs : optional,
             Dict that will be forwarded to ``.measurements_as_array``,
             which will build the ``y`` array.
@@ -285,10 +287,84 @@ class DatasetProvider(BaseDatasetProvider):
         2-tuple of np.array
             X, y
         """
-        return (
-            np.asarray(self.featurized_systems(key=featurization_key)),
-            self.measurements_as_array(**kwargs),
-        )
+        X = np.asarray(self.featurized_systems(key=featurization_key))
+        y = self.measurements_as_array(dtype=y_dtype, **kwargs)
+        assert (
+            X.shape[0] == y.shape[0]
+        ), f"# of X ({X.shape[0]}) and y ({y.shape[0]}) do not match!"
+        return X, y
+
+    def to_dict_of_arrays(self, featurization_key="last", y_dtype="float32") -> dict:
+        """
+        Export dataset to a dict-like object, compatible
+        with ``DictOfArrays`` and NPZ files.
+
+        The idea is to provide unique keys for each system
+        and their features, following the syntax
+        ``X_s{int}_v{int}``.
+
+        This object is useful when the features for each system
+        have different shapes and/or dimensionality and cannot
+        be concatenated in a single homogeneous array
+
+        Parameters
+        ----------
+        featurization_key : Hashable, optional="last"
+            Which key to access in each ``System.featurizations`` dict
+        y_dtype : np.dtype or str, optional="float32"
+            Which kind of dtype to use for the ``y`` array
+
+        Returns
+        -------
+        dict[str, array]
+            A dictionary that maps ``str`` keys to array-like
+            objects. Depending on the featurization scheme, keys
+            can be:
+
+            1. All systems are featurized as an array and they share the same shape
+               -> ``X, y``
+
+            2. All N systems are featurized as an array but they do NOT share the same shape
+               -> ``X_s0, X_s1, ..., X_sN``
+
+            3. All N systems are featurized as a M-tuple of arrays (shape irrelevant)
+               -> ``X_s0_a0, X_s0_a1, X_s1_a0, X_s1_a1, ..., X_sN_aM``
+        """
+        featurized = self.featurized_systems(key=featurization_key)
+        nsystems = len(featurized)
+        dict_of_arrays = {}
+        y = self.measurements_as_array(dtype=y_dtype)
+        assert (
+            nsystems == y.shape[0]
+        ), f"# of systems ({nsystems}) and measurements {y.shape[0]} do not match!"
+        # See which kind of feature object we are handling
+        if isinstance(featurized[0], np.ndarray):
+            # each system _is_ an array already
+            if all(featurized[0].shape == f.shape for f in featurized[1:]):
+                # all arrays are the same shape, we can return a unified X!
+                dict_of_arrays["X"] = np.asarray(featurized)
+            else:
+                # each system might have different shapes, we need separate X
+                for i, feature in enumerate(featurized):
+                    key = f"X_s{i}"
+                    dict_of_arrays[key] = feature
+        elif isinstance(featurized[0], (list, tuple)) and isinstance(featurized[0][0], np.ndarray):
+            # each system has a list of arrays
+            for i, system in enumerate(featurized):
+                for j, feature in enumerate(system):
+                    key = f"X_s{i}_a{j}"
+                    dict_of_arrays[key] = feature
+        else:
+            raise ValueError(
+                "Current featurization scheme is not supported! "
+                "Features must be either: same-shape arrays, different-shape arrays, "
+                "or a list/tuple of arrays (irrelevant shape). Peek at first element:\n"
+                f"{featurized[0]}"
+            )
+
+        dict_of_arrays["y"] = y
+
+        return dict_of_arrays
 
     def observation_model(self, **kwargs):
         """
