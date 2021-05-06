@@ -14,9 +14,6 @@ dependencies:
   - mdanalysis
   - tqdm
   - openff-toolkit >=0.9
-  - pytorch 1.7.*
-  - torchvision
-  - pytorch-lightning
   - xgboost
   - openeye-toolkits >=2020
   - modeller
@@ -33,13 +30,20 @@ dependencies:
   - codecov
 
   - pip:
+      # Torch
+      - --find-links https://download.pytorch.org/whl/torch_stable.html
+      - torch==1.7.1+cpu
+      - torchvision==0.8.2+cpu
+      - torchaudio==0.7.2
       # Torch geometric
-      - --find-links https://pytorch-geometric.com/whl/torch-1.6.0+cpu.html
+      - --find-links https://pytorch-geometric.com/whl/torch-1.7.0+cpu.html
       - torch-geometric
       - torch-scatter
       - torch-sparse
       - torch-cluster
       - torch-spline-conv
+      # Lightning
+      - pytorch-lightning
       # PyTorch trees
       - https://github.com/ValentinFigue/Sklearn_PyTorch/archive/1b56a43e41de331ecdf73d08418f75bb34c9fa06.tar.gz
       - https://github.com/volkamerlab/klifs_utils/archive/master.tar.gz

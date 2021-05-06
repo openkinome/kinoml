@@ -62,6 +62,7 @@ class System:
 
     def check(self):
         assert self.components, "`System` must specify at least one component"
+        return True
 
     @property
     def name(self) -> str:
@@ -92,22 +93,17 @@ class System:
         )
 
 
-class ProteinLigandComplex(System):
+class ProteinSystem(System):
     """
-    A system with at least one protein and one ligand
-    """
+    A System that contains Protein objects. It defines two properties:
 
-    @property
-    def ligand(self):
-        return list(self._components_by_type(BaseLigand))[0]
+    - ``protein``: get the first Protein found in the components
+    - ``proteins``: get all Protein objects found in the components
+    """
 
     @property
     def protein(self):
-        return list(self._components_by_type(BaseProtein))[0]
-
-    @property
-    def ligands(self):
-        return list(self._components_by_type(BaseLigand))
+        return next(self._components_by_type(BaseProtein))
 
     @property
     def proteins(self):
@@ -115,11 +111,43 @@ class ProteinLigandComplex(System):
 
     def check(self):  # this is a requirement
         super().check()
-        assert len(list(self.ligands)) >= 1 and len(list(self.proteins)) >= 1, (
-            "A ProteinLigandComplex must specify at least one Ligand and one Protein. "
-            f"Current contents: {self}."
-        )
+        assert (
+            len(self.proteins) >= 1
+        ), f"A ProteinSystem must specify at least one Protein. Current contents: {self}."
+        return True
 
-    # Bonus perks!
-    def dock(self):
-        raise NotImplementedError
+
+class LigandSystem(System):
+    """
+    A System that contains Ligand objects. It defines two properties:
+
+    - ``ligand``: get the first Ligand found in the components
+    - ``ligands``: get all Ligand objects found in the components
+    """
+
+    @property
+    def ligand(self):
+        return next(self._components_by_type(BaseLigand))
+
+    @property
+    def ligands(self):
+        return list(self._components_by_type(BaseLigand))
+
+    def check(self):  # this is a requirement
+        super().check()
+        assert (
+            len(self.ligands) >= 1
+        ), f"A LigandSystem must specify at least one Ligand. Current contents: {self}."
+        return True
+
+
+class ProteinLigandComplex(ProteinSystem, LigandSystem):
+    """
+    A system with at least one protein and one ligand
+    """
+
+    def check(self):
+        assert ProteinSystem.check(self) and LigandSystem.check(self), (
+            "A ProteinLigandComplex must specify at least one Protein and one Ligand. "
+            f"Current contents: {self}"
+        )

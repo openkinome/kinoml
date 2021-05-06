@@ -28,7 +28,6 @@ class ChEMBLDatasetProvider(MultiDatasetProvider):
         path_or_url="https://github.com/openkinome/datascripts/releases/download/v0.2/activities-chembl28_v0.2.zip",
         measurement_types=("pIC50", "pKi", "pKd"),
         sample=None,
-        **kwargs,
     ):
         """
         Create a MultiDatasetProvider out of the raw data contained in the zip file
@@ -111,4 +110,11 @@ class ChEMBLDatasetProvider(MultiDatasetProvider):
                 print("Couldn't process record", row)
                 print("Exception:", exc)
 
-        return cls(measurements)
+        return cls(
+            measurements,
+            metadata={
+                "path_or_url": path_or_url,
+                "measurement_types": measurement_types,
+                "sample": sample,
+            },
+        )

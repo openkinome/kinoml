@@ -40,17 +40,16 @@ class PKIS2DatasetProvider(KinomeScanDatasetProvider):
     @classmethod
     def from_source(  # pylint: disable=arguments-differ
         cls,
-        filename: Union[AnyStr, Path] = datapath("kinomescan/journal.pone.0181585.s004.csv"),
+        path_or_url: Union[AnyStr, Path] = datapath("kinomescan/journal.pone.0181585.s004.csv"),
         measurement_type: BaseMeasurement = PercentageDisplacementMeasurement,
         conditions: BaseConditions = AssayConditions(pH=7.0),
-        **kwargs
     ):
         """
         Create a DatasetProvider out of the raw data in a file
 
         Parameters
         ----------
-        filename : str
+        path_or_url : str
             CSV file with the protein-ligand measurements
         measurement_type : BaseMeasurement
             Which type of measurement was taken for each protein-ligand pair
@@ -64,6 +63,7 @@ class PKIS2DatasetProvider(KinomeScanDatasetProvider):
         - Investigate lazy access and object generation
         - Review accuracy of item access by indices (correlative order?)
         """
+        filename = cls._download_to_cache_or_retrieve(path_or_url)
         df = cls._read_dataframe(filename)
         df = df[df.index.notna()]
 
@@ -104,7 +104,7 @@ class PKIS2DatasetProvider(KinomeScanDatasetProvider):
                 measurement = measurement_type(value, conditions=conditions, system=systems[key])
                 measurements.append(measurement)
 
-        return cls(measurements=measurements, **kwargs)
+        return cls(measurements=measurements, metadata={"path_or_url": path_or_url})
 
     @staticmethod
     def _read_dataframe(filename: Union[AnyStr, Path]) -> pd.DataFrame:

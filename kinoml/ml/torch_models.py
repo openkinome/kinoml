@@ -4,6 +4,8 @@ import torch.nn.functional as F
 
 
 class _BaseModule(nn.Module):
+    needs_input_shape = True
+
     @staticmethod
     def estimate_input_shape(input_sample):
         return input_sample.shape[1]
@@ -42,6 +44,7 @@ class NeuralNetworkRegression(_BaseModule):
         """
         Defines the foward pass for a given input 'x'.
         """
+        x = x.float()
         x = self._activation(self.fully_connected_1(x))
         return self.fully_connected_out(x)
 
@@ -126,6 +129,8 @@ class ConvolutionNeuralNetworkRegression(_BaseModule):
         The activation function used in the hidden (only!) layer of the network.
     """
 
+    needs_input_shape = False
+
     def __init__(
         self,
         nb_char=53,
@@ -136,7 +141,7 @@ class ConvolutionNeuralNetworkRegression(_BaseModule):
         output_shape=1,
         activation=F.relu,
     ):
-        super(ConvolutionNeuralNetworkRegression, self).__init__()
+        super().__init__()
 
         self.nb_char = nb_char
         self.max_length = max_length
