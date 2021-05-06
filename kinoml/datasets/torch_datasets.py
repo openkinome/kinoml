@@ -124,30 +124,61 @@ class TorchDataset(PrefeaturizedTorchDataset):
         return X, y
 
 
-class XyNpzTorchDataset(_NativeTorchDataset):
+class XyTorchDataset(_NativeTorchDataset):
     """
-    Load ``X`` and ``y`` arrays from a NPZ file present in disk.
-    These files must expose at least two keys: ``X`` and ``y``.
-    It can also contain three more: ``idx_train``, ``idx_test``
-    and ``idx_val``, which correspond to the indices of the
-    training, test and validation subsets.
+    Simple Torch Dataset adaptor where X and y are homogeneous tensors.
+    All systems have the shape.
 
     Parameters
     ----------
-    npz : str
-        Path to a NPZ file with the keys exposed above.
+    X, y : arraylike
+        Featurized systems and their measurements
+    indices : dict of array selectors
+        It will only accept train, train/test or train/test/val keys.
     """
 
-    def __init__(self, npz):
-        data = np.load(npz)
-        self.data_X = torch.as_tensor(data["X"])
-        self.data_y = torch.as_tensor(data["y"])
+    def __init__(self, X, y, indices=None):
+        assert X.shape[0] == y.shape[0], "X and y must have the same number of elements"
+        self.data_X = torch.as_tensor(X)
+        self.data_y = torch.as_tensor(y)
+
+        self.indices = indices or {"train": True}
+        if len(self.indices) == 3:
+            assert sorted(indices) == ["test", "train", "val"]
+        elif len(self.indices) == 2:
+            assert sorted(indices) == ["test", "train"]
+        elif len(self.indices) == 1:
+            assert sorted(indices) == ["test"]
+        else:
+            raise ValueError(
+                "`indices` can only contain up to three keys: train, test and val, "
+                f"but you provided `{list(self.indices.keys())}`"
+            )
+
+    @classmethod
+    def from_npz(cls, path):
+        """
+        Load ``X`` and ``y`` arrays from a NPZ file present in disk.
+        These files must expose at least two keys: ``X`` and ``y``.
+        It can also contain three more: ``idx_train``, ``idx_test``
+        and ``idx_val``, which correspond to the indices of the
+        training, test and validation subsets.
+
+        Parameters
+        ----------
+        npz : str
+            Path to a NPZ file with the keys exposed above.
+        """
+        data = np.load(path)
+        X = torch.as_tensor(data["X"])
+        y = torch.as_tensor(data["y"])
         if "idx_train" in data:
-            self.indices = {
+            indices = {
                 key[4:]: data[key] for key in ["idx_train", "idx_test", "idx_val"] if key in data
             }
         else:
-            self.indices = {"train": True}
+            indices = {"train": True}
+        return cls(X, y, indices=indices)
 
     def __getitem__(self, index):
         return self.data_X[index], self.data_y[index]
@@ -160,7 +191,7 @@ class XyNpzTorchDataset(_NativeTorchDataset):
         return self.data_X.shape[1]
 
 
-class MultiXNpzTorchDataset(_NativeTorchDataset):
+class MultiXTorchDataset(_NativeTorchDataset):
     """
     This class is able to load NPZ files into a ``torch.Dataset`` compliant
     object.
@@ -198,23 +229,40 @@ class MultiXNpzTorchDataset(_NativeTorchDataset):
     This object is better paired with the output of ``DatasetProvider.to_dict_of_arrays``.
     """
 
-    def __init__(self, npz):
-        self.data = data = np.load(npz)
-        self.data_y = torch.tensor(data["y"])
+    def __init__(self, dict_of_arrays, indices=None):
+        self._data = dict_of_arrays
+        self.data_y = torch.tensor(dict_of_arrays["y"])
         if self.is_single_X():
-            self.data_X = torch.tensor(data["X"])
+            self.data_X = torch.tensor(dict_of_arrays["X"])
         else:
             self.data_X = None
 
         self.shape_X = self._shape_X()
         self.shape_y = self.data_y.shape
 
+        self.indices = indices or {"train": True}
+        if len(self.indices) == 3:
+            assert sorted(indices) == ["test", "train", "val"]
+        elif len(self.indices) == 2:
+            assert sorted(indices) == ["test", "train"]
+        elif len(self.indices) == 1:
+            assert sorted(indices) == ["test"]
+        else:
+            raise ValueError(
+                "`indices` can only contain up to three keys: train, test and val, "
+                f"but you provided `{list(self.indices.keys())}`"
+            )
+
+    @classmethod
+    def from_npz(cls, path):
+        data = np.load(path)
         if "idx_train" in data:
-            self.indices = {
+            indices = {
                 key[4:]: data[key] for key in ["idx_train", "idx_test", "idx_val"] if key in data
             }
         else:
-            self.indices = {"train": True}
+            indices = {"train": True}
+        return cls(data, indices)
 
     def _getitem_multi_X(self, accessor):
         single_item = False
@@ -244,9 +292,9 @@ class MultiXNpzTorchDataset(_NativeTorchDataset):
         for index in indices:
             X_prefix = f"X_s{index}"
             X_subresult = []
-            this_system_keys = [k for k in self.data.keys() if k.startswith(X_prefix)]
+            this_system_keys = [k for k in self._data.keys() if k.startswith(X_prefix)]
             for key in sorted(this_system_keys, key=self._key_to_ints):
-                X_subresult.append(torch.tensor(self.data[key]))
+                X_subresult.append(torch.tensor(self._data[key]))
             result_X.append(X_subresult)
 
         if single_item:
@@ -265,14 +313,14 @@ class MultiXNpzTorchDataset(_NativeTorchDataset):
         if self.is_single_X():
             return torch.Size(self.data_X.shape)
 
-        keys = [self._key_to_ints(k) for k in self.data.keys() if k.startswith("X")]
+        keys = [self._key_to_ints(k) for k in self._data.keys() if k.startswith("X")]
         shape = []
         for dim in range(len(keys[0])):
             shape.append(len(set([k[dim] for k in keys])))
         return torch.Size(tuple(shape))
 
     def is_single_X(self):
-        X_keys = [k for k in self.data.keys() if k.startswith("X")]
+        X_keys = [k for k in self._data.keys() if k.startswith("X")]
         return len(X_keys) == 1 and X_keys[0] == "X"
 
     @staticmethod
@@ -291,4 +339,4 @@ class MultiXNpzTorchDataset(_NativeTorchDataset):
         return numbers
 
     def __len__(self):
-        return self.data["y"].shape[0]
+        return self.data_y.shape[0]
