@@ -38,14 +38,16 @@ class OEHybridDockingFeaturizer(BaseFeaturizer):
     _SUPPORTED_TYPES = (ProteinLigandComplex,)
 
     @lru_cache(maxsize=100)
-    def _featurize(self, system: ProteinLigandComplex) -> ProteinLigandComplex:
+    def _featurize_one(self, system: ProteinLigandComplex, options: dict) -> ProteinLigandComplex:
         """
         Perform hybrid docking with the OpenEye toolkit and thoughtful defaults.
 
         Parameters
         ----------
-        system: ProteinLigandComplex
-            A system object holding protein and ligand information.
+        systems: iterable of ProteinLigandComplex
+            A list of System objects holding protein and ligand information.
+        options : dict
+            Unused
 
         Returns
         -------
@@ -63,20 +65,17 @@ class OEHybridDockingFeaturizer(BaseFeaturizer):
         design_unit = self._get_design_unit(protein, system.protein.name, electron_density)
 
         logging.debug("Extracting components ...")
-        prepared_protein, prepared_solvent, prepared_ligand = self._get_components(
-            design_unit
-        )  # TODO: rename prepared_ligand
+        # TODO: rename prepared_ligand
+        prepared_protein, prepared_solvent, prepared_ligand = self._get_components(design_unit)
 
         logging.debug("Creating hybrid receptor ...")
-        hybrid_receptor = create_hybrid_receptor(
-            prepared_protein, prepared_ligand
-        )  # TODO: takes quite long, should save this somehow
+        # TODO: takes quite long, should save this somehow
+        hybrid_receptor = create_hybrid_receptor(prepared_protein, prepared_ligand)
 
         logging.debug("Performing docking ...")
         docking_pose = hybrid_docking(hybrid_receptor, [ligand])[0]
-        oechem.OEPerceiveResidues(
-            docking_pose, oechem.OEPreserveResInfo_None
-        )  # generate residue information
+        # generate residue information
+        oechem.OEPerceiveResidues(docking_pose, oechem.OEPreserveResInfo_None)
 
         logging.debug("Retrieving Featurizer results ...")
         protein_ligand_complex = self._get_featurizer_results(
@@ -472,13 +471,17 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
     _SUPPORTED_TYPES = (ProteinLigandComplex,)
 
     @lru_cache(maxsize=100)
-    def _featurize(self, system: ProteinLigandComplex) -> ProteinLigandComplex:
+    def _featurize_one(self, system: ProteinLigandComplex, options: dict) -> ProteinLigandComplex:
         """
         Perform hybrid docking in kinases using the OpenEye toolkit, the KLIFS database and thoughtful defaults.
+
         Parameters
         ----------
-        system: ProteinLigandComplex
-            A system object holding protein and ligand information.
+        system : ProteinLigandComplex
+            A System objects holding protein and ligand information.
+        options : dict
+            Unused
+
         Returns
         -------
         protein_ligand_complex: ProteinLigandComplex
@@ -509,7 +512,9 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
         # TODO: naming problem with co-crystallized ligand in hybrid docking, see above
         logging.debug("Searching ligand template ...")
         ligand_template = self._select_ligand_template(
-            system.protein.klifs_kinase_id, read_smiles(system.ligand.smiles), self.shape_overlay
+            system.protein.klifs_kinase_id,
+            read_smiles(system.ligand.smiles),
+            self.shape_overlay,
         )
         logging.debug(f"Selected {ligand_template.pdb} as ligand template ...")
 
@@ -584,7 +589,6 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEHybridDockingFeaturizer):
                 ("COMPND", f"\tLigand template: {ligand_template.pdb}"),
             ],
         )
-
         return kinase_ligand_complex  # TODO: MDAnalysis objects
 
     def _select_ligand_template(

@@ -22,13 +22,17 @@ from ..utils import APPDIR
 logger = logging.getLogger(__name__)
 
 
+class FeaturizationError(Exception):
+    """Error raised if a featurization process could not finish successfully"""
+
+
 class BaseDatasetProvider:
     """
     API specification for dataset providers
     """
 
     @classmethod
-    def from_source(cls, filename=None, **kwargs):
+    def from_source(cls, path_or_url=None, **kwargs):
         """
         Parse CSV/raw files to object model.
         """
@@ -58,9 +62,6 @@ class BaseDatasetProvider:
     def featurize(self, *featurizers: Iterable[BaseFeaturizer]):
         raise NotImplementedError
 
-    def clear_featurizations(self):
-        raise NotImplementedError
-
     def featurized_systems(self, key="last"):
         raise NotImplementedError
 
@@ -87,6 +88,8 @@ class DatasetProvider(BaseDatasetProvider):
     measurements: list of BaseMeasurement
         A DatasetProvider holds a list of ``kinoml.core.measurements.BaseMeasurement``
         objects (or any of its subclasses). They must be of the same type!
+    metadata : dict
+        Extra information for provenance
 
     Note
     ----
@@ -96,17 +99,13 @@ class DatasetProvider(BaseDatasetProvider):
 
     _raw_data = None
 
-    def __init__(
-        self,
-        measurements: Iterable[BaseMeasurement],
-        *args,
-        **kwargs,
-    ):
+    def __init__(self, measurements: Iterable[BaseMeasurement], metadata: dict = None):
         types = {type(measurement) for measurement in measurements}
         assert (
             len(types) == 1
         ), f"Dataset providers can only allow one type of measurement! You provided: {types}"
         self.measurements = measurements
+        self.metadata = metadata or {}
 
     def __len__(self):
         return len(self.measurements)
@@ -130,7 +129,7 @@ class DatasetProvider(BaseDatasetProvider):
         )
 
     @classmethod
-    def from_source(cls, filename=None, **kwargs):
+    def from_source(cls, path_or_url=None, **kwargs):
         """
         Parse CSV/raw file to object model. This method is responsible of generating
         the objects for ``self.measurements``, if relevant. Additional kwargs will be
@@ -140,15 +139,15 @@ class DatasetProvider(BaseDatasetProvider):
         """
         raise NotImplementedError
 
-    def featurize(self, *featurizers: Iterable[BaseFeaturizer], processes=1, chunksize=1):
+    def featurize(self, featurizer: BaseFeaturizer):
         """
         Given a collection of ``kinoml.features.core.BaseFeaturizers``, apply them
         to the systems present in the ``self.measurements``.
 
         Parameters
         ----------
-        featurizers : list of BaseFeaturizer
-            Featurization schemes that will be applied to the systems,
+        featurizer : BaseFeaturizer
+            Featurization scheme that will be applied to the systems,
             in a stacked way.
 
         Note
@@ -159,53 +158,30 @@ class DatasetProvider(BaseDatasetProvider):
             * Shall we modify the system in place (default now), return the modified copy or store it?
         """
         systems = self.systems
-        for featurizer in featurizers:
-            # .supports() will test for system type, type of components, type of measurement, etc
-            featurizer.supports(next(iter(systems)), raise_errors=True)
-
-        with multiprocessing.Pool(processes=processes) as pool:
-            new_featurizations = list(
-                tqdm(
-                    pool.imap(self._featurize_one, ((featurizers, s) for s in systems), chunksize),
-                    total=len(systems),
-                )
-            )
-
-        for system, featurizations in zip(systems, new_featurizations):
-            system.featurizations.update(featurizations)
+        featurizer.supports(next(iter(systems)), raise_errors=True)
+        featurizer.featurize(tuple(systems))
+        for system in systems:
+            system.featurizations["last"] = system.featurizations[featurizer.name]
 
         invalid = sum(1 for system in systems if "failed" in system.featurizations)
-        if invalid:
+        if invalid == len(systems):
+            raise FeaturizationError(
+                "No system could be correctly featurized. "
+                "Check `system.featurizations['failed']` for more info"
+            )
+        elif invalid:
             logger.warning(
                 "There were %d systems that could not be featurized! "
-                "Check ``system.featurizations['failed']`` for more info.",
+                "Check `system.featurizations['failed']` for more info.",
                 invalid,
             )
         return systems
-
-    @staticmethod
-    def _featurize_one(featurizers_and_system):
-        featurizers, system = featurizers_and_system
-        try:
-            for featurizer in featurizers:
-                featurizer.featurize(system, inplace=True)
-            system.featurizations["last"] = system.featurizations[featurizers[-1].name]
-        except Exception as exc:  # TODO probably not ideal
-            system.featurizations["failed"] = [featurizers, exc]
-        return system.featurizations
-
-    def clear_featurizations(self):
-        """
-        Clear all the featurization dictionaries present in the systems contained here
-        """
-        for system in self.systems:
-            system.featurizations.clear()
 
     def featurized_systems(self, key="last"):
         """
         Return the ``key`` featurized objects from all systems.
         """
-        return [ms.system.featurizations[key] for ms in self.measurements]
+        return tuple(ms.system.featurizations[key] for ms in self.measurements)
 
     def _to_dataset(self, style="pytorch"):
         """
@@ -287,7 +263,7 @@ class DatasetProvider(BaseDatasetProvider):
     def to_tensorflow(self, *args, **kwargs):
         raise NotImplementedError
 
-    def to_numpy(self, featurization_key="last", **kwargs):
+    def to_numpy(self, featurization_key="last", y_dtype="float32", **kwargs):
         """
         Export dataset to a tuple of two Numpy arrays of same shape:
 
@@ -300,6 +276,8 @@ class DatasetProvider(BaseDatasetProvider):
             Which featurization present in the systems will be taken
             to build the ``X`` array. Usually, ``last`` as provided
             by a ``Pipeline`` object.
+        y_dtype, np.dtype or str, optional="float32"
+            Coerce Y array to this dtype
         kwargs : optional,
             Dict that will be forwarded to ``.measurements_as_array``,
             which will build the ``y`` array.
@@ -308,11 +286,92 @@ class DatasetProvider(BaseDatasetProvider):
         -------
         2-tuple of np.array
             X, y
+
+        Note
+        ----
+        This exporter assumes that each System is featurized as a single
+        tensor with homogeneous shape throughout the system collection.
+        If this does not hold true for your current featurization
+        scheme, consider using ``.to_dict_of_arrays`` instead.
         """
-        return (
-            np.asarray(self.featurized_systems(key=featurization_key)),
-            self.measurements_as_array(**kwargs),
-        )
+        X = np.asarray(self.featurized_systems(key=featurization_key))
+        y = self.measurements_as_array(dtype=y_dtype, **kwargs)
+        assert (
+            X.shape[0] == y.shape[0]
+        ), f"# of X ({X.shape[0]}) and y ({y.shape[0]}) do not match!"
+        return X, y
+
+    def to_dict_of_arrays(self, featurization_key="last", y_dtype="float32") -> dict:
+        """
+        Export dataset to a dict-like object, compatible
+        with ``DictOfArrays`` and NPZ files.
+
+        The idea is to provide unique keys for each system
+        and their features, following the syntax
+        ``X_s{int}_v{int}``.
+
+        This object is useful when the features for each system
+        have different shapes and/or dimensionality and cannot
+        be concatenated in a single homogeneous array
+
+        Parameters
+        ----------
+        featurization_key : Hashable, optional="last"
+            Which key to access in each ``System.featurizations`` dict
+        y_dtype : np.dtype or str, optional="float32"
+            Which kind of dtype to use for the ``y`` array
+
+        Returns
+        -------
+        dict[str, array]
+            A dictionary that maps ``str`` keys to array-like
+            objects. Depending on the featurization scheme, keys
+            can be:
+
+            1. All systems are featurized as an array and they share the same shape
+               -> ``X, y``
+
+            2. All N systems are featurized as an array but they do NOT share the same shape
+               -> ``X_s0, X_s1, ..., X_sN``
+
+            3. All N systems are featurized as a M-tuple of arrays (shape irrelevant)
+               -> ``X_s0_a0, X_s0_a1, X_s1_a0, X_s1_a1, ..., X_sN_aM``
+        """
+        featurized = self.featurized_systems(key=featurization_key)
+        nsystems = len(featurized)
+        dict_of_arrays = {}
+        y = self.measurements_as_array(dtype=y_dtype)
+        assert (
+            nsystems == y.shape[0]
+        ), f"# of systems ({nsystems}) and measurements {y.shape[0]} do not match!"
+        # See which kind of feature object we are handling
+        if isinstance(featurized[0], np.ndarray):
+            # each system _is_ an array already
+            if all(featurized[0].shape == f.shape for f in featurized[1:]):
+                # all arrays are the same shape, we can return a unified X!
+                dict_of_arrays["X"] = np.asarray(featurized)
+            else:
+                # each system might have different shapes, we need separate X
+                for i, feature in enumerate(featurized):
+                    key = f"X_s{i}"
+                    dict_of_arrays[key] = feature
+        elif isinstance(featurized[0], (list, tuple)) and isinstance(featurized[0][0], np.ndarray):
+            # each system has a list of arrays
+            for i, system in enumerate(featurized):
+                for j, feature in enumerate(system):
+                    key = f"X_s{i}_a{j}"
+                    dict_of_arrays[key] = feature
+        else:
+            raise ValueError(
+                "Current featurization scheme is not supported! "
+                "Features must be either: same-shape arrays, different-shape arrays, "
+                "or a list/tuple of arrays (irrelevant shape). Peek at first element:\n"
+                f"{featurized[0]}"
+            )
+
+        dict_of_arrays["y"] = y
+
+        return dict_of_arrays
 
     def observation_model(self, **kwargs):
         """
@@ -382,17 +441,16 @@ class DatasetProvider(BaseDatasetProvider):
         Returns
         -------
         str
-            The path of the (downloaded) file in cache
+            If provided argument is a file, the same path, right away
+            If it was a URL, it will be the (downloaded) cached file path
         """
+        if os.path.isfile(path_or_url):
+            return str(path_or_url)
         filename = os.path.basename(path_or_url)
         cached_path = Path(APPDIR.user_cache_dir) / cls.__name__ / filename
         if not cached_path.is_file():  # file is not available on user cache
-            if os.path.isfile(path_or_url):  # local file
-                open_handle = lambda path: open(path, "rb")
-            else:  # online url
-                open_handle = urlopen
             cached_path.parent.mkdir(parents=True, exist_ok=True)
-            with open_handle(path_or_url) as f, open(cached_path, "wb") as dest:
+            with urlopen(path_or_url) as f, open(cached_path, "wb") as dest:
                 shutil.copyfileobj(f, dest)
         return str(cached_path)
 
@@ -419,7 +477,7 @@ class MultiDatasetProvider(DatasetProvider):
         will be grouped together in different sub-datasets.
     """
 
-    def __init__(self, measurements: Iterable[BaseMeasurement], *args, **kwargs):
+    def __init__(self, measurements: Iterable[BaseMeasurement], metadata: dict = None):
         by_type = defaultdict(list)
         for measurement in measurements:
             by_type[type(measurement)].append(measurement)
@@ -430,6 +488,7 @@ class MultiDatasetProvider(DatasetProvider):
                 providers.append(DatasetProvider(typed_measurements))
 
         self.providers = providers
+        self.metadata = metadata or {}
 
     def observation_models(self, **kwargs):
         """

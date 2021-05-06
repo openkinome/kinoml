@@ -20,6 +20,30 @@ def test_system():
         System(components=[])
 
 
+def test_ligand_system():
+    from kinoml.core.systems import LigandSystem
+    from kinoml.core.ligands import BaseLigand
+
+    pl = LigandSystem(components=[BaseLigand()])
+    assert pl.ligand == list(pl.ligands)[0]
+
+    LigandSystem(components=[], strict=False)
+    with pytest.raises(AssertionError):
+        LigandSystem(components=[])
+
+
+def test_protein_system():
+    from kinoml.core.systems import ProteinSystem
+    from kinoml.core.proteins import BaseProtein
+
+    pl = ProteinSystem(components=[BaseProtein()])
+    assert pl.protein == list(pl.proteins)[0]
+
+    ProteinSystem(components=[], strict=False)
+    with pytest.raises(AssertionError):
+        ProteinSystem(components=[])
+
+
 def test_protein_ligand_complex():
     from kinoml.core.systems import ProteinLigandComplex
     from kinoml.core.proteins import BaseProtein

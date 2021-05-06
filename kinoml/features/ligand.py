@@ -4,7 +4,7 @@ Featurizers that mostly concern ligand-based models
 
 from __future__ import annotations
 from functools import lru_cache
-from typing import Union
+from typing import Union, Iterable
 
 import numpy as np
 import rdkit
@@ -103,8 +103,17 @@ class SmilesToLigandFeaturizer(SingleLigandFeaturizer):
             )
 
     @lru_cache(maxsize=1000)
-    def _featurize(self, system: System) -> Union[RDKitLigand, OpenForceFieldLigand]:
+    def _featurize_one(
+        self, system: Iterable[System], options: dict
+    ) -> RDKitLigand | OpenForceFieldLigand:
         """
+        Parameters
+        ----------
+        system : System
+            The System to be featurized.
+        options : dict
+            Unused
+
         Returns
         -------
         ``RDKitLigand`` or ``OpenForceFieldLigand`` object
@@ -134,16 +143,25 @@ class MorganFingerprintFeaturizer(SingleLigandFeaturizer):
         self.radius = radius
         self.nbits = nbits
 
-    def _featurize(self, system: System) -> np.ndarray:
-        ligand = self._find_ligand(system).to_rdkit()
-        return self._featurize_ligand(ligand)
-
     @lru_cache(maxsize=1000)
-    def _featurize_ligand(self, ligand: rdkit.Chem.Mol) -> np.ndarray:
+    def _featurize_one(self, system: System, options: dict) -> np.ndarray:
+        """
+        Parameters
+        ----------
+        system : System
+            The System to be featurized.
+        options : dict
+            Unused
+
+        Returns
+        -------
+        array
+        """
         from rdkit.Chem.AllChem import GetMorganFingerprintAsBitVect as Morgan
 
         # FIXME: Check whether OFF uses canonical smiles internally, or not
         # otherwise, we should force that behaviour ourselves!
+        ligand = self._find_ligand(system).to_rdkit()
         fp = Morgan(ligand, radius=self.radius, nBits=self.nbits)
         return np.asarray(fp, dtype="uint8")
 
@@ -201,6 +219,11 @@ class OneHotRawSMILESFeaturizer(OneHotSMILESFeaturizer):
 
         Double element symbols (such as `Cl`, ``Br`` for atoms and ``@@`` for chirality)
         are replaced with single element symbols (`L`, ``R`` and ``$`` respectively).
+
+        Parameters
+        ----------
+        system : System
+            The system being featurized
         """
         ligand = self._find_ligand(system)
         return ligand.metadata["smiles"].replace("Cl", "L").replace("Br", "R").replace("@@", "$")
@@ -211,18 +234,13 @@ class GraphLigandFeaturizer(SingleLigandFeaturizer):
     """
     Creates a graph representation of a `Ligand`-like component.
     Each node (atom) is decorated with several RDKit descriptors
-
     Check ```self._per_atom_features``` for details.
 
     Parameters
     ----------
-    per_atom_features : callable
-        function that takes a ``RDKit.Chem.Atom`` object
-        and returns a number of features. It defaults to the internal
-        ``._per_atom_features`` method.
     max_in_ring_size : int, optional=10
         Maximum ring size for testing whether an atom belongs to a
-        ring or not.
+        ring or not. *Currently unused*
     """
 
     ALL_ATOMIC_SYMBOLS = [
@@ -273,124 +291,106 @@ class GraphLigandFeaturizer(SingleLigandFeaturizer):
     ]
     _COMPATIBLE_LIGAND_TYPES = (OpenForceFieldLigand, OpenForceFieldLikeLigand)
 
-    def __init__(
-        self, per_atom_features: callable = None, max_in_ring_size: int = 10, *args, **kwargs
-    ):
+    def __init__(self, max_in_ring_size: int = 10, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.per_atom_features = per_atom_features or self._per_atom_features
         self.max_in_ring_size = max_in_ring_size
+        self._hybridization_names = sorted(rdkit.Chem.rdchem.HybridizationType.names)
 
     @lru_cache(maxsize=1000)
-    def _featurize(self, system: System) -> tuple:
+    def _featurize_one(self, system: System, options: dict) -> tuple:
         """
         Featurizes ligands contained in a System as a labeled graph.
 
+        Parameters
+        ----------
+        system : System
+            The System being featurized
+        options : dict
+            Unused
+
         Returns
         -------
-        tuple
+        tuple of np.array
             A two-tuple with:
-
             - Graph connectivity of the molecule with shape ``(2, n_edges)``
             - Feature matrix with shape ``(n_atoms, n_features)``
         """
         ligand = self._find_ligand(system).to_rdkit()
         connectivity_graph = self._connectivity_COO_format(ligand)
-        per_atom_features = np.array(
-            [
-                self._per_atom_features(a, max_in_ring_size=self.max_in_ring_size)
-                for a in ligand.GetAtoms()
-            ]
-        )
+        # TODO: Is GetAtoms() deterministic in returned sorting?
+        per_atom_features = np.array([self._per_atom_features(a) for a in ligand.GetAtoms()])
 
         return connectivity_graph, per_atom_features
 
-    @staticmethod
-    def _per_atom_features(atom, max_in_ring_size: int = 10):
+    def _per_atom_features(self, atom) -> np.ndarray:
         """
         Computes desired features for each atom in the molecular graph.
 
         Parameters
         ----------
-            atom: atom to extract features from
-            max_in_ring_size: whether the atom belongs to a ring of this size
+        atom: rdkit.Chem.Atom
+            Atom to extract features from
 
         Returns
         -------
-        tuple of atomic features (all 17 included by default).
-
-            atomic_number : int
-                the atomic number.
+        tuple of atomic features.
             atomic_symbol : array
                 the one-hot encoded atomic symbol from `ALL_ATOMIC_SYMBOLS`.
-            degree : int
-                the degree of the atom in the molecule (number of neighbors).
-            total_degree : int
-                the degree of the atom in the molecule including hydrogens.
-            explicit_valence : int
-                the explicit valence of the atom.
-            implicit_valence : int
-                the number of implicit Hs on the atom.
-            total_valence : int
-                the total valence (explicit + implicit) of the atom.
-            atomic_mass : float
-                the atomic mass.
             formal_charge : int
                 the formal charge of atom.
-            explicit_h : int
-                the number of explicit hydrogens.
-            implicit_h : int
-                the total number of implicit hydrogens on the atom.
-            total_h : int
-                the total number of Hs (explicit and implicit) on the atom.
-            ring : bool
-                if the atom is part of a ring.
-            ring_size : array
-                if the atom if part of a ring of size determined by range(3, ``max_in_ring_size`` + 1).
-            aromatic : bool
-                    if atom is aromatic
-            radical_electrons : int
-                number of radical electrons
             hybridization_type : array
                 the one-hot encoded hybridization type from
                 ``rdkit.Chem.rdchem.HybridizationType``.
-        """
-        # Test whether an atom belongs to a given ring size
-        # We try from smaller to larger (starting at 3)
-        # and store the maximum value that returns True
-        ring_size = 0
-        for ring_size_probe in range(3, max_in_ring_size + 1):
-            if atom.IsInRingSize(ring_size_probe):
-                ring_size = ring_size_probe
+            aromatic : bool
+                if atom is aromatic.
+            degree : array
+                the one-hot encoded degree of the atom in the molecule.
+            total_h : int
+                the total number of hydrogens on the atom (implicit and explicit).
+            implicit_h : int
+                the number of implicit hydrogens on the atom.
+            radical_electrons : int
+                the number of radical electrons.
 
-        return (
-            atom.GetAtomicNum(),
-            atom.GetSymbol(),  # TODO : one-hot encode
-            atom.GetDegree(),
-            atom.GetTotalDegree(),  # TODO : ignore if molecule has H
-            atom.GetExplicitValence(),
-            atom.GetImplicitValence(),  # TODO : ignore if molecule has H
-            atom.GetTotalValence(),
-            atom.GetMass(),
-            atom.GetFormalCharge(),
-            atom.GetNumExplicitHs(),
-            atom.GetNumImplicitHs(),
-            atom.GetTotalNumHs(),
-            atom.IsInRing(),
-            ring_size,  # TODO : one-hot encode
-            atom.GetIsAromatic(),
-            atom.GetNumRadicalElectrons(),
-            # We use the .real attribute of the hybridization type
-            # This Enum uses complex numbers to encode the different
-            # types. `.name` will give you the type string, and `.real`
-            # will give you the position in the enum object.
-            # There's a total of 8 possible values. You can check them
-            # with `rdkit.Chem.rdchem.HybridizationType.names` and/or
-            # `rdkit.Chem.rdchem.HybridizationType.values`
-            atom.GetHybridization().real,  # TODO : one-hot encode
+        Notes
+        -----
+        The atomic features are the same as in PotentialNet [1]_.
+
+        .. [1] https://doi.org/10.1021/acscentsci.8b00507
+        """
+        # Return flattened array; notice how the OHE'd matrices are flattened
+        # and iterated with the * unpacking operator --
+        return np.array(
+            [
+                # 1. Chemical element, one-hot encoded
+                *BaseOneHotEncodingFeaturizer.one_hot_encode(
+                    [atom.GetSymbol()], self.ALL_ATOMIC_SYMBOLS
+                ).flatten(),
+                # 2. Formal charge
+                atom.GetFormalCharge(),
+                # 3. Hybridization, one-hot encoded
+                *BaseOneHotEncodingFeaturizer.one_hot_encode(
+                    [atom.GetHybridization().name],
+                    self._hybridization_names,
+                ).flatten(),
+                # 4. Aromaticity
+                atom.GetIsAromatic(),
+                # 5. Total numbers of bonds, one-hot encoded
+                *BaseOneHotEncodingFeaturizer.one_hot_encode(
+                    [atom.GetDegree()], list(range(11))
+                ).flatten(),
+                # 6. Total number of hydrogens
+                atom.GetTotalNumHs(),
+                # 7. Number of implicit hydrogens
+                atom.GetNumImplicitHs(),
+                # 8. Number of radical electrons
+                atom.GetNumRadicalElectrons(),
+            ],
+            dtype="float64",
         )
 
     @staticmethod
-    def _connectivity_COO_format(mol: rdkit.Chem.rdchem.Mol) -> np.array:
+    def _connectivity_COO_format(mol: rdkit.Chem.Mol) -> np.ndarray:
         """
         Returns the connectivity of the molecular graph in COO format.
 
@@ -401,12 +401,13 @@ class GraphLigandFeaturizer(SingleLigandFeaturizer):
 
         Returns
         -------
-        array
+        np.ndarray
             graph connectivity in COO format with shape ``[2, num_edges]``
         """
 
         row, col = [], []
 
+        # TODO: Is GetBonds() deterministic?
         for bond in mol.GetBonds():
             start, end = bond.GetBeginAtomIdx(), bond.GetEndAtomIdx()
             row += [start, end]

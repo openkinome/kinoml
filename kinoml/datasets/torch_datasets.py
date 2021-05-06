@@ -3,6 +3,7 @@ Helper classes to convert between DatasetProvider objects and
 Dataset-like objects native to the PyTorch ecosystem
 """
 from functools import lru_cache
+from typing import List
 
 import numpy as np
 import torch
@@ -155,4 +156,139 @@ class XyNpzTorchDataset(_NativeTorchDataset):
         return self.data_X.shape[0]
 
     def input_size(self):
+        # Optional for some models!
         return self.data_X.shape[1]
+
+
+class MultiXNpzTorchDataset(_NativeTorchDataset):
+    """
+    This class is able to load NPZ files into a ``torch.Dataset`` compliant
+    object.
+
+    It assumes the following things. If each system is characterized with
+    a single tensor:
+
+    - The X tensors can be of the same shape. In that case, the NPZ file
+      only has a single ``X`` key, preloaded and accessible via ``.data_X`.
+      When queried, it returns a view to the ``torch.tensor`` object.
+    - The X tensors have different shape. In that case, the keys of the NPZ
+      follow the ``X_s{int}`` syntax. When queried, it returns a list of
+      ``torch.tensor`` objects.
+
+    If each system is characterized with more than one tensor:
+
+    - The NPZ keys follow the ``X_s{int}_a{int}`` syntax. When queried, it
+      returns a list of tuples of ``torch.tensor`` objects.
+
+    No matter the structure of ``X``, ``y`` is assumed to be a homogeneous
+    tensor, and it will always be returned as a view to the underlying
+    ``torch.tensor`` object.
+
+    Additionally, the NPZ file might contain ``idx_train``, ``idx_test`` (and ``idx_val``)
+    arrays, specifying indices for the train / test / validation split. If provided,
+    they will be stored under an ``.indices`` dict.
+
+    Parameters
+    ----------
+    npz : str
+        Path to the NPZ file.
+
+    Notes
+    -----
+    This object is better paired with the output of ``DatasetProvider.to_dict_of_arrays``.
+    """
+
+    def __init__(self, npz):
+        self.data = data = np.load(npz)
+        self.data_y = torch.tensor(data["y"])
+        if self.is_single_X():
+            self.data_X = torch.tensor(data["X"])
+        else:
+            self.data_X = None
+
+        self.shape_X = self._shape_X()
+        self.shape_y = self.data_y.shape
+
+        if "idx_train" in data:
+            self.indices = {
+                key[4:]: data[key] for key in ["idx_train", "idx_test", "idx_val"] if key in data
+            }
+        else:
+            self.indices = {"train": True}
+
+    def _getitem_multi_X(self, accessor):
+        single_item = False
+        if accessor is True:
+            indices = list(range(self.shape_y[0]))
+        elif accessor is False:
+            return tuple([], [])
+        else:
+            try:
+                indices_arr = np.asarray(accessor)
+                if len(indices_arr.shape) == 1:
+                    indices = indices_arr.tolist()
+            except ValueError:
+                pass
+            if isinstance(accessor, (list, tuple)):
+                if isinstance(accessor[0], int):
+                    indices = accessor
+                elif isinstance(accessor[0], bool):
+                    indices = [i for i, value in enumerate(accessor) if value]
+            elif isinstance(accessor, slice):
+                indices = range(*accessor)
+            elif isinstance(accessor, int):
+                indices = [accessor]
+                single_item = True
+
+        result_X = []
+        for index in indices:
+            X_prefix = f"X_s{index}"
+            X_subresult = []
+            this_system_keys = [k for k in self.data.keys() if k.startswith(X_prefix)]
+            for key in sorted(this_system_keys, key=self._key_to_ints):
+                X_subresult.append(torch.tensor(self.data[key]))
+            result_X.append(X_subresult)
+
+        if single_item:
+            return result_X[0], self.data_y[indices]
+        return result_X, self.data_y[indices]
+
+    def _getitem_single_X(self, index):
+        return self.data_X[index], self.data_y[index]
+
+    def __getitem__(self, index):
+        if self.data_X is None:
+            return self._getitem_multi_X(index)
+        return self._getitem_single_X(index)
+
+    def _shape_X(self):
+        if self.is_single_X():
+            return torch.Size(self.data_X.shape)
+
+        keys = [self._key_to_ints(k) for k in self.data.keys() if k.startswith("X")]
+        shape = []
+        for dim in range(len(keys[0])):
+            shape.append(len(set([k[dim] for k in keys])))
+        return torch.Size(tuple(shape))
+
+    def is_single_X(self):
+        X_keys = [k for k in self.data.keys() if k.startswith("X")]
+        return len(X_keys) == 1 and X_keys[0] == "X"
+
+    @staticmethod
+    def _key_to_ints(key: str) -> List[int]:
+        """
+        NPZ keys are formatted with this syntax:
+
+        ``{X|y}_{1-character str}{int}_{1-character str}{int}``
+
+        We split by underscores and extract the ints into a list
+        """
+        prefixed_numbers = key[2:].split("_")  # [2:] removes the X_ or y_ prefix
+        numbers = []
+        for field in prefixed_numbers:
+            numbers.append(int(field[1:]))  # [1:] removes the pre-int prefix
+        return numbers
+
+    def __len__(self):
+        return self.data["y"].shape[0]
