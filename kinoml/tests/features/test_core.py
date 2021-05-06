@@ -16,6 +16,7 @@ from kinoml.features.core import (
     NullFeaturizer,
     CallableFeaturizer,
     ClearFeaturizations,
+    TupleOfArrays,
 )
 
 
@@ -32,10 +33,15 @@ def test_BaseFeaturizer():
 
 def test_Pipeline():
     ligand = SmilesLigand.from_smiles("CCCC")
-    systems = System(components=[ligand]), System(components=[ligand]), System(components=[ligand])
+    systems = [
+        System(components=[ligand]),
+        System(components=[ligand]),
+        System(components=[ligand]),
+    ]
     featurizers = (NullFeaturizer(), NullFeaturizer())
     pipeline = Pipeline(featurizers)
-    assert pipeline.featurize(systems) == systems
+    pipeline.featurize(systems)
+    assert [s.featurizations["last"] for s in systems] == systems
 
 
 def test_Concatenated():
@@ -48,6 +54,20 @@ def test_Concatenated():
     concatenated = Concatenated([featurizer1, featurizer2], axis=1)
     concatenated.featurize([system])
     assert system.featurizations["last"].shape[0] == 1024
+
+
+def test_TupleOfArrays():
+    from kinoml.features.ligand import MorganFingerprintFeaturizer
+
+    ligand = RDKitLigand.from_smiles("CCCC")
+    system = System([ligand])
+    featurizer1 = MorganFingerprintFeaturizer(radius=2, nbits=512)
+    featurizer2 = MorganFingerprintFeaturizer(radius=2, nbits=1024)
+    aggregated = TupleOfArrays([featurizer1, featurizer2])
+    aggregated.featurize([system])
+    assert len(system.featurizations["last"]) == 2
+    assert system.featurizations["last"][0].shape[0] == 512
+    assert system.featurizations["last"][1].shape[0] == 1024
 
 
 def test_BaseOneHotEncodingFeaturizer():

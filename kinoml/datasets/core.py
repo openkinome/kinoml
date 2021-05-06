@@ -286,6 +286,13 @@ class DatasetProvider(BaseDatasetProvider):
         -------
         2-tuple of np.array
             X, y
+
+        Note
+        ----
+        This exporter assumes that each System is featurized as a single
+        tensor with homogeneous shape throughout the system collection.
+        If this does not hold true for your current featurization
+        scheme, consider using ``.to_dict_of_arrays`` instead.
         """
         X = np.asarray(self.featurized_systems(key=featurization_key))
         y = self.measurements_as_array(dtype=y_dtype, **kwargs)
