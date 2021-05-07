@@ -642,7 +642,7 @@ class HashFeaturizer(BaseFeaturizer):
         inputdata = self.getter(system)
 
         h = hashlib.sha256(inputdata.encode(encoding="UTF-8"))
-        return np.array(int(h.hexdigest(), base=16) / self.denominator)
+        return np.reshape(np.array(int(h.hexdigest(), base=16) / self.denominator), -1)
 
 
 class NullFeaturizer(BaseFeaturizer):
