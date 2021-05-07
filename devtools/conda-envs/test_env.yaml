@@ -30,18 +30,17 @@ dependencies:
   - codecov
 
   - pip:
-      # Torch
-      - --find-links https://download.pytorch.org/whl/torch_stable.html
-      - torch==1.7.1+cpu
-      - torchvision==0.8.2+cpu
+      # Torch -- default is CUDA=10.2 on Linux, CPU on MacOS
+      - torch==1.7.1
+      - torchvision==0.8.2
       - torchaudio==0.7.2
       # Torch geometric
       - --find-links https://pytorch-geometric.com/whl/torch-1.7.0+cpu.html
-      - torch-geometric
       - torch-scatter
       - torch-sparse
       - torch-cluster
       - torch-spline-conv
+      - torch-geometric
       # Lightning
       - pytorch-lightning
       # PyTorch trees
