@@ -6,8 +6,18 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch_geometric.nn import GCNConv
 
+class _BaseModule(nn.Module):
+    needs_input_shape = True
 
-class GraphConvolutionNeuralNetwork(nn.Module):
+    @staticmethod
+    def estimate_input_shape(input_sample):
+        # Take the first batch [0]
+        # From (adjacency, per node) tensors, take per node [1]
+        # From per node tensor, take the number of features [1]
+        return input_sample[0][1][1].shape
+
+
+class GraphConvolutionNeuralNetwork(_BaseModule):
     """
     Builds a Graph Convolutional Network and a feed-forward pass
 
@@ -24,15 +34,15 @@ class GraphConvolutionNeuralNetwork(nn.Module):
     """
 
     def __init__(
-        self, nb_nodes_features=9, embedding_shape=100, output_shape=1, activation=F.relu
+        self, input_shape, embedding_shape=100, output_shape=1, activation=F.relu
     ):
         super().__init__()
-        self.nb_nodes_features = nb_nodes_features
+        self.input_shape = input_shape[0] # nb of per node features
         self.embedding_shape = embedding_shape
         self.output_shape = output_shape
         self._activation = activation
 
-        self.GraphConvLayer1 = GCNConv(self.nb_nodes_features, self.embedding_shape)
+        self.GraphConvLayer1 = GCNConv(self.input_shape, self.embedding_shape)
         self.GraphConvLayer2 = GCNConv(self.embedding_shape, self.output_shape)
 
     def forward(self, data):
