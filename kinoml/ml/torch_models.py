@@ -8,7 +8,11 @@ class _BaseModule(nn.Module):
 
     @staticmethod
     def estimate_input_shape(input_sample):
-        return input_sample.shape[1]
+        if type(input_sample) == list:
+            # The shape of the ligand and the shape of the protein
+            return list([input_sample[0][0].shape, input_sample[0][1].shape])
+        else:
+            return input_sample.shape[1:]
 
 
 class NeuralNetworkRegression(_BaseModule):
@@ -31,7 +35,7 @@ class NeuralNetworkRegression(_BaseModule):
         super().__init__()
 
         self._activation = activation
-        self.input_shape = input_shape
+        self.input_shape = input_shape[0]
         self.hidden_shape = hidden_shape
         self.output_shape = output_shape
 
@@ -112,11 +116,9 @@ class ConvolutionNeuralNetworkRegression(_BaseModule):
 
     Parameters
     ----------
-    nb_char : int, default=53
-        Expected number of possible characters
-        For SMILES characters, we assume 53.
-    max_length : int, default=256
-        Maximum length of SMILES, set to 256.
+    input_shape : tuple
+        Dimension of input tensor, with `nb_char`, expected number of possible characters and
+        maximum length of SMILES.
     embedding_shape : int, default=200
         Dimension of the embedding after convolution.
     kernel_shape : int, default=10
@@ -129,12 +131,10 @@ class ConvolutionNeuralNetworkRegression(_BaseModule):
         The activation function used in the hidden (only!) layer of the network.
     """
 
-    needs_input_shape = False
 
     def __init__(
         self,
-        nb_char=53,
-        max_length=256,
+        input_shape,
         embedding_shape=300,
         kernel_shape=10,
         hidden_shape=100,
@@ -143,8 +143,9 @@ class ConvolutionNeuralNetworkRegression(_BaseModule):
     ):
         super().__init__()
 
-        self.nb_char = nb_char
-        self.max_length = max_length
+        self.input_shape = input_shape
+        self.nb_char = self.input_shape[0]
+        self.max_length = self.input_shape[1]
         self.embedding_shape = embedding_shape
         self.kernel_shape = kernel_shape
         self.hidden_shape = hidden_shape
@@ -167,4 +168,89 @@ class ConvolutionNeuralNetworkRegression(_BaseModule):
         x = self._activation(self.convolution(x))
         x = torch.flatten(x, 1)
         x = self._activation(self.fully_connected_1(x))
+        return self.fully_connected_out(x)
+
+
+class ConvolutionNeuralNetworkRegressionKinaseInformed(_BaseModule):
+    """
+    Builds a Convolutional Neural Network and a feed-forward pass for a kinase-ligand setting.
+
+    Parameters
+    ----------
+    input_shape : tuple
+        Dimension of input tensors, for the ligand and the protein.
+    embedding_shape : int, default=200
+        Dimension of the embedding after convolution.
+    kernel_shape : int, default=10
+        Size of the kernel for the convolution.
+    hidden_shape : int, default=100
+        Number of units in the hidden layer.
+    output_shape : int, default=1
+        Size of the last unit, representing delta_g_over_kt in our setting.
+    activation : torch function, default=relu
+        The activation function used in the hidden (only!) layer of the network.
+    """
+
+
+    def __init__(
+        self,
+        input_shape,
+        embedding_shape=300,
+        kernel_shape=10,
+        hidden_shape=100,
+        output_shape=1,
+        activation=F.relu,
+    ):
+        super().__init__()
+
+        self.input_shape = input_shape
+        # Ligand shape
+        # nb_char = self.input_shape[0][0],
+        # max_length_smiles = self.input_shape[0][1],
+
+        # Protein shape
+        # nb_residues = self.input_shape[1][0],
+        # nb_amino_acids= self.input_shape[1][1],
+
+        self.embedding_shape = embedding_shape
+        self.kernel_shape = kernel_shape
+        self.hidden_shape = hidden_shape
+        self.output_shape = output_shape
+        self._activation = activation
+
+        # Convolution on ligand
+        self.convolution_ligand = nn.Conv1d(
+            # in_channels=nb_char,
+            in_channels = self.input_shape[0][0],
+            out_channels=self.embedding_shape,
+            kernel_size=self.kernel_shape,
+        )
+        self.temp_ligand = (self.input_shape[0][1] - self.kernel_shape + 1) * self.embedding_shape
+
+
+        # Convolution on protein
+        self.convolution_protein = nn.Conv1d(
+            in_channels=self.input_shape[1][1],
+            out_channels=self.embedding_shape,
+            kernel_size=self.kernel_shape,
+        )
+        self.temp_protein = (self.input_shape[1][0] - self.kernel_shape + 1) * self.embedding_shape
+
+        self.fully_connected_1 = nn.Linear(self.temp_ligand + self.temp_protein, self.hidden_shape)
+        self.fully_connected_out = nn.Linear(self.hidden_shape, self.output_shape)
+
+    def forward(self, x_ligand, x_protein):
+        """
+        Defines the foward pass for given two inputs: ligand and protein.
+        """
+        x_lig = self._activation(self.convolution_ligand(x_ligand))
+        x_prot = self._activation(self.convolution_protein(x_protein))
+
+        x_lig = torch.flatten(x_lig, 1)
+        x_prot = torch.flatten(x_prot, 1)
+
+        x = torch.cat((x_lig, x_prot), dim=1)
+
+        x = self._activation(self.fully_connected_1(x))
+
         return self.fully_connected_out(x)
