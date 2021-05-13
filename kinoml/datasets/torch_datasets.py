@@ -2,12 +2,16 @@
 Helper classes to convert between DatasetProvider objects and
 Dataset-like objects native to the PyTorch ecosystem
 """
+from collections import defaultdict
 from functools import lru_cache
+from os import close
 from typing import List
+from pathlib import Path
 
 import numpy as np
 import torch
 from torch.utils.data import Dataset as _NativeTorchDataset, DataLoader as _DataLoader
+from tqdm.auto import tqdm
 
 from ..core.measurements import null_observation_model as _null_observation_model
 
@@ -221,12 +225,13 @@ class MultiXTorchDataset(_NativeTorchDataset):
 
     Parameters
     ----------
-    npz : str
-        Path to the NPZ file.
+    dict_of_arrays : dict of np.ndarray
+        See above.
+    indices : dict of np.ndarray
 
     Notes
     -----
-    This object is better paired with the output of ``DatasetProvider.to_dict_of_arrays``.
+    - This object is better paired with the output of ``DatasetProvider.to_dict_of_arrays``.
     """
 
     def __init__(self, dict_of_arrays, indices=None):
@@ -253,18 +258,78 @@ class MultiXTorchDataset(_NativeTorchDataset):
                 f"but you provided `{list(self.indices.keys())}`"
             )
 
+        # Precompute X keys for faster access
+        # We unpack keys like X_s1_a1->arr into a dict cache[1][1]->arr
+        self._fast_key_access = self._str_keys_to_nested_dict(self._data.keys())
+        self._is_npz = None
+
     @classmethod
-    def from_npz(cls, path):
+    def from_npz(cls, path, lazy=True, close_filehandle=False):
+        """
+        Load from a single NPZ file.
+
+        Parameters
+        ----------
+        path : str
+            Path to the NPZ file
+        lazy : bool, optional=True
+            Whether to let Numpy load arrays on demand, upon access (True)
+            or preload everything in memory (False)
+        close_filehandle : bool, optional=False
+            Whether to close the NPZ filehandle after reading some metadata. This will
+            enable parallelism without preloading everything, but each access will suffer
+            the overhead of opening the NPZ file again!
+
+        Note
+        ----
+        NPZ files cannot be read in parallel (you'll see CRC32 errors and others). If you want
+        to use ``DataLoader(..., num_workers=2)`` or above, you'll need to:
+
+        - A) preload everything with ``lazy=False`. This will use more RAM and incur
+          an initial waiting time.
+        - B) use ``close_filehandle=True``. This will incur a penalty upon each access,
+          because the NPZ file needs to be reloaded each time.
+        """
         data = np.load(path)
+        if not lazy:
+            name = Path(path).stem
+            data = dict(tqdm(data.items(), desc=f"Loading {name}"))
         if "idx_train" in data:
             indices = {
                 key[4:]: data[key] for key in ["idx_train", "idx_test", "idx_val"] if key in data
             }
         else:
             indices = {"train": True}
-        return cls(data, indices)
+
+        inst = cls(data, indices=indices)
+        inst._path = path
+        if close_filehandle:
+            inst._data.close()
+        return inst
 
     def _getitem_multi_X(self, accessor):
+        """
+        Note: This method might scale poorly and can end up being a bottleneck!
+        Most of the time is spent accessing the NPZ file on disk, though.
+
+        Some timings:
+
+        >>> ds = MultiXTorchDataset.from_npz("ChEMBLDatasetProvider.npz")
+        >>> %timeit _ = ds[0:2]
+        2.91 ms ± 222 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
+        >>> %timeit _ = ds[0:4]
+        5.59 ms ± 253 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
+        >>> %timeit _ = ds[0:8]
+        11.4 ms ± 1.02 ms per loop (mean ± std. dev. of 7 runs, 100 loops each)
+        >>> %timeit _ = ds[0:16]
+        22.7 ms ± 1.27 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
+        >>> %timeit _ = ds[0:32]
+        44.7 ms ± 4.47 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
+        >>> %timeit _ = ds[0:64]
+        87 ms ± 2.74 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
+        >>> %timeit _ = ds[0:128]
+        171 ms ± 2.68 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+        """
         single_item = False
         if accessor is True:
             indices = list(range(self.shape_y[0]))
@@ -283,19 +348,30 @@ class MultiXTorchDataset(_NativeTorchDataset):
                 elif isinstance(accessor[0], bool):
                     indices = [i for i, value in enumerate(accessor) if value]
             elif isinstance(accessor, slice):
-                indices = range(*accessor)
+                indices = range(
+                    accessor.start or 0, accessor.stop or len(self), accessor.step or 1
+                )
             elif isinstance(accessor, int):
                 indices = [accessor]
                 single_item = True
 
+        if hasattr(self._data, "zip") and self._data.zip is None:
+            # data was loaded from NPZ but fh was closed; we need to reopen
+            data = np.load(self._path)
+            must_close = True
+        else:
+            data = self._data
+            must_close = False
+
         result_X = []
         for index in indices:
-            X_prefix = f"X_s{index}"
             X_subresult = []
-            this_system_keys = [k for k in self._data.keys() if k.startswith(X_prefix)]
-            for key in sorted(this_system_keys, key=self._key_to_ints):
-                X_subresult.append(torch.tensor(self._data[key]))
+            for key in self._fast_key_access[index]:
+                X_subresult.append(torch.tensor(data[key]))
             result_X.append(X_subresult)
+
+        if must_close:
+            data.close()
 
         if single_item:
             return result_X[0], self.data_y[indices]
@@ -323,16 +399,26 @@ class MultiXTorchDataset(_NativeTorchDataset):
         X_keys = [k for k in self._data.keys() if k.startswith("X")]
         return len(X_keys) == 1 and X_keys[0] == "X"
 
+    def _str_keys_to_nested_dict(self, keys):
+        X_keys = [(k, self._key_to_ints(k)) for k in keys if k.startswith("X")]
+        X_keys.sort(key=lambda x: x[1])
+        result = defaultdict(list)
+        for k, ints in X_keys:
+            result[ints[0]].append(k)
+        return result
+
     @staticmethod
     def _key_to_ints(key: str) -> List[int]:
         """
         NPZ keys are formatted with this syntax:
 
-        ``{X|y}_{1-character str}{int}_{1-character str}{int}``
+        ``{X|y}_{1-character str}{int}_{1-character str}{int}_``
 
         We split by underscores and extract the ints into a list
         """
-        prefixed_numbers = key[2:].split("_")  # [2:] removes the X_ or y_ prefix
+        # key[2:] removes the X_ or y_ prefix
+        # key.rstrip("_") removes the trailing underscore
+        prefixed_numbers = key[2:].rstrip("_").split("_")
         numbers = []
         for field in prefixed_numbers:
             numbers.append(int(field[1:]))  # [1:] removes the pre-int prefix
