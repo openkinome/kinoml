@@ -8,6 +8,20 @@ class _BaseModule(nn.Module):
 
     @staticmethod
     def estimate_input_shape(input_sample):
+        """
+        This static method takes the same input
+        as ``.forward()`` would and estimates the
+        incoming shape so the layers can be initialized
+        properly.
+
+        Most of the time, ``input_sample`` would be a
+        Tensor, in which the first dimension corresponds
+        to systems, and the second is the input shape
+        we need.
+
+        If your ``.forward()`` method takes something else
+        than a Tensor, please adapt this method accordingly.
+        """
         return input_sample.shape[1]
 
 
@@ -47,6 +61,24 @@ class NeuralNetworkRegression(_BaseModule):
         x = x.float()
         x = self._activation(self.fully_connected_1(x))
         return self.fully_connected_out(x)
+
+
+class ListOfTupleNeuralNetworkregression(NeuralNetworkRegression):
+    """
+    This example model does not take a Tensor in, but a
+    tuple of tensors. Each tensor has shape
+    (n_systems, n_features).
+
+    As a result, one needs to concatenate the results
+    before passing it to the parent ``.forward()`` method.
+    """
+
+    @staticmethod
+    def estimate_input_shape(input_sample):
+        return sum(x.shape[1] for x in input_sample)
+
+    def forward(self, x):
+        return super().forward(torch.cat(x, dim=1))
 
 
 class DenseNeuralNetworkRegression(_BaseModule):
