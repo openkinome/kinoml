@@ -165,7 +165,7 @@ class ConvolutionNeuralNetworkRegression(_BaseModule):
         """
         Defines the foward pass for a given input 'x'
         """
-        x = self._activation(self.convolution(x))
+        x = self._activation(self.convolution(x.float()))
         x = torch.flatten(x, 1)
         x = self._activation(self.fully_connected_1(x))
         return self.fully_connected_out(x)
@@ -239,10 +239,13 @@ class ConvolutionNeuralNetworkRegressionKinaseInformed(_BaseModule):
         self.fully_connected_1 = nn.Linear(self.temp_ligand + self.temp_protein, self.hidden_shape)
         self.fully_connected_out = nn.Linear(self.hidden_shape, self.output_shape)
 
-    def forward(self, x_ligand, x_protein):
+    def forward(self, x):
         """
         Defines the foward pass for given two inputs: ligand and protein.
         """
+        x_ligand, x_protein = zip(*x)
+        x_ligand = torch.tensor(x_ligand)
+        x_protein = torch.tensor(x_protein)
         x_lig = self._activation(self.convolution_ligand(x_ligand))
         x_prot = self._activation(self.convolution_protein(x_protein))
 
