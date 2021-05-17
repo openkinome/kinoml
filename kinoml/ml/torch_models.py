@@ -210,7 +210,7 @@ class ConvolutionNeuralNetworkRegressionKinaseInformed(_BaseModule):
 
         # Protein shape
         # nb_residues = self.input_shape[1][0],
-        # nb_amino_acids= self.input_shape[1][1],
+        # max_length_seq = self.input_shape[1][1],
 
         self.embedding_shape = embedding_shape
         self.kernel_shape = kernel_shape
@@ -220,7 +220,6 @@ class ConvolutionNeuralNetworkRegressionKinaseInformed(_BaseModule):
 
         # Convolution on ligand
         self.convolution_ligand = nn.Conv1d(
-            # in_channels=nb_char,
             in_channels = self.input_shape[0][0],
             out_channels=self.embedding_shape,
             kernel_size=self.kernel_shape,
@@ -230,24 +229,23 @@ class ConvolutionNeuralNetworkRegressionKinaseInformed(_BaseModule):
 
         # Convolution on protein
         self.convolution_protein = nn.Conv1d(
-            in_channels=self.input_shape[1][1],
+            in_channels=self.input_shape[1][0],
             out_channels=self.embedding_shape,
             kernel_size=self.kernel_shape,
         )
-        self.temp_protein = (self.input_shape[1][0] - self.kernel_shape + 1) * self.embedding_shape
+        self.temp_protein = (self.input_shape[1][1] - self.kernel_shape + 1) * self.embedding_shape
 
         self.fully_connected_1 = nn.Linear(self.temp_ligand + self.temp_protein, self.hidden_shape)
         self.fully_connected_out = nn.Linear(self.hidden_shape, self.output_shape)
 
     def forward(self, x):
         """
-        Defines the foward pass for given two inputs: ligand and protein.
+        Defines the foward pass for given an input composed of two entities: ligand and protein.
         """
-        x_ligand, x_protein = zip(*x)
-        x_ligand = torch.tensor(x_ligand)
-        x_protein = torch.tensor(x_protein)
-        x_lig = self._activation(self.convolution_ligand(x_ligand))
-        x_prot = self._activation(self.convolution_protein(x_protein))
+        x_ligand, x_protein = [torch.stack(subx) for subx in zip(*x)]
+
+        x_lig = self._activation(self.convolution_ligand(x_ligand.float()))
+        x_prot = self._activation(self.convolution_protein(x_protein.float()))
 
         x_lig = torch.flatten(x_lig, 1)
         x_prot = torch.flatten(x_prot, 1)
