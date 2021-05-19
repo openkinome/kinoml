@@ -653,6 +653,20 @@ class MultiDatasetProvider(DatasetProvider):
                     all_arrays[key] = arr
         return all_arrays
 
+    def to_awkward(self, **kwargs):
+        """
+        See ``DatasetProvider.to_awkward()``. ``X`` and ``y`` will
+        be concatenated along axis=0 (one provider after another)
+        """
+        all_X = []
+        all_y = []
+        for p in self.providers:
+            X, y = p.to_awkward(**kwargs)
+            all_X.append(X)
+            all_y.append(y)
+
+        return ak.concatenate(all_X), ak.concatenate(all_y)
+
     def __repr__(self) -> str:
         measurements = []
         for p in self.providers:
