@@ -3,6 +3,12 @@ kinase_model.py
 Defines the Kinase class
 
 """
+from collections import Counter
+import numpy as np
+
+from .core import BaseFeaturizer, BaseOneHotEncodingFeaturizer
+from ..core.systems import System
+from ..core.kinase import KLIFSBindingSiteSequence
 
 
 class Kinase(object):
@@ -72,3 +78,49 @@ class Kinase(object):
         self.dihedrals = dihedrals
         self.distances = distances
         self.mean_dist = mean_dist
+
+
+
+class KLIFSBindingSiteCompositionFeaturizer(BaseFeaturizer):
+    """
+    Featurizes the kinase using the composition of the residues from the KLIFS' binding site sequence.
+    """
+    # Initialize a Counter object with 0 counts
+    _counter = Counter(sorted(KLIFSBindingSiteSequence.ALPHABET))
+    for k in _counter.keys():
+        _counter[k] = 0
+
+    def _featurize_one(self, system: System, options: dict) -> np.array:
+        """
+        Featurizes a kinase using the residue count in the binding site sequence.
+
+        Parameters
+        ----------
+        system: System
+            The System to be featurized. Sometimes it will
+        options : dict
+            Unused
+
+        Returns
+        -------
+        list of array
+            The count of amino acid in the binding site.
+        """
+        count = self._counter.copy()
+        count.update(system.kinase.sequence)
+        sorted_count = sorted(count.items(), key=lambda kv: kv[0])
+        return np.array([number for _, number in sorted_count])
+
+
+class OneHotEncodedBindingSiteSequenceFeaturizer(BaseOneHotEncodingFeaturizer):
+
+    """
+    Featurizes the kinase using the one-hot encoded KLIFS binding site sequence, using the characters in ``ALPHABET``.
+    """
+
+    ALPHABET = KLIFSBindingSiteSequence.ALPHABET
+
+    def _retrieve_binding_site_sequence(self, system: System) -> str:
+        for comp in system.components:
+            if isinstance(comp, KLIFSBindingSiteSequence):
+                return comp.binding_site_sequence

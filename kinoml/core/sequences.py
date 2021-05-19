@@ -362,3 +362,45 @@ class KinaseDomainAminoAcidSequence(Biosequence):
                     "true_C_terminus": true_C_terminus,
                 },
             )
+
+class KinasePocketAminoAcidSequence(Biosequence):
+    """Biosequence for kinase pocket amino acid sequences."""
+
+    @classmethod
+    def from_uniprot(
+        cls,
+        *uniprot_ids: str,
+    ) -> Union["KinasePocketAminoAcidSequence", Iterable["KinasePocketAminoAcidSequence"], None]:
+        """
+        Retrieve kinase binding site amino acid sequences of kinases defined by their Uniprot identifiers.
+
+        Parameters
+        ----------
+        uniprot_ids: str
+            Uniprot identifier(s). Multiple can be provided.
+
+        Returns
+        -------
+        klifs_binding_site_sequences: list of KinasePocketAminoAcidSequence
+            Retrieved kinase binding site amino acid sequence(s).
+        """
+
+        #def from_uniprot_to_klifs_binding_site_sequence(uniprot_ID):
+        #response = requests.get(f"https://klifs.vu-compmedchem.nl/api/kinase_ID?kinase_name={uniprot_ID}&species=HUMAN")
+        #if response.status_code == 200:
+        #    klifs_binding_site_sequence = response.json()[0]['pocket']
+        #    return klifs_binding_site_sequence
+        #else:
+        #    None
+
+        for uniprot_id in uniprot_ids:
+            # request data
+            response = requests.get(f"https://klifs.vu-compmedchem.nl/api/kinase_ID?kinase_name={uniprot_id}&species=HUMAN")
+            klifs_binding_site_sequence = response.json()[0]['pocket']
+
+            yield cls(
+                klifs_binding_site_sequence,
+                metadata={
+                    "uniprot_id": uniprot_id,
+                },
+            )

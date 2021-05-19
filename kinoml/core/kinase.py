@@ -4,6 +4,9 @@ Defines the Kinase class
 [WIP]
 """
 
+from .components import BaseProtein
+from .sequences import Biosequence, KinasePocketAminoAcidSequence
+
 
 class Kinase(object):
     def __init__(
@@ -72,3 +75,17 @@ class Kinase(object):
         self.dihedrals = dihedrals
         self.distances = distances
         self.mean_dist = mean_dist
+
+class KLIFSBindingSiteSequence(BaseProtein, KinasePocketAminoAcidSequence):
+    """Biosequence that only allows proteinic aminoacids
+
+    Parameters
+    ----------
+    binding_site_sequence : str
+        The KLIFS binding site sequence for this kinase (one-letter symbols)
+    """
+
+    ALPHABET = "ACDEFGHIKLMNPQRSTVWY"
+
+    def __init__(self, sequence, *args, **kwargs):
+        KinasePocketAminoAcidSequence.__init__(self)

@@ -2,9 +2,8 @@
 Test kinoml.core.sequences and derived objects
 """
 
-from ...core.sequences import Biosequence
-from ...core.proteins import AminoAcidSequence
-
+from kinoml.core.sequences import Biosequence, KinasePocketAminoAcidSequence
+from kinoml.core.proteins import AminoAcidSequence
 
 def test_biosequence_mutation():
     s = Biosequence("ATCGTHCTCH")
@@ -31,3 +30,8 @@ def test_biosequence_from_ncbi():
 def test_biosequences_from_ncbis():
     ss = AminoAcidSequence.from_ncbi("NP_005148.2", "NP_001607.1")
     assert len(ss) == 2
+
+def test_biosequence_from_uniprot():
+    binding_site = KinasePocketAminoAcidSequence.from_uniprot("P00519")
+    solution = "HKLGGGQYGEVYEVAVKTLEFLKEAAVMKEIKPNLVQLLGVYIITEFMTYGNLLDYLREYLEKKNFIHRDLAARNCLVVADFGLS"
+    assert solution == next(binding_site)

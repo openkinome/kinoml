@@ -106,6 +106,10 @@ class ProteinSystem(System):
         return next(self._components_by_type(BaseProtein))
 
     @property
+    def kinase(self):
+        return next(self._components_by_type(BaseProtein))
+
+    @property
     def proteins(self):
         return list(self._components_by_type(BaseProtein))
 

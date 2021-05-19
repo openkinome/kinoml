@@ -14,8 +14,7 @@ from ..core.proteins import AminoAcidSequence
 class AminoAcidCompositionFeaturizer(BaseFeaturizer):
 
     """
-    Featurizes the protein using the composition of the residues
-    in the binding site.
+    Featurizes the protein using the composition of the residues from the sequence of the protein.
     """
 
     # Initialize a Counter object with 0 counts
@@ -25,7 +24,7 @@ class AminoAcidCompositionFeaturizer(BaseFeaturizer):
 
     def _featurize_one(self, system: System, options: dict) -> np.array:
         """
-        Featurizes a protein using the residue count in the sequence
+        Featurizes a protein using the residue count in the sequence.
 
         Parameters
         ----------
@@ -48,8 +47,7 @@ class AminoAcidCompositionFeaturizer(BaseFeaturizer):
 class OneHotEncodedSequenceFeaturizer(BaseOneHotEncodingFeaturizer):
 
     """
-    Featurize the sequence of the protein to a one hot encoding
-    using the symbols in ``ALL_AMINOACIDS``.
+    Featurizes the protein using the one-hot encoded sequence, using the characters in ``ALPHABET``.
     """
 
     ALPHABET = AminoAcidSequence.ALPHABET
