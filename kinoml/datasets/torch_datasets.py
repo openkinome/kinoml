@@ -438,6 +438,11 @@ class AwkwardArrayDataset(_NativeTorchDataset):
     they have the same shape. If they do not, then you'll get a list
     of tensors instead.
 
+    If this is the case, make sure to provide a suitable ``collate_fn``
+    function for the corresponding Dataloader! More info:
+
+    https://pytorch.org/docs/stable/data.html#dataloader-collate-fn
+
     Notes
     -----
     With several tensors per system, but all of the same shape, it is faster:
