@@ -416,13 +416,11 @@ class DatasetProvider(BaseDatasetProvider):
         and generalizes when they’re not.
         """
         features = self.featurized_systems(key=featurization_key, clear_after=clear_after)
-        X = []
-        for subX in zip(*features):
-            try:
-                subX = ak.from_numpy(np.array(subX))
-            except ValueError:
-                subX = ak.from_numpy(subX)
-            X.append(subX)
+
+        # Features is a list of systems (s) and their features (f): [(s0f0, s0f1), (s1f0, s1f1)...]
+        # We are going to iterate over columns: (s0f0, s1f0... snf0), (s0f1, s1f1, ..., snf1)
+        # The result is that X will contain the an array of f0, then an array for f1... etc.
+        X = [ak.from_iter(subX) for subX in zip(*features)]
         y = ak.from_numpy(self.measurements_as_array(dtype=y_dtype))
         return X, y
 
