@@ -19,6 +19,8 @@ dependencies:
   - modeller
   - biotite
   - watermark
+  - awkward
+  - pyarrow
 
   # Development
   - jupyterlab

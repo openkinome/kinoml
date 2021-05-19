@@ -52,7 +52,13 @@ class ChEMBLDatasetProvider(MultiDatasetProvider):
         """
         cached_path = cls._download_to_cache_or_retrieve(path_or_url)
         df = pd.read_csv(cached_path)
-
+        df = df.dropna(
+            subset=[
+                "compound_structures.canonical_smiles",
+                "component_sequences.sequence",
+                "activities.standard_type",
+            ]
+        )
         measurement_type_classes = {
             "pIC50": pIC50Measurement,
             "pKi": pKiMeasurement,
