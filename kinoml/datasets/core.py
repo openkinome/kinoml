@@ -178,11 +178,15 @@ class DatasetProvider(BaseDatasetProvider):
             )
         return systems
 
-    def featurized_systems(self, key="last"):
+    def featurized_systems(self, key="last", clear_after=False):
         """
         Return the ``key`` featurized objects from all systems.
         """
-        return tuple(ms.system.featurizations[key] for ms in self.measurements)
+        results = tuple(ms.system.featurizations[key] for ms in self.measurements)
+        if clear_after:
+            for s in self.systems:
+                s.featurizations.clear()
+        return results
 
     def _to_dataset(self, style="pytorch"):
         """

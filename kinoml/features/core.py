@@ -7,12 +7,13 @@ and `._supports`, if needed.
 """
 from __future__ import annotations
 from collections import defaultdict
-from typing import Callable, Hashable, Iterable, Sequence
+from typing import Callable, Hashable, Iterable, Sequence, Type
 import hashlib
 from multiprocessing import Pool
 from functools import partial
 
 import numpy as np
+from tqdm.auto import tqdm
 
 from ..core.systems import System
 from ..utils import Hashabledict
@@ -28,7 +29,9 @@ class BaseFeaturizer:
     def __init__(self, *args, **kwargs):
         pass
 
-    def featurize(self, systems: Iterable[System], processes=1, chunksize=None) -> object:
+    def featurize(
+        self, systems: Iterable[System], processes=1, chunksize=None, keep=True
+    ) -> object:
         """
         Given some systems (compatible with ``_SUPPORTED_TYPES``), apply
         the featurization scheme implemented in this class.
@@ -47,6 +50,9 @@ class BaseFeaturizer:
             used at all.
         chunksize :  int, optional=None
             See https://stackoverflow.com/a/54032744/3407590.
+        keep : bool, optional=True
+            Whether to store the current featurizer in the ``system.featurizations``
+            dictionary with its own key (``self.name``), in addition to ``last``.
 
         Returns
         -------
@@ -57,8 +63,8 @@ class BaseFeaturizer:
             or an array-like object) under a key named after ``.name``.
         """
         self.supports(systems[0])
-        features = self._featurize(systems)
-        systems = self._post_featurize(systems, features)
+        features = self._featurize(systems, processes=processes, chunksize=chunksize, keep=keep)
+        systems = self._post_featurize(systems, features, keep=keep)
         return systems
 
     def __call__(self, *args, **kwargs):
@@ -68,7 +74,9 @@ class BaseFeaturizer:
         """
         return self.featurize(*args, **kwargs)
 
-    def _featurize(self, systems: Iterable[System], processes=1, chunksize=None):
+    def _featurize(
+        self, systems: Iterable[System], processes=1, chunksize=None, keep: bool = True
+    ):
         """
         Some global properties can be optionally computed with
         ``self._featurize_options()``. This returns a dictionary that will
@@ -85,6 +93,9 @@ class BaseFeaturizer:
             used at all.
         chunksize :  int, optional=None
             See https://stackoverflow.com/a/54032744/3407590.
+        keep : bool, optional=True
+            Whether to store the current featurizer in the ``system.featurizations``
+            dictionary with its own key (``self.name``), in addition to ``last``.
 
         Returns
         -------
@@ -93,7 +104,10 @@ class BaseFeaturizer:
         featurization_options = Hashabledict(self._featurize_options(systems) or {})
 
         if processes == 1:
-            features = [self._featurize_one(s, options=featurization_options) for s in systems]
+            features = [
+                self._featurize_one(s, options=featurization_options)
+                for s in tqdm(systems, desc=self.name)
+            ]
         else:
             func = partial(self._featurize_one, options=featurization_options)
             with Pool(processes=processes) as pool:
@@ -141,7 +155,7 @@ class BaseFeaturizer:
         raise NotImplementedError("Implement in your subclass")
 
     def _post_featurize(
-        self, systems: Iterable[System], features: Iterable[System | np.array]
+        self, systems: Iterable[System], features: Iterable[System | np.array], keep: bool = True
     ) -> Iterable[System]:
         """
         Run after featurizing all systems. You shouldn't need to redefine this method
@@ -152,6 +166,9 @@ class BaseFeaturizer:
             The systems being featurized
         features : list of System or array
             The features returned by ``self._featurize``
+        keep : bool, optional=True
+            Whether to store the current featurizer in the ``system.featurizations``
+            dictionary with its own key (``self.name``), in addition to ``last``.
 
         Returns
         -------
@@ -161,7 +178,9 @@ class BaseFeaturizer:
         """
         # TODO: Define self.id() to provide a unique key per class name and chosen init args
         for system, feature in zip(systems, features):
-            system.featurizations[self.name] = system.featurizations["last"] = feature
+            system.featurizations["last"] = feature
+            if keep:
+                system.featurizations[self.name] = feature
         return systems
 
     def supports(self, *systems: System, raise_errors: bool = True) -> bool:
@@ -200,11 +219,14 @@ class BaseFeaturizer:
 
         This is the method you should reimplement in your subclass.
 
-        Parameters:
-            system: the system that will be checked
+        Parameters
+        ----------
+        system: System
+            The system that will be checked
 
-        Returns:
-            True if compatible, False otherwise
+        Returns
+        -------
+        True if compatible, False otherwise
         """
         return isinstance(system, self._SUPPORTED_TYPES)
 
@@ -242,7 +264,9 @@ class Pipeline(BaseFeaturizer):
         self.featurizers = featurizers
         self._shortname = shortname
 
-    def _featurize(self, systems: Iterable[System], processes=1, chunksize=None):
+    def _featurize(
+        self, systems: Iterable[System], processes=1, chunksize=None, keep: bool = True
+    ):
         """
         Given a list of featurizers, apply them sequentially
         on the systems/arrays (e.g. featurizer A returns X, and X is
@@ -257,6 +281,9 @@ class Pipeline(BaseFeaturizer):
             used at all.
         chunksize :  int, optional=None
             See https://stackoverflow.com/a/54032744/3407590.
+        keep : bool, optional=True
+            Whether to store the current featurizer in the ``system.featurizations``
+            dictionary with its own key (``self.name``), in addition to ``last``.
 
         Returns
         -------
@@ -267,6 +294,7 @@ class Pipeline(BaseFeaturizer):
                 systems,
                 processes=processes,
                 chunksize=chunksize,
+                keep=keep,
             )
 
         return [s.featurizations["last"] for s in systems]
@@ -343,7 +371,9 @@ class Concatenated(Pipeline):
         super().__init__(featurizers=featurizers, shortname=shortname)
         self.axis = axis
 
-    def _featurize(self, systems: Iterable[System], processes=1, chunksize=None) -> np.ndarray:
+    def _featurize(
+        self, systems: Iterable[System], processes=1, chunksize=None, keep=True
+    ) -> np.ndarray:
         """
         Given a list of featurizers, apply them serially and concatenate
         the result (e.g. featurizer A returns X, and featurizer B returns Y;
@@ -353,6 +383,14 @@ class Concatenated(Pipeline):
         ----------
         systems: list of System or array-like
             The Systems (or arrays) to be featurized.
+        processes : int, optional=1
+            Number of processors to use. If 1, ``multiprocessing`` will not be
+            used at all.
+        chunksize :  int, optional=None
+            See https://stackoverflow.com/a/54032744/3407590.
+        keep : bool, optional=True
+            Whether to store the current featurizer in the ``system.featurizations``
+            dictionary with its own key (``self.name``), in addition to ``last``.
 
         Returns
         -------
@@ -365,7 +403,12 @@ class Concatenated(Pipeline):
         # We need to end up with a single array!
         list_of_features = []
         for featurizer in self.featurizers:
-            systems = featurizer.featurize(systems)
+            systems = featurizer.featurize(
+                systems,
+                processes=processes,
+                chunksize=chunksize,
+                keep=keep,
+            )
             features = [s.featurizations["last"] for s in systems]
             list_of_features.append(features)
 
@@ -399,7 +442,13 @@ class TupleOfArrays(Pipeline):
     wrapper around individual ``Featurizer`` objects.
     """
 
-    def _featurize(self, systems: Iterable[System], processes=1, chunksize=None) -> np.ndarray:
+    def _featurize(
+        self,
+        systems: Iterable[System],
+        processes: int = 1,
+        chunksize: int = None,
+        keep: bool = True,
+    ) -> np.ndarray:
         """
         Given a list of featurizers, apply them serially and build a
         flat tuple out of the results.
@@ -408,6 +457,14 @@ class TupleOfArrays(Pipeline):
         ----------
         systems: list of System or array-like
             The Systems (or arrays) to be featurized.
+        processes : int, optional=1
+            Number of processors to use. If 1, ``multiprocessing`` will not be
+            used at all.
+        chunksize :  int, optional=None
+            See https://stackoverflow.com/a/54032744/3407590.
+        keep : bool, optional=True
+            Whether to store the current featurizer in the ``system.featurizations``
+            dictionary with its own key (``self.name``), in addition to ``last``.
 
         Returns
         -------
@@ -424,7 +481,12 @@ class TupleOfArrays(Pipeline):
         features_per_system = 0
         for featurizer in self.featurizers:
             # Run a pipeline
-            systems = featurizer.featurize(systems)
+            systems = featurizer.featurize(
+                systems,
+                processes=processes,
+                chunksize=chunksize,
+                keep=keep,
+            )
 
             # Get the current "last" before the next pipeline runs
             # We need to store it in list_of_systems
@@ -721,7 +783,7 @@ class ClearFeaturizations(BaseFeaturizer):
         return system
 
     def _post_featurize(
-        self, systems: Iterable[System], features: Iterable[System | np.array]
+        self, systems: Iterable[System], features: Iterable[System | np.array], keep: bool = True
     ) -> Iterable[System]:
         """
         Bypass the automated population of the ``.featurizations`` dict
