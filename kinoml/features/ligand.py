@@ -102,7 +102,6 @@ class SmilesToLigandFeaturizer(SingleLigandFeaturizer):
                 f"Ligand type `{ligand_type}` is not one of ['rkdit', 'openforcefield']"
             )
 
-    @lru_cache(maxsize=1000)
     def _featurize_one(
         self, system: Iterable[System], options: dict
     ) -> RDKitLigand | OpenForceFieldLigand:
@@ -143,7 +142,6 @@ class MorganFingerprintFeaturizer(SingleLigandFeaturizer):
         self.radius = radius
         self.nbits = nbits
 
-    @lru_cache(maxsize=1000)
     def _featurize_one(self, system: System, options: dict) -> np.ndarray:
         """
         Parameters
@@ -163,7 +161,7 @@ class MorganFingerprintFeaturizer(SingleLigandFeaturizer):
         # otherwise, we should force that behaviour ourselves!
         ligand = self._find_ligand(system).to_rdkit()
         fp = Morgan(ligand, radius=self.radius, nBits=self.nbits)
-        return np.asarray(fp, dtype="uint8")
+        return np.asarray(fp, dtype="bool")
 
 
 class OneHotSMILESFeaturizer(BaseOneHotEncodingFeaturizer, SingleLigandFeaturizer):
@@ -296,7 +294,6 @@ class GraphLigandFeaturizer(SingleLigandFeaturizer):
         self.max_in_ring_size = max_in_ring_size
         self._hybridization_names = sorted(rdkit.Chem.rdchem.HybridizationType.names)
 
-    @lru_cache(maxsize=1000)
     def _featurize_one(self, system: System, options: dict) -> tuple:
         """
         Featurizes ligands contained in a System as a labeled graph.
