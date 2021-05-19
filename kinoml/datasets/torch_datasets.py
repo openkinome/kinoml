@@ -7,8 +7,10 @@ from functools import lru_cache
 from os import close
 from typing import List
 from pathlib import Path
+from functools import lru_cache
 
 import numpy as np
+import awkward as ak
 import torch
 from torch.utils.data import Dataset as _NativeTorchDataset, DataLoader as _DataLoader
 from tqdm.auto import tqdm
@@ -108,7 +110,6 @@ class TorchDataset(PrefeaturizedTorchDataset):
     def estimate_input_size(self):
         return self.featurizer(self.systems[0]).featurizations[self.featurizer.name].shape
 
-    @lru_cache(maxsize=100_000)
     def __getitem__(self, index):
         """
         In this case, the DatasetProvider is passing System objects that will
@@ -266,7 +267,8 @@ class MultiXTorchDataset(_NativeTorchDataset):
     @classmethod
     def from_npz(cls, path, lazy=True, close_filehandle=False):
         """
-        Load from a single NPZ file.
+        Load from a single NPZ file. If lazy=True, this can be very slow
+        for large amounts of arrays.
 
         Parameters
         ----------
@@ -330,30 +332,7 @@ class MultiXTorchDataset(_NativeTorchDataset):
         >>> %timeit _ = ds[0:128]
         171 ms ± 2.68 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
         """
-        single_item = False
-        if accessor is True:
-            indices = list(range(self.shape_y[0]))
-        elif accessor is False:
-            return tuple([], [])
-        else:
-            try:
-                indices_arr = np.asarray(accessor)
-                if len(indices_arr.shape) == 1:
-                    indices = indices_arr.tolist()
-            except ValueError:
-                pass
-            if isinstance(accessor, (list, tuple)):
-                if isinstance(accessor[0], int):
-                    indices = accessor
-                elif isinstance(accessor[0], bool):
-                    indices = [i for i, value in enumerate(accessor) if value]
-            elif isinstance(accessor, slice):
-                indices = range(
-                    accessor.start or 0, accessor.stop or len(self), accessor.step or 1
-                )
-            elif isinstance(accessor, int):
-                indices = [accessor]
-                single_item = True
+        indices, single_item = _accessor_to_indices(accessor, full_size=len(self))
 
         if hasattr(self._data, "zip") and self._data.zip is None:
             # data was loaded from NPZ but fh was closed; we need to reopen
@@ -426,3 +405,108 @@ class MultiXTorchDataset(_NativeTorchDataset):
 
     def __len__(self):
         return self.data_y.shape[0]
+
+
+class AwkwardArrayDataset(_NativeTorchDataset):
+    """
+    Loads an Awkward array of Records.
+
+    The structure of the array dimensions needs to be:
+
+    - List of systems
+    ---- X1
+    ---- X2
+    ---- ...
+    ---- Xn
+    ---- y
+
+    However, X1...Xn, y are accessed by positional index, as a string.
+
+    So, to get all the X1 vectors for all systems, you'd do:
+
+    X1 = data["0"]
+    X2 = data["1"]
+
+    Since ``y`` is always the last one you can use the ``data.fields``
+    list:
+
+    y = data[data.fields[-1]]
+
+    This is essentially what ``__getitem__`` is doing for you.
+
+    It will try to consolidate tensors whenever possible, as long as
+    they have the same shape. If they do not, then you'll get a list
+    of tensors instead.
+
+    Notes
+    -----
+    With several tensors per system, but all of the same shape, it is faster:
+
+    >>> awk = AwkwardArrayDataset.from_parquet("same_shape.parquet")
+    >>> %timeit _ = awk[:50]
+    2.38 ms ± 286 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
+    >>> awk = AwkwardArrayDataset.from_parquet("different_shape.parquet")
+    >>> %timeit _ = awk[:50]
+    9.32 ms ± 252 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
+
+    This is probably due to the Awkward->Numpy->Torch conversions that need
+    to happen for each different-shape sub-tensor. Look in ``__getitem__``
+    for bottlenecks.
+    """
+
+    def __init__(self, data):
+        self.data = data
+
+    def __len__(self):
+        return len(self.data)
+
+    def __getitem__(self, index):
+        X = []
+        fields = self.data.fields
+        for f in fields[:-1]:
+            tensors = self.data[index, f]
+            try:
+                tensors = torch.from_numpy(ak.to_numpy(tensors))
+            except ValueError:
+                # This can be slow with a lot of tensors (index > 1000?)
+                tensors = [torch.from_numpy(ak.to_numpy(t)) for t in tensors]
+            X.append(tensors)
+        y = torch.tensor(self.data[index, fields[-1]])
+        return X, y
+
+    def __repr__(self):
+        return self.data.__repr__()
+
+    def __str__(self):
+        return self.data.__str__()
+
+    @classmethod
+    def from_parquet(cls, path, **kwargs):
+        return cls(ak.from_parquet(path, **kwargs))
+
+
+def _accessor_to_indices(accessor, full_size):
+    single_item = False
+    if accessor is True:
+        indices = range(full_size)
+    elif accessor is False:
+        return tuple([], [])
+    else:
+        try:
+            indices_arr = np.asarray(accessor)
+            if len(indices_arr.shape) == 1:
+                indices = indices_arr.tolist()
+        except ValueError:
+            pass
+        if isinstance(accessor, (list, tuple)):
+            if isinstance(accessor[0], int):
+                indices = accessor
+            elif isinstance(accessor[0], bool):
+                indices = [i for i, value in enumerate(accessor) if value]
+        elif isinstance(accessor, slice):
+            indices = range(accessor.start or 0, accessor.stop or full_size, accessor.step or 1)
+        elif isinstance(accessor, int):
+            indices = [accessor]
+            single_item = True
+
+        return indices, single_item

@@ -14,6 +14,7 @@ import os
 import numpy as np
 import pandas as pd
 from tqdm.auto import tqdm
+import awkward as ak
 
 from ..core.measurements import BaseMeasurement
 from ..features.core import BaseFeaturizer
@@ -384,6 +385,42 @@ class DatasetProvider(BaseDatasetProvider):
         dict_of_arrays["y"] = y
 
         return dict_of_arrays
+
+    def to_awkward(
+        self,
+        featurization_key="last",
+        y_dtype="float32",
+        clear_after=False,
+    ):
+        """
+        Creates an awkward array out of the featurized systems
+        and the associated measurements.
+
+        Returns
+        -------
+        awkward array
+
+        Notes
+        -----
+        Awkward Array is a library for nested, variable-sized data,
+        including arbitrary-length lists, records, mixed types,
+        and missing data, using NumPy-like idioms.
+
+        Arrays are dynamically typed, but operations on
+        them are compiled and fast. Their behavior coincides
+        with NumPy when array dimensions are regular
+        and generalizes when they’re not.
+        """
+        features = self.featurized_systems(key=featurization_key, clear_after=clear_after)
+        X = []
+        for subX in zip(*features):
+            try:
+                subX = ak.from_numpy(np.array(subX))
+            except ValueError:
+                subX = ak.from_numpy(subX)
+            X.append(subX)
+        y = ak.from_numpy(self.measurements_as_array(dtype=y_dtype))
+        return X, y
 
     def observation_model(self, **kwargs):
         """
