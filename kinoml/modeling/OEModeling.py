@@ -5,6 +5,10 @@ from openeye import oechem, oegrid, oespruce
 import pandas as pd
 from scipy.spatial import cKDTree
 
+# TODO: Add space before Parameters and Returns in docstring, check with numpy standard
+# TODO: think more about exceptions
+# TODO: Think about using openff-toolkit as much as possible and converting only if needed
+
 
 def read_smiles(smiles: str) -> oechem.OEGraphMol:
     """
@@ -25,6 +29,8 @@ def read_smiles(smiles: str) -> oechem.OEGraphMol:
     molecules = []
     for molecule in ims.GetOEMols():
         molecules.append(oechem.OEGraphMol(molecule))
+
+    # TODO: add hydrogen by default or explicitly mention in docstring
 
     return molecules[0]
 
