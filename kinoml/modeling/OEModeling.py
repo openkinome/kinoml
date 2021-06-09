@@ -308,14 +308,21 @@ def delete_residue(
     return selection
 
 
-def get_expression_tags(structure) -> List[Dict]:
+def get_expression_tags(
+        structure: oechem.OEGraphMol,
+        labels: Iterable[str] = ("EXPRESSION TAG", "CLONING ARTIFACT"),
+) -> List[Dict]:
     """
     Get the chain id, residue name and residue id of residues in expression tags from a protein structure listed in the
     PDB header section "SEQADV".
+
     Parameters
     ----------
     structure: oechem.OEGraphMol
         An OpenEye molecule with associated PDB header section "SEQADV".
+    labels: Iterable of str
+        The 'SEQADV' labels defining expression tags. Default: ('EXPRESSION TAG', 'CLONING ARTIFACT').
+
     Returns
     -------
     : list of dict
@@ -324,12 +331,12 @@ def get_expression_tags(structure) -> List[Dict]:
     # retrieve "SEQADV" records from PDB header
     pdb_data_pairs = oechem.OEGetPDBDataPairs(structure)
     seqadv_records = [datapair.GetValue() for datapair in pdb_data_pairs if datapair.GetTag() == "SEQADV"]
-    labels = ["EXPRESSION TAG", "CLONING ARTIFACT"]
     expression_tag_labels = [
         seqadv_record
         for seqadv_record in seqadv_records
         if any(label in seqadv_record for label in labels)
     ]
+
     # collect expression tag residue information
     expression_tag_residues = []
     for label in expression_tag_labels:
