@@ -10,13 +10,17 @@ from scipy.spatial import cKDTree
 # TODO: Think about using openff-toolkit as much as possible and converting only if needed
 
 
-def read_smiles(smiles: str) -> oechem.OEGraphMol:
+def read_smiles(smiles: str, add_hydrogens=True) -> oechem.OEGraphMol:
     """
-    Read molecule from a smiles string.
+    Read molecule from a smiles string. Explicit hydrogens will be added by default.
+
     Parameters
     ----------
     smiles: str
         Smiles string.
+    add_hydrogens: bool
+        If explicit hydrogens should be added.
+
     Returns
     -------
     molecule: oechem.OEGraphMol
@@ -28,6 +32,8 @@ def read_smiles(smiles: str) -> oechem.OEGraphMol:
 
     molecules = []
     for molecule in ims.GetOEMols():
+        if add_hydrogens:
+            oechem.OEAddExplicitHydrogens(molecule)
         molecules.append(oechem.OEGraphMol(molecule))
 
     # TODO: add hydrogen by default or explicitly mention in docstring
@@ -35,13 +41,17 @@ def read_smiles(smiles: str) -> oechem.OEGraphMol:
     return molecules[0]
 
 
-def read_molecules(path: str) -> List[oechem.OEGraphMol]:
+def read_molecules(path: str, add_hydrogens=True) -> List[oechem.OEGraphMol]:
     """
-    Read molecules from a file.
+    Read molecules from a file. Explicit hydrogens will be added by default.
+
     Parameters
     ----------
     path: str
         Path to molecule file.
+    add_hydrogens: bool
+        If explicit hydrogens should be added.
+
     Returns
     -------
     molecules: list of oechem.OEGraphMol
@@ -62,6 +72,8 @@ def read_molecules(path: str) -> List[oechem.OEGraphMol]:
             )
         # add more flavors here if behavior should be different from `Default`
         for molecule in ifs.GetOEGraphMols():
+            if add_hydrogens:
+                oechem.OEAddExplicitHydrogens(molecule)
             molecules.append(oechem.OEGraphMol(molecule))
 
     # TODO: returns empty list if something goes wrong
