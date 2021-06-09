@@ -11,7 +11,7 @@ from scipy.spatial import cKDTree
 # TODO: Think about using openff-toolkit as much as possible and converting only if needed
 
 
-def read_smiles(smiles: str, add_hydrogens=True) -> oechem.OEGraphMol:
+def read_smiles(smiles: str, add_hydrogens: bool = True) -> oechem.OEGraphMol:
     """
     Read molecule from a smiles string. Explicit hydrogens will be added by default.
 
@@ -48,7 +48,7 @@ def read_smiles(smiles: str, add_hydrogens=True) -> oechem.OEGraphMol:
     return molecules[0]
 
 
-def read_molecules(path: Union[str, Path], add_hydrogens=False) -> List[oechem.OEGraphMol]:
+def read_molecules(path: Union[str, Path], add_hydrogens: bool = False) -> List[oechem.OEGraphMol]:
     """
     Read molecules from a file. Explicit hydrogens will not be added by default.
 
@@ -179,7 +179,11 @@ def select_chain(molecule: oechem.OEGraphMol, chain_id: str):
     return selection
 
 
-def select_altloc(molecule: oechem.OEGraphMol, altloc_id: str):
+def select_altloc(
+        molecule: oechem.OEGraphMol,
+        altloc_id: str,
+        altloc_fallback: bool = True,
+):
     """
     Select an alternate location from an OpenEye molecule.
 
@@ -189,6 +193,9 @@ def select_altloc(molecule: oechem.OEGraphMol, altloc_id: str):
         An OpenEye molecule holding a molecular structure.
     altloc_id: str
         Alternate location identifier.
+    altloc_fallback: bool
+        If the alternate location with the highest occupancy should be used for residues that do
+        not contain the given alternate location identifier.
 
     Returns
     -------
@@ -203,16 +210,12 @@ def select_altloc(molecule: oechem.OEGraphMol, altloc_id: str):
     # do not change input mol
     selection = molecule.CreateCopy()
 
-    allowed_altloc_ids = [" ", altloc_id]
-
-    # delete other alternate location
+    altloc_factory = oechem.OEAltLocationFactory(selection)
+    if altloc_fallback:
+        altloc_factory.MakePrimaryAltMol(selection)
     altloc_was_present = False
-    for atom in selection.GetAtoms():
-        residue = oechem.OEAtomGetResidue(atom)
-        found_altloc_id = oechem.OEResidue.GetAlternateLocation(residue)
-        if found_altloc_id not in allowed_altloc_ids:
-            selection.DeleteAtom(atom)
-        elif found_altloc_id == altloc_id:
+    for atom in altloc_factory.GetAltAtoms():
+        if altloc_factory.MakeAltMol(selection, atom, altloc_id):
             altloc_was_present = True
 
     # check if altloc id was actually present
