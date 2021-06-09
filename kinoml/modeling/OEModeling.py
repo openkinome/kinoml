@@ -138,6 +138,7 @@ def write_molecules(molecules: List[oechem.OEGraphMol], path: Union[str, Path]):
     with oechem.oemolostream(path) as ofs:
         for molecule in molecules:
             oechem.OEWriteMolecule(ofs, molecule)
+
     return
 
 
@@ -156,6 +157,11 @@ def select_chain(molecule: oechem.OEGraphMol, chain_id: str):
     -------
     selection: oechem.OEGraphMol
         An OpenEye molecule holding the selected chain.
+
+    Raises
+    ------
+    ValueError
+        No atoms were found with given chain id.
     """
     # do not change input mol
     selection = molecule.CreateCopy()
@@ -165,6 +171,10 @@ def select_chain(molecule: oechem.OEGraphMol, chain_id: str):
         residue = oechem.OEAtomGetResidue(atom)
         if residue.GetChainID() != chain_id:
             selection.DeleteAtom(atom)
+
+    # check if chain was actually present
+    if selection.NumAtoms() == 0:
+        raise ValueError("No atoms were found with given chain id.")
 
     return selection
 
@@ -184,6 +194,11 @@ def select_altloc(molecule: oechem.OEGraphMol, altloc_id: str):
     -------
     selection: oechem.OEGraphMol
         An OpenEye molecule holding the selected alternate location.
+
+    Raises
+    ------
+    ValueError
+        No atoms were found with given altloc id.
     """
     # do not change input mol
     selection = molecule.CreateCopy()
@@ -191,10 +206,18 @@ def select_altloc(molecule: oechem.OEGraphMol, altloc_id: str):
     allowed_altloc_ids = [" ", altloc_id]
 
     # delete other alternate location
+    altloc_was_present = False
     for atom in selection.GetAtoms():
         residue = oechem.OEAtomGetResidue(atom)
-        if oechem.OEResidue.GetAlternateLocation(residue) not in allowed_altloc_ids:
+        found_altloc_id = oechem.OEResidue.GetAlternateLocation(residue)
+        if found_altloc_id not in allowed_altloc_ids:
             selection.DeleteAtom(atom)
+        elif found_altloc_id == altloc_id:
+            altloc_was_present = True
+
+    # check if altloc id was actually present
+    if not altloc_was_present:
+        raise ValueError("No atoms were found with given altloc id.")
 
     return selection
 
