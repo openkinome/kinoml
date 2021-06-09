@@ -25,6 +25,11 @@ def read_smiles(smiles: str, add_hydrogens=True) -> oechem.OEGraphMol:
     -------
     molecule: oechem.OEGraphMol
         A molecule as OpenEye molecules.
+
+    Raises
+    ------
+    ValueError
+        Could not interpret input SMILES.
     """
     ims = oechem.oemolistream()
     ims.SetFormat(oechem.OEFormat_SMI)
@@ -36,7 +41,8 @@ def read_smiles(smiles: str, add_hydrogens=True) -> oechem.OEGraphMol:
             oechem.OEAddExplicitHydrogens(molecule)
         molecules.append(oechem.OEGraphMol(molecule))
 
-    # TODO: add hydrogen by default or explicitly mention in docstring
+    if len(molecules) == 0:
+        raise ValueError("Could not interpret input SMILES.")
 
     return molecules[0]
 
@@ -56,6 +62,11 @@ def read_molecules(path: str, add_hydrogens=True) -> List[oechem.OEGraphMol]:
     -------
     molecules: list of oechem.OEGraphMol
         A List of molecules as OpenEye molecules.
+
+    Raises
+    ------
+    ValueError
+        Given file does not contain valid molecules.
     """
     from pathlib import Path
 
@@ -76,7 +87,9 @@ def read_molecules(path: str, add_hydrogens=True) -> List[oechem.OEGraphMol]:
                 oechem.OEAddExplicitHydrogens(molecule)
             molecules.append(oechem.OEGraphMol(molecule))
 
-    # TODO: returns empty list if something goes wrong
+    if len(molecules) == 0:
+        raise ValueError("Given file does not contain valid molecules.")
+
     return molecules
 
 
