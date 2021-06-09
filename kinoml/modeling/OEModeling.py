@@ -1,4 +1,5 @@
 import logging
+from pathlib import Path
 from typing import List, Set, Union, Iterable, Tuple, Dict
 
 from openeye import oechem, oegrid, oespruce
@@ -47,13 +48,13 @@ def read_smiles(smiles: str, add_hydrogens=True) -> oechem.OEGraphMol:
     return molecules[0]
 
 
-def read_molecules(path: str, add_hydrogens=True) -> List[oechem.OEGraphMol]:
+def read_molecules(path: Union[str, Path], add_hydrogens=True) -> List[oechem.OEGraphMol]:
     """
     Read molecules from a file. Explicit hydrogens will be added by default.
 
     Parameters
     ----------
-    path: str
+    path: str, pathlib.Path
         Path to molecule file.
     add_hydrogens: bool
         If explicit hydrogens should be added.
@@ -68,8 +69,6 @@ def read_molecules(path: str, add_hydrogens=True) -> List[oechem.OEGraphMol]:
     ValueError
         Given file does not contain valid molecules.
     """
-    from pathlib import Path
-
     path = str(Path(path).expanduser().resolve())
     suffix = path.split(".")[-1]
     molecules = []
@@ -93,13 +92,13 @@ def read_molecules(path: str, add_hydrogens=True) -> List[oechem.OEGraphMol]:
     return molecules
 
 
-def read_electron_density(path: str) -> Union[oegrid.OESkewGrid, None]:
+def read_electron_density(path: Union[str, Path]) -> Union[oegrid.OESkewGrid, None]:
     """
     Read electron density from a file.
 
     Parameters
     ----------
-    path: str
+    path: str, pathlib.Path
         Path to electron density file.
 
     Returns
@@ -112,8 +111,6 @@ def read_electron_density(path: str) -> Union[oegrid.OESkewGrid, None]:
     ValueError
         Not a valid electron density file or wrong format. Only MTZ is currently supported.
     """
-    from pathlib import Path
-
     path = str(Path(path).expanduser().resolve())
     electron_density = oegrid.OESkewGrid()
     # TODO: different map formats
@@ -126,18 +123,17 @@ def read_electron_density(path: str) -> Union[oegrid.OESkewGrid, None]:
     return electron_density
 
 
-def write_molecules(molecules: List[oechem.OEGraphMol], path: str):
+def write_molecules(molecules: List[oechem.OEGraphMol], path: Union[str, Path]):
     """
     Save molecules to file.
+
     Parameters
     ----------
     molecules: list of oechem.OEGraphMol
         A list of OpenEye molecules for writing.
-    path: str
+    path: str, pathlib.Path
         File path for saving molecules.
     """
-    from pathlib import Path
-
     path = str(Path(path).expanduser().resolve())
     with oechem.oemolostream(path) as ofs:
         for molecule in molecules:
