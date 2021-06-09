@@ -141,15 +141,17 @@ def write_molecules(molecules: List[oechem.OEGraphMol], path: Union[str, Path]):
     return
 
 
-def select_chain(molecule, chain_id):
+def select_chain(molecule: oechem.OEGraphMol, chain_id: str):
     """
     Select a chain from an OpenEye molecule.
+
     Parameters
     ----------
     molecule: oechem.OEGraphMol
         An OpenEye molecule holding a molecular structure.
     chain_id: str
         Chain identifier.
+
     Returns
     -------
     selection: oechem.OEGraphMol
