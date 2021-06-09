@@ -1,6 +1,7 @@
 """
-Test ligand featurizers of `kinoml.modeling`
+Test OEModeling functionalities of `kinoml.modeling`
 """
+from contextlib import contextmanager
 from importlib import resources
 import pytest
 import tempfile
@@ -18,110 +19,162 @@ from kinoml.modeling.OEModeling import (
     assign_caps
 )
 
-# TODO: rename solution to be more precise, e.g. n_heavy_atoms or full docstrings
-# TODO: add files for tests to tests/data/proteins/ and tests/data/molecules, see https://stackoverflow.com/questions/779495/access-data-in-package-subdirectory
-# TODO: think about including tests that are supposed to fail, e.g. raise an exception
-# TODO: look at Parmed for good tests
+
+@contextmanager
+def does_not_raise():
+    yield
+
 
 @pytest.mark.parametrize(
-    "smiles, solution",
+    "smiles, add_hydrogens, expectation, n_atoms",
     [
         (
             "C1=CC=NC=C1",
-            6,
+            True,
+            does_not_raise(),
+            11,
+        ),
+        (
+            "C1=CC=[NH+]C=C1",
+            True,
+            does_not_raise(),
+            12,
         ),
         (
             "CCNCC",
+            True,
+            does_not_raise(),
+            16,
+        ),
+        (
+            "CCNCC",
+            False,
+            does_not_raise(),
             5,
+        ),
+        (
+            "1",
+            False,
+            pytest.raises(ValueError),
+            0
         ),
     ],
 )
-def test_read_smiles(smiles, solution):
+def test_read_smiles(smiles, add_hydrogens, expectation, n_atoms):
     """Compare number of atoms of interpreted SMILES."""
-    molecule = read_smiles(smiles)
-    assert molecule.NumAtoms() == solution
+    with expectation:
+        molecule = read_smiles(smiles, add_hydrogens)
+        assert molecule.NumAtoms() == n_atoms
 
 
 @pytest.mark.parametrize(
-    "package, resource, solutions",
+    "package, resource, add_hydrogens, expectation, n_atoms_list",
     [
         (
             "kinoml.data.molecules",
             "chloroform.sdf",
+            False,
+            does_not_raise(),
             [4],
         ),
         (
             "kinoml.data.molecules",
             "chloroform.sdf",
-            [4],
+            True,
+            does_not_raise(),
+            [5],
         ),
         (
             "kinoml.data.molecules",
             "chloroform_acetamide.sdf",
-            [4, 4],
+            True,
+            does_not_raise(),
+            [5, 9],
         ),
         (
             "kinoml.data.molecules",
             "chloroform_acetamide.pdb",
-            [4, 4],
+            True,
+            does_not_raise(),
+            [5, 9],
         ),
         (
             "kinoml.data.proteins",
             "4f8o.pdb",
-            [2475],
+            True,
+            does_not_raise(),
+            [2497],
+        ),
+        (
+            "kinoml.data.electron_densities",
+            "4f8o_phases.mtz",
+            True,
+            pytest.raises(ValueError),
+            [],
         ),
     ],
 )
-def test_read_molecules(package, resource, solutions):
+def test_read_molecules(package, resource, add_hydrogens, expectation, n_atoms_list):
     """Compare number of read molecules as well as atoms of each interpreted molecule."""
     with resources.path(package, resource) as path:
-        molecules = read_molecules(str(path))
-    assert len(molecules) == len(solutions)
-    for molecule, solution in zip(molecules, solutions):
-        assert molecule.NumAtoms() == solution
+        with expectation:
+            molecules = read_molecules(str(path), add_hydrogens)
+            assert len(molecules) == len(n_atoms_list)
+            for molecule, n_atmos in zip(molecules, n_atoms_list):
+                assert molecule.NumAtoms() == n_atmos
 
 
 @pytest.mark.parametrize(
-    "path, solution",
+    "package, resource, expectation, n_grid_points",
     [
         (
+            "kinoml.data.electron_densities",
             "4f8o_phases.mtz",
+            does_not_raise(),
             396011,
+        ),
+        (
+            "kinoml.data.proteins",
+            "4f8o.pdb",
+            pytest.raises(ValueError),
+            0,
         ),
     ],
 )
-def test_read_electron_density(path, solution):
+def test_read_electron_density(package, resource, expectation, n_grid_points):
     """Compare number of grip points in the interpreted electron density."""
-    electron_density = read_electron_density(path)
-    assert electron_density.GetSize() == solution
+    with resources.path(package, resource) as path:
+        with expectation:
+            electron_density = read_electron_density(path)
+            assert electron_density.GetSize() == n_grid_points
 
 
 @pytest.mark.parametrize(
-    "molecules, suffix, solutions",
+    "molecules, suffix, n_atoms_list",
     [
         (
             [read_smiles("CCC")],
             ".sdf",
-            [3]
+            [11]
         ),
         (
             [read_smiles("CCC")],
             ".pdb",
-            [3]
+            [11]
         ),
         (
             [read_smiles("COCC"), read_smiles("cccccc")],
             ".sdf",
-            [4, 6]
+            [12, 14]
         ),
         (
             [read_smiles("CCC"), read_smiles("cccccc")],
             ".pdb",
-            [3, 6]
+            [11, 14]
         ),
     ],
 )
-def test_write_molecules(molecules, suffix, solutions):
+def test_write_molecules(molecules, suffix, n_atoms_list):
     """Compare number of molecules and atoms in the written file."""
     def _count_molecules(path):
         with open(path) as rf:
@@ -146,70 +199,84 @@ def test_write_molecules(molecules, suffix, solutions):
 
     with tempfile.NamedTemporaryFile(suffix=suffix) as temp_file:
         write_molecules(molecules, temp_file.name)
-        assert _count_molecules(temp_file.name) == len(solutions)
-        for i, (molecule, solution) in enumerate(zip(molecules, solutions)):
-            assert _count_atoms(temp_file.name, i) == solution
+        assert _count_molecules(temp_file.name) == len(n_atoms_list)
+        for i, (molecule, n_atoms) in enumerate(zip(molecules, n_atoms_list)):
+            assert _count_atoms(temp_file.name, i) == n_atoms
 
 
 # TODO: Add a README to data directory explaining whats great about 4f8o
 @pytest.mark.parametrize(
-    "package, resource, chain_id, solution",
+    "package, resource, chain_id, expectation, n_atoms",
     [
         (
             "kinoml.data.proteins",
             "4f8o.pdb",
             "A",
+            does_not_raise(),
             2430
         ),
         (
             "kinoml.data.proteins",
             "4f8o.pdb",
             "B",
+            does_not_raise(),
             45
         ),
-    ],
-)
-def test_select_chain(package, resource, chain_id, solution):
-    """Compare results to number of expected atoms."""
-    with resources.path(package, resource) as path:
-        molecule = read_molecules(str(path))[0]
-    selection = select_chain(molecule, chain_id)
-    assert selection.NumAtoms() == solution
-
-
-@pytest.mark.parametrize(
-    "package, resource, alternate_location, solution",
-    [
         (
             "kinoml.data.proteins",
             "4f8o.pdb",
             "1",
-            2441
-        ),
-        (
-            "kinoml.data.proteins",
-            "4f8o.pdb",
-            "2",
-            2441
-        ),
-        (
-            "kinoml.data.proteins",
-            "4f8o.pdb",
-            "3",
-            2441
+            pytest.raises(ValueError),
+            0
         ),
     ],
 )
-def test_select_altloc(package, resource, alternate_location, solution):
+def test_select_chain(package, resource, chain_id, expectation, n_atoms):
     """Compare results to number of expected atoms."""
     with resources.path(package, resource) as path:
         molecule = read_molecules(str(path))[0]
-    selection = select_altloc(molecule, alternate_location)
-    assert selection.NumAtoms() == solution
+        with expectation:
+            selection = select_chain(molecule, chain_id)
+            assert selection.NumAtoms() == n_atoms
 
 
 @pytest.mark.parametrize(
-    "package, resource, exceptions, remove_water, solution",
+    "package, resource, alternate_location, expectation, n_atoms",
+    [
+        (
+            "kinoml.data.proteins",
+            "4f8o.pdb",
+            "A",
+            does_not_raise(),
+            2458
+        ),
+        (
+            "kinoml.data.proteins",
+            "4f8o.pdb",
+            "B",
+            does_not_raise(),
+            2458
+        ),
+        (
+            "kinoml.data.proteins",
+            "4f8o.pdb",
+            "C",
+            pytest.raises(ValueError),
+            2458
+        ),
+    ],
+)
+def test_select_altloc(package, resource, alternate_location, expectation, n_atoms):
+    """Compare results to number of expected atoms."""
+    with resources.path(package, resource) as path:
+        molecule = read_molecules(str(path))[0]
+        with expectation:
+            selection = select_altloc(molecule, alternate_location)
+            assert selection.NumAtoms() == n_atoms
+
+
+@pytest.mark.parametrize(
+    "package, resource, exceptions, remove_water, n_atoms",
     [
         (
             "kinoml.data.proteins",
@@ -234,17 +301,16 @@ def test_select_altloc(package, resource, alternate_location, solution):
         ),
     ],
 )
-def test_remove_non_protein(package, resource, exceptions, remove_water, solution):
+def test_remove_non_protein(package, resource, exceptions, remove_water, n_atoms):
     """Compare results to number of expected atoms."""
     with resources.path(package, resource) as path:
         molecule = read_molecules(str(path))[0]
     selection = remove_non_protein(molecule, exceptions, remove_water)
-    assert selection.NumAtoms() == solution
+    assert selection.NumAtoms() == n_atoms
 
 
-# TODO: removing a residue that is not there should raise an exception
 @pytest.mark.parametrize(
-    "package, resource, chain_id, residue_name, residue_id, solution",
+    "package, resource, chain_id, residue_name, residue_id, expectation, n_atoms",
     [
         (
             "kinoml.data.proteins",
@@ -252,6 +318,7 @@ def test_remove_non_protein(package, resource, exceptions, remove_water, solutio
             "A",
             "GLY",
             22,
+            does_not_raise(),
             2468
         ),
         (
@@ -260,20 +327,22 @@ def test_remove_non_protein(package, resource, exceptions, remove_water, solutio
             "A",
             "ASP",
             22,
-            2475
+            pytest.raises(ValueError),
+            2468
         ),
     ],
 )
-def test_delete_residue(package, resource, chain_id, residue_name, residue_id, solution):
+def test_delete_residue(package, resource, chain_id, residue_name, residue_id, expectation, n_atoms):
     """Compare results to number of expected atoms."""
     with resources.path(package, resource) as path:
-        molecule = read_molecules(str(path))[0]
-    selection = delete_residue(molecule, chain_id, residue_name, residue_id)
-    assert selection.NumAtoms() == solution
+        with expectation:
+            molecule = read_molecules(str(path))[0]
+            selection = delete_residue(molecule, chain_id, residue_name, residue_id)
+            assert selection.NumAtoms() == n_atoms
 
 
 @pytest.mark.parametrize(
-    "package, resource, solution",
+    "package, resource, n_expression_tags",
     [
         (
             "kinoml.data.proteins",
@@ -282,16 +351,16 @@ def test_delete_residue(package, resource, chain_id, residue_name, residue_id, s
         ),
     ],
 )
-def test_get_expression_tags(package, resource, solution):
+def test_get_expression_tags(package, resource, n_expression_tags):
     """Compare results to number of expression tags."""
     with resources.path(package, resource) as path:
         molecule = read_molecules(str(path))[0]
     expression_tags = get_expression_tags(molecule)
-    assert len(expression_tags) == solution
+    assert len(expression_tags) == n_expression_tags
 
 
 @pytest.mark.parametrize(
-    "package, resource, real_termini, solution",
+    "package, resource, real_termini, caps",
     [
         (
             "kinoml.data.proteins",
@@ -309,7 +378,7 @@ def test_get_expression_tags(package, resource, solution):
             "kinoml.data.proteins",
             "4f8o.pdb",
             [1],
-            {"ACE"}
+            {"NME"}
         ),
         (
             "kinoml.data.proteins",
@@ -319,14 +388,19 @@ def test_get_expression_tags(package, resource, solution):
         ),
     ],
 )
-def test_assign_caps(package, resource, real_termini, solution):
-    """Compare results to number of expected atoms."""
+def test_assign_caps(package, resource, real_termini, caps):
+    """Compare results to expected caps."""
     from openeye import oechem
 
     with resources.path(package, resource) as path:
         molecule = read_molecules(str(path))[0]
-    molecule = assign_caps(molecule, real_termini)
-    hier_view = oechem.OEHierView(molecule)
-    caps = set([residue.GetResidueName() for residue in hier_view.GetResidues()
-                if residue.GetResidueName() in ["ACE", "NME"]])
-    assert caps == solution
+        molecule = select_altloc(molecule, 'A')
+        molecule = assign_caps(molecule, real_termini)
+        hier_view = oechem.OEHierView(molecule)
+        found_caps = set(
+            [
+                residue.GetResidueName() for residue in hier_view.GetResidues()
+                if residue.GetResidueName() in ["ACE", "NME"]
+            ]
+        )
+        assert found_caps == caps
