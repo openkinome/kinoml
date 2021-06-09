@@ -48,9 +48,9 @@ def read_smiles(smiles: str, add_hydrogens=True) -> oechem.OEGraphMol:
     return molecules[0]
 
 
-def read_molecules(path: Union[str, Path], add_hydrogens=True) -> List[oechem.OEGraphMol]:
+def read_molecules(path: Union[str, Path], add_hydrogens=False) -> List[oechem.OEGraphMol]:
     """
-    Read molecules from a file. Explicit hydrogens will be added by default.
+    Read molecules from a file. Explicit hydrogens will not be added by default.
 
     Parameters
     ----------
