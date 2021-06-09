@@ -205,7 +205,8 @@ def remove_non_protein(
         remove_water: bool = False,
 ) -> oechem.OEGraphMol:
     """
-    Remove non-protein atoms from an OpenEye molecule.
+    Remove non-protein atoms from an OpenEye molecule. Water will be kept by default.
+
     Parameters
     ----------
     molecule: oechem.OEGraphMol
@@ -214,6 +215,7 @@ def remove_non_protein(
         Exceptions that should not be removed.
     remove_water: bool
         If water should be removed.
+
     Returns
     -------
     selection: oechem.OEGraphMol
@@ -260,13 +262,27 @@ def delete_residue(
     -------
     : oechem.OEGraphMol
         The OpenEye molecule without the residue.
-    """
-    hier_view = oechem.OEHierView(structure)
-    hier_residue = hier_view.GetResidue(chain_id, residue_name, residue_id)
-    for atom in hier_residue.GetAtoms():
-        structure.DeleteAtom(atom)
 
-    return structure
+    Raises
+    ------
+    ValueError
+        Defined residue was not found in given structure.
+    """
+    # do not change input structure
+    selection = structure.CreateCopy()
+
+    hier_view = oechem.OEHierView(selection)
+    hier_residue = hier_view.GetResidue(chain_id, residue_name, residue_id)
+
+    residue_was_present = False
+    for atom in hier_residue.GetAtoms():
+        selection.DeleteAtom(atom)
+        residue_was_present = True
+
+    if not residue_was_present:
+        raise ValueError("Defined residue was not found in given structure.")
+
+    return selection
 
 
 def get_expression_tags(structure) -> List[Dict]:
