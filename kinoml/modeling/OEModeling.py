@@ -169,23 +169,22 @@ def select_chain(molecule: oechem.OEGraphMol, chain_id: str):
     return selection
 
 
-def select_altloc(molecule, altloc_id):
+def select_altloc(molecule: oechem.OEGraphMol, altloc_id: str):
     """
     Select an alternate location from an OpenEye molecule.
+
     Parameters
     ----------
     molecule: oechem.OEGraphMol
         An OpenEye molecule holding a molecular structure.
     altloc_id: str
         Alternate location identifier.
+
     Returns
     -------
     selection: oechem.OEGraphMol
         An OpenEye molecule holding the selected alternate location.
     """
-    # External libraries
-    from openeye import oechem
-
     # do not change input mol
     selection = molecule.CreateCopy()
 
