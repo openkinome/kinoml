@@ -1,6 +1,7 @@
 """
 Test ligand featurizers of `kinoml.modeling`
 """
+from importlib import resources
 import pytest
 import tempfile
 
@@ -42,33 +43,39 @@ def test_read_smiles(smiles, solution):
 
 
 @pytest.mark.parametrize(
-    "path, solutions",
+    "package, resource, solutions",
     [
         (
+            "kinoml.data.molecules",
             "chloroform.sdf",
             [4],
         ),
         (
-            "chloroform.pdb",
+            "kinoml.data.molecules",
+            "chloroform.sdf",
             [4],
         ),
         (
+            "kinoml.data.molecules",
             "chloroform_acetamide.sdf",
             [4, 4],
         ),
         (
+            "kinoml.data.molecules",
             "chloroform_acetamide.pdb",
             [4, 4],
         ),
         (
+            "kinoml.data.proteins",
             "4f8o.pdb",
             [2475],
         ),
     ],
 )
-def test_read_molecules(path, solutions):
+def test_read_molecules(package, resource, solutions):
     """Compare number of read molecules as well as atoms of each interpreted molecule."""
-    molecules = read_molecules(path)
+    with resources.path(package, resource) as path:
+        molecules = read_molecules(str(path))
     assert len(molecules) == len(solutions)
     for molecule, solution in zip(molecules, solutions):
         assert molecule.NumAtoms() == solution
@@ -146,94 +153,110 @@ def test_write_molecules(molecules, suffix, solutions):
 
 # TODO: Add a README to data directory explaining whats great about 4f8o
 @pytest.mark.parametrize(
-    "molecule, chain_id, solution",
+    "package, resource, chain_id, solution",
     [
         (
-            read_molecules("4f8o.pdb")[0],
+            "kinoml.data.proteins",
+            "4f8o.pdb",
             "A",
             2430
         ),
         (
-            read_molecules("4f8o.pdb")[0],
+            "kinoml.data.proteins",
+            "4f8o.pdb",
             "B",
             45
         ),
     ],
 )
-def test_select_chain(molecule, chain_id, solution):
+def test_select_chain(package, resource, chain_id, solution):
     """Compare results to number of expected atoms."""
+    with resources.path(package, resource) as path:
+        molecule = read_molecules(str(path))[0]
     selection = select_chain(molecule, chain_id)
     assert selection.NumAtoms() == solution
 
 
 @pytest.mark.parametrize(
-    "molecule, alternate_location, solution",
+    "package, resource, alternate_location, solution",
     [
         (
-            read_molecules("4f8o.pdb")[0],
-            1,
+            "kinoml.data.proteins",
+            "4f8o.pdb",
+            "1",
             2441
         ),
         (
-            read_molecules("4f8o.pdb")[0],
-            2,
+            "kinoml.data.proteins",
+            "4f8o.pdb",
+            "2",
             2441
         ),
         (
-            read_molecules("4f8o.pdb")[0],
-            3,
+            "kinoml.data.proteins",
+            "4f8o.pdb",
+            "3",
             2441
         ),
     ],
 )
-def test_select_altloc(molecule, alternate_location, solution):
+def test_select_altloc(package, resource, alternate_location, solution):
     """Compare results to number of expected atoms."""
+    with resources.path(package, resource) as path:
+        molecule = read_molecules(str(path))[0]
     selection = select_altloc(molecule, alternate_location)
     assert selection.NumAtoms() == solution
 
 
 @pytest.mark.parametrize(
-    "molecule, exceptions, remove_water, solution",
+    "package, resource, exceptions, remove_water, solution",
     [
         (
-            read_molecules("4f8o.pdb")[0],
+            "kinoml.data.proteins",
+            "4f8o.pdb",
             [],
             True,
             2104
         ),
         (
-            read_molecules("4f8o.pdb")[0],
+            "kinoml.data.proteins",
+            "4f8o.pdb",
             [],
             False,
             2393
         ),
         (
-            read_molecules("4f8o.pdb")[0],
+            "kinoml.data.proteins",
+            "4f8o.pdb",
             ["AES"],
             True,
             2122
         ),
     ],
 )
-def test_remove_non_protein(molecule, exceptions, remove_water, solution):
+def test_remove_non_protein(package, resource, exceptions, remove_water, solution):
     """Compare results to number of expected atoms."""
+    with resources.path(package, resource) as path:
+        molecule = read_molecules(str(path))[0]
     selection = remove_non_protein(molecule, exceptions, remove_water)
     assert selection.NumAtoms() == solution
 
 
 # TODO: removing a residue that is not there should raise an exception
 @pytest.mark.parametrize(
-    "molecule, chain_id, residue_name, residue_id, solution",
+    "package, resource, chain_id, residue_name, residue_id, solution",
     [
         (
-            read_molecules("4f8o.pdb")[0],
+            "kinoml.data.proteins",
+            "4f8o.pdb",
             "A",
             "GLY",
             22,
             2468
         ),
         (
-            read_molecules("4f8o.pdb")[0],
+            "kinoml.data.proteins",
+            "4f8o.pdb",
             "A",
             "ASP",
             22,
@@ -241,56 +264,67 @@ def test_remove_non_protein(molecule, exceptions, remove_water, solution):
         ),
     ],
 )
-def test_delete_residue(molecule, chain_id, residue_name, residue_id, solution):
+def test_delete_residue(package, resource, chain_id, residue_name, residue_id, solution):
     """Compare results to number of expected atoms."""
+    with resources.path(package, resource) as path:
+        molecule = read_molecules(str(path))[0]
     selection = delete_residue(molecule, chain_id, residue_name, residue_id)
     assert selection.NumAtoms() == solution
 
 
 @pytest.mark.parametrize(
-    "molecule, solution",
+    "package, resource, solution",
     [
         (
-            read_molecules("4f8o.pdb")[0],
+            "kinoml.data.proteins",
+            "4f8o.pdb",
             9
         ),
     ],
 )
-def test_get_expression_tags(molecule, solution):
+def test_get_expression_tags(package, resource, solution):
     """Compare results to number of expression tags."""
+    with resources.path(package, resource) as path:
+        molecule = read_molecules(str(path))[0]
     expression_tags = get_expression_tags(molecule)
     assert len(expression_tags) == solution
 
 
 @pytest.mark.parametrize(
-    "molecule, real_termini, solution",
+    "package, resource, real_termini, solution",
     [
         (
-            read_molecules("4f8o.pdb")[0],
+            "kinoml.data.proteins",
+            "4f8o.pdb",
             [],
             {"ACE", "NME"}
         ),
         (
-            read_molecules("4f8o.pdb")[0],
+            "kinoml.data.proteins",
+            "4f8o.pdb",
             [1, 138],
             set()
         ),
         (
-            read_molecules("4f8o.pdb")[0],
+            "kinoml.data.proteins",
+            "4f8o.pdb",
             [1],
             {"ACE"}
         ),
         (
-            read_molecules("4f8o.pdb")[0],
+            "kinoml.data.proteins",
+            "4f8o.pdb",
             [138],
             {"ACE"}
         ),
     ],
 )
-def test_assign_caps(molecule, real_termini, solution):
+def test_assign_caps(package, resource, real_termini, solution):
     """Compare results to number of expected atoms."""
     from openeye import oechem
 
+    with resources.path(package, resource) as path:
+        molecule = read_molecules(str(path))[0]
     molecule = assign_caps(molecule, real_termini)
     hier_view = oechem.OEHierView(molecule)
     caps = set([residue.GetResidueName() for residue in hier_view.GetResidues()
