@@ -96,14 +96,21 @@ def read_molecules(path: str, add_hydrogens=True) -> List[oechem.OEGraphMol]:
 def read_electron_density(path: str) -> Union[oegrid.OESkewGrid, None]:
     """
     Read electron density from a file.
+
     Parameters
     ----------
     path: str
         Path to electron density file.
+
     Returns
     -------
     electron_density: oegrid.OESkewGrid or None
         A List of molecules as OpenEye molecules.
+
+    Raises
+    ------
+    ValueError
+        Not a valid electron density file or wrong format. Only MTZ is currently supported.
     """
     from pathlib import Path
 
@@ -113,7 +120,9 @@ def read_electron_density(path: str) -> Union[oegrid.OESkewGrid, None]:
     if not oegrid.OEReadMTZ(path, electron_density, oegrid.OEMTZMapType_Fwt):
         electron_density = None
 
-    # TODO: returns None if something goes wrong
+    if electron_density is None:
+        raise ValueError("Not a valid electron density file or wrong format. Only MTZ is currently supported.")
+
     return electron_density
 
 
