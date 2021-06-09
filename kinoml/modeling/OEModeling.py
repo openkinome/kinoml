@@ -2,7 +2,7 @@ import logging
 from pathlib import Path
 from typing import List, Set, Union, Iterable, Tuple, Dict
 
-from openeye import oechem, oegrid, oespruce
+from openeye import oechem, oegrid
 import pandas as pd
 from scipy.spatial import cKDTree
 
@@ -357,18 +357,21 @@ def assign_caps(
 ) -> oechem.OEGraphMol:
     """
     Cap N and C termini of the given input structure. Real termini can be protected from capping by providing the
-    corresponding residue ids.
+    corresponding residue ids via the 'real_termini' argument.
+
     Parameters
     ----------
     structure: oechem.OEGraphMol
         The OpenEye molecule holding the protein structure to cap.
     real_termini: iterable of int or None
         The biologically relevant real termini that shpuld be prevented from capping.
+
     Returns
     -------
     structure: oechem.GraphMol
         The OpenEye molecule holding the capped structure.
     """
+    from openeye import oespruce
 
     def _has_residue_number(atom, residue_numbers=real_termini):
         """Returns True if atom matches any given residue number."""
@@ -449,6 +452,7 @@ def _prepare_structure(
         An OpenEye design unit holding the prepared structure with the highest quality among all identified design
         units.
     """
+    from openeye import oespruce
 
     def _contains_chain(design_unit, chain_id):
         """Returns True if the design unit contains protein residues with given chain ID."""
@@ -1227,6 +1231,8 @@ def apply_insertions(
     from pathlib import Path
     import re
 
+    from openeye import oespruce
+
     def _disconnect_residues(protein, residue1, residue2):
         """Break the bond connecting two protein residues."""
         _is_backbone = oechem.OEIsBackboneAtom()
@@ -1354,6 +1360,8 @@ def apply_mutations(
      : oechem.OEGraphMol
         An OpenEye molecule holding the mutated protein structure.
     """
+    from openeye import oespruce
+
     # the hierarchy view is more stable if reinitialized after each change
     # https://docs.eyesopen.com/toolkits/python/oechemtk/biopolymers.html#a-hierarchy-view
     while True:
@@ -1423,6 +1431,8 @@ def delete_partial_residues(structure: oechem.OEGraphMol) -> oechem.OEGraphMol:
     structure: oechem.OEGraphMol
         An OpenEye molecule holding only residues with completely modeled side chains.
     """
+    from openeye import oespruce
+
     # try to build missing sidechains
     oespruce.OEBuildSidechains(structure)
 
@@ -1711,6 +1721,8 @@ def superpose_proteins(
     superposed_protein: oechem.OEGraphMol
         An OpenEye molecule holding the superposed protein structure.
     """
+    from openeye import oespruce
+
     # do not modify input
     superposed_protein = fit_protein.CreateCopy()
 
