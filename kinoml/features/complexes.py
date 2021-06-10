@@ -1391,10 +1391,10 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEKLIFSKinaseApoFeaturizer):
         : pd.DataFrame
             The input DataFrame filtered for KLIFS entries with most similar ligands.
         """
-        from ..modeling.OEModeling import get_klifs_ligand, generate_reasonable_conformations, overlay_molecules
+        from ..modeling.OEModeling import read_klifs_ligand, generate_reasonable_conformations, overlay_molecules
 
         logging.debug("Retrieving resolved structures of orthosteric ligands ...")
-        complex_ligands = [get_klifs_ligand(structure_id) for structure_id in structures["structure.klifs_id"]]
+        complex_ligands = [read_klifs_ligand(structure_id) for structure_id in structures["structure.klifs_id"]]
 
         logging.debug("Generating reasonable conformations of ligand of interest ...")
         conformations_ensemble = generate_reasonable_conformations(ligand)

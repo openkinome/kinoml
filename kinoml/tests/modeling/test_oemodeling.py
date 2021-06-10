@@ -6,6 +6,8 @@ from importlib import resources
 import pytest
 import tempfile
 
+from bravado_core.exception import SwaggerMappingError
+
 from kinoml.modeling.OEModeling import (
     read_smiles,
     read_molecules,
@@ -18,6 +20,7 @@ from kinoml.modeling.OEModeling import (
     get_expression_tags,
     assign_caps,
     _prepare_structure,
+    read_klifs_ligand,
 )
 
 
@@ -464,3 +467,30 @@ def test_prepare_structure(package, resource, has_ligand, chain_id, altloc, liga
                 ligand_name=ligand_name
             )
             assert all(x in design_unit.GetTitle() for x in title_contains)
+
+
+@pytest.mark.parametrize(
+    "klifs_structure_id, expectation, n_atoms",
+    [
+        (
+            1104,
+            does_not_raise(),
+            45
+        ),
+        (
+            1045,
+            pytest.raises(ValueError),
+            0
+        ),
+        (
+            "X",
+            pytest.raises(SwaggerMappingError),
+            0
+        ),
+    ],
+)
+def test_read_klifs_ligand(klifs_structure_id, expectation, n_atoms):
+    """Compare results to number of expected atoms."""
+    with expectation:
+        molecule = read_klifs_ligand(klifs_structure_id)
+        assert molecule.NumAtoms() == n_atoms

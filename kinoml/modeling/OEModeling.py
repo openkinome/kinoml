@@ -670,13 +670,15 @@ def prepare_protein(
     )
 
 
-def get_klifs_ligand(structure_id: int) -> oechem.OEGraphMol:
+def read_klifs_ligand(structure_id: int) -> oechem.OEGraphMol:
     """
-    Retrieve orthosteric ligand from KLIFS.
+    Retrieve and read an orthosteric kinase ligand from KLIFS.
+
     Parameters
     ----------
     structure_id: int
         KLIFS structure identifier.
+
     Returns
     -------
     molecule: oechem.OEGraphMol
@@ -690,7 +692,7 @@ def get_klifs_ligand(structure_id: int) -> oechem.OEGraphMol:
         from opencadd.databases.klifs import setup_remote
 
         remote = setup_remote()
-        mol2_text = remote.coordinates.to_text(str(structure_id), entity="ligand", extension="mol2")
+        mol2_text = remote.coordinates.to_text(structure_id, entity="ligand", extension="mol2")
         with open(file_path, "w") as wf:
             wf.write(mol2_text)
 
