@@ -678,18 +678,14 @@ class OEKLIFSKinaseApoFeaturizer(OEHybridDockingFeaturizer):
                 protein.klifs_kinase_id = structures["kinase.klifs_id"].iloc[0]
             # if KLIFS kinase ID is not given, query by UniProt ID
             if not hasattr(protein, "klifs_kinase_id"):
+                from ..databases.klifs import klifs_kinase_id_to_uniprot_id
                 logging.debug("Converting UniProt ID to KLIFS kinase ID ...")
-                kinase_ids = remote.kinases.all_kinases()["kinase.klifs_id"].to_list()
-                kinases = remote.kinases.by_kinase_klifs_id(kinase_ids)
-                protein.klifs_kinase_id = kinases[
-                    kinases["kinase.uniprot"] == protein.uniprot_id]["kinase.klifs_id"].iloc[0]
+                protein.klifs_kinase_id = klifs_kinase_id_to_uniprot_id(protein.uniprot_id)["kinase.klifs_id"]
             # if UniProt ID is not given, query by KLIFS kinase ID
             if not hasattr(protein, "uniprot_id"):
                 logging.debug("Converting KLIFS kinase ID to UniProt ID  ...")
-                kinase_ids = remote.kinases.all_kinases()["kinase.klifs_id"].to_list()
-                kinases = remote.kinases.by_kinase_klifs_id(kinase_ids)
-                protein.uniprot_id = kinases[
-                    kinases["kinase.klifs_id"] == protein.klifs_kinase_id]["kinase.uniprot"].iloc[0]
+                kinase = remote.kinases.by_kinase_klifs_id(protein.klifs_kinase_id).iloc[0]
+                protein.uniprot_id = kinase["kinase.uniprot"]
         else:
             raise NotImplementedError(
                 f"{self.__class__.__name__} requires a system with a protein having a 'klifs_kinase_id', " +
