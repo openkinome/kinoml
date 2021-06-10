@@ -426,6 +426,7 @@ def _prepare_structure(
 ) -> Union[oechem.OEDesignUnit, None]:
     """
     Prepare an OpenEye molecule holding a protein ligand complex for docking.
+
     Parameters
     ----------
     structure: oechem.OEGraphMol
@@ -449,11 +450,17 @@ def _prepare_structure(
         If termini should be capped with ACE and NME.
     real_termini: list of int or None
         Residue numbers of biologically real termini will not be capped with ACE and NME.
+
     Returns
     -------
     design_unit: oechem.OEDesignUnit or None
         An OpenEye design unit holding the prepared structure with the highest quality among all identified design
         units.
+
+    Raises
+    ------
+    ValueError
+        No design unit found with given chain ID, ligand name and alternate location.
     """
     from openeye import oespruce
 
@@ -467,11 +474,11 @@ def _prepare_structure(
                 return True
         return False
 
-    def _contains_resname(design_unit, resname):
-        """Returns True if the design unit contains a residue with given residue name."""
-        all_components = oechem.OEGraphMol()
-        design_unit.GetComponents(all_components, oechem.OEDesignUnitComponents_All)
-        hier_view = oechem.OEHierView(all_components)
+    def _contains_ligand(design_unit, resname):
+        """Returns True if the design unit contains a ligand with given residue name."""
+        ligand = oechem.OEGraphMol()
+        design_unit.GetLigand(ligand)
+        hier_view = oechem.OEHierView(ligand)
         for hier_residue in hier_view.GetResidues():
             if hier_residue.GetResidueName() == resname:
                 return True
@@ -479,6 +486,10 @@ def _prepare_structure(
 
     # delete loose protein residues, which make the alignment error prone
     structure = delete_loose_residues(structure)
+
+    # select alternate location
+    if alternate_location:
+        structure = select_altloc(structure, alternate_location)
 
     structure_metadata = oespruce.OEStructureMetadata()
     design_unit_options = oespruce.OEMakeDesignUnitOptions()
@@ -529,7 +540,7 @@ def _prepare_structure(
         design_units = [
             design_unit
             for design_unit in design_units
-            if _contains_resname(design_unit, ligand_name)
+            if _contains_ligand(design_unit, ligand_name)
         ]
 
     # filter design units for chain of interest
@@ -541,21 +552,10 @@ def _prepare_structure(
             if _contains_chain(design_unit, chain_id)
         ]
 
-    # filter design units for alternate location of interest
-    if alternate_location is not None:
-        logging.debug(f"Filtering design units for alternate location {alternate_location} ...")
-        design_units = [
-            design_unit
-            for design_unit in design_units
-            if f"alt{alternate_location}" in design_unit.GetTitle()
-        ]
-
-    if len(design_units) >= 1:
-        design_unit = design_units[0]
+    if len(design_units) == 0:
+        raise ValueError("No design unit found with given chain ID, ligand name and alternate location.")
     else:
-        print("No design unit found!")
-        # TODO: Returns None if something goes wrong
-        return None
+        design_unit = design_units[0]
 
     # assign ACE and NME caps except for real termini
     if cap_termini:
@@ -578,6 +578,7 @@ def prepare_complex(
 ) -> Union[oechem.OEDesignUnit, None]:
     """
     Prepare an OpenEye molecule holding a protein ligand complex for docking.
+
     Parameters
     ----------
     protein_ligand_complex: oechem.OEGraphMol
@@ -597,11 +598,17 @@ def prepare_complex(
         If termini should be capped with ACE and NME.
     real_termini: list of int or None
         Residue numbers of biologically real termini will not be capped with ACE and NME.
+
     Returns
     -------
     design_unit: oechem.OEDesignUnit or None
         An OpenEye design unit holding the prepared structure with the highest quality among all identified design
         units.
+
+    Raises
+    ------
+    ValueError
+        No design unit found with given chain ID, ligand name and alternate location.
     """
     return _prepare_structure(
         structure=protein_ligand_complex,
@@ -626,6 +633,7 @@ def prepare_protein(
 ) -> Union[oechem.OEDesignUnit, None]:
     """
     Prepare an OpenEye molecule holding a protein structure for docking.
+
     Parameters
     ----------
     protein: oechem.OEGraphMol
@@ -641,11 +649,17 @@ def prepare_protein(
         If termini should be capped with ACE and NME.
     real_termini: list of int or None
         Residue numbers of biologically real termini will not be capped with ACE and NME.
+
     Returns
     -------
     design_unit: oechem.OEDesignUnit or None
         An OpenEye design unit holding the prepared structure with the highest quality among all identified design
         units.
+
+    Raises
+    ------
+    ValueError
+        No design unit found with given chain ID, ligand name and alternate location.
     """
     return _prepare_structure(
         structure=protein,

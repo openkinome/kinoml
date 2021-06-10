@@ -16,7 +16,8 @@ from kinoml.modeling.OEModeling import (
     remove_non_protein,
     delete_residue,
     get_expression_tags,
-    assign_caps
+    assign_caps,
+    _prepare_structure,
 )
 
 
@@ -404,3 +405,62 @@ def test_assign_caps(package, resource, real_termini, caps):
             ]
         )
         assert found_caps == caps
+
+@pytest.mark.parametrize(
+    "package, resource, has_ligand, chain_id, altloc, ligand_name, expectation, title_contains",
+    [
+        (
+            "kinoml.data.proteins",
+            "4f8o.pdb",
+            True,
+            "A",
+            "A",
+            "AES",
+            does_not_raise(),
+            ["(A)", "AES"]
+        ),
+        (
+            "kinoml.data.proteins",
+            "4f8o.pdb",
+            False,
+            "A",
+            "A",
+            None,
+            does_not_raise(),
+            ["(A)"]
+        ),
+        (
+            "kinoml.data.proteins",
+            "4f8o.pdb",
+            True,
+            "A",
+            "C",
+            "AES",
+            pytest.raises(ValueError),
+            ["(A)", "AES"]
+        ),
+        (
+            "kinoml.data.proteins",
+            "4f8o.pdb",
+            True,
+            "C",
+            "A",
+            "AES",
+            pytest.raises(ValueError),
+            ["(C)", "AES"]
+        ),
+    ],
+)
+def test_prepare_structure(package, resource, has_ligand, chain_id, altloc, ligand_name, expectation, title_contains):
+    """Check if returned design unit title contains expected strings."""
+    with resources.path(package, resource) as path:
+        structure = read_molecules(str(path))[0]
+        with expectation:
+            design_unit = _prepare_structure(
+                structure,
+                has_ligand=has_ligand,
+                chain_id=chain_id,
+                alternate_location=altloc,
+                ligand_name=ligand_name
+            )
+            assert all(x in design_unit.GetTitle() for x in title_contains)
