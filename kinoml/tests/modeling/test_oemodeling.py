@@ -22,6 +22,7 @@ from kinoml.modeling.OEModeling import (
     _prepare_structure,
     read_klifs_ligand,
     generate_tautomers,
+    generate_enantiomers,
 )
 
 
@@ -66,7 +67,7 @@ def does_not_raise():
     ],
 )
 def test_read_smiles(smiles, add_hydrogens, expectation, n_atoms):
-    """Compare number of atoms of interpreted SMILES."""
+    """Compare results to expected number of atoms."""
     with expectation:
         molecule = read_smiles(smiles, add_hydrogens)
         assert molecule.NumAtoms() == n_atoms
@@ -120,7 +121,7 @@ def test_read_smiles(smiles, add_hydrogens, expectation, n_atoms):
     ],
 )
 def test_read_molecules(package, resource, add_hydrogens, expectation, n_atoms_list):
-    """Compare number of read molecules as well as atoms of each interpreted molecule."""
+    """Compare results to expected number of read molecules as well as atoms of each interpreted molecule."""
     with resources.path(package, resource) as path:
         with expectation:
             molecules = read_molecules(str(path), add_hydrogens)
@@ -147,7 +148,7 @@ def test_read_molecules(package, resource, add_hydrogens, expectation, n_atoms_l
     ],
 )
 def test_read_electron_density(package, resource, expectation, n_grid_points):
-    """Compare number of grip points in the interpreted electron density."""
+    """Compare results to expected number of grip points in the interpreted electron density."""
     with resources.path(package, resource) as path:
         with expectation:
             electron_density = read_electron_density(path)
@@ -180,7 +181,7 @@ def test_read_electron_density(package, resource, expectation, n_grid_points):
     ],
 )
 def test_write_molecules(molecules, suffix, n_atoms_list):
-    """Compare number of molecules and atoms in the written file."""
+    """Compare results to expected number of molecules and atoms in the written file."""
     def _count_molecules(path):
         with open(path) as rf:
             if path.split(".")[-1] == "sdf":
@@ -237,7 +238,7 @@ def test_write_molecules(molecules, suffix, n_atoms_list):
     ],
 )
 def test_select_chain(package, resource, chain_id, expectation, n_atoms):
-    """Compare results to number of expected atoms."""
+    """Compare results to expected number of atoms."""
     with resources.path(package, resource) as path:
         molecule = read_molecules(str(path))[0]
         with expectation:
@@ -272,7 +273,7 @@ def test_select_chain(package, resource, chain_id, expectation, n_atoms):
     ],
 )
 def test_select_altloc(package, resource, alternate_location, expectation, n_atoms):
-    """Compare results to number of expected atoms."""
+    """Compare results to expected number of atoms."""
     with resources.path(package, resource) as path:
         molecule = read_molecules(str(path))[0]
         with expectation:
@@ -307,7 +308,7 @@ def test_select_altloc(package, resource, alternate_location, expectation, n_ato
     ],
 )
 def test_remove_non_protein(package, resource, exceptions, remove_water, n_atoms):
-    """Compare results to number of expected atoms."""
+    """Compare results to expected number of atoms."""
     with resources.path(package, resource) as path:
         molecule = read_molecules(str(path))[0]
     selection = remove_non_protein(molecule, exceptions, remove_water)
@@ -357,7 +358,7 @@ def test_delete_residue(package, resource, chain_id, residue_name, residue_id, e
     ],
 )
 def test_get_expression_tags(package, resource, n_expression_tags):
-    """Compare results to number of expression tags."""
+    """Compare results to expected number of expression tags."""
     with resources.path(package, resource) as path:
         molecule = read_molecules(str(path))[0]
     expression_tags = get_expression_tags(molecule)
@@ -491,7 +492,7 @@ def test_prepare_structure(package, resource, has_ligand, chain_id, altloc, liga
     ],
 )
 def test_read_klifs_ligand(klifs_structure_id, expectation, n_atoms):
-    """Compare results to number of expected atoms."""
+    """Compare results to expected number of atoms."""
     with expectation:
         molecule = read_klifs_ligand(klifs_structure_id)
         assert molecule.NumAtoms() == n_atoms
@@ -519,7 +520,35 @@ def test_read_klifs_ligand(klifs_structure_id, expectation, n_atoms):
     ],
 )
 def test_generate_tautomers(smiles, n_tautomers):
-    """Compare results to number of expected tautomers."""
+    """Compare results to expected number of tautomers."""
     molecule = read_smiles(smiles)
     tautomers = generate_tautomers(molecule)
     assert len(tautomers) == n_tautomers
+
+
+@pytest.mark.parametrize(
+    "smiles, n_enantiomers",
+    [
+        (
+            "CC(C)(C)C",
+            1
+        ),
+        (
+            "C(C)(F)Cl",
+            2
+        ),
+        (
+            "CC(Cl)CCC(O)F",
+            4
+        ),
+        (
+            "CC(Cl)CC(C)C(O)F",
+            8
+        ),
+    ],
+)
+def test_generate_enantiomers(smiles, n_enantiomers):
+    """Compare results to expected number of enantiomers."""
+    molecule = read_smiles(smiles)
+    enantiomers = generate_enantiomers(molecule)
+    assert len(enantiomers) == n_enantiomers

@@ -746,35 +746,41 @@ def generate_tautomers(
 
 
 def generate_enantiomers(
-        molecule: oechem.OEGraphMol,
+        molecule: oechem.OEMolBase,
         max_centers: int = 12,
         force_flip: bool = False,
         enumerate_nitrogens: bool = True,
 ) -> List[oechem.OEGraphMol]:
     """
     Generate enantiomers of a given molecule.
+
     Parameters
     ----------
-    molecule: oechem.OEGraphMol
+    molecule: oechem.OEMolBase
         An OpenEye molecule.
     max_centers: int
         The maximal number of stereo centers to enumerate.
     force_flip: bool
-        If specified stereo centers should be ignored.
+        If specified stereo centers should be enumerated.
     enumerate_nitrogens: bool
         If nitrogens with invertible pyramidal geometry should be enumerated.
+
     Returns
     -------
-    enantiomers: list of oechem.OEGraphMol
+    enantiomers: list of oechem.OEMolBase
         A list of OpenEye molecules holding the enantiomers.
     """
     from openeye import oeomega
 
+    flipper_options = oeomega.OEFlipperOptions()
+    flipper_options.SetMaxCenters(max_centers)
+    flipper_options.SetEnumSpecifiedStereo(force_flip)
+    flipper_options.SetEnumNitrogen(enumerate_nitrogens)
+    flipper_options.SetWarts(True)
+
     enantiomers = [
-        oechem.OEGraphMol(enantiomer)
-        for enantiomer in oeomega.OEFlipper(
-            molecule, max_centers, force_flip, enumerate_nitrogens
-        )
+        enantiomer for enantiomer
+        in oeomega.OEFlipper(molecule, flipper_options)
     ]
     return enantiomers
 
