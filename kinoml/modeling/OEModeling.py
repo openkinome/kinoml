@@ -719,7 +719,7 @@ def generate_tautomers(
     max_return: int
         Maximal number of tautomers to return.
     pKa_norm: bool
-        Assign predominant ionization state at pH ~7.4.
+        Assign the predominant ionization state at pH ~7.4.
 
     Returns
     -------
@@ -833,28 +833,40 @@ def generate_conformations(
 
 
 def generate_reasonable_conformations(
-        molecule: oechem.OEGraphMol,
+        molecule: oechem.OEMolBase,
+        max_conformations: int = 1000,
         dense: bool = False,
-) -> List[oechem.OEMol]:
+        pKa_norm: bool = True,
+) -> List[oechem.OEMCMolBase]:
     """
     Generate conformations of reasonable enantiomers and tautomers of a given molecule.
+
     Parameters
     ----------
-    molecule: oechem.ORGraphMol
+    molecule: oechem.OEMolBase
         An OpenEye molecule.
+    max_conformations: int
+        Maximal number of conformations to generate per isomer. Will overwrite max_conformations settings.
     dense: bool
         If densely sampled conformers should be generated.
+    pKa_norm: bool
+        Assign the predominant ionization state at pH ~7.4.
+
     Returns
     -------
-    conformations_ensemble: list of oechem.OEMol
-        A list of multi-conformer molecules.
+    conformations_ensemble: list of oechem.OEMCMolBase
+        A list of OpenEye multi-conformer molecules.
     """
     import itertools
 
-    tautomers = generate_tautomers(molecule)
+    tautomers = generate_tautomers(molecule, pKa_norm=pKa_norm)
     enantiomers = [generate_enantiomers(tautomer) for tautomer in tautomers]
     conformations_ensemble = [
-        generate_conformations(enantiomer, dense=dense)
+        generate_conformations(
+            enantiomer,
+            max_conformations=max_conformations,
+            dense=dense
+        )
         for enantiomer in itertools.chain.from_iterable(enantiomers)
     ]
     return conformations_ensemble

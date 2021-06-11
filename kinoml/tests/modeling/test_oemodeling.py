@@ -24,6 +24,7 @@ from kinoml.modeling.OEModeling import (
     generate_tautomers,
     generate_enantiomers,
     generate_conformations,
+    generate_reasonable_conformations,
 )
 
 
@@ -573,3 +574,25 @@ def test_generate_conformations(smiles, n_conformations):
     molecule = read_smiles(smiles)
     conformations = generate_conformations(molecule, max_conformations=5)
     assert conformations.NumConfs() == n_conformations
+
+
+@pytest.mark.parametrize(
+    "smiles, n_conformations_list",
+    [
+        (
+            "FC(Cl)Br",
+            [1, 1]
+        ),
+        (
+            "CC(Cl)CCC(O)F",
+            [5, 5, 5, 5]
+        ),
+    ],
+)
+def test_generate_reasonable_conformations(smiles, n_conformations_list):
+    """Compare results to expected number of isomers and conformations."""
+    molecule = read_smiles(smiles)
+    conformations_ensemble = generate_reasonable_conformations(molecule, max_conformations=5)
+    assert len(conformations_ensemble) == len(n_conformations_list)
+    for conformations, n_conformations in zip(conformations_ensemble, n_conformations_list):
+        assert conformations.NumConfs() == n_conformations
