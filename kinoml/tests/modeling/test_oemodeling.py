@@ -23,6 +23,7 @@ from kinoml.modeling.OEModeling import (
     read_klifs_ligand,
     generate_tautomers,
     generate_enantiomers,
+    generate_conformations,
 )
 
 
@@ -552,3 +553,23 @@ def test_generate_enantiomers(smiles, n_enantiomers):
     molecule = read_smiles(smiles)
     enantiomers = generate_enantiomers(molecule)
     assert len(enantiomers) == n_enantiomers
+
+
+@pytest.mark.parametrize(
+    "smiles, n_conformations",
+    [
+        (
+            "CCC(C)C(C)=O",
+            5
+        ),
+        (
+            "C1CCN(C1)CCOC2=C3COCC=CCOCC4=CC(=CC=C4)C5=NC(=NC=C5)NC(=C3)C=C2",
+            5
+        ),
+    ],
+)
+def test_generate_conformations(smiles, n_conformations):
+    """Compare results to expected number of conformations."""
+    molecule = read_smiles(smiles)
+    conformations = generate_conformations(molecule, max_conformations=5)
+    assert conformations.NumConfs() == n_conformations

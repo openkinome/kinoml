@@ -786,23 +786,25 @@ def generate_enantiomers(
 
 
 def generate_conformations(
-        molecule: oechem.OEGraphMol,
+        molecule: oechem.OEMolBase,
         max_conformations: int = 1000,
         dense: bool = False
-) -> oechem.OEMol:
+) -> oechem.OEMCMolBase:
     """
     Generate conformations of a given molecule.
+
     Parameters
     ----------
-    molecule: oechem.OEGraphMol
+    molecule: oechem.OEMolBase
         An OpenEye molecule.
     max_conformations: int
         Maximal number of conformations to generate.
     dense: bool
         If densely sampled conformers should be generated. Will overwrite max_conformations settings.
+
     Returns
     -------
-    conformations: oechem.OEMol
+    conformations: oechem.OEMCMolBase
         An OpenEye multi-conformer molecule holding the generated conformations.
     """
     from openeye import oeomega
