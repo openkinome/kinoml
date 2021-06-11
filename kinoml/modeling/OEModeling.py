@@ -701,30 +701,44 @@ def read_klifs_ligand(structure_id: int) -> oechem.OEGraphMol:
     return molecule
 
 
-def generate_tautomers(molecule: oechem.OEGraphMol) -> List[oechem.OEGraphMol]:
+def generate_tautomers(
+        molecule: Union[oechem.OEMolBase, oechem.OEMCMolBase],
+        max_generate: int = 4096,
+        max_return: int = 16,
+        pKa_norm: bool = True,
+) -> List[Union[oechem.OEMolBase, oechem.OEMCMolBase]]:
     """
     Generate reasonable tautomers of a given molecule.
+
     Parameters
     ----------
-    molecule: oechem.OEGraphMol
+    molecule: oechem.OEMolBase or oechem.OEMCMolBase
         An OpenEye molecule.
+    max_generate: int
+        Maximal number of tautomers to generate.
+    max_return: int
+        Maximal number of tautomers to return.
+    pKa_norm: bool
+        Assign predominant ionization state at pH ~7.4.
+
     Returns
     -------
-    tautomers: list of oechem.OEGraphMol
+    tautomers: list of oechem.OEMolBase or oechem.OEMCMolBase
         A list of OpenEye molecules holding the tautomers.
     """
-    from openeye import oechem, oequacpac
+    from openeye import oequacpac
 
     tautomer_options = oequacpac.OETautomerOptions()
-    tautomer_options.SetMaxTautomersGenerated(4096)
-    tautomer_options.SetMaxTautomersToReturn(16)
+    tautomer_options.SetMaxTautomersGenerated(max_generate)
+    tautomer_options.SetMaxTautomersToReturn(max_return)
+    tautomer_options.SetMaxSearchTime(60)
+    tautomer_options.SetRankTautomers(True)
     tautomer_options.SetCarbonHybridization(True)
     tautomer_options.SetMaxZoneSize(50)
     tautomer_options.SetApplyWarts(True)
-    pKa_norm = True
     tautomers = [
-        oechem.OEGraphMol(tautomer)
-        for tautomer in oequacpac.OEGetReasonableTautomers(
+        tautomer for tautomer
+        in oequacpac.OEGetReasonableTautomers(
             molecule, tautomer_options, pKa_norm
         )
     ]
@@ -754,7 +768,7 @@ def generate_enantiomers(
     enantiomers: list of oechem.OEGraphMol
         A list of OpenEye molecules holding the enantiomers.
     """
-    from openeye import oechem, oeomega
+    from openeye import oeomega
 
     enantiomers = [
         oechem.OEGraphMol(enantiomer)
@@ -785,7 +799,7 @@ def generate_conformations(
     conformations: oechem.OEMol
         An OpenEye multi-conformer molecule holding the generated conformations.
     """
-    from openeye import oechem, oeomega
+    from openeye import oeomega
 
     if oeomega.OEIsMacrocycle(molecule):
         omega_options = oeomega.OEMacrocycleOmegaOptions()

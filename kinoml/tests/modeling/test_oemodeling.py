@@ -21,6 +21,7 @@ from kinoml.modeling.OEModeling import (
     assign_caps,
     _prepare_structure,
     read_klifs_ligand,
+    generate_tautomers,
 )
 
 
@@ -494,3 +495,31 @@ def test_read_klifs_ligand(klifs_structure_id, expectation, n_atoms):
     with expectation:
         molecule = read_klifs_ligand(klifs_structure_id)
         assert molecule.NumAtoms() == n_atoms
+
+
+@pytest.mark.parametrize(
+    "smiles, n_tautomers",
+    [
+        (
+            "COC",
+            1
+        ),
+        (
+            "CCC(O)C(C)=O",
+            2
+        ),
+        (
+            r"C\N=C\NCC(O)C(C)=O",
+            4
+        ),
+        (
+            r"C\N=C/NCCC(=O)C(O)CC(CN\C=N\C)C(O)C(=O)CCN\C=N\C",
+            16
+        ),
+    ],
+)
+def test_generate_tautomers(smiles, n_tautomers):
+    """Compare results to number of expected tautomers."""
+    molecule = read_smiles(smiles)
+    tautomers = generate_tautomers(molecule)
+    assert len(tautomers) == n_tautomers
