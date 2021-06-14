@@ -1317,7 +1317,7 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEKLIFSKinaseApoFeaturizer):
         """
         import json
 
-        from ..modeling.OEModeling import smiles_from_pdb
+        from ..databases.pdb import smiles_from_pdb
         from ..utils import LocalFileStorage
 
         logging.debug("Retrieving smiles information from PDB ...")
