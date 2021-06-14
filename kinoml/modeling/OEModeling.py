@@ -872,44 +872,6 @@ def generate_reasonable_conformations(
     return conformations_ensemble
 
 
-def optimize_poses(
-        docking_poses: List[oechem.OEGraphMol],
-        protein: Union[oechem.OEMolBase, oechem.OEGraphMol],
-) -> List[oechem.OEGraphMol]:
-    """
-    Optimize the torsions of docking poses in a protein binding site.
-    Parameters
-    ----------
-    docking_poses: list of oechem.OEGraphMol
-        The docking poses to optimize.
-    protein: oechem.OEGraphMol or oechem.MolBase
-        The OpenEye molecule holding a protein structure.
-    Returns
-    -------
-    optimized_docking_poses: list of oechem.OEGraphMol
-        The optimized docking poses.
-    """
-    from openeye import oeszybki
-
-    options = oeszybki.OESzybkiOptions()
-    options.SetRunType(oeszybki.OERunType_TorsionsOpt)
-    options.GetProteinOptions().SetExactVdWProteinLigand(True)
-    options.GetProteinOptions().SetProteinElectrostaticModel(
-        oeszybki.OEProteinElectrostatics_ExactCoulomb
-    )
-    options.GetOptOptions().SetGradTolerance(0.00001)
-    szybki = oeszybki.OESzybki(options)
-    szybki.SetProtein(protein)
-
-    optimized_docking_poses = []
-    for docking_pose in docking_poses:
-        result = oeszybki.OESzybkiResults()
-        szybki(docking_pose, result)
-        optimized_docking_poses.append(oechem.OEGraphMol(docking_pose))
-
-    return optimized_docking_poses
-
-
 def overlay_molecules(
         reference_molecule: oechem.OEGraphMol,
         fit_molecule: oechem.OEMol,
