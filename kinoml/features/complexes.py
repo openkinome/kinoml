@@ -1049,7 +1049,7 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEKLIFSKinaseApoFeaturizer):
 
         from ..docking.OEDocking import create_hybrid_receptor, hybrid_docking
         from ..modeling.OEModeling import (
-            compare_molecules,
+            are_identical_molecules,
             read_smiles,
             get_expression_tags,
             delete_residue,
@@ -1144,7 +1144,7 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEKLIFSKinaseApoFeaturizer):
 
         logging.debug("Checking for co-crystallized ligand ...")
         if (
-            compare_molecules(ligand, prepared_ligand_template)
+            are_identical_molecules(ligand, prepared_ligand_template)
             and ligand_template["structure.pdb_id"] == protein_template["structure.pdb_id"]
         ):
             logging.debug(f"Found co-crystallized ligand ...")
@@ -1367,11 +1367,11 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEKLIFSKinaseApoFeaturizer):
         : list of int
             The indices of matching SMILES strings.
         """
-        from ..modeling.OEModeling import read_smiles, compare_molecules
+        from ..modeling.OEModeling import read_smiles, are_identical_molecules
 
         identical_ligand_indices = []
         for i, complex_ligand in enumerate(smiles_iterable):
-            if compare_molecules(ligand, read_smiles(complex_ligand)):
+            if are_identical_molecules(ligand, read_smiles(complex_ligand)):
                 identical_ligand_indices.append(i)
 
         return identical_ligand_indices

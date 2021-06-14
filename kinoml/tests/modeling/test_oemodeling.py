@@ -26,6 +26,8 @@ from kinoml.modeling.OEModeling import (
     generate_conformations,
     generate_reasonable_conformations,
     overlay_molecules,
+    enumerate_isomeric_smiles,
+    are_identical_molecules,
 )
 
 
@@ -628,3 +630,62 @@ def test_overlay_molecules(reference_smiles, fit_smiles, comparator):
     else:
         raise ValueError("Wrong comparator provided. Only '<' and '>' are allowed.")
 
+
+@pytest.mark.parametrize(
+    "smiles, n_smiles",
+    [
+        (
+            "CC(=O)C(C)O",
+            2
+        ),
+        (
+            "CCC(=O)C(C)O",
+            4
+        ),
+        (
+            "C[C@H](F)Cl",
+            1
+        ),
+        (
+            "CC(F)Cl",
+            2
+        ),
+    ],
+)
+def test_enumerate_isomeric_smiles(smiles, n_smiles):
+    """Compare results to expected number of generated isomeric SMILES strings."""
+    molecule = read_smiles(smiles)
+    isomeric_smiles_representations = enumerate_isomeric_smiles(molecule)
+    assert len(isomeric_smiles_representations) == n_smiles
+
+
+@pytest.mark.parametrize(
+    "smiles1, smiles2, identical_molecules",
+    [
+        (
+            "CC(=O)C(C)O",
+            "C[C@@H](O)C(C)=O",
+            True
+        ),
+        (
+            "CCC(=O)C(C)O",
+            "CC[C@@H](O)C(C)=O",
+            True
+        ),
+        (
+            "C[C@H](F)Cl",
+            "CC(F)Cl",
+            True
+        ),
+        (
+            "C[C@H](F)Cl",
+            "C[C@@H](F)Cl",
+            False
+        ),
+    ],
+)
+def test_are_identical_molecules(smiles1, smiles2, identical_molecules):
+    """Compare results to expected molecular identity."""
+    molecule1 = read_smiles(smiles1)
+    molecule2 = read_smiles(smiles2)
+    assert are_identical_molecules(molecule1, molecule2) == identical_molecules

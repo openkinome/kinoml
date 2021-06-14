@@ -915,17 +915,19 @@ def overlay_molecules(
     return score.GetTanimotoCombo(), best_overlay
 
 
-def generate_isomeric_smiles_representations(molecule: oechem.OEGraphMol) -> Set[str]:
+def enumerate_isomeric_smiles(molecule: oechem.OEMolBase) -> Set[str]:
     """
-    Generate reasonable isomeric smiles of a given OpenEye molecule.
+    Enumerate reasonable isomeric SMILES representations of a given OpenEye molecule.
+
     Parameters
     ----------
-    molecule: oechem.OEGraphMol
+    molecule: oechem.OEMolBase
         An OpenEye molecule.
+
     Returns
     -------
     smiles_set: set of str
-        A set of reasonable isomeric smiles strings.
+        A set of reasonable isomeric SMILES strings.
     """
     import itertools
 
@@ -940,27 +942,29 @@ def generate_isomeric_smiles_representations(molecule: oechem.OEGraphMol) -> Set
     return smiles_set
 
 
-def compare_molecules(
-        molecule1: oechem.OEGraphMol,
-        molecule2: oechem.OEGraphMol
+def are_identical_molecules(
+        molecule1: oechem.OEMolBase,
+        molecule2: oechem.OEMolBase
 ) -> bool:
     """
-    Compare two OpenEye molecules.
+    Check if two OpenEye molecules are identical.
+
     Parameters
     ----------
-    molecule1: oechem.OEGraphMol
+    molecule1: oechem.OEMolBase
         The first OpenEye molecule.
-    molecule2: oechem.OEGraphMol
+    molecule2: oechem.OEMolBase
         The second OpenEye molecule.
+
     Returns
     -------
     : bool
-        True if same molecules, else False.
+        True if identical molecules, else False.
     """
-    reasonable_isomeric_smiles1 = generate_isomeric_smiles_representations(molecule1)
-    reasonable_isomeric_smiles2 = generate_isomeric_smiles_representations(molecule2)
+    isomeric_smiles_set1 = enumerate_isomeric_smiles(molecule1)
+    isomeric_smiles_set2 = enumerate_isomeric_smiles(molecule2)
 
-    if len(reasonable_isomeric_smiles1 & reasonable_isomeric_smiles2) == 0:
+    if len(isomeric_smiles_set1 & isomeric_smiles_set2) == 0:
         return False
     else:
         return True
