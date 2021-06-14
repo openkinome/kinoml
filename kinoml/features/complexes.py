@@ -1403,7 +1403,7 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEKLIFSKinaseApoFeaturizer):
         overlay_scores = []
         for conformations in conformations_ensemble:
             overlay_scores += [
-                [i, overlay_molecules(complex_ligand, conformations, False)]
+                [i, overlay_molecules(complex_ligand, conformations)[0]]
                 for i, complex_ligand in enumerate(complex_ligands)
             ]
 

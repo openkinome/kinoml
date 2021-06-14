@@ -873,46 +873,46 @@ def generate_reasonable_conformations(
 
 
 def overlay_molecules(
-        reference_molecule: oechem.OEGraphMol,
-        fit_molecule: oechem.OEMol,
-        return_overlay: bool = True,
-) -> (int, List[oechem.OEGraphMol]):
+        reference_molecule: oechem.OEMolBase,
+        fit_molecule: oechem.OEMCMolBase,
+) -> (float, List[oechem.OEGraphMol]):
     """
-    Overlay two molecules and calculate TanimotoCombo score.
+    Overlay a multi-conformer molecule to a single-conformer molecule and calculate the TanimotoCombo score.
+
     Parameters
     ----------
-    reference_molecule: oechem.OEGraphMol
-        An OpenEye molecule holding the reference molecule for overlay.
-    fit_molecule: oechem.OEMol
-        An OpenEye multi-conformer molecule holding the fit molecule for overlay.
-    return_overlay: bool
-        If the best scored overlay of molecules should be returned.
+    reference_molecule: oechem.OEMolBase
+        An OpenEye molecule holding a single conformation of the reference molecule for overlay.
+    fit_molecule: oechem.OEMCMolBase
+        An OpenEye multi-conformer molecule holding the conformations of a molecule to fit during overlay.
+
     Returns
     -------
-        : int or int and list of oechem.OEGraphMol
-        The TanimotoCombo score of the best overlay and the overlay if score_only is set False.
+    : float, list of oechem.OEGraphMol
+        The TanimotoCombo score and the OpenEye molecules of the best overlay
     """
-    from openeye import oechem, oeshape
+    from openeye import oeshape
 
+    # prepare molecules for overlay
     prep = oeshape.OEOverlapPrep()
     prep.Prep(reference_molecule)
+    prep.Prep(fit_molecule)
 
+    # perform overlay
     overlay = oeshape.OEOverlay()
     overlay.SetupRef(reference_molecule)
-
-    prep.Prep(fit_molecule)
     score = oeshape.OEBestOverlayScore()
     overlay.BestOverlay(score, fit_molecule, oeshape.OEHighestTanimoto())
-    if not return_overlay:
-        return score.GetTanimotoCombo()
-    else:
-        overlay = [reference_molecule]
-        fit_molecule = oechem.OEGraphMol(
-            fit_molecule.GetConf(oechem.OEHasConfIdx(score.GetFitConfIdx()))
-        )
-        score.Transform(fit_molecule)
-        overlay.append(fit_molecule)
-        return score.GetTanimotoCombo(), overlay
+
+    # collect results
+    best_overlay = [reference_molecule]
+    fit_molecule = oechem.OEGraphMol(
+        fit_molecule.GetConf(oechem.OEHasConfIdx(score.GetFitConfIdx()))
+    )
+    score.Transform(fit_molecule)
+    best_overlay.append(fit_molecule)
+
+    return score.GetTanimotoCombo(), best_overlay
 
 
 def generate_isomeric_smiles_representations(molecule: oechem.OEGraphMol) -> Set[str]:

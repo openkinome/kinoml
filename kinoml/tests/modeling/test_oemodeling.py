@@ -25,6 +25,7 @@ from kinoml.modeling.OEModeling import (
     generate_enantiomers,
     generate_conformations,
     generate_reasonable_conformations,
+    overlay_molecules,
 )
 
 
@@ -596,3 +597,34 @@ def test_generate_reasonable_conformations(smiles, n_conformations_list):
     assert len(conformations_ensemble) == len(n_conformations_list)
     for conformations, n_conformations in zip(conformations_ensemble, n_conformations_list):
         assert conformations.NumConfs() == n_conformations
+
+
+@pytest.mark.parametrize(
+    "reference_smiles, fit_smiles, comparator",
+    [
+        (
+            "C1=CC=C(C=C1)C1=CC=CC=C1",
+            "S1C=NC=C1C1=CC=CC=C1",
+            ">"
+        ),
+        (
+            "C1=CC=CC=C1",
+            "COC",
+            "<"
+        ),
+    ],
+)
+def test_overlay_molecules(reference_smiles, fit_smiles, comparator):
+    """Compare results to have a TanimotoCombo score bigger or smaller than 1."""
+    reference_molecule = read_smiles(reference_smiles)
+    reference_molecule = generate_conformations(reference_molecule, max_conformations=1)
+    fit_molecule = read_smiles(fit_smiles)
+    fit_molecule = generate_conformations(fit_molecule, max_conformations=10)
+    score, overlay = overlay_molecules(reference_molecule, fit_molecule)
+    if comparator == ">":
+        assert score > 1
+    elif comparator == "<":
+        assert score < 1
+    else:
+        raise ValueError("Wrong comparator provided. Only '<' and '>' are allowed.")
+
