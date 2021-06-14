@@ -970,20 +970,23 @@ def are_identical_molecules(
         return True
 
 
-def get_sequence(structure: oechem.OEGraphMol) -> str:
+def get_sequence(structure: oechem.OEMolBase) -> str:
     """
-    Get the amino acid sequence with one letter characters of an OpenEye molecule holding a protein structure. All
-    residues not perceived as standard amino acid will receive the character 'X'.
+    Get the amino acid sequence with one letter characters of an OpenEye molecule.
+    All residues not perceived as standard amino acid will receive the character 'X'.
+
     Parameters
     ----------
-    structure: oechem.OEGraphMol
-        An OpenEye molecule holding a protein structure.
+    structure: oechem.OEMolBase
+        An OpenEye molecule.
+
     Returns
     -------
     sequence: str
-        The amino acid sequence of the protein with one letter characters.
+        The amino acid sequence with one letter characters.
     """
     sequence = []
+
     hv = oechem.OEHierView(structure)
     for hier_residue in hv.GetResidues():
         residue = hier_residue.GetOEResidue()
@@ -995,7 +998,9 @@ def get_sequence(structure: oechem.OEGraphMol) -> str:
             )
         else:
             sequence.append("X")
+
     sequence = "".join(sequence)
+
     return sequence
 
 

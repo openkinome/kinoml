@@ -28,6 +28,7 @@ from kinoml.modeling.OEModeling import (
     overlay_molecules,
     enumerate_isomeric_smiles,
     are_identical_molecules,
+    get_sequence,
 )
 
 
@@ -689,3 +690,26 @@ def test_are_identical_molecules(smiles1, smiles2, identical_molecules):
     molecule1 = read_smiles(smiles1)
     molecule2 = read_smiles(smiles2)
     assert are_identical_molecules(molecule1, molecule2) == identical_molecules
+
+
+@pytest.mark.parametrize(
+    "package, resource, sequence",
+    [
+        (
+            "kinoml.data.proteins",
+            "4f8o.pdb",
+            "MNTFHVDFAPNTGEIFAGKQPGDVTMFTLTMGDTAPHGGWRLIPTGDSKGGYMISADGDYVGLYSYMMSWVGIDNNWYINDDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVKQGLXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+        ),
+        (
+            "kinoml.data.molecules",
+            "chloroform.pdb",
+            "X",
+        ),
+    ],
+)
+def test_get_sequence(package, resource, sequence):
+    """Compare results to expected sequence."""
+    with resources.path(package, resource) as path:
+        structure = read_molecules(str(path))[0]
+        assert get_sequence(structure) == sequence
+
