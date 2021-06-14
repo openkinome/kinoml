@@ -1492,7 +1492,7 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEKLIFSKinaseApoFeaturizer):
         : pd.DataFrame
             The input DataFrame filtered for KLIFS entries with most similar kinase pockets.
         """
-        from ..modeling.OEModeling import sequence_similarity
+        from ..modeling.alignment import sequence_similarity
 
         logging.debug("Calculating string similarity between KLIFS pockets ...")
         pocket_similarities = [sequence_similarity(structure_pocket, reference_pocket) for structure_pocket in

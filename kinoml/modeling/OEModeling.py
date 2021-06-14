@@ -970,47 +970,6 @@ def are_identical_molecules(
         return True
 
 
-def sequence_similarity(
-        sequence1: str,
-        sequence2: str,
-        open_gap_penalty: int = -11,
-        extend_gap_penalty: int = -1,
-) -> float:
-    """
-    Compare the characters of two strings.
-    Parameters
-    ----------
-    sequence1: str
-        The first sequence.
-    sequence2: str
-        The second sequence.
-    open_gap_penalty: int
-        The penalty to open a gap.
-    extend_gap_penalty: int
-        The penalty to extend a gap.
-    Returns
-    -------
-    score: float
-        Similarity of sequences.
-    """
-    from Bio import pairwise2
-    from Bio.Align import substitution_matrices
-
-    blosum62 = substitution_matrices.load("BLOSUM62")
-    # replace any characters unknown to the substitution matrix by *
-    sequence1_clean = "".join([x if x in blosum62.alphabet else "*" for x in sequence1])
-    sequence2_clean = "".join([x if x in blosum62.alphabet else "*" for x in sequence2])
-    score = pairwise2.align.globalds(
-        sequence1_clean,
-        sequence2_clean,
-        blosum62,
-        open_gap_penalty,
-        extend_gap_penalty,
-        score_only=True
-    )
-    return score
-
-
 def smiles_from_pdb(ligand_ids: Iterable[str]) -> dict:
     """
     Retrieve SMILES of molecules defined by their PDB chemical identifier.
