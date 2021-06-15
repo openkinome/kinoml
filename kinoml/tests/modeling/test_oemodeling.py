@@ -29,6 +29,7 @@ from kinoml.modeling.OEModeling import (
     enumerate_isomeric_smiles,
     are_identical_molecules,
     get_sequence,
+    get_structure_sequence_alignment,
 )
 
 
@@ -713,3 +714,27 @@ def test_get_sequence(package, resource, sequence):
         structure = read_molecules(str(path))[0]
         assert get_sequence(structure) == sequence
 
+
+@pytest.mark.parametrize(
+    "package, resource, sequence, aligned_sequence",
+    [
+        (  # The missing D82 could be placed at two positions, only "D-" is correct
+            "kinoml.data.proteins",
+            "4f8o_edit.pdb",
+            "MNTFHVDFAPNTGEIFAGKQPGDVTMFTLTMGDTAPHGGWRLIPTGDSKGGYMISADGDYVGLYSYMMSWVGIDNNWYINDDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVKQGLEHHHHHH",
+            "MNTFHVDFAPNTGEIFAGKQPGDVTMFTLTMGDTAPHGGWRLIPTGDSKGGYMISADGDYVGLYSYMMSWVGIDNNWYIND-SPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTV-QGL-------",
+        ),
+        (  # X for all non protein residues
+            "kinoml.data.proteins",
+            "4f8o.pdb",
+            "MNTFHVDFAPNTGEIFAGKQPGDVTMFTLTMGDTAPHGGWRLIPTGDSKGGYMISADGDYVGLYSYMMSWVGIDNNWYINDDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVKQGLEHHHHHH",
+            "MNTFHVDFAPNTGEIFAGKQPGDVTMFTLTMGDTAPHGGWRLIPTGDSKGGYMISADGDYVGLYSYMMSWVGIDNNWYINDDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVKQGLXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+        )
+    ],
+)
+def test_get_structure_sequence_alignment(package, resource, sequence, aligned_sequence):
+    """Compare results to expected sequence."""
+    with resources.path(package, resource) as path:
+        structure = read_molecules(str(path))[0]
+        alignment = get_structure_sequence_alignment(structure, sequence)
+        assert alignment[0] == aligned_sequence

@@ -91,7 +91,7 @@ def read_molecules(path: Union[str, Path], add_hydrogens: bool = False) -> List[
     return molecules
 
 
-def read_electron_density(path: Union[str, Path]) -> Union[oegrid.OESkewGrid, None]:
+def read_electron_density(path: Union[str, Path]) -> oegrid.OESkewGrid:
     """
     Read electron density from a file.
 
@@ -122,13 +122,13 @@ def read_electron_density(path: Union[str, Path]) -> Union[oegrid.OESkewGrid, No
     return electron_density
 
 
-def write_molecules(molecules: List[oechem.OEGraphMol], path: Union[str, Path]):
+def write_molecules(molecules: List[oechem.OEMolBase], path: Union[str, Path]):
     """
     Save molecules to file.
 
     Parameters
     ----------
-    molecules: list of oechem.OEGraphMol
+    molecules: list of oechem.OEMolBase
         A list of OpenEye molecules for writing.
     path: str, pathlib.Path
         File path for saving molecules.
@@ -141,20 +141,20 @@ def write_molecules(molecules: List[oechem.OEGraphMol], path: Union[str, Path]):
     return
 
 
-def select_chain(molecule: oechem.OEGraphMol, chain_id: str):
+def select_chain(molecule: oechem.OEMolBase, chain_id: str) -> oechem.OEMolBase:
     """
     Select a chain from an OpenEye molecule.
 
     Parameters
     ----------
-    molecule: oechem.OEGraphMol
+    molecule: oechem.OEMolBase
         An OpenEye molecule holding a molecular structure.
     chain_id: str
         Chain identifier.
 
     Returns
     -------
-    selection: oechem.OEGraphMol
+    selection: oechem.OEMolBase
         An OpenEye molecule holding the selected chain.
 
     Raises
@@ -179,16 +179,16 @@ def select_chain(molecule: oechem.OEGraphMol, chain_id: str):
 
 
 def select_altloc(
-        molecule: oechem.OEGraphMol,
+        molecule: oechem.OEMolBase,
         altloc_id: str,
         altloc_fallback: bool = True,
-):
+) -> oechem.OEMolBase:
     """
     Select an alternate location from an OpenEye molecule.
 
     Parameters
     ----------
-    molecule: oechem.OEGraphMol
+    molecule: oechem.OEMolBase
         An OpenEye molecule holding a molecular structure.
     altloc_id: str
         Alternate location identifier.
@@ -198,7 +198,7 @@ def select_altloc(
 
     Returns
     -------
-    selection: oechem.OEGraphMol
+    selection: oechem.OEMolBase
         An OpenEye molecule holding the selected alternate location.
 
     Raises
@@ -225,16 +225,16 @@ def select_altloc(
 
 
 def remove_non_protein(
-        molecule: oechem.OEGraphMol,
+        molecule: oechem.OEMolBase,
         exceptions: Union[None, List[str]] = None,
         remove_water: bool = False,
-) -> oechem.OEGraphMol:
+) -> oechem.OEMolBase:
     """
     Remove non-protein atoms from an OpenEye molecule. Water will be kept by default.
 
     Parameters
     ----------
-    molecule: oechem.OEGraphMol
+    molecule: oechem.OEMolBase
         An OpenEye molecule holding a molecular structure.
     exceptions: None or list of str
         Exceptions that should not be removed.
@@ -243,7 +243,7 @@ def remove_non_protein(
 
     Returns
     -------
-    selection: oechem.OEGraphMol
+    selection: oechem.OEMolBase
         An OpenEye molecule holding the filtered structure.
     """
     if exceptions is None:
@@ -264,7 +264,7 @@ def remove_non_protein(
 
 
 def delete_residue(
-        structure: oechem.OEGraphMol,
+        structure: oechem.OEMolBase,
         chain_id: str,
         residue_name: str,
         residue_id: int
@@ -274,7 +274,7 @@ def delete_residue(
 
     Parameters
     ---------
-    structure: oechem.OEGraphMol
+    structure: oechem.OEMolBase
         An OpenEye molecule with residue information.
     chain_id: str
         The chain id of the residue
@@ -285,7 +285,7 @@ def delete_residue(
 
     Returns
     -------
-    : oechem.OEGraphMol
+    : oechem.OEMolBase
         The OpenEye molecule without the residue.
 
     Raises
@@ -311,7 +311,7 @@ def delete_residue(
 
 
 def get_expression_tags(
-        structure: oechem.OEGraphMol,
+        structure: oechem.OEMolBase,
         labels: Iterable[str] = ("EXPRESSION TAG", "CLONING ARTIFACT"),
 ) -> List[Dict]:
     """
@@ -320,7 +320,7 @@ def get_expression_tags(
 
     Parameters
     ----------
-    structure: oechem.OEGraphMol
+    structure: oechem.OEMolBase
         An OpenEye molecule with associated PDB header section "SEQADV".
     labels: Iterable of str
         The 'SEQADV' labels defining expression tags. Default: ('EXPRESSION TAG', 'CLONING ARTIFACT').
@@ -354,23 +354,23 @@ def get_expression_tags(
 
 
 def assign_caps(
-        structure: oechem.OEGraphMol,
+        structure: oechem.OEMolBase,
         real_termini: Union[Iterable[int] or None] = None
-) -> oechem.OEGraphMol:
+) -> oechem.OEMolBase:
     """
     Cap N and C termini of the given input structure. Real termini can be protected from capping by providing the
     corresponding residue ids via the 'real_termini' argument.
 
     Parameters
     ----------
-    structure: oechem.OEGraphMol
+    structure: oechem.OEMolBase
         The OpenEye molecule holding the protein structure to cap.
     real_termini: iterable of int or None
         The biologically relevant real termini that shpuld be prevented from capping.
 
     Returns
     -------
-    structure: oechem.GraphMol
+    structure: oechem.OEMolBase
         The OpenEye molecule holding the capped structure.
     """
     from openeye import oespruce
@@ -413,7 +413,7 @@ def assign_caps(
 
 
 def _prepare_structure(
-        structure: oechem.OEGraphMol,
+        structure: oechem.OEMolBase,
         has_ligand: bool = False,
         electron_density: Union[oegrid.OESkewGrid, None] = None,
         loop_db: Union[str, None] = None,
@@ -422,13 +422,13 @@ def _prepare_structure(
         alternate_location: Union[str, None] = None,
         cap_termini: bool = True,
         real_termini: Union[List[int], None] = None,
-) -> Union[oechem.OEDesignUnit, None]:
+) -> oechem.OEDesignUnit:
     """
     Prepare an OpenEye molecule holding a protein ligand complex for docking.
 
     Parameters
     ----------
-    structure: oechem.OEGraphMol
+    structure: oechem.OEMolBase
         An OpenEye molecule holding a structure with protein and optionally a ligand.
     has_ligand: bool
         If structure contains a ligand that should be used in design unit generation.
@@ -452,7 +452,7 @@ def _prepare_structure(
 
     Returns
     -------
-    design_unit: oechem.OEDesignUnit or None
+    design_unit: oechem.OEDesignUnit
         An OpenEye design unit holding the prepared structure with the highest quality among all identified design
         units.
 
@@ -483,8 +483,8 @@ def _prepare_structure(
                 return True
         return False
 
-    # delete loose protein residues, which make the alignment error prone
-    structure = delete_loose_residues(structure)
+    # delete short protein segments, which make the alignment error prone
+    structure = delete_short_protein_segments(structure)
 
     # select alternate location
     if alternate_location:
@@ -566,7 +566,7 @@ def _prepare_structure(
 
 
 def prepare_complex(
-        protein_ligand_complex: oechem.OEGraphMol,
+        protein_ligand_complex: oechem.OEMolBase,
         electron_density: Union[oegrid.OESkewGrid, None] = None,
         loop_db: Union[str, None] = None,
         ligand_name: Union[str, None] = None,
@@ -574,13 +574,13 @@ def prepare_complex(
         alternate_location: Union[str, None] = None,
         cap_termini: bool = True,
         real_termini: Union[List[int], None] = None,
-) -> Union[oechem.OEDesignUnit, None]:
+) -> oechem.OEDesignUnit:
     """
     Prepare an OpenEye molecule holding a protein ligand complex for docking.
 
     Parameters
     ----------
-    protein_ligand_complex: oechem.OEGraphMol
+    protein_ligand_complex: oechem.OEMolBase
         An OpenEye molecule holding a structure with protein and ligand.
     electron_density: oegrid.OESkewGrid
         An OpenEye grid holding the electron density.
@@ -600,7 +600,7 @@ def prepare_complex(
 
     Returns
     -------
-    design_unit: oechem.OEDesignUnit or None
+    design_unit: oechem.OEDesignUnit
         An OpenEye design unit holding the prepared structure with the highest quality among all identified design
         units.
 
@@ -623,19 +623,19 @@ def prepare_complex(
 
 
 def prepare_protein(
-        protein: oechem.OEGraphMol,
+        protein: oechem.OEMolBase,
         loop_db: Union[str, None] = None,
         chain_id: Union[str, None] = None,
         alternate_location: Union[str, None] = None,
         cap_termini: bool = True,
         real_termini: Union[List[int], None] = None,
-) -> Union[oechem.OEDesignUnit, None]:
+) -> oechem.OEDesignUnit:
     """
     Prepare an OpenEye molecule holding a protein structure for docking.
 
     Parameters
     ----------
-    protein: oechem.OEGraphMol
+    protein: oechem.OEMolBase
         An OpenEye molecule holding a structure with protein.
     loop_db: str
         Path to OpenEye Spruce loop database.
@@ -750,7 +750,7 @@ def generate_enantiomers(
         max_centers: int = 12,
         force_flip: bool = False,
         enumerate_nitrogens: bool = True,
-) -> List[oechem.OEGraphMol]:
+) -> List[oechem.OEMolBase]:
     """
     Generate enantiomers of a given molecule.
 
@@ -1005,22 +1005,24 @@ def get_sequence(structure: oechem.OEMolBase) -> str:
 
 
 def get_structure_sequence_alignment(
-        structure: oechem.OEGraphMol,
+        structure: oechem.OEMolBase,
         sequence: str
 ) -> Tuple[str, str]:
     """
     Generate an alignment between a protein structure and an amino acid sequence. The provided protein structure should
-    only contain protein residues to prevent unexpected behavior. Also, this alignment only works for highly similar
-    sequences, i.e. only few mutations, deletions and insertions.
+    only contain protein residues to prevent unexpected behavior. Also, this alignment was optimized for highly similar
+    sequences, i.e. only few mutations, deletions and insertions. Non protein residues will be marked with "X".
+
     Parameters
     ----------
-    structure: oechem.OEGraphMol
+    structure: oechem.OEMolBase
         An OpenEye molecule holding a protein structure.
     sequence: str
         A one letter amino acid sequence.
+
     Returns
     -------
-     structure_sequence_aligned: str
+    structure_sequence_aligned: str
         The aligned protein structure sequence with gaps denoted as "-".
     sequence_aligned: str
         The aligned amino acid sequence with gaps denoted as "-".
@@ -1055,7 +1057,7 @@ def get_structure_sequence_alignment(
         start_residue = structure_residues[gap_start - 1]
         end_residue = structure_residues[gap_start]
         gap_sequence = sequence_aligned[gap.start():gap.end() - 2]
-        # check for connected residues, which could indicate are wrong alignment
+        # check for connected residues, which could indicate a wrong alignment
         # e.g. ABEDEFG     ABEDEFG
         #      ABE--FG <-> AB--EFG
         if _connected_residues(structure_residues[gap_start],
@@ -1071,6 +1073,8 @@ def get_structure_sequence_alignment(
                 # check two ways to invert gap
                 if not _connected_residues(structure_residues[gap_start - 1],
                                            structure_residues[gap_start]):
+                    # i.e. ABEDEFG     ABEDEFG
+                    #      ABE--FG --> AB--EFG
                     structure_sequence_aligned = (
                             structure_sequence_aligned[:gap.start()] +
                             gap.group()[:-1][::-1] +
@@ -1078,12 +1082,16 @@ def get_structure_sequence_alignment(
                     )
                 elif not _connected_residues(structure_residues[gap_start + 1],
                                              structure_residues[gap_start + 2]):
+                    # i.e. ABEDEFG     ABEDEFG
+                    #      AB--EFG --> AB--EFG
                     structure_sequence_aligned = (
                             structure_sequence_aligned[:gap.start() + 1] +
                             gap.group()[1:][::-1] +
                             structure_sequence_aligned[gap.end():]
                     )
                 else:
+                    # i.e. ABEDEFG     ABEDEFG
+                    #      AB**EFG --> AB--EFG
                     logging.debug(
                         f"Alignment contains insertion with sequence {gap_sequence}" +
                         f" between bonded residues {start_residue.GetResidueNumber()}" +
@@ -1091,7 +1099,7 @@ def get_structure_sequence_alignment(
                         "keeping original alignment ..."
                     )
                     continue
-            logging.debug("Correcting sequence gap ...")
+            logging.debug("Corrected sequence gap ...")
 
     return structure_sequence_aligned, sequence_aligned
 
@@ -1408,20 +1416,21 @@ def delete_partial_residues(structure: oechem.OEGraphMol) -> oechem.OEGraphMol:
     return structure
 
 
-def delete_short_protein_segments(protein: oechem.OEGraphMol) -> oechem.OEGraphMol:
+def delete_short_protein_segments(structure: oechem.OEMolBase) -> oechem.OEMolBase:
     """
-    Delete protein segments consisting of 3 or less residues. The given molecule should only contain protein residues.
+    Delete protein segments consisting of 3 or less residues.
 
     Parameters
     ----------
-    protein: oechem.OEGraphMol
+    structure: oechem.OEMolBase
         An OpenEye molecule holding a protein with possibly short segments.
 
     Returns
     -------
-    protein: oechem.OEGraphMol
+    structure: oechem.OEMolBase
         An OpenEye molecule holding the protein without short segments.
     """
+    protein = remove_non_protein(structure, remove_water=True)
     components = split_molecule_components(protein)
     for component in components:
         residues = set([oechem.OEAtomGetResidue(atom) for atom in component.GetAtoms()])
@@ -1436,60 +1445,8 @@ def delete_short_protein_segments(protein: oechem.OEGraphMol) -> oechem.OEGraphM
                 residue_match.SetChainID(residue.GetChainID())
                 residue_match.SetResidueNumber(str(residue.GetResidueNumber()))
                 residue_predicate = oechem.OEAtomMatchResidue(residue_match)
-                for atom in protein.GetAtoms(residue_predicate):
-                    protein.DeleteAtom(atom)
-
-    return protein
-
-
-def delete_loose_residues(structure: oechem.OEGraphMol) -> oechem.OEGraphMol:
-    """
-    Delete protein residues that are not bonded to any other residue.
-
-    Parameters
-    ----------
-    structure: oechem.OEGraphMol
-        An OpenEye molecule holding a protein structure with possibly loose residues.
-
-    Returns
-    -------
-    structure: oechem.OEGraphMol
-        An OpenEye molecule holding the protein structure without loose residues.
-    """
-    # iterate over protein residues
-    # defined by C alpha atoms that are not hetero atoms
-    for atom in structure.GetAtoms(
-            oechem.OEAndAtom(
-                oechem.OEIsCAlpha(), oechem.OENotAtom(
-                    oechem.OEIsHetAtom()
-                )
-            )
-    ):
-        connected_residues = 0
-        # get neighboring backbone atoms
-        for connected_atom in atom.GetAtoms(
-                oechem.OEIsBackboneAtom()
-        ):
-            # get neighboring backbone carbon or  nitrogen atoms that are not C alpha atoms
-            # which will be from the neighboring residues
-            for _ in connected_atom.GetAtoms(
-                    oechem.OEOrAtom(
-                        oechem.OEIsNitrogen(),
-                        oechem.OEAndAtom(
-                            oechem.OEIsCarbon(),
-                            oechem.OENotAtom(
-                                oechem.OEIsCAlpha()
-                            )
-                        )
-                    )
-            ):
-                connected_residues += 1
-        # delete residues with less than 1 neighbor
-        if connected_residues < 1:
-            residue = oechem.OEAtomGetResidue(atom)
-            logging.debug(f"Deleting loose residue {residue.GetName()}{residue.GetResidueNumber()}...")
-            for residue_atom in structure.GetAtoms(oechem.OEAtomIsInResidue(residue)):
-                structure.DeleteAtom(residue_atom)
+                for atom in structure.GetAtoms(residue_predicate):
+                    structure.DeleteAtom(atom)
 
     return structure
 
@@ -1772,12 +1729,12 @@ def update_residue_identifiers(
     return structure
 
 
-def split_molecule_components(molecule: oechem.OEGraphMol) -> List[oechem.OEGraphMol]:
+def split_molecule_components(molecule: oechem.OEMolBase) -> List[oechem.OEGraphMol]:
     """
     Split an OpenEye Molecule into its bonded components.
     Parameters
     ----------
-    molecule: oechem.OEGraphMol
+    molecule: oechem.OEMolBase
         An OpenEye molecule holding multiple components.
     Returns
     -------
