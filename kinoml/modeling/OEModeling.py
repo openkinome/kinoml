@@ -1404,25 +1404,33 @@ def apply_mutations(
     return structure_with_mutations
 
 
-def delete_partial_residues(structure: oechem.OEGraphMol) -> oechem.OEGraphMol:
+def delete_partial_residues(
+        structure: oechem.OEMolBase,
+) -> oechem.OEMolBase:
     """
-    Delete residues with missing side chain atoms.
+    Delete residues with missing sidechain or backbone atoms. The backbone is considered complete
+    if atoms C, CA and N are present.
+
     Parameters
     ----------
-    structure: oechem.OEGraphMol
+    structure: oechem.OEMolBase
         An OpenEye molecule holding a protein structure.
+
     Returns
     -------
-    structure: oechem.OEGraphMol
+    structure: oechem.OEMolBase
         An OpenEye molecule holding only residues with completely modeled side chains.
     """
     from openeye import oespruce
+
+    # do not change input structure
+    processed_structure = structure.CreateCopy()
 
     # try to build missing sidechains
     oespruce.OEBuildSidechains(structure)
 
     # find residues with missing sidechain atoms
-    incomplete_residues = oespruce.OEGetPartialResidues(structure)
+    incomplete_residues = oespruce.OEGetPartialResidues(processed_structure)
 
     # delete atoms
     for incomplete_residue in incomplete_residues:
@@ -1431,20 +1439,20 @@ def delete_partial_residues(structure: oechem.OEGraphMol) -> oechem.OEGraphMol:
             f"{incomplete_residue.GetName()}"
             f"{incomplete_residue.GetResidueNumber()}"
         )
-        hier_view = oechem.OEHierView(structure)
+        hier_view = oechem.OEHierView(processed_structure)
         structure_residue = hier_view.GetResidue(
             incomplete_residue.GetChainID(),
             incomplete_residue.GetName(),
             incomplete_residue.GetResidueNumber()
         )
         for atom in structure_residue.GetAtoms():
-            structure.DeleteAtom(atom)
+            processed_structure.DeleteAtom(atom)
 
     # spruce sometimes creates protein residues consisting of water atoms, e.g. 2hz0 chain B
     # spruce does not always delete residues with missing backbone atoms, e.g. 3qrj chain B
-    # TODO: submit bug report
+    # TODO: check again and submit bug report
     backbone_atom_names = {"C", "CA", "N"}
-    hier_view = oechem.OEHierView(structure)
+    hier_view = oechem.OEHierView(processed_structure)
     for hier_residue in hier_view.GetResidues():
         atom_names = set([atom.GetName().strip() for atom in hier_residue.GetAtoms()])
         if len(backbone_atom_names.difference(atom_names)) > 0:
@@ -1454,9 +1462,9 @@ def delete_partial_residues(structure: oechem.OEGraphMol) -> oechem.OEGraphMol:
                 f"{hier_residue.GetResidueNumber()} ..."
             )
             for atom in hier_residue.GetAtoms():
-                structure.DeleteAtom(atom)
+                processed_structure.DeleteAtom(atom)
 
-    return structure
+    return processed_structure
 
 
 def delete_short_protein_segments(structure: oechem.OEMolBase) -> oechem.OEMolBase:

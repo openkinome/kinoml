@@ -33,6 +33,7 @@ from kinoml.modeling.OEModeling import (
     apply_deletions,
     apply_insertions,
     apply_mutations,
+    delete_partial_residues,
 )
 
 
@@ -884,3 +885,31 @@ def test_apply_mutations(package, resource, sequence, delete_fallback, expectati
             structure_with_mutations = apply_mutations(structure, sequence, delete_fallback)
             sequence_with_mutations = get_sequence(structure_with_mutations)
             assert sequence_with_mutations == expected_sequence
+
+
+@pytest.mark.parametrize(
+    "package, resource, delete_backbone_C, sequence",
+    [
+        (  # delete first two (missing sidechains) and last (missing backbone C) residue
+            "kinoml.data.proteins",
+            "4f8o_edit.pdb",
+            "LEU138",
+            "TFHVDFAPNTGEIFAGKQPGDVTMFTLTMGDTAPHGGWRLIPTGDSKGGYMISADGDYVGLYSYMMSWVGIDNNWYINDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVQG",
+        ),
+    ],
+)
+def test_delete_partial_residues(package, resource, delete_backbone_C, sequence):
+    """Compare results to expected sequence."""
+    from openeye import oechem
+
+    with resources.path(package, resource) as path:
+        structure = read_molecules(str(path))[0]
+        if delete_backbone_C:
+            hier_view = oechem.OEHierView(structure)
+            hier_residue = hier_view.GetResidue("A", delete_backbone_C[:3], int(delete_backbone_C[3:]))
+            for atom in hier_residue.GetAtoms():
+                atom_name = atom.GetName().strip()
+                if atom_name == "C":
+                    structure.DeleteAtom(atom)
+        structure = delete_partial_residues(structure)
+        assert get_sequence(structure) == sequence
