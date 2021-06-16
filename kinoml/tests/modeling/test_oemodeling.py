@@ -34,6 +34,7 @@ from kinoml.modeling.OEModeling import (
     apply_insertions,
     apply_mutations,
     delete_partial_residues,
+    delete_short_protein_segments,
 )
 
 
@@ -912,4 +913,22 @@ def test_delete_partial_residues(package, resource, delete_backbone_C, sequence)
                 if atom_name == "C":
                     structure.DeleteAtom(atom)
         structure = delete_partial_residues(structure)
+        assert get_sequence(structure) == sequence
+
+
+@pytest.mark.parametrize(
+    "package, resource, sequence",
+    [
+        (  # delete last three residues
+            "kinoml.data.proteins",
+            "4f8o_edit.pdb",
+            "MNTFHVDFAPNTGEIFAGKQPGDVTMFTLTMGDTAPHGGWRLIPTGDSKGGYMISADGDYVGLYSYMMSWVGIDNNWYINDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTV",
+        ),
+    ],
+)
+def test_delete_short_protein_segments(package, resource, sequence):
+    """Compare results to expected sequence."""
+    with resources.path(package, resource) as path:
+        structure = read_molecules(str(path))[0]
+        structure = delete_short_protein_segments(structure)
         assert get_sequence(structure) == sequence

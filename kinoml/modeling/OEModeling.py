@@ -1481,7 +1481,11 @@ def delete_short_protein_segments(structure: oechem.OEMolBase) -> oechem.OEMolBa
     structure: oechem.OEMolBase
         An OpenEye molecule holding the protein without short segments.
     """
-    protein = remove_non_protein(structure, remove_water=True)
+
+    # do not change input structure
+    processed_structure = structure.CreateCopy()
+
+    protein = remove_non_protein(processed_structure, remove_water=True)
     components = split_molecule_components(protein)
     for component in components:
         residues = set([oechem.OEAtomGetResidue(atom) for atom in component.GetAtoms()])
