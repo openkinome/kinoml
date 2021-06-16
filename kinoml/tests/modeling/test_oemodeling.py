@@ -31,6 +31,7 @@ from kinoml.modeling.OEModeling import (
     get_sequence,
     get_structure_sequence_alignment,
     apply_deletions,
+    apply_insertions,
 )
 
 
@@ -822,3 +823,23 @@ def test_apply_deletions(package, resource, sequence, delete_n_anchors, expectat
             sequence_with_deletions = get_sequence(structure_with_deletions)
             assert sequence_with_deletions == expected_sequence
 
+
+@pytest.mark.parametrize(
+    "package_list, resource_list, sequence",
+    [
+        (  # test loop modeling for deleted residue D82
+            ["kinoml.data.proteins", "kinoml.data.proteins"],
+            ["4f8o_edit.pdb", "kinoml_tests_4f8o_spruce.loop_db"],
+            "MNTFHVDFAPNTGEIFAGKQPGDVTMFTLTMGDTAPHGGWRLIPTGDSKGGYMISADGDYVGLYSYMMSWVGIDNNWYINDDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVQGL",
+        )
+    ],
+)
+def test_apply_insertions(package_list, resource_list, sequence):
+    """Compare results to expected sequence."""
+    with resources.path(package_list[0], resource_list[0]) as pdb_path:
+        with resources.path(package_list[1], resource_list[1]) as loop_db_path:
+            structure = read_molecules(str(pdb_path))[0]
+            structure = remove_non_protein(structure, remove_water=True)
+            structure_with_deletions = apply_insertions(structure, sequence, loop_db_path)
+            sequence_with_deletions = get_sequence(structure_with_deletions)
+            assert sequence_with_deletions == sequence

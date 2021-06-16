@@ -1171,28 +1171,27 @@ def apply_deletions(
 
 
 def apply_insertions(
-        target_structure: oechem.OEGraphMol,
+        target_structure: oechem.OEMolBase,
         template_sequence: str,
-        loop_db: str,
-) -> oechem.OEGraphMol:
+        loop_db: Union[str, Path],
+) -> oechem.OEMolBase:
     """
     Apply insertions to a protein structure according to an amino acid sequence. The provided protein structure should
     only contain protein residues to prevent unexpected behavior.
     Parameters
     ----------
-    target_structure: oechem.OEGraphMol
+    target_structure: oechem.OEMolBase
         An OpenEye molecule holding a protein structure for which insertions should be applied.
     template_sequence: str
         A template one letter amino acid sequence, which holds potential insertions when compared to the target
         structure sequence.
-    loop_db: str
+    loop_db: str or Path
         The path to the loop database used by OESpruce to model missing loops.
     Returns
     -------
-     : oechem.OEGraphMol
+    structure_with_insertions: oechem.OEMolBase
         An OpenEye molecule holding the protein structure with applied insertions.
     """
-    from pathlib import Path
     import re
 
     from openeye import oespruce
@@ -1215,6 +1214,9 @@ def apply_insertions(
                             protein.DeleteBond(bond)
         return protein
 
+    # do not change input structure
+    structure_with_insertions = target_structure.CreateCopy()
+
     sidechain_options = oespruce.OESidechainBuilderOptions()
     loop_options = oespruce.OELoopBuilderOptions()
     loop_options.SetOptimizationMaxLoops(5)
@@ -1226,10 +1228,10 @@ def apply_insertions(
         reinitialize = False
         # align template and target sequences
         target_sequence_aligned, template_sequence_aligned = get_structure_sequence_alignment(
-            target_structure, template_sequence)
+            structure_with_insertions, template_sequence)
         logging.debug(f"Template sequence:\n{template_sequence_aligned}")
         logging.debug(f"Target sequence:\n{target_sequence_aligned}")
-        hierview = oechem.OEHierView(target_structure)
+        hierview = oechem.OEHierView(structure_with_insertions)
         structure_residues = list(hierview.GetResidues())
         gaps = list(re.finditer("[^-][-]+[^-]", target_sequence_aligned))
         gaps = sorted(gaps, key=lambda match: len(match.group()))
@@ -1245,7 +1247,7 @@ def apply_insertions(
             # build loop and reinitialize if successful
             if oespruce.OEBuildSingleLoop(
                     loop_conformations,
-                    target_structure,
+                    structure_with_insertions,
                     gap_sequence,
                     start_residue.GetOEResidue(),
                     end_residue.GetOEResidue(),
@@ -1263,7 +1265,7 @@ def apply_insertions(
                     clashes = len(oespruce.OEGetPartialResidues(loop_conformation))
                     if clashes == 0:
                         # break conformation evaluation
-                        target_structure = loop_conformation
+                        structure_with_insertions = loop_conformation
                         reinitialize = True
                         break
                     logging.debug(
@@ -1285,8 +1287,8 @@ def apply_insertions(
                     logging.debug("Failed building loop without clashes, skipping insertion!")
                     # break bond between residues next to insertion
                     # important if an isoform specific insertion failed
-                    target_structure = _disconnect_residues(
-                        target_structure,
+                    structure_with_insertions = _disconnect_residues(
+                        structure_with_insertions,
                         start_residue,
                         end_residue
                     )
@@ -1297,12 +1299,12 @@ def apply_insertions(
     # add hydrogen to newly modeled residues
     options = oechem.OEPlaceHydrogensOptions()
     options.SetBypassPredicate(oechem.OENotAtom(oespruce.OEIsModeledAtom()))
-    oechem.OEPlaceHydrogens(target_structure, options)
+    oechem.OEPlaceHydrogens(structure_with_insertions, options)
 
     # order residues and atoms
-    oechem.OEPDBOrderAtoms(target_structure)
+    oechem.OEPDBOrderAtoms(structure_with_insertions)
 
-    return target_structure
+    return structure_with_insertions
 
 
 def apply_mutations(
