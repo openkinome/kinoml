@@ -30,6 +30,7 @@ from kinoml.modeling.OEModeling import (
     are_identical_molecules,
     get_sequence,
     get_structure_sequence_alignment,
+    apply_deletions,
 )
 
 
@@ -716,25 +717,108 @@ def test_get_sequence(package, resource, sequence):
 
 
 @pytest.mark.parametrize(
-    "package, resource, sequence, aligned_sequence",
+    "package, resource, sequence, expected_alignment",
     [
-        (  # The missing D82 could be placed at two positions, only "D-" is correct
-            "kinoml.data.proteins",
-            "4f8o_edit.pdb",
-            "MNTFHVDFAPNTGEIFAGKQPGDVTMFTLTMGDTAPHGGWRLIPTGDSKGGYMISADGDYVGLYSYMMSWVGIDNNWYINDDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVKQGLEHHHHHH",
-            "MNTFHVDFAPNTGEIFAGKQPGDVTMFTLTMGDTAPHGGWRLIPTGDSKGGYMISADGDYVGLYSYMMSWVGIDNNWYIND-SPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTV-QGL-------",
-        ),
-        (  # X for all non protein residues
+        (  # mutation (middle and end)
             "kinoml.data.proteins",
             "4f8o.pdb",
-            "MNTFHVDFAPNTGEIFAGKQPGDVTMFTLTMGDTAPHGGWRLIPTGDSKGGYMISADGDYVGLYSYMMSWVGIDNNWYINDDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVKQGLEHHHHHH",
-            "MNTFHVDFAPNTGEIFAGKQPGDVTMFTLTMGDTAPHGGWRLIPTGDSKGGYMISADGDYVGLYSYMMSWVGIDNNWYINDDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVKQGLXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+            "MNTFHVDFAPNTGEIFAGKQPGDVTMFTLTMGDTAPHGGWRLIPTGDSKGGYMISADGDYVGLFSYMMSWVGIDNNWYINDDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVKQGV",
+            [
+                "MNTFHVDFAPNTGEIFAGKQPGDVTMFTLTMGDTAPHGGWRLIPTGDSKGGYMISADGDYVGLYSYMMSWVGIDNNWYINDDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVKQGL",
+                "MNTFHVDFAPNTGEIFAGKQPGDVTMFTLTMGDTAPHGGWRLIPTGDSKGGYMISADGDYVGLFSYMMSWVGIDNNWYINDDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVKQGV"
+            ]
+        ),
+        (  # insertions (missing D82 could be placed at two positions, only "D-" is correct)
+            "kinoml.data.proteins",
+            "4f8o_edit.pdb",
+            "MNTFHVDFAPNTGEIFAGKQPGDVTMFTLTMGDTAPHGGWRLIPTGDSKGVVVGYMISADGDYVGLYSYMMSWVGIDNNWYINDDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVKQGLEHHHHHH",
+            [
+                "MNTFHVDFAPNTGEIFAGKQPGDVTMFTLTMGDTAPHGGWRLIPTGDSKG---GYMISADGDYVGLYSYMMSWVGIDNNWYIND-SPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTV-QGL-------",
+                "MNTFHVDFAPNTGEIFAGKQPGDVTMFTLTMGDTAPHGGWRLIPTGDSKGVVVGYMISADGDYVGLYSYMMSWVGIDNNWYINDDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVKQGLEHHHHHH"
+            ]
+        ),
+        (  # deletions (start and middle)
+            "kinoml.data.proteins",
+            "4f8o.pdb",
+            "FHVDFAPNTGEIFAGKQPGDVTMFTLTMGDTAPHGGWRLIPTGDSKGGYMISADGDLYSYMMSWVGIDNNWYINDDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVKQGL",
+            [
+                "MNTFHVDFAPNTGEIFAGKQPGDVTMFTLTMGDTAPHGGWRLIPTGDSKGGYMISADGDYVGLYSYMMSWVGIDNNWYINDDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVKQGL",
+                "---FHVDFAPNTGEIFAGKQPGDVTMFTLTMGDTAPHGGWRLIPTGDSKGGYMISADGD---LYSYMMSWVGIDNNWYINDDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVKQGL"
+            ]
+        ),
+        (  # all together
+            "kinoml.data.proteins",
+            "4f8o_edit.pdb",
+            "FHVDFAPNTGEIFAGKQPGDVTMFTLTMGDTAPHGGWRLIPTGDSKGVVVGYMISADGDLFSYMMSWVGIDNNWYINDDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVKQGVEHHHHHH",
+            [
+                "MNTFHVDFAPNTGEIFAGKQPGDVTMFTLTMGDTAPHGGWRLIPTGDSKG---GYMISADGDYVGLYSYMMSWVGIDNNWYIND-SPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTV-QGL-------",
+                "---FHVDFAPNTGEIFAGKQPGDVTMFTLTMGDTAPHGGWRLIPTGDSKGVVVGYMISADGD---LFSYMMSWVGIDNNWYINDDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVKQGVEHHHHHH"
+            ]
         )
     ],
 )
-def test_get_structure_sequence_alignment(package, resource, sequence, aligned_sequence):
+def test_get_structure_sequence_alignment(package, resource, sequence, expected_alignment):
+    """Compare results to expected sequence alignment."""
+    with resources.path(package, resource) as path:
+        structure = read_molecules(str(path))[0]
+        structure = remove_non_protein(structure, remove_water=True)
+        alignment = get_structure_sequence_alignment(structure, sequence)
+        for sequence1, sequence2 in zip(alignment, expected_alignment):
+            assert sequence1 == sequence2
+
+
+@pytest.mark.parametrize(
+    "package, resource, sequence, delete_n_anchors, expectation, expected_sequence",
+    [
+        (  # no deletions, ignore mutations
+            "kinoml.data.proteins",
+            "4f8o.pdb",
+            "XNTFHVDFAPNTGEIFAGKQPGDVTMFTLTMGDTAPHGGWRLIPTGDSKGXXXISADGDYVGLYSYMMSWVGIDNNWYINDDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVKQXX",
+            2,
+            does_not_raise(),
+            "MNTFHVDFAPNTGEIFAGKQPGDVTMFTLTMGDTAPHGGWRLIPTGDSKGGYMISADGDYVGLYSYMMSWVGIDNNWYINDDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVKQGL",
+        ),
+        (  # delete residue 4 including two anchoring residues on both sides
+            "kinoml.data.proteins",
+            "4f8o.pdb",
+            "MNTHVDFAPNTGEIFAGKQPGDVTMFTLTMGDTAPHGGWRLIPTGDSKGGYMISADGDYVGLYSYMMSWVGIDNNWYINDDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVKQGL",
+            2,
+            does_not_raise(),
+            "MDFAPNTGEIFAGKQPGDVTMFTLTMGDTAPHGGWRLIPTGDSKGGYMISADGDYVGLYSYMMSWVGIDNNWYINDDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVKQGL",
+        ),
+        (  # delete first residue, anchoring residues will be ignored, since it's at the beginning
+            "kinoml.data.proteins",
+            "4f8o.pdb",
+            "NTFHVDFAPNTGEIFAGKQPGDVTMFTLTMGDTAPHGGWRLIPTGDSKGGYMISADGDYVGLYSYMMSWVGIDNNWYINDDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVKQGL",
+            2,
+            does_not_raise(),
+            "NTFHVDFAPNTGEIFAGKQPGDVTMFTLTMGDTAPHGGWRLIPTGDSKGGYMISADGDYVGLYSYMMSWVGIDNNWYINDDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVKQGL",
+        ),
+        (  # delete residue 4 without anchoring residues
+            "kinoml.data.proteins",
+            "4f8o.pdb",
+            "MNTHVDFAPNTGEIFAGKQPGDVTMFTLTMGDTAPHGGWRLIPTGDSKGGYMISADGDYVGLYSYMMSWVGIDNNWYINDDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVKQGL",
+            0,
+            does_not_raise(),
+            "MNTHVDFAPNTGEIFAGKQPGDVTMFTLTMGDTAPHGGWRLIPTGDSKGGYMISADGDYVGLYSYMMSWVGIDNNWYINDDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVKQGL",
+        ),
+        (  # negative value for 'delete_n_anchors' should raise ValueError
+            "kinoml.data.proteins",
+            "4f8o.pdb",
+            "MNTHVDFAPNTGEIFAGKQPGDVTMFTLTMGDTAPHGGWRLIPTGDSKGGYMISADGDYVGLYSYMMSWVGIDNNWYINDDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVKQGL",
+            -1,
+            pytest.raises(ValueError),
+            "MNTHVDFAPNTGEIFAGKQPGDVTMFTLTMGDTAPHGGWRLIPTGDSKGGYMISADGDYVGLYSYMMSWVGIDNNWYINDDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVKQGL",
+        )
+    ],
+)
+def test_apply_deletions(package, resource, sequence, delete_n_anchors, expectation, expected_sequence):
     """Compare results to expected sequence."""
     with resources.path(package, resource) as path:
         structure = read_molecules(str(path))[0]
-        alignment = get_structure_sequence_alignment(structure, sequence)
-        assert alignment[0] == aligned_sequence
+        structure = remove_non_protein(structure, remove_water=True)
+        with expectation:
+            structure_with_deletions = apply_deletions(structure, sequence, delete_n_anchors)
+            sequence_with_deletions = get_sequence(structure_with_deletions)
+            assert sequence_with_deletions == expected_sequence
+

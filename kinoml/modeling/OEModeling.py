@@ -1105,34 +1105,56 @@ def get_structure_sequence_alignment(
 
 
 def apply_deletions(
-        target_structure: oechem.OEGraphMol,
-        template_sequence: str
-) -> oechem.OEGraphMol:
+        target_structure: oechem.OEMolBase,
+        template_sequence: str,
+        delete_n_anchors: int = 2,
+) -> oechem.OEMolBase:
     """
     Apply deletions to a protein structure according to an amino acid sequence. The provided protein structure should
     only contain protein residues to prevent unexpected behavior.
+
     Parameters
     ----------
-    target_structure: oechem.OEGraphMol
+    target_structure: oechem.OEMolBase
         An OpenEye molecule holding a protein structure for which deletions should be applied.
     template_sequence: str
         A template one letter amino acid sequence, which holds potential deletions when compared to the target
         structure sequence.
+    delete_n_anchors: int
+        Specify how many anchoring residues should be deleted at each side of the deletion. Important if connecting
+        anchoring residues after deletion is intended, e.g. via apply_insertion. Only affects deletions in the middle
+        of a sequence, not at the end or the beginning.
+
     Returns
     -------
-     : oechem.OEGraphMol
+    structure_with_deletions: oechem.OEMolBase
         An OpenEye molecule holding the protein structure with applied deletions.
+
+    Raises
+    ------
+    ValueError
+        Negative values are not allowed for 'delete_n_anchors'.
     """
     import re
 
+    if delete_n_anchors < 0:
+        raise ValueError("Negative values are not allowed for 'delete_n_anchors'.")
+
+    # do not change input structure
+    structure_with_deletions = target_structure.CreateCopy()
+
     # align template and target sequences
     target_sequence_aligned, template_sequence_aligned = get_structure_sequence_alignment(
-        target_structure, template_sequence)
+        structure_with_deletions, template_sequence
+    )
     logging.debug(f"Template sequence:\n{template_sequence_aligned}")
     logging.debug(f"Target sequence:\n{target_sequence_aligned}")
-    hierview = oechem.OEHierView(target_structure)
+    hierview = oechem.OEHierView(structure_with_deletions)
     structure_residues = list(hierview.GetResidues())
-    insertions = re.finditer("^[-]+|[^-]{2}[-]+[^-]{2}|[-]+$", template_sequence_aligned)
+    insertions = re.finditer(
+        "^[-]+|[^-]{" + str(delete_n_anchors) + "}[-]+[^-]{" + str(delete_n_anchors) + "}|[-]+$",
+        template_sequence_aligned
+    )
     for insertion in insertions:
         insertion_start = insertion.start() - target_sequence_aligned[:insertion.start()].count("-")
         insertion_end = insertion.end() - target_sequence_aligned[:insertion.end()].count("-")
@@ -1143,9 +1165,9 @@ def apply_deletions(
         # delete atoms
         for insertion_residue in insertion_residues:
             for atom in insertion_residue.GetAtoms():
-                target_structure.DeleteAtom(atom)
+                structure_with_deletions.DeleteAtom(atom)
 
-    return target_structure
+    return structure_with_deletions
 
 
 def apply_insertions(
