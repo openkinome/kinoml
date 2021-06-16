@@ -32,6 +32,7 @@ from kinoml.modeling.OEModeling import (
     get_structure_sequence_alignment,
     apply_deletions,
     apply_insertions,
+    apply_mutations,
 )
 
 
@@ -840,6 +841,46 @@ def test_apply_insertions(package_list, resource_list, sequence):
         with resources.path(package_list[1], resource_list[1]) as loop_db_path:
             structure = read_molecules(str(pdb_path))[0]
             structure = remove_non_protein(structure, remove_water=True)
-            structure_with_deletions = apply_insertions(structure, sequence, loop_db_path)
-            sequence_with_deletions = get_sequence(structure_with_deletions)
-            assert sequence_with_deletions == sequence
+            structure_with_insertions = apply_insertions(structure, sequence, loop_db_path)
+            sequence_with_insertions = get_sequence(structure_with_insertions)
+            assert sequence_with_insertions == sequence
+
+
+@pytest.mark.parametrize(
+    "package, resource, sequence, delete_fallback, expectation, expected_sequence",
+    [
+        (  # mutation succeeds (middle GLYSY -> GLFSY)
+            "kinoml.data.proteins",
+            "4f8o.pdb",
+            "MNTFHVDFAPNTGEIFAGKQPGDVTMFTLTMGDTAPHGGWRLIPTGDSKGGYMISADGDYVGLFSYMMSWVGIDNNWYINDDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVKQGL",
+            True,
+            does_not_raise(),
+            "MNTFHVDFAPNTGEIFAGKQPGDVTMFTLTMGDTAPHGGWRLIPTGDSKGGYMISADGDYVGLFSYMMSWVGIDNNWYINDDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVKQGL"
+        ),
+        (  # mutation fails with delete_fallback (middle TMGDT -> TMWDT)
+            "kinoml.data.proteins",
+            "4f8o.pdb",
+            "MNTFHVDFAPNTGEIFAGKQPGDVTMFTLTMWDTAPHGGWRLIPTGDSKGGYMISADGDYVGLYSYMMSWVGIDNNWYINDDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVKQGL",
+            True,
+            does_not_raise(),
+            "MNTFHVDFAPNTGEIFAGKQPGDVTMFTLTMDTAPHGGWRLIPTGDSKGGYMISADGDYVGLYSYMMSWVGIDNNWYINDDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVKQGL",
+        ),
+        (  # mutation fails without delete_fallback (middle TMGDT -> TMWDT)
+            "kinoml.data.proteins",
+            "4f8o.pdb",
+            "MNTFHVDFAPNTGEIFAGKQPGDVTMFTLTMWDTAPHGGWRLIPTGDSKGGYMISADGDYVGLYSYMMSWVGIDNNWYINDDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVKQGL",
+            False,
+            pytest.raises(ValueError),
+            "MNTFHVDFAPNTGEIFAGKQPGDVTMFTLTMWDTAPHGGWRLIPTGDSKGGYMISADGDYVGLYSYMMSWVGIDNNWYINDDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVKQGL",
+        ),
+    ],
+)
+def test_apply_mutations(package, resource, sequence, delete_fallback, expectation, expected_sequence):
+    """Compare results to expected sequence."""
+    with resources.path(package, resource) as pdb_path:
+        structure = read_molecules(str(pdb_path))[0]
+        structure = remove_non_protein(structure, remove_water=True)
+        with expectation:
+            structure_with_mutations = apply_mutations(structure, sequence, delete_fallback)
+            sequence_with_mutations = get_sequence(structure_with_mutations)
+            assert sequence_with_mutations == expected_sequence

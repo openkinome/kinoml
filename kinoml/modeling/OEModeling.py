@@ -1308,25 +1308,39 @@ def apply_insertions(
 
 
 def apply_mutations(
-        target_structure: oechem.OEGraphMol,
-        template_sequence: str
-) -> oechem.OEGraphMol:
+        target_structure: oechem.OEMolBase,
+        template_sequence: str,
+        fallback_delete: bool = True,
+) -> oechem.OEMolBase:
     """
     Mutate a protein structure according to an amino acid sequence. The provided protein structure should only contain
-    protein residues to prevent unexpected behavior.
+    protein residues to prevent unexpected behavior. Residues that could not be mutated will be deleted by default.
+
     Parameters
     ----------
-    target_structure: oechem.OEGraphMol
+    target_structure: oechem.OEMolBase
         An OpenEye molecule holding a protein structure to mutate.
     template_sequence: str
         A template one letter amino acid sequence, which holds potential mutations when compared to the target
         structure sequence.
+    fallback_delete: bool
+        If the residue should be deleted if it could not be mutated.
+
     Returns
     -------
-     : oechem.OEGraphMol
+     : oechem.OEMolBase
         An OpenEye molecule holding the mutated protein structure.
+
+    Raises
+    ------
+    ValueError
+        Mutation {oeresidue.GetName()}{oeresidue.GetResidueNumber()}{three_letter_code} failed!
+        Only raised when fallback_delete is set False.
     """
     from openeye import oespruce
+
+    # do not change input structure
+    structure_with_mutations = target_structure.CreateCopy()
 
     # the hierarchy view is more stable if reinitialized after each change
     # https://docs.eyesopen.com/toolkits/python/oechemtk/biopolymers.html#a-hierarchy-view
@@ -1334,10 +1348,10 @@ def apply_mutations(
         altered = False
         # align template and target sequences
         target_sequence_aligned, template_sequence_aligned = get_structure_sequence_alignment(
-            target_structure, template_sequence)
+            structure_with_mutations, template_sequence)
         logging.debug(f"Template sequence:\n{template_sequence_aligned}")
         logging.debug(f"Target sequence:\n{target_sequence_aligned}")
-        hierview = oechem.OEHierView(target_structure)
+        hierview = oechem.OEHierView(structure_with_mutations)
         structure_residues = hierview.GetResidues()
         # adjust target structure to match template sequence
         for template_sequence_residue, target_sequence_residue in zip(
@@ -1357,32 +1371,37 @@ def apply_mutations(
                                       f"{oeresidue.GetName()}{oeresidue.GetResidueNumber()}" +
                                       f"{three_letter_code} ...")
                         if oespruce.OEMutateResidue(
-                                target_structure, oeresidue, three_letter_code
+                                structure_with_mutations, oeresidue, three_letter_code
                         ):
                             logging.debug("Successfully mutated residue!")
                             # break loop and reinitialize
                             altered = True
                             break
                         else:
-                            logging.debug("Mutation failed! Deleting residue ...")
-                            # deleting atoms via structure_residue.GetAtoms()
-                            # results in segmentation fault for 2itv
-                            for atom in target_structure.GetAtoms():
-                                if oechem.OEAtomGetResidue(atom) == oeresidue:
-                                    target_structure.DeleteAtom(atom)
+                            if fallback_delete:
+                                logging.debug("Mutation failed! Deleting residue ...")
+                                for atom in structure_with_mutations.GetAtoms():
+                                    if oechem.OEAtomGetResidue(atom) == oeresidue:
+                                        structure_with_mutations.DeleteAtom(atom)
+                            else:
+                                raise ValueError(
+                                    f"Mutation {oeresidue.GetName()}" +
+                                    f"{oeresidue.GetResidueNumber()}" +
+                                    f"{three_letter_code} failed!"
+                                )
         # leave while loop if no changes were introduced
         if not altered:
             break
     # OEMutateResidue doesn't always build side chains
     # and doesn't add hydrogen automatically
-    oespruce.OEBuildSidechains(target_structure)
+    oespruce.OEBuildSidechains(structure_with_mutations)
     options = oechem.OEPlaceHydrogensOptions()
     options.SetBypassPredicate(oechem.OENotAtom(oespruce.OEIsModeledAtom()))
-    oechem.OEPlaceHydrogens(target_structure, options)
+    oechem.OEPlaceHydrogens(structure_with_mutations, options)
     # update residue information
-    oechem.OEPerceiveResidues(target_structure, oechem.OEPreserveResInfo_All)
+    oechem.OEPerceiveResidues(structure_with_mutations, oechem.OEPreserveResInfo_All)
 
-    return target_structure
+    return structure_with_mutations
 
 
 def delete_partial_residues(structure: oechem.OEGraphMol) -> oechem.OEGraphMol:
