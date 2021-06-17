@@ -37,6 +37,7 @@ from kinoml.modeling.OEModeling import (
     delete_short_protein_segments,
     delete_clashing_sidechains,
     get_atom_coordinates,
+    renumber_structure,
 )
 
 
@@ -1000,3 +1001,48 @@ def test_get_atom_coordinates(package, resource):
         assert structure.NumAtoms() == len(coordinates)
         assert set([len(coordinate) for coordinate in coordinates]) == {3}
         assert all_floats
+
+
+@pytest.mark.parametrize(
+    "package, resource, residue_ids, expectation",
+    [
+        (
+            "kinoml.data.proteins",
+            "4f8o.pdb",
+            list(range(245)),
+            does_not_raise()
+        ),
+        (
+            "kinoml.data.molecules",
+            "chloroform.sdf",
+            [3],
+            does_not_raise(),
+        ),
+        (
+            "kinoml.data.molecules",
+            "chloroform.sdf",
+            [],
+            pytest.raises(ValueError),
+        ),
+        (
+            "kinoml.data.molecules",
+            "chloroform.sdf",
+            ["1"],
+            pytest.raises(ValueError),
+        ),
+    ],
+)
+def test_renumber_structure(package, resource, residue_ids, expectation):
+    """
+    Compare results to have the given residue IDs.
+    """
+    from openeye import oechem
+
+    with resources.path(package, resource) as path:
+        structure = read_molecules(str(path))[0]
+        with expectation:
+            structure = renumber_structure(structure, residue_ids)
+            hierview = oechem.OEHierView(structure)
+            new_residue_ids = [residue.GetResidueNumber() for residue in hierview.GetResidues()]
+            assert len(residue_ids) == len(new_residue_ids)
+            assert all([True for x, y in zip(residue_ids, new_residue_ids) if x == y])

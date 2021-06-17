@@ -1622,31 +1622,53 @@ def get_atom_coordinates(molecule: oechem.OEMolBase) -> List[Tuple[float, float,
 
 
 def renumber_structure(
-        target_structure: oechem.OEGraphMol, residue_numbers: List[int]
+        target_structure: oechem.OEMolBase,
+        residue_ids: Iterable[int]
 ) -> oechem.OEGraphMol:
     """
-    Renumber the residues of a protein structure according to the given list of residue numbers.
+    Renumber the residues of a protein structure according to the given list of residue IDs.
+
     Parameters
     ----------
-    target_structure: oechem.OEGraphMol
+    target_structure: oechem.OEMolBase
         An OpenEye molecule holding the protein structure to renumber.
-    residue_numbers: list of int
-        A list of residue numbers matching the order of the target structure.
+    residue_ids: iterable of int
+        An iterable of residue IDs matching the order of the target structure.
+
     Returns
     -------
-    renumbered_structure: oechem.OEGraphMol
+    renumbered_structure: oechem.OEMolBase
         An OpenEye molecule holding the cropped protein structure.
-    """
-    import copy
 
-    renumbered_structure = copy.deepcopy(
-        target_structure
-    )  # don't touch input structure
+    Raises
+    ------
+    ValueError
+        Number of given residue IDs does not match number of residues in the given structure.
+    ValueError
+        Given residue IDs contain wrong types, only int is allowed.
+    """
+    # don't touch input structure
+    renumbered_structure = target_structure.CreateCopy()
+
+    # get residues
     hierview = oechem.OEHierView(renumbered_structure)
-    structure_residues = hierview.GetResidues()
-    for residue_number, structure_residue in zip(residue_numbers, structure_residues):
+    structure_residues = list(hierview.GetResidues())
+
+    # check for matching number of residues
+    if len(structure_residues) != len(residue_ids):
+        raise ValueError(
+            "Number of given residue IDs does not match number of residues in the given " +
+            "structure."
+        )
+
+    # check for matching number of residues
+    if not all([isinstance(residue_id, int) for residue_id in residue_ids]):
+        raise ValueError("Given residue IDs contain wrong types, only int is allowed.")
+
+    # adjust residue numbers
+    for residue_id, structure_residue in zip(residue_ids, structure_residues):
         structure_residue_mod = structure_residue.GetOEResidue()
-        structure_residue_mod.SetResidueNumber(residue_number)
+        structure_residue_mod.SetResidueNumber(residue_id)
         for residue_atom in structure_residue.GetAtoms():
             oechem.OEAtomSetResidue(residue_atom, structure_residue_mod)
 
