@@ -412,7 +412,7 @@ def assign_caps(
     return structure
 
 
-def _prepare_structure(
+def prepare_structure(
         structure: oechem.OEMolBase,
         has_ligand: bool = False,
         electron_density: Union[oegrid.OESkewGrid, None] = None,
@@ -609,7 +609,7 @@ def prepare_complex(
     ValueError
         No design unit found with given chain ID, ligand name and alternate location.
     """
-    return _prepare_structure(
+    return prepare_structure(
         structure=protein_ligand_complex,
         has_ligand=True,
         electron_density=electron_density,
@@ -660,7 +660,7 @@ def prepare_protein(
     ValueError
         No design unit found with given chain ID, ligand name and alternate location.
     """
-    return _prepare_structure(
+    return prepare_structure(
         structure=protein,
         loop_db=loop_db,
         chain_id=chain_id,
@@ -1599,19 +1599,18 @@ def delete_clashing_sidechains(
     return processed_structure
 
 
-def get_atom_coordinates(molecule: oechem.OEGraphMol) -> List[Tuple[float, float, float]]:
+def get_atom_coordinates(molecule: oechem.OEMolBase) -> List[Tuple[float, float, float]]:
     """
     Retrieve the atom coordinates of an OpenEye molecule.
 
     Parameters
     ----------
-    molecule: oechem.OEGraphMol
+    molecule: oechem.OEMolBase
         An OpenEye molecule for which the coordinates should be retrieved.
 
     Returns
     -------
-
-    : list of tuple of float
+    coordinates: list of tuple of float
         The coordinates of the given molecule atoms.
     """
     coordinates_dict = molecule.GetCoords()

@@ -19,7 +19,7 @@ from kinoml.modeling.OEModeling import (
     delete_residue,
     get_expression_tags,
     assign_caps,
-    _prepare_structure,
+    prepare_structure,
     read_klifs_ligand,
     generate_tautomers,
     generate_enantiomers,
@@ -36,6 +36,7 @@ from kinoml.modeling.OEModeling import (
     delete_partial_residues,
     delete_short_protein_segments,
     delete_clashing_sidechains,
+    get_atom_coordinates,
 )
 
 
@@ -474,7 +475,7 @@ def test_prepare_structure(package, resource, has_ligand, chain_id, altloc, liga
     with resources.path(package, resource) as path:
         structure = read_molecules(str(path))[0]
         with expectation:
-            design_unit = _prepare_structure(
+            design_unit = prepare_structure(
                 structure,
                 has_ligand=has_ligand,
                 chain_id=chain_id,
@@ -965,3 +966,37 @@ def test_delete_clashing_sidechains(package, resource, cutoff, sequence):
         structure = delete_clashing_sidechains(structure, cutoff)
         structure = delete_partial_residues(structure)
         assert get_sequence(structure) == sequence
+
+
+@pytest.mark.parametrize(
+    "package, resource",
+    [
+        (
+            "kinoml.data.proteins",
+            "4f8o.pdb",
+        ),
+        (
+            "kinoml.data.molecules",
+            "chloroform.sdf",
+        ),
+    ],
+)
+def test_get_atom_coordinates(package, resource):
+    """
+    Compare results to have the same number of coordinates as atoms and to have exactly three
+    floats as coordinates.
+    """
+    import itertools
+
+    with resources.path(package, resource) as path:
+        structure = read_molecules(str(path))[0]
+        coordinates = get_atom_coordinates(structure)
+        all_floats = all(
+            [
+                isinstance(coordinate, float) for coordinate
+                in itertools.chain.from_iterable(coordinates)
+            ]
+        )
+        assert structure.NumAtoms() == len(coordinates)
+        assert set([len(coordinate) for coordinate in coordinates]) == {3}
+        assert all_floats
