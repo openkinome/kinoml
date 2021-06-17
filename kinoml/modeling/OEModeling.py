@@ -1481,7 +1481,6 @@ def delete_short_protein_segments(structure: oechem.OEMolBase) -> oechem.OEMolBa
     structure: oechem.OEMolBase
         An OpenEye molecule holding the protein without short segments.
     """
-
     # do not change input structure
     processed_structure = structure.CreateCopy()
 
@@ -1507,82 +1506,97 @@ def delete_short_protein_segments(structure: oechem.OEMolBase) -> oechem.OEMolBa
 
 
 def delete_clashing_sidechains(
-        protein: oechem.OEGraphMol,
+        structure: oechem.OEMolBase,
         cutoff: float = 2.0
-) -> oechem.OEGraphMol:
+) -> oechem.OEMolBase:
     """
-    Delete side chains that are clashing with other atoms of the given protein structure. Structures containing
-    non-protein residues may lead to unexpected behavior.
+    Delete side chains that are clashing with other atoms of the given structure.
+
+    Note: Structures containing non-protein residues may lead to unexpected behavior, since also
+    those residues will be deleted if clashing with other residues of the system. However, this
+    behavior is important to be able to also check PTMs for clashes.
 
     Parameters
     ----------
-    protein: oechem.OEGraphMol
+    structure: oechem.OEMolBase
         An OpenEye molecule holding a protein structure.
     cutoff: float
         The distance cutoff that is used for defining a heavy atom clash.
+        Note: Going bigger than 2.3 A may lead to the deletion of residues involved in strong
+        hydrogen bonds.
 
     Returns
     -------
-    : oechem.OEGraphMol
-        An OpenEye molecule holding the protein structure without clashing side chains.
+    processed_structure: oechem.OEMolBase
+        An OpenEye molecule holding the protein structure without clashing sidechains.
     """
-    # get all protein heavy atoms and create KD tree for querying
-    protein_heavy_atoms = oechem.OEGraphMol()
+    from scipy.spatial import distance
+
+    # do not change input structure
+    processed_structure = structure.CreateCopy()
+
+    # get all heavy atoms and create a KD tree for querying
+    heavy_atoms = oechem.OEGraphMol()
     oechem.OESubsetMol(
-        protein_heavy_atoms,
-        protein,
+        heavy_atoms,
+        processed_structure,
         oechem.OEIsHeavy()
     )
-    protein_heavy_atom_coordinates = get_atom_coordinates(protein_heavy_atoms)
-    protein_heavy_atom_tree = cKDTree(protein_heavy_atom_coordinates)
-    # create a list of side chain components
-    # two cysteine side chains connected via a disulfide bond
-    # are considered a single side chain component
-    sidechain_heavy_atoms = oechem.OEGraphMol()
-    oechem.OESubsetMol(
-        sidechain_heavy_atoms,
-        protein_heavy_atoms,
-        oechem.OENotAtom(
-            oechem.OEIsBackboneAtom()
-        )
-    )
-    sidechain_components = split_molecule_components(sidechain_heavy_atoms)
-    # iterate over side chains and check for clashes
-    for sidechain_component in sidechain_components:
-        sidechain_coordinates = get_atom_coordinates(sidechain_component)
-        sidechain_tree = cKDTree(sidechain_coordinates)
-        clashes = protein_heavy_atom_tree.query_ball_tree(sidechain_tree, cutoff)
-        residue_ids = set(
-            [
-                oechem.OEAtomGetResidue(atom).GetResidueNumber()
-                for atom in sidechain_component.GetAtoms()
-            ]
-        )
-        proline = 0
-        atom_sample = sidechain_component.GetAtoms().next()
-        residue_name = oechem.OEAtomGetResidue(atom_sample).GetName().strip()
-        if residue_name == "PRO":
-            proline = 1
-        # check if more atoms are within cutoff than number of side chain atoms
-        # plus 1 for each CA atom and plus 1 for proline
-        if len([x for x in clashes if len(x) > 0]) > \
-                sidechain_component.NumAtoms() + len(residue_ids) + proline:
+    heavy_atom_coordinates_dict = heavy_atoms.GetCoords()
+    heavy_atom_tree = cKDTree(list(heavy_atom_coordinates_dict.values()))
+    backbone_functor = oechem.OEIsBackboneAtom(includeTerminalOxygen=True)
+    # iterate over residues
+    hierview = oechem.OEHierView(heavy_atoms)
+    for residue in hierview.GetResidues():
+        # get atom indices and coordinates
+        non_backbone_atoms = [
+            atom for atom in residue.GetAtoms() if not backbone_functor(atom)
+        ]
+        if len(non_backbone_atoms) == 0:
+            # e.g. in case of a residue with missing sidechain
+            continue
+        non_backbone_atom_indices = [
+            atom.GetIdx() for atom in non_backbone_atoms
+        ]
+        non_backbone_coordinates = [
+            heavy_atom_coordinates_dict[index] for index in non_backbone_atom_indices
+        ]
+        # query for atoms close to sidechain atoms
+        # this will also consider the sidechain atoms themself
+        # and depending on the cutoff bonded atoms, e.g. C alphas
+        non_backbone_tree = cKDTree(non_backbone_coordinates)
+        potential_clashes = heavy_atom_tree.query_ball_tree(non_backbone_tree, cutoff)
+        # detect number of bonds to backbone and other residues below cutoff, e.g. PTMs
+        # those will also show up in the KD Tree query but are no real clash
+        n_additional_clashes = 0
+        for atom in non_backbone_atoms:
+            for neighboring_atom in atom.GetAtoms():
+                if neighboring_atom.GetIdx() not in non_backbone_atom_indices:
+                    if distance.euclidean(
+                        heavy_atom_coordinates_dict[atom.GetIdx()],
+                        heavy_atom_coordinates_dict[neighboring_atom.GetIdx()]
+                    ) < cutoff:
+                        n_additional_clashes += 1
+        # check if more atoms are within cutoff than number of sidechain atoms
+        # as well as additional expected clashes
+        if len([x for x in potential_clashes if len(x) > 0]) > \
+                len(non_backbone_atom_indices) + n_additional_clashes:
+            residue = residue.GetOEResidue()
+            residue_name = residue.GetName()
+            residue_id = residue.GetResidueNumber()
+            chain_id = residue.GetChainID()
             logging.debug(
-                f"Deleting clashing side chains with residue ids {residue_ids} ..."
+                f"Deleting clashing sidechain of {residue_name}" +
+                f"{residue_id} {chain_id} ..."
             )
-            # delete atoms
-            for residue_id in residue_ids:
-                for atom in protein.GetAtoms(
-                        oechem.OEAndAtom(
-                            oechem.OEHasResidueNumber(residue_id),
-                            oechem.OENotAtom(
-                                oechem.OEIsBackboneAtom()
-                            )
-                        )
-                ):
-                    protein.DeleteAtom(atom)
+            # deleting sidechain atoms
+            for atom in processed_structure.GetAtoms(oechem.OEAtomMatchResidue([
+                f"{residue_name}:{residue_id}:.*:{chain_id}:.*:.*"
+            ])):
+                if not backbone_functor(atom):
+                    processed_structure.DeleteAtom(atom)
 
-    return protein
+    return processed_structure
 
 
 def get_atom_coordinates(molecule: oechem.OEGraphMol) -> List[Tuple[float, float, float]]:

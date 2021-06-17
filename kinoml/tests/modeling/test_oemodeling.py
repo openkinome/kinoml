@@ -35,6 +35,7 @@ from kinoml.modeling.OEModeling import (
     apply_mutations,
     delete_partial_residues,
     delete_short_protein_segments,
+    delete_clashing_sidechains,
 )
 
 
@@ -931,4 +932,36 @@ def test_delete_short_protein_segments(package, resource, sequence):
     with resources.path(package, resource) as path:
         structure = read_molecules(str(path))[0]
         structure = delete_short_protein_segments(structure)
+        assert get_sequence(structure) == sequence
+
+
+@pytest.mark.parametrize(
+    "package, resource, cutoff, sequence",
+    [
+        (  # PHE4 is clashing (< 2.0) with ASP33 and GLU112
+            "kinoml.data.proteins",
+            "4f8o_edit.pdb",
+            2.0,
+            "THVDFAPNTGEIFAGKQPGDVTMFTLTMGTAPHGGWRLIPTGDSKGGYMISADGDYVGLYSYMMSWVGIDNNWYINDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEYVFDNKQSTVINSKDVSGEVTVQG",
+        ),
+        (  # setting the cutoff very low should not delete PHE4, ASP33 and GLU112
+            "kinoml.data.proteins",
+            "4f8o_edit.pdb",
+            0.1,
+            "TFHVDFAPNTGEIFAGKQPGDVTMFTLTMGDTAPHGGWRLIPTGDSKGGYMISADGDYVGLYSYMMSWVGIDNNWYINDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVQG",
+        ),
+        (  # setting the cutoff very high should delete all sidechains, except for glycines
+            "kinoml.data.proteins",
+            "4f8o_edit.pdb",
+            4.0,
+            "GGGGGGGGGGGGGGGG",
+        ),
+    ],
+)
+def test_delete_clashing_sidechains(package, resource, cutoff, sequence):
+    """Compare results to expected sequence."""
+    with resources.path(package, resource) as path:
+        structure = read_molecules(str(path))[0]
+        structure = delete_clashing_sidechains(structure, cutoff)
+        structure = delete_partial_residues(structure)
         assert get_sequence(structure) == sequence
