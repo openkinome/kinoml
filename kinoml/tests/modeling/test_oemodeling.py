@@ -38,6 +38,7 @@ from kinoml.modeling.OEModeling import (
     delete_clashing_sidechains,
     get_atom_coordinates,
     renumber_structure,
+    superpose_proteins,
 )
 
 
@@ -1046,3 +1047,44 @@ def test_renumber_structure(package, resource, residue_ids, expectation):
             new_residue_ids = [residue.GetResidueNumber() for residue in hierview.GetResidues()]
             assert len(residue_ids) == len(new_residue_ids)
             assert all([True for x, y in zip(residue_ids, new_residue_ids) if x == y])
+
+
+@pytest.mark.parametrize(
+    "package_list, resource_list, residues, chain_id",
+    [
+        (
+            ["kinoml.data.proteins", "kinoml.data.proteins"],
+            ["4f8o.pdb", "4f8o_edit.pdb"],
+            [],
+            "A"
+        ),
+        (
+            ["kinoml.data.proteins", "kinoml.data.proteins"],
+            ["4f8o.pdb", "4f8o_edit.pdb"],
+            ["GLY13", "GLU14", "ILE15", "PHE16", "ALA17", "GLY18", "LYS19", "GLN20", "PRO21", "GLY22"],
+            "A"
+        ),
+    ],
+)
+def test_superpose_protein(package_list, resource_list, residues, chain_id):
+    """
+    Check if superposed proteins share a similar protein center.
+    This test does not check if the superposition is a good solution.
+    """
+    import numpy as np
+
+    with resources.path(package_list[0], resource_list[0]) as reference_path:
+        reference_structure = read_molecules(str(reference_path))[0]
+        with resources.path(package_list[1], resource_list[1]) as fit_path:
+            fit_structure = read_molecules(str(fit_path))[0]
+            superposed_structure = superpose_proteins(
+                reference_structure,
+                fit_structure,
+                residues,
+                chain_id
+            )
+            superposed_protein = remove_non_protein(superposed_structure, remove_water=True)
+            reference_protein = remove_non_protein(reference_structure, remove_water=True)
+            superposed_protein_center = np.mean(get_atom_coordinates(superposed_protein))
+            reference_protein_center = np.mean(get_atom_coordinates(reference_protein))
+            assert np.linalg.norm(superposed_protein_center - reference_protein_center) < 1

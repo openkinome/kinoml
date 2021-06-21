@@ -1676,20 +1676,21 @@ def renumber_structure(
 
 
 def superpose_proteins(
-        reference_protein: oechem.OEGraphMol,
-        fit_protein: oechem.OEGraphMol,
+        reference_protein: oechem.OEMolBase,
+        fit_protein: oechem.OEMolBase,
         residues: Iterable = tuple(),
         chain_id: str = " ",
         insertion_code: str = " "
-) -> oechem.OEGraphMol:
+) -> oechem.OEMolBase:
     """
     Superpose a protein structure onto a reference protein. The superposition
     can be customized to consider only the specified residues.
+
     Parameters
     ----------
-    reference_protein: oechem.OEGraphMol
+    reference_protein: oechem.OEMolBase
         An OpenEye molecule holding a protein structure which will be used as reference during superposition.
-    fit_protein: oechem.OEGraphMol
+    fit_protein: oechem.OEMolBase
         An OpenEye molecule holding a protein structure which will be superposed onto the reference protein.
     residues: Iterable of str
         Residues that should be used during superposition in format "GLY123".
@@ -1697,9 +1698,10 @@ def superpose_proteins(
         Chain identifier for residues that should be used during superposition.
     insertion_code: str
         Insertion code for residues that should be used during superposition.
+
     Returns
     -------
-    superposed_protein: oechem.OEGraphMol
+    superposed_protein: oechem.OEMolBase
         An OpenEye molecule holding the superposed protein structure.
     """
     from openeye import oespruce
