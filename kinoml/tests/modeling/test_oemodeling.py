@@ -40,6 +40,7 @@ from kinoml.modeling.OEModeling import (
     renumber_structure,
     superpose_proteins,
     update_residue_identifiers,
+    split_molecule_components,
 )
 
 
@@ -1173,3 +1174,33 @@ def test_update_residue_identifiers(
         residue_ids = [residue.GetResidueNumber() for residue in hierview.GetResidues()]
         assert min(residue_ids) == first_residue_id
         assert max(residue_ids) == last_residue_id
+
+
+@pytest.mark.parametrize(
+    "package, resource, n_components",
+    [
+        (
+            "kinoml.data.proteins",
+            "4f8o.pdb",
+            107,
+        ),
+        (
+            "kinoml.data.proteins",
+            "4f8o_edit.pdb",
+            3,
+        ),
+        (
+            "kinoml.data.molecules",
+            "chloroform.sdf",
+            1,
+        ),
+    ],
+)
+def test_split_molecule_components(package, resource, n_components):
+    """
+    Compare results to have the expected number of molecular components.
+    """
+    with resources.path(package, resource) as path:
+        structure = read_molecules(str(path))[0]
+        components = split_molecule_components(structure)
+        assert len(components) == n_components

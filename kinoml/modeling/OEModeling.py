@@ -1838,14 +1838,16 @@ def update_residue_identifiers(
 
 def split_molecule_components(molecule: oechem.OEMolBase) -> List[oechem.OEGraphMol]:
     """
-    Split an OpenEye Molecule into its bonded components.
+    Split an OpenEye molecule into its bonded components.
+
     Parameters
     ----------
     molecule: oechem.OEMolBase
         An OpenEye molecule holding multiple components.
+
     Returns
     -------
-    : list of oechem.OEGraphMol
+    components: list of oechem.OEGraphMol
         A list of OpenEye molecules holding the split components.
     """
     # determine bonded components
