@@ -234,6 +234,7 @@ class OEHybridDockingFeaturizer(BaseFeaturizer):
                 | oechem.OEPreserveResInfo_ChainID
                 | oechem.OEPreserveResInfo_HetAtom
                 | oechem.OEPreserveResInfo_InsertCode
+                | oechem.OEPreserveResInfo_AlternateLocation
         )
         oechem.OEPerceiveResidues(protein, preserved_info)
         oechem.OEPerceiveResidues(solvent, preserved_info)
@@ -1625,6 +1626,7 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEKLIFSKinaseApoFeaturizer):
                 | oechem.OEPreserveResInfo_ChainID
                 | oechem.OEPreserveResInfo_HetAtom
                 | oechem.OEPreserveResInfo_InsertCode
+                | oechem.OEPreserveResInfo_AlternateLocation
         )
         oechem.OEPerceiveResidues(kinase_domain, preserved_info)
         oechem.OEPerceiveResidues(solvent, preserved_info)

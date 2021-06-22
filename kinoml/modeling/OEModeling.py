@@ -1728,26 +1728,34 @@ def superpose_proteins(
 
 
 def update_residue_identifiers(
-        structure: oechem.OEGraphMol,
-        keep_protein_residue_ids: bool = True
-) -> oechem.OEGraphMol:
+        structure: oechem.OEMolBase,
+        keep_protein_residue_ids: bool = True,
+        keep_chain_ids: bool = False,
+) -> oechem.OEMolBase:
     """
-    Updates the atom, residue and chain ids of the given molecular structure. All residues become part of chain A. Atom
-    ids will start from 1. Residue will start from 1, except protein residue ids are fixed. This is especially useful,
-    if molecules were merged, which can result in overlapping atom and residue ids as well as separate chains.
+    Update the atom, residue and chain IDs of the given molecular structure. All residues become
+    part of chain A, unless 'keep_chain_ids' is set True. Atom IDs will start from 1. Residue IDs
+    will start from 1, except 'keep_protein_residue_ids' is set True. This is especially useful, if
+    molecules were merged, which can result in overlapping atom and residue IDs as well as
+    separate chains.
+
     Parameters
     ----------
-    structure: oechem.OEGraphMol
+    structure: oechem.OEMolBase
         The OpenEye molecule structure for updating atom and residue ids.
     keep_protein_residue_ids: bool
         If the protein residues should be kept.
+    keep_chain_ids: bool
+        If the chain IDS should be kept.
+
     Returns
     -------
-    structure: oechem.OEGraphMol
+    structure: oechem.OEMolBase
         The OpenEye molecule structure with updated atom and residue ids.
     """
     # update residue identifiers, except for residue number,
-    # residue names, atom names, chain id, record type and insert code
+    # residue names, atom names, chain id, record type, insert code,
+    # alternate location
     preserved_info = (
             oechem.OEPreserveResInfo_ResidueNumber
             | oechem.OEPreserveResInfo_ResidueName
@@ -1755,6 +1763,7 @@ def update_residue_identifiers(
             | oechem.OEPreserveResInfo_ChainID
             | oechem.OEPreserveResInfo_HetAtom
             | oechem.OEPreserveResInfo_InsertCode
+            | oechem.OEPreserveResInfo_AlternateLocation
     )
     oechem.OEPerceiveResidues(structure, preserved_info)
 
@@ -1776,7 +1785,8 @@ def update_residue_identifiers(
             # apply changes to each atom
             for atom in hv_residue.GetAtoms():
                 residue = oechem.OEAtomGetResidue(atom)
-                residue.SetChainID("A")
+                if not keep_chain_ids:
+                    residue.SetChainID("A")
                 residue.SetResidueNumber(residue_number)
                 oechem.OEAtomSetResidue(atom, residue)
 
@@ -1788,7 +1798,8 @@ def update_residue_identifiers(
             # apply changes to each atom
             for atom in hv_residue.GetAtoms():
                 residue = oechem.OEAtomGetResidue(atom)
-                residue.SetChainID("A")
+                if not keep_chain_ids:
+                    residue.SetChainID("A")
                 residue.SetResidueNumber(residue_number)
                 oechem.OEAtomSetResidue(atom, residue)
 
@@ -1800,7 +1811,8 @@ def update_residue_identifiers(
             # apply changes to each atom
             for atom in hv_residue.GetAtoms():
                 residue = oechem.OEAtomGetResidue(atom)
-                residue.SetChainID("A")
+                if not keep_chain_ids:
+                    residue.SetChainID("A")
                 residue.SetResidueNumber(residue_number)
                 oechem.OEAtomSetResidue(atom, residue)
 
@@ -1808,13 +1820,16 @@ def update_residue_identifiers(
     oechem.OEPDBOrderAtoms(structure)
 
     # update residue identifiers, except for residue number,
-    # residue names, atom names, chain id and record type
+    # residue names, atom names, chain id, record type, insert code,
+    # alternate location
     preserved_info = (
             oechem.OEPreserveResInfo_ResidueNumber
             | oechem.OEPreserveResInfo_ResidueName
             | oechem.OEPreserveResInfo_AtomName
             | oechem.OEPreserveResInfo_ChainID
             | oechem.OEPreserveResInfo_HetAtom
+            | oechem.OEPreserveResInfo_InsertCode
+            | oechem.OEPreserveResInfo_AlternateLocation
     )
     oechem.OEPerceiveResidues(structure, preserved_info)
 

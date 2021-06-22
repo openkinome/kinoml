@@ -39,6 +39,7 @@ from kinoml.modeling.OEModeling import (
     get_atom_coordinates,
     renumber_structure,
     superpose_proteins,
+    update_residue_identifiers,
 )
 
 
@@ -1088,3 +1089,87 @@ def test_superpose_protein(package_list, resource_list, residues, chain_id):
             superposed_protein_center = np.mean(get_atom_coordinates(superposed_protein))
             reference_protein_center = np.mean(get_atom_coordinates(reference_protein))
             assert np.linalg.norm(superposed_protein_center - reference_protein_center) < 1
+
+
+@pytest.mark.parametrize(
+    "package, resource, keep_protein_residue_ids, keep_chain_id, chain_ids, first_residue_id, last_residue_id",
+    [
+        (
+            "kinoml.data.proteins",
+            "4f8o.pdb",
+            True,
+            False,
+            ["A"],
+            1,
+            245,
+        ),
+        (
+            "kinoml.data.proteins",
+            "4f8o.pdb",
+            True,
+            True,
+            ["A", "B"],
+            1,
+            245,
+        ),
+        (
+            "kinoml.data.proteins",
+            "4f8o_edit.pdb",
+            True,
+            True,
+            ["A"],
+            1,
+            138,
+        ),
+        (
+            "kinoml.data.proteins",
+            "4f8o_edit.pdb",
+            False,
+            False,
+            ["A"],
+            1,
+            136,
+        ),
+        (
+            "kinoml.data.molecules",
+            "chloroform.sdf",
+            False,
+            False,
+            ["A"],
+            1,
+            1,
+        ),
+    ],
+)
+def test_update_residue_identifiers(
+        package,
+        resource,
+        keep_protein_residue_ids,
+        keep_chain_id,
+        chain_ids,
+        first_residue_id,
+        last_residue_id,
+):
+    """
+    Compare results to contain expected chains, to start with atom serial 1 and for correct residue ID handling.
+    """
+    from openeye import oechem
+
+    with resources.path(package, resource) as path:
+        structure = read_molecules(str(path))[0]
+        structure = update_residue_identifiers(
+            structure,
+            keep_protein_residue_ids=keep_protein_residue_ids,
+            keep_chain_ids=keep_chain_id
+        )
+        hierview = oechem.OEHierView(structure)
+        # check chain IDs
+        found_chain_ids = [chain.GetChainID() for chain in hierview.GetChains()]
+        assert set(found_chain_ids) == set(chain_ids)
+        # check atom numbering starts with one
+        atoms = structure.GetAtoms()
+        assert oechem.OEAtomGetResidue(atoms.next()).GetSerialNumber() == 1
+        # check max and min residue ID
+        residue_ids = [residue.GetResidueNumber() for residue in hierview.GetResidues()]
+        assert min(residue_ids) == first_residue_id
+        assert max(residue_ids) == last_residue_id
