@@ -4,7 +4,6 @@ Test OEModeling functionalities of `kinoml.modeling`
 from contextlib import contextmanager
 from importlib import resources
 import pytest
-import tempfile
 
 from bravado_core.exception import SwaggerMappingError
 
@@ -200,6 +199,8 @@ def test_read_electron_density(package, resource, expectation, n_grid_points):
 )
 def test_write_molecules(molecules, suffix, n_atoms_list):
     """Compare results to expected number of molecules and atoms in the written file."""
+    import tempfile
+
     def _count_molecules(path):
         with open(path) as rf:
             if path.split(".")[-1] == "sdf":
@@ -511,6 +512,11 @@ def test_prepare_structure(package, resource, has_ligand, chain_id, altloc, liga
 )
 def test_read_klifs_ligand(klifs_structure_id, expectation, n_atoms):
     """Compare results to expected number of atoms."""
+    import warnings
+
+    # filter benign warnings
+    warnings.filterwarnings("ignore", message="numpy.ufunc size changed")
+
     with expectation:
         molecule = read_klifs_ligand(klifs_structure_id)
         assert molecule.NumAtoms() == n_atoms
