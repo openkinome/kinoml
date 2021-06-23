@@ -599,12 +599,15 @@ class OEKLIFSKinaseApoFeaturizer(OEHybridDockingFeaturizer):
         logging.debug("Deleting expression tags ...")
         expression_tags = get_expression_tags(kinase_structure)
         for expression_tag in expression_tags:
-            prepared_kinase = delete_residue(
-                prepared_kinase,
-                chain_id=expression_tag["chain_id"],
-                residue_name=expression_tag["residue_name"],
-                residue_id=expression_tag["residue_id"]
-            )
+            try:
+                prepared_kinase = delete_residue(
+                    prepared_kinase,
+                    chain_id=expression_tag["chain_id"],
+                    residue_name=expression_tag["residue_name"],
+                    residue_id=expression_tag["residue_id"]
+                )
+            except ValueError:
+                pass  # wrong chain or not resolved
 
         logging.debug("Processing kinase domain ...")
         processed_kinase_domain = self._process_kinase_domain(
@@ -1124,12 +1127,15 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEKLIFSKinaseApoFeaturizer):
         logging.debug("Deleting expression tags ...")
         expression_tags = get_expression_tags(kinase_structure)
         for expression_tag in expression_tags:
-            prepared_kinase = delete_residue(
-                prepared_kinase,
-                chain_id=expression_tag["chain_id"],
-                residue_name=expression_tag["residue_name"],
-                residue_id=expression_tag["residue_id"]
-            )
+            try:
+                prepared_kinase = delete_residue(
+                    prepared_kinase,
+                    chain_id=expression_tag["chain_id"],
+                    residue_name=expression_tag["residue_name"],
+                    residue_id=expression_tag["residue_id"]
+                )
+            except ValueError:
+                pass  # wrong chain or not resolved
 
         logging.debug("Extracting ligand ...")
         split_options = oechem.OESplitMolComplexOptions()
@@ -1543,10 +1549,11 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEKLIFSKinaseApoFeaturizer):
         logging.debug("Selecting chain ...")
         ligand_template_structure = select_chain(ligand_template_structure, ligand_template["structure.chain"])
 
-        logging.debug("Selecting alternate location ...")
-        ligand_template_structure = select_altloc(
-            ligand_template_structure, ligand_template["structure.alternate_model"]
-        )
+        if ligand_template["structure.alternate_model"] != "-":
+            logging.debug("Selecting alternate location ...")
+            ligand_template_structure = select_altloc(
+                ligand_template_structure, ligand_template["structure.alternate_model"]
+            )
 
         logging.debug("Removing everything but protein, water and ligand of interest ...")
         ligand_template_structure = remove_non_protein(
