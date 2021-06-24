@@ -234,6 +234,7 @@ class OEHybridDockingFeaturizer(BaseFeaturizer):
                 | oechem.OEPreserveResInfo_ChainID
                 | oechem.OEPreserveResInfo_HetAtom
                 | oechem.OEPreserveResInfo_InsertCode
+                | oechem.OEPreserveResInfo_AlternateLocation
         )
         oechem.OEPerceiveResidues(protein, preserved_info)
         oechem.OEPerceiveResidues(solvent, preserved_info)
@@ -598,12 +599,15 @@ class OEKLIFSKinaseApoFeaturizer(OEHybridDockingFeaturizer):
         logging.debug("Deleting expression tags ...")
         expression_tags = get_expression_tags(kinase_structure)
         for expression_tag in expression_tags:
-            prepared_kinase = delete_residue(
-                prepared_kinase,
-                chain_id=expression_tag["chain_id"],
-                residue_name=expression_tag["residue_name"],
-                residue_id=expression_tag["residue_id"]
-            )
+            try:
+                prepared_kinase = delete_residue(
+                    prepared_kinase,
+                    chain_id=expression_tag["chain_id"],
+                    residue_name=expression_tag["residue_name"],
+                    residue_id=expression_tag["residue_id"]
+                )
+            except ValueError:
+                pass  # wrong chain or not resolved
 
         logging.debug("Processing kinase domain ...")
         processed_kinase_domain = self._process_kinase_domain(
@@ -678,18 +682,14 @@ class OEKLIFSKinaseApoFeaturizer(OEHybridDockingFeaturizer):
                 protein.klifs_kinase_id = structures["kinase.klifs_id"].iloc[0]
             # if KLIFS kinase ID is not given, query by UniProt ID
             if not hasattr(protein, "klifs_kinase_id"):
+                from ..databases.klifs import klifs_kinase_from_uniprot_id
                 logging.debug("Converting UniProt ID to KLIFS kinase ID ...")
-                kinase_ids = remote.kinases.all_kinases()["kinase.klifs_id"].to_list()
-                kinases = remote.kinases.by_kinase_klifs_id(kinase_ids)
-                protein.klifs_kinase_id = kinases[
-                    kinases["kinase.uniprot"] == protein.uniprot_id]["kinase.klifs_id"].iloc[0]
+                protein.klifs_kinase_id = klifs_kinase_from_uniprot_id(protein.uniprot_id)["kinase.klifs_id"]
             # if UniProt ID is not given, query by KLIFS kinase ID
             if not hasattr(protein, "uniprot_id"):
                 logging.debug("Converting KLIFS kinase ID to UniProt ID  ...")
-                kinase_ids = remote.kinases.all_kinases()["kinase.klifs_id"].to_list()
-                kinases = remote.kinases.by_kinase_klifs_id(kinase_ids)
-                protein.uniprot_id = kinases[
-                    kinases["kinase.klifs_id"] == protein.klifs_kinase_id]["kinase.uniprot"].iloc[0]
+                kinase = remote.kinases.by_kinase_klifs_id(protein.klifs_kinase_id).iloc[0]
+                protein.uniprot_id = kinase["kinase.uniprot"]
         else:
             raise NotImplementedError(
                 f"{self.__class__.__name__} requires a system with a protein having a 'klifs_kinase_id', " +
@@ -1053,7 +1053,7 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEKLIFSKinaseApoFeaturizer):
 
         from ..docking.OEDocking import create_hybrid_receptor, hybrid_docking
         from ..modeling.OEModeling import (
-            compare_molecules,
+            are_identical_molecules,
             read_smiles,
             get_expression_tags,
             delete_residue,
@@ -1127,12 +1127,15 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEKLIFSKinaseApoFeaturizer):
         logging.debug("Deleting expression tags ...")
         expression_tags = get_expression_tags(kinase_structure)
         for expression_tag in expression_tags:
-            prepared_kinase = delete_residue(
-                prepared_kinase,
-                chain_id=expression_tag["chain_id"],
-                residue_name=expression_tag["residue_name"],
-                residue_id=expression_tag["residue_id"]
-            )
+            try:
+                prepared_kinase = delete_residue(
+                    prepared_kinase,
+                    chain_id=expression_tag["chain_id"],
+                    residue_name=expression_tag["residue_name"],
+                    residue_id=expression_tag["residue_id"]
+                )
+            except ValueError:
+                pass  # wrong chain or not resolved
 
         logging.debug("Extracting ligand ...")
         split_options = oechem.OESplitMolComplexOptions()
@@ -1148,7 +1151,7 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEKLIFSKinaseApoFeaturizer):
 
         logging.debug("Checking for co-crystallized ligand ...")
         if (
-            compare_molecules(ligand, prepared_ligand_template)
+            are_identical_molecules(ligand, prepared_ligand_template)
             and ligand_template["structure.pdb_id"] == protein_template["structure.pdb_id"]
         ):
             logging.debug(f"Found co-crystallized ligand ...")
@@ -1321,7 +1324,7 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEKLIFSKinaseApoFeaturizer):
         """
         import json
 
-        from ..modeling.OEModeling import smiles_from_pdb
+        from ..databases.pdb import smiles_from_pdb
         from ..utils import LocalFileStorage
 
         logging.debug("Retrieving smiles information from PDB ...")
@@ -1371,11 +1374,11 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEKLIFSKinaseApoFeaturizer):
         : list of int
             The indices of matching SMILES strings.
         """
-        from ..modeling.OEModeling import read_smiles, compare_molecules
+        from ..modeling.OEModeling import read_smiles, are_identical_molecules
 
         identical_ligand_indices = []
         for i, complex_ligand in enumerate(smiles_iterable):
-            if compare_molecules(ligand, read_smiles(complex_ligand)):
+            if are_identical_molecules(ligand, read_smiles(complex_ligand)):
                 identical_ligand_indices.append(i)
 
         return identical_ligand_indices
@@ -1395,10 +1398,10 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEKLIFSKinaseApoFeaturizer):
         : pd.DataFrame
             The input DataFrame filtered for KLIFS entries with most similar ligands.
         """
-        from ..modeling.OEModeling import get_klifs_ligand, generate_reasonable_conformations, overlay_molecules
+        from ..modeling.OEModeling import read_klifs_ligand, generate_reasonable_conformations, overlay_molecules
 
         logging.debug("Retrieving resolved structures of orthosteric ligands ...")
-        complex_ligands = [get_klifs_ligand(structure_id) for structure_id in structures["structure.klifs_id"]]
+        complex_ligands = [read_klifs_ligand(structure_id) for structure_id in structures["structure.klifs_id"]]
 
         logging.debug("Generating reasonable conformations of ligand of interest ...")
         conformations_ensemble = generate_reasonable_conformations(ligand)
@@ -1407,7 +1410,7 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEKLIFSKinaseApoFeaturizer):
         overlay_scores = []
         for conformations in conformations_ensemble:
             overlay_scores += [
-                [i, overlay_molecules(complex_ligand, conformations, False)]
+                [i, overlay_molecules(complex_ligand, conformations)[0]]
                 for i, complex_ligand in enumerate(complex_ligands)
             ]
 
@@ -1496,7 +1499,7 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEKLIFSKinaseApoFeaturizer):
         : pd.DataFrame
             The input DataFrame filtered for KLIFS entries with most similar kinase pockets.
         """
-        from ..modeling.OEModeling import sequence_similarity
+        from ..modeling.alignment import sequence_similarity
 
         logging.debug("Calculating string similarity between KLIFS pockets ...")
         pocket_similarities = [sequence_similarity(structure_pocket, reference_pocket) for structure_pocket in
@@ -1546,10 +1549,11 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEKLIFSKinaseApoFeaturizer):
         logging.debug("Selecting chain ...")
         ligand_template_structure = select_chain(ligand_template_structure, ligand_template["structure.chain"])
 
-        logging.debug("Selecting alternate location ...")
-        ligand_template_structure = select_altloc(
-            ligand_template_structure, ligand_template["structure.alternate_model"]
-        )
+        if ligand_template["structure.alternate_model"] != "-":
+            logging.debug("Selecting alternate location ...")
+            ligand_template_structure = select_altloc(
+                ligand_template_structure, ligand_template["structure.alternate_model"]
+            )
 
         logging.debug("Removing everything but protein, water and ligand of interest ...")
         ligand_template_structure = remove_non_protein(
@@ -1629,6 +1633,7 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEKLIFSKinaseApoFeaturizer):
                 | oechem.OEPreserveResInfo_ChainID
                 | oechem.OEPreserveResInfo_HetAtom
                 | oechem.OEPreserveResInfo_InsertCode
+                | oechem.OEPreserveResInfo_AlternateLocation
         )
         oechem.OEPerceiveResidues(kinase_domain, preserved_info)
         oechem.OEPerceiveResidues(solvent, preserved_info)

@@ -5,6 +5,7 @@ from __future__ import annotations
 from functools import lru_cache
 
 import numpy as np
+from rdkit import Chem
 
 from .core import BaseFeaturizer, BaseOneHotEncodingFeaturizer
 from ..core.systems import System
@@ -60,14 +61,14 @@ ALL_ATOMIC_SYMBOLS = [
 SIZE_OF_RING = [3, 4, 5, 6, 7, 8, 9, 10]
 
 HYBRIZIDATION_TYPES = [
-    rdkit.Chem.rdchem.HybridizationType.OTHER, # OTHER
-    rdkit.Chem.rdchem.HybridizationType.S, # S
-    rdkit.Chem.rdchem.HybridizationType.SP, # SP
-    rdkit.Chem.rdchem.HybridizationType.SP2, # SP2
-    rdkit.Chem.rdchem.HybridizationType.SP3, # SP2
-    rdkit.Chem.rdchem.HybridizationType.SP3D, # SP3D
-    rdkit.Chem.rdchem.HybridizationType.SP3D2, # SP3D2
-    rdkit.Chem.rdchem.HybridizationType.UNSPECIFIED # UNSPECIFIED
+    Chem.rdchem.HybridizationType.OTHER, # OTHER
+    Chem.rdchem.HybridizationType.S, # S
+    Chem.rdchem.HybridizationType.SP, # SP
+    Chem.rdchem.HybridizationType.SP2, # SP2
+    Chem.rdchem.HybridizationType.SP3, # SP2
+    Chem.rdchem.HybridizationType.SP3D, # SP3D
+    Chem.rdchem.HybridizationType.SP3D2, # SP3D2
+    Chem.rdchem.HybridizationType.UNSPECIFIED # UNSPECIFIED
 ]
 
 class SingleLigandFeaturizer(BaseFeaturizer):
