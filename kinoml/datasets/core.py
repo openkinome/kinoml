@@ -14,6 +14,7 @@ import os
 import numpy as np
 import pandas as pd
 from tqdm.auto import tqdm
+import awkward as ak
 
 from ..core.measurements import BaseMeasurement
 from ..features.core import BaseFeaturizer
@@ -177,11 +178,15 @@ class DatasetProvider(BaseDatasetProvider):
             )
         return systems
 
-    def featurized_systems(self, key="last"):
+    def featurized_systems(self, key="last", clear_after=False):
         """
         Return the ``key`` featurized objects from all systems.
         """
-        return tuple(ms.system.featurizations[key] for ms in self.measurements)
+        results = tuple(ms.system.featurizations[key] for ms in self.measurements)
+        if clear_after:
+            for s in self.systems:
+                s.featurizations.clear()
+        return results
 
     def _to_dataset(self, style="pytorch"):
         """
@@ -268,7 +273,7 @@ class DatasetProvider(BaseDatasetProvider):
         Export dataset to a tuple of two Numpy arrays of same shape:
 
         * ``X``: the featurized systems
-        * ``y``: the measurements values
+        * ``y``: the measurements values (must be the same measurement type)
 
         Parameters
         ----------
@@ -301,7 +306,9 @@ class DatasetProvider(BaseDatasetProvider):
         ), f"# of X ({X.shape[0]}) and y ({y.shape[0]}) do not match!"
         return X, y
 
-    def to_dict_of_arrays(self, featurization_key="last", y_dtype="float32") -> dict:
+    def to_dict_of_arrays(
+        self, featurization_key="last", y_dtype="float32", _initial_system_index=0
+    ) -> dict:
         """
         Export dataset to a dict-like object, compatible
         with ``DictOfArrays`` and NPZ files.
@@ -320,6 +327,8 @@ class DatasetProvider(BaseDatasetProvider):
             Which key to access in each ``System.featurizations`` dict
         y_dtype : np.dtype or str, optional="float32"
             Which kind of dtype to use for the ``y`` array
+        _initial_system_index : int, optional=0
+            PRIVATE. Start counting systems in ``X_s{int}`` with this value.
 
         Returns
         -------
@@ -332,10 +341,18 @@ class DatasetProvider(BaseDatasetProvider):
                -> ``X, y``
 
             2. All N systems are featurized as an array but they do NOT share the same shape
-               -> ``X_s0, X_s1, ..., X_sN``
+               -> ``X_s0_, X_s1_, ..., X_sN_``
 
             3. All N systems are featurized as a M-tuple of arrays (shape irrelevant)
-               -> ``X_s0_a0, X_s0_a1, X_s1_a0, X_s1_a1, ..., X_sN_aM``
+               -> ``X_s0_a0_, X_s0_a1_, X_s1_a0_, X_s1_a1_, ..., X_sN_aM_``
+
+
+        Note
+        ----
+        The X keys have a trailing underscore on purpose. Otherwise, filtering
+        keys out of the dictionary by index can be deceivingly slow. For example,
+        filtering for the first system (s1) with ``key.startswith("X_s1")`` will
+        also select for X_s1, X_s10, X_s11... Hence, we filter with ``X_s{int}_``.
         """
         featurized = self.featurized_systems(key=featurization_key)
         nsystems = len(featurized)
@@ -352,14 +369,14 @@ class DatasetProvider(BaseDatasetProvider):
                 dict_of_arrays["X"] = np.asarray(featurized)
             else:
                 # each system might have different shapes, we need separate X
-                for i, feature in enumerate(featurized):
-                    key = f"X_s{i}"
+                for i, feature in enumerate(featurized, start=_initial_system_index):
+                    key = f"X_s{i}_"
                     dict_of_arrays[key] = feature
         elif isinstance(featurized[0], (list, tuple)) and isinstance(featurized[0][0], np.ndarray):
             # each system has a list of arrays
-            for i, system in enumerate(featurized):
+            for i, system in enumerate(featurized, start=_initial_system_index):
                 for j, feature in enumerate(system):
-                    key = f"X_s{i}_a{j}"
+                    key = f"X_s{i}_a{j}_"
                     dict_of_arrays[key] = feature
         else:
             raise ValueError(
@@ -372,6 +389,40 @@ class DatasetProvider(BaseDatasetProvider):
         dict_of_arrays["y"] = y
 
         return dict_of_arrays
+
+    def to_awkward(
+        self,
+        featurization_key="last",
+        y_dtype="float32",
+        clear_after=False,
+    ):
+        """
+        Creates an awkward array out of the featurized systems
+        and the associated measurements.
+
+        Returns
+        -------
+        awkward array
+
+        Notes
+        -----
+        Awkward Array is a library for nested, variable-sized data,
+        including arbitrary-length lists, records, mixed types,
+        and missing data, using NumPy-like idioms.
+
+        Arrays are dynamically typed, but operations on
+        them are compiled and fast. Their behavior coincides
+        with NumPy when array dimensions are regular
+        and generalizes when they’re not.
+        """
+        features = self.featurized_systems(key=featurization_key, clear_after=clear_after)
+
+        # Features is a list of systems (s) and their features (f): [(s0f0, s0f1), (s1f0, s1f1)...]
+        # We are going to iterate over columns: (s0f0, s1f0... snf0), (s0f1, s1f1, ..., snf1)
+        # The result is that X will contain the an array of f0, then an array for f1... etc.
+        X = [ak.from_iter(subX) for subX in zip(*features)]
+        y = ak.from_numpy(self.measurements_as_array(dtype=y_dtype))
+        return X, y
 
     def observation_model(self, **kwargs):
         """
@@ -584,6 +635,37 @@ class MultiDatasetProvider(DatasetProvider):
         method. Check ``DatasetProvider.to_xgboost`` docstring for more details.
         """
         return [p.to_xgboost(**kwargs) for p in self.providers]
+
+    def to_dict_of_arrays(self, **kwargs) -> dict:
+        """
+        Will generate a dictionary of str: np.ndarray. System indices
+        will be accumulated.
+        """
+        all_arrays = {}
+        system_index = 0
+        for p in self.providers:
+            arrays = p.to_dict_of_arrays(_initial_system_index=system_index, **kwargs)
+            system_index += len(p)
+            for key, arr in arrays.items():
+                if key in all_arrays:
+                    all_arrays[key] = np.concatenate([all_arrays[key], arr])
+                else:
+                    all_arrays[key] = arr
+        return all_arrays
+
+    def to_awkward(self, **kwargs):
+        """
+        See ``DatasetProvider.to_awkward()``. ``X`` and ``y`` will
+        be concatenated along axis=0 (one provider after another)
+        """
+        all_X = []
+        all_y = []
+        for p in self.providers:
+            X, y = p.to_awkward(**kwargs)
+            all_X.append(X)
+            all_y.append(y)
+
+        return ak.concatenate(all_X), ak.concatenate(all_y)
 
     def __repr__(self) -> str:
         measurements = []
