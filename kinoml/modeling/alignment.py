@@ -6,9 +6,7 @@ from typing import Union
 class Alignment:
     """Alignment representation of protein sequences"""
 
-    def __init__(
-        self, metadata=None, alignment=None, alignment_file_path=None, *args, **kwargs
-    ):
+    def __init__(self, metadata=None, alignment=None, alignment_file_path=None, *args, **kwargs):
 
         from appdirs import user_cache_dir
 
@@ -22,6 +20,8 @@ class Alignment:
     def get_alignment(cls, seq1: str, seq2: str, local: bool = True):
         """
         Generate an alignment between two sequences
+
+        Parameters
         ----------
         seq1: str
             The first sequence to be aligned
@@ -33,6 +33,7 @@ class Alignment:
             otherwise a local alignment is performed
             (based on the Smith–Waterman algorithm).
             (Default: True)
+
         Returns
         -------
         Alignment
@@ -110,6 +111,8 @@ class Alignment:
     ):
         """
         Generate an alignment file in MODELLER format
+
+        Parameters
         ----------
         aligned_template_seq: str
             The aligned template sequence
@@ -122,8 +125,6 @@ class Alignment:
         ligand: bool
             Specify whether to retain a ligand in the alignment.
             (Default: False)
-        Returns
-        -------
         """
 
         # Convert None entries into dashes

@@ -3,12 +3,12 @@ Featurizers that mostly concern protein-based models
 """
 from __future__ import annotations
 import numpy as np
-from functools import lru_cache
 from collections import Counter
+from typing import Iterable
 
 from .core import BaseFeaturizer, BaseOneHotEncodingFeaturizer
 from ..core.systems import System
-from ..core.proteins import BaseProtein, AminoAcidSequence
+from ..core.proteins import AminoAcidSequence
 
 
 class AminoAcidCompositionFeaturizer(BaseFeaturizer):
@@ -23,17 +23,26 @@ class AminoAcidCompositionFeaturizer(BaseFeaturizer):
     for k in _counter.keys():
         _counter[k] = 0
 
-    def _featurize(self, system: System) -> np.array:
+    def _featurize_one(self, system: System, options: dict) -> np.array:
         """
         Featurizes a protein using the residue count in the sequence
 
-        Returns:
+        Parameters
+        ----------
+        system: System
+            The System to be featurized. Sometimes it will
+        options : dict
+            Unused
+
+        Returns
+        -------
+        list of array
             The count of amino acid in the binding site.
         """
         count = self._counter.copy()
         count.update(system.protein.sequence)
         sorted_count = sorted(count.items(), key=lambda kv: kv[0])
-        return np.array([number for aminoacid, number in sorted_count])
+        return np.array([number for _, number in sorted_count])
 
 
 class OneHotEncodedSequenceFeaturizer(BaseOneHotEncodingFeaturizer):

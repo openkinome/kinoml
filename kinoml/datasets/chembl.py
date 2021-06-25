@@ -1,93 +1,62 @@
 """
 Creates DatasetProvider objects from ChEMBL activity data
 """
-from urllib.request import urlopen
-import shutil
 import random
-from tempfile import TemporaryDirectory
-from zipfile import ZipFile
-from pathlib import Path
+
 
 import pandas as pd
 from tqdm.auto import tqdm
 
-from .core import MultiDatasetProvider, ProteinLigandDatasetProvider
+from .core import MultiDatasetProvider
 from ..core.conditions import AssayConditions
 from ..core.proteins import AminoAcidSequence
 from ..core.ligands import SmilesLigand
 from ..core.systems import ProteinLigandComplex
 from ..core.measurements import pIC50Measurement, pKiMeasurement, pKdMeasurement
-from ..utils import APPDIR
 
 
 class ChEMBLDatasetProvider(MultiDatasetProvider):
 
     """
-    This provider relies heavily on `openkinome/datascripts` data ingestion
-    pipelines. It will load ChEMBL activities from its Releases page
+    This provider relies heavily on ``openkinome/kinodata`` data ingestion
+    pipelines. It will load ChEMBL activities from its Releases page.
     """
 
     @classmethod
     def from_source(
         cls,
-        filename="https://github.com/openkinome/datascripts/releases/download/v0.1/activities-chembl27.zip",
-        measurement_types=("IC50", "Ki", "Kd"),
+        path_or_url="https://github.com/openkinome/datascripts/releases/download/v0.2/activities-chembl28_v0.2.zip",
+        measurement_types=("pIC50", "pKi", "pKd"),
         sample=None,
-        **kwargs,
     ):
         """
         Create a MultiDatasetProvider out of the raw data contained in the zip file
 
-        Parameters:
-            filename: URL to a zipped CSV file containing activities from ChEMBL,
-                using schema detailed below.
+        Parameters
+        ----------
+        path_or_url : str, optional
+            path or URL to a (zipped) CSV file containing activities from ChEMBL,
+            using schema detailed below.
+        measurement_types : tuple of str, optional
+            Which measurement types must be imported from the CSV. By default, all
+            three (pIC50, pKi, pKd) will be loaded, but you can choose a subset (
+            e.g. ``("pIC50",)``).
+        sample : int, optional=None
+            If set to larger than zero, load only N data points from the dataset.
 
-        !!! note
-            - ChEMBL aggregates data from lots of sources, so conditions are guaranteed
-              to be different across experiments.
+        Note
+        ----
+        ChEMBL aggregates data from lots of sources, so conditions are guaranteed
+        to be different across experiments.
 
-        !!! todo
-            - Versioning for different openkinome/datascripts releases
         """
-        csv_filename = "activities-chembl27.csv"
-        cached_path = Path(APPDIR.user_cache_dir) / "chembl" / csv_filename
-        if not cached_path.is_file():
-            # Download zipped CSV and load it with pandas
-            with urlopen(filename) as response, TemporaryDirectory() as tmpdir:
-                tmpzip = Path(tmpdir) / "chembl.zip"
-                with open(tmpzip, "wb") as f:
-                    shutil.copyfileobj(response, f)
-                with ZipFile(tmpzip) as zf:
-                    zf.extractall(tmpdir)
-                cached_path.parent.mkdir(parents=True, exist_ok=True)
-                shutil.copyfile(Path(tmpdir) / csv_filename, cached_path)
-
+        cached_path = cls._download_to_cache_or_retrieve(path_or_url)
         df = pd.read_csv(cached_path)
 
-        # Filter out extremely large or small values
-        # FIXME: Consider dynamic range of each assay instead of filtering out
-        # add a new column with -log10 of the activities
-        activities = df["activities.standard_value"]
-        df = df[(1e6 >= activities) & (activities > 1e-6)]
-
-        # we also convert nM to M by multiplying times 1E-9
-        df = df.assign(p_activities=-pd.np.log10(df["activities.standard_value"] * 1e-9))
-
-        # drop NAs _and_ infinities
-        with pd.option_context("mode.use_inf_as_na", True):
-            df = df.dropna(
-                subset=[
-                    "compound_structures.canonical_smiles",
-                    "activities.standard_value",
-                    "p_activities",
-                ]
-            )
-            # DROP outside range [1e-6, 1E6]
-
         measurement_type_classes = {
-            "IC50": pIC50Measurement,
-            "Ki": pKiMeasurement,
-            "Kd": pKdMeasurement,
+            "pIC50": pIC50Measurement,
+            "pKi": pKiMeasurement,
+            "pKd": pKdMeasurement,
         }
         measurements = []
         systems = {}
@@ -127,11 +96,11 @@ class ChEMBLDatasetProvider(MultiDatasetProvider):
                     "unit": f"-log10({row['activities.standard_units']}E-9)",
                     "confidence": row["assays.confidence_score"],
                     "chembl_activity": row["activities.activity_id"],
-                    "chembl_document": row["docs.doc_id"],
+                    "chembl_document": row["docs.chembl_id"],
                     "year": row["docs.year"],
                 }
                 measurement = MeasurementType(
-                    values=row["p_activities"],
+                    values=row["activities.standard_value"],
                     system=system,
                     conditions=conditions,
                     metadata=metadata,
@@ -141,4 +110,11 @@ class ChEMBLDatasetProvider(MultiDatasetProvider):
                 print("Couldn't process record", row)
                 print("Exception:", exc)
 
-        return cls(measurements)
+        return cls(
+            measurements,
+            metadata={
+                "path_or_url": path_or_url,
+                "measurement_types": measurement_types,
+                "sample": sample,
+            },
+        )

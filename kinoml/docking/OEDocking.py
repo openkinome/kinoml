@@ -4,16 +4,18 @@ from openeye import oechem
 
 
 def create_hybrid_receptor(
-    protein: oechem.OEGraphMol, ligand: oechem.OEGraphMol
+    protein: oechem.OEMolBase, ligand: oechem.OEMolBase
 ) -> oechem.OEGraphMol:
     """
     Create a receptor for hybrid docking.
+
     Parameters
     ----------
-    protein: oechem.OEGraphMol
+    protein: oechem.OEMolBase
         An OpenEye molecule holding a prepared protein structure.
-    ligand: oechem.OEGraphMol
+    ligand: oechem.OEMolBase
         An OpenEye molecule holding a prepared ligand structure.
+
     Returns
     -------
     receptor: oechem.OEGraphMol
@@ -29,16 +31,17 @@ def create_hybrid_receptor(
 
 
 def create_hint_receptor(
-    protein: oechem.OEGraphMol,
+    protein: oechem.OEMolBase,
     hintx: Union[float, int],
     hinty: Union[float, int],
     hintz: Union[float, int],
 ) -> oechem.OEGraphMol:
     """
     Create a hint receptor for docking.
+
     Parameters
     ----------
-    protein: oechem.OEGraphMol
+    protein: oechem.OEMolBase
         An OpenEye molecule holding a prepared protein structure.
     hintx: float or int
         A number defining the hint x coordinate.
@@ -46,6 +49,7 @@ def create_hint_receptor(
         A number defining the hint y coordinate.
     hintz: float or int
         A number defining the hint z coordinate.
+
     Returns
     -------
     receptor: oechem.OEGraphMol
@@ -61,16 +65,18 @@ def create_hint_receptor(
 
 
 def resids_to_box(
-    protein: oechem.OEGraphMol, resids: List[int]
+    protein: oechem.OEMolBase, resids: List[int]
 ) -> Tuple[float, float, float, float, float, float]:
     """
     Retrieve box dimensions of a list if residues.
+
     Parameters
     ----------
-    protein: oechem.OEGraphMol
+    protein: oechem.OEMolBase
         An OpenEye molecule holding a protein structure.
     resids: list of int
         A list of resids defining the residues of interest.
+
     Returns
     -------
     box_dimensions: tuple of float
@@ -102,17 +108,19 @@ def resids_to_box(
 
 
 def create_box_receptor(
-    protein: oechem.OEGraphMol,
+    protein: oechem.OEMolBase,
     box_dimensions: Tuple[float, float, float, float, float, float],
 ) -> oechem.OEGraphMol:
     """
     Create a box receptor for docking.
+
     Parameters
     ----------
-    protein: oechem.OEGraphMol
+    protein: oechem.OEMolBase
         An OpenEye molecule holding a prepared protein structure.
     box_dimensions: tuple of float
         The box dimensions in the order of xmax, ymax, zmax, xmin, ymin, zmin.
+
     Returns
     -------
     receptor: oechem.OEGraphMol
@@ -129,16 +137,18 @@ def create_box_receptor(
 
 
 def pose_molecules(
-    receptor: oechem.OEGraphMol, molecules: List[oechem.OEGraphMol]
+    receptor: oechem.OEMolBase, molecules: List[oechem.OEMolBase]
 ) -> Union[List[oechem.OEGraphMol], None]:
     """
     Generate a binding pose of molecules in a prepared receptor with OpenEye's Posit method.
+
     Parameters
     ----------
-    receptor: oechem.OEGraphMol
+    receptor: oechem.OEMolBase
         An OpenEye molecule holding the prepared receptor.
-    molecules: list of oechem.OEGraphMol
+    molecules: list of oechem.OEMolBase
         A list of OpenEye molecules holding prepared molecules for docking.
+
     Returns
     -------
     posed_molecules: list of oechem.OEGraphMol or None
@@ -198,13 +208,14 @@ def pose_molecules(
 
 
 def _run_docking(
-    receptor: oechem.OEGraphMol,
-    molecules: List[oechem.OEGraphMol],
+    receptor: oechem.OEMolBase,
+    molecules: List[oechem.OEMolBase],
     dock_method: int,
     num_poses: int = 1,
 ) -> Union[List[oechem.OEGraphMol], None]:
     """
     Dock molecules into a prepared receptor.
+
     Parameters
     ----------
     receptor: oechem.OEGraphMol
@@ -215,6 +226,7 @@ def _run_docking(
         Constant defining the docking method.
     num_poses: int
         Number of docking poses to generate per molecule.
+
     Returns
     -------
     docked_molecules: list of oechem.OEGraphMol or None
@@ -246,9 +258,7 @@ def _run_docking(
             docked_mol = oechem.OEMol()
 
             # dock molecule
-            return_code = dock.DockMultiConformerMolecule(
-                docked_mol, conformations, num_poses
-            )
+            return_code = dock.DockMultiConformerMolecule(docked_mol, conformations, num_poses)
             if return_code != oedocking.OEDockingReturnCode_Success:
                 # TODO: Maybe something for logging
                 print(
@@ -278,20 +288,22 @@ def _run_docking(
 
 
 def hybrid_docking(
-    hybrid_receptor: oechem.OEGraphMol,
-    molecules: List[oechem.OEGraphMol],
+    hybrid_receptor: oechem.OEMolBase,
+    molecules: List[oechem.OEMolBase],
     num_poses: int = 1,
 ) -> Union[List[oechem.OEGraphMol], None]:
     """
     Dock molecules into a prepared receptor holding protein and ligand structure.
+
     Parameters
     ----------
-    hybrid_receptor: oechem.OEGraphMol
+    hybrid_receptor: oechem.OEMolBase
         An OpenEye molecule holding the prepared receptor.
-    molecules: list of oechem.OEGraphMol
+    molecules: list of oechem.OEMolBase
         A list of OpenEye molecules holding prepared molecules for docking.
     num_poses: int
         Number of docking poses to generate per molecule.
+
     Returns
     -------
     docked_molecules: list of oechem.OEGraphMol or None
@@ -306,18 +318,20 @@ def hybrid_docking(
 
 
 def chemgauss_docking(
-    receptor: oechem.OEGraphMol, molecules: List[oechem.OEGraphMol], num_poses: int = 1
+    receptor: oechem.OEMolBase, molecules: List[oechem.OEMolBase], num_poses: int = 1
 ) -> Union[List[oechem.OEGraphMol], None]:
     """
     Dock molecules into a prepared receptor holding a protein structure.
+
     Parameters
     ----------
-    receptor: oechem.OEGraphMol
+    receptor: oechem.OEMolBase
         An OpenEye molecule holding the prepared hint or box receptor.
-    molecules: list of oechem.OEGraphMol
+    molecules: list of oechem.OEMolBase
         A list of OpenEye molecules holding prepared molecules for docking.
     num_poses: int
         Number of docking poses to generate per molecule.
+
     Returns
     -------
     docked_molecules: list of oechem.OEGraphMol or None

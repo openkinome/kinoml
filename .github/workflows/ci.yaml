@@ -15,23 +15,28 @@ on:
 
 jobs:
   test:
-    runs-on: ${{ matrix.cfg.os }}
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        cfg:
-
-          - os: ubuntu-latest
+        include:
+          - name: Linux, Python 3.7
+            os: ubuntu-latest
             python-version: "3.7"
+            conda-installer: https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-Linux-x86_64.sh
 
-          - os: ubuntu-latest
-            python-version: "3.8"
+          # OpenEye toolkit is not yet available on Py39
+          # - name: Linux, Python 3.9
+          #   os: ubuntu-latest
+          #   python-version: "3.9"
+          #   conda-installer: https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-Linux-x86_64.sh
 
-          - os: ubuntu-latest
-            python-version: "3.9"
-
-          - os: macOS-latest
+          - name: MacOS, Python 3.7
+            os: macOS-latest
             python-version: "3.7"
+            conda-installer: https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-MacOSX-x86_64.sh
+
 
     env:
       OE_LICENSE: ${{ github.workspace }}/oe_license.txt
@@ -42,11 +47,13 @@ jobs:
 
       - uses: conda-incubator/setup-miniconda@v2
         with:
-          python-version: ${{ matrix.cfg.python-version }}
+          installer-url: ${{ matrix.conda-installer }}
+          python-version: ${{ matrix.python-version }}
           activate-environment: test
           channel-priority: true
           environment-file: devtools/conda-envs/test_env.yaml
           auto-activate-base: false
+          use-mamba: true
 
       - name: Additional info about the build
         shell: bash
@@ -60,6 +67,7 @@ jobs:
         run: |
           conda info --all
           conda list
+          mamba --version
 
       - name: Decrypt and check OE license
         shell: bash -l {0}
@@ -81,6 +89,7 @@ jobs:
 
       - name: CodeCov
         uses: codecov/codecov-action@v1
+        if: always()
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           file: ./coverage.xml
@@ -88,6 +97,7 @@ jobs:
           yml: ./.codecov.yml
 
   lint-format:
+    name: Lint & format checks
     runs-on: ubuntu-18.04
 
     steps:
@@ -95,11 +105,13 @@ jobs:
 
       - uses: conda-incubator/setup-miniconda@v2
         with:
+          installer-url: https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-Linux-x86_64.sh
           python-version: "3.7"
           activate-environment: test
           channel-priority: true
           environment-file: devtools/conda-envs/test_env.yaml
           auto-activate-base: false
+          use-mamba: true
 
       - name: Additional info about the build
         shell: bash
@@ -117,7 +129,7 @@ jobs:
       - name: Install linter / formatter
         shell: bash -l {0}
         run: |
-          conda install pylint black
+          mamba install pylint black
 
       - name: Install package
         shell: bash -l {0}
@@ -136,18 +148,23 @@ jobs:
           black --check -l 99 kinoml/ --exclude kinoml/_version.py
 
   mkdocs:
+    name: Docs
     runs-on: ubuntu-18.04
 
     steps:
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
 
       - uses: conda-incubator/setup-miniconda@v2
         with:
+          installer-url: https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-Linux-x86_64.sh
           python-version: "3.7"
           activate-environment: test
           channel-priority: true
           environment-file: devtools/conda-envs/test_env.yaml
           auto-activate-base: false
+          use-mamba: true
 
       - name: Additional info about the build
         shell: bash
@@ -168,18 +185,15 @@ jobs:
           python -m pip install --no-deps .
 
       - name: Build docs
-        shell: bash
+        shell: bash -l {0}
         run: |
-          # Required to load docstrings sample module inside docs/
-          export PYTHONPATH=$(pwd)
-          mkdocs build
+          cd docs
+          make clean
+          SPHINXOPTS="-W -T --keep-going" make html
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./site
-        # We want to test docs building in PR, but we we
-        # will only deploy if we are on / have merged to master
-        # Whitelist api for PR #8
-        if: github.ref == 'master' || github.head_ref == 'api'
+          publish_dir: ./docs/_build/html
+        if: github.ref == 'refs/heads/master'

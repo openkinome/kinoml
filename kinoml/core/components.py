@@ -1,8 +1,15 @@
+"""
+Base classes for all MolecularComponents.
+
+One or more components can form a System.
+Proteins, ligands, and other molecular entities are
+derived the base class ``MolecularComponent``.
+"""
+
+
 class MolecularComponent:
     """
-    Abstract base molecular entity. Several components
-    can form a System. Proteins, ligands, and other
-    molecular entities are derived from this class.
+    Abstract base molecular entity.
     """
 
     def __init__(self, name="", metadata=None, *args, **kwargs):
@@ -16,6 +23,15 @@ class MolecularComponent:
 
 
 class BaseStructure(MolecularComponent):
+    """
+    Draft class meant to contain 3D structures
+    or trajectories of (macro)molecules. Wraps MDAnalysis'
+    ``Universe`` objects.
+
+    Parameters
+    ----------
+    universe : MDAnalysis.Universe
+    """
 
     def __init__(self, universe, *args, **kwargs):
         super().__init__(self, *args, **kwargs)
@@ -23,10 +39,12 @@ class BaseStructure(MolecularComponent):
 
 
 class BaseLigand(MolecularComponent):
-    pass
+    """
+    Base class for all ligand-like entities.
+    """
 
 
 class BaseProtein(MolecularComponent):
-    pass
-
-
+    """
+    Base class for all protein-like entities.
+    """

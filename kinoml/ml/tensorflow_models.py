@@ -1,23 +1,25 @@
 """
 Example models for TensorFlow
 
-!!! Note: This code is not currently in use.
+.. note::
+
+    This code is not currently in use.
 """
 
-import tensorflow as tf
-from tensorflow.keras import Model
-from tensorflow.keras.layers import Dense, Flatten
+import tensorflow as tf  # pylint: disable=import-error
 
 
 def DNN(input_dim):
     """
     DNN builds and compiles a TF model (a Deep Neural Network) that takes as input 'input_dim'
+
     Parameters
-    ==========
+    ----------
     input_dim : tuple of int
         Expected shape of the input data
+
     Returns
-    =======
+    -------
     model : tf.keras.models.Sequential
     """
     model = tf.keras.models.Sequential(
