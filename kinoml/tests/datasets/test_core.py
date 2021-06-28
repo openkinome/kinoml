@@ -105,7 +105,7 @@ def test_datasetprovider_exporter_single_tensor_different_shapes():
 
     arrays = dataset.to_dict_of_arrays()
     X_keys = [k for k in arrays.keys() if k.startswith("X")]
-    assert sorted(X_keys) == ["X_s0", "X_s1"]
+    assert sorted(X_keys) == ["X_s0_", "X_s1_"]
     for X_key, smi in zip(X_keys, smiles):
         assert arrays[X_key].shape == (53, len(smi))
 
