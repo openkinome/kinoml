@@ -708,7 +708,13 @@ class HashFeaturizer(BaseFeaturizer):
 
 
 class NullFeaturizer(BaseFeaturizer):
-    def _featurize(self, systems: Iterable[System], processes=1, chunksize=None) -> object:
+    def _featurize(
+            self,
+            systems: Iterable[System],
+            processes=1,
+            chunksize=None,
+            keep: bool = None,
+    ) -> object:
         return systems
 
 
