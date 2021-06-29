@@ -105,7 +105,7 @@ def test_datasetprovider_exporter_single_tensor_different_shapes():
 
     arrays = dataset.to_dict_of_arrays()
     X_keys = [k for k in arrays.keys() if k.startswith("X")]
-    assert sorted(X_keys) == ["X_s0", "X_s1"]
+    assert sorted(X_keys) == ["X_s0_", "X_s1_"]
     for X_key, smi in zip(X_keys, smiles):
         assert arrays[X_key].shape == (53, len(smi))
 
@@ -144,9 +144,9 @@ def test_datasetprovider_exporter_multiple_subtensors():
 
     arrays = dataset.to_dict_of_arrays()
     X_keys = [k for k in arrays.keys() if k.startswith("X")]
-    assert sorted(X_keys) == ["X_s0_a0", "X_s0_a1", "X_s1_a0", "X_s1_a1"]
-    assert arrays["X_s0_a0"].shape[0] == 512
-    assert arrays["X_s0_a1"].shape[0] == 1024
+    assert sorted(X_keys) == ["X_s0_a0_", "X_s0_a1_", "X_s1_a0_", "X_s1_a1_"]
+    assert arrays["X_s0_a0_"].shape[0] == 512
+    assert arrays["X_s0_a1_"].shape[0] == 1024
 
 
 def test_datasetprovider_awkward_exporter_single_tensor_same_shape():
