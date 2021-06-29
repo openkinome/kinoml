@@ -15,10 +15,12 @@ dependencies:
   - tqdm
   - openff-toolkit >=0.9
   - xgboost
-  - openeye-toolkits >=2020
+  - openeye-toolkits >=2020.2.0
   - modeller
   - biotite
   - watermark
+  - bravado
+  - biopandas
   - awkward
   - pyarrow
 
@@ -47,7 +49,9 @@ dependencies:
       - pytorch-lightning
       # PyTorch trees
       - https://github.com/ValentinFigue/Sklearn_PyTorch/archive/1b56a43e41de331ecdf73d08418f75bb34c9fa06.tar.gz
-      - https://github.com/volkamerlab/klifs_utils/archive/master.tar.gz
+      # OpenCADD
+      - https://github.com/volkamerlab/opencadd/archive/master.tar.gz
+      # ProDy
       - prody==1.10.11
       # Docs
       # core

@@ -1,0 +1,10 @@
+HETATM    1  C1  UNL     1       0.000   0.000   0.000  1.00 20.00           C
+HETATM    2 CL2  UNL     1       0.000   0.000   0.000  1.00 20.00          CL
+HETATM    3 CL3  UNL     1       0.000   0.000   0.000  1.00 20.00          CL
+HETATM    4 CL4  UNL     1       0.000   0.000   0.000  1.00 20.00          CL
+TER       5      UNL     1 
+CONECT    1    2    3    4
+CONECT    2    1
+CONECT    3    1
+CONECT    4    1
+END

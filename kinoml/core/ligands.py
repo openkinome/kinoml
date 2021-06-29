@@ -8,40 +8,9 @@ import rdkit
 from openff.toolkit.topology import Molecule as _OpenForceFieldMolecule
 
 from .components import BaseLigand
-from ..utils import download_file
+
 
 logger = logging.getLogger(__name__)
-
-
-class FileLigand(BaseLigand):
-    """
-    Docstring pending
-    """
-
-    def __init__(self, path, metadata=None, name="", *args, **kwargs):
-        super().__init__(name=name, metadata=metadata, *args, **kwargs)
-        if str(path).startswith("http"):
-            from appdirs import user_cache_dir
-
-            # TODO: where to save, how to name
-            self.path = f"{user_cache_dir()}/{self.name}.{path.split('.')[-1]}"
-            download_file(path, self.path)
-        else:
-            self.path = path
-
-
-class PDBLigand(FileLigand):
-    """
-    Docstring pending
-    """
-
-    def __init__(self, pdb_id, path, metadata=None, name="", *args, **kwargs):
-        super().__init__(path, metadata=metadata, name=name, *args, **kwargs)
-        from appdirs import user_cache_dir
-
-        self.pdb_id = pdb_id
-        self.path = f"{user_cache_dir()}/{self.name}.sdf"  # <- SDF? Isn't this a PDB?
-        download_file(f"https://files.rcsb.org/ligands/view/{pdb_id}_ideal.sdf", self.path)
 
 
 class OpenForceFieldLigand(BaseLigand, _OpenForceFieldMolecule):
