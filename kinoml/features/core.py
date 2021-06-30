@@ -6,8 +6,7 @@ All ``Featurizer`` objects inherit from ``BaseFeaturizer`` and reimplement `._fe
 and `._supports`, if needed.
 """
 from __future__ import annotations
-from collections import defaultdict
-from typing import Callable, Hashable, Iterable, Sequence, Type
+from typing import Callable, Hashable, Iterable, Sequence, Union
 import hashlib
 from multiprocessing import Pool
 from functools import partial
@@ -63,6 +62,7 @@ class BaseFeaturizer:
             or an array-like object) under a key named after ``.name``.
         """
         self.supports(systems[0])
+        self._pre_featurize(systems)
         features = self._featurize(systems, processes=processes, chunksize=chunksize, keep=keep)
         systems = self._post_featurize(systems, features, keep=keep)
         return systems
@@ -115,7 +115,7 @@ class BaseFeaturizer:
 
         return features
 
-    def _featurize_options(self, systems: Iterable[System]) -> dict | None:
+    def _featurize_options(self, systems: Iterable[System]) -> Union[dict, None]:
         """
         Computes properties that depend on a collection of System objects,
         which might be needed to featurize a single system later (e.g.
@@ -133,6 +133,12 @@ class BaseFeaturizer:
             featurizers require this dynamically computed set of options.
         """
         return None
+
+    def _pre_featurize(self) -> None:
+        """
+        Run before featurizing all systems. Redefine this method if needed.
+        """
+        return
 
     def _featurize_one(self, system: System, options: dict) -> object:
         """
