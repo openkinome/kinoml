@@ -57,6 +57,16 @@ class LocalFileStorage:
         return file_path
 
     @staticmethod
+    def klifs_structure_db(directory=DIRECTORY):
+        file_path = directory / "klifs_structure_db.csv"
+        return file_path
+
+    @staticmethod
+    def klifs_kinase_db(directory=DIRECTORY):
+        file_path = directory / "klifs_kinase_db.csv"
+        return file_path
+
+    @staticmethod
     def featurizer_result(featurizer_name, result_details, file_format, directory=DIRECTORY):
         file_path = directory / f"kinoml_{featurizer_name}_{result_details}.{file_format}"
         return file_path

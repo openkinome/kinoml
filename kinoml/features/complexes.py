@@ -13,7 +13,7 @@ from MDAnalysis.core import universe
 from .core import BaseFeaturizer
 from ..core.proteins import ProteinStructure
 from ..core.sequences import Biosequence
-from ..core.systems import ProteinSystem, ProteinLigandComplex
+from ..core.systems import ProteinSystem, ProteinLigandComplex, System
 
 
 class OEHybridDockingFeaturizer(BaseFeaturizer):
@@ -558,6 +558,102 @@ class OEKLIFSKinaseApoFeaturizer(OEHybridDockingFeaturizer):
 
     _SUPPORTED_TYPES = (ProteinSystem,)
 
+    def _pre_featurize(self) -> None:
+        """
+        Retrieve relevant data from KLIFS and store locally.
+        """
+        self._create_klifs_structure_db()
+        self._create_klifs_kinase_db()
+        return
+
+    @staticmethod
+    def _create_klifs_structure_db(retrieve_pocket_resids=False):
+        """
+        Retrieve structure data from KLIFS and store locally.
+
+        Parameters
+        ----------
+        retrieve_pocket_resids: bool
+            If pocket residue IDs should be retrieved (needed for docking).
+        """
+        from opencadd.databases.klifs import setup_remote
+        import numpy as np
+        import pandas as pd
+
+        from ..utils import LocalFileStorage
+
+        remote = setup_remote()
+        logging.debug("Retrieving all structures from KLIFS ...")
+        available_structures = remote.structures.all_structures()
+        available_structures["structure.pocket_resids"] = np.NaN
+
+        klifs_structure_db_path = LocalFileStorage.klifs_structure_db()
+        # checking for existing database, since retrieving pocket residue IDs takes long
+        if klifs_structure_db_path.is_file():
+            logging.debug("Loading local KLIFS structure database ...")
+            klifs_structure_db = pd.read_csv(klifs_structure_db_path)
+        else:
+            logging.debug("Initializing local KLIFS structure database ...")
+            klifs_structure_db = available_structures.copy()
+
+        logging.debug("Searching new structures ...")
+        new_structures = available_structures[
+            ~available_structures["structure.klifs_id"].isin(
+                klifs_structure_db["structure.klifs_id"]
+            )
+        ]
+
+        if len(new_structures) > 0:
+            logging.debug("Adding new structures to database ...")
+            klifs_structure_db = klifs_structure_db.append(
+                available_structures[available_structures["structure.klifs_id"].isin(
+                    new_structures
+                )]
+            )
+
+        if retrieve_pocket_resids:
+            logging.debug("Adding KLIFS pocket residue IDs ...")
+            structures_wo_pocket_resids = klifs_structure_db[
+                klifs_structure_db["structure.pocket_resids"].isna()
+            ]
+            for structure_klifs_id in structures_wo_pocket_resids["structure.klifs_id"]:
+                pocket = remote.pockets.by_structure_klifs_id(structure_klifs_id)
+                pocket_ids = " ".join(  # filter out missing residues defined as "_"
+                    [residue_id for residue_id in pocket["residue.id"] if residue_id != "_"]
+                )
+                klifs_structure_db.loc[
+                    (klifs_structure_db["structure.klifs_id"] == structure_klifs_id),
+                    "structure.pocket_resids"
+                ] = pocket_ids
+            logging.debug("Removing entries with missing pocket residue IDs ...")
+            klifs_structure_db = klifs_structure_db[
+                klifs_structure_db["structure.pocket_resids"] != ""
+                ]
+
+        logging.debug("Saving KLIFS data locally ...")
+        klifs_structure_db.to_csv(LocalFileStorage.klifs_structure_db(), index=False)
+
+        return
+
+    @staticmethod
+    def _create_klifs_kinase_db():
+        """
+        Retrieve kinase data from KLIFS and store locally.
+        """
+        from opencadd.databases.klifs import setup_remote
+
+        from ..utils import LocalFileStorage
+
+        remote = setup_remote()
+        logging.debug("Retrieving all kinases from KLIFS ...")
+        klifs_kinase_ids = remote.kinases.all_kinases()["kinase.klifs_id"].to_list()
+        klifs_kinase_db = remote.kinases.by_kinase_klifs_id(klifs_kinase_ids)
+
+        logging.debug("Saving KLIFS data locally ...")
+        klifs_kinase_db.to_csv(LocalFileStorage.klifs_kinase_db(), index=False)
+
+        return
+
     @lru_cache(maxsize=100)
     def _featurize_one(self, system: ProteinSystem, options: dict) -> universe:
         """
@@ -1071,6 +1167,27 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEKLIFSKinaseApoFeaturizer):
         self.shape_overlay = shape_overlay
 
     _SUPPORTED_TYPES = (ProteinLigandComplex,)
+
+    def _pre_featurize(self) -> None:
+        """
+        Retrieve relevant data from KLIFS and store locally.
+        """
+        self._create_klifs_structure_db(retrieve_pocket_resids=True)
+        self._create_klifs_kinase_db()
+        if self.shape_overlay:
+            self._dowload_klifs_ligands()
+        return
+
+    def _dowload_klifs_ligands(self) -> None:
+        """
+        Download orthosteric ligands from KLIFS and store locally.
+        """
+        from ..modeling.OEModeling import read_klifs_ligand
+
+        logging.debug("Downloading ligands from KLIFS ...")
+        structures = self._get_available_ligand_templates()
+        [read_klifs_ligand(structure_id) for structure_id in structures["structure.klifs_id"]]
+        return
 
     @lru_cache(maxsize=100)
     def _featurize_one(
