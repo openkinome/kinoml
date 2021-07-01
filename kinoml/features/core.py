@@ -275,9 +275,12 @@ class Pipeline(BaseFeaturizer):
     wrapper around individual ``Featurizer`` objects.
     """
 
-    def __init__(self, featurizers: Iterable[BaseFeaturizer], shortname=None):
+    def __init__(self, featurizers: Iterable[BaseFeaturizer], shortname=None, **kwargs):
+        super().__init__(**kwargs)
         self.featurizers = featurizers
         self._shortname = shortname
+        # TODO: I think this should never use muliprocessing, only the given featurizer can
+        self.use_multiprocessing = False
 
     def _featurize(
         self, systems: Iterable[System], chunksize=None, keep: bool = True
@@ -368,19 +371,13 @@ class Concatenated(Pipeline):
         On which axis to concatenate. By default, it will concatenate
         on axis ``1``, which means that the features in each pipeline
         will be concatenated.
-
-    Note
-    ----
-    While ``Concatenated`` is a subclass of ``BaseFeaturizer``,
-    it should be considered a special case of such. It indeed
-    shares the same API but the implementation details of
-    ``._featurize()`` are slightly different. It acts as a
-    wrapper around individual ``Featurizer`` objects.
     """
 
-    def __init__(self, featurizers: Iterable[BaseFeaturizer], shortname=None, axis=1):
-        super().__init__(featurizers=featurizers, shortname=shortname)
+    def __init__(self, featurizers: Iterable[BaseFeaturizer], axis: int = 1, **kwargs):
+        super().__init__(featurizers, **kwargs)
         self.axis = axis
+        # TODO: I think a this should never use muliprocessing, only the given featurizer can
+        self.use_multiprocessing = False
 
     def _featurize(
         self, systems: Iterable[System], chunksize=None, keep=True
@@ -430,24 +427,12 @@ class TupleOfArrays(Pipeline):
     and featurizer B returns Y, Z; the output is a tuple of X, Y, Z).
 
     The final result will be tuple of tuples.
-
-    Parameters
-    ----------
-    featurizers : list of BaseFeaturizer
-        These should take a System or array, but return only arrays
-        so they can be concatenated. Note that the arrays must
-        have the same number of dimensions. If that is not the case,
-        you will need to reshape one of them using ``CallableFeaturizer``
-        and a lambda function that relies on ``np.reshape`` or similar.
-
-    Note
-    ----
-    While ``TupleOfArrays`` is a subclass of ``BaseFeaturizer``,
-    it should be considered a special case of such. It indeed
-    shares the same API but the implementation details of
-    ``._featurize()`` are slightly different. It acts as a
-    wrapper around individual ``Featurizer`` objects.
     """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # TODO: I think this should never use muliprocessing, only the given featurizer can
+        self.use_multiprocessing = False
 
     def _featurize(
         self,
@@ -535,7 +520,8 @@ class TupleOfArrays(Pipeline):
 class BaseOneHotEncodingFeaturizer(BaseFeaturizer):
     ALPHABET = None
 
-    def __init__(self, dictionary: dict = None):
+    def __init__(self, dictionary: dict = None, **kwargs):
+        super().__init__(**kwargs)
         if dictionary is None:
             dictionary = {c: i for i, c in enumerate(self.ALPHABET)}
         self.dictionary = dictionary
@@ -609,7 +595,8 @@ class PadFeaturizer(BaseFeaturizer):
         value to fill the array-like features with
     """
 
-    def __init__(self, shape: Iterable[int] = "auto", key: Hashable = "last", pad_with: int = 0):
+    def __init__(self, shape: Iterable[int] = "auto", key: Hashable = "last", pad_with: int = 0, **kwargs):
+        super().__init__(**kwargs)
         self.shape = shape
         self.key = key
         self.pad_with = pad_with
@@ -679,8 +666,8 @@ class HashFeaturizer(BaseFeaturizer):
         Normalizes the hash to obtain a value in the unit interval
     """
 
-    def __init__(self, getter: Callable[[System], str] = None, normalize=True, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, getter: Callable[[System], str] = None, normalize=True, **kwargs):
+        super().__init__(**kwargs)
         self.getter = getter or self._getter
         self.normalize = normalize
         self.denominator = 2 ** 256 if normalize else 1
@@ -710,6 +697,10 @@ class HashFeaturizer(BaseFeaturizer):
 
 
 class NullFeaturizer(BaseFeaturizer):
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
     def _featurize(
             self,
             systems: Iterable[System],
@@ -732,7 +723,8 @@ class CallableFeaturizer(BaseFeaturizer):
         for each system.
     """
 
-    def __init__(self, func: Callable[[System], System | np.array] | str = None):
+    def __init__(self, func: Callable[[System], System | np.array] | str = None, **kwargs):
+        super().__init__(**kwargs)
         if func is None:
             func = self._default_func
         elif isinstance(func, str):
@@ -773,7 +765,8 @@ class ClearFeaturizations(BaseFeaturizer):
         Whether to ``keep`` or ``remove`` the entries passed as ``keys``.
     """
 
-    def __init__(self, keys=("last",), style="keep"):
+    def __init__(self, keys=("last",), style="keep", **kwargs):
+        super().__init__(**kwargs)
         assert style in ("keep", "remove"), "`style` must be `keep` or `remove`"
         self.keys = keys
         self.style = style

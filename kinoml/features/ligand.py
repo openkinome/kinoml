@@ -27,6 +27,9 @@ class SingleLigandFeaturizer(BaseFeaturizer):
 
     _COMPATIBLE_LIGAND_TYPES = (BaseLigand,)
 
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
     def _supports(self, system: System) -> bool:
         """
         Check that exactly one ligand is present in the System
@@ -91,8 +94,8 @@ class SmilesToLigandFeaturizer(SingleLigandFeaturizer):
 
     _COMPATIBLE_LIGAND_TYPES = (SmilesLigand,)
 
-    def __init__(self, ligand_type: str = "rdkit", *args, **kwargs):
-        super().__init__(self, *args, **kwargs)
+    def __init__(self, ligand_type: str = "rdkit", **kwargs):
+        super().__init__(**kwargs)
         if ligand_type == "rdkit":
             self._LigandType = RDKitLigand
         elif ligand_type == "openforcefield":
@@ -137,8 +140,8 @@ class MorganFingerprintFeaturizer(SingleLigandFeaturizer):
 
     _COMPATIBLE_LIGAND_TYPES = (OpenForceFieldLigand, OpenForceFieldLikeLigand)
 
-    def __init__(self, radius: int = 2, nbits: int = 512, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, radius: int = 2, nbits: int = 512, **kwargs):
+        super().__init__(**kwargs)
         self.radius = radius
         self.nbits = nbits
 
@@ -188,6 +191,9 @@ class OneHotSMILESFeaturizer(BaseOneHotEncodingFeaturizer, SingleLigandFeaturize
         "LR$"  # single-char representation of Cl, Br, @@
     )
 
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
     def _retrieve_sequence(self, system: System) -> str:
         """
         Get SMILES string from a `Ligand`-like component and postprocesses it.
@@ -210,6 +216,9 @@ class OneHotRawSMILESFeaturizer(OneHotSMILESFeaturizer):
     """
 
     _COMPATIBLE_LIGAND_TYPES = (OpenForceFieldLigand, OpenForceFieldLikeLigand)
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
     def _retrieve_sequence(self, system: System) -> str:
         """
@@ -289,8 +298,8 @@ class GraphLigandFeaturizer(SingleLigandFeaturizer):
     ]
     _COMPATIBLE_LIGAND_TYPES = (OpenForceFieldLigand, OpenForceFieldLikeLigand)
 
-    def __init__(self, max_in_ring_size: int = 10, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, max_in_ring_size: int = 10, **kwargs):
+        super().__init__(**kwargs)
         self.max_in_ring_size = max_in_ring_size
         self._hybridization_names = sorted(rdkit.Chem.rdchem.HybridizationType.names)
 

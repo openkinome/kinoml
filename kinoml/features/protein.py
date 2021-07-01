@@ -18,6 +18,9 @@ class AminoAcidCompositionFeaturizer(BaseFeaturizer):
     in the binding site.
     """
 
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
     # Initialize a Counter object with 0 counts
     _counter = Counter(sorted(AminoAcidSequence.ALPHABET))
     for k in _counter.keys():
@@ -51,6 +54,9 @@ class OneHotEncodedSequenceFeaturizer(BaseOneHotEncodingFeaturizer):
     Featurize the sequence of the protein to a one hot encoding
     using the symbols in ``ALL_AMINOACIDS``.
     """
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
     ALPHABET = AminoAcidSequence.ALPHABET
 
