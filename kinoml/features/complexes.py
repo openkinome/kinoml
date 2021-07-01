@@ -552,9 +552,8 @@ class OEKLIFSKinaseApoFeaturizer(OEHybridDockingFeaturizer):
     import pandas as pd
     from openeye import oechem, oegrid
 
-    def __init__(self, loop_db: Union[str, None] = None):
-        super().__init__(loop_db)
-        self.loop_db = loop_db
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
     _SUPPORTED_TYPES = (ProteinSystem,)
 
@@ -1227,10 +1226,9 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEKLIFSKinaseApoFeaturizer):
     from openeye import oechem
 
     def __init__(
-        self, loop_db: Union[str, None] = None, shape_overlay: bool = False
+            self, shape_overlay: bool = False, *args, **kwargs
     ):
-        super().__init__(loop_db)
-        self.loop_db = loop_db
+        super().__init__(*args, **kwargs)
         self.shape_overlay = shape_overlay
 
     _SUPPORTED_TYPES = (ProteinLigandComplex,)
