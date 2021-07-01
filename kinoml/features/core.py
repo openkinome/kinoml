@@ -8,7 +8,7 @@ and `._supports`, if needed.
 from __future__ import annotations
 from typing import Callable, Hashable, Iterable, Sequence, Union
 import hashlib
-from multiprocessing import Pool
+from multiprocessing import Pool, cpu_count
 from functools import partial
 
 import numpy as np
@@ -20,16 +20,25 @@ from ..utils import Hashabledict
 
 class BaseFeaturizer:
     """
-    Abstract Featurizer class
+    Abstract Featurizer class.
+
+    Parameters
+    ----------
+    use_multiprocessing: bool, default=False
+        If multiprocessing to use.
+    n_processes: int or None, default=None
+        How many processes to use in case of multiprocessing.
+        Defaults to number of available CPUs.
     """
 
     _SUPPORTED_TYPES = (System,)
 
-    def __init__(self, *args, **kwargs):
-        pass
+    def __init__(self, use_multiprocessing=False, n_processes=None, **kwargs):
+        self.use_multiprocessing = use_multiprocessing
+        self.n_processes = n_processes
 
     def featurize(
-        self, systems: Iterable[System], processes=1, chunksize=None, keep=True
+        self, systems: Iterable[System], chunksize=None, keep=True
     ) -> object:
         """
         Given some systems (compatible with ``_SUPPORTED_TYPES``), apply
@@ -44,9 +53,6 @@ class BaseFeaturizer:
         ----------
         systems : list of System
             This is the collection of System objects that will be transformed
-        processes : int, optional=1
-            Number of processors to use. If 1, ``multiprocessing`` will not be
-            used at all.
         chunksize :  int, optional=None
             See https://stackoverflow.com/a/54032744/3407590.
         keep : bool, optional=True
@@ -63,7 +69,7 @@ class BaseFeaturizer:
         """
         self.supports(systems[0])
         self._pre_featurize()
-        features = self._featurize(systems, processes=processes, chunksize=chunksize, keep=keep)
+        features = self._featurize(systems, chunksize=chunksize, keep=keep)
         systems = self._post_featurize(systems, features, keep=keep)
         return systems
 
@@ -75,7 +81,7 @@ class BaseFeaturizer:
         return self.featurize(*args, **kwargs)
 
     def _featurize(
-        self, systems: Iterable[System], processes=1, chunksize=None, keep: bool = True
+        self, systems: Iterable[System], chunksize=None, keep: bool = True
     ):
         """
         Some global properties can be optionally computed with
@@ -88,9 +94,6 @@ class BaseFeaturizer:
         ----------
         systems : list of System
             This is the collection of System objects that will be transformed
-        processes : int, optional=1
-            Number of processors to use. If 1, ``multiprocessing`` will not be
-            used at all.
         chunksize :  int, optional=None
             See https://stackoverflow.com/a/54032744/3407590.
         keep : bool, optional=True
@@ -103,14 +106,20 @@ class BaseFeaturizer:
         """
         featurization_options = Hashabledict(self._featurize_options(systems) or {})
 
-        if processes == 1:
+        if self.use_multiprocessing:
+            if not self.n_processes:
+                self.n_processes = cpu_count()
+        else:
+            self.n_processes = 1
+
+        if self.n_processes == 1:
             features = [
                 self._featurize_one(s, options=featurization_options)
                 for s in tqdm(systems, desc=self.name)
             ]
         else:
             func = partial(self._featurize_one, options=featurization_options)
-            with Pool(processes=processes) as pool:
+            with Pool(processes=self.n_processes) as pool:
                 features = pool.map(func, systems, chunksize)
 
         return features
@@ -271,7 +280,7 @@ class Pipeline(BaseFeaturizer):
         self._shortname = shortname
 
     def _featurize(
-        self, systems: Iterable[System], processes=1, chunksize=None, keep: bool = True
+        self, systems: Iterable[System], chunksize=None, keep: bool = True
     ):
         """
         Given a list of featurizers, apply them sequentially
@@ -282,9 +291,6 @@ class Pipeline(BaseFeaturizer):
         ----------
         systems : list of System
             This is the collection of System objects that will be transformed
-        processes : int, optional=1
-            Number of processors to use. If 1, ``multiprocessing`` will not be
-            used at all.
         chunksize :  int, optional=None
             See https://stackoverflow.com/a/54032744/3407590.
         keep : bool, optional=True
@@ -298,7 +304,6 @@ class Pipeline(BaseFeaturizer):
         for featurizer in self.featurizers:
             systems = featurizer.featurize(
                 systems,
-                processes=processes,
                 chunksize=chunksize,
                 keep=keep,
             )
@@ -378,7 +383,7 @@ class Concatenated(Pipeline):
         self.axis = axis
 
     def _featurize(
-        self, systems: Iterable[System], processes=1, chunksize=None, keep=True
+        self, systems: Iterable[System], chunksize=None, keep=True
     ) -> np.ndarray:
         """
         Given a list of featurizers, apply them serially and concatenate
@@ -389,9 +394,6 @@ class Concatenated(Pipeline):
         ----------
         systems: list of System or array-like
             The Systems (or arrays) to be featurized.
-        processes : int, optional=1
-            Number of processors to use. If 1, ``multiprocessing`` will not be
-            used at all.
         chunksize :  int, optional=None
             See https://stackoverflow.com/a/54032744/3407590.
         keep : bool, optional=True
@@ -411,7 +413,6 @@ class Concatenated(Pipeline):
         for featurizer in self.featurizers:
             systems = featurizer.featurize(
                 systems,
-                processes=processes,
                 chunksize=chunksize,
                 keep=keep,
             )
@@ -451,7 +452,6 @@ class TupleOfArrays(Pipeline):
     def _featurize(
         self,
         systems: Iterable[System],
-        processes: int = 1,
         chunksize: int = None,
         keep: bool = True,
     ) -> np.ndarray:
@@ -463,9 +463,6 @@ class TupleOfArrays(Pipeline):
         ----------
         systems: list of System or array-like
             The Systems (or arrays) to be featurized.
-        processes : int, optional=1
-            Number of processors to use. If 1, ``multiprocessing`` will not be
-            used at all.
         chunksize :  int, optional=None
             See https://stackoverflow.com/a/54032744/3407590.
         keep : bool, optional=True
@@ -489,7 +486,6 @@ class TupleOfArrays(Pipeline):
             # Run a pipeline
             systems = featurizer.featurize(
                 systems,
-                processes=processes,
                 chunksize=chunksize,
                 keep=keep,
             )
@@ -717,7 +713,6 @@ class NullFeaturizer(BaseFeaturizer):
     def _featurize(
             self,
             systems: Iterable[System],
-            processes=1,
             chunksize=None,
             keep: bool = None,
     ) -> object:
