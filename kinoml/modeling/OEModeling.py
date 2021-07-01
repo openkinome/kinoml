@@ -1258,7 +1258,6 @@ def apply_insertions(
                 for i, loop_conformation in enumerate(loop_conformations.GetConfs()):
                     # loop modeling from OESpruce can lead to ring penetration, e.g. 3bel
                     # the next step tries to fix those issues
-                    logging.debug("Deleting newly modeled side chains with severe clashes ...")
                     loop_conformation = oechem.OEGraphMol(loop_conformation)
                     loop_conformation = delete_clashing_sidechains(loop_conformation)
                     oespruce.OEBuildSidechains(loop_conformation)
@@ -1863,3 +1862,50 @@ def split_molecule_components(molecule: oechem.OEMolBase) -> List[oechem.OEGraph
         components.append(component)
 
     return components
+
+
+def residue_ids_to_residue_names(
+        structure: oechem.OEMolBase,
+        residue_ids: List[int],
+        chain_id: Union[None, str] = None
+) -> List[str]:
+    """
+    Get the corresponding residue names for a list of residue IDs and a give OpenEye molecule
+    with residue information.
+
+    Parameters
+    ----------
+    structure: oechem.OEMolBase
+        An OpenEye molecule with residue information.
+    residue_ids: list of int
+        A list of residue IDs.
+    chain_id: None or str
+        The chain ID to filter for.
+
+    Returns
+    -------
+    residue_names: list of str
+        The corresponding residue names as three letter codes.
+
+    Raises
+    ------
+    ValueError
+        No residue found for residue ID {resid}.
+    ValueError
+        Found multiple residues for residue ID {resid}.
+    """
+    residue_names = []
+    if not chain_id:
+        chain_id = ".*"
+    for resid in residue_ids:
+        predicate = oechem.OEAtomMatchResidue(f".*:{resid}:.*:{chain_id}:.*:.*")
+        selection_residue_names = set([
+            oechem.OEAtomGetResidue(atom).GetName() for atom in structure.GetAtoms(predicate)
+        ])
+        if len(selection_residue_names) == 0:
+            raise ValueError(f"No residue found for residue ID {resid}.")
+        elif len(selection_residue_names) > 1:
+            raise ValueError(f"Found multiple residues for residue ID {resid}.")
+        residue_names.append(selection_residue_names.pop())
+
+    return residue_names
