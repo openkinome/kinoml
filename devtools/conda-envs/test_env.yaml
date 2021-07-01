@@ -11,7 +11,6 @@ dependencies:
   - requests
   - pint
   - appdirs
-  - mdanalysis
   - tqdm
   - openff-toolkit >=0.9
   - xgboost
@@ -72,3 +71,5 @@ dependencies:
       - sphinx-material
       # local building
       - sphinx-autobuild
+      # no stable release yet with support for serialization
+      - MDAnalysis==2.0.0b0
