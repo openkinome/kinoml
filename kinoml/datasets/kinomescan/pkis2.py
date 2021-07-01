@@ -61,7 +61,6 @@ class PKIS2DatasetProvider(KinomeScanDatasetProvider):
         TODO:
 
         - Investigate lazy access and object generation
-        - Review accuracy of item access by indices (correlative order?)
         """
         filename = cls._download_to_cache_or_retrieve(path_or_url)
         df = cls._read_dataframe(filename)
