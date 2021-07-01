@@ -62,7 +62,7 @@ class BaseFeaturizer:
             or an array-like object) under a key named after ``.name``.
         """
         self.supports(systems[0])
-        self._pre_featurize(systems)
+        self._pre_featurize()
         features = self._featurize(systems, processes=processes, chunksize=chunksize, keep=keep)
         systems = self._post_featurize(systems, features, keep=keep)
         return systems
