@@ -83,15 +83,19 @@ class FileDownloader:
     Download and store files locally.
     """
 
-    @staticmethod
-    def rcsb_structure_pdb(pdb_id):
-        url = f"https://files.rcsb.org/download/{pdb_id}.pdb"
-        download_file(url, LocalFileStorage.rcsb_structure_pdb(pdb_id))
+    from appdirs import user_cache_dir
+
+    DIRECTORY = Path(user_cache_dir())
 
     @staticmethod
-    def rcsb_electron_density_mtz(pdb_id):
+    def rcsb_structure_pdb(pdb_id, directory=DIRECTORY):
+        url = f"https://files.rcsb.org/download/{pdb_id}.pdb"
+        download_file(url, LocalFileStorage.rcsb_structure_pdb(pdb_id, directory))
+
+    @staticmethod
+    def rcsb_electron_density_mtz(pdb_id, directory=DIRECTORY):
         url = f"https://edmaps.rcsb.org/coefficients/{pdb_id}.mtz"
-        download_file(url, LocalFileStorage.rcsb_electron_density_mtz(pdb_id))
+        download_file(url, LocalFileStorage.rcsb_electron_density_mtz(pdb_id, directory))
 
 
 def datapath(path: str) -> Path:
