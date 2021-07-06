@@ -26,6 +26,10 @@ def smiles_from_pdb(ligand_ids: Iterable[str]) -> dict:
             ']){chem_comp{id}rcsb_chem_comp_descriptor{SMILES}}}'
     response = requests.get(base_url + urllib.parse.quote(query))
     for ligand in json.loads(response.text)["data"]["chem_comps"]:
-        ligands[ligand["chem_comp"]["id"]] = ligand["rcsb_chem_comp_descriptor"]["SMILES"]
+        try:
+            ligands[ligand["chem_comp"]["id"]] = ligand["rcsb_chem_comp_descriptor"]["SMILES"]
+        except TypeError:
+            # missing smiles entry
+            pass
 
     return ligands
