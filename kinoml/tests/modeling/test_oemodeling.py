@@ -19,7 +19,6 @@ from kinoml.modeling.OEModeling import (
     get_expression_tags,
     assign_caps,
     prepare_structure,
-    read_klifs_ligand,
     generate_tautomers,
     generate_enantiomers,
     generate_conformations,
@@ -230,7 +229,6 @@ def test_write_molecules(molecules, suffix, n_atoms_list):
             assert _count_atoms(temp_file.name, i) == n_atoms
 
 
-# TODO: Add a README to data directory explaining whats great about 4f8o
 @pytest.mark.parametrize(
     "package, resource, chain_id, expectation, n_atoms",
     [
@@ -431,6 +429,7 @@ def test_assign_caps(package, resource, real_termini, caps):
         )
         assert found_caps == caps
 
+
 @pytest.mark.parametrize(
     "package, resource, has_ligand, chain_id, altloc, ligand_name, expectation, title_contains",
     [
@@ -510,16 +509,19 @@ def test_prepare_structure(package, resource, has_ligand, chain_id, altloc, liga
             0
         ),
     ],
-)
+)  # TODO: move to tests for featurizers
 def test_read_klifs_ligand(klifs_structure_id, expectation, n_atoms):
     """Compare results to expected number of atoms."""
     import warnings
 
+    from kinoml.features.complexes import OEKLIFSKinaseHybridDockingFeaturizer
+
+    featurizer = OEKLIFSKinaseHybridDockingFeaturizer()
     # filter benign warnings
     warnings.filterwarnings("ignore", message="numpy.ufunc size changed")
 
     with expectation:
-        molecule = read_klifs_ligand(klifs_structure_id)
+        molecule = featurizer._read_klifs_ligand(klifs_structure_id)
         assert molecule.NumAtoms() == n_atoms
 
 

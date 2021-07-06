@@ -670,37 +670,6 @@ def prepare_protein(
     )
 
 
-def read_klifs_ligand(structure_id: int) -> oechem.OEGraphMol:
-    """
-    Retrieve and read an orthosteric kinase ligand from KLIFS.
-
-    Parameters
-    ----------
-    structure_id: int
-        KLIFS structure identifier.
-
-    Returns
-    -------
-    molecule: oechem.OEGraphMol
-        An OpenEye molecule holding the orthosteric ligand.
-    """
-    from ..utils import LocalFileStorage
-
-    file_path = LocalFileStorage.klifs_ligand_mol2(structure_id)
-
-    if not file_path.is_file():
-        from opencadd.databases.klifs import setup_remote
-
-        remote = setup_remote()
-        mol2_text = remote.coordinates.to_text(structure_id, entity="ligand", extension="mol2")
-        with open(file_path, "w") as wf:
-            wf.write(mol2_text)
-
-    molecule = read_molecules(file_path)[0]
-
-    return molecule
-
-
 def generate_tautomers(
         molecule: Union[oechem.OEMolBase, oechem.OEMCMolBase],
         max_generate: int = 4096,
