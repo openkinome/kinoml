@@ -137,7 +137,9 @@ def create_box_receptor(
 
 
 def pose_molecules(
-    receptor: oechem.OEMolBase, molecules: List[oechem.OEMolBase]
+        receptor: oechem.OEMolBase,
+        molecules: List[oechem.OEMolBase],
+        pKa_norm: bool = True,
 ) -> Union[List[oechem.OEGraphMol], None]:
     """
     Generate a binding pose of molecules in a prepared receptor with OpenEye's Posit method.
@@ -148,6 +150,8 @@ def pose_molecules(
         An OpenEye molecule holding the prepared receptor.
     molecules: list of oechem.OEMolBase
         A list of OpenEye molecules holding prepared molecules for docking.
+    pKa_norm: bool, default=True
+        Assign the predominant ionization state at pH ~7.4.
 
     Returns
     -------
@@ -173,7 +177,9 @@ def pose_molecules(
     # pose molecules
     for molecule in molecules:
         # tautomers, enantiomers, conformations
-        conformations_ensemble = generate_reasonable_conformations(molecule, dense=True)
+        conformations_ensemble = generate_reasonable_conformations(
+            molecule, dense=True, pKa_norm=pKa_norm
+        )
 
         posed_conformations = list()
         for conformations in conformations_ensemble:
