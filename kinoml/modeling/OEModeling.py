@@ -710,7 +710,7 @@ def generate_tautomers(
         in oequacpac.OEGetReasonableTautomers(
             molecule, tautomer_options, pKa_norm
         )
-    ]
+    ]  # ToDo: report unexpected behavior, with pKa_norm set False, positively charged imidazole become neutral
     return tautomers
 
 

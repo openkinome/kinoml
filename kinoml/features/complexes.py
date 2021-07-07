@@ -36,6 +36,9 @@ class OEHybridDockingFeaturizer(BaseFeaturizer):
     output_dir: str, Path or None, default=None
         Path to directory used for saving output files. If None, output structures will not be
         saved.
+    pKa_norm: bool, default=True
+        Assign the predominant ionization state of the molecules to dock at pH ~7.4.
+        If False, the ionization state of the input molecules will be conserved.
     """
 
     from openeye import oechem, oegrid
@@ -45,6 +48,7 @@ class OEHybridDockingFeaturizer(BaseFeaturizer):
             loop_db: Union[str, None] = None,
             cache_dir: Union[str, Path, None] = None,
             output_dir: Union[str, Path, None] = None,
+            pKa_norm: bool = True,
             **kwargs,
     ):
         from appdirs import user_cache_dir
@@ -59,6 +63,7 @@ class OEHybridDockingFeaturizer(BaseFeaturizer):
         if output_dir:
             self.output_dir = Path(output_dir).expanduser().resolve()
             self.output_dir.mkdir(parents=True, exist_ok=True)
+        self.pKa_norm = pKa_norm
 
     _SUPPORTED_TYPES = (ProteinLigandComplex,)
 
@@ -98,7 +103,7 @@ class OEHybridDockingFeaturizer(BaseFeaturizer):
         hybrid_receptor = create_hybrid_receptor(prepared_protein, prepared_ligand)
 
         logging.debug("Performing docking ...")
-        docking_pose = hybrid_docking(hybrid_receptor, [ligand])[0]
+        docking_pose = hybrid_docking(hybrid_receptor, [ligand], pKa_norm=self.pKa_norm)[0]
         # generate residue information
         oechem.OEPerceiveResidues(docking_pose, oechem.OEPreserveResInfo_None)
 
@@ -332,6 +337,12 @@ class OEHybridDockingFeaturizer(BaseFeaturizer):
         oechem.OEAddMols(assembled_components, protein)
 
         if ligand:
+            logging.debug("Renaming ligand ...")
+            for atom in ligand.GetAtoms():
+                oeresidue = oechem.OEAtomGetResidue(atom)
+                oeresidue.SetName("LIG")
+                oechem.OEAtomSetResidue(atom, oeresidue)
+
             logging.debug("Adding ligand ...")
             oechem.OEAddMols(assembled_components, ligand)
 
@@ -340,7 +351,10 @@ class OEHybridDockingFeaturizer(BaseFeaturizer):
         oechem.OEAddMols(assembled_components, filtered_solvent)
 
         logging.debug("Updating hydrogen positions of assembled components ...")
-        oechem.OEPlaceHydrogens(assembled_components)
+        options = oechem.OEPlaceHydrogensOptions()  # keep protonation state from docking
+        predicate = oechem.OEAtomMatchResidue(["LIG:.*:.*:.*:.*"])
+        options.SetBypassPredicate(predicate)
+        oechem.OEPlaceHydrogens(assembled_components, options)
         # keep tyrosine protonated, e.g. 6tg1 chain B
         predicate = oechem.OEAndAtom(
             oechem.OEAtomMatchResidue(["TYR:.*:.*:.*:.*"]),
@@ -833,6 +847,10 @@ class OEKLIFSKinaseApoFeaturizer(OEHybridDockingFeaturizer):
 
         logging.debug("Generating new MDAnalysis universe ...")
         structure = ProteinStructure.from_file(file_path)
+
+        if not self.output_dir:
+            logging.debug("Removing structure file ...")
+            file_path.unlink()
 
         return structure
 
@@ -1455,7 +1473,7 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEKLIFSKinaseApoFeaturizer):
                 processed_kinase_domain, prepared_ligand_template
             )
             logging.debug("Performing docking ...")
-            docking_pose = hybrid_docking(hybrid_receptor, [ligand])[0]
+            docking_pose = hybrid_docking(hybrid_receptor, [ligand], pKa_norm=self.pKa_norm)[0]
             oechem.OEPerceiveResidues(
                 docking_pose, oechem.OEPreserveResInfo_None
             )  # generate residue information
@@ -1486,6 +1504,10 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEKLIFSKinaseApoFeaturizer):
 
         logging.debug("Generating new MDAnalysis universe ...")
         structure = ProteinStructure.from_file(file_path)
+
+        if not self.output_dir:
+            logging.debug("Removing structure file ...")
+            file_path.unlink()
 
         return structure
 
