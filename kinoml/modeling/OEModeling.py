@@ -221,6 +221,12 @@ def select_altloc(
     if not altloc_was_present:
         raise ValueError("No atoms were found with given altloc id.")
 
+    # remove alternate location identifiers
+    oechem.OEPerceiveResidues(
+        selection,
+        oechem.OEPreserveResInfo_All - oechem.OEPreserveResInfo_AlternateLocation
+    )
+
     return selection
 
 
