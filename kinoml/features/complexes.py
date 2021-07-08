@@ -1215,13 +1215,14 @@ class OEKLIFSKinaseApoFeaturizer(OEHybridDockingFeaturizer):
         logging.debug("Applying mutations to kinase domain ...")
         kinase_structure = apply_mutations(kinase_structure, kinase_domain_sequence)
 
+        logging.debug("Renumbering residues ...")
+        residue_numbers = self._get_kinase_residue_numbers(kinase_structure, kinase_domain_sequence)
+        kinase_structure = renumber_structure(kinase_structure, residue_numbers)
+
         if self.loop_db:
             logging.debug("Applying insertions to kinase domain ...")
             kinase_structure = apply_insertions(kinase_structure, kinase_domain_sequence, self.loop_db)
 
-        logging.debug("Renumbering residues ...")
-        residue_numbers = self._get_kinase_residue_numbers(kinase_structure, kinase_domain_sequence)
-        kinase_structure = renumber_structure(kinase_structure, residue_numbers)
 
         logging.debug("Checking kinase domain sequence termini ...")
         real_termini = []
