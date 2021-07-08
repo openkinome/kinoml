@@ -24,7 +24,7 @@ class BaseFeaturizer:
 
     Parameters
     ----------
-    use_multiprocessing: bool, default=False
+    use_multiprocessing: bool, default=True
         If multiprocessing to use.
     n_processes: int or None, default=None
         How many processes to use in case of multiprocessing.
@@ -33,7 +33,8 @@ class BaseFeaturizer:
 
     _SUPPORTED_TYPES = (System,)
 
-    def __init__(self, use_multiprocessing=False, n_processes=None, **kwargs):
+    # TODO: environment variables for multiprocessing
+    def __init__(self, use_multiprocessing=True, n_processes=None, **kwargs):
         self.use_multiprocessing = use_multiprocessing
         self.n_processes = n_processes
 
