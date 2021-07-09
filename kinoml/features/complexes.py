@@ -789,29 +789,24 @@ class OEKLIFSKinaseApoFeaturizer(OEHybridDockingFeaturizer):
         logging.debug("Interpreting system ...")
         kinase_structure, electron_density = self._interpret_system(system)[1:]
 
-        if kinase_details["structure.alternate_model"] != "-":
-            logging.debug("Selecting alternate location ...")
-            try:
-                kinase_structure = select_altloc(
-                    kinase_structure, kinase_details["structure.alternate_model"]
-                )
-            except ValueError:
-                logging.debug(
-                    "Could not find alternate location "
-                    f"{kinase_details['structure.alternate_model']} for PDB entry "
-                    f"{kinase_details['structure.pdb_id']} chain "
-                    f"{kinase_details['structure.chain']}. Returning empty universe ..."
-                )
-                return mda.Universe.empty(0)
-
         logging.debug(f"Preparing kinase template structure of {kinase_details['structure.pdb_id']} ...")
-        design_unit = self._get_design_unit(
-            kinase_structure,
-            structure_identifier=kinase_details["structure.pdb_id"],
-            electron_density=electron_density,
-            ligand_name=kinase_details["ligand.expo_id"],
-            chain_id=kinase_details["structure.chain"],
-        )
+        try:
+            design_unit = self._get_design_unit(
+                kinase_structure,
+                structure_identifier=kinase_details["structure.pdb_id"],
+                electron_density=electron_density,
+                ligand_name=kinase_details["ligand.expo_id"],
+                chain_id=kinase_details["structure.chain"],
+                alternate_location=kinase_details["structure.alternate_model"],
+            )
+        except ValueError:
+            logging.debug(
+                f"Could not generate design unit for PDB entry "
+                f"{kinase_details['structure.pdb_id']} with alternate location "
+                f"{kinase_details['structure.alternate_model']} and chain ID " 
+                f"{kinase_details['structure.chain']}. Returning empty universe ..."
+            )
+            return mda.Universe.empty(0)
 
         logging.debug("Extracting kinase and solvent from design unit ...")
         prepared_kinase, prepared_solvent = self._get_components(design_unit)[:-1]
@@ -1430,29 +1425,23 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEKLIFSKinaseApoFeaturizer):
         logging.debug(f"Interpreting system ...")
         ligand, kinase_structure, electron_density = self._interpret_system(system)
 
-        if protein_template["structure.alternate_model"] != "-":
-            logging.debug("Selecting alternate location ...")
-            try:
-                kinase_structure = select_altloc(
-                    kinase_structure, protein_template["structure.alternate_model"]
-                )
-            except ValueError:
-                logging.debug(
-                    "Could not find alternate location "
-                    f"{protein_template['structure.alternate_model']} for PDB entry "
-                    f"{protein_template['structure.pdb_id']} chain "
-                    f"{protein_template['structure.chain']}. Returning empty universe ..."
-                )
-                return mda.Universe.empty(0)
-
         logging.debug(f"Preparing kinase template structure of {protein_template['structure.pdb_id']} ...")
-        design_unit = self._get_design_unit(
-            kinase_structure,
-            structure_identifier=protein_template["structure.pdb_id"],
-            electron_density=electron_density,
-            ligand_name=protein_template["ligand.expo_id"],
-            chain_id=protein_template["structure.chain"],
-        )
+        try:
+            design_unit = self._get_design_unit(
+                kinase_structure,
+                structure_identifier=protein_template["structure.pdb_id"],
+                electron_density=electron_density,
+                ligand_name=protein_template["ligand.expo_id"],
+                chain_id=protein_template["structure.chain"],
+            )
+        except ValueError:
+            logging.debug(
+                f"Could not generate design unit for PDB entry "
+                f"{protein_template['structure.pdb_id']} with alternate location "
+                f"{protein_template['structure.alternate_model']} and chain ID "
+                f"{protein_template['structure.chain']}. Returning empty universe ..."
+            )
+            return mda.Universe.empty(0)
 
         logging.debug(f"Preparing ligand template structure of {ligand_template['structure.pdb_id']} ...")
         prepared_ligand_template = self._prepare_ligand_template(ligand_template)
