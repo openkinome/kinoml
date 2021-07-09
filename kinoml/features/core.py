@@ -672,6 +672,8 @@ class HashFeaturizer(BaseFeaturizer):
         self.getter = getter or self._getter
         self.normalize = normalize
         self.denominator = 2 ** 256 if normalize else 1
+        # TODO: Fails tests when using multiprocessing, because pickling fails
+        self.use_multiprocessing = False
 
     @staticmethod
     def _getter(system):
@@ -731,6 +733,8 @@ class CallableFeaturizer(BaseFeaturizer):
         elif isinstance(func, str):
             func = eval(func)  # pylint: disable=eval-used
         self.callable = func
+        # TODO: Fails tests when using multiprocessing, because pickling fails
+        self.use_multiprocessing = False
 
     @staticmethod
     def _default_func(system, options):
@@ -771,6 +775,8 @@ class ClearFeaturizations(BaseFeaturizer):
         assert style in ("keep", "remove"), "`style` must be `keep` or `remove`"
         self.keys = keys
         self.style = style
+        # TODO: Fails tests when using multiprocessing
+        self.use_multiprocessing = False
 
     def _featurize_one(self, system: System, options: dict) -> System:
         if self.style == "keep":
