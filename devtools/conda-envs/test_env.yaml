@@ -22,6 +22,8 @@ dependencies:
   - biopandas
   - awkward
   - pyarrow
+  - dask
+  - dask-jobqueue
 
   # Development
   - jupyterlab

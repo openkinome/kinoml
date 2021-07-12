@@ -11,6 +11,7 @@ import hashlib
 from multiprocessing import Pool, cpu_count
 from functools import partial
 
+from dask.distributed import Client
 import numpy as np
 from tqdm.auto import tqdm
 
@@ -21,25 +22,20 @@ from ..utils import Hashabledict
 class BaseFeaturizer:
     """
     Abstract Featurizer class.
-
-    Parameters
-    ----------
-    use_multiprocessing: bool, default=True
-        If multiprocessing to use.
-    n_processes: int or None, default=None
-        How many processes to use in case of multiprocessing.
-        Defaults to number of available CPUs.
     """
 
     _SUPPORTED_TYPES = (System,)
 
     # TODO: environment variables for multiprocessing
-    def __init__(self, use_multiprocessing=True, n_processes=None, **kwargs):
-        self.use_multiprocessing = use_multiprocessing
-        self.n_processes = n_processes
 
     def featurize(
-        self, systems: Iterable[System], chunksize=None, keep=True
+            self,
+            systems: Iterable[System],
+            chunksize=None,
+            keep=True,
+            use_multiprocessing: bool = True,
+            n_processes: Union[int, None] = None,
+            dask_client: Union[Client, None] = None,
     ) -> object:
         """
         Given some systems (compatible with ``_SUPPORTED_TYPES``), apply
@@ -59,6 +55,14 @@ class BaseFeaturizer:
         keep : bool, optional=True
             Whether to store the current featurizer in the ``system.featurizations``
             dictionary with its own key (``self.name``), in addition to ``last``.
+        use_multiprocessing : bool, default=True
+            If multiprocessing to use.
+        n_processes : int or None, default=None
+            How many processes to use in case of multiprocessing.
+            Defaults to number of available CPUs.
+        dask_client : dask.distributed.Client or None, default=None
+            A dask client to manage multiprocessing. Will ignore `use_multiprocessing` and
+            `n_processes` attributes.
 
         Returns
         -------
@@ -70,7 +74,14 @@ class BaseFeaturizer:
         """
         self.supports(systems[0])
         self._pre_featurize()
-        features = self._featurize(systems, chunksize=chunksize, keep=keep)
+        features = self._featurize(
+            systems,
+            chunksize=chunksize,
+            keep=keep,
+            use_multiprocessing=use_multiprocessing,
+            n_processes=n_processes,
+            dask_client=dask_client,
+        )
         systems = self._post_featurize(systems, features, keep=keep)
         return systems
 
@@ -82,7 +93,13 @@ class BaseFeaturizer:
         return self.featurize(*args, **kwargs)
 
     def _featurize(
-        self, systems: Iterable[System], chunksize=None, keep: bool = True
+            self,
+            systems: Iterable[System],
+            chunksize=None,
+            keep: bool = True,
+            use_multiprocessing: bool = True,
+            n_processes: Union[int, None] = None,
+            dask_client: Union[Client, None] = None,
     ):
         """
         Some global properties can be optionally computed with
@@ -100,28 +117,42 @@ class BaseFeaturizer:
         keep : bool, optional=True
             Whether to store the current featurizer in the ``system.featurizations``
             dictionary with its own key (``self.name``), in addition to ``last``.
+        use_multiprocessing : bool, default=True
+            If multiprocessing to use.
+        n_processes : int or None, default=None
+            How many processes to use in case of multiprocessing.
+            Defaults to number of available CPUs.
+        dask_client : dask.distributed.Client or None, default=None
+            A dask client to manage multiprocessing. Will ignore `use_multiprocessing` and
+            `n_processes` attributes.
 
         Returns
         -------
         features : list of System or array-like
         """
+
         featurization_options = Hashabledict(self._featurize_options(systems) or {})
 
-        if self.use_multiprocessing:
-            if not self.n_processes:
-                self.n_processes = cpu_count()
-        else:
-            self.n_processes = 1
-
-        if self.n_processes == 1:
-            features = [
-                self._featurize_one(s, options=featurization_options)
-                for s in tqdm(systems, desc=self.name)
-            ]
-        else:
+        if isinstance(dask_client, Client):
             func = partial(self._featurize_one, options=featurization_options)
-            with Pool(processes=self.n_processes) as pool:
-                features = pool.map(func, systems, chunksize)
+            futures = dask_client.map(func, systems)
+            features = dask_client.gather(futures)
+        else:
+            if use_multiprocessing:
+                if not n_processes:
+                    n_processes = cpu_count()
+            else:
+                n_processes = 1
+
+            if n_processes == 1:
+                features = [
+                    self._featurize_one(s, options=featurization_options)
+                    for s in tqdm(systems, desc=self.name)
+                ]
+            else:
+                func = partial(self._featurize_one, options=featurization_options)
+                with Pool(processes=n_processes) as pool:
+                    features = pool.map(func, systems, chunksize)
 
         return features
 
