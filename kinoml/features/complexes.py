@@ -1316,14 +1316,19 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEKLIFSKinaseApoFeaturizer):
         If a shape overlay should be performed for selecting a ligand template
         in the hybrid docking protocol. Otherwise fingerprint similarity will
         be used.
+    exclude_pdb_ids: None or Iterable of str, default=None
+        An iterable of PDB IDs to exclude from searching ligand template for hybrid docking.
     """
 
     import pandas as pd
     from openeye import oechem
 
-    def __init__(self, shape_overlay: bool = False, **kwargs):
+    def __init__(self, shape_overlay: bool = False, exclude_pdb_ids=None, **kwargs):
         super().__init__(**kwargs)
         self.shape_overlay = shape_overlay
+        if exclude_pdb_ids is None:
+            exclude_pdb_ids = set()
+        self.exclude_pdb_ids = exclude_pdb_ids
 
     _SUPPORTED_TYPES = (ProteinLigandComplex,)
 
@@ -1662,6 +1667,12 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEKLIFSKinaseApoFeaturizer):
 
         logging.debug("Loading KLIFS structures ...")
         klifs_structures = pd.read_csv(LocalFileStorage.klifs_structure_db(self.cache_dir))
+
+        if len(self.exclude_pdb_ids) > 0:
+            logging.debug("Removing unwanted structures ...")
+            klifs_structures = klifs_structures[
+                ~klifs_structures["structure.pdb_id"].isin(self.exclude_pdb_ids)
+            ]
 
         logging.debug("Filtering KLIFS entries ...")
         structures = klifs_structures[
