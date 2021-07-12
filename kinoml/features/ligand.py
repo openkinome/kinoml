@@ -3,13 +3,12 @@ Featurizers that mostly concern ligand-based models
 """
 
 from __future__ import annotations
-from functools import lru_cache
 from typing import Union, Iterable
 
 import numpy as np
 import rdkit
 
-from .core import BaseFeaturizer, BaseOneHotEncodingFeaturizer
+from .core import ParallelBaseFeaturizer, BaseOneHotEncodingFeaturizer
 from ..core.systems import System
 from ..core.ligands import (
     BaseLigand,
@@ -20,7 +19,7 @@ from ..core.ligands import (
 )
 
 
-class SingleLigandFeaturizer(BaseFeaturizer):
+class SingleLigandFeaturizer(ParallelBaseFeaturizer):
     """
     Provides a minimally useful ``._supports()`` method for all Ligand-like featurizers.
     """

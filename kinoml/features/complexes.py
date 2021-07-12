@@ -10,13 +10,13 @@ from typing import Union, Tuple, Iterable, List
 
 from MDAnalysis.core import universe
 
-from .core import BaseFeaturizer
+from .core import ParallelBaseFeaturizer
 from ..core.proteins import ProteinStructure
 from ..core.sequences import Biosequence
 from ..core.systems import ProteinSystem, ProteinLigandComplex
 
 
-class OEHybridDockingFeaturizer(BaseFeaturizer):
+class OEHybridDockingFeaturizer(ParallelBaseFeaturizer):
 
     """
     Given a System with exactly one protein and one ligand,
