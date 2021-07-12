@@ -747,7 +747,6 @@ class OEKLIFSKinaseApoFeaturizer(OEHybridDockingFeaturizer):
         import MDAnalysis as mda
 
         from ..modeling.OEModeling import (
-            select_altloc,
             get_expression_tags,
             delete_residue,
             select_chain,
@@ -1317,7 +1316,7 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEKLIFSKinaseApoFeaturizer):
         in the hybrid docking protocol. Otherwise fingerprint similarity will
         be used.
     exclude_pdb_ids: None or Iterable of str, default=None
-        An iterable of PDB IDs to exclude from searching ligand template for hybrid docking.
+        An iterable of PDB IDs to exclude from searching a ligand template for hybrid docking.
     """
 
     import pandas as pd
@@ -1380,7 +1379,6 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEKLIFSKinaseApoFeaturizer):
         from ..modeling.OEModeling import (
             are_identical_molecules,
             read_smiles,
-            select_altloc,
             get_expression_tags,
             delete_residue,
             select_chain,
