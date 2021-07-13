@@ -855,7 +855,7 @@ class OEKLIFSKinaseApoFeaturizer(OEHybridDockingFeaturizer):
                 f"{kinase_details['kinase.klifs_name']}",
                 f"{kinase_details['structure.pdb_id']}",
                 f"chain{kinase_details['structure.chain']}",
-                f"altloc{system.protein.alternate_location}"  # KLIFS alternate locations buggy, e.g. 3cs9
+                f"altloc{kinase_details['structure.alternate_model']}"
             ]),
             None
         )
@@ -1550,7 +1550,7 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEKLIFSKinaseApoFeaturizer):
                 f"{protein_template['kinase.klifs_name']}",
                 f"{protein_template['structure.pdb_id']}",
                 f"chain{protein_template['structure.chain']}",
-                f"altloc{system.protein.alternate_location}"  # KLIFS alternate locations buggy, e.g. 3cs9
+                f"altloc{protein_template['structure.alternate_model']}"
             ]),
             system.ligand.name
         )
