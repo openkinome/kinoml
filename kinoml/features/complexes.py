@@ -1337,8 +1337,32 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEKLIFSKinaseApoFeaturizer):
         """
         self._create_klifs_structure_db(retrieve_pocket_resids=True)
         self._create_klifs_kinase_db()
+        self._create_ligand_smiles_dict()
         if self.shape_overlay:
             self._dowload_klifs_ligands()
+        return
+
+    def _create_ligand_smiles_dict(self) -> None:
+        """
+        Retrieve SMILES representations of orthosteric ligands found in KLIFS and store locally.
+        """
+        import json
+
+        import pandas as pd
+
+        from ..databases.pdb import smiles_from_pdb
+        from ..utils import LocalFileStorage
+
+        logging.debug("Reading available KLIFS structures from cache ...")
+        klifs_structures = pd.read_csv(LocalFileStorage.klifs_structure_db(self.cache_dir))
+
+        logging.debug("Retrieving SMILES for orthosteric ligands ...")
+        pdb_to_smiles = smiles_from_pdb(set(klifs_structures["ligand.expo_id"]))
+
+        logging.debug("Saving local PDB SMILES dictionary ...")
+        with open(LocalFileStorage.pdb_smiles_json(self.cache_dir), "w") as wf:
+            json.dump(pdb_to_smiles, wf)
+
         return
 
     def _dowload_klifs_ligands(self) -> None:
@@ -1713,26 +1737,11 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEKLIFSKinaseApoFeaturizer):
         """
         import json
 
-        from ..databases.pdb import smiles_from_pdb
         from ..utils import LocalFileStorage
 
-        logging.debug("Retrieving smiles information from PDB ...")
-        if LocalFileStorage.pdb_smiles_json(self.cache_dir).is_file():
-            logging.debug("Reading local PDB SMILES dictionary ...")
-            with open(LocalFileStorage.pdb_smiles_json(self.cache_dir), "r") as rf:
-                pdb_to_smiles = json.load(rf)
-        else:
-            logging.debug("Initiating new PDB to SMILES dictionary ...")
-            pdb_to_smiles = {}
-
-        logging.debug("Retrieving SMILES for unknown ligands ...")
-        pdb_to_smiles.update(
-            smiles_from_pdb(set(structures["ligand.expo_id"]) - set(pdb_to_smiles.keys()))
-        )
-
-        logging.debug("Saving local PDB SMILES dictionary ...")
-        with open(LocalFileStorage.pdb_smiles_json(self.cache_dir), "w") as wf:
-            json.dump(pdb_to_smiles, wf)
+        logging.debug("Reading local PDB SMILES dictionary ...")
+        with open(LocalFileStorage.pdb_smiles_json(self.cache_dir), "r") as rf:
+            pdb_to_smiles = json.load(rf)
 
         logging.debug("Adding SMILES to DataFrame ...")
         smiles_column = []
