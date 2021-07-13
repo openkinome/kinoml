@@ -1503,6 +1503,7 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEKLIFSKinaseApoFeaturizer):
 
         logging.debug("Extracting ligand ...")
         split_options = oechem.OESplitMolComplexOptions()
+        split_options.SetSplitCovalent(True)
         prepared_ligand_template = list(oechem.OEGetMolComplexComponents(
             prepared_ligand_template, split_options, split_options.GetLigandFilter())
         )[0]
