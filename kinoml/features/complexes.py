@@ -1174,6 +1174,9 @@ class OEKLIFSKinaseApoFeaturizer(OEHybridDockingFeaturizer):
         if ligand_name == "-":
             ligand_name = None
 
+        if alternate_location == "-":
+            alternate_location = None
+
         # generate unique design unit name
         design_unit_path = LocalFileStorage.featurizer_result(
             self.__class__.__name__,
