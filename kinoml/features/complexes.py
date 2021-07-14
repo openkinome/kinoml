@@ -1227,8 +1227,14 @@ class OEKLIFSKinaseApoFeaturizer(OEHybridDockingFeaturizer):
         logging.debug("Applying deletions to kinase domain ...")
         kinase_structure = apply_deletions(kinase_structure, kinase_domain_sequence)
 
+        logging.debug("Deleting loose protein segments after applying deletions ...")
+        kinase_structure = delete_short_protein_segments(kinase_structure)
+
         logging.debug("Applying mutations to kinase domain ...")
         kinase_structure = apply_mutations(kinase_structure, kinase_domain_sequence)
+
+        logging.debug("Deleting loose protein segments after applying mutations ...")
+        kinase_structure = delete_short_protein_segments(kinase_structure)
 
         logging.debug("Renumbering residues ...")
         residue_numbers = self._get_kinase_residue_numbers(kinase_structure, kinase_domain_sequence)
