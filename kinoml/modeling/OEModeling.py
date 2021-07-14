@@ -1194,7 +1194,7 @@ def apply_insertions(
 
     sidechain_options = oespruce.OESidechainBuilderOptions()
     loop_options = oespruce.OELoopBuilderOptions()
-    loop_options.SetOptimizationMaxLoops(5)
+    loop_options.SetOptimizationMaxLoops(25)
     loop_db = str(Path(loop_db).expanduser().resolve())
     loop_options.SetLoopDBFilename(loop_db)
     # the hierarchy view is more stable if reinitialized after each change
@@ -1245,27 +1245,15 @@ def apply_insertions(
                     logging.debug(
                         f"Generated loop conformation {i} contains not fixable severe clashes, trying next!"
                     )
-            if reinitialize:
-                # break and reinitialize
-                break
             else:
-                # increase number of loops to optimize
-                if loop_options.GetOptimizationMaxLoops() == 5:
-                    logging.debug("Increasing number of loops to optimize to 25!")
-                    loop_options.SetOptimizationMaxLoops(25)
-                    # break and reinitialize
-                    reinitialize = True
-                    break
-                else:
-                    loop_options.SetOptimizationMaxLoops(5)
-                    logging.debug("Failed building loop without clashes, skipping insertion!")
-                    # break bond between residues next to insertion
-                    # important if an isoform specific insertion failed
-                    structure_with_insertions = _disconnect_residues(
-                        structure_with_insertions,
-                        start_residue,
-                        end_residue
-                    )
+                logging.debug("Failed building loop without clashes, skipping insertion!")
+                # break bond between residues next to insertion
+                # important if an isoform specific insertion failed
+                structure_with_insertions = _disconnect_residues(
+                    structure_with_insertions,
+                    start_residue,
+                    end_residue
+                )
         # leave while loop
         if not reinitialize:
             break
