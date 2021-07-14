@@ -1040,14 +1040,16 @@ class OEKLIFSKinaseApoFeaturizer(OEHybridDockingFeaturizer):
     ) -> pd.Series:
         """
         Select a kinase structure from KLIFS with the specified conformation.
+
         Parameters
         ----------
         klifs_kinase_id: int
             KLIFS kinase identifier.
-        dfg: str
+        dfg: str or None, default=None
             The DFG conformation.
-        alpha_c_helix: bool
+        alpha_c_helix: str or None, default=None
             The alpha C helix conformation.
+
         Returns
         -------
         : pd.Series
@@ -1056,6 +1058,13 @@ class OEKLIFSKinaseApoFeaturizer(OEHybridDockingFeaturizer):
         import pandas as pd
 
         from ..utils import LocalFileStorage
+
+        logging.debug("Getting kinase reference pocket ...")
+        klifs_kinases = pd.read_csv(LocalFileStorage.klifs_kinase_db(self.cache_dir))
+        reference_pocket = klifs_kinases[
+            klifs_kinases["kinase.klifs_id"] == klifs_kinase_id
+            ]["kinase.pocket"].iloc[0]
+        reference_pocket = reference_pocket.replace("_", "")
 
         logging.debug("Searching kinase structures from KLIFS matching the kinase of interest ...")
         klifs_structures = pd.read_csv(LocalFileStorage.klifs_structure_db(self.cache_dir))
@@ -1077,27 +1086,55 @@ class OEKLIFSKinaseApoFeaturizer(OEHybridDockingFeaturizer):
             logging.debug("Exception: " + text)
             raise NotImplementedError(text)
         else:
-            logging.debug("Sorting structures by KLIFS quality score ...")
+            structures = self._add_kinase_pocket_similarity(reference_pocket, structures)
+            logging.debug("Sorting kinase structures by quality ...")
             structures = structures.sort_values(
                 by=[
+                    "pocket_similarity",  # detects missing residues and mutations
                     "structure.qualityscore",
                     "structure.resolution",
                     "structure.chain",
                     "structure.alternate_model"
                 ],
-                ascending=[False, True, True, True]
-            )
-
-            logging.debug("Sorting structures by number of KLIFS pocket residues ...")
-            structures = structures.sort_values(
-                by="structure.pocket",
-                ascending=False,
-                key=lambda x: x.str.replace("_", "").str.len()
+                ascending=[False, False, True, True, True]
             )
 
             kinase_structure = structures.iloc[0]
 
         return kinase_structure
+
+    @staticmethod
+    def _add_kinase_pocket_similarity(
+            reference_pocket: str, structures: pd.DataFrame,
+    ) -> pd.DataFrame:
+        """
+        Add a column to the input DataFrame containing the pocket similarity between the pockets
+        of KLIFS structures and a reference pocket.
+
+        Parameters
+        ----------
+        reference_pocket: str
+            The kinase pocket sequence the structures should be compared to.
+        structures: pd.DataFrame
+            A DataFrame containing KLIFS entries.
+
+        Returns
+        -------
+        : pd.DataFrame
+            The input DataFrame with a new 'pocket_similarity' column.
+        """
+        from ..modeling.alignment import sequence_similarity
+
+        logging.debug("Calculating string similarity between KLIFS pockets ...")
+        pocket_similarities = [
+            sequence_similarity(structure_pocket, reference_pocket) for structure_pocket
+            in structures["structure.pocket"]
+        ]
+
+        logging.debug("Adding pocket similarity to dataframe...")
+        structures["pocket_similarity"] = pocket_similarities
+
+        return structures
 
     def _get_design_unit(
         self,
@@ -1635,9 +1672,10 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEKLIFSKinaseApoFeaturizer):
 
         logging.debug("Searching kinase information from KLIFS ...")
         klifs_kinases = pd.read_csv(LocalFileStorage.klifs_kinase_db(self.cache_dir))
-        kinase_details = klifs_kinases[
+        reference_pocket = klifs_kinases[
             klifs_kinases["kinase.klifs_id"] == klifs_kinase_id
-            ].iloc[0]
+            ]["kinase.pocket"].iloc[0]
+        reference_pocket = reference_pocket.replace("_", "")
 
         logging.debug("Retrieve kinase structures from KLIFS for ligand template selection ...")
         structures = self._get_available_ligand_templates()
@@ -1660,11 +1698,9 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEKLIFSKinaseApoFeaturizer):
             logging.debug("Found identical co-crystallized ligands ...")
             structures = structures.iloc[identical_ligands]
             logging.debug("Searching for matching KLIFS kinase id ...")
-            if structures["kinase.klifs_id"].isin([kinase_details["kinase.klifs_id"]]).any():
+            if (structures["kinase.klifs_id"] == klifs_kinase_id).any():
                 logging.debug("Found matching KLIFS kinase id ...")
-                structures = structures[
-                    structures["kinase.klifs_id"].isin([kinase_details["kinase.klifs_id"]])
-                ]
+                structures = structures[structures["kinase.klifs_id"] == klifs_kinase_id]
         else:
             if self.shape_overlay:
                 logging.debug("Filtering for most similar ligands according to their shape overlay ...")
@@ -1674,7 +1710,7 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEKLIFSKinaseApoFeaturizer):
                 structures = self._filter_for_similar_ligands_2d(ligand, structures)
 
         logging.debug("Filtering for most similar kinase pockets ...")
-        structures = self._filter_for_similar_kinase_pockets(kinase_details["kinase.pocket"], structures)
+        structures = self._filter_for_similar_kinase_pockets(reference_pocket, structures)
 
         logging.debug("Picking structure with highest KLIFS quality ...")
         structure_for_ligand = structures.iloc[0]
@@ -1905,9 +1941,8 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEKLIFSKinaseApoFeaturizer):
 
         return structures
 
-    @staticmethod
     def _filter_for_similar_kinase_pockets(
-            reference_pocket: str, structures: pd.DataFrame
+            self, reference_pocket: str, structures: pd.DataFrame
     ) -> pd.DataFrame:
         """
         Filter KLIFS structures for most similar kinase pockets compared
@@ -1926,20 +1961,13 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEKLIFSKinaseApoFeaturizer):
             The input DataFrame filtered for KLIFS entries with most
             similar kinase pockets.
         """
-        from ..modeling.alignment import sequence_similarity
+        from kinoml.modeling.alignment import sequence_similarity
 
-        logging.debug("Calculating string similarity between KLIFS pockets ...")
-        pocket_similarities = [
-            sequence_similarity(structure_pocket, reference_pocket) for structure_pocket
-            in structures["structure.pocket"]
-        ]
-
-        logging.debug("Adding pocket similarity to dataframe...")
-        structures["pocket_similarity"] = pocket_similarities
+        structures = self._add_kinase_pocket_similarity(reference_pocket, structures)
 
         # if maximal possible score is 498, similarity threshold is corrected by 49.8
         threshold_correction = sequence_similarity(reference_pocket, reference_pocket) / 10
-        pocket_similarity_threshold = max(pocket_similarities) - threshold_correction
+        pocket_similarity_threshold = structures["pocket_similarity"].max() - threshold_correction
 
         logging.debug("Picking structures with most similar kinase pockets ...")
         structures = structures[structures["pocket_similarity"] >= pocket_similarity_threshold]
