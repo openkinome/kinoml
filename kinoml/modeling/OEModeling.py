@@ -1245,6 +1245,9 @@ def apply_insertions(
                     logging.debug(
                         f"Generated loop conformation {i} contains not fixable severe clashes, trying next!"
                     )
+            if reinitialize:
+                # break and reinitialize
+                break
             else:
                 logging.debug("Failed building loop without clashes, skipping insertion!")
                 # break bond between residues next to insertion
