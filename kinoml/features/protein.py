@@ -4,14 +4,13 @@ Featurizers that mostly concern protein-based models
 from __future__ import annotations
 import numpy as np
 from collections import Counter
-from typing import Iterable
 
-from .core import BaseFeaturizer, BaseOneHotEncodingFeaturizer
+from .core import ParallelBaseFeaturizer, BaseOneHotEncodingFeaturizer
 from ..core.systems import System
 from ..core.proteins import AminoAcidSequence
 
 
-class AminoAcidCompositionFeaturizer(BaseFeaturizer):
+class AminoAcidCompositionFeaturizer(ParallelBaseFeaturizer):
 
     """
     Featurizes the protein using the composition of the residues
