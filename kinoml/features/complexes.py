@@ -1469,7 +1469,14 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEKLIFSKinaseApoFeaturizer):
         logging.debug(f"Selected {ligand_template['structure.pdb_id']} as ligand template ...")
 
         logging.debug("Searching kinase template ...")
-        if ligand_template["kinase.klifs_id"] == system.protein.klifs_kinase_id:
+        if hasattr(system.protein, "pdb_id"):
+            protein_template = self._select_kinase_structure_by_pdb_id(
+                system.protein.pdb_id,
+                system.protein.klifs_kinase_id,
+                system.protein.chain_id,
+                system.protein.alternate_location
+            )
+        elif ligand_template["kinase.klifs_id"] == system.protein.klifs_kinase_id:
             protein_template = ligand_template
         else:
             try:
