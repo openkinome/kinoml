@@ -22,7 +22,9 @@ class _BaseModule(nn.Module):
         If your ``.forward()`` method takes something else
         than a Tensor, please adapt this method accordingly.
         """
-        return input_sample.shape[1]
+        if type(input_sample) == list:
+            return input_sample[0].shape[1]
+        else: input_sample.shape[1]
 
 
 class NeuralNetworkRegression(_BaseModule):
@@ -58,6 +60,7 @@ class NeuralNetworkRegression(_BaseModule):
         """
         Defines the foward pass for a given input 'x'.
         """
+        x = x[0]
         x = x.float()
         x = self._activation(self.fully_connected_1(x))
         return self.fully_connected_out(x)
