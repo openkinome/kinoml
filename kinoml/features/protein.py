@@ -4,19 +4,21 @@ Featurizers that mostly concern protein-based models
 from __future__ import annotations
 import numpy as np
 from collections import Counter
-from typing import Iterable
 
-from .core import BaseFeaturizer, BaseOneHotEncodingFeaturizer
+from .core import ParallelBaseFeaturizer, BaseOneHotEncodingFeaturizer
 from ..core.systems import System
 from ..core.proteins import AminoAcidSequence
 
 
-class AminoAcidCompositionFeaturizer(BaseFeaturizer):
+class AminoAcidCompositionFeaturizer(ParallelBaseFeaturizer):
 
     """
     Featurizes the protein using the composition of the residues
     in the binding site.
     """
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
     # Initialize a Counter object with 0 counts
     _counter = Counter(sorted(AminoAcidSequence.ALPHABET))
@@ -51,6 +53,9 @@ class OneHotEncodedSequenceFeaturizer(BaseOneHotEncodingFeaturizer):
     Featurize the sequence of the protein to a one hot encoding
     using the symbols in ``ALL_AMINOACIDS``.
     """
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
     ALPHABET = AminoAcidSequence.ALPHABET
 
