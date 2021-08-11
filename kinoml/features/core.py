@@ -11,7 +11,6 @@ import hashlib
 from multiprocessing import Pool, cpu_count
 from functools import partial
 
-from dask.distributed import Client
 import numpy as np
 from tqdm.auto import tqdm
 
@@ -260,7 +259,7 @@ class ParallelBaseFeaturizer(BaseFeaturizer):
             keep=True,
             use_multiprocessing: bool = True,
             n_processes: Union[int, None] = None,
-            dask_client: Union[Client, None] = None,
+            dask_client=None,
     ) -> object:
         """
         Given some systems (compatible with ``_SUPPORTED_TYPES``), apply
@@ -317,7 +316,7 @@ class ParallelBaseFeaturizer(BaseFeaturizer):
             keep: bool = True,
             use_multiprocessing: bool = True,
             n_processes: Union[int, None] = None,
-            dask_client: Union[Client, None] = None,
+            dask_client=None,
     ):
         """
         Some global properties can be optionally computed with
@@ -347,6 +346,7 @@ class ParallelBaseFeaturizer(BaseFeaturizer):
         -------
         features : list of System or array-like
         """
+        from dask.distributed import Client
 
         featurization_options = Hashabledict(self._featurize_options(systems) or {})
 
