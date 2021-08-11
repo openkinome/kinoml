@@ -4,6 +4,7 @@ KinoML
 [![Travis Build Status](https://travis-ci.org/REPLACE_WITH_OWNER_ACCOUNT/KinoML.png)](https://travis-ci.org/REPLACE_WITH_OWNER_ACCOUNT/KinoML)
 [![AppVeyor Build status](https://ci.appveyor.com/api/projects/status/REPLACE_WITH_APPVEYOR_LINK/branch/master?svg=true)](https://ci.appveyor.com/project/REPLACE_WITH_OWNER_ACCOUNT/KinoML/branch/master)
 [![codecov](https://codecov.io/gh/REPLACE_WITH_OWNER_ACCOUNT/KinoML/branch/master/graph/badge.svg)](https://codecov.io/gh/REPLACE_WITH_OWNER_ACCOUNT/KinoML/branch/master)
+[![CI](https://github.com/openkinome/kinoml/actions/workflows/ci.yaml/badge.svg?branch=master)](https://github.com/openkinome/kinoml/actions/workflows/ci.yaml)
 
 Machine Learning for kinase modeling
 
