@@ -11,7 +11,6 @@ dependencies:
   - requests
   - pint
   - appdirs
-  - mdanalysis
   - tqdm
   - openff-toolkit >=0.9
   - xgboost
@@ -23,6 +22,8 @@ dependencies:
   - biopandas
   - awkward
   - pyarrow
+  - dask
+  - dask-jobqueue
 
   # Development
   - jupyterlab
@@ -34,12 +35,11 @@ dependencies:
   - codecov
 
   - pip:
-      # Torch -- default is CUDA=10.2 on Linux, CPU on MacOS
-      - torch==1.7.1
-      - torchvision==0.8.2
-      - torchaudio==0.7.2
+      - torch==1.9.0
+      - torchvision
+      - torchaudio
       # Torch geometric
-      - --find-links https://pytorch-geometric.com/whl/torch-1.7.0+cpu.html
+      - --find-links https://pytorch-geometric.com/whl/torch-1.9.0+cpu.html
       - torch-scatter
       - torch-sparse
       - torch-cluster
@@ -72,3 +72,5 @@ dependencies:
       - sphinx-material
       # local building
       - sphinx-autobuild
+      # no stable release yet with support for serialization
+      - MDAnalysis==2.0.0b0
