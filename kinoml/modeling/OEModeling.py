@@ -221,6 +221,12 @@ def select_altloc(
     if not altloc_was_present:
         raise ValueError("No atoms were found with given altloc id.")
 
+    # remove alternate location identifiers
+    oechem.OEPerceiveResidues(
+        selection,
+        oechem.OEPreserveResInfo_All - oechem.OEPreserveResInfo_AlternateLocation
+    )
+
     return selection
 
 
@@ -670,37 +676,6 @@ def prepare_protein(
     )
 
 
-def read_klifs_ligand(structure_id: int) -> oechem.OEGraphMol:
-    """
-    Retrieve and read an orthosteric kinase ligand from KLIFS.
-
-    Parameters
-    ----------
-    structure_id: int
-        KLIFS structure identifier.
-
-    Returns
-    -------
-    molecule: oechem.OEGraphMol
-        An OpenEye molecule holding the orthosteric ligand.
-    """
-    from ..utils import LocalFileStorage
-
-    file_path = LocalFileStorage.klifs_ligand_mol2(structure_id)
-
-    if not file_path.is_file():
-        from opencadd.databases.klifs import setup_remote
-
-        remote = setup_remote()
-        mol2_text = remote.coordinates.to_text(structure_id, entity="ligand", extension="mol2")
-        with open(file_path, "w") as wf:
-            wf.write(mol2_text)
-
-    molecule = read_molecules(file_path)[0]
-
-    return molecule
-
-
 def generate_tautomers(
         molecule: Union[oechem.OEMolBase, oechem.OEMCMolBase],
         max_generate: int = 4096,
@@ -741,7 +716,7 @@ def generate_tautomers(
         in oequacpac.OEGetReasonableTautomers(
             molecule, tautomer_options, pKa_norm
         )
-    ]
+    ]  # ToDo: report unexpected behavior, with pKa_norm set False, positively charged imidazole become neutral
     return tautomers
 
 
@@ -1219,7 +1194,7 @@ def apply_insertions(
 
     sidechain_options = oespruce.OESidechainBuilderOptions()
     loop_options = oespruce.OELoopBuilderOptions()
-    loop_options.SetOptimizationMaxLoops(5)
+    loop_options.SetOptimizationMaxLoops(25)
     loop_db = str(Path(loop_db).expanduser().resolve())
     loop_options.SetLoopDBFilename(loop_db)
     # the hierarchy view is more stable if reinitialized after each change
@@ -1258,7 +1233,6 @@ def apply_insertions(
                 for i, loop_conformation in enumerate(loop_conformations.GetConfs()):
                     # loop modeling from OESpruce can lead to ring penetration, e.g. 3bel
                     # the next step tries to fix those issues
-                    logging.debug("Deleting newly modeled side chains with severe clashes ...")
                     loop_conformation = oechem.OEGraphMol(loop_conformation)
                     loop_conformation = delete_clashing_sidechains(loop_conformation)
                     oespruce.OEBuildSidechains(loop_conformation)
@@ -1275,23 +1249,14 @@ def apply_insertions(
                 # break and reinitialize
                 break
             else:
-                # increase number of loops to optimize
-                if loop_options.GetOptimizationMaxLoops() == 5:
-                    logging.debug("Increasing number of loops to optimize to 25!")
-                    loop_options.SetOptimizationMaxLoops(25)
-                    # break and reinitialize
-                    reinitialize = True
-                    break
-                else:
-                    loop_options.SetOptimizationMaxLoops(5)
-                    logging.debug("Failed building loop without clashes, skipping insertion!")
-                    # break bond between residues next to insertion
-                    # important if an isoform specific insertion failed
-                    structure_with_insertions = _disconnect_residues(
-                        structure_with_insertions,
-                        start_residue,
-                        end_residue
-                    )
+                logging.debug("Failed building loop without clashes, skipping insertion!")
+                # break bond between residues next to insertion
+                # important if an isoform specific insertion failed
+                structure_with_insertions = _disconnect_residues(
+                    structure_with_insertions,
+                    start_residue,
+                    end_residue
+                )
         # leave while loop
         if not reinitialize:
             break
@@ -1863,3 +1828,50 @@ def split_molecule_components(molecule: oechem.OEMolBase) -> List[oechem.OEGraph
         components.append(component)
 
     return components
+
+
+def residue_ids_to_residue_names(
+        structure: oechem.OEMolBase,
+        residue_ids: List[int],
+        chain_id: Union[None, str] = None
+) -> List[str]:
+    """
+    Get the corresponding residue names for a list of residue IDs and a give OpenEye molecule
+    with residue information.
+
+    Parameters
+    ----------
+    structure: oechem.OEMolBase
+        An OpenEye molecule with residue information.
+    residue_ids: list of int
+        A list of residue IDs.
+    chain_id: None or str
+        The chain ID to filter for.
+
+    Returns
+    -------
+    residue_names: list of str
+        The corresponding residue names as three letter codes.
+
+    Raises
+    ------
+    ValueError
+        No residue found for residue ID {resid}.
+    ValueError
+        Found multiple residues for residue ID {resid}.
+    """
+    residue_names = []
+    if not chain_id:
+        chain_id = ".*"
+    for resid in residue_ids:
+        predicate = oechem.OEAtomMatchResidue(f".*:{resid}:.*:{chain_id}:.*:.*")
+        selection_residue_names = set([
+            oechem.OEAtomGetResidue(atom).GetName() for atom in structure.GetAtoms(predicate)
+        ])
+        if len(selection_residue_names) == 0:
+            raise ValueError(f"No residue found for residue ID {resid}.")
+        elif len(selection_residue_names) > 1:
+            raise ValueError(f"Found multiple residues for residue ID {resid}.")
+        residue_names.append(selection_residue_names.pop())
+
+    return residue_names

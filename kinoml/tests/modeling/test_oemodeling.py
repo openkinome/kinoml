@@ -19,7 +19,6 @@ from kinoml.modeling.OEModeling import (
     get_expression_tags,
     assign_caps,
     prepare_structure,
-    read_klifs_ligand,
     generate_tautomers,
     generate_enantiomers,
     generate_conformations,
@@ -40,6 +39,7 @@ from kinoml.modeling.OEModeling import (
     superpose_proteins,
     update_residue_identifiers,
     split_molecule_components,
+    residue_ids_to_residue_names,
 )
 
 
@@ -229,7 +229,6 @@ def test_write_molecules(molecules, suffix, n_atoms_list):
             assert _count_atoms(temp_file.name, i) == n_atoms
 
 
-# TODO: Add a README to data directory explaining whats great about 4f8o
 @pytest.mark.parametrize(
     "package, resource, chain_id, expectation, n_atoms",
     [
@@ -430,6 +429,7 @@ def test_assign_caps(package, resource, real_termini, caps):
         )
         assert found_caps == caps
 
+
 @pytest.mark.parametrize(
     "package, resource, has_ligand, chain_id, altloc, ligand_name, expectation, title_contains",
     [
@@ -509,16 +509,19 @@ def test_prepare_structure(package, resource, has_ligand, chain_id, altloc, liga
             0
         ),
     ],
-)
+)  # TODO: move to tests for featurizers
 def test_read_klifs_ligand(klifs_structure_id, expectation, n_atoms):
     """Compare results to expected number of atoms."""
     import warnings
 
+    from kinoml.features.complexes import OEKLIFSKinaseHybridDockingFeaturizer
+
+    featurizer = OEKLIFSKinaseHybridDockingFeaturizer()
     # filter benign warnings
     warnings.filterwarnings("ignore", message="numpy.ufunc size changed")
 
     with expectation:
-        molecule = read_klifs_ligand(klifs_structure_id)
+        molecule = featurizer._read_klifs_ligand(klifs_structure_id)
         assert molecule.NumAtoms() == n_atoms
 
 
@@ -1210,3 +1213,50 @@ def test_split_molecule_components(package, resource, n_components):
         structure = read_molecules(str(path))[0]
         components = split_molecule_components(structure)
         assert len(components) == n_components
+
+
+@pytest.mark.parametrize(
+    "package, resource, residue_ids, chain_id, expectation, residue_names",
+    [
+        (
+            "kinoml.data.proteins",
+            "4f8o.pdb",
+            [1, 2, 3],
+            "A",
+            does_not_raise(),
+            ["MET", "ASN", "THR"],
+        ),
+        (  # multiple residues match resids without specifying chain ID
+            "kinoml.data.proteins",
+            "4f8o.pdb",
+            [1, 2, 3],
+            None,
+            pytest.raises(ValueError),
+            ["MET", "ASN", "THR"],
+        ),
+        (  # chain C does not exist
+            "kinoml.data.proteins",
+            "4f8o.pdb",
+            [1, 2, 3],
+            "C",
+            pytest.raises(ValueError),
+            ["MET", "ASN", "THR"],
+        ),
+    ],
+)
+def test_residue_ids_to_residue_names(
+        package,
+        resource,
+        residue_ids,
+        chain_id,
+        expectation,
+        residue_names
+):
+    """
+    Compare results to have the expected residue names.
+    """
+    with resources.path(package, resource) as path:
+        structure = read_molecules(str(path))[0]
+        with expectation:
+            found_residue_names = residue_ids_to_residue_names(structure, residue_ids, chain_id)
+            assert all([True for x, y in zip(found_residue_names, residue_names) if x == y])
