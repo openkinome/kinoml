@@ -1,10 +1,9 @@
 KinoML
 ==============================
 [//]: # (Badges)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![CI](https://github.com/openkinome/kinoml/actions/workflows/ci.yaml/badge.svg?branch=master)](https://github.com/openkinome/kinoml/actions/workflows/ci.yaml)
 [![codecov](https://codecov.io/gh/openkinome/KinoML/branch/master/graph/badge.svg)](https://codecov.io/gh/openkinome/KinoML/branch/master)
-
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
 ![GitHub closed pr](https://img.shields.io/github/issues-pr-closed-raw/openkinome/kinoml) 
 ![GitHub open pr](https://img.shields.io/github/issues-pr-raw/openkinome/kinoml) 
