@@ -4,7 +4,7 @@ channels:
   - openeye
   - salilab
 dependencies:
-  # Base depends
+  # base depends
   - python
   - pip
   - pandas
@@ -14,32 +14,33 @@ dependencies:
   - tqdm
   - openff-toolkit >=0.9
   - xgboost
-  #- openeye-toolkits >=2020.2.0 # segfaults
-  - openeye-toolkits =2020.2
-  - modeller
+  - openeye-toolkits >=2020.2.0 # segfaults
   - biotite
-  - watermark
   - bravado
   - biopandas
   - awkward
   - pyarrow
+
+  # distributed computing
   - dask
   - dask-jobqueue
 
-  # pin cudatoolkit to make sure we end up with consistent CUDA versions with pytorch
-  - cudatoolkit =11.1 # [linux]
+  # reproducible workflows
+  - papermill
+  - watermark
 
   # pytorch
   - pytorch
-
-  # pytorch-geometric
   - pytorch_geometric
 
-  # Development
+  # structural modeling
+  #- modeller
+
+  # development
   - jupyterlab
   - nglview
 
-  # Testing
+  # testing
   - pytest
   - pytest-cov
   - codecov
