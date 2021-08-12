@@ -24,6 +24,8 @@ dependencies:
   - pyarrow
   - dask
   - dask-jobqueue
+  - papermill 2.2.*
+  - matplotlib-base
 
   # Development
   - jupyterlab
