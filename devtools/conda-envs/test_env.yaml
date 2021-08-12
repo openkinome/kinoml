@@ -26,6 +26,7 @@ dependencies:
   - dask-jobqueue
   - papermill 2.2.*
   - matplotlib-base
+  - ruamel.yaml
 
   # Development
   - jupyterlab
