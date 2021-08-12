@@ -346,11 +346,17 @@ class ParallelBaseFeaturizer(BaseFeaturizer):
         -------
         features : list of System or array-like
         """
-        from dask.distributed import Client
-
         featurization_options = Hashabledict(self._featurize_options(systems) or {})
 
-        if isinstance(dask_client, Client):
+        if dask_client is not None:
+
+            if not hasattr(dask_client, "map"):
+                from dask.distributed import Client
+                if not isinstance(dask_client, Client):
+                    raise ValueError(
+                        "The dask_client attribute appears not to be a Client from dask.distributed."
+                    )
+                
             func = partial(self._featurize_one, options=featurization_options)
             futures = dask_client.map(func, systems)
             features = dask_client.gather(futures)
