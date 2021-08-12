@@ -42,15 +42,10 @@ class GraphConvolutionNeuralNetwork(_BaseModule):
         self._activation = activation
 
         self.GraphConvLayer1 = GCNConv(self.input_shape, self.embedding_shape)
-        self.GraphConvLayer2 = GCNConv(self.embedding_shape, self.hidden_shape)
-
-        self.linear = Linear(self.hidden_shape, self.output_shape)
+        self.GraphConvLayer2 = GCNConv(self.embedding_shape, self.output_shape)
 
     def forward(self, data):
-        data = data[0]  # get the first one only?
-        x, edge_index, batch = data.x.float(), data.edge_index.long(), data.batch
+        x, edge_index = data.x, data.edge_index
         x = self._activation(self.GraphConvLayer1(x, edge_index))
-        x = self._activation(self.GraphConvLayer2(x, edge_index))
-        x = global_mean_pool(x, batch)
-        return self.linear(x)
+        return self.GraphConvLayer2(x, edge_index)
 
