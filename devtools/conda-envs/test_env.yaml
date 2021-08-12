@@ -77,3 +77,5 @@ dependencies:
       - sphinx-autobuild
       # no stable release yet with support for serialization
       - MDAnalysis==2.0.0b0
+      # Latest kinoml
+      - https://github.com/openkinome/kinoml/archive/master.tar.gz
