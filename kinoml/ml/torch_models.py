@@ -24,7 +24,8 @@ class _BaseModule(nn.Module):
         """
         if type(input_sample) == list:
             return input_sample[0].shape[1]
-        else: input_sample.shape[1]
+        else:
+            return input_sample.shape[1]
 
 
 class NeuralNetworkRegression(_BaseModule):
