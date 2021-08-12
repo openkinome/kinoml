@@ -26,7 +26,7 @@ dependencies:
   - dask-jobqueue
 
   # pin cudatoolkit to make sure we end up with consistent CUDA versions with pytorch
-  - cudatoolkit =11.1
+  - cudatoolkit =11.1 [linux]
 
   # pytorch
   - pytorch
