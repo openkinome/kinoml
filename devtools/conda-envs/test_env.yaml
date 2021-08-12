@@ -14,7 +14,8 @@ dependencies:
   - tqdm
   - openff-toolkit >=0.9
   - xgboost
-  - openeye-toolkits >=2020.2.0
+  #- openeye-toolkits >=2020.2.0 # segfaults
+  - openeye-toolkits =2020.2
   - modeller
   - biotite
   - watermark
@@ -26,7 +27,7 @@ dependencies:
   - dask-jobqueue
 
   # pin cudatoolkit to make sure we end up with consistent CUDA versions with pytorch
-  - cudatoolkit =11.1 [linux]
+  - cudatoolkit =11.1 # [linux]
 
   # pytorch
   - pytorch
