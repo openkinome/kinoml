@@ -163,7 +163,7 @@ class MorganFingerprintFeaturizer(SingleLigandFeaturizer):
         # otherwise, we should force that behaviour ourselves!
         ligand = self._find_ligand(system).to_rdkit()
         fp = Morgan(ligand, radius=self.radius, nBits=self.nbits)
-        return np.asarray(fp, dtype="bool")
+        return np.asarray(fp, dtype="int64")
 
 
 class OneHotSMILESFeaturizer(BaseOneHotEncodingFeaturizer, SingleLigandFeaturizer):
