@@ -85,7 +85,7 @@ jobs:
       - name: Run unit tests
         shell: bash -l {0}
         run: |
-          pytest -v --cov=kinoml --cov-report=xml --color=yes kinoml/tests/
+          pytest -v --dist loadscope --numprocesses 2 --cov=kinoml --cov-report=xml --color=yes kinoml/tests/
 
       - name: Run notebook tests
         shell: bash -l {0}
