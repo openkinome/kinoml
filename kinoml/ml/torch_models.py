@@ -204,6 +204,8 @@ class ConvolutionNeuralNetworkRegression(_BaseModule):
         """
         Defines the foward pass for a given input 'x'
         """
+        x = x[0]
+        x = x.float()
         x = self._activation(self.convolution(x))
         x = torch.flatten(x, 1)
         x = self._activation(self.fully_connected_1(x))
