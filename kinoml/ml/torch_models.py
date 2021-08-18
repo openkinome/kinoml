@@ -205,11 +205,8 @@ class ConvolutionNeuralNetworkRegression(_BaseModule):
         """
         x = x[0]
         x = x.float()
-        print(x.shape)
         x = self._activation(self.convolution(x))
-        print(f"{x.shape=}")
         x = torch.flatten(x, 1)
-        print(f"{x.shape=}")
         x = self._activation(self.fully_connected_1(x))
         return self.fully_connected_out(x)
 
