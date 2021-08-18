@@ -23,13 +23,11 @@ class _BaseModule(nn.Module):
         than a Tensor, please adapt this method accordingly.
         """
         if len(input_sample)==1: # ligand-only
-            print("ligand-only")
             if len(input_sample[0].shape[1:]) == 1: # for fingerprint: vector
                 return input_sample[0].shape[1]
             else:
                 return input_sample[0].shape[1:] # for smiles: matrix
         else: # kinase-informed
-            print("kinase-informed")
             if len(input_sample[0].shape[1:]) == 1: # for hash + composition: vectors
                 return (input_sample[0].shape[1], input_sample[1].shape[1])
             else:
