@@ -1,8 +1,3 @@
-from ..core.proteins import ProteinStructure
-from ..core.sequences import KinaseDomainAminoAcidSequence
-from typing import Union
-
-
 def sequence_similarity(
         sequence1: str,
         sequence2: str,
