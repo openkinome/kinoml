@@ -692,9 +692,12 @@ class OEKLIFSKinaseApoFeaturizer(OEHybridDockingFeaturizer):
             ]
             for structure_klifs_id in structures_wo_pocket_resids["structure.klifs_id"]:
                 pocket = remote.pockets.by_structure_klifs_id(structure_klifs_id)
-                pocket_ids = " ".join(  # filter out missing residues defined as "_"
-                    [residue_id for residue_id in pocket["residue.id"] if residue_id != "_"]
-                )
+                if any(pd.isnull(pocket["residue.id"])):
+                    pocket_ids = ""
+                else:
+                    pocket_ids = " ".join(  # filter out missing residues defined as "_"
+                        [residue_id for residue_id in pocket["residue.id"] if residue_id != "_"]
+                    )
                 klifs_structure_db.loc[
                     (klifs_structure_db["structure.klifs_id"] == structure_klifs_id),
                     "structure.pocket_resids"
