@@ -22,14 +22,10 @@ class _BaseModule(nn.Module):
         If your ``.forward()`` method takes something else
         than a Tensor, please adapt this method accordingly.
         """
-        if type(input_sample) == list:
-            if len(input_sample) == 1:
-                return input_sample[0].shape[1]
-            else:
-                return input_sample[0].shape[1] # works for hash + composition
-                # return (input_sample[0].shape[1:], input_sample[1].shape[1:]) # works for seq.
+        if len(input_sample[0].shape[1:]) == 1: # for hash + composition: vectors
+            return (input_sample[0].shape[1], input_sample[1].shape[1])
         else:
-            return input_sample.shape[1]
+            return (input_sample[0].shape[1:], input_sample[1].shape[1:]) # for seq.: matrix
 
 
 class NeuralNetworkRegression(_BaseModule):
@@ -67,6 +63,7 @@ class NeuralNetworkRegression(_BaseModule):
         """
         x = x[0]
         x = x.float()
+        print(f"{x.shape = }")
         x = self._activation(self.fully_connected_1(x))
         return self.fully_connected_out(x)
 
@@ -283,6 +280,8 @@ class ConvolutionNeuralNetworkRegressionKinaseInformed(_BaseModule):
         Defines the foward pass for given an input composed of two entities: ligand and protein.
         """
         x_ligand, x_protein = x[0], x[1]
+        print(f"{x_ligand.shape = }")
+        print(f"{x_protein.shape = }")
 
         x_lig = self._activation(self.convolution_ligand(x_ligand.float()))
         x_prot = self._activation(self.convolution_protein(x_protein.float()))
@@ -295,3 +294,74 @@ class ConvolutionNeuralNetworkRegressionKinaseInformed(_BaseModule):
         x = self._activation(self.fully_connected_1(x))
 
         return self.fully_connected_out(x)
+
+class NeuralNetworkRegressionKinaseInformed(_BaseModule):
+   """
+   Builds a Neural Network and a feed-forward pass for a kinase-ligand setting.
+
+   Parameters
+   ----------
+   input_shape : tuple
+       Dimension of input tensors, for the ligand and the protein.
+   embedding_shape : int, default=200
+       Dimension of the embedding after convolution.
+   kernel_shape : int, default=10
+       Size of the kernel for the convolution.
+   hidden_shape : int, default=100
+       Number of units in the hidden layer.
+   output_shape : int, default=1
+       Size of the last unit, representing delta_g_over_kt in our setting.
+   activation : torch function, default=relu
+       The activation function used in the hidden (only!) layer of the network.
+   """
+
+
+   def __init__(
+       self,
+       input_shape,
+       embedding_shape=300,
+       kernel_shape=10,
+       hidden_shape=100,
+       output_shape=1,
+       activation=F.relu,
+   ):
+       super().__init__()
+
+       self.input_shape = input_shape
+
+       self.embedding_shape = embedding_shape
+       self.kernel_shape = kernel_shape
+       self.hidden_shape = hidden_shape
+       self.output_shape = output_shape
+       self._activation = activation
+
+       # Fully connected layer on ligand
+       self.fully_connected_ligand = nn.Linear(self.input_shape[0], 300)
+       self.fully_connected_protein = nn.Linear(self.input_shape[1], 10)
+
+       # Ligand - protein
+       self.ligand_protein = 310
+
+       # Output
+       self.fully_connected_1 = nn.Linear(self.ligand_protein, self.hidden_shape)
+       self.fully_connected_out = nn.Linear(self.hidden_shape, self.output_shape)
+
+   def forward(self, x):
+       """
+       Defines the foward pass for given an input composed of two entities: ligand and protein.
+       """
+       x_ligand, x_protein = x[0], x[1]
+       print(f"{x_ligand.shape = }")
+       print(f"{x_protein.shape = }")
+
+       x_lig = self._activation(self.fully_connected_ligand(x_ligand.float()))
+       x_prot = self._activation(self.fully_connected_protein(x_protein.float()))
+
+       # x_lig = torch.flatten(x_lig, 1)
+       # x_prot = torch.flatten(x_prot, 1)
+
+       x = torch.cat((x_lig, x_prot), dim=1)
+
+       x = self._activation(self.fully_connected_1(x))
+
+       return self.fully_connected_out(x)
