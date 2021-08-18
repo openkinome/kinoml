@@ -22,11 +22,18 @@ class _BaseModule(nn.Module):
         If your ``.forward()`` method takes something else
         than a Tensor, please adapt this method accordingly.
         """
-        if len(input_sample[0].shape[1:]) == 1: # for hash + composition: vectors
-            return (input_sample[0].shape[1], input_sample[1].shape[1])
-        else:
-            return (input_sample[0].shape[1:], input_sample[1].shape[1:]) # for seq.: matrix
-
+        if len(input_sample)==1: # ligand-only
+            print("ligand-only")
+            if len(input_sample[0].shape[1:]) == 1: # for fingerprint: vector
+                return input_sample[0].shape[1]
+            else:
+                return input_sample[0].shape[1:] # for smiles: matrix
+        else: # kinase-informed
+            print("kinase-informed")
+            if len(input_sample[0].shape[1:]) == 1: # for hash + composition: vectors
+                return (input_sample[0].shape[1], input_sample[1].shape[1])
+            else:
+                return (input_sample[0].shape[1:], input_sample[1].shape[1:]) # for seq.: matrix
 
 class NeuralNetworkRegression(_BaseModule):
     """
@@ -165,12 +172,11 @@ class ConvolutionNeuralNetworkRegression(_BaseModule):
         The activation function used in the hidden (only!) layer of the network.
     """
 
-    needs_input_shape = False
+    needs_input_shape = True
 
     def __init__(
         self,
-        nb_char=53,
-        max_length=256,
+        input_shape,
         embedding_shape=300,
         kernel_shape=10,
         hidden_shape=100,
@@ -179,8 +185,7 @@ class ConvolutionNeuralNetworkRegression(_BaseModule):
     ):
         super().__init__()
 
-        self.nb_char = nb_char
-        self.max_length = max_length
+        self.input_shape = input_shape
         self.embedding_shape = embedding_shape
         self.kernel_shape = kernel_shape
         self.hidden_shape = hidden_shape
@@ -188,11 +193,11 @@ class ConvolutionNeuralNetworkRegression(_BaseModule):
         self._activation = activation
 
         self.convolution = nn.Conv1d(
-            in_channels=self.nb_char,
+            in_channels=self.input_shape[0], # nb of characters
             out_channels=self.embedding_shape,
             kernel_size=self.kernel_shape,
         )
-        self.temp = (self.max_length - self.kernel_shape + 1) * self.embedding_shape
+        self.temp = (self.input_shape[1] - self.kernel_shape + 1) * self.embedding_shape
         self.fully_connected_1 = nn.Linear(self.temp, self.hidden_shape)
         self.fully_connected_out = nn.Linear(self.hidden_shape, self.output_shape)
 
@@ -202,8 +207,11 @@ class ConvolutionNeuralNetworkRegression(_BaseModule):
         """
         x = x[0]
         x = x.float()
+        print(x.shape)
         x = self._activation(self.convolution(x))
+        print(f"{x.shape=}")
         x = torch.flatten(x, 1)
+        print(f"{x.shape=}")
         x = self._activation(self.fully_connected_1(x))
         return self.fully_connected_out(x)
 
