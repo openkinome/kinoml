@@ -4,7 +4,6 @@ new representations of the molecular entities and their associated measurements.
 """
 from __future__ import annotations
 
-from abc import ABC
 from typing import Callable, Hashable, Iterable, Sequence, Union
 import hashlib
 from multiprocessing import Pool, cpu_count
