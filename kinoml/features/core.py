@@ -1,11 +1,10 @@
 """
 Featurizers can transform a ``kinoml.core.system.System`` object and produce
 new representations of the molecular entities and their associated measurements.
-
-All ``Featurizer`` objects inherit from ``BaseFeaturizer`` and reimplement `._featurize`
-and `._supports`, if needed.
 """
 from __future__ import annotations
+
+from abc import ABC
 from typing import Callable, Hashable, Iterable, Sequence, Union
 import hashlib
 from multiprocessing import Pool, cpu_count
@@ -15,7 +14,6 @@ import numpy as np
 from tqdm.auto import tqdm
 
 from ..core.systems import System
-from ..utils import Hashabledict
 
 
 class BaseFeaturizer:
@@ -28,9 +26,8 @@ class BaseFeaturizer:
     def featurize(
             self,
             systems: Iterable[System],
-            chunksize=None,
             keep=True,
-    ) -> object:
+    ) -> Iterable[System]:
         """
         Given some systems (compatible with ``_SUPPORTED_TYPES``), apply
         the featurization scheme implemented in this class.
@@ -43,9 +40,7 @@ class BaseFeaturizer:
         Parameters
         ----------
         systems : list of System
-            This is the collection of System objects that will be transformed
-        chunksize :  int, optional=None
-            See https://stackoverflow.com/a/54032744/3407590.
+            This is the collection of System objects that will be transformed.
         keep : bool, optional=True
             Whether to store the current featurizer in the ``system.featurizations``
             dictionary with its own key (``self.name``), in addition to ``last``.
@@ -59,12 +54,8 @@ class BaseFeaturizer:
             or an array-like object) under a key named after ``.name``.
         """
         self.supports(systems[0])
-        self._pre_featurize()
-        features = self._featurize(
-            systems,
-            chunksize=chunksize,
-            keep=keep,
-        )
+        self._pre_featurize(systems)
+        features = self._featurize(systems)
         systems = self._post_featurize(systems, features, keep=keep)
         return systems
 
@@ -75,80 +66,43 @@ class BaseFeaturizer:
         """
         return self.featurize(*args, **kwargs)
 
-    def _featurize(
-            self,
-            systems: Iterable[System],
-            chunksize=None,
-            keep: bool = True,
-    ):
+    def _pre_featurize(self, systems: Iterable[System]) -> None:
         """
-        Some global properties can be optionally computed with
-        ``self._featurize_options()``. This returns a dictionary that will
-        be passed to ``self._featurize_one``, the method responsible of
-        featurizing each System object.
+        Run before featurizing all systems. Redefine this method if needed.
 
         Parameters
         ----------
         systems : list of System
-            This is the collection of System objects that will be transformed
-        chunksize :  int, optional=None
-            See https://stackoverflow.com/a/54032744/3407590.
-        keep : bool, optional=True
-            Whether to store the current featurizer in the ``system.featurizations``
-            dictionary with its own key (``self.name``), in addition to ``last``.
+            This is the collection of System objects that will be transformed.
+        """
+        return
+
+    def _featurize(self, systems: Iterable[System]) -> Iterable[object]:
+        """
+        Featurize all system objects in a serial fashion as defined in ``._featurize_one()``.
+
+        Parameters
+        ----------
+        systems : list of System
+            This is the collection of System objects that will be transformed.
 
         Returns
         -------
         features : list of System or array-like
         """
-
-        featurization_options = Hashabledict(self._featurize_options(systems) or {})
-
-        features = [
-            self._featurize_one(s, options=featurization_options)
-            for s in tqdm(systems, desc=self.name)
-        ]
-
+        features = [self._featurize_one(s) for s in tqdm(systems, desc=self.name)]
         return features
 
-    def _featurize_options(self, systems: Iterable[System]) -> Union[dict, None]:
-        """
-        Computes properties that depend on a collection of System objects,
-        which might be needed to featurize a single system later (e.g.
-        maximum length of a feature that needs to be padded).
-
-        Parameters
-        ----------
-        systems : list of System
-            The Systems that will be eventually featurized.
-
-        Returns
-        -------
-        dict[str, object]
-            Keyword arguments computed out of the list of Systems. Some
-            featurizers require this dynamically computed set of options.
-        """
-        return None
-
-    def _pre_featurize(self) -> None:
-        """
-        Run before featurizing all systems. Redefine this method if needed.
-        """
-        return
-
-    def _featurize_one(self, system: System, options: dict) -> object:
+    def _featurize_one(self, system: System) -> object:
         """
         Implement this method to do the actual leg-work for `self.featurize()`.
-        It takes a single System object and some options (see ``self._featurize_options``)
-        and returns either a new System object or an array-like object.
+        It takes a single System object and returns either a new System object
+        or an array-like object.
 
         Parameters
         ----------
         system : System
             The System to be featurized.
-        options : dict
-            Keyword arguments for this featurizer, usually computed by
-            ``self._featurize_options``.
 
         Returns
         -------
@@ -243,139 +197,101 @@ class BaseFeaturizer:
 class ParallelBaseFeaturizer(BaseFeaturizer):
     """
     Abstract Featurizer class with support for multiprocessing.
+
+    Parameters
+    ----------
+    use_multiprocessing : bool, default=True
+        If multiprocessing to use.
+    n_processes : int or None, default=None
+        How many processes to use in case of multiprocessing.
+        Defaults to number of available CPUs.
+    chunksize :  int, optional=None
+        See https://stackoverflow.com/a/54032744/3407590.
+    dask_client : dask.distributed.Client or None, default=None
+        A dask client to manage multiprocessing. Will ignore `use_multiprocessing`
+        `chunksize` and `n_processes` attributes.
     """
 
     _SUPPORTED_TYPES = (System,)
 
     # TODO: environment variables for multiprocessing
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
-    def featurize(
+    def __init__(
             self,
-            systems: Iterable[System],
-            chunksize=None,
-            keep=True,
             use_multiprocessing: bool = True,
             n_processes: Union[int, None] = None,
+            chunksize: Union[int, None] = None,
             dask_client=None,
-    ) -> object:
-        """
-        Given some systems (compatible with ``_SUPPORTED_TYPES``), apply
-        the featurization scheme implemented in this class.
-
-        First, ``self.supports()`` will check whether the systems are compatible
-        with the featurization scheme. We assume all of them are equal, so only
-        the first one will be checked. Then, the Systems are passed to
-        ``self._featurize`` to handle the actual leg-work.
-
-        Parameters
-        ----------
-        systems : list of System
-            This is the collection of System objects that will be transformed
-        chunksize :  int, optional=None
-            See https://stackoverflow.com/a/54032744/3407590.
-        keep : bool, optional=True
-            Whether to store the current featurizer in the ``system.featurizations``
-            dictionary with its own key (``self.name``), in addition to ``last``.
-        use_multiprocessing : bool, default=True
-            If multiprocessing to use.
-        n_processes : int or None, default=None
-            How many processes to use in case of multiprocessing.
-            Defaults to number of available CPUs.
-        dask_client : dask.distributed.Client or None, default=None
-            A dask client to manage multiprocessing. Will ignore `use_multiprocessing` and
-            `n_processes` attributes.
-
-        Returns
-        -------
-        systems : list of System
-            The same systems that were passed in.
-            The returned Systems will have an extra entry in the ``.featurizations``
-            dictionary, containing the featurized object (either a new System
-            or an array-like object) under a key named after ``.name``.
-        """
-        self.supports(systems[0])
-        self._pre_featurize()
-        features = self._featurize(
-            systems,
-            chunksize=chunksize,
-            keep=keep,
-            use_multiprocessing=use_multiprocessing,
-            n_processes=n_processes,
-            dask_client=dask_client,
-        )
-        systems = self._post_featurize(systems, features, keep=keep)
-        return systems
-
-    def _featurize(
-            self,
-            systems: Iterable[System],
-            chunksize=None,
-            keep: bool = True,
-            use_multiprocessing: bool = True,
-            n_processes: Union[int, None] = None,
-            dask_client=None,
+            **kwargs
     ):
+        super().__init__(**kwargs)
+        self.use_multiprocessing = use_multiprocessing
+        self.n_processes = n_processes
+        self.chunksize = chunksize
+        self.dask_client = dask_client
+
+    def __getstate__(self):
+        """Only preserve object fields that are serializable"""
+
+        def is_serializable(value):
+            import pickle
+            try:
+                pickle.dumps(value)
+                return True
+            except AttributeError as e:
+                return False
+
+        return {name: value for name, value in self.__dict__.items() if is_serializable(value)}
+
+    def __setstate__(self, state):
+        """Only preserve object fields that are serializable."""
+        for name, value in state.items():
+            setattr(self, name, value)
+
+    def _featurize(self, systems: Iterable[System]) -> Iterable[object]:
         """
-        Some global properties can be optionally computed with
-        ``self._featurize_options()``. This returns a dictionary that will
-        be passed to ``self._featurize_one``, the method responsible of
-        featurizing each System object.
+        Featurize all system objects in a parallel fashion as defined in ``._featurize_one()``.
 
         Parameters
         ----------
         systems : list of System
-            This is the collection of System objects that will be transformed
-        chunksize :  int, optional=None
-            See https://stackoverflow.com/a/54032744/3407590.
-        keep : bool, optional=True
-            Whether to store the current featurizer in the ``system.featurizations``
-            dictionary with its own key (``self.name``), in addition to ``last``.
-        use_multiprocessing : bool, default=True
-            If multiprocessing to use.
-        n_processes : int or None, default=None
-            How many processes to use in case of multiprocessing.
-            Defaults to number of available CPUs.
-        dask_client : dask.distributed.Client or None, default=None
-            A dask client to manage multiprocessing. Will ignore `use_multiprocessing` and
-            `n_processes` attributes.
+            This is the collection of System objects that will be transformed.
 
         Returns
         -------
         features : list of System or array-like
         """
-        featurization_options = Hashabledict(self._featurize_options(systems) or {})
-
-        if dask_client is not None:
-
-            if not hasattr(dask_client, "map"):
+        # check for multiprocessing options and featurize
+        if self.dask_client is not None:
+            # check if dask_client is a Client from dask.distributed
+            if not hasattr(self.dask_client, "map"):
                 from dask.distributed import Client
-                if not isinstance(dask_client, Client):
+                if not isinstance(self.dask_client, Client):
                     raise ValueError(
                         "The dask_client attribute appears not to be a Client from dask.distributed."
                     )
-                
-            func = partial(self._featurize_one, options=featurization_options)
-            futures = dask_client.map(func, systems)
-            features = dask_client.gather(futures)
+            # featurize in parallel with dask
+            func = partial(self._featurize_one)
+            futures = self.dask_client.map(func, systems)
+            features = self.dask_client.gather(futures)
         else:
-            if use_multiprocessing:
-                if not n_processes:
-                    n_processes = cpu_count()
+            # determine the number of processes to spawn
+            if self.use_multiprocessing:
+                if not self.n_processes:
+                    self.n_processes = cpu_count()
             else:
-                n_processes = 1
-
-            if n_processes == 1:
+                self.n_processes = 1
+            if self.n_processes == 1:
+                # featurize in a serial fashion
                 features = [
-                    self._featurize_one(s, options=featurization_options)
+                    self._featurize_one(s)
                     for s in tqdm(systems, desc=self.name)
                 ]
             else:
-                func = partial(self._featurize_one, options=featurization_options)
-                with Pool(processes=n_processes) as pool:
-                    features = pool.map(func, systems, chunksize)
+                # featurize in a parallel fashion
+                func = partial(self._featurize_one)
+                with Pool(processes=self.n_processes) as pool:
+                    features = pool.map(func, systems, self.chunksize)
 
         return features
 
@@ -389,7 +305,7 @@ class Pipeline(BaseFeaturizer):
 
     Parameters
     ----------
-    featurizers: list of BaseFeaturizer
+    featurizers: iterable of BaseFeaturizer
         Featurizers to stack. They must be compatible with
         each other!
 
@@ -407,20 +323,17 @@ class Pipeline(BaseFeaturizer):
         self.featurizers = featurizers
         self._shortname = shortname
 
-    def _featurize(
-        self, systems: Iterable[System], chunksize=None, keep: bool = True
-    ):
+    def _featurize(self, systems: Iterable[System], keep: bool = True) -> Iterable[System]:
         """
         Given a list of featurizers, apply them sequentially
-        on the systems/arrays (e.g. featurizer A returns X, and X is
-        taken by featurizer B, which returns Y).
+        on the systems (e.g. featurizer A returns X, and X is
+        taken by featurizer B, which returns Y) and store the
+        features in the systems.
 
         Parameters
         ----------
         systems : list of System
             This is the collection of System objects that will be transformed
-        chunksize :  int, optional=None
-            See https://stackoverflow.com/a/54032744/3407590.
         keep : bool, optional=True
             Whether to store the current featurizer in the ``system.featurizations``
             dictionary with its own key (``self.name``), in addition to ``last``.
@@ -430,11 +343,7 @@ class Pipeline(BaseFeaturizer):
         features : list of System or array-like
         """
         for featurizer in self.featurizers:
-            systems = featurizer.featurize(
-                systems,
-                chunksize=chunksize,
-                keep=keep,
-            )
+            systems = featurizer.featurize(systems, keep=keep)
 
         return [s.featurizations["last"] for s in systems]
 
@@ -502,9 +411,7 @@ class Concatenated(Pipeline):
         super().__init__(featurizers, **kwargs)
         self.axis = axis
 
-    def _featurize(
-        self, systems: Iterable[System], chunksize=None, keep=True
-    ) -> np.ndarray:
+    def _featurize(self, systems: Iterable[System], keep=True) -> np.ndarray:
         """
         Given a list of featurizers, apply them serially and concatenate
         the result (e.g. featurizer A returns X, and featurizer B returns Y;
@@ -514,8 +421,6 @@ class Concatenated(Pipeline):
         ----------
         systems: list of System or array-like
             The Systems (or arrays) to be featurized.
-        chunksize :  int, optional=None
-            See https://stackoverflow.com/a/54032744/3407590.
         keep : bool, optional=True
             Whether to store the current featurizer in the ``system.featurizations``
             dictionary with its own key (``self.name``), in addition to ``last``.
@@ -531,11 +436,7 @@ class Concatenated(Pipeline):
         # We need to end up with a single array!
         list_of_features = []
         for featurizer in self.featurizers:
-            systems = featurizer.featurize(
-                systems,
-                chunksize=chunksize,
-                keep=keep,
-            )
+            systems = featurizer.featurize(systems, keep=keep)
             features = [s.featurizations["last"] for s in systems]
             list_of_features.append(features)
 
@@ -555,12 +456,7 @@ class TupleOfArrays(Pipeline):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    def _featurize(
-        self,
-        systems: Iterable[System],
-        chunksize: int = None,
-        keep: bool = True,
-    ) -> np.ndarray:
+    def _featurize(self, systems: Iterable[System], keep: bool = True) -> np.ndarray:
         """
         Given a list of featurizers, apply them serially and build a
         flat tuple out of the results.
@@ -569,8 +465,6 @@ class TupleOfArrays(Pipeline):
         ----------
         systems: list of System or array-like
             The Systems (or arrays) to be featurized.
-        chunksize :  int, optional=None
-            See https://stackoverflow.com/a/54032744/3407590.
         keep : bool, optional=True
             Whether to store the current featurizer in the ``system.featurizations``
             dictionary with its own key (``self.name``), in addition to ``last``.
@@ -590,12 +484,7 @@ class TupleOfArrays(Pipeline):
         features_per_system = 0
         for featurizer in self.featurizers:
             # Run a pipeline
-            systems = featurizer.featurize(
-                systems,
-                chunksize=chunksize,
-                keep=keep,
-            )
-
+            systems = featurizer.featurize(systems, keep=keep)
             # Get the current "last" before the next pipeline runs
             # We need to store it in list_of_systems
             # list of systems will have shape (N_systems, n_featurizers)
@@ -649,7 +538,7 @@ class BaseOneHotEncodingFeaturizer(ParallelBaseFeaturizer):
         if not self.dictionary:
             raise ValueError("This featurizer requires a populated dictionary!")
 
-    def _featurize_one(self, system: System, options: dict) -> np.ndarray:
+    def _featurize_one(self, system: System) -> np.ndarray:
         """
         One hot encode one system.
 
@@ -728,25 +617,19 @@ class PadFeaturizer(ParallelBaseFeaturizer):
         else:
             return system_or_array
 
-    def _featurize_options(self, systems: Iterable[System]) -> dict | None:
+    def _pre_featurize(self, systems) -> None:
         """
-        Compute the largest shape in the input arrays
+        Compute the largest shape in the input arrays and store in shape attribute.
 
         Parameters
         ----------
         systems : list of System
-
-        Returns
-        -------
-        dict
-            A dictionary containing a single key ``shape``
-            with the largest shape found.
         """
         if self.shape == "auto":
             arraylikes = [self._get_array(s) for s in systems]
-            return {"shape": max(a.shape for a in arraylikes)}
+            self.shape = max(a.shape for a in arraylikes)
 
-    def _featurize_one(self, system: System, options: dict) -> np.ndarray:
+    def _featurize_one(self, system: System) -> np.ndarray:
         """
         Parameters
         ----------
@@ -760,10 +643,9 @@ class PadFeaturizer(ParallelBaseFeaturizer):
         -------
         array
         """
-        shape = options.get("shape", self.shape)
         arraylike = self._get_array(system)
         pads = []
-        for current_size, requested_size in zip(arraylike.shape, shape):
+        for current_size, requested_size in zip(arraylike.shape, self.shape):
             assert (
                 requested_size >= current_size
             ), f"{requested_size} is smaller than {current_size}!"
@@ -772,7 +654,6 @@ class PadFeaturizer(ParallelBaseFeaturizer):
 
 
 class HashFeaturizer(BaseFeaturizer):
-
     """
     Hash an attribute of the protein, such as the name or id.
 
@@ -797,7 +678,7 @@ class HashFeaturizer(BaseFeaturizer):
     def _getter(system):
         return str(system.featurizations["last"])
 
-    def _featurize_one(self, system: System, options: dict) -> np.ndarray:
+    def _featurize_one(self, system: System) -> np.ndarray:
         """
         Featurizes a component using the hash of the chosen attribute.
 
@@ -817,17 +698,12 @@ class HashFeaturizer(BaseFeaturizer):
         return np.reshape(np.array(int(h.hexdigest(), base=16) / self.denominator), -1)
 
 
-class NullFeaturizer(BaseFeaturizer):
+class NullFeaturizer(ParallelBaseFeaturizer):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-    def _featurize(
-            self,
-            systems: Iterable[System],
-            chunksize=None,
-            keep: bool = None,
-    ) -> object:
+    def _featurize(self, systems: Iterable[System], keep: bool = None) -> object:
         return systems
 
 
@@ -853,10 +729,10 @@ class CallableFeaturizer(BaseFeaturizer):
         self.callable = func
 
     @staticmethod
-    def _default_func(system, options):
+    def _default_func(system):
         return system.featurizations["last"]
 
-    def _featurize_one(self, system: System | np.ndarray, options: dict) -> np.ndarray:
+    def _featurize_one(self, system: System | np.ndarray) -> np.ndarray:
         """
         Parameters
         ----------
@@ -892,7 +768,7 @@ class ClearFeaturizations(BaseFeaturizer):
         self.keys = keys
         self.style = style
 
-    def _featurize_one(self, system: System, options: dict) -> System:
+    def _featurize_one(self, system: System) -> System:
         if self.style == "keep":
             to_remove = [k for k in system.featurizations.keys() if k not in self.keys]
         else:
