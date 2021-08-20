@@ -233,6 +233,7 @@ class MultiXTorchDataset(_NativeTorchDataset):
     Notes
     -----
     - This object is better paired with the output of ``DatasetProvider.to_dict_of_arrays``.
+
     """
 
     def __init__(self, dict_of_arrays, indices=None):
@@ -291,6 +292,7 @@ class MultiXTorchDataset(_NativeTorchDataset):
           an initial waiting time.
         - B) use ``close_filehandle=True``. This will incur a penalty upon each access,
           because the NPZ file needs to be reloaded each time.
+        
         """
         data = np.load(path)
         if not lazy:
