@@ -68,7 +68,7 @@ class OEHybridDockingFeaturizer(ParallelBaseFeaturizer):
     _SUPPORTED_TYPES = (ProteinLigandComplex,)
 
     @lru_cache(maxsize=100)
-    def _featurize_one(self, system: ProteinLigandComplex, options: dict) -> universe:
+    def _featurize_one(self, system: ProteinLigandComplex) -> universe:
         """
         Perform hybrid docking with the OpenEye toolkit and thoughtful defaults.
 
@@ -76,8 +76,6 @@ class OEHybridDockingFeaturizer(ParallelBaseFeaturizer):
         ----------
         systems: iterable of ProteinLigandComplex
             A list of System objects holding protein and ligand information.
-        options : dict
-            Unused
 
         Returns
         -------
@@ -633,7 +631,7 @@ class OEKLIFSKinaseApoFeaturizer(OEHybridDockingFeaturizer):
 
     _SUPPORTED_TYPES = (ProteinSystem,)
 
-    def _pre_featurize(self) -> None:
+    def _pre_featurize(self, systems: Iterable[ProteinSystem]) -> None:
         """
         Retrieve relevant data from KLIFS and store locally.
         """
@@ -731,7 +729,7 @@ class OEKLIFSKinaseApoFeaturizer(OEHybridDockingFeaturizer):
         return
 
     @lru_cache(maxsize=100)
-    def _featurize_one(self, system: ProteinSystem, options: dict) -> universe:
+    def _featurize_one(self, system: ProteinSystem) -> universe:
         """
         Prepare a kinase using the OpenEye toolkit, the KLIFS database and thoughtful defaults.
 
@@ -739,8 +737,6 @@ class OEKLIFSKinaseApoFeaturizer(OEHybridDockingFeaturizer):
         ----------
         system: ProteinSystem
             A system object holding protein information.
-        options: dict
-            Unused
 
         Returns
         -------
@@ -1380,7 +1376,7 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEKLIFSKinaseApoFeaturizer):
 
     _SUPPORTED_TYPES = (ProteinLigandComplex,)
 
-    def _pre_featurize(self) -> None:
+    def _pre_featurize(self, systems: Iterable[ProteinLigandComplex]) -> None:
         """
         Retrieve relevant data from KLIFS and store locally.
         """
@@ -1425,11 +1421,7 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEKLIFSKinaseApoFeaturizer):
         return
 
     @lru_cache(maxsize=100)
-    def _featurize_one(
-            self,
-            system: ProteinLigandComplex,
-            options: dict
-    ) -> universe:
+    def _featurize_one(self, system: ProteinLigandComplex) -> universe:
         """
         Perform hybrid docking in kinases using the OpenEye toolkit, the KLIFS database and thoughtful defaults.
 
@@ -1437,8 +1429,6 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEKLIFSKinaseApoFeaturizer):
         ----------
         system : ProteinLigandComplex
             A System objects holding protein and ligand information.
-        options : dict
-            Unused
 
         Returns
         -------

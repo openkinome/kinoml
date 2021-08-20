@@ -25,7 +25,7 @@ class AminoAcidCompositionFeaturizer(ParallelBaseFeaturizer):
     for k in _counter.keys():
         _counter[k] = 0
 
-    def _featurize_one(self, system: System, options: dict) -> np.array:
+    def _featurize_one(self, system: System) -> np.array:
         """
         Featurizes a protein using the residue count in the sequence
 
@@ -33,8 +33,6 @@ class AminoAcidCompositionFeaturizer(ParallelBaseFeaturizer):
         ----------
         system: System
             The System to be featurized. Sometimes it will
-        options : dict
-            Unused
 
         Returns
         -------
