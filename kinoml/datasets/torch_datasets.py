@@ -232,6 +232,7 @@ class MultiXTorchDataset(_NativeTorchDataset):
 
     Notes
     -----
+
     - This object is better paired with the output of ``DatasetProvider.to_dict_of_arrays``.
 
     """
@@ -416,6 +417,7 @@ class AwkwardArrayDataset(_NativeTorchDataset):
     The structure of the array dimensions needs to be:
 
     - List of systems
+
     ---- X1
     ---- X2
     ---- ...
