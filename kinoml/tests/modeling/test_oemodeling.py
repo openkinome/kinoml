@@ -128,14 +128,13 @@ def test_read_smiles(smiles, add_hydrogens, expectation, n_atoms):
             does_not_raise(),
             [2497],
         ),
-        # This example segfaults, so we can't use it
-        #(
-        #    "kinoml.data.electron_densities",
-        #    "4f8o_phases.mtz",
-        #    True,
-        #    pytest.raises(ValueError),
-        #    [],
-        #),
+        (
+            "kinoml.data.electron_densities",
+            "4f8o_phases.mtz",
+            True,
+            pytest.raises(ValueError),
+            [],
+        ),
     ],
 )
 def test_read_molecules(package, resource, add_hydrogens, expectation, n_atoms_list):
@@ -151,13 +150,12 @@ def test_read_molecules(package, resource, add_hydrogens, expectation, n_atoms_l
 @pytest.mark.parametrize(
     "package, resource, expectation, n_grid_points",
     [
-        # Reading this file segfaults for some reason
-        #(
-        #    "kinoml.data.electron_densities",
-        #    "4f8o_phases.mtz",
-        #    does_not_raise(),
-        #    396011,
-        #),
+        (
+            "kinoml.data.electron_densities",
+            "4f8o_phases.mtz",
+            does_not_raise(),
+            396011,
+        ),
         (
             "kinoml.data.proteins",
             "4f8o.pdb",
