@@ -47,7 +47,7 @@ dependencies:
 
   - pip:
       # PyTorch trees
-      - https://github.com/ValentinFigue/Sklearn_PyTorch/archive/1b56a43e41de331ecdf73d08418f75bb34c9fa06.tar.gz
+      #- https://github.com/ValentinFigue/Sklearn_PyTorch/archive/1b56a43e41de331ecdf73d08418f75bb34c9fa06.tar.gz # causes incompatible torch to be installed via pip
       # OpenCADD
       - https://github.com/volkamerlab/opencadd/archive/master.tar.gz
       # ProDy
