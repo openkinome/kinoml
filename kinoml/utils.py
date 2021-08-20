@@ -18,7 +18,9 @@ PACKAGE_ROOT = Path(__file__).parent
 class FromDistpatcherMixin:
     @classmethod
     def _from_dispatcher(cls, value, handler, handler_argname, prefix):
-        available_methods = [n[len(prefix) :] for n in cls.__dict__ if n.startswith(prefix)]
+        available_methods = [
+            n[len(prefix) :] for n in cls.__dict__ if n.startswith(prefix)
+        ]
         if handler not in available_methods:
             raise ValueError(
                 f"`{handler_argname}` must be one of: {', '.join(available_methods)}."
@@ -67,8 +69,12 @@ class LocalFileStorage:
         return file_path
 
     @staticmethod
-    def featurizer_result(featurizer_name, result_details, file_format, directory=DIRECTORY):
-        file_path = directory / f"kinoml_{featurizer_name}_{result_details}.{file_format}"
+    def featurizer_result(
+        featurizer_name, result_details, file_format, directory=DIRECTORY
+    ):
+        file_path = (
+            directory / f"kinoml_{featurizer_name}_{result_details}.{file_format}"
+        )
         return file_path
 
     @staticmethod
@@ -95,7 +101,9 @@ class FileDownloader:
     @staticmethod
     def rcsb_electron_density_mtz(pdb_id, directory=DIRECTORY):
         url = f"https://edmaps.rcsb.org/coefficients/{pdb_id}.mtz"
-        download_file(url, LocalFileStorage.rcsb_electron_density_mtz(pdb_id, directory))
+        download_file(
+            url, LocalFileStorage.rcsb_electron_density_mtz(pdb_id, directory)
+        )
 
 
 def datapath(path: str) -> Path:

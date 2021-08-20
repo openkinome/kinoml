@@ -6,7 +6,9 @@ from typing import Union
 class Alignment:
     """Alignment representation of protein sequences"""
 
-    def __init__(self, metadata=None, alignment=None, alignment_file_path=None, *args, **kwargs):
+    def __init__(
+        self, metadata=None, alignment=None, alignment_file_path=None, *args, **kwargs
+    ):
 
         from appdirs import user_cache_dir
 
@@ -207,11 +209,11 @@ class Alignment:
 
 
 def sequence_similarity(
-        sequence1: str,
-        sequence2: str,
-        open_gap_penalty: int = -11,
-        extend_gap_penalty: int = -1,
-        substitution_matrix: str = "BLOSUM62",
+    sequence1: str,
+    sequence2: str,
+    open_gap_penalty: int = -11,
+    extend_gap_penalty: int = -1,
+    substitution_matrix: str = "BLOSUM62",
 ) -> float:
     """
     Calculate the squence similarity of two amino acid sequences.
@@ -254,6 +256,6 @@ def sequence_similarity(
         substitution_matrix,
         open_gap_penalty,
         extend_gap_penalty,
-        score_only=True
+        score_only=True,
     )
     return score

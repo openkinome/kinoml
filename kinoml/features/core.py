@@ -26,10 +26,10 @@ class BaseFeaturizer:
     _SUPPORTED_TYPES = (System,)
 
     def featurize(
-            self,
-            systems: Iterable[System],
-            chunksize=None,
-            keep=True,
+        self,
+        systems: Iterable[System],
+        chunksize=None,
+        keep=True,
     ) -> object:
         """
         Given some systems (compatible with ``_SUPPORTED_TYPES``), apply
@@ -76,10 +76,10 @@ class BaseFeaturizer:
         return self.featurize(*args, **kwargs)
 
     def _featurize(
-            self,
-            systems: Iterable[System],
-            chunksize=None,
-            keep: bool = True,
+        self,
+        systems: Iterable[System],
+        chunksize=None,
+        keep: bool = True,
     ):
         """
         Some global properties can be optionally computed with
@@ -157,7 +157,10 @@ class BaseFeaturizer:
         raise NotImplementedError("Implement in your subclass")
 
     def _post_featurize(
-        self, systems: Iterable[System], features: Iterable[System | np.array], keep: bool = True
+        self,
+        systems: Iterable[System],
+        features: Iterable[System | np.array],
+        keep: bool = True,
     ) -> Iterable[System]:
         """
         Run after featurizing all systems. You shouldn't need to redefine this method
@@ -253,13 +256,13 @@ class ParallelBaseFeaturizer(BaseFeaturizer):
         super().__init__(**kwargs)
 
     def featurize(
-            self,
-            systems: Iterable[System],
-            chunksize=None,
-            keep=True,
-            use_multiprocessing: bool = True,
-            n_processes: Union[int, None] = None,
-            dask_client=None,
+        self,
+        systems: Iterable[System],
+        chunksize=None,
+        keep=True,
+        use_multiprocessing: bool = True,
+        n_processes: Union[int, None] = None,
+        dask_client=None,
     ) -> object:
         """
         Given some systems (compatible with ``_SUPPORTED_TYPES``), apply
@@ -310,13 +313,13 @@ class ParallelBaseFeaturizer(BaseFeaturizer):
         return systems
 
     def _featurize(
-            self,
-            systems: Iterable[System],
-            chunksize=None,
-            keep: bool = True,
-            use_multiprocessing: bool = True,
-            n_processes: Union[int, None] = None,
-            dask_client=None,
+        self,
+        systems: Iterable[System],
+        chunksize=None,
+        keep: bool = True,
+        use_multiprocessing: bool = True,
+        n_processes: Union[int, None] = None,
+        dask_client=None,
     ):
         """
         Some global properties can be optionally computed with
@@ -352,11 +355,12 @@ class ParallelBaseFeaturizer(BaseFeaturizer):
 
             if not hasattr(dask_client, "map"):
                 from dask.distributed import Client
+
                 if not isinstance(dask_client, Client):
                     raise ValueError(
                         "The dask_client attribute appears not to be a Client from dask.distributed."
                     )
-                
+
             func = partial(self._featurize_one, options=featurization_options)
             futures = dask_client.map(func, systems)
             features = dask_client.gather(futures)
@@ -407,9 +411,7 @@ class Pipeline(BaseFeaturizer):
         self.featurizers = featurizers
         self._shortname = shortname
 
-    def _featurize(
-        self, systems: Iterable[System], chunksize=None, keep: bool = True
-    ):
+    def _featurize(self, systems: Iterable[System], chunksize=None, keep: bool = True):
         """
         Given a list of featurizers, apply them sequentially
         on the systems/arrays (e.g. featurizer A returns X, and X is
@@ -459,7 +461,9 @@ class Pipeline(BaseFeaturizer):
         ``ValueError`` if ``f.supports()`` fails and ``raise_errors`` is ``True``.
         """
         return all(
-            f.supports(s, raise_errors=raise_errors) for f in self.featurizers for s in systems
+            f.supports(s, raise_errors=raise_errors)
+            for f in self.featurizers
+            for s in systems
         )
 
     @property
@@ -716,7 +720,13 @@ class PadFeaturizer(ParallelBaseFeaturizer):
         value to fill the array-like features with
     """
 
-    def __init__(self, shape: Iterable[int] = "auto", key: Hashable = "last", pad_with: int = 0, **kwargs):
+    def __init__(
+        self,
+        shape: Iterable[int] = "auto",
+        key: Hashable = "last",
+        pad_with: int = 0,
+        **kwargs,
+    ):
         super().__init__(**kwargs)
         self.shape = shape
         self.key = key
@@ -787,7 +797,9 @@ class HashFeaturizer(BaseFeaturizer):
         Normalizes the hash to obtain a value in the unit interval
     """
 
-    def __init__(self, getter: Callable[[System], str] = None, normalize=True, **kwargs):
+    def __init__(
+        self, getter: Callable[[System], str] = None, normalize=True, **kwargs
+    ):
         super().__init__(**kwargs)
         self.getter = getter or self._getter
         self.normalize = normalize
@@ -818,15 +830,14 @@ class HashFeaturizer(BaseFeaturizer):
 
 
 class NullFeaturizer(BaseFeaturizer):
-
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
     def _featurize(
-            self,
-            systems: Iterable[System],
-            chunksize=None,
-            keep: bool = None,
+        self,
+        systems: Iterable[System],
+        chunksize=None,
+        keep: bool = None,
     ) -> object:
         return systems
 
@@ -844,7 +855,9 @@ class CallableFeaturizer(BaseFeaturizer):
         for each system.
     """
 
-    def __init__(self, func: Callable[[System], System | np.array] | str = None, **kwargs):
+    def __init__(
+        self, func: Callable[[System], System | np.array] | str = None, **kwargs
+    ):
         super().__init__(**kwargs)
         if func is None:
             func = self._default_func
@@ -904,7 +917,10 @@ class ClearFeaturizations(BaseFeaturizer):
         return system
 
     def _post_featurize(
-        self, systems: Iterable[System], features: Iterable[System | np.array], keep: bool = True
+        self,
+        systems: Iterable[System],
+        features: Iterable[System | np.array],
+        keep: bool = True,
     ) -> Iterable[System]:
         """
         Bypass the automated population of the ``.featurizations`` dict
