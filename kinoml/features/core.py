@@ -404,6 +404,11 @@ class Concatenated(Pipeline):
         On which axis to concatenate. By default, it will concatenate
         on axis ``1``, which means that the features in each pipeline
         will be concatenated.
+
+    Notes
+    -----
+    This Featurizer maybe removed in the future, since it can be replaced
+    by `TupleOfArrays`.
     """
 
     def __init__(self, featurizers: Iterable[BaseFeaturizer], axis: int = 1, **kwargs):
