@@ -356,6 +356,7 @@ def import_object(import_path: str):
         module = import_module(module_str)
         return getattr(module, obj_str)
     return import_module(import_path)
+<<<<<<< HEAD
 
 
 class Hashabledict(dict):
@@ -367,3 +368,5 @@ class Hashabledict(dict):
 
     def __hash__(self):
         return hash((frozenset(self), frozenset(self.values())))
+=======
+>>>>>>> dccedfc812eec9dc4f7e70b2552a50a2e1c0385d

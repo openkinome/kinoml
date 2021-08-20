@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 from ..core.proteins import ProteinStructure
 from ..core.sequences import KinaseDomainAminoAcidSequence
 from typing import Union
@@ -208,6 +209,8 @@ class Alignment:
                     ali_file.write("\n")
 
 
+=======
+>>>>>>> dccedfc812eec9dc4f7e70b2552a50a2e1c0385d
 def sequence_similarity(
     sequence1: str,
     sequence2: str,

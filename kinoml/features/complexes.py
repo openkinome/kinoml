@@ -68,7 +68,7 @@ class OEHybridDockingFeaturizer(ParallelBaseFeaturizer):
     _SUPPORTED_TYPES = (ProteinLigandComplex,)
 
     @lru_cache(maxsize=100)
-    def _featurize_one(self, system: ProteinLigandComplex, options: dict) -> universe:
+    def _featurize_one(self, system: ProteinLigandComplex) -> universe:
         """
         Perform hybrid docking with the OpenEye toolkit and thoughtful defaults.
 
@@ -76,8 +76,6 @@ class OEHybridDockingFeaturizer(ParallelBaseFeaturizer):
         ----------
         systems: iterable of ProteinLigandComplex
             A list of System objects holding protein and ligand information.
-        options : dict
-            Unused
 
         Returns
         -------
@@ -655,7 +653,7 @@ class OEKLIFSKinaseApoFeaturizer(OEHybridDockingFeaturizer):
 
     _SUPPORTED_TYPES = (ProteinSystem,)
 
-    def _pre_featurize(self) -> None:
+    def _pre_featurize(self, systems: Iterable[ProteinSystem]) -> None:
         """
         Retrieve relevant data from KLIFS and store locally.
         """
@@ -714,6 +712,7 @@ class OEKLIFSKinaseApoFeaturizer(OEHybridDockingFeaturizer):
             ]
             for structure_klifs_id in structures_wo_pocket_resids["structure.klifs_id"]:
                 pocket = remote.pockets.by_structure_klifs_id(structure_klifs_id)
+<<<<<<< HEAD
                 pocket_ids = " ".join(  # filter out missing residues defined as "_"
                     [
                         residue_id
@@ -721,6 +720,14 @@ class OEKLIFSKinaseApoFeaturizer(OEHybridDockingFeaturizer):
                         if residue_id != "_"
                     ]
                 )
+=======
+                if any(pd.isnull(pocket["residue.id"])):
+                    pocket_ids = ""
+                else:
+                    pocket_ids = " ".join(  # filter out missing residues defined as "_"
+                        [residue_id for residue_id in pocket["residue.id"] if residue_id != "_"]
+                    )
+>>>>>>> dccedfc812eec9dc4f7e70b2552a50a2e1c0385d
                 klifs_structure_db.loc[
                     (klifs_structure_db["structure.klifs_id"] == structure_klifs_id),
                     "structure.pocket_resids",
@@ -756,7 +763,7 @@ class OEKLIFSKinaseApoFeaturizer(OEHybridDockingFeaturizer):
         return
 
     @lru_cache(maxsize=100)
-    def _featurize_one(self, system: ProteinSystem, options: dict) -> universe:
+    def _featurize_one(self, system: ProteinSystem) -> universe:
         """
         Prepare a kinase using the OpenEye toolkit, the KLIFS database and thoughtful defaults.
 
@@ -764,8 +771,6 @@ class OEKLIFSKinaseApoFeaturizer(OEHybridDockingFeaturizer):
         ----------
         system: ProteinSystem
             A system object holding protein information.
-        options: dict
-            Unused
 
         Returns
         -------
@@ -1436,7 +1441,7 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEKLIFSKinaseApoFeaturizer):
 
     _SUPPORTED_TYPES = (ProteinLigandComplex,)
 
-    def _pre_featurize(self) -> None:
+    def _pre_featurize(self, systems: Iterable[ProteinLigandComplex]) -> None:
         """
         Retrieve relevant data from KLIFS and store locally.
         """
@@ -1486,7 +1491,11 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEKLIFSKinaseApoFeaturizer):
         return
 
     @lru_cache(maxsize=100)
+<<<<<<< HEAD
     def _featurize_one(self, system: ProteinLigandComplex, options: dict) -> universe:
+=======
+    def _featurize_one(self, system: ProteinLigandComplex) -> universe:
+>>>>>>> dccedfc812eec9dc4f7e70b2552a50a2e1c0385d
         """
         Perform hybrid docking in kinases using the OpenEye toolkit, the KLIFS database and thoughtful defaults.
 
@@ -1494,8 +1503,6 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEKLIFSKinaseApoFeaturizer):
         ----------
         system : ProteinLigandComplex
             A System objects holding protein and ligand information.
-        options : dict
-            Unused
 
         Returns
         -------

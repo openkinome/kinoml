@@ -104,16 +104,12 @@ class SmilesToLigandFeaturizer(SingleLigandFeaturizer):
                 f"Ligand type `{ligand_type}` is not one of ['rkdit', 'openforcefield']"
             )
 
-    def _featurize_one(
-        self, system: Iterable[System], options: dict
-    ) -> RDKitLigand | OpenForceFieldLigand:
+    def _featurize_one(self, system: System) -> RDKitLigand | OpenForceFieldLigand:
         """
         Parameters
         ----------
         system : System
             The System to be featurized.
-        options : dict
-            Unused
 
         Returns
         -------
@@ -144,7 +140,7 @@ class MorganFingerprintFeaturizer(SingleLigandFeaturizer):
         self.radius = radius
         self.nbits = nbits
 
-    def _featurize_one(self, system: System, options: dict) -> np.ndarray:
+    def _featurize_one(self, system: System) -> np.ndarray:
         """
         Parameters
         ----------
@@ -302,7 +298,7 @@ class GraphLigandFeaturizer(SingleLigandFeaturizer):
         self.max_in_ring_size = max_in_ring_size
         self._hybridization_names = sorted(rdkit.Chem.rdchem.HybridizationType.names)
 
-    def _featurize_one(self, system: System, options: dict) -> tuple:
+    def _featurize_one(self, system: System) -> tuple:
         """
         Featurizes ligands contained in a System as a labeled graph.
 
