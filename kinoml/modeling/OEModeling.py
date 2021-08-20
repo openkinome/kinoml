@@ -1153,6 +1153,7 @@ def apply_insertions(
     """
     Apply insertions to a protein structure according to an amino acid sequence. The provided protein structure should
     only contain protein residues to prevent unexpected behavior.
+
     Parameters
     ----------
     target_structure: oechem.OEMolBase
@@ -1162,6 +1163,7 @@ def apply_insertions(
         structure sequence.
     loop_db: str or Path
         The path to the loop database used by OESpruce to model missing loops.
+
     Returns
     -------
     structure_with_insertions: oechem.OEMolBase
