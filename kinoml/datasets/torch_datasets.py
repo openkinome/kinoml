@@ -287,7 +287,7 @@ class MultiXTorchDataset(_NativeTorchDataset):
         NPZ files cannot be read in parallel (you'll see CRC32 errors and others). If you want
         to use ``DataLoader(..., num_workers=2)`` or above, you'll need to:
 
-        - A) preload everything with ``lazy=False`. This will use more RAM and incur
+        - A) preload everything with ``lazy=False``. This will use more RAM and incur
           an initial waiting time.
         - B) use ``close_filehandle=True``. This will incur a penalty upon each access,
           because the NPZ file needs to be reloaded each time.
