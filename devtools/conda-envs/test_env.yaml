@@ -31,7 +31,6 @@ dependencies:
 
   # pytorch
   - pytorch
-  - pytorch-gpu
   - pytorch_geometric
 
   # structural modeling
