@@ -322,7 +322,7 @@ class Pipeline(BaseFeaturizer):
         self.featurizers = featurizers
         self._shortname = shortname
 
-    def _featurize(self, systems: Iterable[System], keep: bool = True) -> Iterable[System]:
+    def _featurize(self, systems: Iterable[System], keep: bool = True) -> Iterable[object]:
         """
         Given a list of featurizers, apply them sequentially
         on the systems (e.g. featurizer A returns X, and X is
