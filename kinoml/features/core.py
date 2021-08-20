@@ -475,7 +475,7 @@ class TupleOfArrays(Pipeline):
 
         Returns
         -------
-        tuple of (of tuples) arraylike
+        : tuple of (of tuples) arraylike
             If the last featurizer is returning a single array,
             the shape of the object will be (N_systems,). If
             the last featurizer returns more than one array,
@@ -569,13 +569,15 @@ class BaseOneHotEncodingFeaturizer(ParallelBaseFeaturizer):
     @staticmethod
     def one_hot_encode(sequence: Iterable, dictionary: dict | Sequence) -> np.ndarray:
         """
-        One-hot encode a sequence of characters, given a dictionary
+        One-hot encode a sequence of characters, given a dictionary.
+
         Parameters
         ----------
         sequence : Iterable
         dictionary : dict or sequuence-like
             Mapping of each character to their position in the alphabet. If
             a sequence-like is given, it will be enumerated into a dict.
+        
         Returns
         -------
         array-like
