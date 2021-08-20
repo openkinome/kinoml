@@ -210,9 +210,9 @@ class ConvolutionNeuralNetworkRegression(_BaseModule):
         x = self._activation(self.fully_connected_1(x))
         return self.fully_connected_out(x)
 
-class ConvolutionNeuralNetworkRegressionKinaseInformed(_BaseModule):
+class ConvolutionNeuralNetworkRegressionProteinInformed(_BaseModule):
     """
-    Builds a Convolutional Neural Network and a feed-forward pass for a kinase-ligand setting.
+    Builds a Convolutional Neural Network and a feed-forward pass for a protein-ligand setting.
 
     Parameters
     ----------
@@ -294,9 +294,9 @@ class ConvolutionNeuralNetworkRegressionKinaseInformed(_BaseModule):
 
         return self.fully_connected_out(x)
 
-class NeuralNetworkRegressionKinaseInformed(_BaseModule):
+class NeuralNetworkRegressionProteinInformed(_BaseModule):
    """
-   Builds a Neural Network and a feed-forward pass for a kinase-ligand setting.
+   Builds a Neural Network and a feed-forward pass for a protein-ligand setting.
 
    Parameters
    ----------
