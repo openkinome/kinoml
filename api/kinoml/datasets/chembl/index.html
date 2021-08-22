@@ -68,7 +68,7 @@
     <script src="../../../../_static/copybutton.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area", "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "tex2jax_ignore|mathjax_ignore|document", "processClass": "tex2jax_process|mathjax_process|math|output_area", "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
     <link rel="shortcut icon" href="../../../../_static/custom_favicon.png"/>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
@@ -121,7 +121,7 @@
 <div class="md-search" data-md-component="search" role="dialog">
   <label class="md-search__overlay" for="__search"></label>
   <div class="md-search__inner" role="search">
-    <form class="md-search__form" action="../../../../search.html" method="GET" name="search">
+    <form class="md-search__form" action="../../../../search.html" method="get" name="search">
       <input type="text" class="md-search__input" name="q" placeholder="Search"
              autocapitalize="off" autocomplete="off" spellcheck="false"
              data-md-component="query" data-md-state="active">
@@ -349,13 +349,13 @@
 <h2 id="module-contents">Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="kinoml.datasets.chembl.ChEMBLDatasetProvider">
-<em class="property">class </em><code class="sig-prename descclassname">kinoml.datasets.chembl.</code><code class="sig-name descname">ChEMBLDatasetProvider</code><span class="sig-paren">(</span><em class="sig-param">measurements: Iterable[BaseMeasurement], *args, **kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.chembl.ChEMBLDatasetProvider" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">kinoml.datasets.chembl.</code><code class="sig-name descname">ChEMBLDatasetProvider</code><span class="sig-paren">(</span><em class="sig-param">measurements: Iterable[BaseMeasurement], metadata: dict = None</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.chembl.ChEMBLDatasetProvider" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="../core/index.html#kinoml.datasets.core.MultiDatasetProvider" title="kinoml.datasets.core.MultiDatasetProvider"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.datasets.core.MultiDatasetProvider</span></code></a></p>
 <p>This provider relies heavily on <code class="docutils literal notranslate"><span class="pre">openkinome/kinodata</span></code> data ingestion
 pipelines. It will load ChEMBL activities from its Releases page.</p>
 <dl class="method">
 <dt id="kinoml.datasets.chembl.ChEMBLDatasetProvider.from_source">
-<em class="property">classmethod </em><code class="sig-name descname">from_source</code><span class="sig-paren">(</span><em class="sig-param">cls</em>, <em class="sig-param">path_or_url='https://github.com/openkinome/datascripts/releases/download/v0.2/activities-chembl28_v0.2.zip'</em>, <em class="sig-param">measurement_types=('pIC50'</em>, <em class="sig-param">'pKi'</em>, <em class="sig-param">'pKd')</em>, <em class="sig-param">sample=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.chembl.ChEMBLDatasetProvider.from_source" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="sig-name descname">from_source</code><span class="sig-paren">(</span><em class="sig-param">cls</em>, <em class="sig-param">path_or_url='https://github.com/openkinome/datascripts/releases/download/v0.2/activities-chembl28_v0.2.zip'</em>, <em class="sig-param">measurement_types=('pIC50'</em>, <em class="sig-param">'pKi'</em>, <em class="sig-param">'pKd')</em>, <em class="sig-param">sample=None</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.chembl.ChEMBLDatasetProvider.from_source" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a MultiDatasetProvider out of the raw data contained in the zip file</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>

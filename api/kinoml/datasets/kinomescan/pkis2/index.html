@@ -68,7 +68,7 @@
     <script src="../../../../../_static/copybutton.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area", "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "tex2jax_ignore|mathjax_ignore|document", "processClass": "tex2jax_process|mathjax_process|math|output_area", "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
     <link rel="shortcut icon" href="../../../../../_static/custom_favicon.png"/>
     <link rel="index" title="Index" href="../../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../../search.html" />
@@ -121,7 +121,7 @@
 <div class="md-search" data-md-component="search" role="dialog">
   <label class="md-search__overlay" for="__search"></label>
   <div class="md-search__inner" role="search">
-    <form class="md-search__form" action="../../../../../search.html" method="GET" name="search">
+    <form class="md-search__form" action="../../../../../search.html" method="get" name="search">
       <input type="text" class="md-search__input" name="q" placeholder="Search"
              autocapitalize="off" autocomplete="off" spellcheck="false"
              data-md-component="query" data-md-state="active">
@@ -351,7 +351,7 @@
 <h2 id="module-contents">Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="kinoml.datasets.kinomescan.pkis2.PKIS2DatasetProvider">
-<em class="property">class </em><code class="sig-prename descclassname">kinoml.datasets.kinomescan.pkis2.</code><code class="sig-name descname">PKIS2DatasetProvider</code><span class="sig-paren">(</span><em class="sig-param">measurements: Iterable[BaseMeasurement], *args, **kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.kinomescan.pkis2.PKIS2DatasetProvider" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">kinoml.datasets.kinomescan.pkis2.</code><code class="sig-name descname">PKIS2DatasetProvider</code><span class="sig-paren">(</span><em class="sig-param">measurements: Iterable[BaseMeasurement], metadata: dict = None</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.kinomescan.pkis2.PKIS2DatasetProvider" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="../core/index.html#kinoml.datasets.kinomescan.core.KinomeScanDatasetProvider" title="kinoml.datasets.kinomescan.core.KinomeScanDatasetProvider"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.datasets.kinomescan.core.KinomeScanDatasetProvider</span></code></a></p>
 <p>Loads PKIS2 dataset as provided in _Progress towards a public chemogenomic set
 for protein kinases and a call for contributions [1][].</p>
@@ -372,12 +372,12 @@ is instantiated as a class attribute.</p>
 </div>
 <dl class="method">
 <dt id="kinoml.datasets.kinomescan.pkis2.PKIS2DatasetProvider.from_source">
-<em class="property">classmethod </em><code class="sig-name descname">from_source</code><span class="sig-paren">(</span><em class="sig-param">cls</em>, <em class="sig-param">filename: Union[AnyStr</em>, <em class="sig-param">Path] = datapath('kinomescan/journal.pone.0181585.s004.csv')</em>, <em class="sig-param">measurement_type: BaseMeasurement = PercentageDisplacementMeasurement</em>, <em class="sig-param">conditions: BaseConditions = AssayConditions(pH=7.0)</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.kinomescan.pkis2.PKIS2DatasetProvider.from_source" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="sig-name descname">from_source</code><span class="sig-paren">(</span><em class="sig-param">cls</em>, <em class="sig-param">path_or_url: Union[AnyStr</em>, <em class="sig-param">Path] = datapath('kinomescan/journal.pone.0181585.s004.csv')</em>, <em class="sig-param">measurement_type: BaseMeasurement = PercentageDisplacementMeasurement</em>, <em class="sig-param">conditions: BaseConditions = AssayConditions(pH=7.0)</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.kinomescan.pkis2.PKIS2DatasetProvider.from_source" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a DatasetProvider out of the raw data in a file</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>filename</strong> (<em>str</em>) – CSV file with the protein-ligand measurements</p></li>
+<li><p><strong>path_or_url</strong> (<em>str</em>) – CSV file with the protein-ligand measurements</p></li>
 <li><p><strong>measurement_type</strong> (<a class="reference internal" href="../../../core/measurements/index.html#kinoml.core.measurements.BaseMeasurement" title="kinoml.core.measurements.BaseMeasurement"><em>BaseMeasurement</em></a>) – Which type of measurement was taken for each protein-ligand pair</p></li>
 <li><p><strong>conditions</strong> (<a class="reference internal" href="../../../core/conditions/index.html#kinoml.core.conditions.BaseConditions" title="kinoml.core.conditions.BaseConditions"><em>BaseConditions</em></a>) – Experimental conditions of the assay</p></li>
 </ul>
@@ -388,7 +388,6 @@ is instantiated as a class attribute.</p>
 <p>TODO:</p>
 <ul class="simple">
 <li><p>Investigate lazy access and object generation</p></li>
-<li><p>Review accuracy of item access by indices (correlative order?)</p></li>
 </ul>
 </div>
 </dd></dl>

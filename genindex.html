@@ -68,7 +68,7 @@
     <script src="_static/copybutton.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area", "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "tex2jax_ignore|mathjax_ignore|document", "processClass": "tex2jax_process|mathjax_process|math|output_area", "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
     <link rel="shortcut icon" href="_static/custom_favicon.png"/>
     <link rel="index" title="Index" href="#" />
     <link rel="search" title="Search" href="search.html" />
@@ -119,7 +119,7 @@
 <div class="md-search" data-md-component="search" role="dialog">
   <label class="md-search__overlay" for="__search"></label>
   <div class="md-search__inner" role="search">
-    <form class="md-search__form" action="search.html" method="GET" name="search">
+    <form class="md-search__form" action="search.html" method="get" name="search">
       <input type="text" class="md-search__input" name="q" placeholder="Search"
              autocapitalize="off" autocomplete="off" spellcheck="false"
              data-md-component="query" data-md-state="active">
@@ -342,6 +342,10 @@
       <ul>
         <li><a href="api/kinoml/ml/lightning_modules/index.html#kinoml.ml.lightning_modules.AttrList.__call__">(kinoml.ml.lightning_modules.AttrList method)</a>
 </li>
+        <li><a href="api/kinoml/ml/torch_loops/index.html#kinoml.ml.torch_loops.EarlyStopping.__call__">(kinoml.ml.torch_loops.EarlyStopping method)</a>
+</li>
+        <li><a href="api/kinoml/ml/torch_loops/index.html#kinoml.ml.torch_loops.LRScheduler.__call__">(kinoml.ml.torch_loops.LRScheduler method)</a>
+</li>
       </ul></li>
       <li><a href="api/kinoml/core/conditions/index.html#kinoml.core.conditions.BaseConditions.__eq__">__eq__() (kinoml.core.conditions.BaseConditions method)</a>
 
@@ -358,29 +362,45 @@
       <li><a href="api/kinoml/datasets/core/index.html#kinoml.datasets.core.DatasetProvider.__getitem__">__getitem__() (kinoml.datasets.core.DatasetProvider method)</a>
 
       <ul>
+        <li><a href="api/kinoml/datasets/torch_datasets/index.html#kinoml.datasets.torch_datasets.AwkwardArrayDataset.__getitem__">(kinoml.datasets.torch_datasets.AwkwardArrayDataset method)</a>
+</li>
+        <li><a href="api/kinoml/datasets/torch_datasets/index.html#kinoml.datasets.torch_datasets.MultiXTorchDataset.__getitem__">(kinoml.datasets.torch_datasets.MultiXTorchDataset method)</a>
+</li>
         <li><a href="api/kinoml/datasets/torch_datasets/index.html#kinoml.datasets.torch_datasets.PrefeaturizedTorchDataset.__getitem__">(kinoml.datasets.torch_datasets.PrefeaturizedTorchDataset method)</a>
 </li>
         <li><a href="api/kinoml/datasets/torch_datasets/index.html#kinoml.datasets.torch_datasets.TorchDataset.__getitem__">(kinoml.datasets.torch_datasets.TorchDataset method)</a>
 </li>
-        <li><a href="api/kinoml/datasets/torch_datasets/index.html#kinoml.datasets.torch_datasets.XyNpzTorchDataset.__getitem__">(kinoml.datasets.torch_datasets.XyNpzTorchDataset method)</a>
+        <li><a href="api/kinoml/datasets/torch_datasets/index.html#kinoml.datasets.torch_datasets.XyTorchDataset.__getitem__">(kinoml.datasets.torch_datasets.XyTorchDataset method)</a>
+</li>
+        <li><a href="api/kinoml/datasets/torch_geometric_datasets/index.html#kinoml.datasets.torch_geometric_datasets.AwkwardArrayGeometricDataset.__getitem__">(kinoml.datasets.torch_geometric_datasets.AwkwardArrayGeometricDataset method)</a>
 </li>
       </ul></li>
+      <li><a href="api/kinoml/features/core/index.html#kinoml.features.core.ParallelBaseFeaturizer.__getstate__">__getstate__() (kinoml.features.core.ParallelBaseFeaturizer method)</a>
+</li>
       <li><a href="api/kinoml/index.html#kinoml.__git_revision__">__git_revision__ (in module kinoml)</a>
 </li>
       <li><a href="api/kinoml/core/conditions/index.html#kinoml.core.conditions.BaseConditions.__hash__">__hash__() (kinoml.core.conditions.BaseConditions method)</a>
 </li>
-      <li><a href="api/kinoml/ml/lightning_modules/index.html#kinoml.ml.lightning_modules._IterWithObsModel.__iter__">__iter__() (kinoml.ml.lightning_modules._IterWithObsModel method)</a>
+      <li><a href="api/kinoml/datasets/torch_geometric_datasets/index.html#kinoml.datasets.torch_geometric_datasets.AwkwardArrayGeometricDataset.__iter__">__iter__() (kinoml.datasets.torch_geometric_datasets.AwkwardArrayGeometricDataset method)</a>
 
       <ul>
+        <li><a href="api/kinoml/ml/lightning_modules/index.html#kinoml.ml.lightning_modules._IterWithObsModel.__iter__">(kinoml.ml.lightning_modules._IterWithObsModel method)</a>
+</li>
         <li><a href="api/kinoml/ml/lightning_modules/index.html#kinoml.ml.lightning_modules.ObservationModelDataLoader.__iter__">(kinoml.ml.lightning_modules.ObservationModelDataLoader method)</a>
 </li>
       </ul></li>
       <li><a href="api/kinoml/datasets/core/index.html#kinoml.datasets.core.DatasetProvider.__len__">__len__() (kinoml.datasets.core.DatasetProvider method)</a>
 
       <ul>
+        <li><a href="api/kinoml/datasets/torch_datasets/index.html#kinoml.datasets.torch_datasets.AwkwardArrayDataset.__len__">(kinoml.datasets.torch_datasets.AwkwardArrayDataset method)</a>
+</li>
+        <li><a href="api/kinoml/datasets/torch_datasets/index.html#kinoml.datasets.torch_datasets.MultiXTorchDataset.__len__">(kinoml.datasets.torch_datasets.MultiXTorchDataset method)</a>
+</li>
         <li><a href="api/kinoml/datasets/torch_datasets/index.html#kinoml.datasets.torch_datasets.PrefeaturizedTorchDataset.__len__">(kinoml.datasets.torch_datasets.PrefeaturizedTorchDataset method)</a>
 </li>
-        <li><a href="api/kinoml/datasets/torch_datasets/index.html#kinoml.datasets.torch_datasets.XyNpzTorchDataset.__len__">(kinoml.datasets.torch_datasets.XyNpzTorchDataset method)</a>
+        <li><a href="api/kinoml/datasets/torch_datasets/index.html#kinoml.datasets.torch_datasets.XyTorchDataset.__len__">(kinoml.datasets.torch_datasets.XyTorchDataset method)</a>
+</li>
+        <li><a href="api/kinoml/datasets/torch_geometric_datasets/index.html#kinoml.datasets.torch_geometric_datasets.AwkwardArrayGeometricDataset.__len__">(kinoml.datasets.torch_geometric_datasets.AwkwardArrayGeometricDataset method)</a>
 </li>
       </ul></li>
       <li><a href="api/kinoml/utils/index.html#kinoml.utils.defaultdictwithargs.__missing__">__missing__() (kinoml.utils.defaultdictwithargs method)</a>
@@ -400,9 +420,19 @@
 </li>
         <li><a href="api/kinoml/datasets/core/index.html#kinoml.datasets.core.MultiDatasetProvider.__repr__">(kinoml.datasets.core.MultiDatasetProvider method)</a>
 </li>
+        <li><a href="api/kinoml/datasets/torch_datasets/index.html#kinoml.datasets.torch_datasets.AwkwardArrayDataset.__repr__">(kinoml.datasets.torch_datasets.AwkwardArrayDataset method)</a>
+</li>
+        <li><a href="api/kinoml/datasets/torch_geometric_datasets/index.html#kinoml.datasets.torch_geometric_datasets.AwkwardArrayGeometricDataset.__repr__">(kinoml.datasets.torch_geometric_datasets.AwkwardArrayGeometricDataset method)</a>
+</li>
         <li><a href="api/kinoml/features/core/index.html#kinoml.features.core.BaseFeaturizer.__repr__">(kinoml.features.core.BaseFeaturizer method)</a>
 </li>
-        <li><a href="api/kinoml/features/dunbrack_cluster/index.html#kinoml.features.dunbrack_cluster.PDBDunbrack.__repr__">(kinoml.features.dunbrack_cluster.PDBDunbrack method)</a>
+      </ul></li>
+      <li><a href="api/kinoml/features/core/index.html#kinoml.features.core.ParallelBaseFeaturizer.__setstate__">__setstate__() (kinoml.features.core.ParallelBaseFeaturizer method)</a>
+</li>
+      <li><a href="api/kinoml/datasets/torch_datasets/index.html#kinoml.datasets.torch_datasets.AwkwardArrayDataset.__str__">__str__() (kinoml.datasets.torch_datasets.AwkwardArrayDataset method)</a>
+
+      <ul>
+        <li><a href="api/kinoml/datasets/torch_geometric_datasets/index.html#kinoml.datasets.torch_geometric_datasets.AwkwardArrayGeometricDataset.__str__">(kinoml.datasets.torch_geometric_datasets.AwkwardArrayGeometricDataset method)</a>
 </li>
       </ul></li>
       <li><a href="api/kinoml/index.html#kinoml.__version__">__version__ (in module kinoml)</a>
@@ -417,11 +447,15 @@
         <li><a href="api/kinoml/core/sequences/index.html#kinoml.core.sequences.RNASequence._ACCESSION_URL">(kinoml.core.sequences.RNASequence attribute)</a>
 </li>
       </ul></li>
-      <li><a href="api/kinoml/features/complexes/index.html#kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._add_smiles_column">_add_smiles_column() (kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer static method)</a>
+      <li><a href="api/kinoml/datasets/torch_datasets/index.html#kinoml.datasets.torch_datasets._accessor_to_indices">_accessor_to_indices() (in module kinoml.datasets.torch_datasets)</a>
+</li>
+      <li><a href="api/kinoml/features/complexes/index.html#kinoml.features.complexes.OEKLIFSKinaseApoFeaturizer._add_kinase_pocket_similarity">_add_kinase_pocket_similarity() (kinoml.features.complexes.OEKLIFSKinaseApoFeaturizer static method)</a>
+</li>
+      <li><a href="api/kinoml/features/complexes/index.html#kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._add_smiles_column">_add_smiles_column() (kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer method)</a>
 </li>
       <li><a href="api/kinoml/datasets/kinomescan/utils/index.html#kinoml.datasets.kinomescan.utils.KINOMEScanMapper._apply_mutations">_apply_mutations() (kinoml.datasets.kinomescan.utils.KINOMEScanMapper static method)</a>
 </li>
-      <li><a href="api/kinoml/features/complexes/index.html#kinoml.features.complexes.OEHybridDockingFeaturizer._assemble_complex">_assemble_complex() (kinoml.features.complexes.OEHybridDockingFeaturizer static method)</a>
+      <li><a href="api/kinoml/features/complexes/index.html#kinoml.features.complexes.OEHybridDockingFeaturizer._assemble_components">_assemble_components() (kinoml.features.complexes.OEHybridDockingFeaturizer method)</a>
 </li>
       <li><a href="api/kinoml/ml/torch_models/index.html#kinoml.ml.torch_models._BaseModule">_BaseModule (class in kinoml.ml.torch_models)</a>
 </li>
@@ -453,92 +487,122 @@
 </li>
       <li><a href="api/kinoml/features/protein/index.html#kinoml.features.protein.AminoAcidCompositionFeaturizer._counter">_counter (kinoml.features.protein.AminoAcidCompositionFeaturizer attribute)</a>
 </li>
+      <li><a href="api/kinoml/features/complexes/index.html#kinoml.features.complexes.OEKLIFSKinaseApoFeaturizer._create_klifs_kinase_db">_create_klifs_kinase_db() (kinoml.features.complexes.OEKLIFSKinaseApoFeaturizer method)</a>
+</li>
+      <li><a href="api/kinoml/features/complexes/index.html#kinoml.features.complexes.OEKLIFSKinaseApoFeaturizer._create_klifs_structure_db">_create_klifs_structure_db() (kinoml.features.complexes.OEKLIFSKinaseApoFeaturizer method)</a>
+</li>
+      <li><a href="api/kinoml/features/complexes/index.html#kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._create_ligand_smiles_dict">_create_ligand_smiles_dict() (kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer method)</a>
+</li>
       <li><a href="api/kinoml/datasets/kinomescan/utils/index.html#kinoml.datasets.kinomescan.utils.KINOMEScanMapper._cut_sequence">_cut_sequence() (kinoml.datasets.kinomescan.utils.KINOMEScanMapper static method)</a>
+</li>
+      <li><a href="api/kinoml/features/core/index.html#kinoml.features.core.CallableFeaturizer._default_func">_default_func() (kinoml.features.core.CallableFeaturizer static method)</a>
 </li>
       <li><a href="api/kinoml/ml/lightning_modules/index.html#kinoml.ml.lightning_modules.ObservationModelModule._disabled_validation_epoch_end">_disabled_validation_epoch_end() (kinoml.ml.lightning_modules.ObservationModelModule method)</a>
 </li>
       <li><a href="api/kinoml/ml/lightning_modules/index.html#kinoml.ml.lightning_modules.ObservationModelModule._disabled_validation_step">_disabled_validation_step() (kinoml.ml.lightning_modules.ObservationModelModule method)</a>
 </li>
+      <li><a href="api/kinoml/features/complexes/index.html#kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._dowload_klifs_ligands">_dowload_klifs_ligands() (kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer method)</a>
+</li>
       <li><a href="api/kinoml/datasets/core/index.html#kinoml.datasets.core.DatasetProvider._download_to_cache_or_retrieve">_download_to_cache_or_retrieve() (kinoml.datasets.core.DatasetProvider class method)</a>
 </li>
-      <li><a href="api/kinoml/features/complexes/index.html#kinoml.features.complexes.OEHybridDockingFeaturizer._featurize">_featurize() (kinoml.features.complexes.OEHybridDockingFeaturizer method)</a>
+      <li><a href="api/kinoml/features/core/index.html#kinoml.features.core.BaseFeaturizer._featurize">_featurize() (kinoml.features.core.BaseFeaturizer method)</a>
 
       <ul>
-        <li><a href="api/kinoml/features/complexes/index.html#kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._featurize">(kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer method)</a>
-</li>
-        <li><a href="api/kinoml/features/core/index.html#kinoml.features.core.BaseFeaturizer._featurize">(kinoml.features.core.BaseFeaturizer method)</a>
-</li>
-        <li><a href="api/kinoml/features/core/index.html#kinoml.features.core.BaseOneHotEncodingFeaturizer._featurize">(kinoml.features.core.BaseOneHotEncodingFeaturizer method)</a>
-</li>
         <li><a href="api/kinoml/features/core/index.html#kinoml.features.core.Concatenated._featurize">(kinoml.features.core.Concatenated method)</a>
 </li>
-        <li><a href="api/kinoml/features/core/index.html#kinoml.features.core.HashFeaturizer._featurize">(kinoml.features.core.HashFeaturizer method)</a>
+        <li><a href="api/kinoml/features/core/index.html#kinoml.features.core.NullFeaturizer._featurize">(kinoml.features.core.NullFeaturizer method)</a>
 </li>
-        <li><a href="api/kinoml/features/core/index.html#kinoml.features.core.PadFeaturizer._featurize">(kinoml.features.core.PadFeaturizer method)</a>
+        <li><a href="api/kinoml/features/core/index.html#kinoml.features.core.ParallelBaseFeaturizer._featurize">(kinoml.features.core.ParallelBaseFeaturizer method)</a>
 </li>
         <li><a href="api/kinoml/features/core/index.html#kinoml.features.core.Pipeline._featurize">(kinoml.features.core.Pipeline method)</a>
 </li>
-        <li><a href="api/kinoml/features/core/index.html#kinoml.features.core.ScaleFeaturizer._featurize">(kinoml.features.core.ScaleFeaturizer method)</a>
-</li>
-        <li><a href="api/kinoml/features/ligand/index.html#kinoml.features.ligand.GraphLigandFeaturizer._featurize">(kinoml.features.ligand.GraphLigandFeaturizer method)</a>
-</li>
-        <li><a href="api/kinoml/features/ligand/index.html#kinoml.features.ligand.MorganFingerprintFeaturizer._featurize">(kinoml.features.ligand.MorganFingerprintFeaturizer method)</a>
-</li>
-        <li><a href="api/kinoml/features/ligand/index.html#kinoml.features.ligand.SmilesToLigandFeaturizer._featurize">(kinoml.features.ligand.SmilesToLigandFeaturizer method)</a>
-</li>
-        <li><a href="api/kinoml/features/protein/index.html#kinoml.features.protein.AminoAcidCompositionFeaturizer._featurize">(kinoml.features.protein.AminoAcidCompositionFeaturizer method)</a>
+        <li><a href="api/kinoml/features/core/index.html#kinoml.features.core.TupleOfArrays._featurize">(kinoml.features.core.TupleOfArrays method)</a>
 </li>
       </ul></li>
-      <li><a href="api/kinoml/features/ligand/index.html#kinoml.features.ligand.MorganFingerprintFeaturizer._featurize_ligand">_featurize_ligand() (kinoml.features.ligand.MorganFingerprintFeaturizer method)</a>
+      <li><a href="api/kinoml/features/complexes/index.html#kinoml.features.complexes.OEHybridDockingFeaturizer._featurize_one">_featurize_one() (kinoml.features.complexes.OEHybridDockingFeaturizer method)</a>
+
+      <ul>
+        <li><a href="api/kinoml/features/complexes/index.html#kinoml.features.complexes.OEKLIFSKinaseApoFeaturizer._featurize_one">(kinoml.features.complexes.OEKLIFSKinaseApoFeaturizer method)</a>
 </li>
-      <li><a href="api/kinoml/datasets/core/index.html#kinoml.datasets.core.DatasetProvider._featurize_one">_featurize_one() (kinoml.datasets.core.DatasetProvider static method)</a>
+        <li><a href="api/kinoml/features/complexes/index.html#kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._featurize_one">(kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer method)</a>
 </li>
-      <li><a href="api/kinoml/features/complexes/index.html#kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._filter_for_similar_kinase_pockets">_filter_for_similar_kinase_pockets() (kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer static method)</a>
+        <li><a href="api/kinoml/features/core/index.html#kinoml.features.core.BaseFeaturizer._featurize_one">(kinoml.features.core.BaseFeaturizer method)</a>
+</li>
+        <li><a href="api/kinoml/features/core/index.html#kinoml.features.core.BaseOneHotEncodingFeaturizer._featurize_one">(kinoml.features.core.BaseOneHotEncodingFeaturizer method)</a>
+</li>
+        <li><a href="api/kinoml/features/core/index.html#kinoml.features.core.CallableFeaturizer._featurize_one">(kinoml.features.core.CallableFeaturizer method)</a>
+</li>
+        <li><a href="api/kinoml/features/core/index.html#kinoml.features.core.ClearFeaturizations._featurize_one">(kinoml.features.core.ClearFeaturizations method)</a>
+</li>
+        <li><a href="api/kinoml/features/core/index.html#kinoml.features.core.HashFeaturizer._featurize_one">(kinoml.features.core.HashFeaturizer method)</a>
+</li>
+        <li><a href="api/kinoml/features/core/index.html#kinoml.features.core.PadFeaturizer._featurize_one">(kinoml.features.core.PadFeaturizer method)</a>
+</li>
+        <li><a href="api/kinoml/features/ligand/index.html#kinoml.features.ligand.GraphLigandFeaturizer._featurize_one">(kinoml.features.ligand.GraphLigandFeaturizer method)</a>
+</li>
+        <li><a href="api/kinoml/features/ligand/index.html#kinoml.features.ligand.MorganFingerprintFeaturizer._featurize_one">(kinoml.features.ligand.MorganFingerprintFeaturizer method)</a>
+</li>
+        <li><a href="api/kinoml/features/ligand/index.html#kinoml.features.ligand.SmilesToLigandFeaturizer._featurize_one">(kinoml.features.ligand.SmilesToLigandFeaturizer method)</a>
+</li>
+        <li><a href="api/kinoml/features/protein/index.html#kinoml.features.protein.AminoAcidCompositionFeaturizer._featurize_one">(kinoml.features.protein.AminoAcidCompositionFeaturizer method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/kinoml/features/complexes/index.html#kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._filter_for_similar_kinase_pockets">_filter_for_similar_kinase_pockets() (kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer method)</a>
 </li>
       <li><a href="api/kinoml/features/complexes/index.html#kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._filter_for_similar_ligands_2d">_filter_for_similar_ligands_2d() (kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer static method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/kinoml/features/complexes/index.html#kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._filter_for_similar_ligands_3d">_filter_for_similar_ligands_3d() (kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer static method)</a>
+      <li><a href="api/kinoml/features/complexes/index.html#kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._filter_for_similar_ligands_3d">_filter_for_similar_ligands_3d() (kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer method)</a>
 </li>
       <li><a href="api/kinoml/features/ligand/index.html#kinoml.features.ligand.SingleLigandFeaturizer._find_ligand">_find_ligand() (kinoml.features.ligand.SingleLigandFeaturizer method)</a>
 </li>
-      <li><a href="api/kinoml/modeling/alignment/index.html#kinoml.modeling.alignment.Alignment._format_alignment_with_ligands">_format_alignment_with_ligands() (kinoml.modeling.alignment.Alignment method)</a>
-</li>
       <li><a href="api/kinoml/utils/index.html#kinoml.utils.FromDistpatcherMixin._from_dispatcher">_from_dispatcher() (kinoml.utils.FromDistpatcherMixin class method)</a>
 </li>
-      <li><a href="api/kinoml/features/complexes/index.html#kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._get_available_ligand_templates">_get_available_ligand_templates() (kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer static method)</a>
+      <li><a href="api/kinoml/features/core/index.html#kinoml.features.core.PadFeaturizer._get_array">_get_array() (kinoml.features.core.PadFeaturizer method)</a>
+</li>
+      <li><a href="api/kinoml/features/complexes/index.html#kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._get_available_ligand_templates">_get_available_ligand_templates() (kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer method)</a>
 </li>
       <li><a href="api/kinoml/features/complexes/index.html#kinoml.features.complexes.OEHybridDockingFeaturizer._get_components">_get_components() (kinoml.features.complexes.OEHybridDockingFeaturizer static method)</a>
 </li>
       <li><a href="api/kinoml/features/complexes/index.html#kinoml.features.complexes.OEHybridDockingFeaturizer._get_design_unit">_get_design_unit() (kinoml.features.complexes.OEHybridDockingFeaturizer method)</a>
 
       <ul>
-        <li><a href="api/kinoml/features/complexes/index.html#kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._get_design_unit">(kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer method)</a>
+        <li><a href="api/kinoml/features/complexes/index.html#kinoml.features.complexes.OEKLIFSKinaseApoFeaturizer._get_design_unit">(kinoml.features.complexes.OEKLIFSKinaseApoFeaturizer method)</a>
 </li>
       </ul></li>
-      <li><a href="api/kinoml/features/complexes/index.html#kinoml.features.complexes.OEHybridDockingFeaturizer._get_featurizer_results">_get_featurizer_results() (kinoml.features.complexes.OEHybridDockingFeaturizer method)</a>
-</li>
       <li><a href="api/kinoml/features/complexes/index.html#kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._get_identical_ligand_indices">_get_identical_ligand_indices() (kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer static method)</a>
 </li>
-      <li><a href="api/kinoml/features/complexes/index.html#kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._get_kinase_residue_numbers">_get_kinase_residue_numbers() (kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer static method)</a>
+      <li><a href="api/kinoml/features/complexes/index.html#kinoml.features.complexes.OEKLIFSKinaseApoFeaturizer._get_kinase_residue_numbers">_get_kinase_residue_numbers() (kinoml.features.complexes.OEKLIFSKinaseApoFeaturizer static method)</a>
+</li>
+      <li><a href="api/kinoml/datasets/torch_datasets/index.html#kinoml.datasets.torch_datasets.MultiXTorchDataset._getitem_multi_X">_getitem_multi_X() (kinoml.datasets.torch_datasets.MultiXTorchDataset method)</a>
+</li>
+      <li><a href="api/kinoml/datasets/torch_datasets/index.html#kinoml.datasets.torch_datasets.MultiXTorchDataset._getitem_single_X">_getitem_single_X() (kinoml.datasets.torch_datasets.MultiXTorchDataset method)</a>
+</li>
+      <li><a href="api/kinoml/features/core/index.html#kinoml.features.core.HashFeaturizer._getter">_getter() (kinoml.features.core.HashFeaturizer static method)</a>
 </li>
       <li><a href="api/kinoml/core/ligands/index.html#kinoml.core.ligands.OpenForceFieldLigand._initialize_from_dict">_initialize_from_dict() (kinoml.core.ligands.OpenForceFieldLigand method)</a>
 </li>
-      <li><a href="api/kinoml/features/complexes/index.html#kinoml.features.complexes.OEHybridDockingFeaturizer._interpret_system">_interpret_system() (kinoml.features.complexes.OEHybridDockingFeaturizer static method)</a>
+      <li><a href="api/kinoml/features/complexes/index.html#kinoml.features.complexes.OEKLIFSKinaseApoFeaturizer._interpret_kinase">_interpret_kinase() (kinoml.features.complexes.OEKLIFSKinaseApoFeaturizer method)</a>
+</li>
+      <li><a href="api/kinoml/features/complexes/index.html#kinoml.features.complexes.OEHybridDockingFeaturizer._interpret_system">_interpret_system() (kinoml.features.complexes.OEHybridDockingFeaturizer method)</a>
 </li>
       <li><a href="api/kinoml/ml/lightning_modules/index.html#kinoml.ml.lightning_modules._IterWithObsModel">_IterWithObsModel (class in kinoml.ml.lightning_modules)</a>
 </li>
-      <li><a href="api/kinoml/core/measurements/index.html#kinoml.core.measurements.ObservationModelMeasurement._loss_adapter">_loss_adapter() (kinoml.core.measurements.ObservationModelMeasurement class method)</a>
+      <li><a href="api/kinoml/datasets/torch_datasets/index.html#kinoml.datasets.torch_datasets.MultiXTorchDataset._key_to_ints">_key_to_ints() (kinoml.datasets.torch_datasets.MultiXTorchDataset static method)</a>
 </li>
-      <li><a href="api/kinoml/core/measurements/index.html#kinoml.core.measurements.PercentageDisplacementMeasurement._loss_adapter_xgboost__mse">_loss_adapter_xgboost__mse() (kinoml.core.measurements.PercentageDisplacementMeasurement static method)</a>
+      <li><a href="api/kinoml/core/measurements/index.html#kinoml.core.measurements.ObservationModelMeasurement._loss_adapter_generic">_loss_adapter_generic() (kinoml.core.measurements.ObservationModelMeasurement static method)</a>
+</li>
+      <li><a href="api/kinoml/core/measurements/index.html#kinoml.core.measurements.ObservationModelMeasurement._loss_adapter_pytorch">_loss_adapter_pytorch() (kinoml.core.measurements.ObservationModelMeasurement class method)</a>
+</li>
+      <li><a href="api/kinoml/core/measurements/index.html#kinoml.core.measurements.PercentageDisplacementMeasurement._loss_adapter_xgboost_mse">_loss_adapter_xgboost_mse() (kinoml.core.measurements.PercentageDisplacementMeasurement static method)</a>
 
       <ul>
-        <li><a href="api/kinoml/core/measurements/index.html#kinoml.core.measurements.pIC50Measurement._loss_adapter_xgboost__mse">(kinoml.core.measurements.pIC50Measurement static method)</a>
+        <li><a href="api/kinoml/core/measurements/index.html#kinoml.core.measurements.pIC50Measurement._loss_adapter_xgboost_mse">(kinoml.core.measurements.pIC50Measurement static method)</a>
 </li>
-        <li><a href="api/kinoml/core/measurements/index.html#kinoml.core.measurements.pKdMeasurement._loss_adapter_xgboost__mse">(kinoml.core.measurements.pKdMeasurement static method)</a>
+        <li><a href="api/kinoml/core/measurements/index.html#kinoml.core.measurements.pKdMeasurement._loss_adapter_xgboost_mse">(kinoml.core.measurements.pKdMeasurement static method)</a>
 </li>
-        <li><a href="api/kinoml/core/measurements/index.html#kinoml.core.measurements.pKiMeasurement._loss_adapter_xgboost__mse">(kinoml.core.measurements.pKiMeasurement static method)</a>
+        <li><a href="api/kinoml/core/measurements/index.html#kinoml.core.measurements.pKiMeasurement._loss_adapter_xgboost_mse">(kinoml.core.measurements.pKiMeasurement static method)</a>
 </li>
       </ul></li>
       <li><a href="api/kinoml/core/sequences/index.html#kinoml.core.sequences.Biosequence._mutate_with_deletion">_mutate_with_deletion() (kinoml.core.sequences.Biosequence method)</a>
@@ -587,33 +651,53 @@
 </li>
       <li><a href="api/kinoml/datasets/kinomescan/utils/index.html#kinoml.datasets.kinomescan.utils.KINOMEScanMapper._obtain_sequences">_obtain_sequences() (kinoml.datasets.kinomescan.utils.KINOMEScanMapper method)</a>
 </li>
-      <li><a href="api/kinoml/modeling/OEModeling/index.html#kinoml.modeling.OEModeling._OEFixBuiltLoopFragmentNumbers">_OEFixBuiltLoopFragmentNumbers() (in module kinoml.modeling.OEModeling)</a>
-</li>
-      <li><a href="api/kinoml/modeling/OEModeling/index.html#kinoml.modeling.OEModeling._OEFixConnectionNH">_OEFixConnectionNH() (in module kinoml.modeling.OEModeling)</a>
-</li>
-      <li><a href="api/kinoml/modeling/OEModeling/index.html#kinoml.modeling.OEModeling._OEFixLoopIssues">_OEFixLoopIssues() (in module kinoml.modeling.OEModeling)</a>
-</li>
-      <li><a href="api/kinoml/modeling/OEModeling/index.html#kinoml.modeling.OEModeling._OEFixMissingOXT">_OEFixMissingOXT() (in module kinoml.modeling.OEModeling)</a>
-</li>
-      <li><a href="api/kinoml/modeling/OEModeling/index.html#kinoml.modeling.OEModeling._OEFixWaterFragmentNumbers">_OEFixWaterFragmentNumbers() (in module kinoml.modeling.OEModeling)</a>
+      <li><a href="api/kinoml/ml/torch_loops/index.html#kinoml.ml.torch_loops._old_training_loop">_old_training_loop() (in module kinoml.ml.torch_loops)</a>
 </li>
       <li><a href="api/kinoml/ml/lightning_modules/index.html#kinoml.ml.lightning_modules.CrossValidateTrainer._patch_paths_for_kfold">_patch_paths_for_kfold() (kinoml.ml.lightning_modules.CrossValidateTrainer method)</a>
 </li>
-      <li><a href="api/kinoml/features/dunbrack_cluster/index.html#kinoml.features.dunbrack_cluster.PDBDunbrack._PDB_DUNBRACK_LIBRARY">_PDB_DUNBRACK_LIBRARY (kinoml.features.dunbrack_cluster.PDBDunbrack attribute)</a>
+      <li><a href="api/kinoml/features/ligand/index.html#kinoml.features.ligand.GraphLigandFeaturizer._per_atom_features">_per_atom_features() (kinoml.features.ligand.GraphLigandFeaturizer method)</a>
 </li>
-      <li><a href="api/kinoml/features/ligand/index.html#kinoml.features.ligand.GraphLigandFeaturizer._per_atom_features">_per_atom_features() (kinoml.features.ligand.GraphLigandFeaturizer static method)</a>
+      <li><a href="api/kinoml/features/core/index.html#kinoml.features.core.BaseFeaturizer._post_featurize">_post_featurize() (kinoml.features.core.BaseFeaturizer method)</a>
+
+      <ul>
+        <li><a href="api/kinoml/features/core/index.html#kinoml.features.core.ClearFeaturizations._post_featurize">(kinoml.features.core.ClearFeaturizations method)</a>
 </li>
+      </ul></li>
+      <li><a href="api/kinoml/core/measurements/index.html#kinoml.core.measurements.ObservationModelMeasurement._post_loss_adapter">_post_loss_adapter() (kinoml.core.measurements.ObservationModelMeasurement static method)</a>
+
+      <ul>
+        <li><a href="api/kinoml/core/measurements/index.html#kinoml.core.measurements.PercentageDisplacementMeasurement._post_loss_adapter">(kinoml.core.measurements.PercentageDisplacementMeasurement static method)</a>
+</li>
+        <li><a href="api/kinoml/core/measurements/index.html#kinoml.core.measurements.pIC50Measurement._post_loss_adapter">(kinoml.core.measurements.pIC50Measurement static method)</a>
+</li>
+        <li><a href="api/kinoml/core/measurements/index.html#kinoml.core.measurements.pKdMeasurement._post_loss_adapter">(kinoml.core.measurements.pKdMeasurement static method)</a>
+</li>
+        <li><a href="api/kinoml/core/measurements/index.html#kinoml.core.measurements.pKiMeasurement._post_loss_adapter">(kinoml.core.measurements.pKiMeasurement static method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/kinoml/features/complexes/index.html#kinoml.features.complexes.OEKLIFSKinaseApoFeaturizer._pre_featurize">_pre_featurize() (kinoml.features.complexes.OEKLIFSKinaseApoFeaturizer method)</a>
+
+      <ul>
+        <li><a href="api/kinoml/features/complexes/index.html#kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._pre_featurize">(kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer method)</a>
+</li>
+        <li><a href="api/kinoml/features/core/index.html#kinoml.features.core.BaseFeaturizer._pre_featurize">(kinoml.features.core.BaseFeaturizer method)</a>
+</li>
+        <li><a href="api/kinoml/features/core/index.html#kinoml.features.core.PadFeaturizer._pre_featurize">(kinoml.features.core.PadFeaturizer method)</a>
+</li>
+      </ul></li>
       <li><a href="api/kinoml/features/complexes/index.html#kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._prepare_ligand_template">_prepare_ligand_template() (kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer method)</a>
 </li>
-      <li><a href="api/kinoml/modeling/OEModeling/index.html#kinoml.modeling.OEModeling._prepare_structure">_prepare_structure() (in module kinoml.modeling.OEModeling)</a>
-</li>
-      <li><a href="api/kinoml/features/complexes/index.html#kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._process_kinase_domain">_process_kinase_domain() (kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer method)</a>
+      <li><a href="api/kinoml/features/complexes/index.html#kinoml.features.complexes.OEKLIFSKinaseApoFeaturizer._process_kinase_domain">_process_kinase_domain() (kinoml.features.complexes.OEKLIFSKinaseApoFeaturizer method)</a>
 </li>
       <li><a href="api/kinoml/core/conditions/index.html#kinoml.core.conditions.BaseConditions._properties">_properties() (kinoml.core.conditions.BaseConditions method)</a>
 </li>
       <li><a href="api/kinoml/datasets/core/index.html#kinoml.datasets.core.DatasetProvider._raw_data">_raw_data (kinoml.datasets.core.DatasetProvider attribute)</a>
 </li>
       <li><a href="api/kinoml/datasets/kinomescan/pkis2/index.html#kinoml.datasets.kinomescan.pkis2.PKIS2DatasetProvider._read_dataframe">_read_dataframe() (kinoml.datasets.kinomescan.pkis2.PKIS2DatasetProvider static method)</a>
+</li>
+      <li><a href="api/kinoml/features/complexes/index.html#kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._read_klifs_ligand">_read_klifs_ligand() (kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer method)</a>
+</li>
+      <li><a href="api/kinoml/features/complexes/index.html#kinoml.features.complexes.OEHybridDockingFeaturizer._remove_clashing_water">_remove_clashing_water() (kinoml.features.complexes.OEHybridDockingFeaturizer static method)</a>
 </li>
       <li><a href="api/kinoml/datasets/kinomescan/utils/index.html#kinoml.datasets.kinomescan.utils.KINOMEScanMapper._retrieve_sequence">_retrieve_sequence() (kinoml.datasets.kinomescan.utils.KINOMEScanMapper static method)</a>
 
@@ -627,20 +711,30 @@
         <li><a href="api/kinoml/features/protein/index.html#kinoml.features.protein.OneHotEncodedSequenceFeaturizer._retrieve_sequence">(kinoml.features.protein.OneHotEncodedSequenceFeaturizer method)</a>
 </li>
       </ul></li>
-      <li><a href="api/kinoml/docking/OEDocking/index.html#kinoml.docking.OEDocking._run_docking">_run_docking() (in module kinoml.docking.OEDocking)</a>
+      <li><a href="api/kinoml/features/complexes/index.html#kinoml.features.complexes.OEKLIFSKinaseApoFeaturizer._select_kinase_structure_by_klifs_kinase_id">_select_kinase_structure_by_klifs_kinase_id() (kinoml.features.complexes.OEKLIFSKinaseApoFeaturizer method)</a>
+</li>
+      <li><a href="api/kinoml/features/complexes/index.html#kinoml.features.complexes.OEKLIFSKinaseApoFeaturizer._select_kinase_structure_by_pdb_id">_select_kinase_structure_by_pdb_id() (kinoml.features.complexes.OEKLIFSKinaseApoFeaturizer method)</a>
 </li>
       <li><a href="api/kinoml/features/complexes/index.html#kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._select_ligand_template">_select_ligand_template() (kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer method)</a>
 </li>
-      <li><a href="api/kinoml/features/complexes/index.html#kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._select_protein_template">_select_protein_template() (kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer static method)</a>
+      <li><a href="api/kinoml/datasets/torch_datasets/index.html#kinoml.datasets.torch_datasets.MultiXTorchDataset._shape_X">_shape_X() (kinoml.datasets.torch_datasets.MultiXTorchDataset method)</a>
 </li>
       <li><a href="api/kinoml/ml/lightning_modules/index.html#kinoml.ml.lightning_modules.ObservationModelModule._standard_step">_standard_step() (kinoml.ml.lightning_modules.ObservationModelModule method)</a>
+</li>
+      <li><a href="api/kinoml/datasets/torch_datasets/index.html#kinoml.datasets.torch_datasets.MultiXTorchDataset._str_keys_to_nested_dict">_str_keys_to_nested_dict() (kinoml.datasets.torch_datasets.MultiXTorchDataset method)</a>
+</li>
+      <li><a href="api/kinoml/features/complexes/index.html#kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._superpose_templates">_superpose_templates() (kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer static method)</a>
 </li>
       <li><a href="api/kinoml/features/complexes/index.html#kinoml.features.complexes.OEHybridDockingFeaturizer._SUPPORTED_TYPES">_SUPPORTED_TYPES (kinoml.features.complexes.OEHybridDockingFeaturizer attribute)</a>
 
       <ul>
+        <li><a href="api/kinoml/features/complexes/index.html#kinoml.features.complexes.OEKLIFSKinaseApoFeaturizer._SUPPORTED_TYPES">(kinoml.features.complexes.OEKLIFSKinaseApoFeaturizer attribute)</a>
+</li>
         <li><a href="api/kinoml/features/complexes/index.html#kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._SUPPORTED_TYPES">(kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer attribute)</a>
 </li>
         <li><a href="api/kinoml/features/core/index.html#kinoml.features.core.BaseFeaturizer._SUPPORTED_TYPES">(kinoml.features.core.BaseFeaturizer attribute)</a>
+</li>
+        <li><a href="api/kinoml/features/core/index.html#kinoml.features.core.ParallelBaseFeaturizer._SUPPORTED_TYPES">(kinoml.features.core.ParallelBaseFeaturizer attribute)</a>
 </li>
       </ul></li>
       <li><a href="api/kinoml/features/core/index.html#kinoml.features.core.BaseFeaturizer._supports">_supports() (kinoml.features.core.BaseFeaturizer method)</a>
@@ -668,16 +762,10 @@
       <li><a href="api/kinoml/datasets/kinomescan/utils/index.html#kinoml.datasets.kinomescan.utils.KINOMEScanMapper.accession_for_name">accession_for_name() (kinoml.datasets.kinomescan.utils.KINOMEScanMapper method)</a>
 </li>
       <li><a href="api/kinoml/core/sequences/index.html#kinoml.core.sequences.Biosequence.ACCESSION_MAX_RETRIEVAL">ACCESSION_MAX_RETRIEVAL (kinoml.core.sequences.Biosequence attribute)</a>
-
-      <ul>
-        <li><a href="api/kinoml/core/sequences/index.html#kinoml.core.sequences.KinaseDomainAminoAcidSequence.ACCESSION_MAX_RETRIEVAL">(kinoml.core.sequences.KinaseDomainAminoAcidSequence attribute)</a>
 </li>
-      </ul></li>
       <li><a href="api/kinoml/ml/lightning_modules/index.html#kinoml.ml.lightning_modules.MultiDataModule.active_dataset">active_dataset() (kinoml.ml.lightning_modules.MultiDataModule property)</a>
 </li>
       <li><a href="api/kinoml/ml/lightning_modules/index.html#kinoml.ml.lightning_modules.MultiDataModule.active_dataset_index">active_dataset_index() (kinoml.ml.lightning_modules.MultiDataModule property)</a>
-</li>
-      <li><a href="api/kinoml/modeling/alignment/index.html#kinoml.modeling.alignment.Alignment">Alignment (class in kinoml.modeling.alignment)</a>
 </li>
       <li><a href="api/kinoml/features/ligand/index.html#kinoml.features.ligand.GraphLigandFeaturizer.ALL_ATOMIC_SYMBOLS">ALL_ATOMIC_SYMBOLS (kinoml.features.ligand.GraphLigandFeaturizer attribute)</a>
 </li>
@@ -697,25 +785,39 @@
         <li><a href="api/kinoml/features/protein/index.html#kinoml.features.protein.OneHotEncodedSequenceFeaturizer.ALPHABET">(kinoml.features.protein.OneHotEncodedSequenceFeaturizer attribute)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/kinoml/features/protein/index.html#kinoml.features.protein.AminoAcidCompositionFeaturizer">AminoAcidCompositionFeaturizer (class in kinoml.features.protein)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/kinoml/core/proteins/index.html#kinoml.core.proteins.AminoAcidSequence">AminoAcidSequence (class in kinoml.core.proteins)</a>
+
+      <ul>
+        <li><a href="api/kinoml/core/sequences/index.html#kinoml.core.sequences.AminoAcidSequence">(class in kinoml.core.sequences)</a>
 </li>
+      </ul></li>
       <li><a href="api/kinoml/utils/index.html#kinoml.utils.APPDIR">APPDIR (in module kinoml.utils)</a>
+</li>
+      <li><a href="api/kinoml/modeling/OEModeling/index.html#kinoml.modeling.OEModeling.apply_deletions">apply_deletions() (in module kinoml.modeling.OEModeling)</a>
+</li>
+      <li><a href="api/kinoml/modeling/OEModeling/index.html#kinoml.modeling.OEModeling.apply_insertions">apply_insertions() (in module kinoml.modeling.OEModeling)</a>
+</li>
+      <li><a href="api/kinoml/modeling/OEModeling/index.html#kinoml.modeling.OEModeling.apply_mutations">apply_mutations() (in module kinoml.modeling.OEModeling)</a>
+</li>
+      <li><a href="api/kinoml/modeling/OEModeling/index.html#kinoml.modeling.OEModeling.are_identical_molecules">are_identical_molecules() (in module kinoml.modeling.OEModeling)</a>
 </li>
       <li><a href="api/kinoml/datasets/torch_datasets/index.html#kinoml.datasets.torch_datasets.PrefeaturizedTorchDataset.as_dataloader">as_dataloader() (kinoml.datasets.torch_datasets.PrefeaturizedTorchDataset method)</a>
 </li>
       <li><a href="api/kinoml/core/conditions/index.html#kinoml.core.conditions.AssayConditions">AssayConditions (class in kinoml.core.conditions)</a>
 </li>
-      <li><a href="api/kinoml/features/dunbrack_cluster/index.html#kinoml.features.dunbrack_cluster.assign">assign() (in module kinoml.features.dunbrack_cluster)</a>
-
-      <ul>
-        <li><a href="api/kinoml/datasets/groups/index.html#kinoml.datasets.groups.BaseGrouper.assign">(kinoml.datasets.groups.BaseGrouper method)</a>
+      <li><a href="api/kinoml/datasets/groups/index.html#kinoml.datasets.groups.BaseGrouper.assign">assign() (kinoml.datasets.groups.BaseGrouper method)</a>
 </li>
-      </ul></li>
+      <li><a href="api/kinoml/modeling/OEModeling/index.html#kinoml.modeling.OEModeling.assign_caps">assign_caps() (in module kinoml.modeling.OEModeling)</a>
+</li>
       <li><a href="api/kinoml/ml/lightning_modules/index.html#kinoml.ml.lightning_modules.AttrList">AttrList (class in kinoml.ml.lightning_modules)</a>
+</li>
+      <li><a href="api/kinoml/datasets/torch_datasets/index.html#kinoml.datasets.torch_datasets.AwkwardArrayDataset">AwkwardArrayDataset (class in kinoml.datasets.torch_datasets)</a>
+</li>
+      <li><a href="api/kinoml/datasets/torch_geometric_datasets/index.html#kinoml.datasets.torch_geometric_datasets.AwkwardArrayGeometricDataset">AwkwardArrayGeometricDataset (class in kinoml.datasets.torch_geometric_datasets)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -755,6 +857,8 @@
 <h2 id="C">C</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/kinoml/features/core/index.html#kinoml.features.core.CallableFeaturizer">CallableFeaturizer (class in kinoml.features.core)</a>
+</li>
       <li><a href="api/kinoml/datasets/groups/index.html#kinoml.datasets.groups.CallableGrouper">CallableGrouper (class in kinoml.datasets.groups)</a>
 </li>
       <li><a href="api/kinoml/core/conditions/index.html#kinoml.core.conditions.AssayConditions.check">check() (kinoml.core.conditions.AssayConditions method)</a>
@@ -772,7 +876,11 @@
 </li>
         <li><a href="api/kinoml/core/measurements/index.html#kinoml.core.measurements.pKiMeasurement.check">(kinoml.core.measurements.pKiMeasurement method)</a>
 </li>
+        <li><a href="api/kinoml/core/systems/index.html#kinoml.core.systems.LigandSystem.check">(kinoml.core.systems.LigandSystem method)</a>
+</li>
         <li><a href="api/kinoml/core/systems/index.html#kinoml.core.systems.ProteinLigandComplex.check">(kinoml.core.systems.ProteinLigandComplex method)</a>
+</li>
+        <li><a href="api/kinoml/core/systems/index.html#kinoml.core.systems.ProteinSystem.check">(kinoml.core.systems.ProteinSystem method)</a>
 </li>
         <li><a href="api/kinoml/core/systems/index.html#kinoml.core.systems.System.check">(kinoml.core.systems.System method)</a>
 </li>
@@ -781,27 +889,17 @@
 </li>
       <li><a href="api/kinoml/docking/OEDocking/index.html#kinoml.docking.OEDocking.chemgauss_docking">chemgauss_docking() (in module kinoml.docking.OEDocking)</a>
 </li>
-      <li><a href="api/kinoml/modeling/OEModeling/index.html#kinoml.modeling.OEModeling.clashing_atoms">clashing_atoms() (in module kinoml.modeling.OEModeling)</a>
-</li>
-      <li><a href="api/kinoml/ml/lightning_modules/index.html#kinoml.ml.lightning_modules.CrossValidateTrainer.clear">clear() (kinoml.ml.lightning_modules.CrossValidateTrainer method)</a>
-</li>
-      <li><a href="api/kinoml/datasets/core/index.html#kinoml.datasets.core.BaseDatasetProvider.clear_featurizations">clear_featurizations() (kinoml.datasets.core.BaseDatasetProvider method)</a>
-
-      <ul>
-        <li><a href="api/kinoml/datasets/core/index.html#kinoml.datasets.core.DatasetProvider.clear_featurizations">(kinoml.datasets.core.DatasetProvider method)</a>
-</li>
-      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/kinoml/ml/lightning_modules/index.html#kinoml.ml.lightning_modules.CrossValidateTrainer.clear">clear() (kinoml.ml.lightning_modules.CrossValidateTrainer method)</a>
+</li>
+      <li><a href="api/kinoml/features/core/index.html#kinoml.features.core.ClearFeaturizations">ClearFeaturizations (class in kinoml.features.core)</a>
+</li>
       <li><a href="api/kinoml/ml/tensorflow_models/index.html#kinoml.ml.tensorflow_models.CNN">CNN() (in module kinoml.ml.tensorflow_models)</a>
 </li>
       <li><a href="api/kinoml/utils/index.html#kinoml.utils.collapsible">collapsible() (in module kinoml.utils)</a>
 </li>
-      <li><a href="api/kinoml/modeling/OEModeling/index.html#kinoml.modeling.OEModeling.compare_molecules">compare_molecules() (in module kinoml.modeling.OEModeling)</a>
-</li>
       <li><a href="api/kinoml/ml/lightning_modules/index.html#kinoml.ml.lightning_modules.RootMeanSquaredError.compute">compute() (kinoml.ml.lightning_modules.RootMeanSquaredError method)</a>
-</li>
-      <li><a href="api/kinoml/features/protein_struct_features/index.html#kinoml.features.protein_struct_features.compute_simple_protein_features">compute_simple_protein_features() (in module kinoml.features.protein_struct_features)</a>
 </li>
       <li><a href="api/kinoml/features/core/index.html#kinoml.features.core.Concatenated">Concatenated (class in kinoml.features.core)</a>
 </li>
@@ -839,17 +937,27 @@
 </li>
       <li><a href="api/kinoml/utils/index.html#kinoml.utils.defaultdictwithargs">defaultdictwithargs (class in kinoml.utils)</a>
 </li>
-      <li><a href="api/kinoml/ml/torch_models/index.html#kinoml.ml.torch_models.DenseNeuralNetworkRegression">DenseNeuralNetworkRegression (class in kinoml.ml.torch_models)</a>
+      <li><a href="api/kinoml/modeling/OEModeling/index.html#kinoml.modeling.OEModeling.delete_clashing_sidechains">delete_clashing_sidechains() (in module kinoml.modeling.OEModeling)</a>
+</li>
+      <li><a href="api/kinoml/modeling/OEModeling/index.html#kinoml.modeling.OEModeling.delete_partial_residues">delete_partial_residues() (in module kinoml.modeling.OEModeling)</a>
+</li>
+      <li><a href="api/kinoml/modeling/OEModeling/index.html#kinoml.modeling.OEModeling.delete_residue">delete_residue() (in module kinoml.modeling.OEModeling)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/kinoml/utils/index.html#kinoml.utils.LocalFileStorage.DIRECTORY">DIRECTORY (kinoml.utils.LocalFileStorage attribute)</a>
+      <li><a href="api/kinoml/modeling/OEModeling/index.html#kinoml.modeling.OEModeling.delete_short_protein_segments">delete_short_protein_segments() (in module kinoml.modeling.OEModeling)</a>
 </li>
+      <li><a href="api/kinoml/ml/torch_models/index.html#kinoml.ml.torch_models.DenseNeuralNetworkRegression">DenseNeuralNetworkRegression (class in kinoml.ml.torch_models)</a>
+</li>
+      <li><a href="api/kinoml/utils/index.html#kinoml.utils.FileDownloader.DIRECTORY">DIRECTORY (kinoml.utils.FileDownloader attribute)</a>
+
+      <ul>
+        <li><a href="api/kinoml/utils/index.html#kinoml.utils.LocalFileStorage.DIRECTORY">(kinoml.utils.LocalFileStorage attribute)</a>
+</li>
+      </ul></li>
       <li><a href="api/kinoml/core/sequences/index.html#kinoml.core.sequences.DNASequence">DNASequence (class in kinoml.core.sequences)</a>
 </li>
       <li><a href="api/kinoml/ml/tensorflow_models/index.html#kinoml.ml.tensorflow_models.DNN">DNN() (in module kinoml.ml.tensorflow_models)</a>
-</li>
-      <li><a href="api/kinoml/core/systems/index.html#kinoml.core.systems.ProteinLigandComplex.dock">dock() (kinoml.core.systems.ProteinLigandComplex method)</a>
 </li>
       <li><a href="api/kinoml/utils/index.html#kinoml.utils.download_file">download_file() (in module kinoml.utils)</a>
 </li>
@@ -859,10 +967,20 @@
 <h2 id="E">E</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/kinoml/ml/torch_loops/index.html#kinoml.ml.torch_loops.EarlyStopping">EarlyStopping (class in kinoml.ml.torch_loops)</a>
+</li>
+      <li><a href="api/kinoml/modeling/OEModeling/index.html#kinoml.modeling.OEModeling.enumerate_isomeric_smiles">enumerate_isomeric_smiles() (in module kinoml.modeling.OEModeling)</a>
+</li>
       <li><a href="api/kinoml/core/measurements/index.html#kinoml.core.measurements.BaseMeasurement.errors">errors() (kinoml.core.measurements.BaseMeasurement property)</a>
 </li>
-      <li><a href="api/kinoml/ml/torch_models/index.html#kinoml.ml.torch_models._BaseModule.estimate_input_shape">estimate_input_shape() (kinoml.ml.torch_models._BaseModule static method)</a>
+      <li><a href="api/kinoml/ml/torch_geometric_models/index.html#kinoml.ml.torch_geometric_models.GraphConvolutionNeuralNetwork.estimate_input_shape">estimate_input_shape() (kinoml.ml.torch_geometric_models.GraphConvolutionNeuralNetwork static method)</a>
+
+      <ul>
+        <li><a href="api/kinoml/ml/torch_models/index.html#kinoml.ml.torch_models._BaseModule.estimate_input_shape">(kinoml.ml.torch_models._BaseModule static method)</a>
 </li>
+        <li><a href="api/kinoml/ml/torch_models/index.html#kinoml.ml.torch_models.ListOfTupleNeuralNetworkregression.estimate_input_shape">(kinoml.ml.torch_models.ListOfTupleNeuralNetworkregression static method)</a>
+</li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/kinoml/datasets/torch_datasets/index.html#kinoml.datasets.torch_datasets.PrefeaturizedTorchDataset.estimate_input_size">estimate_input_size() (kinoml.datasets.torch_datasets.PrefeaturizedTorchDataset method)</a>
@@ -879,6 +997,8 @@
 <h2 id="F">F</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/kinoml/datasets/core/index.html#kinoml.datasets.core.FeaturizationError">FeaturizationError</a>
+</li>
       <li><a href="api/kinoml/core/systems/index.html#kinoml.core.systems.System.featurizations">featurizations (kinoml.core.systems.System attribute)</a>
 </li>
       <li><a href="api/kinoml/datasets/core/index.html#kinoml.datasets.core.BaseDatasetProvider.featurize">featurize() (kinoml.datasets.core.BaseDatasetProvider method)</a>
@@ -887,8 +1007,6 @@
         <li><a href="api/kinoml/datasets/core/index.html#kinoml.datasets.core.DatasetProvider.featurize">(kinoml.datasets.core.DatasetProvider method)</a>
 </li>
         <li><a href="api/kinoml/features/core/index.html#kinoml.features.core.BaseFeaturizer.featurize">(kinoml.features.core.BaseFeaturizer method)</a>
-</li>
-        <li><a href="api/kinoml/features/core/index.html#kinoml.features.core.NullFeaturizer.featurize">(kinoml.features.core.NullFeaturizer method)</a>
 </li>
       </ul></li>
       <li><a href="api/kinoml/datasets/core/index.html#kinoml.datasets.core.BaseDatasetProvider.featurized_systems">featurized_systems() (kinoml.datasets.core.BaseDatasetProvider method)</a>
@@ -900,10 +1018,6 @@
       <li><a href="api/kinoml/utils/index.html#kinoml.utils.LocalFileStorage.featurizer_result">featurizer_result() (kinoml.utils.LocalFileStorage static method)</a>
 </li>
       <li><a href="api/kinoml/utils/index.html#kinoml.utils.FileDownloader">FileDownloader (class in kinoml.utils)</a>
-</li>
-      <li><a href="api/kinoml/core/ligands/index.html#kinoml.core.ligands.FileLigand">FileLigand (class in kinoml.core.ligands)</a>
-</li>
-      <li><a href="api/kinoml/core/proteins/index.html#kinoml.core.proteins.FileProtein">FileProtein (class in kinoml.core.proteins)</a>
 </li>
       <li><a href="api/kinoml/utils/index.html#kinoml.utils.fill_until_next_multiple">fill_until_next_multiple() (in module kinoml.utils)</a>
 </li>
@@ -918,17 +1032,19 @@
 </li>
         <li><a href="api/kinoml/ml/torch_models/index.html#kinoml.ml.torch_models.DenseNeuralNetworkRegression.forward">(kinoml.ml.torch_models.DenseNeuralNetworkRegression method)</a>
 </li>
+        <li><a href="api/kinoml/ml/torch_models/index.html#kinoml.ml.torch_models.ListOfTupleNeuralNetworkregression.forward">(kinoml.ml.torch_models.ListOfTupleNeuralNetworkregression method)</a>
+</li>
         <li><a href="api/kinoml/ml/torch_models/index.html#kinoml.ml.torch_models.NeuralNetworkRegression.forward">(kinoml.ml.torch_models.NeuralNetworkRegression method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/kinoml/core/proteins/index.html#kinoml.core.proteins.ProteinStructure.from_file">from_file() (kinoml.core.proteins.ProteinStructure class method)</a>
 </li>
       <li><a href="api/kinoml/core/proteins/index.html#kinoml.core.proteins.ProteinStructure.from_hgnc">from_hgnc() (kinoml.core.proteins.ProteinStructure class method)</a>
 </li>
       <li><a href="api/kinoml/core/proteins/index.html#kinoml.core.proteins.Kinase.from_kinmap">from_kinmap() (kinoml.core.proteins.Kinase class method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/kinoml/core/proteins/index.html#kinoml.core.proteins.Kinase.from_klifs">from_klifs() (kinoml.core.proteins.Kinase class method)</a>
 </li>
       <li><a href="api/kinoml/core/proteins/index.html#kinoml.core.proteins.Kinase.from_manning">from_manning() (kinoml.core.proteins.Kinase class method)</a>
@@ -937,6 +1053,18 @@
 </li>
       <li><a href="api/kinoml/core/sequences/index.html#kinoml.core.sequences.Biosequence.from_ncbi">from_ncbi() (kinoml.core.sequences.Biosequence class method)</a>
 </li>
+      <li><a href="api/kinoml/datasets/torch_datasets/index.html#kinoml.datasets.torch_datasets.MultiXTorchDataset.from_npz">from_npz() (kinoml.datasets.torch_datasets.MultiXTorchDataset class method)</a>
+
+      <ul>
+        <li><a href="api/kinoml/datasets/torch_datasets/index.html#kinoml.datasets.torch_datasets.XyTorchDataset.from_npz">(kinoml.datasets.torch_datasets.XyTorchDataset class method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/kinoml/datasets/torch_datasets/index.html#kinoml.datasets.torch_datasets.AwkwardArrayDataset.from_parquet">from_parquet() (kinoml.datasets.torch_datasets.AwkwardArrayDataset class method)</a>
+
+      <ul>
+        <li><a href="api/kinoml/datasets/torch_geometric_datasets/index.html#kinoml.datasets.torch_geometric_datasets.AwkwardArrayGeometricDataset.from_parquet">(kinoml.datasets.torch_geometric_datasets.AwkwardArrayGeometricDataset class method)</a>
+</li>
+      </ul></li>
       <li><a href="api/kinoml/core/proteins/index.html#kinoml.core.proteins.ProteinStructure.from_sequence">from_sequence() (kinoml.core.proteins.ProteinStructure class method)</a>
 </li>
       <li><a href="api/kinoml/core/ligands/index.html#kinoml.core.ligands.OpenForceFieldLigand.from_smiles">from_smiles() (kinoml.core.ligands.OpenForceFieldLigand class method)</a>
@@ -962,7 +1090,7 @@
       <li><a href="api/kinoml/core/proteins/index.html#kinoml.core.proteins.ProteinStructure.from_uniprot">from_uniprot() (kinoml.core.proteins.ProteinStructure class method)</a>
 
       <ul>
-        <li><a href="api/kinoml/core/sequences/index.html#kinoml.core.sequences.KinaseDomainAminoAcidSequence.from_uniprot">(kinoml.core.sequences.KinaseDomainAminoAcidSequence class method)</a>
+        <li><a href="api/kinoml/core/sequences/index.html#kinoml.core.sequences.AminoAcidSequence.from_uniprot">(kinoml.core.sequences.AminoAcidSequence class method)</a>
 </li>
       </ul></li>
       <li><a href="api/kinoml/utils/index.html#kinoml.utils.FromDistpatcherMixin">FromDistpatcherMixin (class in kinoml.utils)</a>
@@ -977,32 +1105,32 @@
 </li>
       <li><a href="api/kinoml/modeling/OEModeling/index.html#kinoml.modeling.OEModeling.generate_enantiomers">generate_enantiomers() (in module kinoml.modeling.OEModeling)</a>
 </li>
-      <li><a href="api/kinoml/modeling/OEModeling/index.html#kinoml.modeling.OEModeling.generate_isomeric_smiles_representations">generate_isomeric_smiles_representations() (in module kinoml.modeling.OEModeling)</a>
-</li>
       <li><a href="api/kinoml/modeling/OEModeling/index.html#kinoml.modeling.OEModeling.generate_reasonable_conformations">generate_reasonable_conformations() (in module kinoml.modeling.OEModeling)</a>
 </li>
       <li><a href="api/kinoml/modeling/OEModeling/index.html#kinoml.modeling.OEModeling.generate_tautomers">generate_tautomers() (in module kinoml.modeling.OEModeling)</a>
 </li>
-      <li><a href="api/kinoml/modeling/alignment/index.html#kinoml.modeling.alignment.Alignment.get_alignment">get_alignment() (kinoml.modeling.alignment.Alignment class method)</a>
+      <li><a href="api/kinoml/modeling/OEModeling/index.html#kinoml.modeling.OEModeling.get_atom_coordinates">get_atom_coordinates() (in module kinoml.modeling.OEModeling)</a>
 </li>
       <li><a href="api/kinoml/_version/index.html#kinoml._version.get_config">get_config() (in module kinoml._version)</a>
+</li>
+      <li><a href="api/kinoml/modeling/OEModeling/index.html#kinoml.modeling.OEModeling.get_expression_tags">get_expression_tags() (in module kinoml.modeling.OEModeling)</a>
 </li>
       <li><a href="api/kinoml/_version/index.html#kinoml._version.get_keywords">get_keywords() (in module kinoml._version)</a>
 </li>
       <li><a href="api/kinoml/ml/lightning_modules/index.html#kinoml.ml.lightning_modules.MultiDataModule.get_kfold">get_kfold() (kinoml.ml.lightning_modules.MultiDataModule method)</a>
 </li>
-      <li><a href="api/kinoml/modeling/OEModeling/index.html#kinoml.modeling.OEModeling.get_klifs_ligand">get_klifs_ligand() (in module kinoml.modeling.OEModeling)</a>
+      <li><a href="api/kinoml/modeling/OEModeling/index.html#kinoml.modeling.OEModeling.get_sequence">get_sequence() (in module kinoml.modeling.OEModeling)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/kinoml/modeling/homology/index.html#kinoml.modeling.homology.HomologyModel.get_pdb_template">get_pdb_template() (kinoml.modeling.homology.HomologyModel method)</a>
-</li>
-      <li><a href="api/kinoml/modeling/OEModeling/index.html#kinoml.modeling.OEModeling.get_sequence">get_sequence() (in module kinoml.modeling.OEModeling)</a>
+      <li><a href="api/kinoml/core/sequences/index.html#kinoml.core.sequences.AminoAcidSequence.get_sequence_details_from_uniprot_response">get_sequence_details_from_uniprot_response() (kinoml.core.sequences.AminoAcidSequence static method)</a>
 
       <ul>
-        <li><a href="api/kinoml/modeling/homology/index.html#kinoml.modeling.homology.HomologyModel.get_sequence">(kinoml.modeling.homology.HomologyModel method)</a>
+        <li><a href="api/kinoml/core/sequences/index.html#kinoml.core.sequences.KinaseDomainAminoAcidSequence.get_sequence_details_from_uniprot_response">(kinoml.core.sequences.KinaseDomainAminoAcidSequence static method)</a>
 </li>
       </ul></li>
+      <li><a href="api/kinoml/modeling/OEModeling/index.html#kinoml.modeling.OEModeling.get_structure_sequence_alignment">get_structure_sequence_alignment() (in module kinoml.modeling.OEModeling)</a>
+</li>
       <li><a href="api/kinoml/index.html#kinoml.get_versions">get_versions() (in module kinoml)</a>
 
       <ul>
@@ -1029,11 +1157,9 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/kinoml/_version/index.html#kinoml._version.HANDLERS">HANDLERS (in module kinoml._version)</a>
 </li>
-      <li><a href="api/kinoml/features/core/index.html#kinoml.features.core.HashFeaturizer">HashFeaturizer (class in kinoml.features.core)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/kinoml/modeling/homology/index.html#kinoml.modeling.homology.HomologyModel">HomologyModel (class in kinoml.modeling.homology)</a>
+      <li><a href="api/kinoml/features/core/index.html#kinoml.features.core.HashFeaturizer">HashFeaturizer (class in kinoml.features.core)</a>
 </li>
       <li><a href="api/kinoml/docking/OEDocking/index.html#kinoml.docking.OEDocking.hybrid_docking">hybrid_docking() (in module kinoml.docking.OEDocking)</a>
 </li>
@@ -1057,7 +1183,9 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/kinoml/datasets/core/index.html#kinoml.datasets.core.MultiDatasetProvider.indices_by_provider">indices_by_provider() (kinoml.datasets.core.MultiDatasetProvider method)</a>
 </li>
-      <li><a href="api/kinoml/datasets/torch_datasets/index.html#kinoml.datasets.torch_datasets.XyNpzTorchDataset.input_size">input_size() (kinoml.datasets.torch_datasets.XyNpzTorchDataset method)</a>
+      <li><a href="api/kinoml/datasets/torch_datasets/index.html#kinoml.datasets.torch_datasets.XyTorchDataset.input_size">input_size() (kinoml.datasets.torch_datasets.XyTorchDataset method)</a>
+</li>
+      <li><a href="api/kinoml/datasets/torch_datasets/index.html#kinoml.datasets.torch_datasets.MultiXTorchDataset.is_single_X">is_single_X() (kinoml.datasets.torch_datasets.MultiXTorchDataset method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -1065,18 +1193,10 @@
 <h2 id="K">K</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/kinoml/features/protein_struct_features/index.html#kinoml.features.protein_struct_features.key_klifs_residues">key_klifs_residues() (in module kinoml.features.protein_struct_features)</a>
-</li>
       <li><a href="api/kinoml/ml/lightning_modules/index.html#kinoml.ml.lightning_modules.KFold3Way">KFold3Way (class in kinoml.ml.lightning_modules)</a>
 </li>
-      <li><a href="api/kinoml/core/kinase/index.html#kinoml.core.kinase.Kinase">Kinase (class in kinoml.core.kinase)</a>
-
-      <ul>
-        <li><a href="api/kinoml/core/proteins/index.html#kinoml.core.proteins.Kinase">(class in kinoml.core.proteins)</a>
+      <li><a href="api/kinoml/core/proteins/index.html#kinoml.core.proteins.Kinase">Kinase (class in kinoml.core.proteins)</a>
 </li>
-        <li><a href="api/kinoml/features/kinase/index.html#kinoml.features.kinase.Kinase">(class in kinoml.features.kinase)</a>
-</li>
-      </ul></li>
       <li><a href="api/kinoml/core/sequences/index.html#kinoml.core.sequences.KinaseDomainAminoAcidSequence">KinaseDomainAminoAcidSequence (class in kinoml.core.sequences)</a>
 </li>
       <li><a href="api/kinoml/datasets/kinomescan/core/index.html#kinoml.datasets.kinomescan.core.KinomeScanDatasetProvider">KinomeScanDatasetProvider (class in kinoml.datasets.kinomescan.core)</a>
@@ -1099,8 +1219,6 @@
 </li>
       <li><a href="api/kinoml/core/conditions/index.html#module-kinoml.core.conditions">kinoml.core.conditions (module)</a>
 </li>
-      <li><a href="api/kinoml/core/kinase/index.html#module-kinoml.core.kinase">kinoml.core.kinase (module)</a>
-</li>
       <li><a href="api/kinoml/core/ligands/index.html#module-kinoml.core.ligands">kinoml.core.ligands (module)</a>
 </li>
       <li><a href="api/kinoml/core/measurements/index.html#module-kinoml.core.measurements">kinoml.core.measurements (module)</a>
@@ -1110,6 +1228,12 @@
       <li><a href="api/kinoml/core/sequences/index.html#module-kinoml.core.sequences">kinoml.core.sequences (module)</a>
 </li>
       <li><a href="api/kinoml/core/systems/index.html#module-kinoml.core.systems">kinoml.core.systems (module)</a>
+</li>
+      <li><a href="api/kinoml/databases/index.html#module-kinoml.databases">kinoml.databases (module)</a>
+</li>
+      <li><a href="api/kinoml/databases/klifs/index.html#module-kinoml.databases.klifs">kinoml.databases.klifs (module)</a>
+</li>
+      <li><a href="api/kinoml/databases/pdb/index.html#module-kinoml.databases.pdb">kinoml.databases.pdb (module)</a>
 </li>
       <li><a href="api/kinoml/datasets/index.html#module-kinoml.datasets">kinoml.datasets (module)</a>
 </li>
@@ -1131,6 +1255,8 @@
 </li>
       <li><a href="api/kinoml/datasets/torch_datasets/index.html#module-kinoml.datasets.torch_datasets">kinoml.datasets.torch_datasets (module)</a>
 </li>
+      <li><a href="api/kinoml/datasets/torch_geometric_datasets/index.html#module-kinoml.datasets.torch_geometric_datasets">kinoml.datasets.torch_geometric_datasets (module)</a>
+</li>
       <li><a href="api/kinoml/docking/index.html#module-kinoml.docking">kinoml.docking (module)</a>
 </li>
       <li><a href="api/kinoml/docking/OEDocking/index.html#module-kinoml.docking.OEDocking">kinoml.docking.OEDocking (module)</a>
@@ -1141,17 +1267,9 @@
 </li>
       <li><a href="api/kinoml/features/core/index.html#module-kinoml.features.core">kinoml.features.core (module)</a>
 </li>
-      <li><a href="api/kinoml/features/dunbrack_cluster/index.html#module-kinoml.features.dunbrack_cluster">kinoml.features.dunbrack_cluster (module)</a>
-</li>
-      <li><a href="api/kinoml/features/kinase/index.html#module-kinoml.features.kinase">kinoml.features.kinase (module)</a>
-</li>
-      <li><a href="api/kinoml/features/klifs/index.html#module-kinoml.features.klifs">kinoml.features.klifs (module)</a>
-</li>
       <li><a href="api/kinoml/features/ligand/index.html#module-kinoml.features.ligand">kinoml.features.ligand (module)</a>
 </li>
       <li><a href="api/kinoml/features/protein/index.html#module-kinoml.features.protein">kinoml.features.protein (module)</a>
-</li>
-      <li><a href="api/kinoml/features/protein_struct_features/index.html#module-kinoml.features.protein_struct_features">kinoml.features.protein_struct_features (module)</a>
 </li>
       <li><a href="api/kinoml/ml/index.html#module-kinoml.ml">kinoml.ml (module)</a>
 </li>
@@ -1173,8 +1291,6 @@
 </li>
       <li><a href="api/kinoml/modeling/example/index.html#module-kinoml.modeling.example">kinoml.modeling.example (module)</a>
 </li>
-      <li><a href="api/kinoml/modeling/homology/index.html#module-kinoml.modeling.homology">kinoml.modeling.homology (module)</a>
-</li>
       <li><a href="api/kinoml/modeling/OEModeling/index.html#module-kinoml.modeling.OEModeling">kinoml.modeling.OEModeling (module)</a>
 </li>
       <li><a href="api/kinoml/optimize/index.html#module-kinoml.optimize">kinoml.optimize (module)</a>
@@ -1183,9 +1299,13 @@
 </li>
       <li><a href="api/kinoml/workflows/index.html#module-kinoml.workflows">kinoml.workflows (module)</a>
 </li>
-      <li><a href="api/kinoml/modeling/OEModeling/index.html#kinoml.modeling.OEModeling.klifs_kinase_from_uniprot_id">klifs_kinase_from_uniprot_id() (in module kinoml.modeling.OEModeling)</a>
+      <li><a href="api/kinoml/utils/index.html#kinoml.utils.LocalFileStorage.klifs_kinase_db">klifs_kinase_db() (kinoml.utils.LocalFileStorage static method)</a>
+</li>
+      <li><a href="api/kinoml/databases/klifs/index.html#kinoml.databases.klifs.klifs_kinase_from_uniprot_id">klifs_kinase_from_uniprot_id() (in module kinoml.databases.klifs)</a>
 </li>
       <li><a href="api/kinoml/utils/index.html#kinoml.utils.LocalFileStorage.klifs_ligand_mol2">klifs_ligand_mol2() (kinoml.utils.LocalFileStorage static method)</a>
+</li>
+      <li><a href="api/kinoml/utils/index.html#kinoml.utils.LocalFileStorage.klifs_structure_db">klifs_structure_db() (kinoml.utils.LocalFileStorage static method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -1195,9 +1315,13 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/kinoml/core/ligands/index.html#kinoml.core.ligands.Ligand">Ligand (in module kinoml.core.ligands)</a>
 </li>
-      <li><a href="api/kinoml/core/systems/index.html#kinoml.core.systems.ProteinLigandComplex.ligand">ligand() (kinoml.core.systems.ProteinLigandComplex property)</a>
+      <li><a href="api/kinoml/core/systems/index.html#kinoml.core.systems.LigandSystem.ligand">ligand() (kinoml.core.systems.LigandSystem property)</a>
 </li>
-      <li><a href="api/kinoml/core/systems/index.html#kinoml.core.systems.ProteinLigandComplex.ligands">ligands() (kinoml.core.systems.ProteinLigandComplex property)</a>
+      <li><a href="api/kinoml/core/systems/index.html#kinoml.core.systems.LigandSystem.ligands">ligands() (kinoml.core.systems.LigandSystem property)</a>
+</li>
+      <li><a href="api/kinoml/core/systems/index.html#kinoml.core.systems.LigandSystem">LigandSystem (class in kinoml.core.systems)</a>
+</li>
+      <li><a href="api/kinoml/ml/torch_models/index.html#kinoml.ml.torch_models.ListOfTupleNeuralNetworkregression">ListOfTupleNeuralNetworkregression (class in kinoml.ml.torch_models)</a>
 </li>
       <li><a href="api/kinoml/core/measurements/index.html#kinoml.core.measurements.LN10">LN10 (in module kinoml.core.measurements)</a>
 </li>
@@ -1214,8 +1338,6 @@
 </li>
         <li><a href="api/kinoml/datasets/kinomescan/utils/index.html#kinoml.datasets.kinomescan.utils.logger">(in module kinoml.datasets.kinomescan.utils)</a>
 </li>
-        <li><a href="api/kinoml/features/klifs/index.html#kinoml.features.klifs.logger">(in module kinoml.features.klifs)</a>
-</li>
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -1231,16 +1353,14 @@
       </ul></li>
       <li><a href="api/kinoml/datasets/core/index.html#kinoml.datasets.core.MultiDatasetProvider.loss_adapters">loss_adapters() (kinoml.datasets.core.MultiDatasetProvider method)</a>
 </li>
+      <li><a href="api/kinoml/ml/torch_loops/index.html#kinoml.ml.torch_loops.LRScheduler">LRScheduler (class in kinoml.ml.torch_loops)</a>
+</li>
   </ul></td>
 </tr></table>
 
 <h2 id="M">M</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/kinoml/modeling/alignment/index.html#kinoml.modeling.alignment.Alignment.make_ali_file">make_ali_file() (kinoml.modeling.alignment.Alignment method)</a>
-</li>
-      <li><a href="api/kinoml/modeling/homology/index.html#kinoml.modeling.homology.HomologyModel.make_model">make_model() (kinoml.modeling.homology.HomologyModel method)</a>
-</li>
       <li><a href="api/kinoml/datasets/core/index.html#kinoml.datasets.core.BaseDatasetProvider.measurement_type">measurement_type() (kinoml.datasets.core.BaseDatasetProvider property)</a>
 
       <ul>
@@ -1257,10 +1377,10 @@
       </ul></li>
       <li><a href="api/kinoml/datasets/core/index.html#kinoml.datasets.core.BaseDatasetProvider.measurements_by_group">measurements_by_group() (kinoml.datasets.core.BaseDatasetProvider method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/kinoml/core/components/index.html#kinoml.core.components.MolecularComponent">MolecularComponent (class in kinoml.core.components)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/kinoml/features/ligand/index.html#kinoml.features.ligand.MorganFingerprintFeaturizer">MorganFingerprintFeaturizer (class in kinoml.features.ligand)</a>
 </li>
       <li><a href="api/kinoml/ml/tensorflow_models/index.html#kinoml.ml.tensorflow_models.MPNN">MPNN() (in module kinoml.ml.tensorflow_models)</a>
@@ -1271,9 +1391,9 @@
 </li>
       <li><a href="api/kinoml/datasets/core/index.html#kinoml.datasets.core.MultiDatasetProvider">MultiDatasetProvider (class in kinoml.datasets.core)</a>
 </li>
-      <li><a href="api/kinoml/core/sequences/index.html#kinoml.core.sequences.Biosequence.mutate">mutate() (kinoml.core.sequences.Biosequence method)</a>
+      <li><a href="api/kinoml/datasets/torch_datasets/index.html#kinoml.datasets.torch_datasets.MultiXTorchDataset">MultiXTorchDataset (class in kinoml.datasets.torch_datasets)</a>
 </li>
-      <li><a href="api/kinoml/modeling/OEModeling/index.html#kinoml.modeling.OEModeling.mutate_structure">mutate_structure() (in module kinoml.modeling.OEModeling)</a>
+      <li><a href="api/kinoml/core/sequences/index.html#kinoml.core.sequences.Biosequence.mutate">mutate() (kinoml.core.sequences.Biosequence method)</a>
 </li>
       <li><a href="api/kinoml/datasets/kinomescan/utils/index.html#kinoml.datasets.kinomescan.utils.KINOMEScanMapper.mutations_for_name">mutations_for_name() (kinoml.datasets.kinomescan.utils.KINOMEScanMapper method)</a>
 </li>
@@ -1293,6 +1413,14 @@
       </ul></li>
       <li><a href="api/kinoml/datasets/kinomescan/utils/index.html#kinoml.datasets.kinomescan.utils.KINOMEScanMapper.name_is_mutated">name_is_mutated() (kinoml.datasets.kinomescan.utils.KINOMEScanMapper method)</a>
 </li>
+      <li><a href="api/kinoml/ml/torch_geometric_models/index.html#kinoml.ml.torch_geometric_models.GraphConvolutionNeuralNetwork.needs_input_shape">needs_input_shape (kinoml.ml.torch_geometric_models.GraphConvolutionNeuralNetwork attribute)</a>
+
+      <ul>
+        <li><a href="api/kinoml/ml/torch_models/index.html#kinoml.ml.torch_models._BaseModule.needs_input_shape">(kinoml.ml.torch_models._BaseModule attribute)</a>
+</li>
+        <li><a href="api/kinoml/ml/torch_models/index.html#kinoml.ml.torch_models.ConvolutionNeuralNetworkRegression.needs_input_shape">(kinoml.ml.torch_models.ConvolutionNeuralNetworkRegression attribute)</a>
+</li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/kinoml/ml/torch_models/index.html#kinoml.ml.torch_models.NeuralNetworkRegression">NeuralNetworkRegression (class in kinoml.ml.torch_models)</a>
@@ -1331,6 +1459,8 @@
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/kinoml/features/complexes/index.html#kinoml.features.complexes.OEKLIFSKinaseApoFeaturizer">OEKLIFSKinaseApoFeaturizer (class in kinoml.features.complexes)</a>
+</li>
       <li><a href="api/kinoml/features/complexes/index.html#kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer">OEKLIFSKinaseHybridDockingFeaturizer (class in kinoml.features.complexes)</a>
 </li>
       <li><a href="api/kinoml/features/core/index.html#kinoml.features.core.BaseOneHotEncodingFeaturizer.one_hot_encode">one_hot_encode() (kinoml.features.core.BaseOneHotEncodingFeaturizer static method)</a>
@@ -1345,8 +1475,6 @@
 </li>
       <li><a href="api/kinoml/core/ligands/index.html#kinoml.core.ligands.OpenForceFieldLikeLigand">OpenForceFieldLikeLigand (class in kinoml.core.ligands)</a>
 </li>
-      <li><a href="api/kinoml/modeling/OEModeling/index.html#kinoml.modeling.OEModeling.optimize_poses">optimize_poses() (in module kinoml.modeling.OEModeling)</a>
-</li>
       <li><a href="api/kinoml/modeling/OEModeling/index.html#kinoml.modeling.OEModeling.overlay_molecules">overlay_molecules() (in module kinoml.modeling.OEModeling)</a>
 </li>
   </ul></td>
@@ -1359,13 +1487,9 @@
 </li>
       <li><a href="api/kinoml/features/core/index.html#kinoml.features.core.PadFeaturizer">PadFeaturizer (class in kinoml.features.core)</a>
 </li>
+      <li><a href="api/kinoml/features/core/index.html#kinoml.features.core.ParallelBaseFeaturizer">ParallelBaseFeaturizer (class in kinoml.features.core)</a>
+</li>
       <li><a href="api/kinoml/utils/index.html#kinoml.utils.LocalFileStorage.pdb_smiles_json">pdb_smiles_json() (kinoml.utils.LocalFileStorage static method)</a>
-</li>
-      <li><a href="api/kinoml/features/dunbrack_cluster/index.html#kinoml.features.dunbrack_cluster.PDBDunbrack">PDBDunbrack (class in kinoml.features.dunbrack_cluster)</a>
-</li>
-      <li><a href="api/kinoml/core/ligands/index.html#kinoml.core.ligands.PDBLigand">PDBLigand (class in kinoml.core.ligands)</a>
-</li>
-      <li><a href="api/kinoml/core/proteins/index.html#kinoml.core.proteins.PDBProtein">PDBProtein (class in kinoml.core.proteins)</a>
 </li>
       <li><a href="api/kinoml/core/measurements/index.html#kinoml.core.measurements.PercentageDisplacementMeasurement">PercentageDisplacementMeasurement (class in kinoml.core.measurements)</a>
 </li>
@@ -1381,12 +1505,12 @@
 </li>
       <li><a href="api/kinoml/core/measurements/index.html#kinoml.core.measurements.pKiMeasurement">pKiMeasurement (class in kinoml.core.measurements)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/kinoml/datasets/kinomescan/pkis2/index.html#kinoml.datasets.kinomescan.pkis2.PKIS2DatasetProvider">PKIS2DatasetProvider (class in kinoml.datasets.kinomescan.pkis2)</a>
 </li>
       <li><a href="api/kinoml/_version/index.html#kinoml._version.plus_or_dot">plus_or_dot() (in module kinoml._version)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/kinoml/docking/OEDocking/index.html#kinoml.docking.OEDocking.pose_molecules">pose_molecules() (in module kinoml.docking.OEDocking)</a>
 </li>
       <li><a href="api/kinoml/analysis/plots/index.html#kinoml.analysis.plots.predicted_vs_observed">predicted_vs_observed() (in module kinoml.analysis.plots)</a>
@@ -1397,7 +1521,9 @@
 </li>
       <li><a href="api/kinoml/modeling/OEModeling/index.html#kinoml.modeling.OEModeling.prepare_protein">prepare_protein() (in module kinoml.modeling.OEModeling)</a>
 </li>
-      <li><a href="api/kinoml/core/systems/index.html#kinoml.core.systems.ProteinLigandComplex.protein">protein() (kinoml.core.systems.ProteinLigandComplex property)</a>
+      <li><a href="api/kinoml/modeling/OEModeling/index.html#kinoml.modeling.OEModeling.prepare_structure">prepare_structure() (in module kinoml.modeling.OEModeling)</a>
+</li>
+      <li><a href="api/kinoml/core/systems/index.html#kinoml.core.systems.ProteinSystem.protein">protein() (kinoml.core.systems.ProteinSystem property)</a>
 </li>
       <li><a href="api/kinoml/modeling/example/index.html#kinoml.modeling.example.ProteinAtomCount">ProteinAtomCount (class in kinoml.modeling.example)</a>
 </li>
@@ -1405,9 +1531,11 @@
 </li>
       <li><a href="api/kinoml/datasets/core/index.html#kinoml.datasets.core.ProteinLigandDatasetProvider">ProteinLigandDatasetProvider (class in kinoml.datasets.core)</a>
 </li>
-      <li><a href="api/kinoml/core/systems/index.html#kinoml.core.systems.ProteinLigandComplex.proteins">proteins() (kinoml.core.systems.ProteinLigandComplex property)</a>
+      <li><a href="api/kinoml/core/systems/index.html#kinoml.core.systems.ProteinSystem.proteins">proteins() (kinoml.core.systems.ProteinSystem property)</a>
 </li>
       <li><a href="api/kinoml/core/proteins/index.html#kinoml.core.proteins.ProteinStructure">ProteinStructure (class in kinoml.core.proteins)</a>
+</li>
+      <li><a href="api/kinoml/core/systems/index.html#kinoml.core.systems.ProteinSystem">ProteinSystem (class in kinoml.core.systems)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -1415,7 +1543,7 @@
 <h2 id="Q">Q</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/kinoml/features/klifs/index.html#kinoml.features.klifs.query_klifs_database">query_klifs_database() (in module kinoml.features.klifs)</a>
+      <li><a href="api/kinoml/core/sequences/index.html#kinoml.core.sequences.AminoAcidSequence.query_uniprot">query_uniprot() (kinoml.core.sequences.AminoAcidSequence static method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -1459,10 +1587,10 @@
 </li>
       <li><a href="api/kinoml/modeling/OEModeling/index.html#kinoml.modeling.OEModeling.read_smiles">read_smiles() (in module kinoml.modeling.OEModeling)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/kinoml/_version/index.html#kinoml._version.register_vcs_handler">register_vcs_handler() (in module kinoml._version)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/kinoml/modeling/OEModeling/index.html#kinoml.modeling.OEModeling.remove_non_protein">remove_non_protein() (in module kinoml.modeling.OEModeling)</a>
 </li>
       <li><a href="api/kinoml/_version/index.html#kinoml._version.render">render() (in module kinoml._version)</a>
@@ -1483,6 +1611,8 @@
 </li>
       <li><a href="api/kinoml/docking/OEDocking/index.html#kinoml.docking.OEDocking.resids_to_box">resids_to_box() (in module kinoml.docking.OEDocking)</a>
 </li>
+      <li><a href="api/kinoml/modeling/OEModeling/index.html#kinoml.modeling.OEModeling.residue_ids_to_residue_names">residue_ids_to_residue_names() (in module kinoml.modeling.OEModeling)</a>
+</li>
       <li><a href="api/kinoml/core/sequences/index.html#kinoml.core.sequences.RNASequence">RNASequence (class in kinoml.core.sequences)</a>
 </li>
       <li><a href="api/kinoml/analysis/metrics/index.html#kinoml.analysis.metrics.root_mean_squared_error">root_mean_squared_error() (in module kinoml.analysis.metrics)</a>
@@ -1491,14 +1621,14 @@
 </li>
       <li><a href="api/kinoml/_version/index.html#kinoml._version.run_command">run_command() (in module kinoml._version)</a>
 </li>
+      <li><a href="api/kinoml/docking/OEDocking/index.html#kinoml.docking.OEDocking.run_docking">run_docking() (in module kinoml.docking.OEDocking)</a>
+</li>
   </ul></td>
 </tr></table>
 
 <h2 id="S">S</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/kinoml/features/core/index.html#kinoml.features.core.ScaleFeaturizer">ScaleFeaturizer (class in kinoml.features.core)</a>
-</li>
       <li><a href="api/kinoml/utils/index.html#kinoml.utils.seed_everything">seed_everything() (in module kinoml.utils)</a>
 </li>
       <li><a href="api/kinoml/modeling/OEModeling/index.html#kinoml.modeling.OEModeling.select_altloc">select_altloc() (in module kinoml.modeling.OEModeling)</a>
@@ -1511,29 +1641,29 @@
 </li>
       <li><a href="api/kinoml/datasets/kinomescan/utils/index.html#kinoml.datasets.kinomescan.utils.KINOMEScanMapper.sequence_for_name">sequence_for_name() (kinoml.datasets.kinomescan.utils.KINOMEScanMapper method)</a>
 </li>
+      <li><a href="api/kinoml/modeling/alignment/index.html#kinoml.modeling.alignment.sequence_similarity">sequence_similarity() (in module kinoml.modeling.alignment)</a>
+</li>
+      <li><a href="api/kinoml/features/core/index.html#kinoml.features.core.Pipeline.shortname">shortname() (kinoml.features.core.Pipeline property)</a>
+</li>
       <li><a href="api/kinoml/features/ligand/index.html#kinoml.features.ligand.SingleLigandFeaturizer">SingleLigandFeaturizer (class in kinoml.features.ligand)</a>
 </li>
-      <li><a href="api/kinoml/modeling/OEModeling/index.html#kinoml.modeling.OEModeling.smiles_from_pdb">smiles_from_pdb() (in module kinoml.modeling.OEModeling)</a>
+      <li><a href="api/kinoml/databases/pdb/index.html#kinoml.databases.pdb.smiles_from_pdb">smiles_from_pdb() (in module kinoml.databases.pdb)</a>
 </li>
       <li><a href="api/kinoml/core/ligands/index.html#kinoml.core.ligands.SmilesLigand">SmilesLigand (class in kinoml.core.ligands)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/kinoml/features/ligand/index.html#kinoml.features.ligand.SmilesToLigandFeaturizer">SmilesToLigandFeaturizer (class in kinoml.features.ligand)</a>
 </li>
       <li><a href="api/kinoml/ml/lightning_modules/index.html#kinoml.ml.lightning_modules.KFold3Way.split">split() (kinoml.ml.lightning_modules.KFold3Way method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/kinoml/datasets/core/index.html#kinoml.datasets.core.DatasetProvider.split_by_groups">split_by_groups() (kinoml.datasets.core.DatasetProvider method)</a>
 </li>
       <li><a href="api/kinoml/modeling/OEModeling/index.html#kinoml.modeling.OEModeling.split_molecule_components">split_molecule_components() (in module kinoml.modeling.OEModeling)</a>
 </li>
       <li><a href="api/kinoml/datasets/kinomescan/utils/index.html#kinoml.datasets.kinomescan.utils.KINOMEScanMapper.start_stop_for_name">start_stop_for_name() (kinoml.datasets.kinomescan.utils.KINOMEScanMapper method)</a>
 </li>
-      <li><a href="api/kinoml/modeling/OEModeling/index.html#kinoml.modeling.OEModeling.string_similarity">string_similarity() (in module kinoml.modeling.OEModeling)</a>
-</li>
       <li><a href="api/kinoml/modeling/example/index.html#kinoml.modeling.example.structure">structure (in module kinoml.modeling.example)</a>
-</li>
-      <li><a href="api/kinoml/features/dunbrack_cluster/index.html#kinoml.features.dunbrack_cluster.PDBDunbrack.structures_by_cluster">structures_by_cluster() (kinoml.features.dunbrack_cluster.PDBDunbrack method)</a>
 </li>
       <li><a href="api/kinoml/modeling/OEModeling/index.html#kinoml.modeling.OEModeling.superpose_proteins">superpose_proteins() (in module kinoml.modeling.OEModeling)</a>
 </li>
@@ -1565,6 +1695,12 @@
 </li>
       <li><a href="api/kinoml/ml/lightning_modules/index.html#kinoml.ml.lightning_modules.ObservationModelModule.test_step">test_step() (kinoml.ml.lightning_modules.ObservationModelModule method)</a>
 </li>
+      <li><a href="api/kinoml/datasets/core/index.html#kinoml.datasets.core.DatasetProvider.to_awkward">to_awkward() (kinoml.datasets.core.DatasetProvider method)</a>
+
+      <ul>
+        <li><a href="api/kinoml/datasets/core/index.html#kinoml.datasets.core.MultiDatasetProvider.to_awkward">(kinoml.datasets.core.MultiDatasetProvider method)</a>
+</li>
+      </ul></li>
       <li><a href="api/kinoml/datasets/core/index.html#kinoml.datasets.core.BaseDatasetProvider.to_dataframe">to_dataframe() (kinoml.datasets.core.BaseDatasetProvider method)</a>
 
       <ul>
@@ -1575,6 +1711,12 @@
       </ul></li>
       <li><a href="api/kinoml/core/ligands/index.html#kinoml.core.ligands.OpenForceFieldLigand.to_dict">to_dict() (kinoml.core.ligands.OpenForceFieldLigand method)</a>
 </li>
+      <li><a href="api/kinoml/datasets/core/index.html#kinoml.datasets.core.DatasetProvider.to_dict_of_arrays">to_dict_of_arrays() (kinoml.datasets.core.DatasetProvider method)</a>
+
+      <ul>
+        <li><a href="api/kinoml/datasets/core/index.html#kinoml.datasets.core.MultiDatasetProvider.to_dict_of_arrays">(kinoml.datasets.core.MultiDatasetProvider method)</a>
+</li>
+      </ul></li>
       <li><a href="api/kinoml/datasets/core/index.html#kinoml.datasets.core.BaseDatasetProvider.to_numpy">to_numpy() (kinoml.datasets.core.BaseDatasetProvider method)</a>
 
       <ul>
@@ -1627,6 +1769,8 @@
 </li>
       <li><a href="api/kinoml/ml/lightning_modules/index.html#kinoml.ml.lightning_modules.ObservationModelModule.training_step">training_step() (kinoml.ml.lightning_modules.ObservationModelModule method)</a>
 </li>
+      <li><a href="api/kinoml/features/core/index.html#kinoml.features.core.TupleOfArrays">TupleOfArrays (class in kinoml.features.core)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -1637,8 +1781,6 @@
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/kinoml/features/dunbrack_cluster/index.html#kinoml.features.dunbrack_cluster.PDBDunbrack.update">update() (kinoml.features.dunbrack_cluster.PDBDunbrack method)</a>
-</li>
       <li><a href="api/kinoml/modeling/OEModeling/index.html#kinoml.modeling.OEModeling.update_residue_identifiers">update_residue_identifiers() (in module kinoml.modeling.OEModeling)</a>
 </li>
   </ul></td>
@@ -1679,7 +1821,7 @@
 <h2 id="X">X</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/kinoml/datasets/torch_datasets/index.html#kinoml.datasets.torch_datasets.XyNpzTorchDataset">XyNpzTorchDataset (class in kinoml.datasets.torch_datasets)</a>
+      <li><a href="api/kinoml/datasets/torch_datasets/index.html#kinoml.datasets.torch_datasets.XyTorchDataset">XyTorchDataset (class in kinoml.datasets.torch_datasets)</a>
 </li>
   </ul></td>
 </tr></table>

@@ -68,11 +68,11 @@
     <script src="../../../../_static/copybutton.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area", "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "tex2jax_ignore|mathjax_ignore|document", "processClass": "tex2jax_process|mathjax_process|math|output_area", "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
     <link rel="shortcut icon" href="../../../../_static/custom_favicon.png"/>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
-    <link rel="next" title="kinoml.docking" href="../../docking/index.html" />
+    <link rel="next" title="kinoml.datasets.torch_geometric_datasets" href="../torch_geometric_datasets/index.html" />
     <link rel="prev" title="kinoml.datasets.groups" href="../groups/index.html" />
   
     <link rel="apple-touch-icon" href="../../../../_static/images/custom_favicon.png"/>
@@ -121,7 +121,7 @@
 <div class="md-search" data-md-component="search" role="dialog">
   <label class="md-search__overlay" for="__search"></label>
   <div class="md-search__inner" role="search">
-    <form class="md-search__form" action="../../../../search.html" method="GET" name="search">
+    <form class="md-search__form" action="../../../../search.html" method="get" name="search">
       <input type="text" class="md-search__input" name="q" placeholder="Search"
              autocapitalize="off" autocomplete="off" spellcheck="false"
              data-md-component="query" data-md-state="active">
@@ -339,15 +339,55 @@
         </li></ul>
             </nav>
         </li>
-        <li class="md-nav__item"><a href="#kinoml.datasets.torch_datasets.XyNpzTorchDataset" class="md-nav__link">XyNpzTorchDataset</a><nav class="md-nav">
+        <li class="md-nav__item"><a href="#kinoml.datasets.torch_datasets.XyTorchDataset" class="md-nav__link">XyTorchDataset</a><nav class="md-nav">
               <ul class="md-nav__list">
-        <li class="md-nav__item"><a href="#kinoml.datasets.torch_datasets.XyNpzTorchDataset.__getitem__" class="md-nav__link">__getitem__</a>
+        <li class="md-nav__item"><a href="#kinoml.datasets.torch_datasets.XyTorchDataset.from_npz" class="md-nav__link">from_npz</a>
         </li>
-        <li class="md-nav__item"><a href="#kinoml.datasets.torch_datasets.XyNpzTorchDataset.__len__" class="md-nav__link">__len__</a>
+        <li class="md-nav__item"><a href="#kinoml.datasets.torch_datasets.XyTorchDataset.__getitem__" class="md-nav__link">__getitem__</a>
         </li>
-        <li class="md-nav__item"><a href="#kinoml.datasets.torch_datasets.XyNpzTorchDataset.input_size" class="md-nav__link">input_size</a>
+        <li class="md-nav__item"><a href="#kinoml.datasets.torch_datasets.XyTorchDataset.__len__" class="md-nav__link">__len__</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.datasets.torch_datasets.XyTorchDataset.input_size" class="md-nav__link">input_size</a>
         </li></ul>
             </nav>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.datasets.torch_datasets.MultiXTorchDataset" class="md-nav__link">MultiXTorchDataset</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#kinoml.datasets.torch_datasets.MultiXTorchDataset.from_npz" class="md-nav__link">from_npz</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.datasets.torch_datasets.MultiXTorchDataset._getitem_multi_X" class="md-nav__link">_getitem_multi_X</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.datasets.torch_datasets.MultiXTorchDataset._getitem_single_X" class="md-nav__link">_getitem_single_X</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.datasets.torch_datasets.MultiXTorchDataset.__getitem__" class="md-nav__link">__getitem__</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.datasets.torch_datasets.MultiXTorchDataset._shape_X" class="md-nav__link">_shape_X</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.datasets.torch_datasets.MultiXTorchDataset.is_single_X" class="md-nav__link">is_single_X</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.datasets.torch_datasets.MultiXTorchDataset._str_keys_to_nested_dict" class="md-nav__link">_str_keys_to_nested_dict</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.datasets.torch_datasets.MultiXTorchDataset._key_to_ints" class="md-nav__link">_key_to_ints</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.datasets.torch_datasets.MultiXTorchDataset.__len__" class="md-nav__link">__len__</a>
+        </li></ul>
+            </nav>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.datasets.torch_datasets.AwkwardArrayDataset" class="md-nav__link">AwkwardArrayDataset</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#kinoml.datasets.torch_datasets.AwkwardArrayDataset.__len__" class="md-nav__link">__len__</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.datasets.torch_datasets.AwkwardArrayDataset.__getitem__" class="md-nav__link">__getitem__</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.datasets.torch_datasets.AwkwardArrayDataset.__repr__" class="md-nav__link">__repr__</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.datasets.torch_datasets.AwkwardArrayDataset.__str__" class="md-nav__link">__str__</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.datasets.torch_datasets.AwkwardArrayDataset.from_parquet" class="md-nav__link">from_parquet</a>
+        </li></ul>
+            </nav>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.datasets.torch_datasets._accessor_to_indices" class="md-nav__link">_accessor_to_indices</a>
         </li></ul>
             </nav>
         </li></ul>
@@ -448,10 +488,23 @@ be featurized (and memoized) upon access only.</p>
 </dd></dl>
 </dd></dl>
 <dl class="class">
-<dt id="kinoml.datasets.torch_datasets.XyNpzTorchDataset">
-<em class="property">class </em><code class="sig-prename descclassname">kinoml.datasets.torch_datasets.</code><code class="sig-name descname">XyNpzTorchDataset</code><span class="sig-paren">(</span><em class="sig-param">npz</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.torch_datasets.XyNpzTorchDataset" title="Permalink to this definition">¶</a></dt>
+<dt id="kinoml.datasets.torch_datasets.XyTorchDataset">
+<em class="property">class </em><code class="sig-prename descclassname">kinoml.datasets.torch_datasets.</code><code class="sig-name descname">XyTorchDataset</code><span class="sig-paren">(</span><em class="sig-param">X</em>, <em class="sig-param">y</em>, <em class="sig-param">indices=None</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.torch_datasets.XyTorchDataset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.utils.data.Dataset</span></code></p>
-<p>Load <code class="docutils literal notranslate"><span class="pre">X</span></code> and <code class="docutils literal notranslate"><span class="pre">y</span></code> arrays from a NPZ file present in disk.
+<p>Simple Torch Dataset adaptor where X and y are homogeneous tensors.
+All systems have the shape.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>y</strong> (<em>X</em><em>,</em>) – Featurized systems and their measurements</p></li>
+<li><p><strong>indices</strong> (<em>dict of array selectors</em>) – It will only accept train, train/test or train/test/val keys.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="kinoml.datasets.torch_datasets.XyTorchDataset.from_npz">
+<em class="property">classmethod </em><code class="sig-name descname">from_npz</code><span class="sig-paren">(</span><em class="sig-param">cls</em>, <em class="sig-param">path</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.torch_datasets.XyTorchDataset.from_npz" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load <code class="docutils literal notranslate"><span class="pre">X</span></code> and <code class="docutils literal notranslate"><span class="pre">y</span></code> arrays from a NPZ file present in disk.
 These files must expose at least two keys: <code class="docutils literal notranslate"><span class="pre">X</span></code> and <code class="docutils literal notranslate"><span class="pre">y</span></code>.
 It can also contain three more: <code class="docutils literal notranslate"><span class="pre">idx_train</span></code>, <code class="docutils literal notranslate"><span class="pre">idx_test</span></code>
 and <code class="docutils literal notranslate"><span class="pre">idx_val</span></code>, which correspond to the indices of the
@@ -461,19 +514,216 @@ training, test and validation subsets.</p>
 <dd class="field-odd"><p><strong>npz</strong> (<em>str</em>) – Path to a NPZ file with the keys exposed above.</p>
 </dd>
 </dl>
+</dd></dl>
 <dl class="method">
-<dt id="kinoml.datasets.torch_datasets.XyNpzTorchDataset.__getitem__">
-<code class="sig-name descname">__getitem__</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">index</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.torch_datasets.XyNpzTorchDataset.__getitem__" title="Permalink to this definition">¶</a></dt>
+<dt id="kinoml.datasets.torch_datasets.XyTorchDataset.__getitem__">
+<code class="sig-name descname">__getitem__</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">index</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.torch_datasets.XyTorchDataset.__getitem__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 <dl class="method">
-<dt id="kinoml.datasets.torch_datasets.XyNpzTorchDataset.__len__">
-<code class="sig-name descname">__len__</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.torch_datasets.XyNpzTorchDataset.__len__" title="Permalink to this definition">¶</a></dt>
+<dt id="kinoml.datasets.torch_datasets.XyTorchDataset.__len__">
+<code class="sig-name descname">__len__</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.torch_datasets.XyTorchDataset.__len__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 <dl class="method">
-<dt id="kinoml.datasets.torch_datasets.XyNpzTorchDataset.input_size">
-<code class="sig-name descname">input_size</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.torch_datasets.XyNpzTorchDataset.input_size" title="Permalink to this definition">¶</a></dt>
+<dt id="kinoml.datasets.torch_datasets.XyTorchDataset.input_size">
+<code class="sig-name descname">input_size</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.torch_datasets.XyTorchDataset.input_size" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 </dd></dl>
+<dl class="class">
+<dt id="kinoml.datasets.torch_datasets.MultiXTorchDataset">
+<em class="property">class </em><code class="sig-prename descclassname">kinoml.datasets.torch_datasets.</code><code class="sig-name descname">MultiXTorchDataset</code><span class="sig-paren">(</span><em class="sig-param">dict_of_arrays</em>, <em class="sig-param">indices=None</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.torch_datasets.MultiXTorchDataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.utils.data.Dataset</span></code></p>
+<p>This class is able to load NPZ files into a <code class="docutils literal notranslate"><span class="pre">torch.Dataset</span></code> compliant
+object.</p>
+<p>It assumes the following things. If each system is characterized with
+a single tensor:</p>
+<ul class="simple">
+<li><p>The X tensors can be of the same shape. In that case, the NPZ file
+only has a single <code class="docutils literal notranslate"><span class="pre">X</span></code> key, preloaded and accessible via <code class="docutils literal notranslate"><span class="pre">.data_X`.</span>
+<span class="pre">When</span> <span class="pre">queried,</span> <span class="pre">it</span> <span class="pre">returns</span> <span class="pre">a</span> <span class="pre">view</span> <span class="pre">to</span> <span class="pre">the</span> <span class="pre">``torch.tensor</span></code> object.</p></li>
+<li><p>The X tensors have different shape. In that case, the keys of the NPZ
+follow the <code class="docutils literal notranslate"><span class="pre">X_s{int}</span></code> syntax. When queried, it returns a list of
+<code class="docutils literal notranslate"><span class="pre">torch.tensor</span></code> objects.</p></li>
+</ul>
+<p>If each system is characterized with more than one tensor:</p>
+<ul class="simple">
+<li><p>The NPZ keys follow the <code class="docutils literal notranslate"><span class="pre">X_s{int}_a{int}</span></code> syntax. When queried, it
+returns a list of tuples of <code class="docutils literal notranslate"><span class="pre">torch.tensor</span></code> objects.</p></li>
+</ul>
+<p>No matter the structure of <code class="docutils literal notranslate"><span class="pre">X</span></code>, <code class="docutils literal notranslate"><span class="pre">y</span></code> is assumed to be a homogeneous
+tensor, and it will always be returned as a view to the underlying
+<code class="docutils literal notranslate"><span class="pre">torch.tensor</span></code> object.</p>
+<p>Additionally, the NPZ file might contain <code class="docutils literal notranslate"><span class="pre">idx_train</span></code>, <code class="docutils literal notranslate"><span class="pre">idx_test</span></code> (and <code class="docutils literal notranslate"><span class="pre">idx_val</span></code>)
+arrays, specifying indices for the train / test / validation split. If provided,
+they will be stored under an <code class="docutils literal notranslate"><span class="pre">.indices</span></code> dict.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dict_of_arrays</strong> (<em>dict of np.ndarray</em>) – See above.</p></li>
+<li><p><strong>indices</strong> (<em>dict of np.ndarray</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition-notes admonition">
+<p class="admonition-title">Notes</p>
+<ul class="simple">
+<li><p>This object is better paired with the output of <code class="docutils literal notranslate"><span class="pre">DatasetProvider.to_dict_of_arrays</span></code>.</p></li>
+</ul>
+</div>
+<dl class="method">
+<dt id="kinoml.datasets.torch_datasets.MultiXTorchDataset.from_npz">
+<em class="property">classmethod </em><code class="sig-name descname">from_npz</code><span class="sig-paren">(</span><em class="sig-param">cls</em>, <em class="sig-param">path</em>, <em class="sig-param">lazy=True</em>, <em class="sig-param">close_filehandle=False</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.torch_datasets.MultiXTorchDataset.from_npz" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load from a single NPZ file. If lazy=True, this can be very slow
+for large amounts of arrays.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> (<em>str</em>) – Path to the NPZ file</p></li>
+<li><p><strong>lazy</strong> (<em>bool</em><em>, </em><em>optional=True</em>) – Whether to let Numpy load arrays on demand, upon access (True)
+or preload everything in memory (False)</p></li>
+<li><p><strong>close_filehandle</strong> (<em>bool</em><em>, </em><em>optional=False</em>) – Whether to close the NPZ filehandle after reading some metadata. This will
+enable parallelism without preloading everything, but each access will suffer
+the overhead of opening the NPZ file again!</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>NPZ files cannot be read in parallel (you’ll see CRC32 errors and others). If you want
+to use <code class="docutils literal notranslate"><span class="pre">DataLoader(...,</span> <span class="pre">num_workers=2)</span></code> or above, you’ll need to:</p>
+<ul class="simple">
+<li><p>A) preload everything with <code class="docutils literal notranslate"><span class="pre">lazy=False</span></code>. This will use more RAM and incur
+an initial waiting time.</p></li>
+<li><p>B) use <code class="docutils literal notranslate"><span class="pre">close_filehandle=True</span></code>. This will incur a penalty upon each access,
+because the NPZ file needs to be reloaded each time.</p></li>
+</ul>
+</div>
+</dd></dl>
+<dl class="method">
+<dt id="kinoml.datasets.torch_datasets.MultiXTorchDataset._getitem_multi_X">
+<code class="sig-name descname">_getitem_multi_X</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">accessor</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.torch_datasets.MultiXTorchDataset._getitem_multi_X" title="Permalink to this definition">¶</a></dt>
+<dd><p>Note: This method might scale poorly and can end up being a bottleneck!
+Most of the time is spent accessing the NPZ file on disk, though.</p>
+<p>Some timings:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">MultiXTorchDataset</span><span class="o">.</span><span class="n">from_npz</span><span class="p">(</span><span class="s2">"ChEMBLDatasetProvider.npz"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="o">%</span><span class="n">timeit</span> <span class="n">_</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
+<span class="go">2.91 ms ± 222 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="o">%</span><span class="n">timeit</span> <span class="n">_</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span>
+<span class="go">5.59 ms ± 253 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="o">%</span><span class="n">timeit</span> <span class="n">_</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">8</span><span class="p">]</span>
+<span class="go">11.4 ms ± 1.02 ms per loop (mean ± std. dev. of 7 runs, 100 loops each)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="o">%</span><span class="n">timeit</span> <span class="n">_</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">16</span><span class="p">]</span>
+<span class="go">22.7 ms ± 1.27 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="o">%</span><span class="n">timeit</span> <span class="n">_</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">32</span><span class="p">]</span>
+<span class="go">44.7 ms ± 4.47 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="o">%</span><span class="n">timeit</span> <span class="n">_</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">64</span><span class="p">]</span>
+<span class="go">87 ms ± 2.74 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="o">%</span><span class="n">timeit</span> <span class="n">_</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">128</span><span class="p">]</span>
+<span class="go">171 ms ± 2.68 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)</span>
+</pre></div>
+</div>
+</dd></dl>
+<dl class="method">
+<dt id="kinoml.datasets.torch_datasets.MultiXTorchDataset._getitem_single_X">
+<code class="sig-name descname">_getitem_single_X</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">index</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.torch_datasets.MultiXTorchDataset._getitem_single_X" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="method">
+<dt id="kinoml.datasets.torch_datasets.MultiXTorchDataset.__getitem__">
+<code class="sig-name descname">__getitem__</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">index</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.torch_datasets.MultiXTorchDataset.__getitem__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="method">
+<dt id="kinoml.datasets.torch_datasets.MultiXTorchDataset._shape_X">
+<code class="sig-name descname">_shape_X</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.torch_datasets.MultiXTorchDataset._shape_X" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="method">
+<dt id="kinoml.datasets.torch_datasets.MultiXTorchDataset.is_single_X">
+<code class="sig-name descname">is_single_X</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.torch_datasets.MultiXTorchDataset.is_single_X" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="method">
+<dt id="kinoml.datasets.torch_datasets.MultiXTorchDataset._str_keys_to_nested_dict">
+<code class="sig-name descname">_str_keys_to_nested_dict</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">keys</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.torch_datasets.MultiXTorchDataset._str_keys_to_nested_dict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="method">
+<dt id="kinoml.datasets.torch_datasets.MultiXTorchDataset._key_to_ints">
+<em class="property">static </em><code class="sig-name descname">_key_to_ints</code><span class="sig-paren">(</span><em class="sig-param">key: str</em><span class="sig-paren">)</span> → List[int]<a class="headerlink" href="#kinoml.datasets.torch_datasets.MultiXTorchDataset._key_to_ints" title="Permalink to this definition">¶</a></dt>
+<dd><p>NPZ keys are formatted with this syntax:</p>
+<p><code class="docutils literal notranslate"><span class="pre">{X|y}_{1-character</span> <span class="pre">str}{int}_{1-character</span> <span class="pre">str}{int}_</span></code></p>
+<p>We split by underscores and extract the ints into a list</p>
+</dd></dl>
+<dl class="method">
+<dt id="kinoml.datasets.torch_datasets.MultiXTorchDataset.__len__">
+<code class="sig-name descname">__len__</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.torch_datasets.MultiXTorchDataset.__len__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+</dd></dl>
+<dl class="class">
+<dt id="kinoml.datasets.torch_datasets.AwkwardArrayDataset">
+<em class="property">class </em><code class="sig-prename descclassname">kinoml.datasets.torch_datasets.</code><code class="sig-name descname">AwkwardArrayDataset</code><span class="sig-paren">(</span><em class="sig-param">data</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.torch_datasets.AwkwardArrayDataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.utils.data.Dataset</span></code></p>
+<p>Loads an Awkward array of Records.</p>
+<p>The structure of the array dimensions needs to be:</p>
+<ul class="simple">
+<li><p>List of systems</p></li>
+</ul>
+<p>—- X1
+—- X2
+—- …
+—- Xn
+—- y</p>
+<p>However, X1…Xn, y are accessed by positional index, as a string.</p>
+<p>So, to get all the X1 vectors for all systems, you’d do:</p>
+<p>X1 = data[“0”]
+X2 = data[“1”]</p>
+<p>Since <code class="docutils literal notranslate"><span class="pre">y</span></code> is always the last one you can use the <code class="docutils literal notranslate"><span class="pre">data.fields</span></code>
+list:</p>
+<p>y = data[data.fields[-1]]</p>
+<p>This is essentially what <code class="docutils literal notranslate"><span class="pre">__getitem__</span></code> is doing for you.</p>
+<p>It will try to consolidate tensors whenever possible, as long as
+they have the same shape. If they do not, then you’ll get a list
+of tensors instead.</p>
+<p>If this is the case, make sure to provide a suitable <code class="docutils literal notranslate"><span class="pre">collate_fn</span></code>
+function for the corresponding Dataloader! More info:</p>
+<p><a class="reference external" href="https://pytorch.org/docs/stable/data.html#dataloader-collate-fn">https://pytorch.org/docs/stable/data.html#dataloader-collate-fn</a></p>
+<div class="admonition-notes admonition">
+<p class="admonition-title">Notes</p>
+<p>With several tensors per system, but all of the same shape, it is faster:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">awk</span> <span class="o">=</span> <span class="n">AwkwardArrayDataset</span><span class="o">.</span><span class="n">from_parquet</span><span class="p">(</span><span class="s2">"same_shape.parquet"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="o">%</span><span class="n">timeit</span> <span class="n">_</span> <span class="o">=</span> <span class="n">awk</span><span class="p">[:</span><span class="mi">50</span><span class="p">]</span>
+<span class="go">2.38 ms ± 286 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">awk</span> <span class="o">=</span> <span class="n">AwkwardArrayDataset</span><span class="o">.</span><span class="n">from_parquet</span><span class="p">(</span><span class="s2">"different_shape.parquet"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="o">%</span><span class="n">timeit</span> <span class="n">_</span> <span class="o">=</span> <span class="n">awk</span><span class="p">[:</span><span class="mi">50</span><span class="p">]</span>
+<span class="go">9.32 ms ± 252 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)</span>
+</pre></div>
+</div>
+<p>This is probably due to the Awkward-&gt;Numpy-&gt;Torch conversions that need
+to happen for each different-shape sub-tensor. Look in <code class="docutils literal notranslate"><span class="pre">__getitem__</span></code>
+for bottlenecks.</p>
+</div>
+<dl class="method">
+<dt id="kinoml.datasets.torch_datasets.AwkwardArrayDataset.__len__">
+<code class="sig-name descname">__len__</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.torch_datasets.AwkwardArrayDataset.__len__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="method">
+<dt id="kinoml.datasets.torch_datasets.AwkwardArrayDataset.__getitem__">
+<code class="sig-name descname">__getitem__</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">index</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.torch_datasets.AwkwardArrayDataset.__getitem__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="method">
+<dt id="kinoml.datasets.torch_datasets.AwkwardArrayDataset.__repr__">
+<code class="sig-name descname">__repr__</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.torch_datasets.AwkwardArrayDataset.__repr__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return repr(self).</p>
+</dd></dl>
+<dl class="method">
+<dt id="kinoml.datasets.torch_datasets.AwkwardArrayDataset.__str__">
+<code class="sig-name descname">__str__</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.torch_datasets.AwkwardArrayDataset.__str__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return str(self).</p>
+</dd></dl>
+<dl class="method">
+<dt id="kinoml.datasets.torch_datasets.AwkwardArrayDataset.from_parquet">
+<em class="property">classmethod </em><code class="sig-name descname">from_parquet</code><span class="sig-paren">(</span><em class="sig-param">cls</em>, <em class="sig-param">path</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.torch_datasets.AwkwardArrayDataset.from_parquet" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+</dd></dl>
+<dl class="function">
+<dt id="kinoml.datasets.torch_datasets._accessor_to_indices">
+<code class="sig-prename descclassname">kinoml.datasets.torch_datasets.</code><code class="sig-name descname">_accessor_to_indices</code><span class="sig-paren">(</span><em class="sig-param">accessor</em>, <em class="sig-param">full_size</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.torch_datasets._accessor_to_indices" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 </section>
 </section>
 
@@ -501,12 +751,12 @@ training, test and validation subsets.</p>
             </a>
           
           
-            <a href="../../docking/index.html" title="kinoml.docking"
+            <a href="../torch_geometric_datasets/index.html" title="kinoml.datasets.torch_geometric_datasets"
                class="md-flex md-footer-nav__link md-footer-nav__link--next"
                rel="next">
             <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title"><span
                 class="md-flex__ellipsis"> <span
-                class="md-footer-nav__direction"> Next </span> <code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.docking</span></code> </span>
+                class="md-footer-nav__direction"> Next </span> <code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.datasets.torch_geometric_datasets</span></code> </span>
             </div>
             <div class="md-flex__cell md-flex__cell--shrink"><i
                 class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>

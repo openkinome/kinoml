@@ -68,11 +68,11 @@
     <script src="../../../../_static/copybutton.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area", "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "tex2jax_ignore|mathjax_ignore|document", "processClass": "tex2jax_process|mathjax_process|math|output_area", "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
     <link rel="shortcut icon" href="../../../../_static/custom_favicon.png"/>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
-    <link rel="next" title="kinoml.features.protein_struct_features" href="../protein_struct_features/index.html" />
+    <link rel="next" title="kinoml.ml" href="../../ml/index.html" />
     <link rel="prev" title="kinoml.features.ligand" href="../ligand/index.html" />
   
     <link rel="apple-touch-icon" href="../../../../_static/images/custom_favicon.png"/>
@@ -121,7 +121,7 @@
 <div class="md-search" data-md-component="search" role="dialog">
   <label class="md-search__overlay" for="__search"></label>
   <div class="md-search__inner" role="search">
-    <form class="md-search__form" action="../../../../search.html" method="GET" name="search">
+    <form class="md-search__form" action="../../../../search.html" method="get" name="search">
       <input type="text" class="md-search__input" name="q" placeholder="Search"
              autocapitalize="off" autocomplete="off" spellcheck="false"
              data-md-component="query" data-md-state="active">
@@ -323,7 +323,7 @@
               <ul class="md-nav__list">
         <li class="md-nav__item"><a href="#kinoml.features.protein.AminoAcidCompositionFeaturizer._counter" class="md-nav__link">_counter</a>
         </li>
-        <li class="md-nav__item"><a href="#kinoml.features.protein.AminoAcidCompositionFeaturizer._featurize" class="md-nav__link">_featurize</a>
+        <li class="md-nav__item"><a href="#kinoml.features.protein.AminoAcidCompositionFeaturizer._featurize_one" class="md-nav__link">_featurize_one</a>
         </li></ul>
             </nav>
         </li>
@@ -359,8 +359,8 @@
 <h2 id="module-contents">Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="kinoml.features.protein.AminoAcidCompositionFeaturizer">
-<em class="property">class </em><code class="sig-prename descclassname">kinoml.features.protein.</code><code class="sig-name descname">AminoAcidCompositionFeaturizer</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.protein.AminoAcidCompositionFeaturizer" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="../core/index.html#kinoml.features.core.BaseFeaturizer" title="kinoml.features.core.BaseFeaturizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.features.core.BaseFeaturizer</span></code></a></p>
+<em class="property">class </em><code class="sig-prename descclassname">kinoml.features.protein.</code><code class="sig-name descname">AminoAcidCompositionFeaturizer</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.protein.AminoAcidCompositionFeaturizer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../core/index.html#kinoml.features.core.ParallelBaseFeaturizer" title="kinoml.features.core.ParallelBaseFeaturizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.features.core.ParallelBaseFeaturizer</span></code></a></p>
 <p>Featurizes the protein using the composition of the residues
 in the binding site.</p>
 <dl class="attribute">
@@ -368,25 +368,25 @@ in the binding site.</p>
 <code class="sig-name descname">_counter</code><a class="headerlink" href="#kinoml.features.protein.AminoAcidCompositionFeaturizer._counter" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 <dl class="method">
-<dt id="kinoml.features.protein.AminoAcidCompositionFeaturizer._featurize">
-<code class="sig-name descname">_featurize</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">system: System</em><span class="sig-paren">)</span> → np.array<a class="headerlink" href="#kinoml.features.protein.AminoAcidCompositionFeaturizer._featurize" title="Permalink to this definition">¶</a></dt>
+<dt id="kinoml.features.protein.AminoAcidCompositionFeaturizer._featurize_one">
+<code class="sig-name descname">_featurize_one</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">system: System</em><span class="sig-paren">)</span> → np.array<a class="headerlink" href="#kinoml.features.protein.AminoAcidCompositionFeaturizer._featurize_one" title="Permalink to this definition">¶</a></dt>
 <dd><p>Featurizes a protein using the residue count in the sequence</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>system</strong> (<a class="reference internal" href="../../core/systems/index.html#kinoml.core.systems.System" title="kinoml.core.systems.System"><em>System</em></a>) – </p>
+<dd class="field-odd"><p><strong>system</strong> (<a class="reference internal" href="../../core/systems/index.html#kinoml.core.systems.System" title="kinoml.core.systems.System"><em>System</em></a>) – The System to be featurized. Sometimes it will</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>The count of amino acid in the binding site.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>array</p>
+<dd class="field-odd"><p>list of array</p>
 </dd>
 </dl>
 </dd></dl>
 </dd></dl>
 <dl class="class">
 <dt id="kinoml.features.protein.OneHotEncodedSequenceFeaturizer">
-<em class="property">class </em><code class="sig-prename descclassname">kinoml.features.protein.</code><code class="sig-name descname">OneHotEncodedSequenceFeaturizer</code><span class="sig-paren">(</span><em class="sig-param">dictionary: dict = None</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.protein.OneHotEncodedSequenceFeaturizer" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">kinoml.features.protein.</code><code class="sig-name descname">OneHotEncodedSequenceFeaturizer</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.protein.OneHotEncodedSequenceFeaturizer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="../core/index.html#kinoml.features.core.BaseOneHotEncodingFeaturizer" title="kinoml.features.core.BaseOneHotEncodingFeaturizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.features.core.BaseOneHotEncodingFeaturizer</span></code></a></p>
 <p>Featurize the sequence of the protein to a one hot encoding
 using the symbols in <code class="docutils literal notranslate"><span class="pre">ALL_AMINOACIDS</span></code>.</p>
@@ -427,12 +427,12 @@ using the symbols in <code class="docutils literal notranslate"><span class="pre
             </a>
           
           
-            <a href="../protein_struct_features/index.html" title="kinoml.features.protein_struct_features"
+            <a href="../../ml/index.html" title="kinoml.ml"
                class="md-flex md-footer-nav__link md-footer-nav__link--next"
                rel="next">
             <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title"><span
                 class="md-flex__ellipsis"> <span
-                class="md-footer-nav__direction"> Next </span> <code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.features.protein_struct_features</span></code> </span>
+                class="md-footer-nav__direction"> Next </span> <code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.ml</span></code> </span>
             </div>
             <div class="md-flex__cell md-flex__cell--shrink"><i
                 class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>

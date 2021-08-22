@@ -68,7 +68,7 @@
     <script src="../../_static/copybutton.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area", "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "tex2jax_ignore|mathjax_ignore|document", "processClass": "tex2jax_process|mathjax_process|math|output_area", "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
     <link rel="shortcut icon" href="../../_static/custom_favicon.png"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -121,7 +121,7 @@
 <div class="md-search" data-md-component="search" role="dialog">
   <label class="md-search__overlay" for="__search"></label>
   <div class="md-search__inner" role="search">
-    <form class="md-search__form" action="../../search.html" method="GET" name="search">
+    <form class="md-search__form" action="../../search.html" method="get" name="search">
       <input type="text" class="md-search__input" name="q" placeholder="Search"
              autocapitalize="off" autocomplete="off" spellcheck="false"
              data-md-component="query" data-md-state="active">
@@ -394,12 +394,16 @@ with a focus on kinase modeling</p>
 <li class="toctree-l1"><a class="reference internal" href="core/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.core</span></code></a><ul>
 <li class="toctree-l2"><a class="reference internal" href="core/components/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.core.components</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="core/conditions/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.core.conditions</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="core/kinase/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.core.kinase</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="core/ligands/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.core.ligands</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="core/measurements/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.core.measurements</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="core/proteins/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.core.proteins</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="core/sequences/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.core.sequences</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="core/systems/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.core.systems</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="databases/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.databases</span></code></a><ul>
+<li class="toctree-l2"><a class="reference internal" href="databases/klifs/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.databases.klifs</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="databases/pdb/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.databases.pdb</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="datasets/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.datasets</span></code></a><ul>
@@ -413,6 +417,7 @@ with a focus on kinase modeling</p>
 <li class="toctree-l2"><a class="reference internal" href="datasets/core/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.datasets.core</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="datasets/groups/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.datasets.groups</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="datasets/torch_datasets/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.datasets.torch_datasets</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="datasets/torch_geometric_datasets/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.datasets.torch_geometric_datasets</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="docking/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.docking</span></code></a><ul>
@@ -422,12 +427,8 @@ with a focus on kinase modeling</p>
 <li class="toctree-l1"><a class="reference internal" href="features/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.features</span></code></a><ul>
 <li class="toctree-l2"><a class="reference internal" href="features/complexes/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.features.complexes</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="features/core/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.features.core</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="features/dunbrack_cluster/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.features.dunbrack_cluster</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="features/kinase/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.features.kinase</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="features/klifs/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.features.klifs</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="features/ligand/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.features.ligand</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="features/protein/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.features.protein</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="features/protein_struct_features/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.features.protein_struct_features</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="ml/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.ml</span></code></a><ul>
@@ -443,7 +444,6 @@ with a focus on kinase modeling</p>
 <li class="toctree-l2"><a class="reference internal" href="modeling/OEModeling/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.modeling.OEModeling</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="modeling/alignment/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.modeling.alignment</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="modeling/example/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.modeling.example</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="modeling/homology/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.modeling.homology</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="optimize/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.optimize</span></code></a></li>

@@ -68,11 +68,11 @@
     <script src="../../../../_static/copybutton.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area", "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "tex2jax_ignore|mathjax_ignore|document", "processClass": "tex2jax_process|mathjax_process|math|output_area", "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
     <link rel="shortcut icon" href="../../../../_static/custom_favicon.png"/>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
-    <link rel="next" title="kinoml.datasets" href="../../datasets/index.html" />
+    <link rel="next" title="kinoml.databases" href="../../databases/index.html" />
     <link rel="prev" title="kinoml.core.sequences" href="../sequences/index.html" />
   
     <link rel="apple-touch-icon" href="../../../../_static/images/custom_favicon.png"/>
@@ -121,7 +121,7 @@
 <div class="md-search" data-md-component="search" role="dialog">
   <label class="md-search__overlay" for="__search"></label>
   <div class="md-search__inner" role="search">
-    <form class="md-search__form" action="../../../../search.html" method="GET" name="search">
+    <form class="md-search__form" action="../../../../search.html" method="get" name="search">
       <input type="text" class="md-search__input" name="q" placeholder="Search"
              autocapitalize="off" autocomplete="off" spellcheck="false"
              data-md-component="query" data-md-state="active">
@@ -335,19 +335,29 @@
         </li></ul>
             </nav>
         </li>
+        <li class="md-nav__item"><a href="#kinoml.core.systems.ProteinSystem" class="md-nav__link">ProteinSystem</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#kinoml.core.systems.ProteinSystem.protein" class="md-nav__link">protein</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.core.systems.ProteinSystem.proteins" class="md-nav__link">proteins</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.core.systems.ProteinSystem.check" class="md-nav__link">check</a>
+        </li></ul>
+            </nav>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.core.systems.LigandSystem" class="md-nav__link">LigandSystem</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#kinoml.core.systems.LigandSystem.ligand" class="md-nav__link">ligand</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.core.systems.LigandSystem.ligands" class="md-nav__link">ligands</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.core.systems.LigandSystem.check" class="md-nav__link">check</a>
+        </li></ul>
+            </nav>
+        </li>
         <li class="md-nav__item"><a href="#kinoml.core.systems.ProteinLigandComplex" class="md-nav__link">ProteinLigandComplex</a><nav class="md-nav">
               <ul class="md-nav__list">
-        <li class="md-nav__item"><a href="#kinoml.core.systems.ProteinLigandComplex.ligand" class="md-nav__link">ligand</a>
-        </li>
-        <li class="md-nav__item"><a href="#kinoml.core.systems.ProteinLigandComplex.protein" class="md-nav__link">protein</a>
-        </li>
-        <li class="md-nav__item"><a href="#kinoml.core.systems.ProteinLigandComplex.ligands" class="md-nav__link">ligands</a>
-        </li>
-        <li class="md-nav__item"><a href="#kinoml.core.systems.ProteinLigandComplex.proteins" class="md-nav__link">proteins</a>
-        </li>
         <li class="md-nav__item"><a href="#kinoml.core.systems.ProteinLigandComplex.check" class="md-nav__link">check</a>
-        </li>
-        <li class="md-nav__item"><a href="#kinoml.core.systems.ProteinLigandComplex.dock" class="md-nav__link">dock</a>
         </li></ul>
             </nav>
         </li></ul>
@@ -434,33 +444,57 @@ abstraction can be useful.</p>
 </dd></dl>
 </dd></dl>
 <dl class="class">
+<dt id="kinoml.core.systems.ProteinSystem">
+<em class="property">class </em><code class="sig-prename descclassname">kinoml.core.systems.</code><code class="sig-name descname">ProteinSystem</code><span class="sig-paren">(</span><em class="sig-param">components: Iterable[MolecularComponent], strict: bool = True, *args, **kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.systems.ProteinSystem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#kinoml.core.systems.System" title="kinoml.core.systems.System"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.core.systems.System</span></code></a></p>
+<p>A System that contains Protein objects. It defines two properties:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">protein</span></code>: get the first Protein found in the components</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">proteins</span></code>: get all Protein objects found in the components</p></li>
+</ul>
+<dl class="method">
+<dt id="kinoml.core.systems.ProteinSystem.protein">
+<em class="property">property </em><code class="sig-name descname">protein</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.systems.ProteinSystem.protein" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="method">
+<dt id="kinoml.core.systems.ProteinSystem.proteins">
+<em class="property">property </em><code class="sig-name descname">proteins</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.systems.ProteinSystem.proteins" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="method">
+<dt id="kinoml.core.systems.ProteinSystem.check">
+<code class="sig-name descname">check</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.systems.ProteinSystem.check" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+</dd></dl>
+<dl class="class">
+<dt id="kinoml.core.systems.LigandSystem">
+<em class="property">class </em><code class="sig-prename descclassname">kinoml.core.systems.</code><code class="sig-name descname">LigandSystem</code><span class="sig-paren">(</span><em class="sig-param">components: Iterable[MolecularComponent], strict: bool = True, *args, **kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.systems.LigandSystem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#kinoml.core.systems.System" title="kinoml.core.systems.System"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.core.systems.System</span></code></a></p>
+<p>A System that contains Ligand objects. It defines two properties:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">ligand</span></code>: get the first Ligand found in the components</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ligands</span></code>: get all Ligand objects found in the components</p></li>
+</ul>
+<dl class="method">
+<dt id="kinoml.core.systems.LigandSystem.ligand">
+<em class="property">property </em><code class="sig-name descname">ligand</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.systems.LigandSystem.ligand" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="method">
+<dt id="kinoml.core.systems.LigandSystem.ligands">
+<em class="property">property </em><code class="sig-name descname">ligands</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.systems.LigandSystem.ligands" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="method">
+<dt id="kinoml.core.systems.LigandSystem.check">
+<code class="sig-name descname">check</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.systems.LigandSystem.check" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+</dd></dl>
+<dl class="class">
 <dt id="kinoml.core.systems.ProteinLigandComplex">
 <em class="property">class </em><code class="sig-prename descclassname">kinoml.core.systems.</code><code class="sig-name descname">ProteinLigandComplex</code><span class="sig-paren">(</span><em class="sig-param">components: Iterable[MolecularComponent], strict: bool = True, *args, **kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.systems.ProteinLigandComplex" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#kinoml.core.systems.System" title="kinoml.core.systems.System"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.core.systems.System</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#kinoml.core.systems.ProteinSystem" title="kinoml.core.systems.ProteinSystem"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.core.systems.ProteinSystem</span></code></a>, <a class="reference internal" href="#kinoml.core.systems.LigandSystem" title="kinoml.core.systems.LigandSystem"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.core.systems.LigandSystem</span></code></a></p>
 <p>A system with at least one protein and one ligand</p>
-<dl class="method">
-<dt id="kinoml.core.systems.ProteinLigandComplex.ligand">
-<em class="property">property </em><code class="sig-name descname">ligand</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.systems.ProteinLigandComplex.ligand" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-<dl class="method">
-<dt id="kinoml.core.systems.ProteinLigandComplex.protein">
-<em class="property">property </em><code class="sig-name descname">protein</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.systems.ProteinLigandComplex.protein" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-<dl class="method">
-<dt id="kinoml.core.systems.ProteinLigandComplex.ligands">
-<em class="property">property </em><code class="sig-name descname">ligands</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.systems.ProteinLigandComplex.ligands" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-<dl class="method">
-<dt id="kinoml.core.systems.ProteinLigandComplex.proteins">
-<em class="property">property </em><code class="sig-name descname">proteins</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.systems.ProteinLigandComplex.proteins" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
 <dl class="method">
 <dt id="kinoml.core.systems.ProteinLigandComplex.check">
 <code class="sig-name descname">check</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.systems.ProteinLigandComplex.check" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-<dl class="method">
-<dt id="kinoml.core.systems.ProteinLigandComplex.dock">
-<em class="property">abstract </em><code class="sig-name descname">dock</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.systems.ProteinLigandComplex.dock" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 </dd></dl>
 </section>
@@ -490,12 +524,12 @@ abstraction can be useful.</p>
             </a>
           
           
-            <a href="../../datasets/index.html" title="kinoml.datasets"
+            <a href="../../databases/index.html" title="kinoml.databases"
                class="md-flex md-footer-nav__link md-footer-nav__link--next"
                rel="next">
             <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title"><span
                 class="md-flex__ellipsis"> <span
-                class="md-footer-nav__direction"> Next </span> <code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.datasets</span></code> </span>
+                class="md-footer-nav__direction"> Next </span> <code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.databases</span></code> </span>
             </div>
             <div class="md-flex__cell md-flex__cell--shrink"><i
                 class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>

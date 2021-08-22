@@ -68,7 +68,7 @@
     <script src="../../../../_static/copybutton.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area", "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "tex2jax_ignore|mathjax_ignore|document", "processClass": "tex2jax_process|mathjax_process|math|output_area", "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
     <link rel="shortcut icon" href="../../../../_static/custom_favicon.png"/>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
@@ -121,7 +121,7 @@
 <div class="md-search" data-md-component="search" role="dialog">
   <label class="md-search__overlay" for="__search"></label>
   <div class="md-search__inner" role="search">
-    <form class="md-search__form" action="../../../../search.html" method="GET" name="search">
+    <form class="md-search__form" action="../../../../search.html" method="get" name="search">
       <input type="text" class="md-search__input" name="q" placeholder="Search"
              autocapitalize="off" autocomplete="off" spellcheck="false"
              data-md-component="query" data-md-state="active">
@@ -323,7 +323,7 @@
               <ul class="md-nav__list">
         <li class="md-nav__item"><a href="#kinoml.features.complexes.OEHybridDockingFeaturizer._SUPPORTED_TYPES" class="md-nav__link">_SUPPORTED_TYPES</a>
         </li>
-        <li class="md-nav__item"><a href="#kinoml.features.complexes.OEHybridDockingFeaturizer._featurize" class="md-nav__link">_featurize</a>
+        <li class="md-nav__item"><a href="#kinoml.features.complexes.OEHybridDockingFeaturizer._featurize_one" class="md-nav__link">_featurize_one</a>
         </li>
         <li class="md-nav__item"><a href="#kinoml.features.complexes.OEHybridDockingFeaturizer._interpret_system" class="md-nav__link">_interpret_system</a>
         </li>
@@ -331,13 +331,41 @@
         </li>
         <li class="md-nav__item"><a href="#kinoml.features.complexes.OEHybridDockingFeaturizer._get_components" class="md-nav__link">_get_components</a>
         </li>
-        <li class="md-nav__item"><a href="#kinoml.features.complexes.OEHybridDockingFeaturizer._get_featurizer_results" class="md-nav__link">_get_featurizer_results</a>
+        <li class="md-nav__item"><a href="#kinoml.features.complexes.OEHybridDockingFeaturizer._assemble_components" class="md-nav__link">_assemble_components</a>
         </li>
-        <li class="md-nav__item"><a href="#kinoml.features.complexes.OEHybridDockingFeaturizer._assemble_complex" class="md-nav__link">_assemble_complex</a>
-        </li>
-        <li class="md-nav__item"><a href="#kinoml.features.complexes.OEHybridDockingFeaturizer._write_results" class="md-nav__link">_write_results</a>
+        <li class="md-nav__item"><a href="#kinoml.features.complexes.OEHybridDockingFeaturizer._remove_clashing_water" class="md-nav__link">_remove_clashing_water</a>
         </li>
         <li class="md-nav__item"><a href="#kinoml.features.complexes.OEHybridDockingFeaturizer._update_pdb_header" class="md-nav__link">_update_pdb_header</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.features.complexes.OEHybridDockingFeaturizer._write_results" class="md-nav__link">_write_results</a>
+        </li></ul>
+            </nav>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.features.complexes.OEKLIFSKinaseApoFeaturizer" class="md-nav__link">OEKLIFSKinaseApoFeaturizer</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#kinoml.features.complexes.OEKLIFSKinaseApoFeaturizer._SUPPORTED_TYPES" class="md-nav__link">_SUPPORTED_TYPES</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.features.complexes.OEKLIFSKinaseApoFeaturizer._pre_featurize" class="md-nav__link">_pre_featurize</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.features.complexes.OEKLIFSKinaseApoFeaturizer._create_klifs_structure_db" class="md-nav__link">_create_klifs_structure_db</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.features.complexes.OEKLIFSKinaseApoFeaturizer._create_klifs_kinase_db" class="md-nav__link">_create_klifs_kinase_db</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.features.complexes.OEKLIFSKinaseApoFeaturizer._featurize_one" class="md-nav__link">_featurize_one</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.features.complexes.OEKLIFSKinaseApoFeaturizer._interpret_kinase" class="md-nav__link">_interpret_kinase</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.features.complexes.OEKLIFSKinaseApoFeaturizer._select_kinase_structure_by_pdb_id" class="md-nav__link">_select_kinase_structure_by_pdb_id</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.features.complexes.OEKLIFSKinaseApoFeaturizer._select_kinase_structure_by_klifs_kinase_id" class="md-nav__link">_select_kinase_structure_by_klifs_kinase_id</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.features.complexes.OEKLIFSKinaseApoFeaturizer._add_kinase_pocket_similarity" class="md-nav__link">_add_kinase_pocket_similarity</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.features.complexes.OEKLIFSKinaseApoFeaturizer._get_design_unit" class="md-nav__link">_get_design_unit</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.features.complexes.OEKLIFSKinaseApoFeaturizer._process_kinase_domain" class="md-nav__link">_process_kinase_domain</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.features.complexes.OEKLIFSKinaseApoFeaturizer._get_kinase_residue_numbers" class="md-nav__link">_get_kinase_residue_numbers</a>
         </li></ul>
             </nav>
         </li>
@@ -345,7 +373,15 @@
               <ul class="md-nav__list">
         <li class="md-nav__item"><a href="#kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._SUPPORTED_TYPES" class="md-nav__link">_SUPPORTED_TYPES</a>
         </li>
-        <li class="md-nav__item"><a href="#kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._featurize" class="md-nav__link">_featurize</a>
+        <li class="md-nav__item"><a href="#kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._pre_featurize" class="md-nav__link">_pre_featurize</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._create_ligand_smiles_dict" class="md-nav__link">_create_ligand_smiles_dict</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._dowload_klifs_ligands" class="md-nav__link">_dowload_klifs_ligands</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._featurize_one" class="md-nav__link">_featurize_one</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._read_klifs_ligand" class="md-nav__link">_read_klifs_ligand</a>
         </li>
         <li class="md-nav__item"><a href="#kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._select_ligand_template" class="md-nav__link">_select_ligand_template</a>
         </li>
@@ -361,15 +397,9 @@
         </li>
         <li class="md-nav__item"><a href="#kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._filter_for_similar_kinase_pockets" class="md-nav__link">_filter_for_similar_kinase_pockets</a>
         </li>
-        <li class="md-nav__item"><a href="#kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._select_protein_template" class="md-nav__link">_select_protein_template</a>
-        </li>
-        <li class="md-nav__item"><a href="#kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._get_design_unit" class="md-nav__link">_get_design_unit</a>
-        </li>
-        <li class="md-nav__item"><a href="#kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._process_kinase_domain" class="md-nav__link">_process_kinase_domain</a>
-        </li>
         <li class="md-nav__item"><a href="#kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._prepare_ligand_template" class="md-nav__link">_prepare_ligand_template</a>
         </li>
-        <li class="md-nav__item"><a href="#kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._get_kinase_residue_numbers" class="md-nav__link">_get_kinase_residue_numbers</a>
+        <li class="md-nav__item"><a href="#kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._superpose_templates" class="md-nav__link">_superpose_templates</a>
         </li></ul>
             </nav>
         </li></ul>
@@ -398,8 +428,8 @@ subclasses thereof</p>
 <h2 id="module-contents">Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="kinoml.features.complexes.OEHybridDockingFeaturizer">
-<em class="property">class </em><code class="sig-prename descclassname">kinoml.features.complexes.</code><code class="sig-name descname">OEHybridDockingFeaturizer</code><span class="sig-paren">(</span><em class="sig-param">loop_db: Union[str</em>, <em class="sig-param">None] = None</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.complexes.OEHybridDockingFeaturizer" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="../core/index.html#kinoml.features.core.BaseFeaturizer" title="kinoml.features.core.BaseFeaturizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.features.core.BaseFeaturizer</span></code></a></p>
+<em class="property">class </em><code class="sig-prename descclassname">kinoml.features.complexes.</code><code class="sig-name descname">OEHybridDockingFeaturizer</code><span class="sig-paren">(</span><em class="sig-param">loop_db: Union[str</em>, <em class="sig-param">None] = None</em>, <em class="sig-param">cache_dir: Union[str</em>, <em class="sig-param">Path</em>, <em class="sig-param">None] = None</em>, <em class="sig-param">output_dir: Union[str</em>, <em class="sig-param">Path</em>, <em class="sig-param">None] = None</em>, <em class="sig-param">pKa_norm: bool = True</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.complexes.OEHybridDockingFeaturizer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../core/index.html#kinoml.features.core.ParallelBaseFeaturizer" title="kinoml.features.core.ParallelBaseFeaturizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.features.core.ParallelBaseFeaturizer</span></code></a></p>
 <p>Given a System with exactly one protein and one ligand,
 dock the ligand in the designated binding pocket.</p>
 <p>We assume that a smiles and file-based System object will be passed;
@@ -407,7 +437,15 @@ this means we will have a System.components with FileProtein and
 FileLigand or SmilesLigand. The file itself could be a URL.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>loop_db</strong> (<em>str</em>) – The path to the loop database used by OESpruce to model missing loops.</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>loop_db</strong> (<em>str</em>) – The path to the loop database used by OESpruce to model missing loops.</p></li>
+<li><p><strong>cache_dir</strong> (<em>str</em><em>, </em><em>Path</em><em> or </em><em>None</em><em>, </em><em>default=None</em>) – Path to directory used for saving intermediate files. If None, default location
+provided by <cite>appdirs.user_cache_dir()</cite> will be used.</p></li>
+<li><p><strong>output_dir</strong> (<em>str</em><em>, </em><em>Path</em><em> or </em><em>None</em><em>, </em><em>default=None</em>) – Path to directory used for saving output files. If None, output structures will not be
+saved.</p></li>
+<li><p><strong>pKa_norm</strong> (<em>bool</em><em>, </em><em>default=True</em>) – Assign the predominant ionization state of the molecules to dock at pH ~7.4.
+If False, the ionization state of the input molecules will be conserved.</p></li>
+</ul>
 </dd>
 </dl>
 <dl class="attribute">
@@ -415,24 +453,24 @@ FileLigand or SmilesLigand. The file itself could be a URL.</p>
 <code class="sig-name descname">_SUPPORTED_TYPES</code><a class="headerlink" href="#kinoml.features.complexes.OEHybridDockingFeaturizer._SUPPORTED_TYPES" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 <dl class="method">
-<dt id="kinoml.features.complexes.OEHybridDockingFeaturizer._featurize">
-<code class="sig-name descname">_featurize</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">system: ProteinLigandComplex</em><span class="sig-paren">)</span> → ProteinLigandComplex<a class="headerlink" href="#kinoml.features.complexes.OEHybridDockingFeaturizer._featurize" title="Permalink to this definition">¶</a></dt>
+<dt id="kinoml.features.complexes.OEHybridDockingFeaturizer._featurize_one">
+<code class="sig-name descname">_featurize_one</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">system: ProteinLigandComplex</em><span class="sig-paren">)</span> → universe<a class="headerlink" href="#kinoml.features.complexes.OEHybridDockingFeaturizer._featurize_one" title="Permalink to this definition">¶</a></dt>
 <dd><p>Perform hybrid docking with the OpenEye toolkit and thoughtful defaults.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>system</strong> (<a class="reference internal" href="../../core/systems/index.html#kinoml.core.systems.ProteinLigandComplex" title="kinoml.core.systems.ProteinLigandComplex"><em>ProteinLigandComplex</em></a>) – A system object holding protein and ligand information.</p>
+<dd class="field-odd"><p><strong>systems</strong> (<em>iterable of ProteinLigandComplex</em>) – A list of System objects holding protein and ligand information.</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><strong>protein_ligand_complex</strong> – The same system but with docked ligand.</p>
+<dd class="field-even"><p>An MDAnalysis universe of the featurized system.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference internal" href="../../core/systems/index.html#kinoml.core.systems.ProteinLigandComplex" title="kinoml.core.systems.ProteinLigandComplex">ProteinLigandComplex</a></p>
+<dd class="field-odd"><p>universe</p>
 </dd>
 </dl>
 </dd></dl>
 <dl class="method">
 <dt id="kinoml.features.complexes.OEHybridDockingFeaturizer._interpret_system">
-<em class="property">static </em><code class="sig-name descname">_interpret_system</code><span class="sig-paren">(</span><em class="sig-param">system: ProteinLigandComplex</em><span class="sig-paren">)</span> → Tuple[oechem.OEGraphMol, oechem.OEGraphMol, Union[oegrid.OESkewGrid, None]]<a class="headerlink" href="#kinoml.features.complexes.OEHybridDockingFeaturizer._interpret_system" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">_interpret_system</code><span class="sig-paren">(</span><em class="sig-param">self, system: Union[ProteinSystem, ProteinLigandComplex]</em><span class="sig-paren">)</span> → Tuple[Union[oechem.OEGraphMol, None], Union[oechem.OEGraphMol, None], Union[oegrid.OESkewGrid, None]]<a class="headerlink" href="#kinoml.features.complexes.OEHybridDockingFeaturizer._interpret_system" title="Permalink to this definition">¶</a></dt>
 <dd><p>Interpret the given system components and retrieve OpenEye objects holding ligand,
 protein and electron density.</p>
 <dl class="field-list simple">
@@ -484,117 +522,280 @@ protein and electron density.</p>
 </dl>
 </dd></dl>
 <dl class="method">
-<dt id="kinoml.features.complexes.OEHybridDockingFeaturizer._get_featurizer_results">
-<code class="sig-name descname">_get_featurizer_results</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">system: ProteinLigandComplex</em>, <em class="sig-param">protein: oechem.OEGraphMol</em>, <em class="sig-param">solvent: oechem.OEGraphMol</em>, <em class="sig-param">docking_pose: oechem.OEGraphMol</em>, <em class="sig-param">other_pdb_header_info: Union[None</em>, <em class="sig-param">List[Tuple[str</em>, <em class="sig-param">str]]] = None</em><span class="sig-paren">)</span> → ProteinLigandComplex<a class="headerlink" href="#kinoml.features.complexes.OEHybridDockingFeaturizer._get_featurizer_results" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get results from the Featurizer.</p>
+<dt id="kinoml.features.complexes.OEHybridDockingFeaturizer._assemble_components">
+<code class="sig-name descname">_assemble_components</code><span class="sig-paren">(</span><em class="sig-param">self, protein: oechem.OEMolBase, solvent: oechem.OEMolBase, ligand: Union[oechem.OEMolBase, None]</em><span class="sig-paren">)</span> → oechem.OEMolBase<a class="headerlink" href="#kinoml.features.complexes.OEHybridDockingFeaturizer._assemble_components" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assemble components of a solvated protein-ligand complex into a single OpenEye molecule.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>system</strong> (<a class="reference internal" href="../../core/systems/index.html#kinoml.core.systems.ProteinLigandComplex" title="kinoml.core.systems.ProteinLigandComplex"><em>ProteinLigandComplex</em></a>) – The system that was featurized.</p></li>
-<li><p><strong>protein</strong> (<em>oechem.OEGraphMol</em>) – An OpenEye molecule holding the prepared protein.</p></li>
-<li><p><strong>solvent</strong> (<em>oechem.OEGraphMol</em>) – An OpenEye molecule holding the prepared solvent.</p></li>
-<li><p><strong>docking_pose</strong> (<em>oechem.OEGraphMol</em>) – An OpenEye molecule holding the docking pose.</p></li>
-<li><p><strong>other_pdb_header_info</strong> (<em>None</em><em> or </em><em>list of tuple of str</em>) – Tuples with information that should be saved in the PDB header.
-Each tuple consists of two strings, i.e., the PDB header section
-(e.g. COMPND) and the respective information.</p></li>
+<li><p><strong>protein</strong> (<em>oechem.OEMolBase</em>) – An OpenEye molecule holding the protein of interest.</p></li>
+<li><p><strong>solvent</strong> (<em>oechem.OEMolBase</em>) – An OpenEye molecule holding the solvent of interest.</p></li>
+<li><p><strong>ligand</strong> (<em>oechem.OEMolBase</em><em> or </em><em>None</em>) – An OpenEye molecule holding the ligand of interest if given.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>A system holding the Featurizer results.</p>
+<dd class="field-even"><p><strong>assembled_components</strong> – An OpenEye molecule holding protein, solvent and ligand if given.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference internal" href="../../core/systems/index.html#kinoml.core.systems.ProteinLigandComplex" title="kinoml.core.systems.ProteinLigandComplex">ProteinLigandComplex</a></p>
+<dd class="field-odd"><p>oechem.OEMolBase</p>
 </dd>
 </dl>
 </dd></dl>
 <dl class="method">
-<dt id="kinoml.features.complexes.OEHybridDockingFeaturizer._assemble_complex">
-<em class="property">static </em><code class="sig-name descname">_assemble_complex</code><span class="sig-paren">(</span><em class="sig-param">protein: oechem.OEGraphMol</em>, <em class="sig-param">solvent: oechem.OEGraphMol</em>, <em class="sig-param">ligand: oechem.OEGraphMol</em><span class="sig-paren">)</span> → oechem.OEGraphMol<a class="headerlink" href="#kinoml.features.complexes.OEHybridDockingFeaturizer._assemble_complex" title="Permalink to this definition">¶</a></dt>
-<dd><p>Assemble components of a solvated protein-ligand complex into a single
-OpenEye molecule. Water molecules will be checked for clashes with the ligand.</p>
+<dt id="kinoml.features.complexes.OEHybridDockingFeaturizer._remove_clashing_water">
+<em class="property">static </em><code class="sig-name descname">_remove_clashing_water</code><span class="sig-paren">(</span><em class="sig-param">solvent: oechem.OEMolBase, ligand: Union[oechem.OEMolBase, None], protein: oechem.OEMolBase</em><span class="sig-paren">)</span> → oechem.OEGraphMol<a class="headerlink" href="#kinoml.features.complexes.OEHybridDockingFeaturizer._remove_clashing_water" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove water molecules clashing with a ligand or newly modeled protein residues.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>protein</strong> (<em>oechem.OEGraphMol</em>) – An OpenEye molecule holding the protein of interest.</p></li>
-<li><p><strong>solvent</strong> (<em>oechem.OEGraphMol</em>) – An OpenEye molecule holding the solvent of interest.</p></li>
-<li><p><strong>ligand</strong> (<em>oechem.OEGraphMol</em>) – An OpenEye molecule holding the ligand of interest.</p></li>
+<li><p><strong>solvent</strong> (<em>oechem.OEGraphMol</em>) – An OpenEye molecule holding the water molecules.</p></li>
+<li><p><strong>ligand</strong> (<em>oechem.OEGraphMol</em><em> or </em><em>None</em>) – An OpenEye molecule holding the ligand or None.</p></li>
+<li><p><strong>protein</strong> (<em>oechem.OEGraphMol</em>) – An OpenEye molecule holding the protein.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><strong>protein_ligand_complex</strong> – An OpenEye molecule holding protein, ligand and solvent.</p>
+<dd class="field-even"><p>An OpenEye molecule holding water molecules not clashing with the ligand or newly modeled protein residues.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>oechem.OEGraphMol</p>
-</dd>
-</dl>
-</dd></dl>
-<dl class="method">
-<dt id="kinoml.features.complexes.OEHybridDockingFeaturizer._write_results">
-<code class="sig-name descname">_write_results</code><span class="sig-paren">(</span><em class="sig-param">self, system: ProteinLigandComplex, solvated_protein: oechem.OEGraphMol, ligand: oechem.OEGraphMol, protein_ligand_complex: oechem.OEGraphMol, other_pdb_header_info: Union[None, List[Tuple[str, str]]]</em><span class="sig-paren">)</span> → Tuple[str, str]<a class="headerlink" href="#kinoml.features.complexes.OEHybridDockingFeaturizer._write_results" title="Permalink to this definition">¶</a></dt>
-<dd><p>Write the docking results from the Featurizer and retrieve the paths to protein and ligand.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>system</strong> (<a class="reference internal" href="../../core/systems/index.html#kinoml.core.systems.ProteinLigandComplex" title="kinoml.core.systems.ProteinLigandComplex"><em>ProteinLigandComplex</em></a>) – The system to featurize.</p></li>
-<li><p><strong>solvated_protein</strong> (<em>oechem.OEGraphMol</em>) – The OpenEye molecule holding the protein and solvent molecules
-not clashing with the docked ligand.</p></li>
-<li><p><strong>ligand</strong> (<em>oechem.OEGraphMol</em>) – The OpenEye molecule holding the docked ligand.</p></li>
-<li><p><strong>protein_ligand_complex</strong> (<em>oechem.OEGraphMol</em>) – The OpenEye molecule holding protein, solvent and ligand.</p></li>
-<li><p><strong>other_pdb_header_info</strong> (<em>None</em><em> or </em><em>list of tuple of str</em>) – Tuples with information that should be saved in the PDB header.
-Each tuple consists of two strings, i.e., the PDB header section
-(e.g. COMPND) and the respective information.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Paths to prepared protein and docked ligand structure.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>tuple of str and str</p>
 </dd>
 </dl>
 </dd></dl>
 <dl class="method">
 <dt id="kinoml.features.complexes.OEHybridDockingFeaturizer._update_pdb_header">
-<code class="sig-name descname">_update_pdb_header</code><span class="sig-paren">(</span><em class="sig-param">self, structure: oechem.OEGraphMol, protein_name: str, solvent_clashing_ligand_name: str, ligand_name: str, other_pdb_header_info: Union[None, List[Tuple[str, str]]]</em><span class="sig-paren">)</span> → oechem.OEGraphMol<a class="headerlink" href="#kinoml.features.complexes.OEHybridDockingFeaturizer._update_pdb_header" title="Permalink to this definition">¶</a></dt>
-<dd><p>Stores information about Featurizer, protein, solvent and
-ligand in the PDB header COMPND section in the
+<code class="sig-name descname">_update_pdb_header</code><span class="sig-paren">(</span><em class="sig-param">self, structure: oechem.OEMolBase, protein_name: str, ligand_name: [str, None], other_pdb_header_info: Union[None, Iterable[Tuple[str, str]]] = None</em><span class="sig-paren">)</span> → oechem.OEMolBase<a class="headerlink" href="#kinoml.features.complexes.OEHybridDockingFeaturizer._update_pdb_header" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stores information about Featurizer, protein and ligand in the PDB header COMPND section in the
 given OpenEye molecule.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>structure</strong> (<em>oechem.OEGraphMol</em>) – An OpenEye molecule.</p></li>
+<li><p><strong>structure</strong> (<em>oechem.OEMolBase</em>) – An OpenEye molecule.</p></li>
 <li><p><strong>protein_name</strong> (<em>str</em>) – The name of the protein.</p></li>
-<li><p><strong>solvent_clashing_ligand_name</strong> (<em>str</em>) – The name of the ligand that was used to remove clashing water molecules.</p></li>
-<li><p><strong>ligand_name</strong> (<em>str</em>) – The name of the ligand.</p></li>
-<li><p><strong>other_pdb_header_info</strong> (<em>None</em><em> or </em><em>list of tuple of str</em>) – Tuples with information that should be saved in the PDB header.
-Each tuple consists of two strings, i.e., the PDB header section (e.g. COMPND)
-and the respective information.</p></li>
+<li><p><strong>ligand_name</strong> (<em>str</em><em> or </em><em>None</em>) – The name of the ligand if present.</p></li>
+<li><p><strong>other_pdb_header_info</strong> (<em>None</em><em> or </em><em>iterable of tuple of str</em>) – Tuples with information that should be saved in the PDB header. Each tuple consists of two strings,
+i.e., the PDB header section (e.g. COMPND) and the respective information.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The OpenEye molecule containing the update PDB header.</p>
+<dd class="field-even"><p>The OpenEye molecule containing the updated PDB header.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>oechem.OEGraphMol</p>
+<dd class="field-odd"><p>oechem.OEMolBase</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="method">
+<dt id="kinoml.features.complexes.OEHybridDockingFeaturizer._write_results">
+<code class="sig-name descname">_write_results</code><span class="sig-paren">(</span><em class="sig-param">self, structure: oechem.OEMolBase, protein_name: str, ligand_name: Union[str, None]</em><span class="sig-paren">)</span> → Path<a class="headerlink" href="#kinoml.features.complexes.OEHybridDockingFeaturizer._write_results" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write the results from the Featurizer and retrieve the paths to protein or complex if a
+ligand is present.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>structure</strong> (<em>oechem.OEMolBase</em>) – The OpenEye molecule holding the featurized system.</p></li>
+<li><p><strong>protein_name</strong> (<em>str</em>) – The name of the protein.</p></li>
+<li><p><strong>ligand_name</strong> (<em>str</em><em> or </em><em>None</em>) – The name of the ligand if present.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Path to prepared protein or complex if ligand structure is present.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Path</p>
+</dd>
+</dl>
+</dd></dl>
+</dd></dl>
+<dl class="class">
+<dt id="kinoml.features.complexes.OEKLIFSKinaseApoFeaturizer">
+<em class="property">class </em><code class="sig-prename descclassname">kinoml.features.complexes.</code><code class="sig-name descname">OEKLIFSKinaseApoFeaturizer</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.complexes.OEKLIFSKinaseApoFeaturizer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#kinoml.features.complexes.OEHybridDockingFeaturizer" title="kinoml.features.complexes.OEHybridDockingFeaturizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.features.complexes.OEHybridDockingFeaturizer</span></code></a></p>
+<p>Given a System with exactly one kinase prepare an apo kinase.</p>
+<dl class="attribute">
+<dt id="kinoml.features.complexes.OEKLIFSKinaseApoFeaturizer._SUPPORTED_TYPES">
+<code class="sig-name descname">_SUPPORTED_TYPES</code><a class="headerlink" href="#kinoml.features.complexes.OEKLIFSKinaseApoFeaturizer._SUPPORTED_TYPES" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="method">
+<dt id="kinoml.features.complexes.OEKLIFSKinaseApoFeaturizer._pre_featurize">
+<code class="sig-name descname">_pre_featurize</code><span class="sig-paren">(</span><em class="sig-param">self, systems: Iterable[ProteinSystem]</em><span class="sig-paren">)</span> → None<a class="headerlink" href="#kinoml.features.complexes.OEKLIFSKinaseApoFeaturizer._pre_featurize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve relevant data from KLIFS and store locally.</p>
+</dd></dl>
+<dl class="method">
+<dt id="kinoml.features.complexes.OEKLIFSKinaseApoFeaturizer._create_klifs_structure_db">
+<code class="sig-name descname">_create_klifs_structure_db</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">retrieve_pocket_resids=False</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.complexes.OEKLIFSKinaseApoFeaturizer._create_klifs_structure_db" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve structure data from KLIFS and store locally.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>retrieve_pocket_resids</strong> (<em>bool</em>) – If pocket residue IDs should be retrieved (needed for docking).</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="method">
+<dt id="kinoml.features.complexes.OEKLIFSKinaseApoFeaturizer._create_klifs_kinase_db">
+<code class="sig-name descname">_create_klifs_kinase_db</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.complexes.OEKLIFSKinaseApoFeaturizer._create_klifs_kinase_db" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve kinase data from KLIFS and store locally.</p>
+</dd></dl>
+<dl class="method">
+<dt id="kinoml.features.complexes.OEKLIFSKinaseApoFeaturizer._featurize_one">
+<code class="sig-name descname">_featurize_one</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">system: ProteinSystem</em><span class="sig-paren">)</span> → universe<a class="headerlink" href="#kinoml.features.complexes.OEKLIFSKinaseApoFeaturizer._featurize_one" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prepare a kinase using the OpenEye toolkit, the KLIFS database and thoughtful defaults.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>system</strong> (<a class="reference internal" href="../../core/systems/index.html#kinoml.core.systems.ProteinSystem" title="kinoml.core.systems.ProteinSystem"><em>ProteinSystem</em></a>) – A system object holding protein information.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An MDAnalysis universe of the featurized system.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>universe</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="method">
+<dt id="kinoml.features.complexes.OEKLIFSKinaseApoFeaturizer._interpret_kinase">
+<code class="sig-name descname">_interpret_kinase</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">protein: ProteinSystem</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.complexes.OEKLIFSKinaseApoFeaturizer._interpret_kinase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Interpret the kinase information stored in the given Protein object.
+:param protein: The Protein object.
+:type protein: Protein</p>
+</dd></dl>
+<dl class="method">
+<dt id="kinoml.features.complexes.OEKLIFSKinaseApoFeaturizer._select_kinase_structure_by_pdb_id">
+<code class="sig-name descname">_select_kinase_structure_by_pdb_id</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">pdb_id: str</em>, <em class="sig-param">klifs_kinase_id: int</em>, <em class="sig-param">chain_id: Union[str</em>, <em class="sig-param">None] = None</em>, <em class="sig-param">alternate_location: Union[str</em>, <em class="sig-param">None] = None</em><span class="sig-paren">)</span> → pd.Series<a class="headerlink" href="#kinoml.features.complexes.OEKLIFSKinaseApoFeaturizer._select_kinase_structure_by_pdb_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Select a kinase structure via PDB identifier.
+:param pdb_id: The PDB identifier.
+:type pdb_id: int
+:param klifs_kinase_id: KLIFS kinase identifier.
+:type klifs_kinase_id: int
+:param chain_id: The chain of interest.
+:type chain_id: str or None
+:param alternate_location: The alternate location of interest.
+:type alternate_location: str or None</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Details about the selected kinase structure.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>pd.Series</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="method">
+<dt id="kinoml.features.complexes.OEKLIFSKinaseApoFeaturizer._select_kinase_structure_by_klifs_kinase_id">
+<code class="sig-name descname">_select_kinase_structure_by_klifs_kinase_id</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">klifs_kinase_id: int</em>, <em class="sig-param">dfg: Union[str</em>, <em class="sig-param">None] = None</em>, <em class="sig-param">alpha_c_helix: Union[str</em>, <em class="sig-param">None] = None</em><span class="sig-paren">)</span> → pd.Series<a class="headerlink" href="#kinoml.features.complexes.OEKLIFSKinaseApoFeaturizer._select_kinase_structure_by_klifs_kinase_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Select a kinase structure from KLIFS with the specified conformation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>klifs_kinase_id</strong> (<em>int</em>) – KLIFS kinase identifier.</p></li>
+<li><p><strong>dfg</strong> (<em>str</em><em> or </em><em>None</em><em>, </em><em>default=None</em>) – The DFG conformation.</p></li>
+<li><p><strong>alpha_c_helix</strong> (<em>str</em><em> or </em><em>None</em><em>, </em><em>default=None</em>) – The alpha C helix conformation.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Details about the selected kinase structure.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>pd.Series</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="method">
+<dt id="kinoml.features.complexes.OEKLIFSKinaseApoFeaturizer._add_kinase_pocket_similarity">
+<em class="property">static </em><code class="sig-name descname">_add_kinase_pocket_similarity</code><span class="sig-paren">(</span><em class="sig-param">reference_pocket: str</em>, <em class="sig-param">structures: pd.DataFrame</em><span class="sig-paren">)</span> → pd.DataFrame<a class="headerlink" href="#kinoml.features.complexes.OEKLIFSKinaseApoFeaturizer._add_kinase_pocket_similarity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a column to the input DataFrame containing the pocket similarity between the pockets
+of KLIFS structures and a reference pocket.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>reference_pocket</strong> (<em>str</em>) – The kinase pocket sequence the structures should be compared to.</p></li>
+<li><p><strong>structures</strong> (<em>pd.DataFrame</em>) – A DataFrame containing KLIFS entries.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The input DataFrame with a new ‘pocket_similarity’ column.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>pd.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="method">
+<dt id="kinoml.features.complexes.OEKLIFSKinaseApoFeaturizer._get_design_unit">
+<code class="sig-name descname">_get_design_unit</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">protein_structure: oechem.OEMolBase</em>, <em class="sig-param">structure_identifier: str</em>, <em class="sig-param">electron_density: Union[oegrid.OESkewGrid</em>, <em class="sig-param">None] = None</em>, <em class="sig-param">ligand_name: Union[str</em>, <em class="sig-param">None] = None</em>, <em class="sig-param">chain_id: Union[str</em>, <em class="sig-param">None] = None</em>, <em class="sig-param">alternate_location: Union[str</em>, <em class="sig-param">None] = None</em><span class="sig-paren">)</span> → oechem.OEDesignUnit<a class="headerlink" href="#kinoml.features.complexes.OEKLIFSKinaseApoFeaturizer._get_design_unit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get an OpenEye design unit from a protein ligand complex.
+:param protein_structure: An OpenEye molecule holding the protein that might be in complex with a ligand.
+:type protein_structure: oechem.OEMolBase
+:param structure_identifier: A unique identifier describing the structure to prepare.
+:type structure_identifier: str
+:param electron_density: An OpenEye grid holding the electron density of the protein ligand complex.
+:type electron_density: oegrid.OESkewGrid or None
+:param ligand_name: Residue name of the ligand in complex with the protein structure.
+:type ligand_name: str or None
+:param chain_id: The chain of interest.
+:type chain_id: str or None
+:param alternate_location: The alternate location of interest.
+:type alternate_location: str or None</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The design unit.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>oechem.OEDesignUnit</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="method">
+<dt id="kinoml.features.complexes.OEKLIFSKinaseApoFeaturizer._process_kinase_domain">
+<code class="sig-name descname">_process_kinase_domain</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">kinase_structure: oechem.OEMolBase</em>, <em class="sig-param">kinase_domain_sequence: Biosequence</em>, <em class="sig-param">chain_id: Union[str</em>, <em class="sig-param">None] = None</em><span class="sig-paren">)</span> → oechem.OEMolBase<a class="headerlink" href="#kinoml.features.complexes.OEKLIFSKinaseApoFeaturizer._process_kinase_domain" title="Permalink to this definition">¶</a></dt>
+<dd><p>Process a kinase domain according to UniProt.
+:param kinase_structure: An OpenEye molecule holding the kinase structure to process.
+:type kinase_structure: oechem.OEMolBase
+:param kinase_domain_sequence: The kinase domain sequence with associated metadata.
+:type kinase_domain_sequence: Biosequence
+:param chain_id: The chain of the kinase. Other chains will be deleted.
+:type chain_id: str or None</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>An OpenEye molecule holding the processed kinase structure.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>oechem.OEMolBase</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="method">
+<dt id="kinoml.features.complexes.OEKLIFSKinaseApoFeaturizer._get_kinase_residue_numbers">
+<em class="property">static </em><code class="sig-name descname">_get_kinase_residue_numbers</code><span class="sig-paren">(</span><em class="sig-param">kinase_domain_structure: oechem.OEMolBase</em>, <em class="sig-param">kinase_domain_sequence: Biosequence</em><span class="sig-paren">)</span> → List[int]<a class="headerlink" href="#kinoml.features.complexes.OEKLIFSKinaseApoFeaturizer._get_kinase_residue_numbers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the canonical residue numbers of a kinase domain structure.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>kinase_domain_structure</strong> (<em>oechem.OEMolBase</em>) – The kinase domain structure.</p></li>
+<li><p><strong>kinase_domain_sequence</strong> (<a class="reference internal" href="../../core/sequences/index.html#kinoml.core.sequences.Biosequence" title="kinoml.core.sequences.Biosequence"><em>Biosequence</em></a>) – The canonical kinase domain sequence.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>residue_number</strong> – A list of canonical residue numbers in the same order as the residues in the given kinase domain structure.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list of int</p>
 </dd>
 </dl>
 </dd></dl>
 </dd></dl>
 <dl class="class">
 <dt id="kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer">
-<em class="property">class </em><code class="sig-prename descclassname">kinoml.features.complexes.</code><code class="sig-name descname">OEKLIFSKinaseHybridDockingFeaturizer</code><span class="sig-paren">(</span><em class="sig-param">loop_db: Union[str</em>, <em class="sig-param">None] = None</em>, <em class="sig-param">shape_overlay: bool = False</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#kinoml.features.complexes.OEHybridDockingFeaturizer" title="kinoml.features.complexes.OEHybridDockingFeaturizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.features.complexes.OEHybridDockingFeaturizer</span></code></a></p>
+<em class="property">class </em><code class="sig-prename descclassname">kinoml.features.complexes.</code><code class="sig-name descname">OEKLIFSKinaseHybridDockingFeaturizer</code><span class="sig-paren">(</span><em class="sig-param">shape_overlay: bool = False</em>, <em class="sig-param">exclude_pdb_ids=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#kinoml.features.complexes.OEKLIFSKinaseApoFeaturizer" title="kinoml.features.complexes.OEKLIFSKinaseApoFeaturizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.features.complexes.OEKLIFSKinaseApoFeaturizer</span></code></a></p>
 <p>Given a System with exactly one kinase and one ligand,
 dock the ligand in the designated binding pocket.</p>
-<p>We assume that the system contains a BaseProtein with a
-<code class="docutils literal notranslate"><span class="pre">klifs_kinase_id</span></code> attribute and a SmilesLigand.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>loop_db</strong> (<em>str</em>) – The path to the loop database used by OESpruce to model missing loops.</p></li>
 <li><p><strong>shape_overlay</strong> (<em>bool</em><em>, </em><em>optional=False</em>) – If a shape overlay should be performed for selecting a ligand template
 in the hybrid docking protocol. Otherwise fingerprint similarity will
 be used.</p></li>
+<li><p><strong>exclude_pdb_ids</strong> (<em>None</em><em> or </em><em>Iterable of str</em><em>, </em><em>default=None</em>) – An iterable of PDB IDs to exclude from searching a ligand template for hybrid docking.</p></li>
 </ul>
 </dd>
 </dl>
@@ -603,32 +804,64 @@ be used.</p></li>
 <code class="sig-name descname">_SUPPORTED_TYPES</code><a class="headerlink" href="#kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._SUPPORTED_TYPES" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 <dl class="method">
-<dt id="kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._featurize">
-<code class="sig-name descname">_featurize</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">system: ProteinLigandComplex</em><span class="sig-paren">)</span> → ProteinLigandComplex<a class="headerlink" href="#kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._featurize" title="Permalink to this definition">¶</a></dt>
-<dd><p>Perform hybrid docking in kinases using the OpenEye toolkit, the KLIFS database and thoughtful defaults.
-:param system: A system object holding protein and ligand information.
-:type system: ProteinLigandComplex</p>
+<dt id="kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._pre_featurize">
+<code class="sig-name descname">_pre_featurize</code><span class="sig-paren">(</span><em class="sig-param">self, systems: Iterable[ProteinLigandComplex]</em><span class="sig-paren">)</span> → None<a class="headerlink" href="#kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._pre_featurize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve relevant data from KLIFS and store locally.</p>
+</dd></dl>
+<dl class="method">
+<dt id="kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._create_ligand_smiles_dict">
+<code class="sig-name descname">_create_ligand_smiles_dict</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span> → None<a class="headerlink" href="#kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._create_ligand_smiles_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve SMILES representations of orthosteric ligands found in KLIFS and store locally.</p>
+</dd></dl>
+<dl class="method">
+<dt id="kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._dowload_klifs_ligands">
+<code class="sig-name descname">_dowload_klifs_ligands</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span> → None<a class="headerlink" href="#kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._dowload_klifs_ligands" title="Permalink to this definition">¶</a></dt>
+<dd><p>Download orthosteric ligands from KLIFS and store locally.</p>
+</dd></dl>
+<dl class="method">
+<dt id="kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._featurize_one">
+<code class="sig-name descname">_featurize_one</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">system: ProteinLigandComplex</em><span class="sig-paren">)</span> → universe<a class="headerlink" href="#kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._featurize_one" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform hybrid docking in kinases using the OpenEye toolkit, the KLIFS database and thoughtful defaults.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p><strong>protein_ligand_complex</strong> – The same system but with docked ligand.</p>
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>system</strong> (<a class="reference internal" href="../../core/systems/index.html#kinoml.core.systems.ProteinLigandComplex" title="kinoml.core.systems.ProteinLigandComplex"><em>ProteinLigandComplex</em></a>) – A System objects holding protein and ligand information.</p>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference internal" href="../../core/systems/index.html#kinoml.core.systems.ProteinLigandComplex" title="kinoml.core.systems.ProteinLigandComplex">ProteinLigandComplex</a></p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An MDAnalysis universe of the featurized system.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>universe</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="method">
+<dt id="kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._read_klifs_ligand">
+<code class="sig-name descname">_read_klifs_ligand</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">structure_id: int</em><span class="sig-paren">)</span> → oechem.OEGraphMol<a class="headerlink" href="#kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._read_klifs_ligand" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve and read an orthosteric kinase ligand from KLIFS.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>structure_id</strong> (<em>int</em>) – KLIFS structure identifier.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>molecule</strong> – An OpenEye molecule holding the orthosteric ligand.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>oechem.OEGraphMol</p>
 </dd>
 </dl>
 </dd></dl>
 <dl class="method">
 <dt id="kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._select_ligand_template">
-<code class="sig-name descname">_select_ligand_template</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">klifs_kinase_id: int</em>, <em class="sig-param">ligand: oechem.OEGraphMol</em>, <em class="sig-param">shape_overlay: bool</em><span class="sig-paren">)</span> → pd.Series<a class="headerlink" href="#kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._select_ligand_template" title="Permalink to this definition">¶</a></dt>
-<dd><p>Select a kinase in complex with a ligand from KLIFS holding a
-ligand similar to the given SMILES and bound to
-a kinase similar to the kinase of interest.</p>
+<code class="sig-name descname">_select_ligand_template</code><span class="sig-paren">(</span><em class="sig-param">self, klifs_kinase_id: int, ligand: oechem.OEMolBase, dfg: Union[str or None], ac_helix: Union[str or None]</em><span class="sig-paren">)</span> → pd.Series<a class="headerlink" href="#kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._select_ligand_template" title="Permalink to this definition">¶</a></dt>
+<dd><p>Select a kinase in complex with a ligand from KLIFS holding a ligand similar to the given SMILES, bound to
+a kinase similar to the kinase of interest and in the given KLIFS kinase conformation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>klifs_kinase_id</strong> (<em>int</em>) – KLIFS kinase identifier.</p></li>
-<li><p><strong>ligand</strong> (<em>oechem.OEGraphMol</em>) – An OpenEye molecule holding the ligand that should be docked.</p></li>
-<li><p><strong>shape_overlay</strong> (<em>bool</em>) – If shape should be considered for identifying similar ligands.</p></li>
+<li><p><strong>ligand</strong> (<em>oechem.OEMolBase</em>) – An OpenEye molecule holding the ligand that should be docked.</p></li>
+<li><p><strong>dfg</strong> (<em>str</em><em> or </em><em>None</em>) – The KLIFS DFG conformation the ligand template should bind to.</p></li>
+<li><p><strong>ac_helix</strong> (<em>str</em><em> or </em><em>None</em>) – The KLIFS alpha C helix conformation the ligand template should bind to.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -641,7 +874,7 @@ a kinase similar to the kinase of interest.</p>
 </dd></dl>
 <dl class="method">
 <dt id="kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._get_available_ligand_templates">
-<em class="property">static </em><code class="sig-name descname">_get_available_ligand_templates</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._get_available_ligand_templates" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">_get_available_ligand_templates</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span> → pd.DataFrame<a class="headerlink" href="#kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._get_available_ligand_templates" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get available ligand templates from KLIFS.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -654,7 +887,7 @@ a kinase similar to the kinase of interest.</p>
 </dd></dl>
 <dl class="method">
 <dt id="kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._add_smiles_column">
-<em class="property">static </em><code class="sig-name descname">_add_smiles_column</code><span class="sig-paren">(</span><em class="sig-param">structures: pd.DataFrame</em><span class="sig-paren">)</span> → pd.DataFrame<a class="headerlink" href="#kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._add_smiles_column" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">_add_smiles_column</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">structures: pd.DataFrame</em><span class="sig-paren">)</span> → pd.DataFrame<a class="headerlink" href="#kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._add_smiles_column" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add SMILES column to a DataFrame containing KLIFS entries.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -670,12 +903,12 @@ a kinase similar to the kinase of interest.</p>
 </dd></dl>
 <dl class="method">
 <dt id="kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._get_identical_ligand_indices">
-<em class="property">static </em><code class="sig-name descname">_get_identical_ligand_indices</code><span class="sig-paren">(</span><em class="sig-param">ligand: oechem.OEGraphMol, smiles_iterable: Iterable[str]</em><span class="sig-paren">)</span> → List[int]<a class="headerlink" href="#kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._get_identical_ligand_indices" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="sig-name descname">_get_identical_ligand_indices</code><span class="sig-paren">(</span><em class="sig-param">ligand: oechem.OEMolBase, smiles_iterable: Iterable[str]</em><span class="sig-paren">)</span> → List[int]<a class="headerlink" href="#kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._get_identical_ligand_indices" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the indices of the SMILES matching the given ligand.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>ligand</strong> (<em>oechem.OEGraphMol</em>) – An OpenEye molecule holding the ligand to dock.</p></li>
+<li><p><strong>ligand</strong> (<em>oechem.OEMolBase</em>) – An OpenEye molecule holding the ligand to dock.</p></li>
 <li><p><strong>smiles_iterable</strong> (<em>iterable of str</em>) – An iterable of SMILES strings representing the molecules to compare with ligand.</p></li>
 </ul>
 </dd>
@@ -689,14 +922,11 @@ a kinase similar to the kinase of interest.</p>
 </dd></dl>
 <dl class="method">
 <dt id="kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._filter_for_similar_ligands_3d">
-<em class="property">static </em><code class="sig-name descname">_filter_for_similar_ligands_3d</code><span class="sig-paren">(</span><em class="sig-param">ligand: oechem.OEGraphMol</em>, <em class="sig-param">structures: pd.DataFrame</em><span class="sig-paren">)</span> → pd.DataFrame<a class="headerlink" href="#kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._filter_for_similar_ligands_3d" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">_filter_for_similar_ligands_3d</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">ligand: oechem.OEMolBase</em>, <em class="sig-param">structures: pd.DataFrame</em><span class="sig-paren">)</span> → pd.DataFrame<a class="headerlink" href="#kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._filter_for_similar_ligands_3d" title="Permalink to this definition">¶</a></dt>
 <dd><p>Filter KLIFS structures for similar ligands according to a shape overlay.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>ligand</strong> (<em>oechem.OEGraphMol</em>) – An OpenEye molecule holding the ligand to dock.</p></li>
-<li><p><strong>structures</strong> (<em>pd.DataFrame</em>) – A DataFrame containing KLIFS entries.</p></li>
-</ul>
+<dd class="field-odd"><p><strong>ligand</strong> (<em>oechem.OEMolBase</em>) – An OpenEye molecule holding the ligand to dock.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>The input DataFrame filtered for KLIFS entries with most similar ligands.</p>
@@ -708,12 +938,12 @@ a kinase similar to the kinase of interest.</p>
 </dd></dl>
 <dl class="method">
 <dt id="kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._filter_for_similar_ligands_2d">
-<em class="property">static </em><code class="sig-name descname">_filter_for_similar_ligands_2d</code><span class="sig-paren">(</span><em class="sig-param">ligand: oechem.OEGraphMol</em>, <em class="sig-param">structures: pd.DataFrame</em><span class="sig-paren">)</span> → pd.DataFrame<a class="headerlink" href="#kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._filter_for_similar_ligands_2d" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="sig-name descname">_filter_for_similar_ligands_2d</code><span class="sig-paren">(</span><em class="sig-param">ligand: oechem.OEMolBase</em>, <em class="sig-param">structures: pd.DataFrame</em><span class="sig-paren">)</span> → pd.DataFrame<a class="headerlink" href="#kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._filter_for_similar_ligands_2d" title="Permalink to this definition">¶</a></dt>
 <dd><p>Filter KLIFS structures for similar ligands according to a fingerprint comparison.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>ligand</strong> (<em>oechem.OEGraphMol</em>) – An OpenEye molecule holding the ligand to dock.</p></li>
+<li><p><strong>ligand</strong> (<em>oechem.OEMolBase</em>) – An OpenEye molecule holding the ligand to dock.</p></li>
 <li><p><strong>structures</strong> (<em>pd.DataFrame</em>) – A DataFrame containing KLIFS entries.</p></li>
 </ul>
 </dd>
@@ -727,7 +957,7 @@ a kinase similar to the kinase of interest.</p>
 </dd></dl>
 <dl class="method">
 <dt id="kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._filter_for_similar_kinase_pockets">
-<em class="property">static </em><code class="sig-name descname">_filter_for_similar_kinase_pockets</code><span class="sig-paren">(</span><em class="sig-param">reference_pocket</em>, <em class="sig-param">structures</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._filter_for_similar_kinase_pockets" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">_filter_for_similar_kinase_pockets</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">reference_pocket: str</em>, <em class="sig-param">structures: pd.DataFrame</em><span class="sig-paren">)</span> → pd.DataFrame<a class="headerlink" href="#kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._filter_for_similar_kinase_pockets" title="Permalink to this definition">¶</a></dt>
 <dd><p>Filter KLIFS structures for most similar kinase pockets compared
 to the reference pocket.</p>
 <dl class="field-list simple">
@@ -747,105 +977,42 @@ similar kinase pockets.</p>
 </dl>
 </dd></dl>
 <dl class="method">
-<dt id="kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._select_protein_template">
-<em class="property">static </em><code class="sig-name descname">_select_protein_template</code><span class="sig-paren">(</span><em class="sig-param">klifs_kinase_id: int</em>, <em class="sig-param">dfg: Union[str</em>, <em class="sig-param">None] = None</em>, <em class="sig-param">alpha_c_helix: Union[str</em>, <em class="sig-param">None] = None</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._select_protein_template" title="Permalink to this definition">¶</a></dt>
-<dd><p>Select a kinase structure from KLIFS holding a kinase
-structure similar to the kinase of interest and with the
-specified conformation.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>klifs_kinase_id</strong> (<em>int</em>) – KLIFS kinase identifier.</p></li>
-<li><p><strong>dfg</strong> (<em>str</em>) – The DFG conformation.</p></li>
-<li><p><strong>alpha_c_helix</strong> (<em>bool</em>) – The alpha C helix conformation.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Details about the selected kinase structure.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>pd.Series</p>
-</dd>
-</dl>
-</dd></dl>
-<dl class="method">
-<dt id="kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._get_design_unit">
-<code class="sig-name descname">_get_design_unit</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">protein_structure: oechem.OEGraphMol</em>, <em class="sig-param">design_unit_identifier: str</em>, <em class="sig-param">electron_density: Union[oegrid.OESkewGrid</em>, <em class="sig-param">None] = None</em>, <em class="sig-param">ligand_name: Union[str</em>, <em class="sig-param">None] = None</em><span class="sig-paren">)</span> → oechem.OEDesignUnit<a class="headerlink" href="#kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._get_design_unit" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get an OpenEye design unit from a protein ligand complex.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>protein_structure</strong> (<em>oechem.OEGraphMol</em>) – An OpenEye molecule holding the protein that might be in
-complex with a ligand.</p></li>
-<li><p><strong>design_unit_identifier</strong> (<em>str</em>) – A unique identifier describing the design unit.</p></li>
-<li><p><strong>electron_density</strong> (<em>oegrid.OESkewGrid</em><em> or </em><em>None</em>) – An OpenEye grid holding the electron density of the protein ligand complex.</p></li>
-<li><p><strong>ligand_name</strong> (<em>str</em><em> or </em><em>None</em>) – Residue name of the ligand in complex with the protein structure.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The design unit.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>oechem.OEDesignUnit</p>
-</dd>
-</dl>
-</dd></dl>
-<dl class="method">
-<dt id="kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._process_kinase_domain">
-<code class="sig-name descname">_process_kinase_domain</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">kinase_structure: oechem.OEGraphMol</em>, <em class="sig-param">uniprot_id: str</em><span class="sig-paren">)</span> → oechem.OEGraphMol<a class="headerlink" href="#kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._process_kinase_domain" title="Permalink to this definition">¶</a></dt>
-<dd><p>Process a kinase domain according to UniProt.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>kinase_structure</strong> (<em>oechem.OEGraphMol</em>) – An OpenEye molecule holding the kinase structure to process.</p></li>
-<li><p><strong>uniprot_id</strong> (<em>str</em>) – The UniProt identifier.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>An OpenEye molecule holding the processed kinase structure.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>oechem.OEGraphMol</p>
-</dd>
-</dl>
-</dd></dl>
-<dl class="method">
 <dt id="kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._prepare_ligand_template">
-<code class="sig-name descname">_prepare_ligand_template</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">ligand_template: pd.Series</em>, <em class="sig-param">kinase_domain: oechem.OEGraphMol</em><span class="sig-paren">)</span> → oechem.OEGraphMol<a class="headerlink" href="#kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._prepare_ligand_template" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">_prepare_ligand_template</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">ligand_template: pd.Series</em><span class="sig-paren">)</span> → oechem.OEMolBase<a class="headerlink" href="#kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._prepare_ligand_template" title="Permalink to this definition">¶</a></dt>
 <dd><p>Prepare a PDB structure containing the ligand template of interest.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>ligand_template</strong> (<em>pd.Series</em>) – A data series containing entries ‘pdb’, ‘chain’, ‘ligand’ and ‘alt’.</p></li>
-<li><p><strong>kinase_domain</strong> (<em>oechem.OEGraphMol</em>) – An OpenEye molecule holding the kinase domain the ligand
-template structure should be superposed to.</p></li>
-</ul>
+<dd class="field-odd"><p><strong>ligand_template</strong> (<em>pd.Series</em>) – A data series containing entries ‘structure.pdb_id’, ‘structure.chain’, ‘ligand.expo_id’ and
+‘structure.alternate_model’.</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>An OpenEye molecule holding the prepared ligand structure.</p>
+<dd class="field-even"><p>An OpenEye molecule holding the prepared ligand template structure.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>oechem.OEGraphMol</p>
+<dd class="field-odd"><p>oechem.OEMolBase</p>
 </dd>
 </dl>
 </dd></dl>
 <dl class="method">
-<dt id="kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._get_kinase_residue_numbers">
-<em class="property">static </em><code class="sig-name descname">_get_kinase_residue_numbers</code><span class="sig-paren">(</span><em class="sig-param">kinase_domain_structure: oechem.OEGraphMol</em>, <em class="sig-param">canonical_kinase_domain_sequence: KinaseDomainAminoAcidSequence</em><span class="sig-paren">)</span> → List[int]<a class="headerlink" href="#kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._get_kinase_residue_numbers" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the canonical residue numbers of a kinase domain structure.</p>
+<dt id="kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._superpose_templates">
+<em class="property">static </em><code class="sig-name descname">_superpose_templates</code><span class="sig-paren">(</span><em class="sig-param">design_unit: oechem.OEDesignUnit, ligand_template_structure: oechem.OEMolBase, ligand_template: pd.Series, chain_id: Union[str, None]</em><span class="sig-paren">)</span> → Tuple[oechem.OEGraphMol, oechem.OEGraphMol]<a class="headerlink" href="#kinoml.features.complexes.OEKLIFSKinaseHybridDockingFeaturizer._superpose_templates" title="Permalink to this definition">¶</a></dt>
+<dd><p>Superpose the kinase domain from the design unit to the given ligand template structure. The superposed kinase
+domain will be returned with kinase domain and solvent separated.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>kinase_domain_structure</strong> (<em>oechem.OEGraphMol</em>) – The kinase domain structure.</p></li>
-<li><p><strong>canonical_kinase_domain_sequence</strong> (<a class="reference internal" href="../../core/sequences/index.html#kinoml.core.sequences.KinaseDomainAminoAcidSequence" title="kinoml.core.sequences.KinaseDomainAminoAcidSequence"><em>KinaseDomainAminoAcidSequence</em></a>) – The canonical kinase domain sequence.</p></li>
+<li><p><strong>design_unit</strong> (<em>oechem.OEDesignUnit</em>) – The OpenEye design unit containing the kinase domain.</p></li>
+<li><p><strong>ligand_template_structure</strong> (<em>oechem.OEMolBase</em>) – An OpenEye molecule holding the ligand template structure.</p></li>
+<li><p><strong>ligand_template</strong> (<em>pd.Series</em>) – A data series containing entries ‘structure.chain’ and ‘structure.klifs_id’.</p></li>
+<li><p><strong>chain_id</strong> (<em>str</em><em> or </em><em>None</em>) – The chain of the kinase. Other chains will be deleted.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><strong>residue_number</strong> – A list of canonical residue numbers in the same order
-as the residues in the given kinase domain structure.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>list of int</p>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>kinase_domain</strong> (<em>oechem.OEGraphMol</em>) – The superposed kinase domain without solvent.</p></li>
+<li><p><strong>solvent</strong> (<em>oechem.OEGraphMol</em>) – The solvent of the superposed kinase domain.</p></li>
+</ul>
+</p>
 </dd>
 </dl>
 </dd></dl>

@@ -68,7 +68,7 @@
     <script src="../../../_static/copybutton.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area", "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "tex2jax_ignore|mathjax_ignore|document", "processClass": "tex2jax_process|mathjax_process|math|output_area", "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
     <link rel="shortcut icon" href="../../../_static/custom_favicon.png"/>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
@@ -120,7 +120,7 @@
 <div class="md-search" data-md-component="search" role="dialog">
   <label class="md-search__overlay" for="__search"></label>
   <div class="md-search__inner" role="search">
-    <form class="md-search__form" action="../../../search.html" method="GET" name="search">
+    <form class="md-search__form" action="../../../search.html" method="get" name="search">
       <input type="text" class="md-search__input" name="q" placeholder="Search"
              autocapitalize="off" autocomplete="off" spellcheck="false"
              data-md-component="query" data-md-state="active">
@@ -339,6 +339,10 @@
         </li>
         <li class="md-nav__item"><a href="#kinoml.utils.LocalFileStorage.klifs_ligand_mol2" class="md-nav__link">klifs_ligand_mol2</a>
         </li>
+        <li class="md-nav__item"><a href="#kinoml.utils.LocalFileStorage.klifs_structure_db" class="md-nav__link">klifs_structure_db</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.utils.LocalFileStorage.klifs_kinase_db" class="md-nav__link">klifs_kinase_db</a>
+        </li>
         <li class="md-nav__item"><a href="#kinoml.utils.LocalFileStorage.featurizer_result" class="md-nav__link">featurizer_result</a>
         </li>
         <li class="md-nav__item"><a href="#kinoml.utils.LocalFileStorage.pdb_smiles_json" class="md-nav__link">pdb_smiles_json</a>
@@ -347,6 +351,8 @@
         </li>
         <li class="md-nav__item"><a href="#kinoml.utils.FileDownloader" class="md-nav__link">FileDownloader</a><nav class="md-nav">
               <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#kinoml.utils.FileDownloader.DIRECTORY" class="md-nav__link">DIRECTORY</a>
+        </li>
         <li class="md-nav__item"><a href="#kinoml.utils.FileDownloader.rcsb_structure_pdb" class="md-nav__link">rcsb_structure_pdb</a>
         </li>
         <li class="md-nav__item"><a href="#kinoml.utils.FileDownloader.rcsb_electron_density_mtz" class="md-nav__link">rcsb_electron_density_mtz</a>
@@ -438,6 +444,14 @@
 <em class="property">static </em><code class="sig-name descname">klifs_ligand_mol2</code><span class="sig-paren">(</span><em class="sig-param">structure_id</em>, <em class="sig-param">directory=DIRECTORY</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.utils.LocalFileStorage.klifs_ligand_mol2" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 <dl class="method">
+<dt id="kinoml.utils.LocalFileStorage.klifs_structure_db">
+<em class="property">static </em><code class="sig-name descname">klifs_structure_db</code><span class="sig-paren">(</span><em class="sig-param">directory=DIRECTORY</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.utils.LocalFileStorage.klifs_structure_db" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="method">
+<dt id="kinoml.utils.LocalFileStorage.klifs_kinase_db">
+<em class="property">static </em><code class="sig-name descname">klifs_kinase_db</code><span class="sig-paren">(</span><em class="sig-param">directory=DIRECTORY</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.utils.LocalFileStorage.klifs_kinase_db" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="method">
 <dt id="kinoml.utils.LocalFileStorage.featurizer_result">
 <em class="property">static </em><code class="sig-name descname">featurizer_result</code><span class="sig-paren">(</span><em class="sig-param">featurizer_name</em>, <em class="sig-param">result_details</em>, <em class="sig-param">file_format</em>, <em class="sig-param">directory=DIRECTORY</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.utils.LocalFileStorage.featurizer_result" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -450,13 +464,17 @@
 <dt id="kinoml.utils.FileDownloader">
 <em class="property">class </em><code class="sig-prename descclassname">kinoml.utils.</code><code class="sig-name descname">FileDownloader</code><a class="headerlink" href="#kinoml.utils.FileDownloader" title="Permalink to this definition">¶</a></dt>
 <dd><p>Download and store files locally.</p>
+<dl class="attribute">
+<dt id="kinoml.utils.FileDownloader.DIRECTORY">
+<code class="sig-name descname">DIRECTORY</code><a class="headerlink" href="#kinoml.utils.FileDownloader.DIRECTORY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 <dl class="method">
 <dt id="kinoml.utils.FileDownloader.rcsb_structure_pdb">
-<em class="property">static </em><code class="sig-name descname">rcsb_structure_pdb</code><span class="sig-paren">(</span><em class="sig-param">pdb_id</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.utils.FileDownloader.rcsb_structure_pdb" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="sig-name descname">rcsb_structure_pdb</code><span class="sig-paren">(</span><em class="sig-param">pdb_id</em>, <em class="sig-param">directory=DIRECTORY</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.utils.FileDownloader.rcsb_structure_pdb" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 <dl class="method">
 <dt id="kinoml.utils.FileDownloader.rcsb_electron_density_mtz">
-<em class="property">static </em><code class="sig-name descname">rcsb_electron_density_mtz</code><span class="sig-paren">(</span><em class="sig-param">pdb_id</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.utils.FileDownloader.rcsb_electron_density_mtz" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="sig-name descname">rcsb_electron_density_mtz</code><span class="sig-paren">(</span><em class="sig-param">pdb_id</em>, <em class="sig-param">directory=DIRECTORY</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.utils.FileDownloader.rcsb_electron_density_mtz" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 </dd></dl>
 <dl class="function">

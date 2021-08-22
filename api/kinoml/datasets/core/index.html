@@ -68,7 +68,7 @@
     <script src="../../../../_static/copybutton.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area", "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "tex2jax_ignore|mathjax_ignore|document", "processClass": "tex2jax_process|mathjax_process|math|output_area", "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
     <link rel="shortcut icon" href="../../../../_static/custom_favicon.png"/>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
@@ -121,7 +121,7 @@
 <div class="md-search" data-md-component="search" role="dialog">
   <label class="md-search__overlay" for="__search"></label>
   <div class="md-search__inner" role="search">
-    <form class="md-search__form" action="../../../../search.html" method="GET" name="search">
+    <form class="md-search__form" action="../../../../search.html" method="get" name="search">
       <input type="text" class="md-search__input" name="q" placeholder="Search"
              autocapitalize="off" autocomplete="off" spellcheck="false"
              data-md-component="query" data-md-state="active">
@@ -321,6 +321,8 @@
               <ul class="md-nav__list">
         <li class="md-nav__item"><a href="#kinoml.datasets.core.logger" class="md-nav__link">logger</a>
         </li>
+        <li class="md-nav__item"><a href="#kinoml.datasets.core.FeaturizationError" class="md-nav__link">FeaturizationError</a>
+        </li>
         <li class="md-nav__item"><a href="#kinoml.datasets.core.BaseDatasetProvider" class="md-nav__link">BaseDatasetProvider</a><nav class="md-nav">
               <ul class="md-nav__list">
         <li class="md-nav__item"><a href="#kinoml.datasets.core.BaseDatasetProvider.from_source" class="md-nav__link">from_source</a>
@@ -338,8 +340,6 @@
         <li class="md-nav__item"><a href="#kinoml.datasets.core.BaseDatasetProvider.conditions" class="md-nav__link">conditions</a>
         </li>
         <li class="md-nav__item"><a href="#kinoml.datasets.core.BaseDatasetProvider.featurize" class="md-nav__link">featurize</a>
-        </li>
-        <li class="md-nav__item"><a href="#kinoml.datasets.core.BaseDatasetProvider.clear_featurizations" class="md-nav__link">clear_featurizations</a>
         </li>
         <li class="md-nav__item"><a href="#kinoml.datasets.core.BaseDatasetProvider.featurized_systems" class="md-nav__link">featurized_systems</a>
         </li>
@@ -367,10 +367,6 @@
         </li>
         <li class="md-nav__item"><a href="#kinoml.datasets.core.DatasetProvider.featurize" class="md-nav__link">featurize</a>
         </li>
-        <li class="md-nav__item"><a href="#kinoml.datasets.core.DatasetProvider._featurize_one" class="md-nav__link">_featurize_one</a>
-        </li>
-        <li class="md-nav__item"><a href="#kinoml.datasets.core.DatasetProvider.clear_featurizations" class="md-nav__link">clear_featurizations</a>
-        </li>
         <li class="md-nav__item"><a href="#kinoml.datasets.core.DatasetProvider.featurized_systems" class="md-nav__link">featurized_systems</a>
         </li>
         <li class="md-nav__item"><a href="#kinoml.datasets.core.DatasetProvider._to_dataset" class="md-nav__link">_to_dataset</a>
@@ -384,6 +380,10 @@
         <li class="md-nav__item"><a href="#kinoml.datasets.core.DatasetProvider.to_tensorflow" class="md-nav__link">to_tensorflow</a>
         </li>
         <li class="md-nav__item"><a href="#kinoml.datasets.core.DatasetProvider.to_numpy" class="md-nav__link">to_numpy</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.datasets.core.DatasetProvider.to_dict_of_arrays" class="md-nav__link">to_dict_of_arrays</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.datasets.core.DatasetProvider.to_awkward" class="md-nav__link">to_awkward</a>
         </li>
         <li class="md-nav__item"><a href="#kinoml.datasets.core.DatasetProvider.observation_model" class="md-nav__link">observation_model</a>
         </li>
@@ -425,6 +425,10 @@
         </li>
         <li class="md-nav__item"><a href="#kinoml.datasets.core.MultiDatasetProvider.to_xgboost" class="md-nav__link">to_xgboost</a>
         </li>
+        <li class="md-nav__item"><a href="#kinoml.datasets.core.MultiDatasetProvider.to_dict_of_arrays" class="md-nav__link">to_dict_of_arrays</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.datasets.core.MultiDatasetProvider.to_awkward" class="md-nav__link">to_awkward</a>
+        </li>
         <li class="md-nav__item"><a href="#kinoml.datasets.core.MultiDatasetProvider.__repr__" class="md-nav__link">__repr__</a>
         </li></ul>
             </nav>
@@ -457,13 +461,19 @@
 <dt id="kinoml.datasets.core.logger">
 <code class="sig-prename descclassname">kinoml.datasets.core.</code><code class="sig-name descname">logger</code><a class="headerlink" href="#kinoml.datasets.core.logger" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+<dl class="exception">
+<dt id="kinoml.datasets.core.FeaturizationError">
+<em class="property">exception </em><code class="sig-prename descclassname">kinoml.datasets.core.</code><code class="sig-name descname">FeaturizationError</code><a class="headerlink" href="#kinoml.datasets.core.FeaturizationError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<p>Error raised if a featurization process could not finish successfully</p>
+</dd></dl>
 <dl class="class">
 <dt id="kinoml.datasets.core.BaseDatasetProvider">
 <em class="property">class </em><code class="sig-prename descclassname">kinoml.datasets.core.</code><code class="sig-name descname">BaseDatasetProvider</code><a class="headerlink" href="#kinoml.datasets.core.BaseDatasetProvider" title="Permalink to this definition">¶</a></dt>
 <dd><p>API specification for dataset providers</p>
 <dl class="method">
 <dt id="kinoml.datasets.core.BaseDatasetProvider.from_source">
-<em class="property">abstract classmethod </em><code class="sig-name descname">from_source</code><span class="sig-paren">(</span><em class="sig-param">cls</em>, <em class="sig-param">filename=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.core.BaseDatasetProvider.from_source" title="Permalink to this definition">¶</a></dt>
+<em class="property">abstract classmethod </em><code class="sig-name descname">from_source</code><span class="sig-paren">(</span><em class="sig-param">cls</em>, <em class="sig-param">path_or_url=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.core.BaseDatasetProvider.from_source" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parse CSV/raw files to object model.</p>
 </dd></dl>
 <dl class="method">
@@ -495,10 +505,6 @@
 <em class="property">abstract </em><code class="sig-name descname">featurize</code><span class="sig-paren">(</span><em class="sig-param">self, *featurizers: Iterable[BaseFeaturizer]</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.core.BaseDatasetProvider.featurize" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 <dl class="method">
-<dt id="kinoml.datasets.core.BaseDatasetProvider.clear_featurizations">
-<em class="property">abstract </em><code class="sig-name descname">clear_featurizations</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.core.BaseDatasetProvider.clear_featurizations" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-<dl class="method">
 <dt id="kinoml.datasets.core.BaseDatasetProvider.featurized_systems">
 <em class="property">abstract </em><code class="sig-name descname">featurized_systems</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">key='last'</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.core.BaseDatasetProvider.featurized_systems" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -521,13 +527,16 @@
 </dd></dl>
 <dl class="class">
 <dt id="kinoml.datasets.core.DatasetProvider">
-<em class="property">class </em><code class="sig-prename descclassname">kinoml.datasets.core.</code><code class="sig-name descname">DatasetProvider</code><span class="sig-paren">(</span><em class="sig-param">measurements: Iterable[BaseMeasurement], *args, **kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.core.DatasetProvider" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">kinoml.datasets.core.</code><code class="sig-name descname">DatasetProvider</code><span class="sig-paren">(</span><em class="sig-param">measurements: Iterable[BaseMeasurement], metadata: dict = None</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.core.DatasetProvider" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#kinoml.datasets.core.BaseDatasetProvider" title="kinoml.datasets.core.BaseDatasetProvider"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.datasets.core.BaseDatasetProvider</span></code></a></p>
 <p>Base object for all DatasetProvider classes.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>measurements</strong> (<em>list of BaseMeasurement</em>) – A DatasetProvider holds a list of <code class="docutils literal notranslate"><span class="pre">kinoml.core.measurements.BaseMeasurement</span></code>
-objects (or any of its subclasses). They must be of the same type!</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>measurements</strong> (<em>list of BaseMeasurement</em>) – A DatasetProvider holds a list of <code class="docutils literal notranslate"><span class="pre">kinoml.core.measurements.BaseMeasurement</span></code>
+objects (or any of its subclasses). They must be of the same type!</p></li>
+<li><p><strong>metadata</strong> (<em>dict</em>) – Extra information for provenance</p></li>
+</ul>
 </dd>
 </dl>
 <div class="admonition note">
@@ -554,7 +563,7 @@ using <code class="docutils literal notranslate"><span class="pre">MultiDatasetP
 </dd></dl>
 <dl class="method">
 <dt id="kinoml.datasets.core.DatasetProvider.from_source">
-<em class="property">abstract classmethod </em><code class="sig-name descname">from_source</code><span class="sig-paren">(</span><em class="sig-param">cls</em>, <em class="sig-param">filename=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.core.DatasetProvider.from_source" title="Permalink to this definition">¶</a></dt>
+<em class="property">abstract classmethod </em><code class="sig-name descname">from_source</code><span class="sig-paren">(</span><em class="sig-param">cls</em>, <em class="sig-param">path_or_url=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.core.DatasetProvider.from_source" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parse CSV/raw file to object model. This method is responsible of generating
 the objects for <code class="docutils literal notranslate"><span class="pre">self.measurements</span></code>, if relevant. Additional kwargs will be
 passed to <code class="docutils literal notranslate"><span class="pre">__init__</span></code>.</p>
@@ -562,12 +571,12 @@ passed to <code class="docutils literal notranslate"><span class="pre">__init__<
 </dd></dl>
 <dl class="method">
 <dt id="kinoml.datasets.core.DatasetProvider.featurize">
-<code class="sig-name descname">featurize</code><span class="sig-paren">(</span><em class="sig-param">self, *featurizers: Iterable[BaseFeaturizer], processes=1, chunksize=1</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.core.DatasetProvider.featurize" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">featurize</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">featurizer: BaseFeaturizer</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.core.DatasetProvider.featurize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Given a collection of <code class="docutils literal notranslate"><span class="pre">kinoml.features.core.BaseFeaturizers</span></code>, apply them
 to the systems present in the <code class="docutils literal notranslate"><span class="pre">self.measurements</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>featurizers</strong> (<em>list of BaseFeaturizer</em>) – Featurization schemes that will be applied to the systems,
+<dd class="field-odd"><p><strong>featurizer</strong> (<a class="reference internal" href="../../features/core/index.html#kinoml.features.core.BaseFeaturizer" title="kinoml.features.core.BaseFeaturizer"><em>BaseFeaturizer</em></a>) – Featurization scheme that will be applied to the systems,
 in a stacked way.</p>
 </dd>
 </dl>
@@ -583,17 +592,8 @@ in a stacked way.</p>
 </div>
 </dd></dl>
 <dl class="method">
-<dt id="kinoml.datasets.core.DatasetProvider._featurize_one">
-<em class="property">static </em><code class="sig-name descname">_featurize_one</code><span class="sig-paren">(</span><em class="sig-param">featurizers_and_system</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.core.DatasetProvider._featurize_one" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-<dl class="method">
-<dt id="kinoml.datasets.core.DatasetProvider.clear_featurizations">
-<code class="sig-name descname">clear_featurizations</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.core.DatasetProvider.clear_featurizations" title="Permalink to this definition">¶</a></dt>
-<dd><p>Clear all the featurization dictionaries present in the systems contained here</p>
-</dd></dl>
-<dl class="method">
 <dt id="kinoml.datasets.core.DatasetProvider.featurized_systems">
-<code class="sig-name descname">featurized_systems</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">key='last'</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.core.DatasetProvider.featurized_systems" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">featurized_systems</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">key='last'</em>, <em class="sig-param">clear_after=False</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.core.DatasetProvider.featurized_systems" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the <code class="docutils literal notranslate"><span class="pre">key</span></code> featurized objects from all systems.</p>
 </dd></dl>
 <dl class="method">
@@ -650,11 +650,11 @@ found in <code class="docutils literal notranslate"><span class="pre">kinoml.tor
 <dd></dd></dl>
 <dl class="method">
 <dt id="kinoml.datasets.core.DatasetProvider.to_numpy">
-<code class="sig-name descname">to_numpy</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">featurization_key='last'</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.core.DatasetProvider.to_numpy" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">to_numpy</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">featurization_key='last'</em>, <em class="sig-param">y_dtype='float32'</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.core.DatasetProvider.to_numpy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Export dataset to a tuple of two Numpy arrays of same shape:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">X</span></code>: the featurized systems</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">y</span></code>: the measurements values</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">y</span></code>: the measurements values (must be the same measurement type)</p></li>
 </ul>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -662,6 +662,7 @@ found in <code class="docutils literal notranslate"><span class="pre">kinoml.tor
 <li><p><strong>featurization_key</strong> (<em>str</em><em>, </em><em>optional="last"</em>) – Which featurization present in the systems will be taken
 to build the <code class="docutils literal notranslate"><span class="pre">X</span></code> array. Usually, <code class="docutils literal notranslate"><span class="pre">last</span></code> as provided
 by a <code class="docutils literal notranslate"><span class="pre">Pipeline</span></code> object.</p></li>
+<li><p><strong>np.dtype</strong><strong> or </strong><strong>str</strong><strong>, </strong><strong>optional="float32"</strong> (<em>y_dtype</em><em>,</em>) – Coerce Y array to this dtype</p></li>
 <li><p><strong>kwargs</strong> (<em>optional</em><em>,</em>) – Dict that will be forwarded to <code class="docutils literal notranslate"><span class="pre">.measurements_as_array</span></code>,
 which will build the <code class="docutils literal notranslate"><span class="pre">y</span></code> array.</p></li>
 </ul>
@@ -673,6 +674,82 @@ which will build the <code class="docutils literal notranslate"><span class="pre
 <dd class="field-odd"><p>2-tuple of np.array</p>
 </dd>
 </dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This exporter assumes that each System is featurized as a single
+tensor with homogeneous shape throughout the system collection.
+If this does not hold true for your current featurization
+scheme, consider using <code class="docutils literal notranslate"><span class="pre">.to_dict_of_arrays</span></code> instead.</p>
+</div>
+</dd></dl>
+<dl class="method">
+<dt id="kinoml.datasets.core.DatasetProvider.to_dict_of_arrays">
+<code class="sig-name descname">to_dict_of_arrays</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">featurization_key='last'</em>, <em class="sig-param">y_dtype='float32'</em>, <em class="sig-param">_initial_system_index=0</em><span class="sig-paren">)</span> → dict<a class="headerlink" href="#kinoml.datasets.core.DatasetProvider.to_dict_of_arrays" title="Permalink to this definition">¶</a></dt>
+<dd><p>Export dataset to a dict-like object, compatible
+with <code class="docutils literal notranslate"><span class="pre">DictOfArrays</span></code> and NPZ files.</p>
+<p>The idea is to provide unique keys for each system
+and their features, following the syntax
+<code class="docutils literal notranslate"><span class="pre">X_s{int}_v{int}</span></code>.</p>
+<p>This object is useful when the features for each system
+have different shapes and/or dimensionality and cannot
+be concatenated in a single homogeneous array</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>featurization_key</strong> (<em>Hashable</em><em>, </em><em>optional="last"</em>) – Which key to access in each <code class="docutils literal notranslate"><span class="pre">System.featurizations</span></code> dict</p></li>
+<li><p><strong>y_dtype</strong> (<em>np.dtype</em><em> or </em><em>str</em><em>, </em><em>optional="float32"</em>) – Which kind of dtype to use for the <code class="docutils literal notranslate"><span class="pre">y</span></code> array</p></li>
+<li><p><strong>_initial_system_index</strong> (<em>int</em><em>, </em><em>optional=0</em>) – PRIVATE. Start counting systems in <code class="docutils literal notranslate"><span class="pre">X_s{int}</span></code> with this value.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p>A dictionary that maps <code class="docutils literal notranslate"><span class="pre">str</span></code> keys to array-like
+objects. Depending on the featurization scheme, keys
+can be:</p>
+<ol class="arabic simple">
+<li><p>All systems are featurized as an array and they share the same shape
+-&gt; <code class="docutils literal notranslate"><span class="pre">X,</span> <span class="pre">y</span></code></p></li>
+<li><p>All N systems are featurized as an array but they do NOT share the same shape
+-&gt; <code class="docutils literal notranslate"><span class="pre">X_s0_,</span> <span class="pre">X_s1_,</span> <span class="pre">...,</span> <span class="pre">X_sN_</span></code></p></li>
+<li><p>All N systems are featurized as a M-tuple of arrays (shape irrelevant)
+-&gt; <code class="docutils literal notranslate"><span class="pre">X_s0_a0_,</span> <span class="pre">X_s0_a1_,</span> <span class="pre">X_s1_a0_,</span> <span class="pre">X_s1_a1_,</span> <span class="pre">...,</span> <span class="pre">X_sN_aM_</span></code></p></li>
+</ol>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict[str, array]</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The X keys have a trailing underscore on purpose. Otherwise, filtering
+keys out of the dictionary by index can be deceivingly slow. For example,
+filtering for the first system (s1) with <code class="docutils literal notranslate"><span class="pre">key.startswith("X_s1")</span></code> will
+also select for X_s1, X_s10, X_s11… Hence, we filter with <code class="docutils literal notranslate"><span class="pre">X_s{int}_</span></code>.</p>
+</div>
+</dd></dl>
+<dl class="method">
+<dt id="kinoml.datasets.core.DatasetProvider.to_awkward">
+<code class="sig-name descname">to_awkward</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">featurization_key='last'</em>, <em class="sig-param">y_dtype='float32'</em>, <em class="sig-param">clear_after=False</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.core.DatasetProvider.to_awkward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates an awkward array out of the featurized systems
+and the associated measurements.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>awkward array</p>
+</dd>
+</dl>
+<div class="admonition-notes admonition">
+<p class="admonition-title">Notes</p>
+<p>Awkward Array is a library for nested, variable-sized data,
+including arbitrary-length lists, records, mixed types,
+and missing data, using NumPy-like idioms.</p>
+<p>Arrays are dynamically typed, but operations on
+them are compiled and fast. Their behavior coincides
+with NumPy when array dimensions are regular
+and generalizes when they’re not.</p>
+</div>
 </dd></dl>
 <dl class="method">
 <dt id="kinoml.datasets.core.DatasetProvider.observation_model">
@@ -726,7 +803,8 @@ retrieve an already cached copy.</p>
 <dd class="field-odd"><p><strong>path_or_url</strong> (<em>str</em><em> or </em><em>Path-like</em>) – File path or URL pointing to the required file</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The path of the (downloaded) file in cache</p>
+<dd class="field-even"><p>If provided argument is a file, the same path, right away
+If it was a URL, it will be the (downloaded) cached file path</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>str</p>
@@ -736,7 +814,7 @@ retrieve an already cached copy.</p>
 </dd></dl>
 <dl class="class">
 <dt id="kinoml.datasets.core.MultiDatasetProvider">
-<em class="property">class </em><code class="sig-prename descclassname">kinoml.datasets.core.</code><code class="sig-name descname">MultiDatasetProvider</code><span class="sig-paren">(</span><em class="sig-param">measurements: Iterable[BaseMeasurement], *args, **kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.core.MultiDatasetProvider" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">kinoml.datasets.core.</code><code class="sig-name descname">MultiDatasetProvider</code><span class="sig-paren">(</span><em class="sig-param">measurements: Iterable[BaseMeasurement], metadata: dict = None</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.core.MultiDatasetProvider" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#kinoml.datasets.core.DatasetProvider" title="kinoml.datasets.core.DatasetProvider"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.datasets.core.DatasetProvider</span></code></a></p>
 <p>Adapter class that is able to expose a DatasetProvider-like
 interface to a collection of Measurements of different types.</p>
@@ -825,6 +903,18 @@ method. Check <code class="docutils literal notranslate"><span class="pre">Datas
 method. Check <code class="docutils literal notranslate"><span class="pre">DatasetProvider.to_xgboost</span></code> docstring for more details.</p>
 </dd></dl>
 <dl class="method">
+<dt id="kinoml.datasets.core.MultiDatasetProvider.to_dict_of_arrays">
+<code class="sig-name descname">to_dict_of_arrays</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span> → dict<a class="headerlink" href="#kinoml.datasets.core.MultiDatasetProvider.to_dict_of_arrays" title="Permalink to this definition">¶</a></dt>
+<dd><p>Will generate a dictionary of str: np.ndarray. System indices
+will be accumulated.</p>
+</dd></dl>
+<dl class="method">
+<dt id="kinoml.datasets.core.MultiDatasetProvider.to_awkward">
+<code class="sig-name descname">to_awkward</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.core.MultiDatasetProvider.to_awkward" title="Permalink to this definition">¶</a></dt>
+<dd><p>See <code class="docutils literal notranslate"><span class="pre">DatasetProvider.to_awkward()</span></code>. <code class="docutils literal notranslate"><span class="pre">X</span></code> and <code class="docutils literal notranslate"><span class="pre">y</span></code> will
+be concatenated along axis=0 (one provider after another)</p>
+</dd></dl>
+<dl class="method">
 <dt id="kinoml.datasets.core.MultiDatasetProvider.__repr__">
 <code class="sig-name descname">__repr__</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span> → str<a class="headerlink" href="#kinoml.datasets.core.MultiDatasetProvider.__repr__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return repr(self).</p>
@@ -832,13 +922,16 @@ method. Check <code class="docutils literal notranslate"><span class="pre">Datas
 </dd></dl>
 <dl class="class">
 <dt id="kinoml.datasets.core.ProteinLigandDatasetProvider">
-<em class="property">class </em><code class="sig-prename descclassname">kinoml.datasets.core.</code><code class="sig-name descname">ProteinLigandDatasetProvider</code><span class="sig-paren">(</span><em class="sig-param">measurements: Iterable[BaseMeasurement], *args, **kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.core.ProteinLigandDatasetProvider" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">kinoml.datasets.core.</code><code class="sig-name descname">ProteinLigandDatasetProvider</code><span class="sig-paren">(</span><em class="sig-param">measurements: Iterable[BaseMeasurement], metadata: dict = None</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.core.ProteinLigandDatasetProvider" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#kinoml.datasets.core.DatasetProvider" title="kinoml.datasets.core.DatasetProvider"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.datasets.core.DatasetProvider</span></code></a></p>
 <p>Base object for all DatasetProvider classes.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>measurements</strong> (<em>list of BaseMeasurement</em>) – A DatasetProvider holds a list of <code class="docutils literal notranslate"><span class="pre">kinoml.core.measurements.BaseMeasurement</span></code>
-objects (or any of its subclasses). They must be of the same type!</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>measurements</strong> (<em>list of BaseMeasurement</em>) – A DatasetProvider holds a list of <code class="docutils literal notranslate"><span class="pre">kinoml.core.measurements.BaseMeasurement</span></code>
+objects (or any of its subclasses). They must be of the same type!</p></li>
+<li><p><strong>metadata</strong> (<em>dict</em>) – Extra information for provenance</p></li>
+</ul>
 </dd>
 </dl>
 <div class="admonition note">

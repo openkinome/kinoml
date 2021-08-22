@@ -68,12 +68,12 @@
     <script src="../../../../_static/copybutton.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area", "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "tex2jax_ignore|mathjax_ignore|document", "processClass": "tex2jax_process|mathjax_process|math|output_area", "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
     <link rel="shortcut icon" href="../../../../_static/custom_favicon.png"/>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
     <link rel="next" title="kinoml.core.measurements" href="../measurements/index.html" />
-    <link rel="prev" title="kinoml.core.kinase" href="../kinase/index.html" />
+    <link rel="prev" title="kinoml.core.conditions" href="../conditions/index.html" />
   
     <link rel="apple-touch-icon" href="../../../../_static/images/custom_favicon.png"/>
   
@@ -121,7 +121,7 @@
 <div class="md-search" data-md-component="search" role="dialog">
   <label class="md-search__overlay" for="__search"></label>
   <div class="md-search__inner" role="search">
-    <form class="md-search__form" action="../../../../search.html" method="GET" name="search">
+    <form class="md-search__form" action="../../../../search.html" method="get" name="search">
       <input type="text" class="md-search__input" name="q" placeholder="Search"
              autocapitalize="off" autocomplete="off" spellcheck="false"
              data-md-component="query" data-md-state="active">
@@ -321,10 +321,6 @@
               <ul class="md-nav__list">
         <li class="md-nav__item"><a href="#kinoml.core.ligands.logger" class="md-nav__link">logger</a>
         </li>
-        <li class="md-nav__item"><a href="#kinoml.core.ligands.FileLigand" class="md-nav__link">FileLigand</a>
-        </li>
-        <li class="md-nav__item"><a href="#kinoml.core.ligands.PDBLigand" class="md-nav__link">PDBLigand</a>
-        </li>
         <li class="md-nav__item"><a href="#kinoml.core.ligands.OpenForceFieldLigand" class="md-nav__link">OpenForceFieldLigand</a><nav class="md-nav">
               <ul class="md-nav__list">
         <li class="md-nav__item"><a href="#kinoml.core.ligands.OpenForceFieldLigand.from_smiles" class="md-nav__link">from_smiles</a>
@@ -395,18 +391,6 @@
 <dt id="kinoml.core.ligands.logger">
 <code class="sig-prename descclassname">kinoml.core.ligands.</code><code class="sig-name descname">logger</code><a class="headerlink" href="#kinoml.core.ligands.logger" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-<dl class="class">
-<dt id="kinoml.core.ligands.FileLigand">
-<em class="property">class </em><code class="sig-prename descclassname">kinoml.core.ligands.</code><code class="sig-name descname">FileLigand</code><span class="sig-paren">(</span><em class="sig-param">path</em>, <em class="sig-param">metadata=None</em>, <em class="sig-param">name=''</em>, <em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.ligands.FileLigand" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="../components/index.html#kinoml.core.components.BaseLigand" title="kinoml.core.components.BaseLigand"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.core.components.BaseLigand</span></code></a></p>
-<p>Docstring pending</p>
-</dd></dl>
-<dl class="class">
-<dt id="kinoml.core.ligands.PDBLigand">
-<em class="property">class </em><code class="sig-prename descclassname">kinoml.core.ligands.</code><code class="sig-name descname">PDBLigand</code><span class="sig-paren">(</span><em class="sig-param">pdb_id</em>, <em class="sig-param">path</em>, <em class="sig-param">metadata=None</em>, <em class="sig-param">name=''</em>, <em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.ligands.PDBLigand" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#kinoml.core.ligands.FileLigand" title="kinoml.core.ligands.FileLigand"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.core.ligands.FileLigand</span></code></a></p>
-<p>Docstring pending</p>
-</dd></dl>
 <dl class="class">
 <dt id="kinoml.core.ligands.OpenForceFieldLigand">
 <em class="property">class </em><code class="sig-prename descclassname">kinoml.core.ligands.</code><code class="sig-name descname">OpenForceFieldLigand</code><span class="sig-paren">(</span><em class="sig-param">metadata=None</em>, <em class="sig-param">name=''</em>, <em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.ligands.OpenForceFieldLigand" title="Permalink to this definition">¶</a></dt>
@@ -636,7 +620,7 @@ representation. If you want the RAW smiles, use
     <div class="md-footer-nav">
       <nav class="md-footer-nav__inner md-grid">
           
-            <a href="../kinase/index.html" title="kinoml.core.kinase"
+            <a href="../conditions/index.html" title="kinoml.core.conditions"
                class="md-flex md-footer-nav__link md-footer-nav__link--prev"
                rel="prev">
               <div class="md-flex__cell md-flex__cell--shrink">
@@ -645,7 +629,7 @@ representation. If you want the RAW smiles, use
               <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
                 <span class="md-flex__ellipsis">
                   <span
-                      class="md-footer-nav__direction"> Previous </span> <code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.core.kinase</span></code> </span>
+                      class="md-footer-nav__direction"> Previous </span> <code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.core.conditions</span></code> </span>
               </div>
             </a>
           

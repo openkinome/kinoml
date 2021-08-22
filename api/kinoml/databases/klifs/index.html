@@ -48,7 +48,7 @@
     <link rel="apple-touch-icon" href="../../../../_static/images/custom_favicon.png"/>
   
   
-    <title>kinoml.features.protein_struct_features &#8212; KinoML 0.1 documentation</title>
+    <title>kinoml.databases.klifs &#8212; KinoML 0.1 documentation</title>
     <link rel="stylesheet" href="../../../../_static/material.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/twemoji.css" />
@@ -68,12 +68,12 @@
     <script src="../../../../_static/copybutton.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area", "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "tex2jax_ignore|mathjax_ignore|document", "processClass": "tex2jax_process|mathjax_process|math|output_area", "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
     <link rel="shortcut icon" href="../../../../_static/custom_favicon.png"/>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
-    <link rel="next" title="kinoml.ml" href="../../ml/index.html" />
-    <link rel="prev" title="kinoml.features.protein" href="../protein/index.html" />
+    <link rel="next" title="kinoml.databases.pdb" href="../pdb/index.html" />
+    <link rel="prev" title="kinoml.databases" href="../index.html" />
   
     <link rel="apple-touch-icon" href="../../../../_static/images/custom_favicon.png"/>
   
@@ -94,7 +94,7 @@
   <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer">
   <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search">
   <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
-  <a href="#api/kinoml/features/protein_struct_features/index" tabindex="1" class="md-skip"> Skip to content </a>
+  <a href="#api/kinoml/databases/klifs/index" tabindex="1" class="md-skip"> Skip to content </a>
   <header class="md-header" data-md-component="header">
   <nav class="md-header-nav md-grid">
     <div class="md-flex navheader">
@@ -112,7 +112,7 @@
       <div class="md-flex__cell md-flex__cell--stretch">
         <div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
           <span class="md-header-nav__topic">KinoML</span>
-          <span class="md-header-nav__topic"> kinoml.features.protein_struct_features </span>
+          <span class="md-header-nav__topic"> kinoml.databases.klifs </span>
         </div>
       </div>
       <div class="md-flex__cell md-flex__cell--shrink">
@@ -121,7 +121,7 @@
 <div class="md-search" data-md-component="search" role="dialog">
   <label class="md-search__overlay" for="__search"></label>
   <div class="md-search__inner" role="search">
-    <form class="md-search__form" action="../../../../search.html" method="GET" name="search">
+    <form class="md-search__form" action="../../../../search.html" method="get" name="search">
       <input type="text" class="md-search__input" name="q" placeholder="Search"
              autocapitalize="off" autocomplete="off" spellcheck="false"
              data-md-component="query" data-md-state="active">
@@ -184,7 +184,7 @@
             
             <li class="md-tabs__item"><a href="https://openkinome.org" class="md-tabs__link">OpenKinome</a></li>
           <li class="md-tabs__item"><a href="../../index.html" class="md-tabs__link"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml</span></code></a></li>
-          <li class="md-tabs__item"><a href="../index.html" class="md-tabs__link"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.features</span></code></a></li>
+          <li class="md-tabs__item"><a href="../index.html" class="md-tabs__link"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.databases</span></code></a></li>
       </ul>
     </div>
   </nav>
@@ -315,13 +315,11 @@
 <nav class="md-nav md-nav--secondary">
     <label class="md-nav__title" for="__toc">Contents</label>
   <ul class="md-nav__list" data-md-scrollfix="">
-        <li class="md-nav__item"><a href="#api-kinoml-features-protein-struct-features-index--page-root" class="md-nav__link"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.features.protein_struct_features</span></code></a><nav class="md-nav">
+        <li class="md-nav__item"><a href="#api-kinoml-databases-klifs-index--page-root" class="md-nav__link"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.databases.klifs</span></code></a><nav class="md-nav">
               <ul class="md-nav__list">
         <li class="md-nav__item"><a href="#module-contents" class="md-nav__link">Module Contents</a><nav class="md-nav">
               <ul class="md-nav__list">
-        <li class="md-nav__item"><a href="#kinoml.features.protein_struct_features.key_klifs_residues" class="md-nav__link">key_klifs_residues</a>
-        </li>
-        <li class="md-nav__item"><a href="#kinoml.features.protein_struct_features.compute_simple_protein_features" class="md-nav__link">compute_simple_protein_features</a>
+        <li class="md-nav__item"><a href="#kinoml.databases.klifs.klifs_kinase_from_uniprot_id" class="md-nav__link">klifs_kinase_from_uniprot_id</a>
         </li></ul>
             </nav>
         </li></ul>
@@ -340,51 +338,29 @@
         <div class="md-content">
           <article class="md-content__inner md-typeset" role="main">
             
-  <section id="module-kinoml.features.protein_struct_features">
-<span id="kinoml-features-protein-struct-features"></span><h1 id="api-kinoml-features-protein-struct-features-index--page-root"><a class="reference internal" href="#api-kinoml-features-protein-struct-features-index--page-root" title="kinoml.features.protein_struct_features"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.features.protein_struct_features</span></code></a><a class="headerlink" href="#api-kinoml-features-protein-struct-features-index--page-root" title="Permalink to this headline">¶</a></h1>
-<p>protein.py
-This is a tool to featurize kinase conformational changes through the entire Kinome.</p>
+  <section id="module-kinoml.databases.klifs">
+<span id="kinoml-databases-klifs"></span><h1 id="api-kinoml-databases-klifs-index--page-root"><a class="reference internal" href="#api-kinoml-databases-klifs-index--page-root" title="kinoml.databases.klifs"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.databases.klifs</span></code></a><a class="headerlink" href="#api-kinoml-databases-klifs-index--page-root" title="Permalink to this headline">¶</a></h1>
 <section id="module-contents">
 <h2 id="module-contents">Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
-<dt id="kinoml.features.protein_struct_features.key_klifs_residues">
-<code class="sig-prename descclassname">kinoml.features.protein_struct_features.</code><code class="sig-name descname">key_klifs_residues</code><span class="sig-paren">(</span><em class="sig-param">numbering</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.protein_struct_features.key_klifs_residues" title="Permalink to this definition">¶</a></dt>
-<dd><p>Retrieve a list of PDB residue indices relevant to key kinase conformations mapped via KLIFS.</p>
-<p>Define indices of the residues relevant to a list of 12 collective variables relevant to
-kinase conformational changes. These variables include: angle between aC and aE helices,
-the key K-E salt bridge, DFG-Phe conformation (two distances), X-DFG-Phi, X-DFG-Psi,
-DFG-Asp-Phi, DFG-Asp-Psi, DFG-Phe-Phi, DFG-Phe-Psi, DFG-Phe-Chi1, and the FRET L-S distance.
-All features are under the current numbering of the structure provided.</p>
+<dt id="kinoml.databases.klifs.klifs_kinase_from_uniprot_id">
+<code class="sig-prename descclassname">kinoml.databases.klifs.</code><code class="sig-name descname">klifs_kinase_from_uniprot_id</code><span class="sig-paren">(</span><em class="sig-param">uniprot_id: str</em><span class="sig-paren">)</span> → pd.DataFrame<a class="headerlink" href="#kinoml.databases.klifs.klifs_kinase_from_uniprot_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve KLIFS kinase details about the kinase matching the given Uniprot ID.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>numbering</strong> (<em>list of int</em>) – numbering[klifs_index] is the residue number for the given PDB file corresponding to KLIFS residue index ‘klifs_index’</p>
+<dd class="field-odd"><p><strong>uniprot_id</strong> (<em>str</em>) – Uniprot identifier.</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><strong>key_res</strong> – Key residue indices</p>
+<dd class="field-even"><p><strong>kinase</strong> – KLIFS kinase details.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>list of int</p>
+<dd class="field-odd"><p>pd.Series</p>
 </dd>
-</dl>
-</dd></dl>
-<dl class="function">
-<dt id="kinoml.features.protein_struct_features.compute_simple_protein_features">
-<code class="sig-prename descclassname">kinoml.features.protein_struct_features.</code><code class="sig-name descname">compute_simple_protein_features</code><span class="sig-paren">(</span><em class="sig-param">u</em>, <em class="sig-param">key_res</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.protein_struct_features.compute_simple_protein_features" title="Permalink to this definition">¶</a></dt>
-<dd><p>This function takes the PDB code, chain id and certain coordinates of a kinase from
-a command line and returns its structural features.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>u</strong> (<em>object</em>) – A MDAnalysis.core.universe.Universe object of the input structure (a pdb file or a simulation trajectory).</p></li>
-<li><p><strong>key_res</strong> (<em>dict of int</em>) – A dictionary (with keys ‘group0’ … ‘group4’) of feature-related residue indices in five feature groups.</p></li>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>ValueError:</strong> – No KLIFS kinase found for UniProt ID.</p></li>
+<li><p><strong>ValueError:</strong> – Multiple KLIFS kinases found for UniProt ID.</p></li>
 </ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><ul class="simple">
-<li><p><strong>features</strong> (<em>list of floats</em>) – A list (single structure) or lists (multiple frames in a trajectory) of 72 features in 5 groups (A-loop, P-loop, aC, DFG, FRET)</p></li>
-<li><p><em>.. todo :: Use kwargs with sensible defaults instead of relying only on positional arguments.</em></p></li>
-</ul>
-</p>
 </dd>
 </dl>
 </dd></dl>
@@ -401,7 +377,7 @@ a command line and returns its structural features.</p>
     <div class="md-footer-nav">
       <nav class="md-footer-nav__inner md-grid">
           
-            <a href="../protein/index.html" title="kinoml.features.protein"
+            <a href="../index.html" title="kinoml.databases"
                class="md-flex md-footer-nav__link md-footer-nav__link--prev"
                rel="prev">
               <div class="md-flex__cell md-flex__cell--shrink">
@@ -410,17 +386,17 @@ a command line and returns its structural features.</p>
               <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
                 <span class="md-flex__ellipsis">
                   <span
-                      class="md-footer-nav__direction"> Previous </span> <code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.features.protein</span></code> </span>
+                      class="md-footer-nav__direction"> Previous </span> <code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.databases</span></code> </span>
               </div>
             </a>
           
           
-            <a href="../../ml/index.html" title="kinoml.ml"
+            <a href="../pdb/index.html" title="kinoml.databases.pdb"
                class="md-flex md-footer-nav__link md-footer-nav__link--next"
                rel="next">
             <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title"><span
                 class="md-flex__ellipsis"> <span
-                class="md-footer-nav__direction"> Next </span> <code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.ml</span></code> </span>
+                class="md-footer-nav__direction"> Next </span> <code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.databases.pdb</span></code> </span>
             </div>
             <div class="md-flex__cell md-flex__cell--shrink"><i
                 class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>

@@ -68,11 +68,11 @@
     <script src="../../../../_static/copybutton.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area", "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "tex2jax_ignore|mathjax_ignore|document", "processClass": "tex2jax_process|mathjax_process|math|output_area", "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
     <link rel="shortcut icon" href="../../../../_static/custom_favicon.png"/>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
-    <link rel="next" title="kinoml.features.dunbrack_cluster" href="../dunbrack_cluster/index.html" />
+    <link rel="next" title="kinoml.features.ligand" href="../ligand/index.html" />
     <link rel="prev" title="kinoml.features.complexes" href="../complexes/index.html" />
   
     <link rel="apple-touch-icon" href="../../../../_static/images/custom_favicon.png"/>
@@ -121,7 +121,7 @@
 <div class="md-search" data-md-component="search" role="dialog">
   <label class="md-search__overlay" for="__search"></label>
   <div class="md-search__inner" role="search">
-    <form class="md-search__form" action="../../../../search.html" method="GET" name="search">
+    <form class="md-search__form" action="../../../../search.html" method="get" name="search">
       <input type="text" class="md-search__input" name="q" placeholder="Search"
              autocapitalize="off" autocomplete="off" spellcheck="false"
              data-md-component="query" data-md-state="active">
@@ -327,7 +327,13 @@
         </li>
         <li class="md-nav__item"><a href="#kinoml.features.core.BaseFeaturizer.__call__" class="md-nav__link">__call__</a>
         </li>
+        <li class="md-nav__item"><a href="#kinoml.features.core.BaseFeaturizer._pre_featurize" class="md-nav__link">_pre_featurize</a>
+        </li>
         <li class="md-nav__item"><a href="#kinoml.features.core.BaseFeaturizer._featurize" class="md-nav__link">_featurize</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.features.core.BaseFeaturizer._featurize_one" class="md-nav__link">_featurize_one</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.features.core.BaseFeaturizer._post_featurize" class="md-nav__link">_post_featurize</a>
         </li>
         <li class="md-nav__item"><a href="#kinoml.features.core.BaseFeaturizer.supports" class="md-nav__link">supports</a>
         </li>
@@ -339,6 +345,18 @@
         </li></ul>
             </nav>
         </li>
+        <li class="md-nav__item"><a href="#kinoml.features.core.ParallelBaseFeaturizer" class="md-nav__link">ParallelBaseFeaturizer</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#kinoml.features.core.ParallelBaseFeaturizer._SUPPORTED_TYPES" class="md-nav__link">_SUPPORTED_TYPES</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.features.core.ParallelBaseFeaturizer.__getstate__" class="md-nav__link">__getstate__</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.features.core.ParallelBaseFeaturizer.__setstate__" class="md-nav__link">__setstate__</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.features.core.ParallelBaseFeaturizer._featurize" class="md-nav__link">_featurize</a>
+        </li></ul>
+            </nav>
+        </li>
         <li class="md-nav__item"><a href="#kinoml.features.core.Pipeline" class="md-nav__link">Pipeline</a><nav class="md-nav">
               <ul class="md-nav__list">
         <li class="md-nav__item"><a href="#kinoml.features.core.Pipeline._featurize" class="md-nav__link">_featurize</a>
@@ -346,6 +364,8 @@
         <li class="md-nav__item"><a href="#kinoml.features.core.Pipeline.supports" class="md-nav__link">supports</a>
         </li>
         <li class="md-nav__item"><a href="#kinoml.features.core.Pipeline.name" class="md-nav__link">name</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.features.core.Pipeline.shortname" class="md-nav__link">shortname</a>
         </li></ul>
             </nav>
         </li>
@@ -355,11 +375,17 @@
         </li></ul>
             </nav>
         </li>
+        <li class="md-nav__item"><a href="#kinoml.features.core.TupleOfArrays" class="md-nav__link">TupleOfArrays</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#kinoml.features.core.TupleOfArrays._featurize" class="md-nav__link">_featurize</a>
+        </li></ul>
+            </nav>
+        </li>
         <li class="md-nav__item"><a href="#kinoml.features.core.BaseOneHotEncodingFeaturizer" class="md-nav__link">BaseOneHotEncodingFeaturizer</a><nav class="md-nav">
               <ul class="md-nav__list">
         <li class="md-nav__item"><a href="#kinoml.features.core.BaseOneHotEncodingFeaturizer.ALPHABET" class="md-nav__link">ALPHABET</a>
         </li>
-        <li class="md-nav__item"><a href="#kinoml.features.core.BaseOneHotEncodingFeaturizer._featurize" class="md-nav__link">_featurize</a>
+        <li class="md-nav__item"><a href="#kinoml.features.core.BaseOneHotEncodingFeaturizer._featurize_one" class="md-nav__link">_featurize_one</a>
         </li>
         <li class="md-nav__item"><a href="#kinoml.features.core.BaseOneHotEncodingFeaturizer._retrieve_sequence" class="md-nav__link">_retrieve_sequence</a>
         </li>
@@ -369,25 +395,41 @@
         </li>
         <li class="md-nav__item"><a href="#kinoml.features.core.PadFeaturizer" class="md-nav__link">PadFeaturizer</a><nav class="md-nav">
               <ul class="md-nav__list">
-        <li class="md-nav__item"><a href="#kinoml.features.core.PadFeaturizer._featurize" class="md-nav__link">_featurize</a>
+        <li class="md-nav__item"><a href="#kinoml.features.core.PadFeaturizer._get_array" class="md-nav__link">_get_array</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.features.core.PadFeaturizer._pre_featurize" class="md-nav__link">_pre_featurize</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.features.core.PadFeaturizer._featurize_one" class="md-nav__link">_featurize_one</a>
         </li></ul>
             </nav>
         </li>
         <li class="md-nav__item"><a href="#kinoml.features.core.HashFeaturizer" class="md-nav__link">HashFeaturizer</a><nav class="md-nav">
               <ul class="md-nav__list">
-        <li class="md-nav__item"><a href="#kinoml.features.core.HashFeaturizer._featurize" class="md-nav__link">_featurize</a>
+        <li class="md-nav__item"><a href="#kinoml.features.core.HashFeaturizer._getter" class="md-nav__link">_getter</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.features.core.HashFeaturizer._featurize_one" class="md-nav__link">_featurize_one</a>
         </li></ul>
             </nav>
         </li>
         <li class="md-nav__item"><a href="#kinoml.features.core.NullFeaturizer" class="md-nav__link">NullFeaturizer</a><nav class="md-nav">
               <ul class="md-nav__list">
-        <li class="md-nav__item"><a href="#kinoml.features.core.NullFeaturizer.featurize" class="md-nav__link">featurize</a>
+        <li class="md-nav__item"><a href="#kinoml.features.core.NullFeaturizer._featurize" class="md-nav__link">_featurize</a>
         </li></ul>
             </nav>
         </li>
-        <li class="md-nav__item"><a href="#kinoml.features.core.ScaleFeaturizer" class="md-nav__link">ScaleFeaturizer</a><nav class="md-nav">
+        <li class="md-nav__item"><a href="#kinoml.features.core.CallableFeaturizer" class="md-nav__link">CallableFeaturizer</a><nav class="md-nav">
               <ul class="md-nav__list">
-        <li class="md-nav__item"><a href="#kinoml.features.core.ScaleFeaturizer._featurize" class="md-nav__link">_featurize</a>
+        <li class="md-nav__item"><a href="#kinoml.features.core.CallableFeaturizer._default_func" class="md-nav__link">_default_func</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.features.core.CallableFeaturizer._featurize_one" class="md-nav__link">_featurize_one</a>
+        </li></ul>
+            </nav>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.features.core.ClearFeaturizations" class="md-nav__link">ClearFeaturizations</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#kinoml.features.core.ClearFeaturizations._featurize_one" class="md-nav__link">_featurize_one</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.features.core.ClearFeaturizations._post_featurize" class="md-nav__link">_post_featurize</a>
         </li></ul>
             </nav>
         </li></ul>
@@ -412,38 +454,41 @@
 <span id="kinoml-features-core"></span><h1 id="api-kinoml-features-core-index--page-root"><a class="reference internal" href="#api-kinoml-features-core-index--page-root" title="kinoml.features.core"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.features.core</span></code></a><a class="headerlink" href="#api-kinoml-features-core-index--page-root" title="Permalink to this headline">¶</a></h1>
 <p>Featurizers can transform a <code class="docutils literal notranslate"><span class="pre">kinoml.core.system.System</span></code> object and produce
 new representations of the molecular entities and their associated measurements.</p>
-<p>All <code class="docutils literal notranslate"><span class="pre">Featurizer</span></code> objects inherit from <code class="docutils literal notranslate"><span class="pre">BaseFeaturizer</span></code> and reimplement <cite>._featurize</cite>
-and <cite>._supports</cite>, if needed.</p>
 <section id="module-contents">
 <h2 id="module-contents">Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="kinoml.features.core.BaseFeaturizer">
-<em class="property">class </em><code class="sig-prename descclassname">kinoml.features.core.</code><code class="sig-name descname">BaseFeaturizer</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.core.BaseFeaturizer" title="Permalink to this definition">¶</a></dt>
-<dd><p>Abstract Featurizer class</p>
+<em class="property">class </em><code class="sig-prename descclassname">kinoml.features.core.</code><code class="sig-name descname">BaseFeaturizer</code><a class="headerlink" href="#kinoml.features.core.BaseFeaturizer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Abstract Featurizer class.</p>
 <dl class="attribute">
 <dt id="kinoml.features.core.BaseFeaturizer._SUPPORTED_TYPES">
 <code class="sig-name descname">_SUPPORTED_TYPES</code><a class="headerlink" href="#kinoml.features.core.BaseFeaturizer._SUPPORTED_TYPES" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 <dl class="method">
 <dt id="kinoml.features.core.BaseFeaturizer.featurize">
-<code class="sig-name descname">featurize</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">system</em>, <em class="sig-param">inplace: bool = True</em><span class="sig-paren">)</span> → object<a class="headerlink" href="#kinoml.features.core.BaseFeaturizer.featurize" title="Permalink to this definition">¶</a></dt>
-<dd><p>Given an system (compatible with <code class="docutils literal notranslate"><span class="pre">_SUPPORTED_TYPES</span></code>), apply
+<code class="sig-name descname">featurize</code><span class="sig-paren">(</span><em class="sig-param">self, systems: Iterable[System], keep=True</em><span class="sig-paren">)</span> → Iterable[System]<a class="headerlink" href="#kinoml.features.core.BaseFeaturizer.featurize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given some systems (compatible with <code class="docutils literal notranslate"><span class="pre">_SUPPORTED_TYPES</span></code>), apply
 the featurization scheme implemented in this class.</p>
+<p>First, <code class="docutils literal notranslate"><span class="pre">self.supports()</span></code> will check whether the systems are compatible
+with the featurization scheme. We assume all of them are equal, so only
+the first one will be checked. Then, the Systems are passed to
+<code class="docutils literal notranslate"><span class="pre">self._featurize</span></code> to handle the actual leg-work.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>system</strong> (<a class="reference internal" href="../../core/systems/index.html#kinoml.core.systems.System" title="kinoml.core.systems.System"><em>System</em></a>) – This is System object that will be transformed</p></li>
-<li><p><strong>inplace</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to modify the System directly or operate on a copy.</p></li>
+<li><p><strong>systems</strong> (<em>list of System</em>) – This is the collection of System objects that will be transformed.</p></li>
+<li><p><strong>keep</strong> (<em>bool</em><em>, </em><em>optional=True</em>) – Whether to store the current featurizer in the <code class="docutils literal notranslate"><span class="pre">system.featurizations</span></code>
+dictionary with its own key (<code class="docutils literal notranslate"><span class="pre">self.name</span></code>), in addition to <code class="docutils literal notranslate"><span class="pre">last</span></code>.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><strong>system</strong> – The same system that was passed in, unless <code class="docutils literal notranslate"><span class="pre">inplace</span></code> is False.
-The returned System will have an extra entry in the <code class="docutils literal notranslate"><span class="pre">.featurizations</span></code>
+<dd class="field-even"><p><strong>systems</strong> – The same systems that were passed in.
+The returned Systems will have an extra entry in the <code class="docutils literal notranslate"><span class="pre">.featurizations</span></code>
 dictionary, containing the featurized object (either a new System
-or an array-like object) undera key named after <code class="docutils literal notranslate"><span class="pre">.name</span></code>.</p>
+or an array-like object) under a key named after <code class="docutils literal notranslate"><span class="pre">.name</span></code>.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference internal" href="../../core/systems/index.html#kinoml.core.systems.System" title="kinoml.core.systems.System">System</a></p>
+<dd class="field-odd"><p>list of System</p>
 </dd>
 </dl>
 </dd></dl>
@@ -454,12 +499,68 @@ or an array-like object) undera key named after <code class="docutils literal no
 <code class="docutils literal notranslate"><span class="pre">.featurize()</span></code>.</p>
 </dd></dl>
 <dl class="method">
-<dt id="kinoml.features.core.BaseFeaturizer._featurize">
-<em class="property">abstract </em><code class="sig-name descname">_featurize</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">system: System</em><span class="sig-paren">)</span> → object<a class="headerlink" href="#kinoml.features.core.BaseFeaturizer._featurize" title="Permalink to this definition">¶</a></dt>
-<dd><p>Implement this method to do the actual work for <cite>self.featurize()</cite>.</p>
+<dt id="kinoml.features.core.BaseFeaturizer._pre_featurize">
+<code class="sig-name descname">_pre_featurize</code><span class="sig-paren">(</span><em class="sig-param">self, systems: Iterable[System]</em><span class="sig-paren">)</span> → None<a class="headerlink" href="#kinoml.features.core.BaseFeaturizer._pre_featurize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run before featurizing all systems. Redefine this method if needed.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>system</strong> (<a class="reference internal" href="../../core/systems/index.html#kinoml.core.systems.System" title="kinoml.core.systems.System"><em>System</em></a>) – The System to be featurized. Sometimes it will</p>
+<dd class="field-odd"><p><strong>systems</strong> (<em>list of System</em>) – This is the collection of System objects that will be transformed.</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="method">
+<dt id="kinoml.features.core.BaseFeaturizer._featurize">
+<code class="sig-name descname">_featurize</code><span class="sig-paren">(</span><em class="sig-param">self, systems: Iterable[System]</em><span class="sig-paren">)</span> → Iterable[object]<a class="headerlink" href="#kinoml.features.core.BaseFeaturizer._featurize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Featurize all system objects in a serial fashion as defined in <code class="docutils literal notranslate"><span class="pre">._featurize_one()</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>systems</strong> (<em>list of System</em>) – This is the collection of System objects that will be transformed.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>features</strong></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list of System or array-like</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="method">
+<dt id="kinoml.features.core.BaseFeaturizer._featurize_one">
+<em class="property">abstract </em><code class="sig-name descname">_featurize_one</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">system: System</em><span class="sig-paren">)</span> → object<a class="headerlink" href="#kinoml.features.core.BaseFeaturizer._featurize_one" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implement this method to do the actual leg-work for <cite>self.featurize()</cite>.
+It takes a single System object and returns either a new System object
+or an array-like object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>system</strong> (<a class="reference internal" href="../../core/systems/index.html#kinoml.core.systems.System" title="kinoml.core.systems.System"><em>System</em></a>) – The System to be featurized.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="../../core/systems/index.html#kinoml.core.systems.System" title="kinoml.core.systems.System">System</a> or array-like</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="method">
+<dt id="kinoml.features.core.BaseFeaturizer._post_featurize">
+<code class="sig-name descname">_post_featurize</code><span class="sig-paren">(</span><em class="sig-param">self, systems: Iterable[System], features: Iterable[System | np.array], keep: bool = True</em><span class="sig-paren">)</span> → Iterable[System]<a class="headerlink" href="#kinoml.features.core.BaseFeaturizer._post_featurize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run after featurizing all systems. You shouldn’t need to redefine this method</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>systems</strong> (<em>list of System</em>) – The systems being featurized</p></li>
+<li><p><strong>features</strong> (<em>list of System</em><em> or </em><em>array</em>) – The features returned by <code class="docutils literal notranslate"><span class="pre">self._featurize</span></code></p></li>
+<li><p><strong>keep</strong> (<em>bool</em><em>, </em><em>optional=True</em>) – Whether to store the current featurizer in the <code class="docutils literal notranslate"><span class="pre">system.featurizations</span></code>
+dictionary with its own key (<code class="docutils literal notranslate"><span class="pre">self.name</span></code>), in addition to <code class="docutils literal notranslate"><span class="pre">last</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The same systems as passed, but with <code class="docutils literal notranslate"><span class="pre">.featurizations</span></code> extended with
+the calculated features in two entries: the featurizer name and <code class="docutils literal notranslate"><span class="pre">last</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>systems</p>
 </dd>
 </dl>
 </dd></dl>
@@ -471,15 +572,18 @@ or an array-like object) undera key named after <code class="docutils literal no
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>systems</strong> – systems to be checked (by type, contained attributes, etc)</p></li>
-<li><p><strong>raise_errors</strong> – if True, raise <cite>ValueError</cite>.</p></li>
+<li><p><strong>systems</strong> (<em>list of System</em>) – Systems to be checked (by type, contained attributes, etc)</p></li>
+<li><p><strong>raise_errors</strong> (<em>bool</em><em>, </em><em>optional=True</em>) – if True, raise <cite>ValueError</cite> if errors were found</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>True if all systems are compatible, False otherwise</p>
 </dd>
-<dt class="field-odd">Raises</dt>
-<dd class="field-odd"><p><strong>ValueError if ._supports</strong><strong>(</strong><strong>) </strong><strong>fails and raise_errors is True.</strong> – </p>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>ValueError if ._supports</strong><strong>(</strong><strong>) </strong><strong>fails and raise_errors is True.</strong> – </p>
 </dd>
 </dl>
 </dd></dl>
@@ -491,10 +595,13 @@ a single system and the current featurizer.</p>
 <p>This is the method you should reimplement in your subclass.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>system</strong> – the system that will be checked</p>
+<dd class="field-odd"><p><strong>system</strong> (<a class="reference internal" href="../../core/systems/index.html#kinoml.core.systems.System" title="kinoml.core.systems.System"><em>System</em></a>) – The system that will be checked</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>True if compatible, False otherwise</p>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>True if compatible, False otherwise</p>
 </dd>
 </dl>
 </dd></dl>
@@ -509,25 +616,94 @@ a single system and the current featurizer.</p>
 </dd></dl>
 </dd></dl>
 <dl class="class">
+<dt id="kinoml.features.core.ParallelBaseFeaturizer">
+<em class="property">class </em><code class="sig-prename descclassname">kinoml.features.core.</code><code class="sig-name descname">ParallelBaseFeaturizer</code><span class="sig-paren">(</span><em class="sig-param">use_multiprocessing: bool = True</em>, <em class="sig-param">n_processes: Union[int</em>, <em class="sig-param">None] = None</em>, <em class="sig-param">chunksize: Union[int</em>, <em class="sig-param">None] = None</em>, <em class="sig-param">dask_client=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.core.ParallelBaseFeaturizer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#kinoml.features.core.BaseFeaturizer" title="kinoml.features.core.BaseFeaturizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.features.core.BaseFeaturizer</span></code></a></p>
+<p>Abstract Featurizer class with support for multiprocessing.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>use_multiprocessing</strong> (<em>bool</em><em>, </em><em>default=True</em>) – If multiprocessing to use.</p></li>
+<li><p><strong>n_processes</strong> (<em>int</em><em> or </em><em>None</em><em>, </em><em>default=None</em>) – How many processes to use in case of multiprocessing.
+Defaults to number of available CPUs.</p></li>
+<li><p><strong>chunksize</strong> (<em>int</em><em>, </em><em>optional=None</em>) – See <a class="reference external" href="https://stackoverflow.com/a/54032744/3407590">https://stackoverflow.com/a/54032744/3407590</a>.</p></li>
+<li><p><strong>dask_client</strong> (<em>dask.distributed.Client</em><em> or </em><em>None</em><em>, </em><em>default=None</em>) – A dask client to manage multiprocessing. Will ignore <cite>use_multiprocessing</cite>
+<cite>chunksize</cite> and <cite>n_processes</cite> attributes.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="attribute">
+<dt id="kinoml.features.core.ParallelBaseFeaturizer._SUPPORTED_TYPES">
+<code class="sig-name descname">_SUPPORTED_TYPES</code><a class="headerlink" href="#kinoml.features.core.ParallelBaseFeaturizer._SUPPORTED_TYPES" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="method">
+<dt id="kinoml.features.core.ParallelBaseFeaturizer.__getstate__">
+<code class="sig-name descname">__getstate__</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.core.ParallelBaseFeaturizer.__getstate__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Only preserve object fields that are serializable</p>
+</dd></dl>
+<dl class="method">
+<dt id="kinoml.features.core.ParallelBaseFeaturizer.__setstate__">
+<code class="sig-name descname">__setstate__</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">state</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.core.ParallelBaseFeaturizer.__setstate__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Only preserve object fields that are serializable.</p>
+</dd></dl>
+<dl class="method">
+<dt id="kinoml.features.core.ParallelBaseFeaturizer._featurize">
+<code class="sig-name descname">_featurize</code><span class="sig-paren">(</span><em class="sig-param">self, systems: Iterable[System]</em><span class="sig-paren">)</span> → Iterable[object]<a class="headerlink" href="#kinoml.features.core.ParallelBaseFeaturizer._featurize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Featurize all system objects in a parallel fashion as defined in <code class="docutils literal notranslate"><span class="pre">._featurize_one()</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>systems</strong> (<em>list of System</em>) – This is the collection of System objects that will be transformed.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>features</strong></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list of System or array-like</p>
+</dd>
+</dl>
+</dd></dl>
+</dd></dl>
+<dl class="class">
 <dt id="kinoml.features.core.Pipeline">
-<em class="property">class </em><code class="sig-prename descclassname">kinoml.features.core.</code><code class="sig-name descname">Pipeline</code><span class="sig-paren">(</span><em class="sig-param">featurizers: Iterable[BaseFeaturizer]</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.core.Pipeline" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">kinoml.features.core.</code><code class="sig-name descname">Pipeline</code><span class="sig-paren">(</span><em class="sig-param">featurizers: Iterable[BaseFeaturizer], shortname=None, **kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.core.Pipeline" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#kinoml.features.core.BaseFeaturizer" title="kinoml.features.core.BaseFeaturizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.features.core.BaseFeaturizer</span></code></a></p>
 <p>Given a list of featurizers, apply them sequentially
 on the systems (e.g. featurizer A returns X, and X is
 taken by featurizer B, which returns Y).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>featurizers</strong> (<em>list of BaseFeaturizer</em>) – Featurizers to stack. They must be compatible with
+<dd class="field-odd"><p><strong>featurizers</strong> (<em>iterable of BaseFeaturizer</em>) – Featurizers to stack. They must be compatible with
 each other!</p>
 </dd>
 </dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>While <code class="docutils literal notranslate"><span class="pre">Pipeline</span></code> is a subclass of <code class="docutils literal notranslate"><span class="pre">BaseFeaturizer</span></code>,
+it should be considered a special case of such. It indeed
+shares the same API but the implementation details of
+<code class="docutils literal notranslate"><span class="pre">._featurize()</span></code> are slightly different. It acts as a
+wrapper around individual <code class="docutils literal notranslate"><span class="pre">Featurizer</span></code> objects.</p>
+</div>
 <dl class="method">
 <dt id="kinoml.features.core.Pipeline._featurize">
-<code class="sig-name descname">_featurize</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">system_or_array</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.core.Pipeline._featurize" title="Permalink to this definition">¶</a></dt>
-<dd><p>Implement this method to do the actual work for <cite>self.featurize()</cite>.</p>
+<code class="sig-name descname">_featurize</code><span class="sig-paren">(</span><em class="sig-param">self, systems: Iterable[System], keep: bool = True</em><span class="sig-paren">)</span> → Iterable[object]<a class="headerlink" href="#kinoml.features.core.Pipeline._featurize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a list of featurizers, apply them sequentially
+on the systems (e.g. featurizer A returns X, and X is
+taken by featurizer B, which returns Y) and store the
+features in the systems.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>system</strong> (<a class="reference internal" href="../../core/systems/index.html#kinoml.core.systems.System" title="kinoml.core.systems.System"><em>System</em></a>) – The System to be featurized. Sometimes it will</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>systems</strong> (<em>list of System</em>) – This is the collection of System objects that will be transformed</p></li>
+<li><p><strong>keep</strong> (<em>bool</em><em>, </em><em>optional=True</em>) – Whether to store the current featurizer in the <code class="docutils literal notranslate"><span class="pre">system.featurizations</span></code>
+dictionary with its own key (<code class="docutils literal notranslate"><span class="pre">self.name</span></code>), in addition to <code class="docutils literal notranslate"><span class="pre">last</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>features</strong></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list of System or array-like</p>
 </dd>
 </dl>
 </dd></dl>
@@ -557,50 +733,131 @@ each other!</p>
 <dt id="kinoml.features.core.Pipeline.name">
 <em class="property">property </em><code class="sig-name descname">name</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.core.Pipeline.name" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+<dl class="method">
+<dt id="kinoml.features.core.Pipeline.shortname">
+<em class="property">property </em><code class="sig-name descname">shortname</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.core.Pipeline.shortname" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 </dd></dl>
 <dl class="class">
 <dt id="kinoml.features.core.Concatenated">
-<em class="property">class </em><code class="sig-prename descclassname">kinoml.features.core.</code><code class="sig-name descname">Concatenated</code><span class="sig-paren">(</span><em class="sig-param">featurizers: Iterable[BaseFeaturizer], axis=0</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.core.Concatenated" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">kinoml.features.core.</code><code class="sig-name descname">Concatenated</code><span class="sig-paren">(</span><em class="sig-param">featurizers: Iterable[BaseFeaturizer], axis: int = 1, **kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.core.Concatenated" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#kinoml.features.core.Pipeline" title="kinoml.features.core.Pipeline"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.features.core.Pipeline</span></code></a></p>
-<p>Given a list of featurizers, apply them sequentially and concatenate
+<p>Given a list of featurizers, apply them serially and concatenate
 the result (e.g. featurizer A returns X, and featurizer B returns Y;
 the output is XY).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>featurizers</strong> (<em>list of BaseFeaturizer</em>) – These should take a System or array, but return only arrays
-so the can be concatenated.</p></li>
-<li><p><strong>axis</strong> (<em>int</em><em>, </em><em>optional=0</em>) – On which axis to concatenate</p></li>
+so they can be concatenated. Note that the arrays must
+have the same number of dimensions. If that is not the case,
+you will need to reshape one of them using <code class="docutils literal notranslate"><span class="pre">CallableFeaturizer</span></code>
+and a lambda function that relies on <code class="docutils literal notranslate"><span class="pre">np.reshape</span></code> or similar.</p></li>
+<li><p><strong>axis</strong> (<em>int</em><em>, </em><em>optional=1</em>) – On which axis to concatenate. By default, it will concatenate
+on axis <code class="docutils literal notranslate"><span class="pre">1</span></code>, which means that the features in each pipeline
+will be concatenated.</p></li>
 </ul>
 </dd>
 </dl>
+<div class="admonition-notes admonition">
+<p class="admonition-title">Notes</p>
+<p>This Featurizer maybe removed in the future, since it can be replaced
+by <cite>TupleOfArrays</cite>.</p>
+</div>
 <dl class="method">
 <dt id="kinoml.features.core.Concatenated._featurize">
-<code class="sig-name descname">_featurize</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">system_or_array</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.core.Concatenated._featurize" title="Permalink to this definition">¶</a></dt>
-<dd><p>Implement this method to do the actual work for <cite>self.featurize()</cite>.</p>
+<code class="sig-name descname">_featurize</code><span class="sig-paren">(</span><em class="sig-param">self, systems: Iterable[System], keep=True</em><span class="sig-paren">)</span> → np.ndarray<a class="headerlink" href="#kinoml.features.core.Concatenated._featurize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a list of featurizers, apply them serially and concatenate
+the result (e.g. featurizer A returns X, and featurizer B returns Y;
+the output is XY).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>system</strong> (<a class="reference internal" href="../../core/systems/index.html#kinoml.core.systems.System" title="kinoml.core.systems.System"><em>System</em></a>) – The System to be featurized. Sometimes it will</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>systems</strong> (<em>list of System</em><em> or </em><em>array-like</em>) – The Systems (or arrays) to be featurized.</p></li>
+<li><p><strong>keep</strong> (<em>bool</em><em>, </em><em>optional=True</em>) – Whether to store the current featurizer in the <code class="docutils literal notranslate"><span class="pre">system.featurizations</span></code>
+dictionary with its own key (<code class="docutils literal notranslate"><span class="pre">self.name</span></code>), in addition to <code class="docutils literal notranslate"><span class="pre">last</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Concatenated arrays along specified <code class="docutils literal notranslate"><span class="pre">axis</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+</dd></dl>
+<dl class="class">
+<dt id="kinoml.features.core.TupleOfArrays">
+<em class="property">class </em><code class="sig-prename descclassname">kinoml.features.core.</code><code class="sig-name descname">TupleOfArrays</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.core.TupleOfArrays" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#kinoml.features.core.Pipeline" title="kinoml.features.core.Pipeline"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.features.core.Pipeline</span></code></a></p>
+<p>Given a list of featurizers, apply them serially and return
+the result directly as a flattened tuple of the arrays, for
+each system. E.g; given one system, featurizer A returns X,
+and featurizer B returns Y, Z; the output is a tuple of X, Y, Z).</p>
+<p>The final result will be tuple of tuples.</p>
+<dl class="method">
+<dt id="kinoml.features.core.TupleOfArrays._featurize">
+<code class="sig-name descname">_featurize</code><span class="sig-paren">(</span><em class="sig-param">self, systems: Iterable[System], keep: bool = True</em><span class="sig-paren">)</span> → np.ndarray<a class="headerlink" href="#kinoml.features.core.TupleOfArrays._featurize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a list of featurizers, apply them serially and build a
+flat tuple out of the results.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>systems</strong> (<em>list of System</em><em> or </em><em>array-like</em>) – The Systems (or arrays) to be featurized.</p></li>
+<li><p><strong>keep</strong> (<em>bool</em><em>, </em><em>optional=True</em>) – Whether to store the current featurizer in the <code class="docutils literal notranslate"><span class="pre">system.featurizations</span></code>
+dictionary with its own key (<code class="docutils literal notranslate"><span class="pre">self.name</span></code>), in addition to <code class="docutils literal notranslate"><span class="pre">last</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>If the last featurizer is returning a single array,
+the shape of the object will be (N_systems,). If
+the last featurizer returns more than one array,
+it will be (N_systems, M_returned_objects).</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>tuple of (of tuples) arraylike</p>
 </dd>
 </dl>
 </dd></dl>
 </dd></dl>
 <dl class="class">
 <dt id="kinoml.features.core.BaseOneHotEncodingFeaturizer">
-<em class="property">class </em><code class="sig-prename descclassname">kinoml.features.core.</code><code class="sig-name descname">BaseOneHotEncodingFeaturizer</code><span class="sig-paren">(</span><em class="sig-param">dictionary: dict = None</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.core.BaseOneHotEncodingFeaturizer" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#kinoml.features.core.BaseFeaturizer" title="kinoml.features.core.BaseFeaturizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.features.core.BaseFeaturizer</span></code></a></p>
-<p>Abstract Featurizer class</p>
+<em class="property">class </em><code class="sig-prename descclassname">kinoml.features.core.</code><code class="sig-name descname">BaseOneHotEncodingFeaturizer</code><span class="sig-paren">(</span><em class="sig-param">dictionary: dict = None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.core.BaseOneHotEncodingFeaturizer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#kinoml.features.core.ParallelBaseFeaturizer" title="kinoml.features.core.ParallelBaseFeaturizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.features.core.ParallelBaseFeaturizer</span></code></a></p>
+<p>Abstract Featurizer class with support for multiprocessing.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>use_multiprocessing</strong> (<em>bool</em><em>, </em><em>default=True</em>) – If multiprocessing to use.</p></li>
+<li><p><strong>n_processes</strong> (<em>int</em><em> or </em><em>None</em><em>, </em><em>default=None</em>) – How many processes to use in case of multiprocessing.
+Defaults to number of available CPUs.</p></li>
+<li><p><strong>chunksize</strong> (<em>int</em><em>, </em><em>optional=None</em>) – See <a class="reference external" href="https://stackoverflow.com/a/54032744/3407590">https://stackoverflow.com/a/54032744/3407590</a>.</p></li>
+<li><p><strong>dask_client</strong> (<em>dask.distributed.Client</em><em> or </em><em>None</em><em>, </em><em>default=None</em>) – A dask client to manage multiprocessing. Will ignore <cite>use_multiprocessing</cite>
+<cite>chunksize</cite> and <cite>n_processes</cite> attributes.</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="attribute">
 <dt id="kinoml.features.core.BaseOneHotEncodingFeaturizer.ALPHABET">
 <code class="sig-name descname">ALPHABET</code><a class="headerlink" href="#kinoml.features.core.BaseOneHotEncodingFeaturizer.ALPHABET" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 <dl class="method">
-<dt id="kinoml.features.core.BaseOneHotEncodingFeaturizer._featurize">
-<code class="sig-name descname">_featurize</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">system: System</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.core.BaseOneHotEncodingFeaturizer._featurize" title="Permalink to this definition">¶</a></dt>
-<dd><p>Implement this method to do the actual work for <cite>self.featurize()</cite>.</p>
+<dt id="kinoml.features.core.BaseOneHotEncodingFeaturizer._featurize_one">
+<code class="sig-name descname">_featurize_one</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">system: System</em><span class="sig-paren">)</span> → np.ndarray<a class="headerlink" href="#kinoml.features.core.BaseOneHotEncodingFeaturizer._featurize_one" title="Permalink to this definition">¶</a></dt>
+<dd><p>One hot encode one system.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>system</strong> (<a class="reference internal" href="../../core/systems/index.html#kinoml.core.systems.System" title="kinoml.core.systems.System"><em>System</em></a>) – The System to be featurized. Sometimes it will</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>system</strong> (<a class="reference internal" href="../../core/systems/index.html#kinoml.core.systems.System" title="kinoml.core.systems.System"><em>System</em></a>) – The System to be featurized.</p></li>
+<li><p><strong>options</strong> (<em>dict</em>) – Unused</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>array</p>
 </dd>
 </dl>
 </dd></dl>
@@ -611,13 +868,14 @@ so the can be concatenated.</p></li>
 </dd></dl>
 <dl class="method">
 <dt id="kinoml.features.core.BaseOneHotEncodingFeaturizer.one_hot_encode">
-<em class="property">static </em><code class="sig-name descname">one_hot_encode</code><span class="sig-paren">(</span><em class="sig-param">sequence: str</em>, <em class="sig-param">dictionary: dict</em><span class="sig-paren">)</span> → np.ndarray<a class="headerlink" href="#kinoml.features.core.BaseOneHotEncodingFeaturizer.one_hot_encode" title="Permalink to this definition">¶</a></dt>
-<dd><p>One-hot encode a sequence of characters, given a dictionary</p>
+<em class="property">static </em><code class="sig-name descname">one_hot_encode</code><span class="sig-paren">(</span><em class="sig-param">sequence: Iterable</em>, <em class="sig-param">dictionary: dict | Sequence</em><span class="sig-paren">)</span> → np.ndarray<a class="headerlink" href="#kinoml.features.core.BaseOneHotEncodingFeaturizer.one_hot_encode" title="Permalink to this definition">¶</a></dt>
+<dd><p>One-hot encode a sequence of characters, given a dictionary.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>sequence</strong> (<em>str</em>) – </p></li>
-<li><p><strong>dictionary</strong> (<em>dict</em>) – Mapping of each character to their position in the alphabet</p></li>
+<li><p><strong>sequence</strong> (<em>Iterable</em>) – </p></li>
+<li><p><strong>dictionary</strong> (<em>dict</em><em> or </em><em>sequuence-like</em>) – Mapping of each character to their position in the alphabet. If
+a sequence-like is given, it will be enumerated into a dict.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -631,98 +889,201 @@ so the can be concatenated.</p></li>
 </dd></dl>
 <dl class="class">
 <dt id="kinoml.features.core.PadFeaturizer">
-<em class="property">class </em><code class="sig-prename descclassname">kinoml.features.core.</code><code class="sig-name descname">PadFeaturizer</code><span class="sig-paren">(</span><em class="sig-param">shape: Iterable[int], key: Hashable = 'last', pad_with: int = 0</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.core.PadFeaturizer" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#kinoml.features.core.BaseFeaturizer" title="kinoml.features.core.BaseFeaturizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.features.core.BaseFeaturizer</span></code></a></p>
+<em class="property">class </em><code class="sig-prename descclassname">kinoml.features.core.</code><code class="sig-name descname">PadFeaturizer</code><span class="sig-paren">(</span><em class="sig-param">shape: Iterable[int] = 'auto'</em>, <em class="sig-param">key: Hashable = 'last'</em>, <em class="sig-param">pad_with: int = 0</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.core.PadFeaturizer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#kinoml.features.core.ParallelBaseFeaturizer" title="kinoml.features.core.ParallelBaseFeaturizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.features.core.ParallelBaseFeaturizer</span></code></a></p>
 <p>Pads features of a given system to a desired size or length.</p>
-<p>This class wraps <code class="docutils literal notranslate"><span class="pre">numpy.pad</span></code> with <cite>mode=constant</cite>, auto-calculating
+<p>This class wraps <code class="docutils literal notranslate"><span class="pre">numpy.pad</span></code> with <code class="docutils literal notranslate"><span class="pre">mode=constant</span></code>, auto-calculating
 the needed additions to match the requested shape.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>shape</strong> (<em>tuple of int</em>) – The desired size of the transformed features</p></li>
+<li><p><strong>shape</strong> (<em>tuple of int</em><em>, or </em><em>"auto"</em>) – The desired size of the transformed features. If “auto”, shape
+will be estimated from the Dataset passed at runtime so it matches
+the largest observed.</p></li>
 <li><p><strong>key</strong> (<em>hashable</em>) – element to retrieve from <code class="docutils literal notranslate"><span class="pre">System.featurizations</span></code></p></li>
 <li><p><strong>pad_with</strong> (<em>int</em>) – value to fill the array-like features with</p></li>
 </ul>
 </dd>
 </dl>
 <dl class="method">
-<dt id="kinoml.features.core.PadFeaturizer._featurize">
-<code class="sig-name descname">_featurize</code><span class="sig-paren">(</span><em class="sig-param">self, system_or_array: Union[System, np.ndarray]</em><span class="sig-paren">)</span> → np.ndarray<a class="headerlink" href="#kinoml.features.core.PadFeaturizer._featurize" title="Permalink to this definition">¶</a></dt>
-<dd><p>Implement this method to do the actual work for <cite>self.featurize()</cite>.</p>
+<dt id="kinoml.features.core.PadFeaturizer._get_array">
+<code class="sig-name descname">_get_array</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">system_or_array: System | np.ndarray</em><span class="sig-paren">)</span> → np.ndarray<a class="headerlink" href="#kinoml.features.core.PadFeaturizer._get_array" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="method">
+<dt id="kinoml.features.core.PadFeaturizer._pre_featurize">
+<code class="sig-name descname">_pre_featurize</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">systems</em><span class="sig-paren">)</span> → None<a class="headerlink" href="#kinoml.features.core.PadFeaturizer._pre_featurize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the largest shape in the input arrays and store in shape attribute.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>system</strong> (<a class="reference internal" href="../../core/systems/index.html#kinoml.core.systems.System" title="kinoml.core.systems.System"><em>System</em></a>) – The System to be featurized. Sometimes it will</p>
+<dd class="field-odd"><p><strong>systems</strong> (<em>list of System</em>) – </p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="method">
+<dt id="kinoml.features.core.PadFeaturizer._featurize_one">
+<code class="sig-name descname">_featurize_one</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">system: System</em><span class="sig-paren">)</span> → np.ndarray<a class="headerlink" href="#kinoml.features.core.PadFeaturizer._featurize_one" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>system</strong> (<a class="reference internal" href="../../core/systems/index.html#kinoml.core.systems.System" title="kinoml.core.systems.System"><em>System</em></a><em> or </em><em>array-like</em>) – The System (or array) to be featurized.</p></li>
+<li><p><strong>options</strong> (<em>dict</em>) – Must contain a key <code class="docutils literal notranslate"><span class="pre">shape</span></code> with the expected final shape
+of the systems.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>array</p>
 </dd>
 </dl>
 </dd></dl>
 </dd></dl>
 <dl class="class">
 <dt id="kinoml.features.core.HashFeaturizer">
-<em class="property">class </em><code class="sig-prename descclassname">kinoml.features.core.</code><code class="sig-name descname">HashFeaturizer</code><span class="sig-paren">(</span><em class="sig-param">attributes</em>, <em class="sig-param">normalize=True</em>, <em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.core.HashFeaturizer" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">kinoml.features.core.</code><code class="sig-name descname">HashFeaturizer</code><span class="sig-paren">(</span><em class="sig-param">getter: Callable[[System], str] = None, normalize=True, **kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.core.HashFeaturizer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#kinoml.features.core.BaseFeaturizer" title="kinoml.features.core.BaseFeaturizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.features.core.BaseFeaturizer</span></code></a></p>
 <p>Hash an attribute of the protein, such as the name or id.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>attribute</strong> (<em>str</em><em> or </em><em>tuple</em>) – Attribute(s) in the target object that will be hashed</p></li>
+<li><p><strong>getter</strong> (<em>callable</em><em>, </em><em>optional</em>) – A function or lambda that takes a System and returns
+a string to be hashed. Default value will return
+whatever <code class="docutils literal notranslate"><span class="pre">system.featurizations["last"]</span></code> contains,
+as a string</p></li>
 <li><p><strong>normalize</strong> (<em>bool</em><em>, </em><em>default=True</em>) – Normalizes the hash to obtain a value in the unit interval</p></li>
 </ul>
 </dd>
 </dl>
 <dl class="method">
-<dt id="kinoml.features.core.HashFeaturizer._featurize">
-<code class="sig-name descname">_featurize</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">system</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.core.HashFeaturizer._featurize" title="Permalink to this definition">¶</a></dt>
+<dt id="kinoml.features.core.HashFeaturizer._getter">
+<em class="property">static </em><code class="sig-name descname">_getter</code><span class="sig-paren">(</span><em class="sig-param">system</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.core.HashFeaturizer._getter" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="method">
+<dt id="kinoml.features.core.HashFeaturizer._featurize_one">
+<code class="sig-name descname">_featurize_one</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">system: System</em><span class="sig-paren">)</span> → np.ndarray<a class="headerlink" href="#kinoml.features.core.HashFeaturizer._featurize_one" title="Permalink to this definition">¶</a></dt>
 <dd><p>Featurizes a component using the hash of the chosen attribute.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>Sha256’d attribute</p>
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>system</strong> (<a class="reference internal" href="../../core/systems/index.html#kinoml.core.systems.System" title="kinoml.core.systems.System"><em>System</em></a>) – The System to be featurized.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Sha256’d attribute</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>array</p>
 </dd>
 </dl>
 </dd></dl>
 </dd></dl>
 <dl class="class">
 <dt id="kinoml.features.core.NullFeaturizer">
-<em class="property">class </em><code class="sig-prename descclassname">kinoml.features.core.</code><code class="sig-name descname">NullFeaturizer</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.core.NullFeaturizer" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#kinoml.features.core.BaseFeaturizer" title="kinoml.features.core.BaseFeaturizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.features.core.BaseFeaturizer</span></code></a></p>
-<p>Abstract Featurizer class</p>
-<dl class="method">
-<dt id="kinoml.features.core.NullFeaturizer.featurize">
-<code class="sig-name descname">featurize</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">system</em>, <em class="sig-param">inplace: bool = True</em><span class="sig-paren">)</span> → object<a class="headerlink" href="#kinoml.features.core.NullFeaturizer.featurize" title="Permalink to this definition">¶</a></dt>
-<dd><p>Given an system (compatible with <code class="docutils literal notranslate"><span class="pre">_SUPPORTED_TYPES</span></code>), apply
-the featurization scheme implemented in this class.</p>
+<em class="property">class </em><code class="sig-prename descclassname">kinoml.features.core.</code><code class="sig-name descname">NullFeaturizer</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.core.NullFeaturizer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#kinoml.features.core.ParallelBaseFeaturizer" title="kinoml.features.core.ParallelBaseFeaturizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.features.core.ParallelBaseFeaturizer</span></code></a></p>
+<p>Abstract Featurizer class with support for multiprocessing.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>system</strong> (<a class="reference internal" href="../../core/systems/index.html#kinoml.core.systems.System" title="kinoml.core.systems.System"><em>System</em></a>) – This is System object that will be transformed</p></li>
-<li><p><strong>inplace</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to modify the System directly or operate on a copy.</p></li>
+<li><p><strong>use_multiprocessing</strong> (<em>bool</em><em>, </em><em>default=True</em>) – If multiprocessing to use.</p></li>
+<li><p><strong>n_processes</strong> (<em>int</em><em> or </em><em>None</em><em>, </em><em>default=None</em>) – How many processes to use in case of multiprocessing.
+Defaults to number of available CPUs.</p></li>
+<li><p><strong>chunksize</strong> (<em>int</em><em>, </em><em>optional=None</em>) – See <a class="reference external" href="https://stackoverflow.com/a/54032744/3407590">https://stackoverflow.com/a/54032744/3407590</a>.</p></li>
+<li><p><strong>dask_client</strong> (<em>dask.distributed.Client</em><em> or </em><em>None</em><em>, </em><em>default=None</em>) – A dask client to manage multiprocessing. Will ignore <cite>use_multiprocessing</cite>
+<cite>chunksize</cite> and <cite>n_processes</cite> attributes.</p></li>
 </ul>
 </dd>
+</dl>
+<dl class="method">
+<dt id="kinoml.features.core.NullFeaturizer._featurize">
+<code class="sig-name descname">_featurize</code><span class="sig-paren">(</span><em class="sig-param">self, systems: Iterable[System], keep: bool = None</em><span class="sig-paren">)</span> → object<a class="headerlink" href="#kinoml.features.core.NullFeaturizer._featurize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Featurize all system objects in a parallel fashion as defined in <code class="docutils literal notranslate"><span class="pre">._featurize_one()</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>systems</strong> (<em>list of System</em>) – This is the collection of System objects that will be transformed.</p>
+</dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><strong>system</strong> – The same system that was passed in, unless <code class="docutils literal notranslate"><span class="pre">inplace</span></code> is False.
-The returned System will have an extra entry in the <code class="docutils literal notranslate"><span class="pre">.featurizations</span></code>
-dictionary, containing the featurized object (either a new System
-or an array-like object) undera key named after <code class="docutils literal notranslate"><span class="pre">.name</span></code>.</p>
+<dd class="field-even"><p><strong>features</strong></p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference internal" href="../../core/systems/index.html#kinoml.core.systems.System" title="kinoml.core.systems.System">System</a></p>
+<dd class="field-odd"><p>list of System or array-like</p>
 </dd>
 </dl>
 </dd></dl>
 </dd></dl>
 <dl class="class">
-<dt id="kinoml.features.core.ScaleFeaturizer">
-<em class="property">class </em><code class="sig-prename descclassname">kinoml.features.core.</code><code class="sig-name descname">ScaleFeaturizer</code><span class="sig-paren">(</span><em class="sig-param">key: Hashable = 'last'</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.core.ScaleFeaturizer" title="Permalink to this definition">¶</a></dt>
+<dt id="kinoml.features.core.CallableFeaturizer">
+<em class="property">class </em><code class="sig-prename descclassname">kinoml.features.core.</code><code class="sig-name descname">CallableFeaturizer</code><span class="sig-paren">(</span><em class="sig-param">func: Callable[[System], System | np.array] | str = None, **kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.core.CallableFeaturizer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#kinoml.features.core.BaseFeaturizer" title="kinoml.features.core.BaseFeaturizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.features.core.BaseFeaturizer</span></code></a></p>
-<p>WIP</p>
-<dl class="method">
-<dt id="kinoml.features.core.ScaleFeaturizer._featurize">
-<code class="sig-name descname">_featurize</code><span class="sig-paren">(</span><em class="sig-param">self, system_or_array: Union[System, np.ndarray]</em><span class="sig-paren">)</span> → np.ndarray<a class="headerlink" href="#kinoml.features.core.ScaleFeaturizer._featurize" title="Permalink to this definition">¶</a></dt>
-<dd><p>Implement this method to do the actual work for <cite>self.featurize()</cite>.</p>
+<p>Apply an arbitrary callable to a System.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>system</strong> (<a class="reference internal" href="../../core/systems/index.html#kinoml.core.systems.System" title="kinoml.core.systems.System"><em>System</em></a>) – The System to be featurized. Sometimes it will</p>
+<dd class="field-odd"><p><strong>func</strong> (<em>callable</em><em> or </em><em>str</em><em> or </em><em>None</em>) – Must take a System and return a System or array. If
+<code class="docutils literal notranslate"><span class="pre">str</span></code> it will be <code class="docutils literal notranslate"><span class="pre">eval</span></code>’d into a callable. If None,
+the default callable will return <code class="docutils literal notranslate"><span class="pre">system.featurizations["last"]</span></code>
+for each system.</p>
 </dd>
 </dl>
+<dl class="method">
+<dt id="kinoml.features.core.CallableFeaturizer._default_func">
+<em class="property">static </em><code class="sig-name descname">_default_func</code><span class="sig-paren">(</span><em class="sig-param">system</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.core.CallableFeaturizer._default_func" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="method">
+<dt id="kinoml.features.core.CallableFeaturizer._featurize_one">
+<code class="sig-name descname">_featurize_one</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">system: System | np.ndarray</em><span class="sig-paren">)</span> → np.ndarray<a class="headerlink" href="#kinoml.features.core.CallableFeaturizer._featurize_one" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>system</strong> (<a class="reference internal" href="../../core/systems/index.html#kinoml.core.systems.System" title="kinoml.core.systems.System"><em>System</em></a><em> or </em><em>array-like</em>) – The System (or array) to be featurized.</p></li>
+<li><p><strong>options</strong> (<em>dict</em>) – Unused</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>array-like</p>
+</dd>
+</dl>
+</dd></dl>
+</dd></dl>
+<dl class="class">
+<dt id="kinoml.features.core.ClearFeaturizations">
+<em class="property">class </em><code class="sig-prename descclassname">kinoml.features.core.</code><code class="sig-name descname">ClearFeaturizations</code><span class="sig-paren">(</span><em class="sig-param">keys=('last'</em>, <em class="sig-param">)</em>, <em class="sig-param">style='keep'</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.core.ClearFeaturizations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#kinoml.features.core.BaseFeaturizer" title="kinoml.features.core.BaseFeaturizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.features.core.BaseFeaturizer</span></code></a></p>
+<p>Remove keys from the <code class="docutils literal notranslate"><span class="pre">.featurizations</span></code> dictionary in each
+<code class="docutils literal notranslate"><span class="pre">System</span></code> object. By default, it will remove all keys
+that are not <code class="docutils literal notranslate"><span class="pre">last</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>keys</strong> (<em>tuple of str</em><em>, </em><em>optional=</em><em>(</em><em>"last"</em><em>,</em><em>)</em>) – Which keys to keep or remove, depending on <code class="docutils literal notranslate"><span class="pre">style</span></code>.</p></li>
+<li><p><strong>style</strong> (<em>str</em><em>, </em><em>optional="keep"</em>) – Whether to <code class="docutils literal notranslate"><span class="pre">keep</span></code> or <code class="docutils literal notranslate"><span class="pre">remove</span></code> the entries passed as <code class="docutils literal notranslate"><span class="pre">keys</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="kinoml.features.core.ClearFeaturizations._featurize_one">
+<code class="sig-name descname">_featurize_one</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">system: System</em><span class="sig-paren">)</span> → System<a class="headerlink" href="#kinoml.features.core.ClearFeaturizations._featurize_one" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implement this method to do the actual leg-work for <cite>self.featurize()</cite>.
+It takes a single System object and returns either a new System object
+or an array-like object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>system</strong> (<a class="reference internal" href="../../core/systems/index.html#kinoml.core.systems.System" title="kinoml.core.systems.System"><em>System</em></a>) – The System to be featurized.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="../../core/systems/index.html#kinoml.core.systems.System" title="kinoml.core.systems.System">System</a> or array-like</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="method">
+<dt id="kinoml.features.core.ClearFeaturizations._post_featurize">
+<code class="sig-name descname">_post_featurize</code><span class="sig-paren">(</span><em class="sig-param">self, systems: Iterable[System], features: Iterable[System | np.array], keep: bool = True</em><span class="sig-paren">)</span> → Iterable[System]<a class="headerlink" href="#kinoml.features.core.ClearFeaturizations._post_featurize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bypass the automated population of the <code class="docutils literal notranslate"><span class="pre">.featurizations</span></code> dict
+in each System</p>
 </dd></dl>
 </dd></dl>
 </section>
@@ -752,12 +1113,12 @@ or an array-like object) undera key named after <code class="docutils literal no
             </a>
           
           
-            <a href="../dunbrack_cluster/index.html" title="kinoml.features.dunbrack_cluster"
+            <a href="../ligand/index.html" title="kinoml.features.ligand"
                class="md-flex md-footer-nav__link md-footer-nav__link--next"
                rel="next">
             <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title"><span
                 class="md-flex__ellipsis"> <span
-                class="md-footer-nav__direction"> Next </span> <code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.features.dunbrack_cluster</span></code> </span>
+                class="md-footer-nav__direction"> Next </span> <code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.features.ligand</span></code> </span>
             </div>
             <div class="md-flex__cell md-flex__cell--shrink"><i
                 class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>

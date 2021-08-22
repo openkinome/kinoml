@@ -68,7 +68,7 @@
     <script src="../../../../_static/copybutton.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area", "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "tex2jax_ignore|mathjax_ignore|document", "processClass": "tex2jax_process|mathjax_process|math|output_area", "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
     <link rel="shortcut icon" href="../../../../_static/custom_favicon.png"/>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
@@ -121,7 +121,7 @@
 <div class="md-search" data-md-component="search" role="dialog">
   <label class="md-search__overlay" for="__search"></label>
   <div class="md-search__inner" role="search">
-    <form class="md-search__form" action="../../../../search.html" method="GET" name="search">
+    <form class="md-search__form" action="../../../../search.html" method="get" name="search">
       <input type="text" class="md-search__input" name="q" placeholder="Search"
              autocapitalize="off" autocomplete="off" spellcheck="false"
              data-md-component="query" data-md-state="active">
@@ -329,7 +329,7 @@
         </li>
         <li class="md-nav__item"><a href="#kinoml.docking.OEDocking.pose_molecules" class="md-nav__link">pose_molecules</a>
         </li>
-        <li class="md-nav__item"><a href="#kinoml.docking.OEDocking._run_docking" class="md-nav__link">_run_docking</a>
+        <li class="md-nav__item"><a href="#kinoml.docking.OEDocking.run_docking" class="md-nav__link">run_docking</a>
         </li>
         <li class="md-nav__item"><a href="#kinoml.docking.OEDocking.hybrid_docking" class="md-nav__link">hybrid_docking</a>
         </li>
@@ -358,149 +358,163 @@
 <h2 id="module-contents">Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="kinoml.docking.OEDocking.create_hybrid_receptor">
-<code class="sig-prename descclassname">kinoml.docking.OEDocking.</code><code class="sig-name descname">create_hybrid_receptor</code><span class="sig-paren">(</span><em class="sig-param">protein: oechem.OEGraphMol</em>, <em class="sig-param">ligand: oechem.OEGraphMol</em><span class="sig-paren">)</span> → oechem.OEGraphMol<a class="headerlink" href="#kinoml.docking.OEDocking.create_hybrid_receptor" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create a receptor for hybrid docking.
-:param protein: An OpenEye molecule holding a prepared protein structure.
-:type protein: oechem.OEGraphMol
-:param ligand: An OpenEye molecule holding a prepared ligand structure.
-:type ligand: oechem.OEGraphMol</p>
+<code class="sig-prename descclassname">kinoml.docking.OEDocking.</code><code class="sig-name descname">create_hybrid_receptor</code><span class="sig-paren">(</span><em class="sig-param">protein: oechem.OEMolBase</em>, <em class="sig-param">ligand: oechem.OEMolBase</em><span class="sig-paren">)</span> → oechem.OEGraphMol<a class="headerlink" href="#kinoml.docking.OEDocking.create_hybrid_receptor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a receptor for hybrid docking.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p><strong>receptor</strong> – An OpenEye molecule holding a receptor with protein and ligand.</p>
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>protein</strong> (<em>oechem.OEMolBase</em>) – An OpenEye molecule holding a prepared protein structure.</p></li>
+<li><p><strong>ligand</strong> (<em>oechem.OEMolBase</em>) – An OpenEye molecule holding a prepared ligand structure.</p></li>
+</ul>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>oechem.OEGraphMol</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>receptor</strong> – An OpenEye molecule holding a receptor with protein and ligand.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>oechem.OEGraphMol</p>
 </dd>
 </dl>
 </dd></dl>
 <dl class="function">
 <dt id="kinoml.docking.OEDocking.create_hint_receptor">
-<code class="sig-prename descclassname">kinoml.docking.OEDocking.</code><code class="sig-name descname">create_hint_receptor</code><span class="sig-paren">(</span><em class="sig-param">protein: oechem.OEGraphMol, hintx: Union[float, int], hinty: Union[float, int], hintz: Union[float, int]</em><span class="sig-paren">)</span> → oechem.OEGraphMol<a class="headerlink" href="#kinoml.docking.OEDocking.create_hint_receptor" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create a hint receptor for docking.
-:param protein: An OpenEye molecule holding a prepared protein structure.
-:type protein: oechem.OEGraphMol
-:param hintx: A number defining the hint x coordinate.
-:type hintx: float or int
-:param hinty: A number defining the hint y coordinate.
-:type hinty: float or int
-:param hintz: A number defining the hint z coordinate.
-:type hintz: float or int</p>
+<code class="sig-prename descclassname">kinoml.docking.OEDocking.</code><code class="sig-name descname">create_hint_receptor</code><span class="sig-paren">(</span><em class="sig-param">protein: oechem.OEMolBase, hintx: Union[float, int], hinty: Union[float, int], hintz: Union[float, int]</em><span class="sig-paren">)</span> → oechem.OEGraphMol<a class="headerlink" href="#kinoml.docking.OEDocking.create_hint_receptor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a hint receptor for docking.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p><strong>receptor</strong> – An OpenEye molecule holding a receptor with defined binding site via hint coordinates.</p>
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>protein</strong> (<em>oechem.OEMolBase</em>) – An OpenEye molecule holding a prepared protein structure.</p></li>
+<li><p><strong>hintx</strong> (<em>float</em><em> or </em><em>int</em>) – A number defining the hint x coordinate.</p></li>
+<li><p><strong>hinty</strong> (<em>float</em><em> or </em><em>int</em>) – A number defining the hint y coordinate.</p></li>
+<li><p><strong>hintz</strong> (<em>float</em><em> or </em><em>int</em>) – A number defining the hint z coordinate.</p></li>
+</ul>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>oechem.OEGraphMol</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>receptor</strong> – An OpenEye molecule holding a receptor with defined binding site via hint coordinates.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>oechem.OEGraphMol</p>
 </dd>
 </dl>
 </dd></dl>
 <dl class="function">
 <dt id="kinoml.docking.OEDocking.resids_to_box">
-<code class="sig-prename descclassname">kinoml.docking.OEDocking.</code><code class="sig-name descname">resids_to_box</code><span class="sig-paren">(</span><em class="sig-param">protein: oechem.OEGraphMol, resids: List[int]</em><span class="sig-paren">)</span> → Tuple[float, float, float, float, float, float]<a class="headerlink" href="#kinoml.docking.OEDocking.resids_to_box" title="Permalink to this definition">¶</a></dt>
-<dd><p>Retrieve box dimensions of a list if residues.
-:param protein: An OpenEye molecule holding a protein structure.
-:type protein: oechem.OEGraphMol
-:param resids: A list of resids defining the residues of interest.
-:type resids: list of int</p>
+<code class="sig-prename descclassname">kinoml.docking.OEDocking.</code><code class="sig-name descname">resids_to_box</code><span class="sig-paren">(</span><em class="sig-param">protein: oechem.OEMolBase, resids: List[int]</em><span class="sig-paren">)</span> → Tuple[float, float, float, float, float, float]<a class="headerlink" href="#kinoml.docking.OEDocking.resids_to_box" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve box dimensions of a list if residues.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p><strong>box_dimensions</strong> – The box dimensions in the order of xmax, ymax, zmax, xmin, ymin, zmin.</p>
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>protein</strong> (<em>oechem.OEMolBase</em>) – An OpenEye molecule holding a protein structure.</p></li>
+<li><p><strong>resids</strong> (<em>list of int</em>) – A list of resids defining the residues of interest.</p></li>
+</ul>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>tuple of float</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>box_dimensions</strong> – The box dimensions in the order of xmax, ymax, zmax, xmin, ymin, zmin.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>tuple of float</p>
 </dd>
 </dl>
 </dd></dl>
 <dl class="function">
 <dt id="kinoml.docking.OEDocking.create_box_receptor">
-<code class="sig-prename descclassname">kinoml.docking.OEDocking.</code><code class="sig-name descname">create_box_receptor</code><span class="sig-paren">(</span><em class="sig-param">protein: oechem.OEGraphMol, box_dimensions: Tuple[float, float, float, float, float, float]</em><span class="sig-paren">)</span> → oechem.OEGraphMol<a class="headerlink" href="#kinoml.docking.OEDocking.create_box_receptor" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create a box receptor for docking.
-:param protein: An OpenEye molecule holding a prepared protein structure.
-:type protein: oechem.OEGraphMol
-:param box_dimensions: The box dimensions in the order of xmax, ymax, zmax, xmin, ymin, zmin.
-:type box_dimensions: tuple of float</p>
+<code class="sig-prename descclassname">kinoml.docking.OEDocking.</code><code class="sig-name descname">create_box_receptor</code><span class="sig-paren">(</span><em class="sig-param">protein: oechem.OEMolBase, box_dimensions: Tuple[float, float, float, float, float, float]</em><span class="sig-paren">)</span> → oechem.OEGraphMol<a class="headerlink" href="#kinoml.docking.OEDocking.create_box_receptor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a box receptor for docking.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p><strong>receptor</strong> – An OpenEye molecule holding a receptor with defined binding site via box dimensions.</p>
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>protein</strong> (<em>oechem.OEMolBase</em>) – An OpenEye molecule holding a prepared protein structure.</p></li>
+<li><p><strong>box_dimensions</strong> (<em>tuple of float</em>) – The box dimensions in the order of xmax, ymax, zmax, xmin, ymin, zmin.</p></li>
+</ul>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>oechem.OEGraphMol</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>receptor</strong> – An OpenEye molecule holding a receptor with defined binding site via box dimensions.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>oechem.OEGraphMol</p>
 </dd>
 </dl>
 </dd></dl>
 <dl class="function">
 <dt id="kinoml.docking.OEDocking.pose_molecules">
-<code class="sig-prename descclassname">kinoml.docking.OEDocking.</code><code class="sig-name descname">pose_molecules</code><span class="sig-paren">(</span><em class="sig-param">receptor: oechem.OEGraphMol, molecules: List[oechem.OEGraphMol]</em><span class="sig-paren">)</span> → Union[List[oechem.OEGraphMol], None]<a class="headerlink" href="#kinoml.docking.OEDocking.pose_molecules" title="Permalink to this definition">¶</a></dt>
-<dd><p>Generate a binding pose of molecules in a prepared receptor with OpenEye’s Posit method.
-:param receptor: An OpenEye molecule holding the prepared receptor.
-:type receptor: oechem.OEGraphMol
-:param molecules: A list of OpenEye molecules holding prepared molecules for docking.
-:type molecules: list of oechem.OEGraphMol</p>
+<code class="sig-prename descclassname">kinoml.docking.OEDocking.</code><code class="sig-name descname">pose_molecules</code><span class="sig-paren">(</span><em class="sig-param">receptor: oechem.OEMolBase, molecules: List[oechem.OEMolBase], pKa_norm: bool = True</em><span class="sig-paren">)</span> → Union[List[oechem.OEGraphMol], None]<a class="headerlink" href="#kinoml.docking.OEDocking.pose_molecules" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a binding pose of molecules in a prepared receptor with OpenEye’s Posit method.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p><strong>posed_molecules</strong> – A list of OpenEye molecules holding the docked molecules.</p>
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>receptor</strong> (<em>oechem.OEMolBase</em>) – An OpenEye molecule holding the prepared receptor.</p></li>
+<li><p><strong>molecules</strong> (<em>list of oechem.OEMolBase</em>) – A list of OpenEye molecules holding prepared molecules for docking.</p></li>
+<li><p><strong>pKa_norm</strong> (<em>bool</em><em>, </em><em>default=True</em>) – Assign the predominant ionization state at pH ~7.4.</p></li>
+</ul>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>list of oechem.OEGraphMol or None</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>posed_molecules</strong> – A list of OpenEye molecules holding the docked molecules.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list of oechem.OEGraphMol or None</p>
 </dd>
 </dl>
 </dd></dl>
 <dl class="function">
-<dt id="kinoml.docking.OEDocking._run_docking">
-<code class="sig-prename descclassname">kinoml.docking.OEDocking.</code><code class="sig-name descname">_run_docking</code><span class="sig-paren">(</span><em class="sig-param">receptor: oechem.OEGraphMol, molecules: List[oechem.OEGraphMol], dock_method: int, num_poses: int = 1</em><span class="sig-paren">)</span> → Union[List[oechem.OEGraphMol], None]<a class="headerlink" href="#kinoml.docking.OEDocking._run_docking" title="Permalink to this definition">¶</a></dt>
-<dd><p>Dock molecules into a prepared receptor.
-:param receptor: An OpenEye molecule holding the prepared receptor.
-:type receptor: oechem.OEGraphMol
-:param molecules: A list of OpenEye molecules holding prepared molecules for docking.
-:type molecules: list of oechem.OEGraphMol
-:param dock_method: Constant defining the docking method.
-:type dock_method: int
-:param num_poses: Number of docking poses to generate per molecule.
-:type num_poses: int</p>
+<dt id="kinoml.docking.OEDocking.run_docking">
+<code class="sig-prename descclassname">kinoml.docking.OEDocking.</code><code class="sig-name descname">run_docking</code><span class="sig-paren">(</span><em class="sig-param">receptor: oechem.OEMolBase, molecules: List[oechem.OEMolBase], dock_method: int, num_poses: int = 1, pKa_norm: bool = True</em><span class="sig-paren">)</span> → Union[List[oechem.OEGraphMol], None]<a class="headerlink" href="#kinoml.docking.OEDocking.run_docking" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dock molecules into a prepared receptor.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p><strong>docked_molecules</strong> – A list of OpenEye molecules holding the docked molecules.</p>
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>receptor</strong> (<em>oechem.OEGraphMol</em>) – An OpenEye molecule holding the prepared receptor.</p></li>
+<li><p><strong>molecules</strong> (<em>list of oechem.OEGraphMol</em>) – A list of OpenEye molecules holding prepared molecules for docking.</p></li>
+<li><p><strong>dock_method</strong> (<em>int</em>) – Constant defining the docking method.</p></li>
+<li><p><strong>num_poses</strong> (<em>int</em>) – Number of docking poses to generate per molecule.</p></li>
+<li><p><strong>pKa_norm</strong> (<em>bool</em><em>, </em><em>default=True</em>) – Assign the predominant ionization state at pH ~7.4.</p></li>
+</ul>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>list of oechem.OEGraphMol or None</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>docked_molecules</strong> – A list of OpenEye molecules holding the docked molecules.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list of oechem.OEGraphMol or None</p>
 </dd>
 </dl>
 </dd></dl>
 <dl class="function">
 <dt id="kinoml.docking.OEDocking.hybrid_docking">
-<code class="sig-prename descclassname">kinoml.docking.OEDocking.</code><code class="sig-name descname">hybrid_docking</code><span class="sig-paren">(</span><em class="sig-param">hybrid_receptor: oechem.OEGraphMol, molecules: List[oechem.OEGraphMol], num_poses: int = 1</em><span class="sig-paren">)</span> → Union[List[oechem.OEGraphMol], None]<a class="headerlink" href="#kinoml.docking.OEDocking.hybrid_docking" title="Permalink to this definition">¶</a></dt>
-<dd><p>Dock molecules into a prepared receptor holding protein and ligand structure.
-:param hybrid_receptor: An OpenEye molecule holding the prepared receptor.
-:type hybrid_receptor: oechem.OEGraphMol
-:param molecules: A list of OpenEye molecules holding prepared molecules for docking.
-:type molecules: list of oechem.OEGraphMol
-:param num_poses: Number of docking poses to generate per molecule.
-:type num_poses: int</p>
+<code class="sig-prename descclassname">kinoml.docking.OEDocking.</code><code class="sig-name descname">hybrid_docking</code><span class="sig-paren">(</span><em class="sig-param">hybrid_receptor: oechem.OEMolBase, molecules: List[oechem.OEMolBase], num_poses: int = 1, pKa_norm: bool = True</em><span class="sig-paren">)</span> → Union[List[oechem.OEGraphMol], None]<a class="headerlink" href="#kinoml.docking.OEDocking.hybrid_docking" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dock molecules into a prepared receptor holding protein and ligand structure.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p><strong>docked_molecules</strong> – A list of OpenEye molecules holding the docked molecules.</p>
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>hybrid_receptor</strong> (<em>oechem.OEMolBase</em>) – An OpenEye molecule holding the prepared receptor.</p></li>
+<li><p><strong>molecules</strong> (<em>list of oechem.OEMolBase</em>) – A list of OpenEye molecules holding prepared molecules for docking.</p></li>
+<li><p><strong>num_poses</strong> (<em>int</em>) – Number of docking poses to generate per molecule.</p></li>
+<li><p><strong>pKa_norm</strong> (<em>bool</em><em>, </em><em>default=True</em>) – Assign the predominant ionization state at pH ~7.4.</p></li>
+</ul>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>list of oechem.OEGraphMol or None</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>docked_molecules</strong> – A list of OpenEye molecules holding the docked molecules.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list of oechem.OEGraphMol or None</p>
 </dd>
 </dl>
 </dd></dl>
 <dl class="function">
 <dt id="kinoml.docking.OEDocking.chemgauss_docking">
-<code class="sig-prename descclassname">kinoml.docking.OEDocking.</code><code class="sig-name descname">chemgauss_docking</code><span class="sig-paren">(</span><em class="sig-param">receptor: oechem.OEGraphMol, molecules: List[oechem.OEGraphMol], num_poses: int = 1</em><span class="sig-paren">)</span> → Union[List[oechem.OEGraphMol], None]<a class="headerlink" href="#kinoml.docking.OEDocking.chemgauss_docking" title="Permalink to this definition">¶</a></dt>
-<dd><p>Dock molecules into a prepared receptor holding a protein structure.
-:param receptor: An OpenEye molecule holding the prepared hint or box receptor.
-:type receptor: oechem.OEGraphMol
-:param molecules: A list of OpenEye molecules holding prepared molecules for docking.
-:type molecules: list of oechem.OEGraphMol
-:param num_poses: Number of docking poses to generate per molecule.
-:type num_poses: int</p>
+<code class="sig-prename descclassname">kinoml.docking.OEDocking.</code><code class="sig-name descname">chemgauss_docking</code><span class="sig-paren">(</span><em class="sig-param">receptor: oechem.OEMolBase, molecules: List[oechem.OEMolBase], num_poses: int = 1, pKa_norm: bool = True</em><span class="sig-paren">)</span> → Union[List[oechem.OEGraphMol], None]<a class="headerlink" href="#kinoml.docking.OEDocking.chemgauss_docking" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dock molecules into a prepared receptor holding a protein structure.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p><strong>docked_molecules</strong> – A list of OpenEye molecules holding the docked molecules.</p>
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>receptor</strong> (<em>oechem.OEMolBase</em>) – An OpenEye molecule holding the prepared hint or box receptor.</p></li>
+<li><p><strong>molecules</strong> (<em>list of oechem.OEMolBase</em>) – A list of OpenEye molecules holding prepared molecules for docking.</p></li>
+<li><p><strong>num_poses</strong> (<em>int</em>) – Number of docking poses to generate per molecule.</p></li>
+<li><p><strong>pKa_norm</strong> (<em>bool</em><em>, </em><em>default=True</em>) – Assign the predominant ionization state at pH ~7.4.</p></li>
+</ul>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>list of oechem.OEGraphMol or None</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>docked_molecules</strong> – A list of OpenEye molecules holding the docked molecules.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list of oechem.OEGraphMol or None</p>
 </dd>
 </dl>
 </dd></dl>

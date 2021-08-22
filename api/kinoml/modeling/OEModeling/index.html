@@ -68,7 +68,7 @@
     <script src="../../../../_static/copybutton.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area", "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "tex2jax_ignore|mathjax_ignore|document", "processClass": "tex2jax_process|mathjax_process|math|output_area", "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
     <link rel="shortcut icon" href="../../../../_static/custom_favicon.png"/>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
@@ -121,7 +121,7 @@
 <div class="md-search" data-md-component="search" role="dialog">
   <label class="md-search__overlay" for="__search"></label>
   <div class="md-search__inner" role="search">
-    <form class="md-search__form" action="../../../../search.html" method="GET" name="search">
+    <form class="md-search__form" action="../../../../search.html" method="get" name="search">
       <input type="text" class="md-search__input" name="q" placeholder="Search"
              autocapitalize="off" autocomplete="off" spellcheck="false"
              data-md-component="query" data-md-state="active">
@@ -333,25 +333,17 @@
         </li>
         <li class="md-nav__item"><a href="#kinoml.modeling.OEModeling.remove_non_protein" class="md-nav__link">remove_non_protein</a>
         </li>
-        <li class="md-nav__item"><a href="#kinoml.modeling.OEModeling._OEFixBuiltLoopFragmentNumbers" class="md-nav__link">_OEFixBuiltLoopFragmentNumbers</a>
+        <li class="md-nav__item"><a href="#kinoml.modeling.OEModeling.delete_residue" class="md-nav__link">delete_residue</a>
         </li>
-        <li class="md-nav__item"><a href="#kinoml.modeling.OEModeling._OEFixWaterFragmentNumbers" class="md-nav__link">_OEFixWaterFragmentNumbers</a>
+        <li class="md-nav__item"><a href="#kinoml.modeling.OEModeling.get_expression_tags" class="md-nav__link">get_expression_tags</a>
         </li>
-        <li class="md-nav__item"><a href="#kinoml.modeling.OEModeling._OEFixConnectionNH" class="md-nav__link">_OEFixConnectionNH</a>
+        <li class="md-nav__item"><a href="#kinoml.modeling.OEModeling.assign_caps" class="md-nav__link">assign_caps</a>
         </li>
-        <li class="md-nav__item"><a href="#kinoml.modeling.OEModeling._OEFixLoopIssues" class="md-nav__link">_OEFixLoopIssues</a>
-        </li>
-        <li class="md-nav__item"><a href="#kinoml.modeling.OEModeling._OEFixMissingOXT" class="md-nav__link">_OEFixMissingOXT</a>
-        </li>
-        <li class="md-nav__item"><a href="#kinoml.modeling.OEModeling._prepare_structure" class="md-nav__link">_prepare_structure</a>
+        <li class="md-nav__item"><a href="#kinoml.modeling.OEModeling.prepare_structure" class="md-nav__link">prepare_structure</a>
         </li>
         <li class="md-nav__item"><a href="#kinoml.modeling.OEModeling.prepare_complex" class="md-nav__link">prepare_complex</a>
         </li>
         <li class="md-nav__item"><a href="#kinoml.modeling.OEModeling.prepare_protein" class="md-nav__link">prepare_protein</a>
-        </li>
-        <li class="md-nav__item"><a href="#kinoml.modeling.OEModeling.klifs_kinase_from_uniprot_id" class="md-nav__link">klifs_kinase_from_uniprot_id</a>
-        </li>
-        <li class="md-nav__item"><a href="#kinoml.modeling.OEModeling.get_klifs_ligand" class="md-nav__link">get_klifs_ligand</a>
         </li>
         <li class="md-nav__item"><a href="#kinoml.modeling.OEModeling.generate_tautomers" class="md-nav__link">generate_tautomers</a>
         </li>
@@ -361,21 +353,29 @@
         </li>
         <li class="md-nav__item"><a href="#kinoml.modeling.OEModeling.generate_reasonable_conformations" class="md-nav__link">generate_reasonable_conformations</a>
         </li>
-        <li class="md-nav__item"><a href="#kinoml.modeling.OEModeling.optimize_poses" class="md-nav__link">optimize_poses</a>
-        </li>
         <li class="md-nav__item"><a href="#kinoml.modeling.OEModeling.overlay_molecules" class="md-nav__link">overlay_molecules</a>
         </li>
-        <li class="md-nav__item"><a href="#kinoml.modeling.OEModeling.generate_isomeric_smiles_representations" class="md-nav__link">generate_isomeric_smiles_representations</a>
+        <li class="md-nav__item"><a href="#kinoml.modeling.OEModeling.enumerate_isomeric_smiles" class="md-nav__link">enumerate_isomeric_smiles</a>
         </li>
-        <li class="md-nav__item"><a href="#kinoml.modeling.OEModeling.compare_molecules" class="md-nav__link">compare_molecules</a>
-        </li>
-        <li class="md-nav__item"><a href="#kinoml.modeling.OEModeling.string_similarity" class="md-nav__link">string_similarity</a>
-        </li>
-        <li class="md-nav__item"><a href="#kinoml.modeling.OEModeling.smiles_from_pdb" class="md-nav__link">smiles_from_pdb</a>
+        <li class="md-nav__item"><a href="#kinoml.modeling.OEModeling.are_identical_molecules" class="md-nav__link">are_identical_molecules</a>
         </li>
         <li class="md-nav__item"><a href="#kinoml.modeling.OEModeling.get_sequence" class="md-nav__link">get_sequence</a>
         </li>
-        <li class="md-nav__item"><a href="#kinoml.modeling.OEModeling.mutate_structure" class="md-nav__link">mutate_structure</a>
+        <li class="md-nav__item"><a href="#kinoml.modeling.OEModeling.get_structure_sequence_alignment" class="md-nav__link">get_structure_sequence_alignment</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.modeling.OEModeling.apply_deletions" class="md-nav__link">apply_deletions</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.modeling.OEModeling.apply_insertions" class="md-nav__link">apply_insertions</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.modeling.OEModeling.apply_mutations" class="md-nav__link">apply_mutations</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.modeling.OEModeling.delete_partial_residues" class="md-nav__link">delete_partial_residues</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.modeling.OEModeling.delete_short_protein_segments" class="md-nav__link">delete_short_protein_segments</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.modeling.OEModeling.delete_clashing_sidechains" class="md-nav__link">delete_clashing_sidechains</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.modeling.OEModeling.get_atom_coordinates" class="md-nav__link">get_atom_coordinates</a>
         </li>
         <li class="md-nav__item"><a href="#kinoml.modeling.OEModeling.renumber_structure" class="md-nav__link">renumber_structure</a>
         </li>
@@ -385,7 +385,7 @@
         </li>
         <li class="md-nav__item"><a href="#kinoml.modeling.OEModeling.split_molecule_components" class="md-nav__link">split_molecule_components</a>
         </li>
-        <li class="md-nav__item"><a href="#kinoml.modeling.OEModeling.clashing_atoms" class="md-nav__link">clashing_atoms</a>
+        <li class="md-nav__item"><a href="#kinoml.modeling.OEModeling.residue_ids_to_residue_names" class="md-nav__link">residue_ids_to_residue_names</a>
         </li></ul>
             </nav>
         </li></ul>
@@ -410,11 +410,14 @@
 <h2 id="module-contents">Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="kinoml.modeling.OEModeling.read_smiles">
-<code class="sig-prename descclassname">kinoml.modeling.OEModeling.</code><code class="sig-name descname">read_smiles</code><span class="sig-paren">(</span><em class="sig-param">smiles: str</em><span class="sig-paren">)</span> → oechem.OEGraphMol<a class="headerlink" href="#kinoml.modeling.OEModeling.read_smiles" title="Permalink to this definition">¶</a></dt>
-<dd><p>Read molecule from a smiles string.</p>
+<code class="sig-prename descclassname">kinoml.modeling.OEModeling.</code><code class="sig-name descname">read_smiles</code><span class="sig-paren">(</span><em class="sig-param">smiles: str</em>, <em class="sig-param">add_hydrogens: bool = True</em><span class="sig-paren">)</span> → oechem.OEGraphMol<a class="headerlink" href="#kinoml.modeling.OEModeling.read_smiles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read molecule from a smiles string. Explicit hydrogens will be added by default.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>smiles</strong> (<em>str</em>) – Smiles string.</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>smiles</strong> (<em>str</em>) – Smiles string.</p></li>
+<li><p><strong>add_hydrogens</strong> (<em>bool</em>) – If explicit hydrogens should be added.</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p><strong>molecule</strong> – A molecule as OpenEye molecules.</p>
@@ -422,15 +425,21 @@
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>oechem.OEGraphMol</p>
 </dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>ValueError</strong> – Could not interpret input SMILES.</p>
+</dd>
 </dl>
 </dd></dl>
 <dl class="function">
 <dt id="kinoml.modeling.OEModeling.read_molecules">
-<code class="sig-prename descclassname">kinoml.modeling.OEModeling.</code><code class="sig-name descname">read_molecules</code><span class="sig-paren">(</span><em class="sig-param">path: str</em><span class="sig-paren">)</span> → List[oechem.OEGraphMol]<a class="headerlink" href="#kinoml.modeling.OEModeling.read_molecules" title="Permalink to this definition">¶</a></dt>
-<dd><p>Read molecules from a file.</p>
+<code class="sig-prename descclassname">kinoml.modeling.OEModeling.</code><code class="sig-name descname">read_molecules</code><span class="sig-paren">(</span><em class="sig-param">path: Union[str, Path], add_hydrogens: bool = False</em><span class="sig-paren">)</span> → List[oechem.OEGraphMol]<a class="headerlink" href="#kinoml.modeling.OEModeling.read_molecules" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read molecules from a file. Explicit hydrogens will not be added by default.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>path</strong> (<em>str</em>) – Path to molecule file.</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> (<em>str</em><em>, </em><em>pathlib.Path</em>) – Path to molecule file.</p></li>
+<li><p><strong>add_hydrogens</strong> (<em>bool</em>) – If explicit hydrogens should be added.</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p><strong>molecules</strong> – A List of molecules as OpenEye molecules.</p>
@@ -438,15 +447,18 @@
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>list of oechem.OEGraphMol</p>
 </dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>ValueError</strong> – Given file does not contain valid molecules.</p>
+</dd>
 </dl>
 </dd></dl>
 <dl class="function">
 <dt id="kinoml.modeling.OEModeling.read_electron_density">
-<code class="sig-prename descclassname">kinoml.modeling.OEModeling.</code><code class="sig-name descname">read_electron_density</code><span class="sig-paren">(</span><em class="sig-param">path: str</em><span class="sig-paren">)</span> → Union[oegrid.OESkewGrid, None]<a class="headerlink" href="#kinoml.modeling.OEModeling.read_electron_density" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">kinoml.modeling.OEModeling.</code><code class="sig-name descname">read_electron_density</code><span class="sig-paren">(</span><em class="sig-param">path: Union[str, Path]</em><span class="sig-paren">)</span> → oegrid.OESkewGrid<a class="headerlink" href="#kinoml.modeling.OEModeling.read_electron_density" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read electron density from a file.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>path</strong> (<em>str</em>) – Path to electron density file.</p>
+<dd class="field-odd"><p><strong>path</strong> (<em>str</em><em>, </em><em>pathlib.Path</em>) – Path to electron density file.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p><strong>electron_density</strong> – A List of molecules as OpenEye molecules.</p>
@@ -454,29 +466,32 @@
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>oegrid.OESkewGrid or None</p>
 </dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>ValueError</strong> – Not a valid electron density file or wrong format. Only MTZ is currently supported.</p>
+</dd>
 </dl>
 </dd></dl>
 <dl class="function">
 <dt id="kinoml.modeling.OEModeling.write_molecules">
-<code class="sig-prename descclassname">kinoml.modeling.OEModeling.</code><code class="sig-name descname">write_molecules</code><span class="sig-paren">(</span><em class="sig-param">molecules: List[oechem.OEGraphMol], path: str</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.modeling.OEModeling.write_molecules" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">kinoml.modeling.OEModeling.</code><code class="sig-name descname">write_molecules</code><span class="sig-paren">(</span><em class="sig-param">molecules: List[oechem.OEMolBase], path: Union[str, Path]</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.modeling.OEModeling.write_molecules" title="Permalink to this definition">¶</a></dt>
 <dd><p>Save molecules to file.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>molecules</strong> (<em>list of oechem.OEGraphMol</em>) – A list of OpenEye molecules for writing.</p></li>
-<li><p><strong>path</strong> (<em>str</em>) – File path for saving molecules.</p></li>
+<li><p><strong>molecules</strong> (<em>list of oechem.OEMolBase</em>) – A list of OpenEye molecules for writing.</p></li>
+<li><p><strong>path</strong> (<em>str</em><em>, </em><em>pathlib.Path</em>) – File path for saving molecules.</p></li>
 </ul>
 </dd>
 </dl>
 </dd></dl>
 <dl class="function">
 <dt id="kinoml.modeling.OEModeling.select_chain">
-<code class="sig-prename descclassname">kinoml.modeling.OEModeling.</code><code class="sig-name descname">select_chain</code><span class="sig-paren">(</span><em class="sig-param">molecule</em>, <em class="sig-param">chain_id</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.modeling.OEModeling.select_chain" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">kinoml.modeling.OEModeling.</code><code class="sig-name descname">select_chain</code><span class="sig-paren">(</span><em class="sig-param">molecule: oechem.OEMolBase</em>, <em class="sig-param">chain_id: str</em><span class="sig-paren">)</span> → oechem.OEMolBase<a class="headerlink" href="#kinoml.modeling.OEModeling.select_chain" title="Permalink to this definition">¶</a></dt>
 <dd><p>Select a chain from an OpenEye molecule.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>molecule</strong> (<em>oechem.OEGraphMol</em>) – An OpenEye molecule holding a molecular structure.</p></li>
+<li><p><strong>molecule</strong> (<em>oechem.OEMolBase</em>) – An OpenEye molecule holding a molecular structure.</p></li>
 <li><p><strong>chain_id</strong> (<em>str</em>) – Chain identifier.</p></li>
 </ul>
 </dd>
@@ -484,37 +499,45 @@
 <dd class="field-even"><p><strong>selection</strong> – An OpenEye molecule holding the selected chain.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>oechem.OEGraphMol</p>
+<dd class="field-odd"><p>oechem.OEMolBase</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>ValueError</strong> – No atoms were found with given chain id.</p>
 </dd>
 </dl>
 </dd></dl>
 <dl class="function">
 <dt id="kinoml.modeling.OEModeling.select_altloc">
-<code class="sig-prename descclassname">kinoml.modeling.OEModeling.</code><code class="sig-name descname">select_altloc</code><span class="sig-paren">(</span><em class="sig-param">molecule</em>, <em class="sig-param">altloc_id</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.modeling.OEModeling.select_altloc" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">kinoml.modeling.OEModeling.</code><code class="sig-name descname">select_altloc</code><span class="sig-paren">(</span><em class="sig-param">molecule: oechem.OEMolBase</em>, <em class="sig-param">altloc_id: str</em>, <em class="sig-param">altloc_fallback: bool = True</em><span class="sig-paren">)</span> → oechem.OEMolBase<a class="headerlink" href="#kinoml.modeling.OEModeling.select_altloc" title="Permalink to this definition">¶</a></dt>
 <dd><p>Select an alternate location from an OpenEye molecule.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>molecule</strong> (<em>oechem.OEGraphMol</em>) – An OpenEye molecule holding a molecular structure.</p></li>
+<li><p><strong>molecule</strong> (<em>oechem.OEMolBase</em>) – An OpenEye molecule holding a molecular structure.</p></li>
 <li><p><strong>altloc_id</strong> (<em>str</em>) – Alternate location identifier.</p></li>
+<li><p><strong>altloc_fallback</strong> (<em>bool</em>) – If the alternate location with the highest occupancy should be used for residues that do
+not contain the given alternate location identifier.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p><strong>selection</strong> – An OpenEye molecule holding the selected alternate location.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>oechem.OEGraphMol</p>
+<dd class="field-odd"><p>oechem.OEMolBase</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>ValueError</strong> – No atoms were found with given altloc id.</p>
 </dd>
 </dl>
 </dd></dl>
 <dl class="function">
 <dt id="kinoml.modeling.OEModeling.remove_non_protein">
-<code class="sig-prename descclassname">kinoml.modeling.OEModeling.</code><code class="sig-name descname">remove_non_protein</code><span class="sig-paren">(</span><em class="sig-param">molecule: oechem.OEGraphMol</em>, <em class="sig-param">exceptions: Union[None</em>, <em class="sig-param">List[str]] = None</em>, <em class="sig-param">remove_water: bool = False</em><span class="sig-paren">)</span> → oechem.OEGraphMol<a class="headerlink" href="#kinoml.modeling.OEModeling.remove_non_protein" title="Permalink to this definition">¶</a></dt>
-<dd><p>Remove non-protein atoms from an OpenEye molecule.</p>
+<code class="sig-prename descclassname">kinoml.modeling.OEModeling.</code><code class="sig-name descname">remove_non_protein</code><span class="sig-paren">(</span><em class="sig-param">molecule: oechem.OEMolBase</em>, <em class="sig-param">exceptions: Union[None</em>, <em class="sig-param">List[str]] = None</em>, <em class="sig-param">remove_water: bool = False</em><span class="sig-paren">)</span> → oechem.OEMolBase<a class="headerlink" href="#kinoml.modeling.OEModeling.remove_non_protein" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove non-protein atoms from an OpenEye molecule. Water will be kept by default.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>molecule</strong> (<em>oechem.OEGraphMol</em>) – An OpenEye molecule holding a molecular structure.</p></li>
+<li><p><strong>molecule</strong> (<em>oechem.OEMolBase</em>) – An OpenEye molecule holding a molecular structure.</p></li>
 <li><p><strong>exceptions</strong> (<em>None</em><em> or </em><em>list of str</em>) – Exceptions that should not be removed.</p></li>
 <li><p><strong>remove_water</strong> (<em>bool</em>) – If water should be removed.</p></li>
 </ul>
@@ -523,73 +546,121 @@
 <dd class="field-even"><p><strong>selection</strong> – An OpenEye molecule holding the filtered structure.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>oechem.OEGraphMol</p>
+<dd class="field-odd"><p>oechem.OEMolBase</p>
 </dd>
 </dl>
 </dd></dl>
 <dl class="function">
-<dt id="kinoml.modeling.OEModeling._OEFixBuiltLoopFragmentNumbers">
-<code class="sig-prename descclassname">kinoml.modeling.OEModeling.</code><code class="sig-name descname">_OEFixBuiltLoopFragmentNumbers</code><span class="sig-paren">(</span><em class="sig-param">protein</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.modeling.OEModeling._OEFixBuiltLoopFragmentNumbers" title="Permalink to this definition">¶</a></dt>
-<dd><p>Temporary fix, thanks to Jesper!</p>
+<dt id="kinoml.modeling.OEModeling.delete_residue">
+<code class="sig-prename descclassname">kinoml.modeling.OEModeling.</code><code class="sig-name descname">delete_residue</code><span class="sig-paren">(</span><em class="sig-param">structure: oechem.OEMolBase</em>, <em class="sig-param">chain_id: str</em>, <em class="sig-param">residue_name: str</em>, <em class="sig-param">residue_id: int</em><span class="sig-paren">)</span> → oechem.OEGraphMol<a class="headerlink" href="#kinoml.modeling.OEModeling.delete_residue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete a residue from an OpenEye molecule.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>structure</strong> (<em>oechem.OEMolBase</em>) – An OpenEye molecule with residue information.</p></li>
+<li><p><strong>chain_id</strong> (<em>str</em>) – The chain id of the residue</p></li>
+<li><p><strong>residue_name</strong> (<em>str</em>) – The residue name in three letter code.</p></li>
+<li><p><strong>residue_id</strong> (<em>int</em>) – The residue id.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The OpenEye molecule without the residue.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>oechem.OEMolBase</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>ValueError</strong> – Defined residue was not found in given structure.</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="function">
-<dt id="kinoml.modeling.OEModeling._OEFixWaterFragmentNumbers">
-<code class="sig-prename descclassname">kinoml.modeling.OEModeling.</code><code class="sig-name descname">_OEFixWaterFragmentNumbers</code><span class="sig-paren">(</span><em class="sig-param">solvent</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.modeling.OEModeling._OEFixWaterFragmentNumbers" title="Permalink to this definition">¶</a></dt>
-<dd><p>Temporary fix, thanks to Jesper!</p>
+<dt id="kinoml.modeling.OEModeling.get_expression_tags">
+<code class="sig-prename descclassname">kinoml.modeling.OEModeling.</code><code class="sig-name descname">get_expression_tags</code><span class="sig-paren">(</span><em class="sig-param">structure: oechem.OEMolBase</em>, <em class="sig-param">labels: Iterable[str] = ('EXPRESSION TAG'</em>, <em class="sig-param">'CLONING ARTIFACT')</em><span class="sig-paren">)</span> → List[Dict]<a class="headerlink" href="#kinoml.modeling.OEModeling.get_expression_tags" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the chain id, residue name and residue id of residues in expression tags from a protein structure listed in the
+PDB header section “SEQADV”.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>structure</strong> (<em>oechem.OEMolBase</em>) – An OpenEye molecule with associated PDB header section “SEQADV”.</p></li>
+<li><p><strong>labels</strong> (<em>Iterable of str</em>) – The ‘SEQADV’ labels defining expression tags. Default: (‘EXPRESSION TAG’, ‘CLONING ARTIFACT’).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The chain id, residue name and residue id of residues in the expression tags.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list of dict</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="function">
-<dt id="kinoml.modeling.OEModeling._OEFixConnectionNH">
-<code class="sig-prename descclassname">kinoml.modeling.OEModeling.</code><code class="sig-name descname">_OEFixConnectionNH</code><span class="sig-paren">(</span><em class="sig-param">protein</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.modeling.OEModeling._OEFixConnectionNH" title="Permalink to this definition">¶</a></dt>
-<dd><p>Temporary fix, thanks to Jesper!</p>
+<dt id="kinoml.modeling.OEModeling.assign_caps">
+<code class="sig-prename descclassname">kinoml.modeling.OEModeling.</code><code class="sig-name descname">assign_caps</code><span class="sig-paren">(</span><em class="sig-param">structure: oechem.OEMolBase</em>, <em class="sig-param">real_termini: Union[Iterable[int] or None] = None</em><span class="sig-paren">)</span> → oechem.OEMolBase<a class="headerlink" href="#kinoml.modeling.OEModeling.assign_caps" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cap N and C termini of the given input structure. Real termini can be protected from capping by providing the
+corresponding residue ids via the ‘real_termini’ argument.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>structure</strong> (<em>oechem.OEMolBase</em>) – The OpenEye molecule holding the protein structure to cap.</p></li>
+<li><p><strong>real_termini</strong> (<em>iterable of int</em><em> or </em><em>None</em>) – The biologically relevant real termini that shpuld be prevented from capping.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>structure</strong> – The OpenEye molecule holding the capped structure.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>oechem.OEMolBase</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="function">
-<dt id="kinoml.modeling.OEModeling._OEFixLoopIssues">
-<code class="sig-prename descclassname">kinoml.modeling.OEModeling.</code><code class="sig-name descname">_OEFixLoopIssues</code><span class="sig-paren">(</span><em class="sig-param">du</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.modeling.OEModeling._OEFixLoopIssues" title="Permalink to this definition">¶</a></dt>
-<dd><p>Temporary fix, thanks to Jesper!</p>
-</dd></dl>
-<dl class="function">
-<dt id="kinoml.modeling.OEModeling._OEFixMissingOXT">
-<code class="sig-prename descclassname">kinoml.modeling.OEModeling.</code><code class="sig-name descname">_OEFixMissingOXT</code><span class="sig-paren">(</span><em class="sig-param">du</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.modeling.OEModeling._OEFixMissingOXT" title="Permalink to this definition">¶</a></dt>
-<dd><p>Temporary fix, thanks to Jesper!</p>
-</dd></dl>
-<dl class="function">
-<dt id="kinoml.modeling.OEModeling._prepare_structure">
-<code class="sig-prename descclassname">kinoml.modeling.OEModeling.</code><code class="sig-name descname">_prepare_structure</code><span class="sig-paren">(</span><em class="sig-param">structure: oechem.OEGraphMol, has_ligand: bool = False, electron_density: Union[oegrid.OESkewGrid, None] = None, loop_db: Union[str, None] = None, ligand_name: Union[str, None] = None, cap_termini: bool = True, real_termini: Union[List[int], None] = None</em><span class="sig-paren">)</span> → Union[oechem.OEDesignUnit, None]<a class="headerlink" href="#kinoml.modeling.OEModeling._prepare_structure" title="Permalink to this definition">¶</a></dt>
+<dt id="kinoml.modeling.OEModeling.prepare_structure">
+<code class="sig-prename descclassname">kinoml.modeling.OEModeling.</code><code class="sig-name descname">prepare_structure</code><span class="sig-paren">(</span><em class="sig-param">structure: oechem.OEMolBase, has_ligand: bool = False, electron_density: Union[oegrid.OESkewGrid, None] = None, loop_db: Union[str, None] = None, ligand_name: Union[str, None] = None, chain_id: Union[str, None] = None, alternate_location: Union[str, None] = None, cap_termini: bool = True, real_termini: Union[List[int], None] = None</em><span class="sig-paren">)</span> → oechem.OEDesignUnit<a class="headerlink" href="#kinoml.modeling.OEModeling.prepare_structure" title="Permalink to this definition">¶</a></dt>
 <dd><p>Prepare an OpenEye molecule holding a protein ligand complex for docking.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>structure</strong> (<em>oechem.OEGraphMol</em>) – An OpenEye molecule holding a structure with protein and optionally a ligand.</p></li>
+<li><p><strong>structure</strong> (<em>oechem.OEMolBase</em>) – An OpenEye molecule holding a structure with protein and optionally a ligand.</p></li>
 <li><p><strong>has_ligand</strong> (<em>bool</em>) – If structure contains a ligand that should be used in design unit generation.</p></li>
 <li><p><strong>electron_density</strong> (<em>oegrid.OESkewGrid</em>) – An OpenEye grid holding the electron density.</p></li>
 <li><p><strong>loop_db</strong> (<em>str</em><em> or </em><em>None</em>) – Path to OpenEye Spruce loop database. You can request a copy at
 <a class="reference external" href="https://www.eyesopen.com/database-downloads">https://www.eyesopen.com/database-downloads</a>. A testing subset (3TPP) is available
 at <a class="reference external" href="https://docs.eyesopen.com/toolkits/python/sprucetk/examples_make_design_units.html">https://docs.eyesopen.com/toolkits/python/sprucetk/examples_make_design_units.html</a>.</p></li>
 <li><p><strong>ligand_name</strong> (<em>str</em><em> or </em><em>None</em>) – The name of the ligand located in the binding pocket of interest.</p></li>
+<li><p><strong>chain_id</strong> (<em>str</em><em> or </em><em>None</em>) – The chain id of interest. If chain id is None, best chain will be selected according to OESpruce.</p></li>
+<li><p><strong>alternate_location</strong> (<em>str</em><em> or </em><em>None</em>) – The alternate location of interest. If alternate location is None, best alternate location will be selected
+according to OEChem.</p></li>
 <li><p><strong>cap_termini</strong> (<em>bool</em>) – If termini should be capped with ACE and NME.</p></li>
 <li><p><strong>real_termini</strong> (<em>list of int</em><em> or </em><em>None</em>) – Residue numbers of biologically real termini will not be capped with ACE and NME.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><strong>design_unit</strong> – An OpenEye design unit holding the prepared structure with the
-highest quality among all identified design units.</p>
+<dd class="field-even"><p><strong>design_unit</strong> – An OpenEye design unit holding the prepared structure with the highest quality among all identified design
+units.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>oechem.OEDesignUnit or None</p>
+<dd class="field-odd"><p>oechem.OEDesignUnit</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>ValueError</strong> – No design unit found with given chain ID, ligand name and alternate location.</p>
 </dd>
 </dl>
 </dd></dl>
 <dl class="function">
 <dt id="kinoml.modeling.OEModeling.prepare_complex">
-<code class="sig-prename descclassname">kinoml.modeling.OEModeling.</code><code class="sig-name descname">prepare_complex</code><span class="sig-paren">(</span><em class="sig-param">protein_ligand_complex: oechem.OEGraphMol, electron_density: Union[oegrid.OESkewGrid, None] = None, loop_db: Union[str, None] = None, ligand_name: Union[str, None] = None, cap_termini: bool = True, real_termini: Union[List[int], None] = None</em><span class="sig-paren">)</span> → Union[oechem.OEDesignUnit, None]<a class="headerlink" href="#kinoml.modeling.OEModeling.prepare_complex" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">kinoml.modeling.OEModeling.</code><code class="sig-name descname">prepare_complex</code><span class="sig-paren">(</span><em class="sig-param">protein_ligand_complex: oechem.OEMolBase, electron_density: Union[oegrid.OESkewGrid, None] = None, loop_db: Union[str, None] = None, ligand_name: Union[str, None] = None, chain_id: Union[str, None] = None, alternate_location: Union[str, None] = None, cap_termini: bool = True, real_termini: Union[List[int], None] = None</em><span class="sig-paren">)</span> → oechem.OEDesignUnit<a class="headerlink" href="#kinoml.modeling.OEModeling.prepare_complex" title="Permalink to this definition">¶</a></dt>
 <dd><p>Prepare an OpenEye molecule holding a protein ligand complex for docking.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>protein_ligand_complex</strong> (<em>oechem.OEGraphMol</em>) – An OpenEye molecule holding a structure with protein and ligand.</p></li>
+<li><p><strong>protein_ligand_complex</strong> (<em>oechem.OEMolBase</em>) – An OpenEye molecule holding a structure with protein and ligand.</p></li>
 <li><p><strong>electron_density</strong> (<em>oegrid.OESkewGrid</em>) – An OpenEye grid holding the electron density.</p></li>
 <li><p><strong>loop_db</strong> (<em>str</em><em> or </em><em>None</em>) – Path to OpenEye Spruce loop database.</p></li>
 <li><p><strong>ligand_name</strong> (<em>str</em><em> or </em><em>None</em>) – The name of the ligand located in the binding pocket of interest.</p></li>
+<li><p><strong>chain_id</strong> (<em>str</em><em> or </em><em>None</em>) – The chain id of interest. If chain id is None, best chain will be selected according to OESpruce.</p></li>
+<li><p><strong>alternate_location</strong> (<em>str</em><em> or </em><em>None</em>) – The alternate location of interest. If alternate location is None, best alternate location will be selected
+according to OEChem.</p></li>
 <li><p><strong>cap_termini</strong> (<em>bool</em>) – If termini should be capped with ACE and NME.</p></li>
 <li><p><strong>real_termini</strong> (<em>list of int</em><em> or </em><em>None</em>) – Residue numbers of biologically real termini will not be capped with ACE and NME.</p></li>
 </ul>
@@ -599,19 +670,25 @@ highest quality among all identified design units.</p>
 units.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>oechem.OEDesignUnit or None</p>
+<dd class="field-odd"><p>oechem.OEDesignUnit</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>ValueError</strong> – No design unit found with given chain ID, ligand name and alternate location.</p>
 </dd>
 </dl>
 </dd></dl>
 <dl class="function">
 <dt id="kinoml.modeling.OEModeling.prepare_protein">
-<code class="sig-prename descclassname">kinoml.modeling.OEModeling.</code><code class="sig-name descname">prepare_protein</code><span class="sig-paren">(</span><em class="sig-param">protein: oechem.OEGraphMol, loop_db: Union[str, None] = None, cap_termini: bool = True, real_termini: Union[List[int], None] = None</em><span class="sig-paren">)</span> → Union[oechem.OEDesignUnit, None]<a class="headerlink" href="#kinoml.modeling.OEModeling.prepare_protein" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">kinoml.modeling.OEModeling.</code><code class="sig-name descname">prepare_protein</code><span class="sig-paren">(</span><em class="sig-param">protein: oechem.OEMolBase, loop_db: Union[str, None] = None, chain_id: Union[str, None] = None, alternate_location: Union[str, None] = None, cap_termini: bool = True, real_termini: Union[List[int], None] = None</em><span class="sig-paren">)</span> → oechem.OEDesignUnit<a class="headerlink" href="#kinoml.modeling.OEModeling.prepare_protein" title="Permalink to this definition">¶</a></dt>
 <dd><p>Prepare an OpenEye molecule holding a protein structure for docking.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>protein</strong> (<em>oechem.OEGraphMol</em>) – An OpenEye molecule holding a structure with protein.</p></li>
+<li><p><strong>protein</strong> (<em>oechem.OEMolBase</em>) – An OpenEye molecule holding a structure with protein.</p></li>
 <li><p><strong>loop_db</strong> (<em>str</em>) – Path to OpenEye Spruce loop database.</p></li>
+<li><p><strong>chain_id</strong> (<em>str</em><em> or </em><em>None</em>) – The chain id of interest. If chain id is None, best chain will be selected according to OESpruce.</p></li>
+<li><p><strong>alternate_location</strong> (<em>str</em><em> or </em><em>None</em>) – The alternate location of interest. If alternate location is None, best alternate location will be selected
+according to OEChem.</p></li>
 <li><p><strong>cap_termini</strong> (<em>bool</em>) – If termini should be capped with ACE and NME.</p></li>
 <li><p><strong>real_termini</strong> (<em>list of int</em><em> or </em><em>None</em>) – Residue numbers of biologically real termini will not be capped with ACE and NME.</p></li>
 </ul>
@@ -623,66 +700,42 @@ units.</p>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>oechem.OEDesignUnit or None</p>
 </dd>
-</dl>
-</dd></dl>
-<dl class="function">
-<dt id="kinoml.modeling.OEModeling.klifs_kinase_from_uniprot_id">
-<code class="sig-prename descclassname">kinoml.modeling.OEModeling.</code><code class="sig-name descname">klifs_kinase_from_uniprot_id</code><span class="sig-paren">(</span><em class="sig-param">uniprot_id: str</em><span class="sig-paren">)</span> → pd.DataFrame<a class="headerlink" href="#kinoml.modeling.OEModeling.klifs_kinase_from_uniprot_id" title="Permalink to this definition">¶</a></dt>
-<dd><p>Retrieve KLIFS kinase details about the kinase matching the given Uniprot ID.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>uniprot_id</strong> (<em>str</em>) – Uniprot identifier.</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><strong>kinases</strong> – KLIFS structure details.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>pd.Series</p>
-</dd>
-</dl>
-</dd></dl>
-<dl class="function">
-<dt id="kinoml.modeling.OEModeling.get_klifs_ligand">
-<code class="sig-prename descclassname">kinoml.modeling.OEModeling.</code><code class="sig-name descname">get_klifs_ligand</code><span class="sig-paren">(</span><em class="sig-param">structure_id: int</em><span class="sig-paren">)</span> → oechem.OEGraphMol<a class="headerlink" href="#kinoml.modeling.OEModeling.get_klifs_ligand" title="Permalink to this definition">¶</a></dt>
-<dd><p>Retrieve orthosteric ligand from KLIFS.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>structure_id</strong> (<em>int</em>) – KLIFS structure identifier.</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><strong>molecule</strong> – An OpenEye molecule holding the orthosteric ligand.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>oechem.OEGraphMol</p>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>ValueError</strong> – No design unit found with given chain ID, ligand name and alternate location.</p>
 </dd>
 </dl>
 </dd></dl>
 <dl class="function">
 <dt id="kinoml.modeling.OEModeling.generate_tautomers">
-<code class="sig-prename descclassname">kinoml.modeling.OEModeling.</code><code class="sig-name descname">generate_tautomers</code><span class="sig-paren">(</span><em class="sig-param">molecule: oechem.OEGraphMol</em><span class="sig-paren">)</span> → List[oechem.OEGraphMol]<a class="headerlink" href="#kinoml.modeling.OEModeling.generate_tautomers" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">kinoml.modeling.OEModeling.</code><code class="sig-name descname">generate_tautomers</code><span class="sig-paren">(</span><em class="sig-param">molecule: Union[oechem.OEMolBase, oechem.OEMCMolBase], max_generate: int = 4096, max_return: int = 16, pKa_norm: bool = True</em><span class="sig-paren">)</span> → List[Union[oechem.OEMolBase, oechem.OEMCMolBase]]<a class="headerlink" href="#kinoml.modeling.OEModeling.generate_tautomers" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate reasonable tautomers of a given molecule.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>molecule</strong> (<em>oechem.OEGraphMol</em>) – An OpenEye molecule.</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>molecule</strong> (<em>oechem.OEMolBase</em><em> or </em><em>oechem.OEMCMolBase</em>) – An OpenEye molecule.</p></li>
+<li><p><strong>max_generate</strong> (<em>int</em>) – Maximal number of tautomers to generate.</p></li>
+<li><p><strong>max_return</strong> (<em>int</em>) – Maximal number of tautomers to return.</p></li>
+<li><p><strong>pKa_norm</strong> (<em>bool</em>) – Assign the predominant ionization state at pH ~7.4.</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p><strong>tautomers</strong> – A list of OpenEye molecules holding the tautomers.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>list of oechem.OEGraphMol</p>
+<dd class="field-odd"><p>list of oechem.OEMolBase or oechem.OEMCMolBase</p>
 </dd>
 </dl>
 </dd></dl>
 <dl class="function">
 <dt id="kinoml.modeling.OEModeling.generate_enantiomers">
-<code class="sig-prename descclassname">kinoml.modeling.OEModeling.</code><code class="sig-name descname">generate_enantiomers</code><span class="sig-paren">(</span><em class="sig-param">molecule: oechem.OEGraphMol</em>, <em class="sig-param">max_centers: int = 12</em>, <em class="sig-param">force_flip: bool = False</em>, <em class="sig-param">enumerate_nitrogens: bool = True</em><span class="sig-paren">)</span> → List[oechem.OEGraphMol]<a class="headerlink" href="#kinoml.modeling.OEModeling.generate_enantiomers" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">kinoml.modeling.OEModeling.</code><code class="sig-name descname">generate_enantiomers</code><span class="sig-paren">(</span><em class="sig-param">molecule: oechem.OEMolBase</em>, <em class="sig-param">max_centers: int = 12</em>, <em class="sig-param">force_flip: bool = False</em>, <em class="sig-param">enumerate_nitrogens: bool = True</em><span class="sig-paren">)</span> → List[oechem.OEMolBase]<a class="headerlink" href="#kinoml.modeling.OEModeling.generate_enantiomers" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate enantiomers of a given molecule.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>molecule</strong> (<em>oechem.OEGraphMol</em>) – An OpenEye molecule.</p></li>
+<li><p><strong>molecule</strong> (<em>oechem.OEMolBase</em>) – An OpenEye molecule.</p></li>
 <li><p><strong>max_centers</strong> (<em>int</em>) – The maximal number of stereo centers to enumerate.</p></li>
-<li><p><strong>force_flip</strong> (<em>bool</em>) – If specified stereo centers should be ignored.</p></li>
+<li><p><strong>force_flip</strong> (<em>bool</em>) – If specified stereo centers should be enumerated.</p></li>
 <li><p><strong>enumerate_nitrogens</strong> (<em>bool</em>) – If nitrogens with invertible pyramidal geometry should be enumerated.</p></li>
 </ul>
 </dd>
@@ -690,18 +743,18 @@ units.</p>
 <dd class="field-even"><p><strong>enantiomers</strong> – A list of OpenEye molecules holding the enantiomers.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>list of oechem.OEGraphMol</p>
+<dd class="field-odd"><p>list of oechem.OEMolBase</p>
 </dd>
 </dl>
 </dd></dl>
 <dl class="function">
 <dt id="kinoml.modeling.OEModeling.generate_conformations">
-<code class="sig-prename descclassname">kinoml.modeling.OEModeling.</code><code class="sig-name descname">generate_conformations</code><span class="sig-paren">(</span><em class="sig-param">molecule: oechem.OEGraphMol</em>, <em class="sig-param">max_conformations: int = 1000</em>, <em class="sig-param">dense: bool = False</em><span class="sig-paren">)</span> → oechem.OEMol<a class="headerlink" href="#kinoml.modeling.OEModeling.generate_conformations" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">kinoml.modeling.OEModeling.</code><code class="sig-name descname">generate_conformations</code><span class="sig-paren">(</span><em class="sig-param">molecule: oechem.OEMolBase</em>, <em class="sig-param">max_conformations: int = 1000</em>, <em class="sig-param">dense: bool = False</em><span class="sig-paren">)</span> → oechem.OEMCMolBase<a class="headerlink" href="#kinoml.modeling.OEModeling.generate_conformations" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate conformations of a given molecule.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>molecule</strong> (<em>oechem.OEGraphMol</em>) – An OpenEye molecule.</p></li>
+<li><p><strong>molecule</strong> (<em>oechem.OEMolBase</em>) – An OpenEye molecule.</p></li>
 <li><p><strong>max_conformations</strong> (<em>int</em>) – Maximal number of conformations to generate.</p></li>
 <li><p><strong>dense</strong> (<em>bool</em>) – If densely sampled conformers should be generated. Will overwrite max_conformations settings.</p></li>
 </ul>
@@ -710,79 +763,60 @@ units.</p>
 <dd class="field-even"><p><strong>conformations</strong> – An OpenEye multi-conformer molecule holding the generated conformations.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>oechem.OEMol</p>
+<dd class="field-odd"><p>oechem.OEMCMolBase</p>
 </dd>
 </dl>
 </dd></dl>
 <dl class="function">
 <dt id="kinoml.modeling.OEModeling.generate_reasonable_conformations">
-<code class="sig-prename descclassname">kinoml.modeling.OEModeling.</code><code class="sig-name descname">generate_reasonable_conformations</code><span class="sig-paren">(</span><em class="sig-param">molecule: oechem.OEGraphMol</em>, <em class="sig-param">dense: bool = False</em><span class="sig-paren">)</span> → List[oechem.OEMol]<a class="headerlink" href="#kinoml.modeling.OEModeling.generate_reasonable_conformations" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">kinoml.modeling.OEModeling.</code><code class="sig-name descname">generate_reasonable_conformations</code><span class="sig-paren">(</span><em class="sig-param">molecule: oechem.OEMolBase</em>, <em class="sig-param">max_conformations: int = 1000</em>, <em class="sig-param">dense: bool = False</em>, <em class="sig-param">pKa_norm: bool = True</em><span class="sig-paren">)</span> → List[oechem.OEMCMolBase]<a class="headerlink" href="#kinoml.modeling.OEModeling.generate_reasonable_conformations" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate conformations of reasonable enantiomers and tautomers of a given molecule.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>molecule</strong> (<em>oechem.ORGraphMol</em>) – An OpenEye molecule.</p></li>
+<li><p><strong>molecule</strong> (<em>oechem.OEMolBase</em>) – An OpenEye molecule.</p></li>
+<li><p><strong>max_conformations</strong> (<em>int</em>) – Maximal number of conformations to generate per isomer. Will overwrite max_conformations settings.</p></li>
 <li><p><strong>dense</strong> (<em>bool</em>) – If densely sampled conformers should be generated.</p></li>
+<li><p><strong>pKa_norm</strong> (<em>bool</em>) – Assign the predominant ionization state at pH ~7.4.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><strong>conformations_ensemble</strong> – A list of multi-conformer molecules.</p>
+<dd class="field-even"><p><strong>conformations_ensemble</strong> – A list of OpenEye multi-conformer molecules.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>list of oechem.OEMol</p>
-</dd>
-</dl>
-</dd></dl>
-<dl class="function">
-<dt id="kinoml.modeling.OEModeling.optimize_poses">
-<code class="sig-prename descclassname">kinoml.modeling.OEModeling.</code><code class="sig-name descname">optimize_poses</code><span class="sig-paren">(</span><em class="sig-param">docking_poses: List[oechem.OEGraphMol], protein: Union[oechem.OEMolBase, oechem.OEGraphMol]</em><span class="sig-paren">)</span> → List[oechem.OEGraphMol]<a class="headerlink" href="#kinoml.modeling.OEModeling.optimize_poses" title="Permalink to this definition">¶</a></dt>
-<dd><p>Optimize the torsions of docking poses in a protein binding site.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>docking_poses</strong> (<em>list of oechem.OEGraphMol</em>) – The docking poses to optimize.</p></li>
-<li><p><strong>protein</strong> (<em>oechem.OEGraphMol</em><em> or </em><em>oechem.MolBase</em>) – The OpenEye molecule holding a protein structure.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><strong>optimized_docking_poses</strong> – The optimized docking poses.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>list of oechem.OEGraphMol</p>
+<dd class="field-odd"><p>list of oechem.OEMCMolBase</p>
 </dd>
 </dl>
 </dd></dl>
 <dl class="function">
 <dt id="kinoml.modeling.OEModeling.overlay_molecules">
-<code class="sig-prename descclassname">kinoml.modeling.OEModeling.</code><code class="sig-name descname">overlay_molecules</code><span class="sig-paren">(</span><em class="sig-param">reference_molecule: oechem.OEGraphMol</em>, <em class="sig-param">fit_molecule: oechem.OEMol</em>, <em class="sig-param">return_overlay: bool = True</em><span class="sig-paren">)</span> → Union[int, List[oechem.OEGraphMol]]<a class="headerlink" href="#kinoml.modeling.OEModeling.overlay_molecules" title="Permalink to this definition">¶</a></dt>
-<dd><p>Overlay two molecules and calculate TanimotoCombo score.</p>
+<code class="sig-prename descclassname">kinoml.modeling.OEModeling.</code><code class="sig-name descname">overlay_molecules</code><span class="sig-paren">(</span><em class="sig-param">reference_molecule: oechem.OEMolBase, fit_molecule: oechem.OEMCMolBase) -&gt; (float, List[oechem.OEGraphMol]</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.modeling.OEModeling.overlay_molecules" title="Permalink to this definition">¶</a></dt>
+<dd><p>Overlay a multi-conformer molecule to a single-conformer molecule and calculate the TanimotoCombo score.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>reference_molecule</strong> (<em>oechem.OEGraphMol</em>) – An OpenEye molecule holding the reference molecule for overlay.</p></li>
-<li><p><strong>fit_molecule</strong> (<em>oechem.OEMol</em>) – An OpenEye multi-conformer molecule holding the fit molecule for overlay.</p></li>
-<li><p><strong>return_overlay</strong> (<em>bool</em>) – If the best scored overlay of molecules should be returned.</p></li>
+<li><p><strong>reference_molecule</strong> (<em>oechem.OEMolBase</em>) – An OpenEye molecule holding a single conformation of the reference molecule for overlay.</p></li>
+<li><p><strong>fit_molecule</strong> (<em>oechem.OEMCMolBase</em>) – An OpenEye multi-conformer molecule holding the conformations of a molecule to fit during overlay.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><ul class="simple">
-<li><p><em>int or int and list of oechem.OEGraphMol</em></p></li>
-<li><p><em>The TanimotoCombo score of the best overlay and the overlay if score_only is set False.</em></p></li>
-</ul>
-</p>
+<dd class="field-even"><p>The TanimotoCombo score and the OpenEye molecules of the best overlay</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float, list of oechem.OEGraphMol</p>
 </dd>
 </dl>
 </dd></dl>
 <dl class="function">
-<dt id="kinoml.modeling.OEModeling.generate_isomeric_smiles_representations">
-<code class="sig-prename descclassname">kinoml.modeling.OEModeling.</code><code class="sig-name descname">generate_isomeric_smiles_representations</code><span class="sig-paren">(</span><em class="sig-param">molecule: oechem.OEGraphMol</em><span class="sig-paren">)</span> → Set[str]<a class="headerlink" href="#kinoml.modeling.OEModeling.generate_isomeric_smiles_representations" title="Permalink to this definition">¶</a></dt>
-<dd><p>Generate reasonable isomeric smiles of a given OpenEye molecule.</p>
+<dt id="kinoml.modeling.OEModeling.enumerate_isomeric_smiles">
+<code class="sig-prename descclassname">kinoml.modeling.OEModeling.</code><code class="sig-name descname">enumerate_isomeric_smiles</code><span class="sig-paren">(</span><em class="sig-param">molecule: oechem.OEMolBase</em><span class="sig-paren">)</span> → Set[str]<a class="headerlink" href="#kinoml.modeling.OEModeling.enumerate_isomeric_smiles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Enumerate reasonable isomeric SMILES representations of a given OpenEye molecule.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>molecule</strong> (<em>oechem.OEGraphMol</em>) – An OpenEye molecule.</p>
+<dd class="field-odd"><p><strong>molecule</strong> (<em>oechem.OEMolBase</em>) – An OpenEye molecule.</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><strong>smiles_set</strong> – A set of reasonable isomeric smiles strings.</p>
+<dd class="field-even"><p><strong>smiles_set</strong> – A set of reasonable isomeric SMILES strings.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>set of str</p>
@@ -790,18 +824,18 @@ units.</p>
 </dl>
 </dd></dl>
 <dl class="function">
-<dt id="kinoml.modeling.OEModeling.compare_molecules">
-<code class="sig-prename descclassname">kinoml.modeling.OEModeling.</code><code class="sig-name descname">compare_molecules</code><span class="sig-paren">(</span><em class="sig-param">molecule1: oechem.OEGraphMol</em>, <em class="sig-param">molecule2: oechem.OEGraphMol</em><span class="sig-paren">)</span> → bool<a class="headerlink" href="#kinoml.modeling.OEModeling.compare_molecules" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compare two OpenEye molecules.</p>
+<dt id="kinoml.modeling.OEModeling.are_identical_molecules">
+<code class="sig-prename descclassname">kinoml.modeling.OEModeling.</code><code class="sig-name descname">are_identical_molecules</code><span class="sig-paren">(</span><em class="sig-param">molecule1: oechem.OEMolBase</em>, <em class="sig-param">molecule2: oechem.OEMolBase</em><span class="sig-paren">)</span> → bool<a class="headerlink" href="#kinoml.modeling.OEModeling.are_identical_molecules" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if two OpenEye molecules are identical.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>molecule1</strong> (<em>oechem.OEGraphMol</em>) – The first OpenEye molecule.</p></li>
-<li><p><strong>molecule2</strong> (<em>oechem.OEGraphMol</em>) – The second OpenEye molecule.</p></li>
+<li><p><strong>molecule1</strong> (<em>oechem.OEMolBase</em>) – The first OpenEye molecule.</p></li>
+<li><p><strong>molecule2</strong> (<em>oechem.OEMolBase</em>) – The second OpenEye molecule.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>True if same molecules, else False.</p>
+<dd class="field-even"><p>True if identical molecules, else False.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>bool</p>
@@ -809,52 +843,16 @@ units.</p>
 </dl>
 </dd></dl>
 <dl class="function">
-<dt id="kinoml.modeling.OEModeling.string_similarity">
-<code class="sig-prename descclassname">kinoml.modeling.OEModeling.</code><code class="sig-name descname">string_similarity</code><span class="sig-paren">(</span><em class="sig-param">string1: str</em>, <em class="sig-param">string2: str</em><span class="sig-paren">)</span> → float<a class="headerlink" href="#kinoml.modeling.OEModeling.string_similarity" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compare the characters of two strings.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>string1</strong> (<em>str</em>) – The first string.</p></li>
-<li><p><strong>string2</strong> (<em>str</em>) – The second string.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><ul class="simple">
-<li><p><em>float</em></p></li>
-<li><p><em>Similarity of strings expressed as fraction of matching characters.</em></p></li>
-</ul>
-</p>
-</dd>
-</dl>
-</dd></dl>
-<dl class="function">
-<dt id="kinoml.modeling.OEModeling.smiles_from_pdb">
-<code class="sig-prename descclassname">kinoml.modeling.OEModeling.</code><code class="sig-name descname">smiles_from_pdb</code><span class="sig-paren">(</span><em class="sig-param">ligand_ids: Iterable[str]</em><span class="sig-paren">)</span> → dict<a class="headerlink" href="#kinoml.modeling.OEModeling.smiles_from_pdb" title="Permalink to this definition">¶</a></dt>
-<dd><p>Retrieve SMILES of molecules defined by their PDB chemical identifier.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>ligand_ids</strong> (<em>iterable of str</em>) – Iterable of PDB chemical identifiers.</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><strong>ligands</strong> – Dictionary with PDB chemical identifier as keys and SMILES as values.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>dict</p>
-</dd>
-</dl>
-</dd></dl>
-<dl class="function">
 <dt id="kinoml.modeling.OEModeling.get_sequence">
-<code class="sig-prename descclassname">kinoml.modeling.OEModeling.</code><code class="sig-name descname">get_sequence</code><span class="sig-paren">(</span><em class="sig-param">structure: oechem.OEGraphMol</em><span class="sig-paren">)</span> → str<a class="headerlink" href="#kinoml.modeling.OEModeling.get_sequence" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the amino acid sequence with one letter characters of an OpenEye molecule holding a protein structure. All
-residues not perceived as amino acid will receive the character ‘X’.</p>
+<code class="sig-prename descclassname">kinoml.modeling.OEModeling.</code><code class="sig-name descname">get_sequence</code><span class="sig-paren">(</span><em class="sig-param">structure: oechem.OEMolBase</em><span class="sig-paren">)</span> → str<a class="headerlink" href="#kinoml.modeling.OEModeling.get_sequence" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the amino acid sequence with one letter characters of an OpenEye molecule.
+All residues not perceived as standard amino acid will receive the character ‘X’.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>structure</strong> (<em>oechem.OEGraphMol</em>) – An OpenEye molecule holding a protein structure.</p>
+<dd class="field-odd"><p><strong>structure</strong> (<em>oechem.OEMolBase</em>) – An OpenEye molecule.</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><strong>sequence</strong> – The amino acid sequence of the protein with one letter characters.</p>
+<dd class="field-even"><p><strong>sequence</strong> – The amino acid sequence with one letter characters.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>str</p>
@@ -862,94 +860,257 @@ residues not perceived as amino acid will receive the character ‘X’.</p>
 </dl>
 </dd></dl>
 <dl class="function">
-<dt id="kinoml.modeling.OEModeling.mutate_structure">
-<code class="sig-prename descclassname">kinoml.modeling.OEModeling.</code><code class="sig-name descname">mutate_structure</code><span class="sig-paren">(</span><em class="sig-param">target_structure: oechem.OEGraphMol</em>, <em class="sig-param">template_sequence: str</em><span class="sig-paren">)</span> → oechem.OEGraphMol<a class="headerlink" href="#kinoml.modeling.OEModeling.mutate_structure" title="Permalink to this definition">¶</a></dt>
-<dd><p>Mutate a protein structure according to an amino acid sequence.</p>
+<dt id="kinoml.modeling.OEModeling.get_structure_sequence_alignment">
+<code class="sig-prename descclassname">kinoml.modeling.OEModeling.</code><code class="sig-name descname">get_structure_sequence_alignment</code><span class="sig-paren">(</span><em class="sig-param">structure: oechem.OEMolBase</em>, <em class="sig-param">sequence: str</em><span class="sig-paren">)</span> → Tuple[str, str]<a class="headerlink" href="#kinoml.modeling.OEModeling.get_structure_sequence_alignment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate an alignment between a protein structure and an amino acid sequence. The provided protein structure should
+only contain protein residues to prevent unexpected behavior. Also, this alignment was optimized for highly similar
+sequences, i.e. only few mutations, deletions and insertions. Non protein residues will be marked with “X”.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>target_structure</strong> (<em>oechem.OEGraphMol</em>) – An OpenEye molecule holding a protein structure to mutate.</p></li>
-<li><p><strong>template_sequence</strong> (<em>str</em>) – A template one letter amino acid sequence, which defines the sequence the target structure should be mutated
-to. Protein residues not matching a template sequence will be either mutated or deleted.</p></li>
+<li><p><strong>structure</strong> (<em>oechem.OEMolBase</em>) – An OpenEye molecule holding a protein structure.</p></li>
+<li><p><strong>sequence</strong> (<em>str</em>) – A one letter amino acid sequence.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><strong>mutated_structure</strong> – An OpenEye molecule holding the mutated protein structure.</p>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>structure_sequence_aligned</strong> (<em>str</em>) – The aligned protein structure sequence with gaps denoted as “-“.</p></li>
+<li><p><strong>sequence_aligned</strong> (<em>str</em>) – The aligned amino acid sequence with gaps denoted as “-“.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="function">
+<dt id="kinoml.modeling.OEModeling.apply_deletions">
+<code class="sig-prename descclassname">kinoml.modeling.OEModeling.</code><code class="sig-name descname">apply_deletions</code><span class="sig-paren">(</span><em class="sig-param">target_structure: oechem.OEMolBase</em>, <em class="sig-param">template_sequence: str</em>, <em class="sig-param">delete_n_anchors: int = 2</em><span class="sig-paren">)</span> → oechem.OEMolBase<a class="headerlink" href="#kinoml.modeling.OEModeling.apply_deletions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply deletions to a protein structure according to an amino acid sequence. The provided protein structure should
+only contain protein residues to prevent unexpected behavior.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>target_structure</strong> (<em>oechem.OEMolBase</em>) – An OpenEye molecule holding a protein structure for which deletions should be applied.</p></li>
+<li><p><strong>template_sequence</strong> (<em>str</em>) – A template one letter amino acid sequence, which holds potential deletions when compared to the target
+structure sequence.</p></li>
+<li><p><strong>delete_n_anchors</strong> (<em>int</em>) – Specify how many anchoring residues should be deleted at each side of the deletion. Important if connecting
+anchoring residues after deletion is intended, e.g. via apply_insertion. Only affects deletions in the middle
+of a sequence, not at the end or the beginning.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>structure_with_deletions</strong> – An OpenEye molecule holding the protein structure with applied deletions.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>oechem.OEGraphMol</p>
+<dd class="field-odd"><p>oechem.OEMolBase</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>ValueError</strong> – Negative values are not allowed for ‘delete_n_anchors’.</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="function">
+<dt id="kinoml.modeling.OEModeling.apply_insertions">
+<code class="sig-prename descclassname">kinoml.modeling.OEModeling.</code><code class="sig-name descname">apply_insertions</code><span class="sig-paren">(</span><em class="sig-param">target_structure: oechem.OEMolBase, template_sequence: str, loop_db: Union[str, Path]</em><span class="sig-paren">)</span> → oechem.OEMolBase<a class="headerlink" href="#kinoml.modeling.OEModeling.apply_insertions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply insertions to a protein structure according to an amino acid sequence. The provided protein structure should
+only contain protein residues to prevent unexpected behavior.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>target_structure</strong> (<em>oechem.OEMolBase</em>) – An OpenEye molecule holding a protein structure for which insertions should be applied.</p></li>
+<li><p><strong>template_sequence</strong> (<em>str</em>) – A template one letter amino acid sequence, which holds potential insertions when compared to the target
+structure sequence.</p></li>
+<li><p><strong>loop_db</strong> (<em>str</em><em> or </em><em>Path</em>) – The path to the loop database used by OESpruce to model missing loops.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>structure_with_insertions</strong> – An OpenEye molecule holding the protein structure with applied insertions.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>oechem.OEMolBase</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="function">
+<dt id="kinoml.modeling.OEModeling.apply_mutations">
+<code class="sig-prename descclassname">kinoml.modeling.OEModeling.</code><code class="sig-name descname">apply_mutations</code><span class="sig-paren">(</span><em class="sig-param">target_structure: oechem.OEMolBase</em>, <em class="sig-param">template_sequence: str</em>, <em class="sig-param">fallback_delete: bool = True</em><span class="sig-paren">)</span> → oechem.OEMolBase<a class="headerlink" href="#kinoml.modeling.OEModeling.apply_mutations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Mutate a protein structure according to an amino acid sequence. The provided protein structure should only contain
+protein residues to prevent unexpected behavior. Residues that could not be mutated will be deleted by default.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>target_structure</strong> (<em>oechem.OEMolBase</em>) – An OpenEye molecule holding a protein structure to mutate.</p></li>
+<li><p><strong>template_sequence</strong> (<em>str</em>) – A template one letter amino acid sequence, which holds potential mutations when compared to the target
+structure sequence.</p></li>
+<li><p><strong>fallback_delete</strong> (<em>bool</em>) – If the residue should be deleted if it could not be mutated.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An OpenEye molecule holding the mutated protein structure.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>oechem.OEMolBase</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>ValueError</strong> – Mutation {oeresidue.GetName()}{oeresidue.GetResidueNumber()}{three_letter_code} failed!
+Only raised when fallback_delete is set False.</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="function">
+<dt id="kinoml.modeling.OEModeling.delete_partial_residues">
+<code class="sig-prename descclassname">kinoml.modeling.OEModeling.</code><code class="sig-name descname">delete_partial_residues</code><span class="sig-paren">(</span><em class="sig-param">structure: oechem.OEMolBase</em><span class="sig-paren">)</span> → oechem.OEMolBase<a class="headerlink" href="#kinoml.modeling.OEModeling.delete_partial_residues" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete residues with missing sidechain or backbone atoms. The backbone is considered complete
+if atoms C, CA and N are present.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>structure</strong> (<em>oechem.OEMolBase</em>) – An OpenEye molecule holding a protein structure.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>structure</strong> – An OpenEye molecule holding only residues with completely modeled side chains.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>oechem.OEMolBase</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="function">
+<dt id="kinoml.modeling.OEModeling.delete_short_protein_segments">
+<code class="sig-prename descclassname">kinoml.modeling.OEModeling.</code><code class="sig-name descname">delete_short_protein_segments</code><span class="sig-paren">(</span><em class="sig-param">structure: oechem.OEMolBase</em><span class="sig-paren">)</span> → oechem.OEMolBase<a class="headerlink" href="#kinoml.modeling.OEModeling.delete_short_protein_segments" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete protein segments consisting of 3 or less residues.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>structure</strong> (<em>oechem.OEMolBase</em>) – An OpenEye molecule holding a protein with possibly short segments.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>structure</strong> – An OpenEye molecule holding the protein without short segments.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>oechem.OEMolBase</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="function">
+<dt id="kinoml.modeling.OEModeling.delete_clashing_sidechains">
+<code class="sig-prename descclassname">kinoml.modeling.OEModeling.</code><code class="sig-name descname">delete_clashing_sidechains</code><span class="sig-paren">(</span><em class="sig-param">structure: oechem.OEMolBase</em>, <em class="sig-param">cutoff: float = 2.0</em><span class="sig-paren">)</span> → oechem.OEMolBase<a class="headerlink" href="#kinoml.modeling.OEModeling.delete_clashing_sidechains" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete side chains that are clashing with other atoms of the given structure.</p>
+<p>Note: Structures containing non-protein residues may lead to unexpected behavior, since also
+those residues will be deleted if clashing with other residues of the system. However, this
+behavior is important to be able to also check PTMs for clashes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>structure</strong> (<em>oechem.OEMolBase</em>) – An OpenEye molecule holding a protein structure.</p></li>
+<li><p><strong>cutoff</strong> (<em>float</em>) – The distance cutoff that is used for defining a heavy atom clash.
+Note: Going bigger than 2.3 A may lead to the deletion of residues involved in strong
+hydrogen bonds.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>processed_structure</strong> – An OpenEye molecule holding the protein structure without clashing sidechains.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>oechem.OEMolBase</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="function">
+<dt id="kinoml.modeling.OEModeling.get_atom_coordinates">
+<code class="sig-prename descclassname">kinoml.modeling.OEModeling.</code><code class="sig-name descname">get_atom_coordinates</code><span class="sig-paren">(</span><em class="sig-param">molecule: oechem.OEMolBase</em><span class="sig-paren">)</span> → List[Tuple[float, float, float]]<a class="headerlink" href="#kinoml.modeling.OEModeling.get_atom_coordinates" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve the atom coordinates of an OpenEye molecule.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>molecule</strong> (<em>oechem.OEMolBase</em>) – An OpenEye molecule for which the coordinates should be retrieved.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>coordinates</strong> – The coordinates of the given molecule atoms.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list of tuple of float</p>
 </dd>
 </dl>
 </dd></dl>
 <dl class="function">
 <dt id="kinoml.modeling.OEModeling.renumber_structure">
-<code class="sig-prename descclassname">kinoml.modeling.OEModeling.</code><code class="sig-name descname">renumber_structure</code><span class="sig-paren">(</span><em class="sig-param">target_structure: oechem.OEGraphMol, residue_numbers: List[int]</em><span class="sig-paren">)</span> → oechem.OEGraphMol<a class="headerlink" href="#kinoml.modeling.OEModeling.renumber_structure" title="Permalink to this definition">¶</a></dt>
-<dd><p>Renumber the residues of a protein structure according to the given list of residue numbers.</p>
+<code class="sig-prename descclassname">kinoml.modeling.OEModeling.</code><code class="sig-name descname">renumber_structure</code><span class="sig-paren">(</span><em class="sig-param">target_structure: oechem.OEMolBase, residue_ids: Iterable[int]</em><span class="sig-paren">)</span> → oechem.OEGraphMol<a class="headerlink" href="#kinoml.modeling.OEModeling.renumber_structure" title="Permalink to this definition">¶</a></dt>
+<dd><p>Renumber the residues of a protein structure according to the given list of residue IDs.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>target_structure</strong> (<em>oechem.OEGraphMol</em>) – An OpenEye molecule holding the protein structure to renumber.</p></li>
-<li><p><strong>residue_numbers</strong> (<em>list of int</em>) – A list of residue numbers matching the order of the target structure.</p></li>
+<li><p><strong>target_structure</strong> (<em>oechem.OEMolBase</em>) – An OpenEye molecule holding the protein structure to renumber.</p></li>
+<li><p><strong>residue_ids</strong> (<em>iterable of int</em>) – An iterable of residue IDs matching the order of the target structure.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p><strong>renumbered_structure</strong> – An OpenEye molecule holding the cropped protein structure.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>oechem.OEGraphMol</p>
+<dd class="field-odd"><p>oechem.OEMolBase</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>ValueError</strong> – Number of given residue IDs does not match number of residues in the given structure.</p></li>
+<li><p><strong>ValueError</strong> – Given residue IDs contain wrong types, only int is allowed.</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
 <dl class="function">
 <dt id="kinoml.modeling.OEModeling.superpose_proteins">
-<code class="sig-prename descclassname">kinoml.modeling.OEModeling.</code><code class="sig-name descname">superpose_proteins</code><span class="sig-paren">(</span><em class="sig-param">reference_protein: oechem.OEGraphMol</em>, <em class="sig-param">fit_protein: oechem.OEGraphMol</em><span class="sig-paren">)</span> → oechem.OEGraphMol<a class="headerlink" href="#kinoml.modeling.OEModeling.superpose_proteins" title="Permalink to this definition">¶</a></dt>
-<dd><p>Superpose a protein structure onto a reference protein.</p>
+<code class="sig-prename descclassname">kinoml.modeling.OEModeling.</code><code class="sig-name descname">superpose_proteins</code><span class="sig-paren">(</span><em class="sig-param">reference_protein: oechem.OEMolBase</em>, <em class="sig-param">fit_protein: oechem.OEMolBase</em>, <em class="sig-param">residues: Iterable = tuple()</em>, <em class="sig-param">chain_id: str = ' '</em>, <em class="sig-param">insertion_code: str = ' '</em><span class="sig-paren">)</span> → oechem.OEMolBase<a class="headerlink" href="#kinoml.modeling.OEModeling.superpose_proteins" title="Permalink to this definition">¶</a></dt>
+<dd><p>Superpose a protein structure onto a reference protein. The superposition
+can be customized to consider only the specified residues.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>reference_protein</strong> (<em>oechem.OEGraphMol</em>) – An OpenEye molecule holding a protein structure which will be used as reference during superposition.</p></li>
-<li><p><strong>fit_protein</strong> (<em>oechem.OEGraphMol</em>) – An OpenEye molecule holding a protein structure which will be superposed onto the reference protein.</p></li>
+<li><p><strong>reference_protein</strong> (<em>oechem.OEMolBase</em>) – An OpenEye molecule holding a protein structure which will be used as reference during superposition.</p></li>
+<li><p><strong>fit_protein</strong> (<em>oechem.OEMolBase</em>) – An OpenEye molecule holding a protein structure which will be superposed onto the reference protein.</p></li>
+<li><p><strong>residues</strong> (<em>Iterable of str</em>) – Residues that should be used during superposition in format “GLY123”.</p></li>
+<li><p><strong>chain_id</strong> (<em>str</em>) – Chain identifier for residues that should be used during superposition.</p></li>
+<li><p><strong>insertion_code</strong> (<em>str</em>) – Insertion code for residues that should be used during superposition.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p><strong>superposed_protein</strong> – An OpenEye molecule holding the superposed protein structure.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>oechem.OEGraphMol</p>
+<dd class="field-odd"><p>oechem.OEMolBase</p>
 </dd>
 </dl>
 </dd></dl>
 <dl class="function">
 <dt id="kinoml.modeling.OEModeling.update_residue_identifiers">
-<code class="sig-prename descclassname">kinoml.modeling.OEModeling.</code><code class="sig-name descname">update_residue_identifiers</code><span class="sig-paren">(</span><em class="sig-param">structure: oechem.OEGraphMol</em>, <em class="sig-param">keep_protein_residue_ids: bool = True</em><span class="sig-paren">)</span> → oechem.OEGraphMol<a class="headerlink" href="#kinoml.modeling.OEModeling.update_residue_identifiers" title="Permalink to this definition">¶</a></dt>
-<dd><p>Updates the atom, residue and chain ids of the given molecular structure. All residues become part of chain A. Atom
-ids will start from 1. Residue will start from 1, except protein residue ids are fixed. This is especially useful,
-if molecules were merged, which can result in overlapping atom and residue ids as well as separate chains.</p>
+<code class="sig-prename descclassname">kinoml.modeling.OEModeling.</code><code class="sig-name descname">update_residue_identifiers</code><span class="sig-paren">(</span><em class="sig-param">structure: oechem.OEMolBase</em>, <em class="sig-param">keep_protein_residue_ids: bool = True</em>, <em class="sig-param">keep_chain_ids: bool = False</em><span class="sig-paren">)</span> → oechem.OEMolBase<a class="headerlink" href="#kinoml.modeling.OEModeling.update_residue_identifiers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the atom, residue and chain IDs of the given molecular structure. All residues become
+part of chain A, unless ‘keep_chain_ids’ is set True. Atom IDs will start from 1. Residue IDs
+will start from 1, except ‘keep_protein_residue_ids’ is set True. This is especially useful, if
+molecules were merged, which can result in overlapping atom and residue IDs as well as
+separate chains.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>structure</strong> (<em>oechem.OEGraphMol</em>) – The OpenEye molecule structure for updating atom and residue ids.</p></li>
+<li><p><strong>structure</strong> (<em>oechem.OEMolBase</em>) – The OpenEye molecule structure for updating atom and residue ids.</p></li>
 <li><p><strong>keep_protein_residue_ids</strong> (<em>bool</em>) – If the protein residues should be kept.</p></li>
+<li><p><strong>keep_chain_ids</strong> (<em>bool</em>) – If the chain IDS should be kept.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p><strong>structure</strong> – The OpenEye molecule structure with updated atom and residue ids.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>oechem.OEGraphMol</p>
+<dd class="field-odd"><p>oechem.OEMolBase</p>
 </dd>
 </dl>
 </dd></dl>
 <dl class="function">
 <dt id="kinoml.modeling.OEModeling.split_molecule_components">
-<code class="sig-prename descclassname">kinoml.modeling.OEModeling.</code><code class="sig-name descname">split_molecule_components</code><span class="sig-paren">(</span><em class="sig-param">molecule: oechem.OEGraphMol</em><span class="sig-paren">)</span> → List[oechem.OEGraphMol]<a class="headerlink" href="#kinoml.modeling.OEModeling.split_molecule_components" title="Permalink to this definition">¶</a></dt>
-<dd><p>Split an OpenEye Molecule into its bonded components.</p>
+<code class="sig-prename descclassname">kinoml.modeling.OEModeling.</code><code class="sig-name descname">split_molecule_components</code><span class="sig-paren">(</span><em class="sig-param">molecule: oechem.OEMolBase</em><span class="sig-paren">)</span> → List[oechem.OEGraphMol]<a class="headerlink" href="#kinoml.modeling.OEModeling.split_molecule_components" title="Permalink to this definition">¶</a></dt>
+<dd><p>Split an OpenEye molecule into its bonded components.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>molecule</strong> (<em>oechem.OEGraphMol</em>) – An OpenEye molecule holding multiple components.</p>
+<dd class="field-odd"><p><strong>molecule</strong> (<em>oechem.OEMolBase</em>) – An OpenEye molecule holding multiple components.</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>A list of OpenEye molecules holding the split components.</p>
+<dd class="field-even"><p><strong>components</strong> – A list of OpenEye molecules holding the split components.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>list of oechem.OEGraphMol</p>
@@ -957,21 +1118,29 @@ if molecules were merged, which can result in overlapping atom and residue ids a
 </dl>
 </dd></dl>
 <dl class="function">
-<dt id="kinoml.modeling.OEModeling.clashing_atoms">
-<code class="sig-prename descclassname">kinoml.modeling.OEModeling.</code><code class="sig-name descname">clashing_atoms</code><span class="sig-paren">(</span><em class="sig-param">molecule1: oechem.OEGraphMol</em>, <em class="sig-param">molecule2: oechem.OEGraphMol</em><span class="sig-paren">)</span> → bool<a class="headerlink" href="#kinoml.modeling.OEModeling.clashing_atoms" title="Permalink to this definition">¶</a></dt>
-<dd><p>Evaluates if the atoms of two molecules are clashing.</p>
+<dt id="kinoml.modeling.OEModeling.residue_ids_to_residue_names">
+<code class="sig-prename descclassname">kinoml.modeling.OEModeling.</code><code class="sig-name descname">residue_ids_to_residue_names</code><span class="sig-paren">(</span><em class="sig-param">structure: oechem.OEMolBase, residue_ids: List[int], chain_id: Union[None, str] = None</em><span class="sig-paren">)</span> → List[str]<a class="headerlink" href="#kinoml.modeling.OEModeling.residue_ids_to_residue_names" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the corresponding residue names for a list of residue IDs and a give OpenEye molecule
+with residue information.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>molecule1</strong> (<em>oechem.OEGraphMol</em>) – An OpenEye molecule.</p></li>
-<li><p><strong>molecule2</strong> (<em>oechem.OEGraphMol</em>) – An OpenEye molecule.</p></li>
+<li><p><strong>structure</strong> (<em>oechem.OEMolBase</em>) – An OpenEye molecule with residue information.</p></li>
+<li><p><strong>residue_ids</strong> (<em>list of int</em>) – A list of residue IDs.</p></li>
+<li><p><strong>chain_id</strong> (<em>None</em><em> or </em><em>str</em>) – The chain ID to filter for.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>If any atoms of two molecules are clashing</p>
+<dd class="field-even"><p><strong>residue_names</strong> – The corresponding residue names as three letter codes.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>bool</p>
+<dd class="field-odd"><p>list of str</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>ValueError</strong> – No residue found for residue ID {resid}.</p></li>
+<li><p><strong>ValueError</strong> – Found multiple residues for residue ID {resid}.</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
