@@ -144,7 +144,7 @@ class Biosequence(str):
                 stop_res == self[stop_pos - 1]
             ), f"Element at position {stop_pos} is not {stop_res}"
         return self.__class__(
-            self[start_pos - 1: stop_pos],
+            self[start_pos - 1 : stop_pos],
             name=f"{self.name}{ ' | ' if self.name else '' }Cut: {start}/{stop}",
             metadata={"cut": (start, stop)},
         )
@@ -183,8 +183,7 @@ class Biosequence(str):
         mutation_types = {m: self._type_mutation(m, raise_errors) for m in mutations}
         mutation_count = Counter(mutation_types.values())
         if mutation_count["insertion"] + mutation_count["deletion"] > 1:
-            msg = f"Only one simultaneous insertion or deletion is currently supported."
-                  f"You provided `{','.join(mutations)}`"
+            msg = f"Only one simultaneous insertion or deletion is currently supported. You provided `{','.join(mutations)}`"
             if raise_errors:
                 raise ValueError(msg)
             logger.warning("Warning: %s", msg)
@@ -296,20 +295,14 @@ class DNASequence(Biosequence):
     """Biosequence that only allows DNA bases"""
 
     ALPHABET = "ATCG"
-    _ACCESSION_URL = (
-        "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=nuccore&id={}"
-        "&rettype=fasta&retmode=text"
-    )
+    _ACCESSION_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=nuccore&id={}&rettype=fasta&retmode=text"
 
 
 class RNASequence(Biosequence):
     """Biosequence that only allows RNA bases"""
 
     ALPHABET = "AUCG"
-    _ACCESSION_URL = (
-        "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=nuccore&id={}"
-        "&rettype=fasta&retmode=text"
-    )
+    _ACCESSION_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=nuccore&id={}&rettype=fasta&retmode=text"
 
 
 class AminoAcidSequence(Biosequence):
@@ -430,7 +423,7 @@ class KinaseDomainAminoAcidSequence(AminoAcidSequence):
         true_C_terminus = False
         if end == len(sequence):
             true_C_terminus = True
-        kinase_domain_sequence = sequence[begin - 1: end]
+        kinase_domain_sequence = sequence[begin - 1 : end]
 
         sequence_details = {
             "sequence": kinase_domain_sequence,
