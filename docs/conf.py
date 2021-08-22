@@ -64,6 +64,7 @@ autoapi_ignore = [
     "*migrations*",
     "_version*",
     "*tests*",
+    "*/data/*",
 ]
 autoapi_options = [
     "members",
