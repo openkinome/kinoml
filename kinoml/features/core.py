@@ -23,9 +23,9 @@ class BaseFeaturizer:
     _SUPPORTED_TYPES = (System,)
 
     def featurize(
-            self,
-            systems: Iterable[System],
-            keep=True,
+        self,
+        systems: Iterable[System],
+        keep=True,
     ) -> Iterable[System]:
         """
         Given some systems (compatible with ``_SUPPORTED_TYPES``), apply
@@ -110,7 +110,10 @@ class BaseFeaturizer:
         raise NotImplementedError("Implement in your subclass")
 
     def _post_featurize(
-        self, systems: Iterable[System], features: Iterable[System | np.array], keep: bool = True
+        self,
+        systems: Iterable[System],
+        features: Iterable[System | np.array],
+        keep: bool = True,
     ) -> Iterable[System]:
         """
         Run after featurizing all systems. You shouldn't need to redefine this method
@@ -216,12 +219,12 @@ class ParallelBaseFeaturizer(BaseFeaturizer):
     # TODO: environment variables for multiprocessing
 
     def __init__(
-            self,
-            use_multiprocessing: bool = True,
-            n_processes: Union[int, None] = None,
-            chunksize: Union[int, None] = None,
-            dask_client=None,
-            **kwargs
+        self,
+        use_multiprocessing: bool = True,
+        n_processes: Union[int, None] = None,
+        chunksize: Union[int, None] = None,
+        dask_client=None,
+        **kwargs,
     ):
         super().__init__(**kwargs)
         self.use_multiprocessing = use_multiprocessing
@@ -234,13 +237,18 @@ class ParallelBaseFeaturizer(BaseFeaturizer):
 
         def is_serializable(value):
             import pickle
+
             try:
                 pickle.dumps(value)
                 return True
             except AttributeError as e:
                 return False
 
-        return {name: value for name, value in self.__dict__.items() if is_serializable(value)}
+        return {
+            name: value
+            for name, value in self.__dict__.items()
+            if is_serializable(value)
+        }
 
     def __setstate__(self, state):
         """Only preserve object fields that are serializable."""
@@ -265,6 +273,7 @@ class ParallelBaseFeaturizer(BaseFeaturizer):
             # check if dask_client is a Client from dask.distributed
             if not hasattr(self.dask_client, "map"):
                 from dask.distributed import Client
+
                 if not isinstance(self.dask_client, Client):
                     raise ValueError(
                         "The dask_client attribute appears not to be a Client from dask.distributed."
@@ -283,8 +292,7 @@ class ParallelBaseFeaturizer(BaseFeaturizer):
             if self.n_processes == 1:
                 # featurize in a serial fashion
                 features = [
-                    self._featurize_one(s)
-                    for s in tqdm(systems, desc=self.name)
+                    self._featurize_one(s) for s in tqdm(systems, desc=self.name)
                 ]
             else:
                 # featurize in a parallel fashion
@@ -322,7 +330,9 @@ class Pipeline(BaseFeaturizer):
         self.featurizers = featurizers
         self._shortname = shortname
 
-    def _featurize(self, systems: Iterable[System], keep: bool = True) -> Iterable[object]:
+    def _featurize(
+        self, systems: Iterable[System], keep: bool = True
+    ) -> Iterable[object]:
         """
         Given a list of featurizers, apply them sequentially
         on the systems (e.g. featurizer A returns X, and X is
@@ -367,7 +377,9 @@ class Pipeline(BaseFeaturizer):
         ``ValueError`` if ``f.supports()`` fails and ``raise_errors`` is ``True``.
         """
         return all(
-            f.supports(s, raise_errors=raise_errors) for f in self.featurizers for s in systems
+            f.supports(s, raise_errors=raise_errors)
+            for f in self.featurizers
+            for s in systems
         )
 
     @property
@@ -577,7 +589,7 @@ class BaseOneHotEncodingFeaturizer(ParallelBaseFeaturizer):
         dictionary : dict or sequuence-like
             Mapping of each character to their position in the alphabet. If
             a sequence-like is given, it will be enumerated into a dict.
-        
+
         Returns
         -------
         array-like
@@ -611,7 +623,13 @@ class PadFeaturizer(ParallelBaseFeaturizer):
         value to fill the array-like features with
     """
 
-    def __init__(self, shape: Iterable[int] = "auto", key: Hashable = "last", pad_with: int = 0, **kwargs):
+    def __init__(
+        self,
+        shape: Iterable[int] = "auto",
+        key: Hashable = "last",
+        pad_with: int = 0,
+        **kwargs,
+    ):
         super().__init__(**kwargs)
         self.shape = shape
         self.key = key
@@ -674,7 +692,9 @@ class HashFeaturizer(BaseFeaturizer):
         Normalizes the hash to obtain a value in the unit interval
     """
 
-    def __init__(self, getter: Callable[[System], str] = None, normalize=True, **kwargs):
+    def __init__(
+        self, getter: Callable[[System], str] = None, normalize=True, **kwargs
+    ):
         super().__init__(**kwargs)
         self.getter = getter or self._getter
         self.normalize = normalize
@@ -705,7 +725,6 @@ class HashFeaturizer(BaseFeaturizer):
 
 
 class NullFeaturizer(ParallelBaseFeaturizer):
-
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
@@ -726,7 +745,9 @@ class CallableFeaturizer(BaseFeaturizer):
         for each system.
     """
 
-    def __init__(self, func: Callable[[System], System | np.array] | str = None, **kwargs):
+    def __init__(
+        self, func: Callable[[System], System | np.array] | str = None, **kwargs
+    ):
         super().__init__(**kwargs)
         if func is None:
             func = self._default_func
@@ -786,7 +807,10 @@ class ClearFeaturizations(BaseFeaturizer):
         return system
 
     def _post_featurize(
-        self, systems: Iterable[System], features: Iterable[System | np.array], keep: bool = True
+        self,
+        systems: Iterable[System],
+        features: Iterable[System | np.array],
+        keep: bool = True,
     ) -> Iterable[System]:
         """
         Bypass the automated population of the ``.featurizations`` dict
