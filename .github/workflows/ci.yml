@@ -54,6 +54,13 @@ jobs:
           auto-activate-base: false
           use-mamba: true
 
+      - name: Cache klifs data
+        uses: actions/cache@v2
+        with:
+          path:
+            python -c 'from appdirs import user_cache_dir; print(user_cache_dir())'
+          key: ${{ runner.os }}-${{ hashFiles('klifs_*_db.csv') }}
+
       - name: Additional info about the build
         shell: bash
         run: |
