@@ -348,14 +348,3 @@ def import_object(import_path: str):
         module = import_module(module_str)
         return getattr(module, obj_str)
     return import_module(import_path)
-
-
-class Hashabledict(dict):
-    """
-    A dictionary that can be hashed so it can be used in
-    multiprocessing contexts. It shouldn't be modified
-    after instantiation!
-    """
-
-    def __hash__(self):
-        return hash((frozenset(self), frozenset(self.values())))
