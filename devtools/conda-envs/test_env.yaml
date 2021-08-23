@@ -27,6 +27,7 @@ dependencies:
   - papermill 2.2.*
   - matplotlib-base
   - ruamel.yaml
+  - mdanalysis >=2.0.0
 
   # Development
   - jupyterlab
@@ -75,5 +76,3 @@ dependencies:
       - sphinx-material
       # local building
       - sphinx-autobuild
-      # no stable release yet with support for serialization
-      - MDAnalysis==2.0.0b0
