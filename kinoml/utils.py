@@ -348,3 +348,9 @@ def import_object(import_path: str):
         module = import_module(module_str)
         return getattr(module, obj_str)
     return import_module(import_path)
+
+def string_to_sha256(string: str):
+    """
+
+    """
+
