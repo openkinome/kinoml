@@ -6,7 +6,7 @@ from collections import Counter
 import logging
 import numpy as np
 from pathlib import Path
-from typing import Union, Tuple
+from typing import Union, Tuple, Iterable
 
 from .core import ParallelBaseFeaturizer, BaseOneHotEncodingFeaturizer
 from ..core.proteins import BaseProtein, ProteinStructure
@@ -107,7 +107,7 @@ class OEProteinStructureFeaturizer(ParallelBaseFeaturizer):
         saved.
     """
     from MDAnalysis.core import universe
-    from openeye import oechem, oegrid
+    from openeye import oechem
 
     def __init__(
             self,
@@ -147,11 +147,22 @@ class OEProteinStructureFeaturizer(ParallelBaseFeaturizer):
         """
         from openeye import oechem
 
+        from ..utils import sha256_objects
+
         logging.debug("Interpreting system ...")
         protein = self._read_protein_structure(system.protein)
 
         logging.debug("Preparing protein structure ...")
-        design_unit = self._get_design_unit(protein)
+        design_unit = self._get_design_unit(
+            protein,
+            sha256_objects([
+                getattr(self, "loop_db"),
+                getattr(system.protein, "path", None),
+                getattr(system.protein, "chain_id", None),
+                getattr(system.protein, "alternate_location", None),
+                getattr(system.protein, "sequence", None),
+            ])
+        )
 
         logging.debug("Extracting components ...")
         prepared_protein, prepared_solvent, prepared_ligand = self._get_components(design_unit)
@@ -248,8 +259,8 @@ class OEProteinStructureFeaturizer(ParallelBaseFeaturizer):
 
     def _get_design_unit(
             self,
-            
             complex_structure: oechem.OEGraphMol,
+            design_unit_identifier: str,
     ) -> oechem.OEDesignUnit:
         """
         Get an OpenEye design unit from a protein ligand complex.
@@ -273,7 +284,8 @@ class OEProteinStructureFeaturizer(ParallelBaseFeaturizer):
 
         design_unit_path = LocalFileStorage.featurizer_result(
             self.__class__.__name__,
-            f"{design_unit_identifier}_design_unit", "oedu",
+            design_unit_identifier,
+            "oedu",
             self.cache_dir,
         )
         if not design_unit_path.is_file():

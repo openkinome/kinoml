@@ -349,8 +349,22 @@ def import_object(import_path: str):
         return getattr(module, obj_str)
     return import_module(import_path)
 
-def string_to_sha256(string: str):
-    """
 
+def sha256_objects(objects_to_hash: Iterable[object]) -> str:
     """
+    Generate a SHA256 hash of pickable objects.
 
+    Parameters
+    ----------
+    objects_to_hash: Iterable of object
+        Objects that should be hashed
+
+    Returns
+    -------
+    : str
+        The SHA256 of given objects.
+    """
+    import hashlib
+    import pickle
+
+    return hashlib.sha256(pickle.dumps(objects_to_hash)).hexdigest()
