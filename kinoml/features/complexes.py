@@ -185,10 +185,12 @@ class OEBaseComplexFeaturizer(ParallelBaseFeaturizer):
     ) -> Tuple[oechem.OEGraphMol(), oechem.OEGraphMol(), oechem.OEGraphMol()]:
         """
         Get protein, solvent and ligand components from an OpenEye design unit.
+
         Parameters
         ----------
         design_unit: oechem.OEDesignUnit
             The OpenEye design unit to extract components from.
+
         Returns
         -------
         components: tuple of oechem.OEGraphMol, oechem.OEGraphMol and oechem.OEGraphMol
@@ -210,8 +212,7 @@ class OEBaseComplexFeaturizer(ParallelBaseFeaturizer):
                 protein.DeleteAtom(atom)
 
         # perceive residues to remove artifacts of other design units in the sequence of the protein
-        # preserve certain properties to assure correct behavior of the pipeline,
-        # e.g. deletion of chains in OEKLIFSKinaseApoFeaturizer._process_kinase_domain method
+        # preserve certain properties to assure correct behavior of the pipeline
         preserved_info = (
                 oechem.OEPreserveResInfo_ResidueNumber
                 | oechem.OEPreserveResInfo_ResidueName
@@ -603,7 +604,9 @@ class OEComplexFeaturizer(OEBaseComplexFeaturizer):
         : universe
             An MDAnalysis universe of the featurized system.
         """
-        from openeye import oechem
 
         logging.debug("Preparing complex structure ...")
         design_unit = self._get_design_unit(system)
+
+        logging.debug("Extracting design unit components ...")
+        protein, solvent, ligand = self._get_components(design_unit)

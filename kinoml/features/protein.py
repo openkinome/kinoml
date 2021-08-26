@@ -127,3 +127,6 @@ class OEProteinStructureFeaturizer(OEBaseComplexFeaturizer):
 
         logging.debug("Preparing protein structure ...")
         design_unit = self._get_design_unit(system)
+
+        logging.debug("Extracting design unit components ...")
+        protein, solvent = self._get_components(design_unit)[-1]
