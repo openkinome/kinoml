@@ -132,9 +132,9 @@ class OEProteinStructureFeaturizer(OEBaseComplexFeaturizer):
         protein, solvent = self._get_components(design_unit)[-1]
 
         if hasattr(system.protein, "sequence"):
-            protein = self._process_protein(protein, system.sequence)
+            protein = self._process_protein(protein, system.protein.sequence)
 
         logging.debug("Assembling components ...")
-        solvated_protein = self._assemble_components(protein, solvent, ligand)
+        solvated_protein = self._assemble_components(protein, solvent)
 
 

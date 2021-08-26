@@ -4,10 +4,11 @@ subclasses thereof
 """
 import logging
 from pathlib import Path
-from typing import Iterable, Tuple, Union
+from typing import List, Iterable, Tuple, Union
 
 from .core import ParallelBaseFeaturizer
 from ..core.proteins import BaseProtein
+from ..core.sequences import AminoAcidSequence
 from ..core.systems import System, ProteinSystem, ProteinLigandComplex
 
 
@@ -237,7 +238,7 @@ class OEBaseComplexFeaturizer(ParallelBaseFeaturizer):
     def _process_protein(
             self,
             protein_structure: oechem.OEMolBase,
-            amino_acid_sequence: Biosequence,
+            amino_acid_sequence: AminoAcidSequence,
             chain_id: Union[str, None] = None
     ) -> oechem.OEMolBase:
         """
@@ -247,7 +248,7 @@ class OEBaseComplexFeaturizer(ParallelBaseFeaturizer):
         ----------
         protein_structure: oechem.OEMolBase
             An OpenEye molecule holding the protein structure to process.
-        amino_acid_sequence: Biosequence
+        amino_acid_sequence: AminoAcidSequence
             The amino acid sequence with associated metadata.
         chain_id: str or None
             The chain ID of the protein. Other chains will be deleted.
@@ -257,8 +258,8 @@ class OEBaseComplexFeaturizer(ParallelBaseFeaturizer):
         : oechem.OEMolBase
             An OpenEye molecule holding the processed protein structure.
         """
-
         from ..modeling.OEModeling import (
+            read_molecules,
             select_chain,
             assign_caps,
             apply_deletions,
@@ -267,8 +268,20 @@ class OEBaseComplexFeaturizer(ParallelBaseFeaturizer):
             delete_clashing_sidechains,
             delete_partial_residues,
             delete_short_protein_segments,
-            renumber_structure
+            renumber_structure,
+            write_molecules
         )
+        from ..utils import LocalFileStorage, sha256_objects
+
+        processed_protein_path = LocalFileStorage.featurizer_result(
+            self.__class__.__name__,
+            sha256_objects([self.loop_db, protein_structure, amino_acid_sequence, chain_id]),
+            "oeb",
+            self.cache_dir,
+        )
+        if processed_protein_path.is_file():
+            logging.debug("Reading processed protein from file ...")
+            return read_molecules(processed_protein_path)[0]
 
         if chain_id:
             logging.debug(f"Deleting all chains but {chain_id} ...")
@@ -317,12 +330,15 @@ class OEBaseComplexFeaturizer(ParallelBaseFeaturizer):
         logging.debug(f"Assigning caps except for real termini {real_termini} ...")
         protein_structure = assign_caps(protein_structure, real_termini)
 
+        logging.debug("Writing processed protein structure ...")
+        write_molecules([protein_structure], processed_protein_path)
+
         return protein_structure
 
     @staticmethod
     def _get_protein_residue_numbers(
             protein_structure: oechem.OEMolBase,
-            amino_acid_sequence: Biosequence
+            amino_acid_sequence: AminoAcidSequence
     ) -> List[int]:
         """
         Get the residue numbers of a protein structure according to given amino acid sequence.
@@ -331,7 +347,7 @@ class OEBaseComplexFeaturizer(ParallelBaseFeaturizer):
         ----------
         protein_structure: oechem.OEMolBase
             The kinase domain structure.
-        amino_acid_sequence: Biosequence
+        amino_acid_sequence: AminoAcidSequence
             The canonical kinase domain sequence.
 
         Returns
@@ -373,18 +389,20 @@ class OEBaseComplexFeaturizer(ParallelBaseFeaturizer):
         self,
         protein: oechem.OEMolBase,
         solvent: oechem.OEMolBase,
-        ligand: Union[oechem.OEMolBase, None]
+        ligand: Union[oechem.OEMolBase, None] = None
     ) -> oechem.OEMolBase:
         """
         Assemble components of a solvated protein-ligand complex into a single OpenEye molecule.
+
         Parameters
         ----------
         protein: oechem.OEMolBase
             An OpenEye molecule holding the protein of interest.
         solvent: oechem.OEMolBase
             An OpenEye molecule holding the solvent of interest.
-        ligand: oechem.OEMolBase or None
+        ligand: oechem.OEMolBase or None, default=None
             An OpenEye molecule holding the ligand of interest if given.
+
         Returns
         -------
         assembled_components: oechem.OEMolBase
@@ -747,9 +765,9 @@ class OEComplexFeaturizer(OEBaseComplexFeaturizer):
         protein, solvent, ligand = self._get_components(design_unit)
 
         if hasattr(system.protein, "sequence"):
-            protein = self._process_protein(protein, system.sequence)
+            protein = self._process_protein(protein, system.protein.sequence)
 
         logging.debug("Assembling components ...")
         protein_ligand_complex = self._assemble_components(protein, solvent, ligand)
 
-        
+
