@@ -234,6 +234,141 @@ class OEBaseComplexFeaturizer(ParallelBaseFeaturizer):
         )
         return protein, solvent, ligand
 
+    def _process_protein(
+            self,
+            protein_structure: oechem.OEMolBase,
+            amino_acid_sequence: Biosequence,
+            chain_id: Union[str, None] = None
+    ) -> oechem.OEMolBase:
+        """
+        Process a protein a structure according to the given amino acid sequence.
+
+        Parameters
+        ----------
+        protein_structure: oechem.OEMolBase
+            An OpenEye molecule holding the protein structure to process.
+        amino_acid_sequence: Biosequence
+            The amino acid sequence with associated metadata.
+        chain_id: str or None
+            The chain ID of the protein. Other chains will be deleted.
+
+        Returns
+        -------
+        : oechem.OEMolBase
+            An OpenEye molecule holding the processed protein structure.
+        """
+
+        from ..modeling.OEModeling import (
+            select_chain,
+            assign_caps,
+            apply_deletions,
+            apply_insertions,
+            apply_mutations,
+            delete_clashing_sidechains,
+            delete_partial_residues,
+            delete_short_protein_segments,
+            renumber_structure
+        )
+
+        if chain_id:
+            logging.debug(f"Deleting all chains but {chain_id} ...")
+            protein_structure = select_chain(protein_structure, chain_id)
+
+        logging.debug(f"Deleting residues with clashing side chains ...")  # e.g. 2j5f, 4wd5
+        protein_structure = delete_clashing_sidechains(protein_structure)
+
+        logging.debug("Deleting residues with missing atoms ...")
+        protein_structure = delete_partial_residues(protein_structure)
+
+        logging.debug("Deleting loose protein segments ...")
+        protein_structure = delete_short_protein_segments(protein_structure)
+
+        logging.debug("Applying deletions to protein structure ...")
+        protein_structure = apply_deletions(protein_structure, amino_acid_sequence)
+
+        logging.debug("Deleting loose protein segments after applying deletions ...")
+        protein_structure = delete_short_protein_segments(protein_structure)
+
+        logging.debug("Applying mutations to protein structure ...")
+        protein_structure = apply_mutations(protein_structure, amino_acid_sequence)
+
+        logging.debug("Deleting loose protein segments after applying mutations ...")
+        protein_structure = delete_short_protein_segments(protein_structure)
+
+        logging.debug("Renumbering protein residues ...")
+        residue_numbers = self._get_protein_residue_numbers(protein_structure, amino_acid_sequence)
+        protein_structure = renumber_structure(protein_structure, residue_numbers)
+
+        if self.loop_db:
+            logging.debug("Applying insertions to protein structure ...")
+            protein_structure = apply_insertions(protein_structure, amino_acid_sequence, self.loop_db)
+
+        logging.debug("Checking protein structure sequence termini ...")
+        real_termini = []
+        if amino_acid_sequence.metadata["true_N_terminus"]:
+            if amino_acid_sequence.metadata["begin"] == residue_numbers[0]:
+                real_termini.append(residue_numbers[0])
+        if amino_acid_sequence.metadata["true_C_terminus"]:
+            if amino_acid_sequence.metadata["end"] == residue_numbers[-1]:
+                real_termini.append(residue_numbers[-1])
+        if len(real_termini) == 0:
+            real_termini = None
+
+        logging.debug(f"Assigning caps except for real termini {real_termini} ...")
+        protein_structure = assign_caps(protein_structure, real_termini)
+
+        return protein_structure
+
+    @staticmethod
+    def _get_protein_residue_numbers(
+            protein_structure: oechem.OEMolBase,
+            amino_acid_sequence: Biosequence
+    ) -> List[int]:
+        """
+        Get the residue numbers of a protein structure according to given amino acid sequence.
+
+        Parameters
+        ----------
+        protein_structure: oechem.OEMolBase
+            The kinase domain structure.
+        amino_acid_sequence: Biosequence
+            The canonical kinase domain sequence.
+
+        Returns
+        -------
+        residue_number: list of int
+            A list of residue numbers according to the given amino acid sequence in the same order
+            as the residues in the given protein structure.
+        """
+        from ..modeling.OEModeling import get_structure_sequence_alignment
+
+        logging.debug("Aligning sequences ...")
+        target_sequence, template_sequence = get_structure_sequence_alignment(
+            protein_structure, amino_acid_sequence)
+        logging.debug(f"Template sequence:\n{template_sequence}")
+        logging.debug(f"Target sequence:\n{target_sequence}")
+
+        logging.debug("Generating residue numbers ...")
+        residue_numbers = []
+        residue_number = amino_acid_sequence.metadata["begin"]
+        for template_sequence_residue, target_sequence_residue in zip(
+                template_sequence, target_sequence
+        ):
+            if template_sequence_residue != "-":
+                if target_sequence_residue != "-":
+                    residue_numbers.append(residue_number)
+                residue_number += 1
+            else:
+                # I doubt this this will ever happen in the current implementation
+                text = (
+                    "Cannot generate residue IDs. The given protein structure contain residues "
+                    "that are not part of the canoical sequence from UniProt."
+                )
+                logging.debug("Exception: " + text)
+                raise ValueError(text)
+
+        return residue_numbers
+
     def _assemble_components(
         self,
         protein: oechem.OEMolBase,
@@ -610,3 +745,11 @@ class OEComplexFeaturizer(OEBaseComplexFeaturizer):
 
         logging.debug("Extracting design unit components ...")
         protein, solvent, ligand = self._get_components(design_unit)
+
+        if hasattr(system.protein, "sequence"):
+            protein = self._process_protein(protein, system.sequence)
+
+        logging.debug("Assembling components ...")
+        protein_ligand_complex = self._assemble_components(protein, solvent, ligand)
+
+        
