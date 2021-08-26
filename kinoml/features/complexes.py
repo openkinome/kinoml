@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import List, Iterable, Tuple, Union
 
 from .core import ParallelBaseFeaturizer
-from ..core.proteins import BaseProtein
+from ..core.proteins import BaseProtein, ProteinStructure
 from ..core.sequences import AminoAcidSequence
 from ..core.systems import System, ProteinSystem, ProteinLigandComplex
 
@@ -69,9 +69,9 @@ class OEBaseComplexFeaturizer(ParallelBaseFeaturizer):
         from ..utils import FileDownloader, LocalFileStorage
 
         logging.debug("Checking for existing attributes ...")
-        if not hasattr(protein, "pdb_id") and not hasattr(protein, "pdb_id"):
+        if not hasattr(protein, "pdb_id") and not hasattr(protein, "path"):
             raise AttributeError(
-                f"The {self.__class__.__name__} requires systems with protein components having an"
+                f"The {self.__class__.__name__} requires systems with protein components having a"
                 f" `pdb_id` or `path` attribute."
             )
 
@@ -83,6 +83,11 @@ class OEBaseComplexFeaturizer(ParallelBaseFeaturizer):
                     f"Downloading protein structure {protein.pdb_id} from PDB ..."
                 )
                 FileDownloader.rcsb_structure_pdb(protein.pdb_id, self.cache_dir)
+
+        if type(protein.path) == str:
+            logging.debug(f"Converting given path to Path object ...")
+            protein.path = Path(protein.path).expanduser().resolve()
+
         logging.debug(f"Reading protein structure from {protein.path} ...")
         protein = read_molecules(protein.path)[0]
 
@@ -109,7 +114,7 @@ class OEBaseComplexFeaturizer(ParallelBaseFeaturizer):
 
         Parameters
         ----------
-        system: System
+        system: ProteinSystem or ProteinLigandComplex
             A system with a protein component and optionally a ligand component.
 
         Returns
@@ -460,6 +465,7 @@ class OEBaseComplexFeaturizer(ParallelBaseFeaturizer):
     ) -> oechem.OEGraphMol:
         """
         Remove water molecules clashing with a ligand or newly modeled protein residues.
+
         Parameters
         ----------
         solvent: oechem.OEGraphMol
@@ -468,10 +474,12 @@ class OEBaseComplexFeaturizer(ParallelBaseFeaturizer):
             An OpenEye molecule holding the ligand or None.
         protein: oechem.OEGraphMol
             An OpenEye molecule holding the protein.
+
         Returns
         -------
          : oechem.OEGraphMol
-            An OpenEye molecule holding water molecules not clashing with the ligand or newly modeled protein residues.
+            An OpenEye molecule holding water molecules not clashing with the ligand or newly
+            modeled protein residues.
         """
         from openeye import oechem, oespruce
         from scipy.spatial import cKDTree
@@ -540,23 +548,25 @@ class OEBaseComplexFeaturizer(ParallelBaseFeaturizer):
         self,
         structure: oechem.OEMolBase,
         protein_name: str,
-        ligand_name: [str, None],
+        ligand_name: [str, None] = None,
         other_pdb_header_info: Union[None, Iterable[Tuple[str, str]]] = None
     ) -> oechem.OEMolBase:
         """
         Stores information about Featurizer, protein and ligand in the PDB header COMPND section in the
         given OpenEye molecule.
+
         Parameters
         ----------
         structure: oechem.OEMolBase
             An OpenEye molecule.
         protein_name: str
             The name of the protein.
-        ligand_name: str or None
+        ligand_name: str or None, default=None
             The name of the ligand if present.
         other_pdb_header_info: None or iterable of tuple of str
             Tuples with information that should be saved in the PDB header. Each tuple consists of two strings,
             i.e., the PDB header section (e.g. COMPND) and the respective information.
+
         Returns
         -------
         : oechem.OEMolBase
@@ -579,23 +589,25 @@ class OEBaseComplexFeaturizer(ParallelBaseFeaturizer):
         self,
         structure: oechem.OEMolBase,
         protein_name: str,
-        ligand_name: Union[str, None],
+        ligand_name: Union[str, None] = None,
      ) -> Path:
         """
         Write the results from the Featurizer and retrieve the paths to protein or complex if a
         ligand is present.
+
         Parameters
         ----------
         structure: oechem.OEMolBase
             The OpenEye molecule holding the featurized system.
         protein_name: str
             The name of the protein.
-        ligand_name: str or None
+        ligand_name: str or None, default=None
             The name of the ligand if present.
+
         Returns
         -------
         : Path
-            Path to prepared protein or complex if ligand structure is present.
+            Path to prepared protein or complex if ligand is present.
         """
         from openeye import oechem
 
@@ -710,6 +722,8 @@ class OEComplexFeaturizer(OEBaseComplexFeaturizer):
     the complex structure to prepare. Additionally the protein component can have the following
     optional attributes to customize the protein modeling:
 
+     - `name`: A string specifying the name of the protein, will be used for generating the
+       output file name.
      - `chain_id`: A string specifying which chain should be used.
      - `alternate_location`: A string specifying which alternate location should be used.
      - `uniprot_id`: A string specifying the UniProt ID that will be used to fetch the amino acid
@@ -722,6 +736,8 @@ class OEComplexFeaturizer(OEBaseComplexFeaturizer):
     The ligand component can be a BaseLigand without any further attributes. Additionally the
     ligand component can have the following optional attributes to customize the complex modeling:
 
+     - `name`: A string specifying the name of the ligand, will be used for generating the
+       output file name.
      - `expo_id`: A string specifying the ligand of interest. This is especially useful if
        multiple ligands are present in a PDB structure.
 
@@ -770,4 +786,30 @@ class OEComplexFeaturizer(OEBaseComplexFeaturizer):
         logging.debug("Assembling components ...")
         protein_ligand_complex = self._assemble_components(protein, solvent, ligand)
 
+        logging.debug("Updating pdb header ...")
+        protein_ligand_complex = self._update_pdb_header(
+            protein_ligand_complex,
+            protein_name=system.protein.name,
+            ligand_name=system.ligand.name,
+        )
 
+        logging.debug("Writing results ...")
+        file_path = self._write_results(
+            protein_ligand_complex,
+            "_".join([
+                f"{system.protein.name}",
+                f"{system.protein.pdb_id if hasattr(system.protein, 'pdb_id') else system.protein.path.stem}",
+                f"chain{getattr(system.protein, 'chain_id', None)}",
+                f"altloc{getattr(system.protein, 'alternate_location', None)}"
+            ]),
+            system.ligand.name,
+        )
+
+        logging.debug("Generating new MDAnalysis universe ...")
+        structure = ProteinStructure.from_file(file_path)
+
+        if not self.output_dir:
+            logging.debug("Removing structure file ...")
+            file_path.unlink()
+
+        return structure

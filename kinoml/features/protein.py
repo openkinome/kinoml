@@ -8,6 +8,7 @@ import numpy as np
 
 from .core import ParallelBaseFeaturizer, BaseOneHotEncodingFeaturizer
 from .complexes import OEBaseComplexFeaturizer
+from ..core.proteins import ProteinStructure
 from ..core.systems import System, ProteinSystem
 
 
@@ -83,6 +84,8 @@ class OEProteinStructureFeaturizer(OEBaseComplexFeaturizer):
     the protein structure to prepare. Additionally the protein component can have the following
     optional attributes to customize the protein modeling:
 
+     - `name`: A string specifying the name of the protein, will be used for generating the
+       output file name.
      - `chain_id`: A string specifying which chain should be used.
      - `alternate_location`: A string specifying which alternate location should be used.
      - `uniprot_id`: A string specifying the UniProt ID that will be used to fetch the amino acid
@@ -137,4 +140,28 @@ class OEProteinStructureFeaturizer(OEBaseComplexFeaturizer):
         logging.debug("Assembling components ...")
         solvated_protein = self._assemble_components(protein, solvent)
 
+        logging.debug("Updating pdb header ...")
+        solvated_protein = self._update_pdb_header(
+            solvated_protein,
+            protein_name=system.protein.name
+        )
 
+        logging.debug("Writing results ...")
+        file_path = self._write_results(
+            solvated_protein,
+            "_".join([
+                f"{system.protein.name}",
+                f"{system.protein.pdb_id if hasattr(system.protein, 'pdb_id') else system.protein.path.stem}",
+                f"chain{getattr(system.protein, 'chain_id', None)}",
+                f"altloc{getattr(system.protein, 'alternate_location', None)}"
+            ])
+        )
+
+        logging.debug("Generating new MDAnalysis universe ...")
+        structure = ProteinStructure.from_file(file_path)
+
+        if not self.output_dir:
+            logging.debug("Removing structure file ...")
+            file_path.unlink()
+
+        return structure
