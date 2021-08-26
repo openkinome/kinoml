@@ -1283,7 +1283,6 @@ class OEKLIFSKinaseApoFeaturizer(OEHybridDockingFeaturizer):
             logging.debug("Applying insertions to kinase domain ...")
             kinase_structure = apply_insertions(kinase_structure, kinase_domain_sequence, self.loop_db)
 
-
         logging.debug("Checking kinase domain sequence termini ...")
         real_termini = []
         if kinase_domain_sequence.metadata["true_N_terminus"]:

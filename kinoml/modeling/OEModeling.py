@@ -1347,9 +1347,23 @@ def apply_mutations(
                         else:
                             if fallback_delete:
                                 logging.debug("Mutation failed! Deleting residue ...")
-                                for atom in structure_with_mutations.GetAtoms():
-                                    if oechem.OEAtomGetResidue(atom) == oeresidue:
-                                        structure_with_mutations.DeleteAtom(atom)
+                                atom_functor = oechem.OEOrAtom(
+                                    # if residue was not mutated
+                                    oechem.OEAtomMatchResidue([
+                                        f"{oeresidue.GetName()}:{oeresidue.GetResidueNumber()}"
+                                        f":.*:{oeresidue.GetChainID()}:.*"
+                                    ]),
+                                    # if residue was mutated but side chain chopped of
+                                    oechem.OEAtomMatchResidue([
+                                        f"{three_letter_code}:{oeresidue.GetResidueNumber()}"
+                                        f":.*:{oeresidue.GetChainID()}:.*"
+                                    ])
+                                )
+                                for atom in structure_with_mutations.GetAtoms(atom_functor):
+                                    structure_with_mutations.DeleteAtom(atom)
+                                # break loop and reinitialize
+                                altered = True
+                                break
                             else:
                                 raise ValueError(
                                     f"Mutation {oeresidue.GetName()}" +
