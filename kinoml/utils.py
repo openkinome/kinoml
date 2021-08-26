@@ -357,7 +357,7 @@ def sha256_objects(objects_to_hash: Iterable[object]) -> str:
     Parameters
     ----------
     objects_to_hash: Iterable of object
-        Objects that should be hashed
+        Objects that should be hashed.
 
     Returns
     -------
