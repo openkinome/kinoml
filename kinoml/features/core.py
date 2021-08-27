@@ -930,7 +930,6 @@ class OEBaseModelingFeaturizer(ParallelBaseFeaturizer):
         structure: oechem.OEGraphMol
             An OpenEye molecule holding the protein structure.
         """
-        from ..core.sequences import AminoAcidSequence
         from ..modeling.OEModeling import read_molecules
         from ..utils import FileDownloader, LocalFileStorage
 
@@ -1042,7 +1041,7 @@ class OEBaseModelingFeaturizer(ParallelBaseFeaturizer):
         ----------
         protein_structure: oechem.OEMolBase
             An OpenEye molecule holding the protein structure to process.
-        amino_acid_sequence: AminoAcidSequence
+        amino_acid_sequence: core.sequences.AminoAcidSequence
             The amino acid sequence with associated metadata.
         chain_id: str or None
             The chain ID of the protein. Other chains will be deleted.
@@ -1141,7 +1140,7 @@ class OEBaseModelingFeaturizer(ParallelBaseFeaturizer):
         ----------
         protein_structure: oechem.OEMolBase
             The kinase domain structure.
-        amino_acid_sequence: AminoAcidSequence
+        amino_acid_sequence: core.sequences.AminoAcidSequence
             The canonical kinase domain sequence.
 
         Returns
