@@ -56,6 +56,11 @@ class OEComplexFeaturizer(OEBaseModelingFeaturizer):
     output_dir: str, Path or None, default=None
         Path to directory used for saving output files. If None, output structures will not be
         saved.
+
+    Note
+    ----
+    If the ligand of interest is covalently bonded to the protein, the covalent bond will be
+    broken. This may lead to the transformation of the ligand into a radical.
     """
     from MDAnalysis.core import universe
 

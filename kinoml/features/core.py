@@ -28,9 +28,9 @@ class BaseFeaturizer:
 
     def featurize(
             self,
-            systems: Iterable[System],
+            systems: List[System],
             keep=True,
-    ) -> Iterable[System]:
+    ) -> List[System]:
         """
         Given some systems (compatible with ``_SUPPORTED_TYPES``), apply
         the featurization scheme implemented in this class.
@@ -69,7 +69,7 @@ class BaseFeaturizer:
         """
         return self.featurize(*args, **kwargs)
 
-    def _pre_featurize(self, systems: Iterable[System]) -> None:
+    def _pre_featurize(self, systems: List[System]) -> None:
         """
         Run before featurizing all systems. Redefine this method if needed.
 
@@ -80,7 +80,7 @@ class BaseFeaturizer:
         """
         return
 
-    def _featurize(self, systems: Iterable[System]) -> Iterable[object]:
+    def _featurize(self, systems: List[System]) -> List[object]:
         """
         Featurize all system objects in a serial fashion as defined in ``._featurize_one()``.
 
@@ -114,8 +114,8 @@ class BaseFeaturizer:
         raise NotImplementedError("Implement in your subclass")
 
     def _post_featurize(
-        self, systems: Iterable[System], features: Iterable[System | np.array], keep: bool = True
-    ) -> Iterable[System]:
+        self, systems: List[System], features: List[System | np.array], keep: bool = True
+    ) -> List[System]:
         """
         Run after featurizing all systems. You shouldn't need to redefine this method
 
@@ -251,7 +251,7 @@ class ParallelBaseFeaturizer(BaseFeaturizer):
         for name, value in state.items():
             setattr(self, name, value)
 
-    def _featurize(self, systems: Iterable[System]) -> Iterable[object]:
+    def _featurize(self, systems: List[System]) -> List[object]:
         """
         Featurize all system objects in a parallel fashion as defined in ``._featurize_one()``.
 
@@ -321,12 +321,12 @@ class Pipeline(BaseFeaturizer):
     wrapper around individual ``Featurizer`` objects.
     """
 
-    def __init__(self, featurizers: Iterable[BaseFeaturizer], shortname=None, **kwargs):
+    def __init__(self, featurizers: List[BaseFeaturizer], shortname=None, **kwargs):
         super().__init__(**kwargs)
         self.featurizers = featurizers
         self._shortname = shortname
 
-    def _featurize(self, systems: Iterable[System], keep: bool = True) -> Iterable[object]:
+    def _featurize(self, systems: List[System], keep: bool = True) -> List[object]:
         """
         Given a list of featurizers, apply them sequentially
         on the systems (e.g. featurizer A returns X, and X is
@@ -415,11 +415,11 @@ class Concatenated(Pipeline):
     by `TupleOfArrays`.
     """
 
-    def __init__(self, featurizers: Iterable[BaseFeaturizer], axis: int = 1, **kwargs):
+    def __init__(self, featurizers: List[BaseFeaturizer], axis: int = 1, **kwargs):
         super().__init__(featurizers, **kwargs)
         self.axis = axis
 
-    def _featurize(self, systems: Iterable[System], keep=True) -> np.ndarray:
+    def _featurize(self, systems: List[System], keep=True) -> np.ndarray:
         """
         Given a list of featurizers, apply them serially and concatenate
         the result (e.g. featurizer A returns X, and featurizer B returns Y;
@@ -464,7 +464,7 @@ class TupleOfArrays(Pipeline):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    def _featurize(self, systems: Iterable[System], keep: bool = True) -> np.ndarray:
+    def _featurize(self, systems: List[System], keep: bool = True) -> List:
         """
         Given a list of featurizers, apply them serially and build a
         flat tuple out of the results.
@@ -838,65 +838,6 @@ class OEBaseModelingFeaturizer(ParallelBaseFeaturizer):
             self.output_dir = Path(output_dir).expanduser().resolve()
             self.output_dir.mkdir(parents=True, exist_ok=True)
 
-    def _read_protein_structure(self, protein: BaseProtein) -> oechem.OEGraphMol:
-        """
-        Interpret the given protein component and retrieve an OpenEye molecule holding the protein
-        structure.
-
-        Parameters
-        ----------
-        protein: BaseProtein
-            The protein component.
-
-        Returns
-        -------
-        structure: oechem.OEGraphMol
-            An OpenEye molecule holding the protein structure.
-        """
-        from ..core.sequences import AminoAcidSequence
-        from ..modeling.OEModeling import read_molecules
-        from ..utils import FileDownloader, LocalFileStorage
-
-        logging.debug("Checking for existing attributes ...")
-        if not hasattr(protein, "pdb_id") and not hasattr(protein, "path"):
-            raise AttributeError(
-                f"The {self.__class__.__name__} requires systems with protein components having a"
-                f" `pdb_id` or `path` attribute."
-            )
-
-        logging.debug("Interpreting protein structure ...")
-        if hasattr(protein, "pdb_id"):
-            protein.path = LocalFileStorage.rcsb_structure_pdb(protein.pdb_id, self.cache_dir)
-            if protein.path.is_file():
-                logging.debug(
-                    f"Downloading protein structure {protein.pdb_id} from PDB ..."
-                )
-                FileDownloader.rcsb_structure_pdb(protein.pdb_id, self.cache_dir)
-
-        if type(protein.path) == str:
-            logging.debug(f"Converting given path to Path object ...")
-            protein.path = Path(protein.path).expanduser().resolve()
-
-        logging.debug(f"Reading protein structure from {protein.path} ...")
-        protein = read_molecules(protein.path)[0]
-
-        logging.debug(f"Interpreting protein sequence ...")
-        if not hasattr(protein, "sequence"):
-            if hasattr(protein, "uniprot_id"):
-                logging.debug(
-                    f"Retrieving amino acid sequence details for UniProt entry "
-                    f"{protein.uniprot_id} ..."
-                )
-                protein.sequence = AminoAcidSequence.from_uniprot(protein.uniprot_id)
-        else:
-            if not isinstance(protein.sequence, AminoAcidSequence):
-                raise AttributeError(
-                    f"The {self.__class__.__name__} only accepts systems with protein components whose"
-                    f" `sequence` attribute is an instance of `AminoAcidSequence`."
-                )
-
-        return protein
-
     def _get_design_unit(self, system: Union[ProteinSystem, ProteinLigandComplex]) -> oechem.OEDesignUnit:
         """
         Get an OpenEye design unit from a system.
@@ -973,6 +914,65 @@ class OEBaseModelingFeaturizer(ParallelBaseFeaturizer):
         oechem.OEReadDesignUnit(str(design_unit_path), design_unit)
 
         return design_unit
+
+    def _read_protein_structure(self, protein: BaseProtein) -> oechem.OEGraphMol:
+        """
+        Interpret the given protein component and retrieve an OpenEye molecule holding the protein
+        structure.
+
+        Parameters
+        ----------
+        protein: BaseProtein
+            The protein component.
+
+        Returns
+        -------
+        structure: oechem.OEGraphMol
+            An OpenEye molecule holding the protein structure.
+        """
+        from ..core.sequences import AminoAcidSequence
+        from ..modeling.OEModeling import read_molecules
+        from ..utils import FileDownloader, LocalFileStorage
+
+        logging.debug("Checking for existing attributes ...")
+        if not hasattr(protein, "pdb_id") and not hasattr(protein, "path"):
+            raise AttributeError(
+                f"The {self.__class__.__name__} requires systems with protein components having a"
+                f" `pdb_id` or `path` attribute."
+            )
+
+        logging.debug("Interpreting protein structure ...")
+        if hasattr(protein, "pdb_id"):
+            protein.path = LocalFileStorage.rcsb_structure_pdb(protein.pdb_id, self.cache_dir)
+            if not protein.path.is_file():
+                logging.debug(
+                    f"Downloading protein structure {protein.pdb_id} from PDB ..."
+                )
+                FileDownloader.rcsb_structure_pdb(protein.pdb_id, self.cache_dir)
+
+        if type(protein.path) == str:
+            logging.debug(f"Converting given path to Path object ...")
+            protein.path = Path(protein.path).expanduser().resolve()
+
+        logging.debug(f"Reading protein structure from {protein.path} ...")
+        structure = read_molecules(protein.path)[0]
+
+        logging.debug(f"Interpreting protein sequence ...")
+        if not hasattr(protein, "sequence"):
+            if hasattr(protein, "uniprot_id"):
+                logging.debug(
+                    f"Retrieving amino acid sequence details for UniProt entry "
+                    f"{protein.uniprot_id} ..."
+                )
+                protein.sequence = AminoAcidSequence.from_uniprot(protein.uniprot_id)
+        else:
+            if not isinstance(protein.sequence, AminoAcidSequence):
+                raise AttributeError(
+                    f"The {self.__class__.__name__} only accepts systems with protein components whose"
+                    f" `sequence` attribute is an instance of `AminoAcidSequence`."
+                )
+
+        return structure
 
     @staticmethod
     def _get_components(

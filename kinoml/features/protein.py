@@ -131,7 +131,7 @@ class OEProteinStructureFeaturizer(OEBaseModelingFeaturizer):
         design_unit = self._get_design_unit(system)
 
         logging.debug("Extracting design unit components ...")
-        protein, solvent = self._get_components(design_unit)[-1]
+        protein, solvent = self._get_components(design_unit)[:-1]
 
         if hasattr(system.protein, "sequence"):
             protein = self._process_protein(protein, system.protein.sequence)
