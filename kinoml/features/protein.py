@@ -6,8 +6,7 @@ from collections import Counter
 import logging
 import numpy as np
 
-from .core import ParallelBaseFeaturizer, BaseOneHotEncodingFeaturizer
-from .complexes import OEBaseComplexFeaturizer
+from .core import ParallelBaseFeaturizer, BaseOneHotEncodingFeaturizer, OEBaseModelingFeaturizer
 from ..core.proteins import ProteinStructure
 from ..core.systems import System, ProteinSystem
 
@@ -69,7 +68,7 @@ class OneHotEncodedSequenceFeaturizer(BaseOneHotEncodingFeaturizer):
                 return comp.sequence
 
 
-class OEProteinStructureFeaturizer(OEBaseComplexFeaturizer):
+class OEProteinStructureFeaturizer(OEBaseModelingFeaturizer):
     """
     Given systems with exactly one protein, prepare the protein structure by:
 
