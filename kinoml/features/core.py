@@ -969,7 +969,7 @@ class OEBaseModelingFeaturizer(ParallelBaseFeaturizer):
             if not isinstance(protein.sequence, AminoAcidSequence):
                 raise AttributeError(
                     f"The {self.__class__.__name__} only accepts systems with protein components whose"
-                    f" `sequence` attribute is an instance of `AminoAcidSequence`."
+                    f" `sequence` attribute is an instance of `core.sequences.AminoAcidSequence`."
                 )
 
         return structure
