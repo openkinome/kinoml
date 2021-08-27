@@ -3,12 +3,9 @@ Featurizers that can only get applied to ProteinLigandComplexes or
 subclasses thereof
 """
 import logging
-from pathlib import Path
-from typing import List, Iterable, Tuple, Union
 
-from .core import ParallelBaseFeaturizer, OEBaseModelingFeaturizer
-from ..core.proteins import BaseProtein, ProteinStructure
-from ..core.sequences import AminoAcidSequence
+from .core import OEBaseModelingFeaturizer
+from ..core.proteins import ProteinStructure
 from ..core.systems import ProteinSystem, ProteinLigandComplex
 
 
