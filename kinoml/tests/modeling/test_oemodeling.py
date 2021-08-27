@@ -491,41 +491,6 @@ def test_prepare_structure(package, resource, has_ligand, chain_id, altloc, liga
 
 
 @pytest.mark.parametrize(
-    "klifs_structure_id, expectation, n_atoms",
-    [
-        (
-            1104,
-            does_not_raise(),
-            45
-        ),
-        (
-            1045,
-            pytest.raises(ValueError),
-            0
-        ),
-        (
-            "X",
-            pytest.raises(SwaggerMappingError),
-            0
-        ),
-    ],
-)  # TODO: move to tests for featurizers
-def test_read_klifs_ligand(klifs_structure_id, expectation, n_atoms):
-    """Compare results to expected number of atoms."""
-    import warnings
-
-    from kinoml.features.complexes import OEKLIFSKinaseHybridDockingFeaturizer
-
-    featurizer = OEKLIFSKinaseHybridDockingFeaturizer()
-    # filter benign warnings
-    warnings.filterwarnings("ignore", message="numpy.ufunc size changed")
-
-    with expectation:
-        molecule = featurizer._read_klifs_ligand(klifs_structure_id)
-        assert molecule.NumAtoms() == n_atoms
-
-
-@pytest.mark.parametrize(
     "smiles, n_tautomers",
     [
         (
