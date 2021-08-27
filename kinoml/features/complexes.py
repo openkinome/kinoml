@@ -16,7 +16,7 @@ class OEComplexFeaturizer(OEBaseModelingFeaturizer):
      - modeling missing loops
      - building missing side chains
      - mutations, if `uniprot_id` or `sequence` attribute is provided for the protein component
-      (see below)
+       (see below)
      - removing everything but protein, water and ligand of interest
      - protonation at pH 7.4
 
