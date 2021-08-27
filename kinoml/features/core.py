@@ -803,7 +803,7 @@ class OEBaseModelingFeaturizer(ParallelBaseFeaturizer):
     """
     This abstract class defines several methods that use functionality from the OpenEye toolkit
     for molecular modeling. Featurizers that subclass `OEBaseModelingFeaturizer` need to implement
-     at least the `_featurize_one` method.
+    at least the `_featurize_one` method.
 
     Parameters
     ----------
@@ -1049,7 +1049,7 @@ class OEBaseModelingFeaturizer(ParallelBaseFeaturizer):
 
         Returns
         -------
-        : oechem.OEMolBase
+        :oechem.OEMolBase
             An OpenEye molecule holding the processed protein structure.
         """
         from ..modeling.OEModeling import (
@@ -1266,7 +1266,7 @@ class OEBaseModelingFeaturizer(ParallelBaseFeaturizer):
 
         Returns
         -------
-         : oechem.OEGraphMol
+        :oechem.OEGraphMol
             An OpenEye molecule holding water molecules not clashing with the ligand or newly
             modeled protein residues.
         """
@@ -1358,7 +1358,7 @@ class OEBaseModelingFeaturizer(ParallelBaseFeaturizer):
 
         Returns
         -------
-        : oechem.OEMolBase
+        :oechem.OEMolBase
             The OpenEye molecule containing the updated PDB header.
         """
         from openeye import oechem
@@ -1395,7 +1395,7 @@ class OEBaseModelingFeaturizer(ParallelBaseFeaturizer):
 
         Returns
         -------
-        : Path
+        :Path
             Path to prepared protein or complex if ligand is present.
         """
         from openeye import oechem
