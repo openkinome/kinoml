@@ -137,7 +137,7 @@ def create_box_receptor(
 
 
 def pose_molecules(
-        receptor: oechem.OEMolBase,
+        receptor: Union[oechem.OEMolBase, oechem.OEDesignUnit],
         molecules: List[oechem.OEMolBase],
         pKa_norm: bool = True,
 ) -> Union[List[oechem.OEGraphMol], None]:
@@ -146,8 +146,8 @@ def pose_molecules(
 
     Parameters
     ----------
-    receptor: oechem.OEMolBase
-        An OpenEye molecule holding the prepared receptor.
+    receptor: oechem.OEMolBase or oechem. OEDesignUnit
+        An OpenEye molecule holding the prepared receptor or a design unit with receptor object.
     molecules: list of oechem.OEMolBase
         A list of OpenEye molecules holding prepared molecules for docking.
     pKa_norm: bool, default=True
@@ -214,7 +214,7 @@ def pose_molecules(
 
 
 def run_docking(
-        receptor: oechem.OEMolBase,
+        receptor: Union[oechem.OEMolBase, oechem.OEDesignUnit],
         molecules: List[oechem.OEMolBase],
         dock_method: int,
         num_poses: int = 1,
@@ -225,8 +225,8 @@ def run_docking(
 
     Parameters
     ----------
-    receptor: oechem.OEGraphMol
-        An OpenEye molecule holding the prepared receptor.
+    receptor: oechem.OEGraphMol or oechem. OEDesignUnit
+        An OpenEye molecule holding the prepared receptor or a design unit with receptor object.
     molecules: list of oechem.OEGraphMol
         A list of OpenEye molecules holding prepared molecules for docking.
     dock_method: int
@@ -299,7 +299,7 @@ def run_docking(
 
 
 def hybrid_docking(
-        hybrid_receptor: oechem.OEMolBase,
+        hybrid_receptor: Union[oechem.OEMolBase, oechem.OEDesignUnit],
         molecules: List[oechem.OEMolBase],
         num_poses: int = 1,
         pKa_norm: bool = True,
@@ -309,8 +309,8 @@ def hybrid_docking(
 
     Parameters
     ----------
-    hybrid_receptor: oechem.OEMolBase
-        An OpenEye molecule holding the prepared receptor.
+    hybrid_receptor: oechem.OEMolBase or oechem. OEDesignUnit
+        An OpenEye molecule holding the prepared receptor or a design unit with receptor object.
     molecules: list of oechem.OEMolBase
         A list of OpenEye molecules holding prepared molecules for docking.
     num_poses: int
@@ -332,7 +332,7 @@ def hybrid_docking(
 
 
 def chemgauss_docking(
-        receptor: oechem.OEMolBase,
+        receptor: Union[oechem.OEMolBase, oechem.OEDesignUnit],
         molecules: List[oechem.OEMolBase],
         num_poses: int = 1,
         pKa_norm: bool = True,
@@ -342,8 +342,8 @@ def chemgauss_docking(
 
     Parameters
     ----------
-    receptor: oechem.OEMolBase
-        An OpenEye molecule holding the prepared hint or box receptor.
+    receptor: oechem.OEMolBase or oechem. OEDesignUnit
+        An OpenEye molecule holding the prepared receptor or a design unit with receptor object.
     molecules: list of oechem.OEMolBase
         A list of OpenEye molecules holding prepared molecules for docking.
     num_poses: int

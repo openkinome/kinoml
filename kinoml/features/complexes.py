@@ -183,7 +183,6 @@ class OEHybridDockingFeaturizer(OEBaseModelingFeaturizer):
         super().__init__(**kwargs)
         self.pKa_norm = pKa_norm
 
-
     _SUPPORTED_TYPES = (ProteinLigandComplex,)
 
     def _featurize_one(self, system: ProteinLigandComplex) -> universe:
@@ -200,9 +199,9 @@ class OEHybridDockingFeaturizer(OEBaseModelingFeaturizer):
         : universe
             An MDAnalysis universe of the featurized system.
         """
-        from openeye import oechem
+        from openeye import oechem, oedocking
 
-        from ..docking.OEDocking import create_hybrid_receptor, hybrid_docking
+        from ..docking.OEDocking import hybrid_docking
         from ..modeling.OEModeling import read_smiles
 
         logging.debug("Preparing complex structure ...")
@@ -213,13 +212,15 @@ class OEHybridDockingFeaturizer(OEBaseModelingFeaturizer):
 
         if hasattr(system.protein, "sequence"):
             protein = self._process_protein(protein, system.protein.sequence)
+            oechem.OEUpdateDesignUnit(design_unit, protein, oechem.OEDesignUnitComponents_Protein)
 
-        logging.debug("Creating hybrid receptor ...")
-        hybrid_receptor = create_hybrid_receptor(protein, ligand)
+        if not design_unit.HasReceptor():
+            logging.debug("Preparing receptor for docking ...")
+            oedocking.OEMakeReceptor(design_unit)
 
         logging.debug("Performing docking ...")
         docking_pose = hybrid_docking(
-            hybrid_receptor,
+            design_unit,
             [read_smiles(system.ligand.to_smiles())],
             pKa_norm=self.pKa_norm
         )[0]
