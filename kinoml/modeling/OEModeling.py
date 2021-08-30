@@ -506,9 +506,10 @@ def prepare_structure(
     )
     design_unit_options.GetPrepOptions().GetBuildOptions().GetLoopBuilderOptions().SetSeqAlignGapPenalty(-1)
     design_unit_options.GetPrepOptions().GetBuildOptions().GetLoopBuilderOptions().SetSeqAlignExtendPenalty(0)
-    # capping options, capping done separately
-    design_unit_options.GetPrepOptions().GetBuildOptions().SetCapCTermini(False)
-    design_unit_options.GetPrepOptions().GetBuildOptions().SetCapNTermini(False)
+    # capping options, capping done separately if `real_termini` given
+    if not cap_termini or real_termini:
+        design_unit_options.GetPrepOptions().GetBuildOptions().SetCapCTermini(False)
+        design_unit_options.GetPrepOptions().GetBuildOptions().SetCapNTermini(False)
     # provide path to loop database
     if loop_db is not None:
         from pathlib import Path
@@ -563,7 +564,7 @@ def prepare_structure(
         design_unit = design_units[0]
 
     # assign ACE and NME caps except for real termini
-    if cap_termini:
+    if cap_termini and real_termini:
         impl = design_unit.GetImpl()
         protein = impl.GetProtein()
         assign_caps(protein, real_termini)
