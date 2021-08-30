@@ -364,15 +364,15 @@ def assign_caps(
         real_termini: Union[Iterable[int] or None] = None
 ) -> oechem.OEMolBase:
     """
-    Cap N and C termini of the given input structure. Real termini can be protected from capping by providing the
-    corresponding residue ids via the 'real_termini' argument.
+    Cap N and C termini of the given input structure. Real termini can be protected from capping
+    by providing the corresponding residue ids via the 'real_termini' argument.
 
     Parameters
     ----------
     structure: oechem.OEMolBase
         The OpenEye molecule holding the protein structure to cap.
     real_termini: iterable of int or None
-        The biologically relevant real termini that shpuld be prevented from capping.
+        The biologically relevant real termini that should be prevented from capping.
 
     Returns
     -------
@@ -410,10 +410,30 @@ def assign_caps(
     else:
         oespruce.OECapTermini(structure)
 
-    # add hydrogen to newly modeled atoms
-    options = oechem.OEPlaceHydrogensOptions()
-    options.SetBypassPredicate(oechem.OENotAtom(oespruce.OEIsModeledAtom()))
-    oechem.OEPlaceHydrogens(structure, options)
+    # fix backbone, i.e. add missing OXT atoms
+    oechem.OEClearPDBData(structure)  # prevent modeling based on PDB header
+    structure_metadata = oespruce.OEStructureMetadata()
+    design_unit_options = oespruce.OEMakeDesignUnitOptions()
+    design_unit_options.GetPrepOptions().GetBuildOptions().SetCapCTermini(False)  # no capping
+    design_unit_options.GetPrepOptions().GetBuildOptions().SetCapNTermini(False)  # no capping
+    design_unit_options.GetPrepOptions().SetProtonate(False)  # add hydrogens later
+    design_unit = list(
+        oespruce.OEMakeBioDesignUnits(structure, structure_metadata, design_unit_options)
+    )[0]
+    oespruce.OEFixBackbone(design_unit)  # fix backbone (only available for design units)
+    design_unit.GetComponents(structure, oechem.OEDesignUnitComponents_All)
+
+    # add hydrogens to newly modeled atoms
+    place_hydrogens_options = oechem.OEPlaceHydrogensOptions()
+    place_hydrogens_options.SetBypassPredicate(oechem.OENotAtom(oespruce.OEIsModeledAtom()))
+    oechem.OEPlaceHydrogens(structure, place_hydrogens_options)
+
+    # delete lonely hydrogens, e.g. 4f8o
+    for atom in structure.GetAtoms():
+        if atom.GetDegree() == 0:
+            if atom.GetAtomicNum() == 1:
+                print("yes")
+                structure.DeleteAtom(atom)
 
     return structure
 
