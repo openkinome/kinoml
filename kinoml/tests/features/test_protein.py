@@ -25,7 +25,7 @@ import pytest
             None,
             None,
             None,
-            240
+            239
         ),
         (
             "kinoml.data.proteins",
