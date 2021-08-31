@@ -70,3 +70,37 @@ def test_hybrid_docking(package, resource, smiles_list, n_poses):
             design_unit, [read_smiles(smiles) for smiles in smiles_list], n_poses
         )
         assert len(docking_poses) == len(smiles_list) * n_poses
+
+
+@pytest.mark.parametrize(
+    "package, resource, resids, smiles_list, n_poses",
+    [
+        (
+            "kinoml.data.proteins",
+            "4f8o_edit.pdb",
+            [50, 51, 52, 62, 63, 64, 70, 77],
+            ["c1cc(ccc1CCN)S(=O)(=O)F", "c1cc(ccc1CCN)S(=O)(=O)N"],
+            3,
+        ),
+    ],
+)
+def test_chemgauss_docking(package, resource, resids, smiles_list, n_poses):
+    """Compare results to expected number of docked molecules and docking poses"""
+    from openeye import oechem, oedocking
+
+    from kinoml.docking.OEDocking import chemgauss_docking, resids_to_box_molecule
+    from kinoml.modeling.OEModeling import read_molecules, read_smiles, prepare_protein
+
+    with resources.path(package, resource) as path:
+        structure = read_molecules(str(path))[0]
+        design_unit = prepare_protein(structure)
+        protein = oechem.OEGraphMol()
+        design_unit.GetProtein(protein)
+        box_molecule = resids_to_box_molecule(protein, resids)
+        options = oedocking.OEMakeReceptorOptions()
+        options.SetBoxMol(box_molecule)
+        oedocking.OEMakeReceptor(design_unit, options)
+        docking_poses = chemgauss_docking(
+            design_unit, [read_smiles(smiles) for smiles in smiles_list], n_poses
+        )
+        assert len(docking_poses) == len(smiles_list) * n_poses
