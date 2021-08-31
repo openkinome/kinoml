@@ -41,3 +41,32 @@ def test_resids_to_box_molecule(package, resource, resids, expectation, min_x):
             box_molecule = resids_to_box_molecule(protein, resids)
             x_coordinates = [coordinates[0] for coordinates in box_molecule.GetCoords().values()]
             assert round(min(x_coordinates), 3) == round(min_x, 3)
+
+
+@pytest.mark.parametrize(
+    "package, resource, smiles_list, n_poses",
+    [
+        (
+            "kinoml.data.proteins",
+            "4f8o.pdb",
+            ["c1cc(ccc1CCN)S(=O)(=O)F", "c1cc(ccc1CCN)S(=O)(=O)N"],
+            3,
+        ),
+    ],
+)
+def test_hybrid_docking(package, resource, smiles_list, n_poses):
+    """Compare results to expected number of docked molecules and docking poses"""
+    from openeye import oedocking
+
+    from kinoml.docking.OEDocking import hybrid_docking
+    from kinoml.modeling.OEModeling import read_molecules, read_smiles, prepare_complex
+
+    with resources.path(package, resource) as path:
+        structure = read_molecules(str(path))[0]
+        design_unit = prepare_complex(structure)
+        if not design_unit.HasReceptor():
+            oedocking.OEMakeReceptor(design_unit)
+        docking_poses = hybrid_docking(
+            design_unit, [read_smiles(smiles) for smiles in smiles_list], n_poses
+        )
+        assert len(docking_poses) == len(smiles_list) * n_poses
