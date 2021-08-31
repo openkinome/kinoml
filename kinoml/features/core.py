@@ -869,11 +869,11 @@ class OEBaseModelingFeaturizer(ParallelBaseFeaturizer):
             logging.debug("Generating design unit ...")
             if hasattr(system.protein, "sequence"):
                 # model loops and caps later separately
-                if hasattr(system, "ligand"):
+                if hasattr(system.protein, "expo_id"):
                     design_unit = prepare_complex(
                         structure,
                         loop_db=None,
-                        ligand_name=getattr(system.ligand, "expo_id", None),
+                        ligand_name=getattr(system.protein, "expo_id", None),
                         chain_id=getattr(system.protein, "chain_id", None),
                         alternate_location=getattr(system.protein, "alternate_location", None),
                         cap_termini=False
@@ -888,11 +888,11 @@ class OEBaseModelingFeaturizer(ParallelBaseFeaturizer):
                     )
             else:
                 # model loops and caps with built in OESpruce capabilities
-                if hasattr(system, "ligand"):
+                if hasattr(system.protein, "expo_id"):
                     design_unit = prepare_complex(
                         structure,
                         loop_db=self.loop_db,
-                        ligand_name=getattr(system.ligand, "expo_id", None),
+                        ligand_name=getattr(system.protein, "expo_id", None),
                         chain_id=getattr(system.protein, "chain_id", None),
                         alternate_location=getattr(system.protein, "alternate_location", None),
                         cap_termini=True

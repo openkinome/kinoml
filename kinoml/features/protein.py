@@ -80,13 +80,20 @@ class OEProteinStructureFeaturizer(OEBaseModelingFeaturizer):
      - protonation at pH 7.4
 
     The protein component of each system must have a `pdb_id` or a `path` attribute specifying
-    the protein structure to prepare. Additionally the protein component can have the following
-    optional attributes to customize the protein modeling:
+    the protein structure to prepare.
+
+     - `pdb_id`: A string specifying the PDB entry of interest, required if `path` not given.
+     - `path`: The path to the structure file, required if `pdb_id` not given.
+
+    Additionally, the protein component can have the following optional attributes to customize
+    the protein modeling:
 
      - `name`: A string specifying the name of the protein, will be used for generating the
        output file name.
      - `chain_id`: A string specifying which chain should be used.
      - `alternate_location`: A string specifying which alternate location should be used.
+     - `expo_id`: A string specifying a ligand bound to the protein of interest. This is especially
+       useful if multiple proteins are found in one PDB structure.
      - `uniprot_id`: A string specifying the UniProt ID that will be used to fetch the amino acid
        sequence from UniProt, which will be used for modeling the protein. This will supersede the
        sequence information given in the PDB header.
