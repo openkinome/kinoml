@@ -96,7 +96,7 @@ def pose_molecules(
     options.SetIgnoreNitrogenStereo(True)  # nitrogen stereo centers can be problematic
     options.SetPoseRelaxMode(oedocking.OEPoseRelaxMode_ALL)
     poser = oedocking.OEPosit()
-    poser.Initialize(design_unit)
+    poser.AddReceptor(design_unit)
 
     posed_molecules = list()
     # pose molecules
@@ -113,7 +113,7 @@ def pose_molecules(
             if return_code != oedocking.OEDockingReturnCode_Success:
                 # TODO: Maybe something for logging
                 print(
-                    f"POsing failed for molecule with title {conformations.GetTitle()} with error code "
+                    f"Posing failed for molecule with title {conformations.GetTitle()} with error code "
                     f"{oedocking.OEDockingReturnCodeGetName(return_code)}."
                 )
                 continue
