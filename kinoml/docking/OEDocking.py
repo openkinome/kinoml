@@ -256,7 +256,7 @@ def hybrid_docking(
     return docked_molecules
 
 
-def chemgauss_docking(
+def fred_docking(
         design_unit: oechem.OEDesignUnit,
         molecules: List[oechem.OEMolBase],
         num_poses: int = 1,

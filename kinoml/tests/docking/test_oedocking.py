@@ -84,11 +84,11 @@ def test_hybrid_docking(package, resource, smiles_list, n_poses):
         ),
     ],
 )
-def test_chemgauss_docking(package, resource, resids, smiles_list, n_poses):
+def test_fred_docking(package, resource, resids, smiles_list, n_poses):
     """Compare results to expected number of docked molecules and docking poses"""
     from openeye import oechem, oedocking
 
-    from kinoml.docking.OEDocking import chemgauss_docking, resids_to_box_molecule
+    from kinoml.docking.OEDocking import fred_docking, resids_to_box_molecule
     from kinoml.modeling.OEModeling import read_molecules, read_smiles, prepare_protein
 
     with resources.path(package, resource) as path:
@@ -100,7 +100,7 @@ def test_chemgauss_docking(package, resource, resids, smiles_list, n_poses):
         options = oedocking.OEMakeReceptorOptions()
         options.SetBoxMol(box_molecule)
         oedocking.OEMakeReceptor(design_unit, options)
-        docking_poses = chemgauss_docking(
+        docking_poses = fred_docking(
             design_unit, [read_smiles(smiles) for smiles in smiles_list], n_poses
         )
         assert len(docking_poses) == len(smiles_list) * n_poses
