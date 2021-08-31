@@ -6,7 +6,7 @@ import pytest
 
 
 @pytest.mark.parametrize(
-    "package, resource_list, pdb_id, uniprot_id, chain_id, alternate_location, "
+    "package, resource_list, pdb_id, uniprot_id, chain_id, alternate_location, expo_id, "
     "expected_n_residues",
     [
         (
@@ -16,11 +16,13 @@ import pytest
             "P31522",
             "A",
             "B",
+            "AES",
             216
         ),
         (
             "kinoml.data.proteins",
             ["kinoml_tests_4f8o_spruce.loop_db", "4f8o.pdb"],
+            None,
             None,
             None,
             None,
@@ -34,6 +36,7 @@ import pytest
             "P31522",
             None,
             None,
+            None,
             109
         ),
     ],
@@ -45,6 +48,7 @@ def test_OEProteinStructureFeaturizer(
         uniprot_id,
         chain_id,
         alternate_location,
+        expo_id,
         expected_n_residues
 ):
     """
@@ -63,6 +67,8 @@ def test_OEProteinStructureFeaturizer(
             base_protein.chain_id = chain_id
         if alternate_location:
             base_protein.alternate_location = alternate_location
+        if expo_id:
+            base_protein.expo_id = expo_id
         if pdb_id:
             base_protein.pdb_id = pdb_id
             system = ProteinSystem([base_protein])

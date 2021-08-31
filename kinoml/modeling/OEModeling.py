@@ -432,7 +432,6 @@ def assign_caps(
     for atom in structure.GetAtoms():
         if atom.GetDegree() == 0:
             if atom.GetAtomicNum() == 1:
-                print("yes")
                 structure.DeleteAtom(atom)
 
     return structure
