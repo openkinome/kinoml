@@ -86,6 +86,10 @@ class OEComplexFeaturizer(OEBaseModelingFeaturizer):
             An MDAnalysis universe of the featurized system.
         """
 
+        if not hasattr(system.protein, "expo_id"):
+            logging.debug("Setting expo_id attribute to None ...")
+            system.protein.expo_id = None
+
         logging.debug("Preparing complex structure ...")
         design_unit = self._get_design_unit(system)
 
@@ -213,6 +217,10 @@ class OEHybridDockingFeaturizer(OEBaseModelingFeaturizer):
 
         from ..docking.OEDocking import hybrid_docking
         from ..modeling.OEModeling import read_smiles
+
+        if not hasattr(system.protein, "expo_id"):
+            logging.debug("Setting expo_id attribute to None ...")
+            system.protein.expo_id = None
 
         logging.debug("Preparing complex structure ...")
         design_unit = self._get_design_unit(system)
@@ -351,7 +359,7 @@ class OEFredDockingFeaturizer(OEBaseModelingFeaturizer):
         from openeye import oechem, oedocking
 
         from ..docking.OEDocking import fred_docking, resids_to_box_molecule
-        from ..modeling.OEModeling import read_smiles, residue_ids_to_residue_names
+        from ..modeling.OEModeling import read_smiles
 
         logging.debug("Preparing complex structure ...")
         design_unit = self._get_design_unit(system)
