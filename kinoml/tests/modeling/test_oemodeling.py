@@ -5,8 +5,6 @@ from contextlib import contextmanager
 from importlib import resources
 import pytest
 
-from bravado_core.exception import SwaggerMappingError
-
 from kinoml.modeling.OEModeling import (
     read_smiles,
     read_molecules,
