@@ -152,7 +152,7 @@ def run_docking(
     ----------
     design_unit: oechem.OEDesignUnit
         A design unit with a receptor object.
-    molecules: list of oechem.OEGraphMol
+    molecules: list of oechem.OEMolBase
         A list of OpenEye molecules holding prepared molecules for docking.
     dock_method: int
         Constant defining the docking method.
