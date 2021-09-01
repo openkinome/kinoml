@@ -1223,3 +1223,33 @@ def test_residue_ids_to_residue_names(
         with expectation:
             found_residue_names = residue_ids_to_residue_names(structure, residue_ids, chain_id)
             assert all([True for x, y in zip(found_residue_names, residue_names) if x == y])
+
+
+@pytest.mark.parametrize(
+    "package, resource, n_residues",
+    [
+        (
+            "kinoml.data.proteins",
+            "4f8o.pdb",
+            243,
+        ),
+        (
+            "kinoml.data.proteins",
+            "4f8o_edit.pdb",
+            134,
+        ),
+    ],
+)
+def test_delete_expression_tags(package, resource, n_residues):
+    """
+    Compare results to have the expected number of residues.
+    """
+    from openeye import oechem
+
+    from kinoml.modeling.OEModeling import delete_expression_tags
+
+    with resources.path(package, resource) as path:
+        structure = read_molecules(str(path))[0]
+        structure = delete_expression_tags(structure)
+        hierview = oechem.OEHierView(structure)
+        assert len(list(hierview.GetResidues())) == n_residues

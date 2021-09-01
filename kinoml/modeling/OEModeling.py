@@ -1911,3 +1911,34 @@ def residue_ids_to_residue_names(
         residue_names.append(selection_residue_names.pop())
 
     return residue_names
+
+
+def delete_expression_tags(structure: oechem.OEMolBase) -> oechem.OEMolBase:
+    """
+    Delete the expression tags from a protein structure.
+
+    Parameters
+    ----------
+    structure: oechem.OEMolBase
+        An OpenEye molecule with PDB header information.
+
+    Returns
+    -------
+    : oechem.OEMolBase
+        The structure without expression tags.
+    """
+    structure = structure.CreateCopy()
+    expression_tags = get_expression_tags(structure)
+
+    for expression_tag in expression_tags:
+        try:
+            structure = delete_residue(
+                structure,
+                chain_id=expression_tag["chain_id"],
+                residue_name=expression_tag["residue_name"],
+                residue_id=expression_tag["residue_id"]
+            )
+        except ValueError:
+            pass  # wrong chain or not resolved
+
+    return structure
