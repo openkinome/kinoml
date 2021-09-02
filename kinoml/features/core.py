@@ -930,7 +930,7 @@ class OEBaseModelingFeaturizer(ParallelBaseFeaturizer):
         structure: oechem.OEGraphMol
             An OpenEye molecule holding the protein structure.
         """
-        from ..modeling.OEModeling import read_molecules
+        from ..modeling.OEModeling import read_molecules, delete_expression_tags
         from ..utils import FileDownloader, LocalFileStorage
 
         logging.debug("Checking for existing attributes ...")
@@ -964,12 +964,15 @@ class OEBaseModelingFeaturizer(ParallelBaseFeaturizer):
                     f"{protein.uniprot_id} ..."
                 )
                 protein.sequence = AminoAcidSequence.from_uniprot(protein.uniprot_id)
-        else:
+        if hasattr(protein, "sequence"):
             if not isinstance(protein.sequence, AminoAcidSequence):
                 raise AttributeError(
-                    f"The {self.__class__.__name__} only accepts systems with protein components whose"
-                    f" `sequence` attribute is an instance of `core.sequences.AminoAcidSequence`."
+                    f"The {self.__class__.__name__} only accepts systems with protein components "
+                    f"whose `sequence` attribute is an instance of "
+                    f"`core.sequences.AminoAcidSequence`."
                 )
+            logging.debug("Deleting expression tags ...")
+            structure = delete_expression_tags(structure)
 
         return structure
 
@@ -1493,3 +1496,406 @@ class OEBaseModelingFeaturizer(ParallelBaseFeaturizer):
                 write_molecules([structure], protein_path)
 
                 return protein_path
+
+
+class OEBaseKLIFSModelingFeaturizer(OEBaseModelingFeaturizer):
+    """
+    This abstract class defines several methods that use functionality from the OpenEye toolkit
+    and data from the KLIFS database for molecular modeling of kinases. Featurizers that subclass
+    `OEBaseKLIFSModelingFeaturizer` need to implement at least the `_featurize_one` method.
+
+    Parameters
+    ----------
+    loop_db: str
+        The path to the loop database used by OESpruce to model missing loops.
+    cache_dir: str, Path or None, default=None
+        Path to directory used for saving intermediate files. If None, default location
+        provided by `appdirs.user_cache_dir()` will be used.
+    output_dir: str, Path or None, default=None
+        Path to directory used for saving output files. If None, output structures will not be
+        saved.
+    """
+    import pandas as pd
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    def _create_klifs_structure_db(self, retrieve_pocket_resids=False):
+        """
+        Retrieve structure data from KLIFS and store locally.
+
+        Parameters
+        ----------
+        retrieve_pocket_resids: bool
+            If pocket residue IDs should be retrieved (needed for docking).
+        """
+        from opencadd.databases.klifs import setup_remote
+        import numpy as np
+        import pandas as pd
+
+        from ..utils import LocalFileStorage
+
+        remote = setup_remote()
+        logging.debug("Retrieving all structures from KLIFS ...")
+        available_structures = remote.structures.all_structures()
+        available_structures["structure.pocket_resids"] = np.NaN
+
+        klifs_structure_db_path = LocalFileStorage.klifs_structure_db(self.cache_dir)
+        # checking for existing database, since retrieving pocket residue IDs takes long
+        if klifs_structure_db_path.is_file():
+            logging.debug("Loading local KLIFS structure database ...")
+            klifs_structure_db = pd.read_csv(klifs_structure_db_path)
+        else:
+            logging.debug("Initializing local KLIFS structure database ...")
+            klifs_structure_db = available_structures.copy()
+
+        logging.debug("Searching new structures ...")
+        new_structures = available_structures[
+            ~available_structures["structure.klifs_id"].isin(
+                klifs_structure_db["structure.klifs_id"]
+            )
+        ]
+
+        if len(new_structures) > 0:
+            logging.debug("Adding new structures to database ...")
+            klifs_structure_db = klifs_structure_db.append(
+                available_structures[available_structures["structure.klifs_id"].isin(
+                    new_structures
+                )]
+            )
+
+        if retrieve_pocket_resids:
+            logging.debug("Adding KLIFS pocket residue IDs ...")
+            structures_wo_pocket_resids = klifs_structure_db[
+                klifs_structure_db["structure.pocket_resids"].isna()
+            ]
+            for structure_klifs_id in structures_wo_pocket_resids["structure.klifs_id"]:
+                pocket = remote.pockets.by_structure_klifs_id(structure_klifs_id)
+                if any(pd.isnull(pocket["residue.id"])):
+                    pocket_ids = ""
+                else:
+                    pocket_ids = " ".join(  # filter out missing residues defined as "_"
+                        [residue_id for residue_id in pocket["residue.id"] if residue_id != "_"]
+                    )
+                klifs_structure_db.loc[
+                    (klifs_structure_db["structure.klifs_id"] == structure_klifs_id),
+                    "structure.pocket_resids"
+                ] = pocket_ids
+            logging.debug("Removing entries with missing pocket residue IDs ...")
+            klifs_structure_db = klifs_structure_db[
+                klifs_structure_db["structure.pocket_resids"] != ""
+                ]
+
+        logging.debug("Saving KLIFS data locally ...")
+        klifs_structure_db.to_csv(klifs_structure_db_path, index=False)
+
+        return
+
+    def _create_klifs_kinase_db(self):
+        """
+        Retrieve kinase data from KLIFS and store locally.
+        """
+        from opencadd.databases.klifs import setup_remote
+
+        from ..utils import LocalFileStorage
+
+        remote = setup_remote()
+        logging.debug("Retrieving all kinases from KLIFS ...")
+        klifs_kinase_ids = remote.kinases.all_kinases()["kinase.klifs_id"].to_list()
+        klifs_kinase_db = remote.kinases.by_kinase_klifs_id(klifs_kinase_ids)
+
+        logging.debug("Saving KLIFS data locally ...")
+        klifs_kinase_db.to_csv(LocalFileStorage.klifs_kinase_db(self.cache_dir), index=False)
+
+        return
+
+    def _interpret_kinase(self, protein: BaseProtein):
+        """
+        Interpret the kinase information stored in the given Protein object.
+
+        Parameters
+        ----------
+        protein: BaseProtein
+            The Protein object.
+        """
+        import pandas as pd
+
+        from ..utils import LocalFileStorage
+
+        klifs_structures = pd.read_csv(LocalFileStorage.klifs_structure_db(self.cache_dir))
+        klifs_kinases = pd.read_csv(LocalFileStorage.klifs_kinase_db(self.cache_dir))
+
+        # identify kinase of interest and get KLIFS kinase ID and UniProt ID if not provided
+        if any([
+            hasattr(protein, "klifs_kinase_id"),
+            hasattr(protein, "uniprot_id"),
+            hasattr(protein, "pdb_id")
+        ]):
+            # add chain_id and alternate_location attributes if not present
+            if not hasattr(protein, "chain_id"):
+                protein.chain_id = None
+            if not hasattr(protein, "alternate_location"):
+                protein.alternate_location = None
+            # if pdb id is given, query KLIFS by pdb
+            if hasattr(protein, "pdb_id"):
+                structures = klifs_structures[
+                    klifs_structures["structure.pdb_id"] == protein.pdb_id
+                    ]
+                if protein.alternate_location:
+                    structures = structures[
+                        structures["structure.alternate_model"] == protein.alternate_location
+                        ]
+                if protein.chain_id:
+                    structures = structures[
+                        structures["structure.chain"] == protein.chain_id
+                        ]
+                protein.klifs_kinase_id = structures["kinase.klifs_id"].iloc[0]
+            # if KLIFS kinase ID is not given, query by UniProt ID
+            if not hasattr(protein, "klifs_kinase_id"):
+                logging.debug("Converting UniProt ID to KLIFS kinase ID ...")
+                protein.klifs_kinase_id = klifs_kinases[
+                    klifs_kinases["kinase.uniprot"] == protein.uniprot_id
+                    ]["kinase.klifs_id"].iloc[0]
+            # if UniProt ID is not given, query by KLIFS kinase ID
+            if not hasattr(protein, "uniprot_id"):
+                logging.debug("Converting KLIFS kinase ID to UniProt ID  ...")
+                protein.uniprot_id = klifs_kinases[
+                    klifs_kinases["kinase.klifs_id"] == protein.klifs_kinase_id
+                    ]["kinase.uniprot"].iloc[0]
+        else:
+            text = (
+                f"{self.__class__.__name__} requires a system with a protein having a "
+                "'klifs_kinase_id', 'uniprot_id' or 'pdb_id' attribute.")
+            logging.debug("Exception: " + text)
+            raise ValueError(text)
+
+        # identify DFG conformation of interest
+        if not hasattr(protein, "dfg"):
+            protein.dfg = None
+        else:
+            if protein.dfg not in ["in", "out", "out-like"]:
+                text = (
+                    f"{self.__class__.__name__} requires a system with a protein having either no "
+                    "'dfg' attribute or a 'dfg' attribute with a KLIFS specific DFG conformation "
+                    "('in', 'out' or 'out-like')."
+                )
+                logging.debug("Exception: " + text)
+                raise ValueError(text)
+
+        # identify aC helix conformation of interest
+        if not hasattr(protein, "ac_helix"):
+            protein.ac_helix = None
+        else:
+            if protein.ac_helix not in ["in", "out", "out-like"]:
+                text = (
+                    f"{self.__class__.__name__} requires a system with a protein having either no "
+                    "'ac_helix' attribute or an 'ac_helix' attribute with a KLIFS specific alpha C"
+                    " helix conformation ('in', 'out' or 'out-like')."
+                )
+                logging.debug("Exception: " + text)
+                raise NotImplementedError(text)
+
+        # identify amino acid sequence of interest
+        if not hasattr(protein, "sequence"):
+            logging.debug(
+                f"Retrieving kinase sequence details for UniProt entry {protein.uniprot_id} ...")
+            protein.sequence = AminoAcidSequence.from_uniprot(protein.uniprot_id)
+
+        return
+
+    def _select_kinase_structure_by_pdb_id(
+            self, system: Union[ProteinSystem, ProteinLigandComplex],
+    ) -> pd.Series:
+        """
+        Select a kinase structure via PDB identifier.
+
+        Parameters
+        ----------
+        system: ProteinSystem or ProteinLigandComplex
+            A system with a protein component with attributes for `pdb_id`, `klifs_kinase_id`,
+            `chain_id` and `alternate_location`.
+
+        Returns
+        -------
+        : pd.Series
+            Details about the selected kinase structure.
+        """
+        import pandas as pd
+
+        from ..utils import LocalFileStorage
+
+        logging.debug("Searching kinase structures from KLIFS matching the pdb of interest ...")
+        klifs_structures = pd.read_csv(LocalFileStorage.klifs_structure_db(self.cache_dir))
+        structures = klifs_structures[
+            klifs_structures["structure.pdb_id"] == system.protein.pdb_id
+            ]
+        structures = structures[
+            structures["kinase.klifs_id"] == system.protein.klifs_kinase_id
+            ]
+        if system.protein.alternate_location:
+            structures = structures[
+                structures["structure.alternate_model"] == system.protein.alternate_location
+                ]
+        if system.protein.chain_id:
+            structures = structures[
+                structures["structure.chain"] == system.protein.chain_id
+                ]
+
+        if len(structures) == 0:
+            text = (
+                f"No structure found for PDB ID {system.protein.pdb_id}, chain "
+                f"{system.protein.chain_id} and alternate location "
+                f"{system.protein.alternate_location}."
+            )
+            logging.debug("Exception: " + text)
+            raise NotImplementedError(text)
+        else:
+            logging.debug("Picking structure with highest KLIFS quality score ...")
+            structures = structures.sort_values(
+                by=[
+                    "structure.qualityscore",
+                    "structure.resolution",
+                    "structure.chain",
+                    "structure.alternate_model"
+                ],
+                ascending=[False, True, True, True]
+            )
+            kinase_structure = structures.iloc[0]
+
+        return kinase_structure
+
+    def _select_kinase_structure_by_klifs_kinase_id(
+            self, system: Union[ProteinSystem, ProteinLigandComplex],
+    ) -> pd.Series:
+        """
+        Select a kinase structure from KLIFS with the specified conformation.
+
+        Parameters
+        ----------
+        system: ProteinSystem or ProteinLigandComplex
+            A system with a protein component with attributes for `klifs_kinase_id`, `dfg` and
+            `ac_helix`.
+
+        Returns
+        -------
+        : pd.Series
+            Details about the selected kinase structure.
+        """
+        import pandas as pd
+
+        from ..utils import LocalFileStorage
+
+        logging.debug("Getting kinase reference pocket ...")
+        klifs_kinases = pd.read_csv(LocalFileStorage.klifs_kinase_db(self.cache_dir))
+        reference_pocket = klifs_kinases[
+            klifs_kinases["kinase.klifs_id"] == system.protein.klifs_kinase_id
+            ]["kinase.pocket"].iloc[0]
+        reference_pocket = reference_pocket.replace("_", "")
+
+        logging.debug("Searching kinase structures from KLIFS matching the kinase of interest ...")
+        klifs_structures = pd.read_csv(LocalFileStorage.klifs_structure_db(self.cache_dir))
+        structures = klifs_structures[
+            klifs_structures["kinase.klifs_id"] == system.protein.klifs_kinase_id
+            ]
+
+        logging.debug("Filtering KLIFS structures to match given kinase conformation ...")
+        if system.protein.dfg:
+            structures = structures[structures["structure.dfg"] == system.protein.dfg]
+        if system.protein.ac_helix:
+            structures = structures[structures["structure.ac_helix"] == system.protein.ac_helix]
+
+        if len(structures) == 0:
+            # TODO: Use homology modeling or something similar
+            text = (
+                f"No structure available in DFG {system.protein.dfg}/alpha C helix "
+                f"{system.protein.ac_helix} conformation."
+            )
+            logging.debug("Exception: " + text)
+            raise NotImplementedError(text)
+        else:
+            structures = self._add_kinase_pocket_similarity(reference_pocket, structures)
+            logging.debug("Sorting kinase structures by quality ...")
+            structures = structures.sort_values(
+                by=[
+                    "pocket_similarity",  # detects missing residues and mutations
+                    "structure.qualityscore",
+                    "structure.resolution",
+                    "structure.chain",
+                    "structure.alternate_model"
+                ],
+                ascending=[False, False, True, True, True]
+            )
+
+            kinase_structure = structures.iloc[0]
+
+        return kinase_structure
+
+    @staticmethod
+    def _add_kinase_pocket_similarity(
+            reference_pocket: str, structures: pd.DataFrame,
+    ) -> pd.DataFrame:
+        """
+        Add a column to the input DataFrame containing the pocket similarity between the pockets
+        of KLIFS structures and a reference pocket.
+
+        Parameters
+        ----------
+        reference_pocket: str
+            The kinase pocket sequence the structures should be compared to.
+        structures: pd.DataFrame
+            A DataFrame containing KLIFS entries.
+
+        Returns
+        -------
+        : pd.DataFrame
+            The input DataFrame with a new 'pocket_similarity' column.
+        """
+        from ..modeling.alignment import sequence_similarity
+
+        logging.debug("Calculating string similarity between KLIFS pockets ...")
+        pocket_similarities = [
+            sequence_similarity(structure_pocket, reference_pocket) for structure_pocket
+            in structures["structure.pocket"]
+        ]
+
+        logging.debug("Adding pocket similarity to dataframe...")
+        structures["pocket_similarity"] = pocket_similarities
+
+        return structures
+
+    @staticmethod
+    def _add_kinase_attributes(
+            system: Union[ProteinSystem, ProteinLigandComplex],
+            kinase_details: pd.Series
+    ) -> Union[ProteinSystem, ProteinLigandComplex]:
+        """
+        Store kinase details into the corresponding attributes of the protein component of the
+        given system.
+
+        Parameters
+        ----------
+        system: ProteinSystem or ProteinLigandComplex
+            The system with a protein component
+        kinase_details: pd.Series
+            A pandas series with entries for 'structure.pdb_id', 'structure.chain' and
+            'structure.alternate_model'.
+
+        Returns
+        -------
+        : ProteinSystem or ProteinLigandComplex
+            The system with the same protein component but added attributes.
+        """
+
+        logging.debug("Adding 'pdb_id' attribute to protein component ...")
+        system.protein.pdb_id = kinase_details["structure.pdb_id"]
+
+        logging.debug("Adding 'chain_id' attribute to protein component ...")
+        system.protein.chain_id = kinase_details["structure.chain"]
+
+        logging.debug("Adding 'alternate_location' attribute to protein component ...")
+        alternate_location = kinase_details["structure.alternate_model"]
+        if alternate_location == "-":
+            alternate_location = None
+        system.protein.alternate_location = alternate_location
+
+        return system
