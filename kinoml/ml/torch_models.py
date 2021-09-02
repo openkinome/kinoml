@@ -181,8 +181,6 @@ class ConvolutionNeuralNetworkRegression(_BaseModule):
         The activation function used in the hidden (only!) layer of the network.
     """
 
-    needs_input_shape = True
-
     def __init__(
         self,
         input_shape,
