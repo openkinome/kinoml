@@ -307,7 +307,7 @@ class AminoAcidSequence(Biosequence):
     """Biosequence for amino acid sequences."""
 
     @classmethod
-    def from_uniprot(cls, uniprot_id: str) -> Biosequence:
+    def from_uniprot(cls, uniprot_id: str) -> "AminoAcidSequence":
         """
         Retrieve an amino acid sequence defined by a UniProt identifier.
         Parameters
@@ -322,7 +322,7 @@ class AminoAcidSequence(Biosequence):
         response = cls.query_uniprot(uniprot_id)
         sequence_details = cls.get_sequence_details_from_uniprot_response(response)
 
-        amino_acid_sequence = Biosequence(
+        amino_acid_sequence = AminoAcidSequence(
             sequence_details["sequence"],
             name=sequence_details["name"],
             metadata={
