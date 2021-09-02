@@ -232,7 +232,9 @@ class MultiXTorchDataset(_NativeTorchDataset):
 
     Notes
     -----
+
     - This object is better paired with the output of ``DatasetProvider.to_dict_of_arrays``.
+
     """
 
     def __init__(self, dict_of_arrays, indices=None):
@@ -287,10 +289,11 @@ class MultiXTorchDataset(_NativeTorchDataset):
         NPZ files cannot be read in parallel (you'll see CRC32 errors and others). If you want
         to use ``DataLoader(..., num_workers=2)`` or above, you'll need to:
 
-        - A) preload everything with ``lazy=False`. This will use more RAM and incur
+        - A) preload everything with ``lazy=False``. This will use more RAM and incur
           an initial waiting time.
         - B) use ``close_filehandle=True``. This will incur a penalty upon each access,
           because the NPZ file needs to be reloaded each time.
+        
         """
         data = np.load(path)
         if not lazy:
@@ -414,6 +417,7 @@ class AwkwardArrayDataset(_NativeTorchDataset):
     The structure of the array dimensions needs to be:
 
     - List of systems
+
     ---- X1
     ---- X2
     ---- ...
