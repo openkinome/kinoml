@@ -349,9 +349,19 @@
         </li>
         <li class="md-nav__item"><a href="#kinoml.ml.torch_models.ConvolutionNeuralNetworkRegression" class="md-nav__link">ConvolutionNeuralNetworkRegression</a><nav class="md-nav">
               <ul class="md-nav__list">
-        <li class="md-nav__item"><a href="#kinoml.ml.torch_models.ConvolutionNeuralNetworkRegression.needs_input_shape" class="md-nav__link">needs_input_shape</a>
-        </li>
         <li class="md-nav__item"><a href="#kinoml.ml.torch_models.ConvolutionNeuralNetworkRegression.forward" class="md-nav__link">forward</a>
+        </li></ul>
+            </nav>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.ml.torch_models.ConvolutionNeuralNetworkRegressionProteinInformed" class="md-nav__link">ConvolutionNeuralNetworkRegressionProteinInformed</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#kinoml.ml.torch_models.ConvolutionNeuralNetworkRegressionProteinInformed.forward" class="md-nav__link">forward</a>
+        </li></ul>
+            </nav>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.ml.torch_models.NeuralNetworkRegressionProteinInformed" class="md-nav__link">NeuralNetworkRegressionProteinInformed</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#kinoml.ml.torch_models.NeuralNetworkRegressionProteinInformed.forward" class="md-nav__link">forward</a>
         </li></ul>
             </nav>
         </li></ul>
@@ -429,7 +439,7 @@ than a Tensor, please adapt this method accordingly.</p>
 <dt id="kinoml.ml.torch_models.NeuralNetworkRegression">
 <em class="property">class </em><code class="sig-prename descclassname">kinoml.ml.torch_models.</code><code class="sig-name descname">NeuralNetworkRegression</code><span class="sig-paren">(</span><em class="sig-param">input_shape</em>, <em class="sig-param">hidden_shape=100</em>, <em class="sig-param">output_shape=1</em>, <em class="sig-param">activation=F.relu</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.torch_models.NeuralNetworkRegression" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#kinoml.ml.torch_models._BaseModule" title="kinoml.ml.torch_models._BaseModule"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.ml.torch_models._BaseModule</span></code></a></p>
-<p>Builds a Pytorch model (a vanilla neural network) and a feed-forward pass.</p>
+<p>Builds a vanilla neural network and a feed-forward pass for a ligand setting.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -442,8 +452,16 @@ than a Tensor, please adapt this method accordingly.</p>
 </dl>
 <dl class="method">
 <dt id="kinoml.ml.torch_models.NeuralNetworkRegression.forward">
-<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">x</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.torch_models.NeuralNetworkRegression.forward" title="Permalink to this definition">¶</a></dt>
-<dd><p>Defines the foward pass for a given input ‘x’.</p>
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">system</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.torch_models.NeuralNetworkRegression.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the foward pass for a system,
+which contains the featurized molecular components and the associated measurement/label.
+Since only the featurized system is needed, the first element is retrieved.
+In this case, the ligand is a 1D array of shape (<cite>length of fingerprint</cite>).</p>
+<div class="admonition-notes admonition">
+<p class="admonition-title">Notes</p>
+<p>More information about how featurization are stored can be found at
+<a class="reference external" href="https://github.com/openkinome/experiments-binding-affinity/blob/master/features/featurize-template.ipynb">https://github.com/openkinome/experiments-binding-affinity/blob/master/features/featurize-template.ipynb</a> .</p>
+</div>
 </dd></dl>
 </dd></dl>
 <dl class="class">
@@ -472,7 +490,15 @@ than a Tensor, please adapt this method accordingly.</p>
 <dl class="method">
 <dt id="kinoml.ml.torch_models.ListOfTupleNeuralNetworkregression.forward">
 <code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">x</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.torch_models.ListOfTupleNeuralNetworkregression.forward" title="Permalink to this definition">¶</a></dt>
-<dd><p>Defines the foward pass for a given input ‘x’.</p>
+<dd><p>Defines the foward pass for a system,
+which contains the featurized molecular components and the associated measurement/label.
+Since only the featurized system is needed, the first element is retrieved.
+In this case, the ligand is a 1D array of shape (<cite>length of fingerprint</cite>).</p>
+<div class="admonition-notes admonition">
+<p class="admonition-title">Notes</p>
+<p>More information about how featurization are stored can be found at
+<a class="reference external" href="https://github.com/openkinome/experiments-binding-affinity/blob/master/features/featurize-template.ipynb">https://github.com/openkinome/experiments-binding-affinity/blob/master/features/featurize-template.ipynb</a> .</p>
+</div>
 </dd></dl>
 </dd></dl>
 <dl class="class">
@@ -499,15 +525,13 @@ than a Tensor, please adapt this method accordingly.</p>
 </dd></dl>
 <dl class="class">
 <dt id="kinoml.ml.torch_models.ConvolutionNeuralNetworkRegression">
-<em class="property">class </em><code class="sig-prename descclassname">kinoml.ml.torch_models.</code><code class="sig-name descname">ConvolutionNeuralNetworkRegression</code><span class="sig-paren">(</span><em class="sig-param">nb_char=53</em>, <em class="sig-param">max_length=256</em>, <em class="sig-param">embedding_shape=300</em>, <em class="sig-param">kernel_shape=10</em>, <em class="sig-param">hidden_shape=100</em>, <em class="sig-param">output_shape=1</em>, <em class="sig-param">activation=F.relu</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.torch_models.ConvolutionNeuralNetworkRegression" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">kinoml.ml.torch_models.</code><code class="sig-name descname">ConvolutionNeuralNetworkRegression</code><span class="sig-paren">(</span><em class="sig-param">input_shape</em>, <em class="sig-param">embedding_shape=300</em>, <em class="sig-param">kernel_shape=10</em>, <em class="sig-param">hidden_shape=100</em>, <em class="sig-param">output_shape=1</em>, <em class="sig-param">activation=F.relu</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.torch_models.ConvolutionNeuralNetworkRegression" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#kinoml.ml.torch_models._BaseModule" title="kinoml.ml.torch_models._BaseModule"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.ml.torch_models._BaseModule</span></code></a></p>
-<p>Builds a Convolutional Neural Network and a feed-forward pass.</p>
+<p>Builds a Convolutional Neural Network and a feed-forward pass for a ligand setting.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>nb_char</strong> (<em>int</em><em>, </em><em>default=53</em>) – Expected number of possible characters
-For SMILES characters, we assume 53.</p></li>
-<li><p><strong>max_length</strong> (<em>int</em><em>, </em><em>default=256</em>) – Maximum length of SMILES, set to 256.</p></li>
+<li><p><strong>input_shape</strong> (<em>int</em>) – Dimension of the input of the system.</p></li>
 <li><p><strong>embedding_shape</strong> (<em>int</em><em>, </em><em>default=200</em>) – Dimension of the embedding after convolution.</p></li>
 <li><p><strong>kernel_shape</strong> (<em>int</em><em>, </em><em>default=10</em>) – Size of the kernel for the convolution.</p></li>
 <li><p><strong>hidden_shape</strong> (<em>int</em><em>, </em><em>default=100</em>) – Number of units in the hidden layer.</p></li>
@@ -516,14 +540,85 @@ For SMILES characters, we assume 53.</p></li>
 </ul>
 </dd>
 </dl>
-<dl class="attribute">
-<dt id="kinoml.ml.torch_models.ConvolutionNeuralNetworkRegression.needs_input_shape">
-<code class="sig-name descname">needs_input_shape</code><em class="property"> = False</em><a class="headerlink" href="#kinoml.ml.torch_models.ConvolutionNeuralNetworkRegression.needs_input_shape" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
 <dl class="method">
 <dt id="kinoml.ml.torch_models.ConvolutionNeuralNetworkRegression.forward">
-<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">x</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.torch_models.ConvolutionNeuralNetworkRegression.forward" title="Permalink to this definition">¶</a></dt>
-<dd><p>Defines the foward pass for a given input ‘x’</p>
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">system</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.torch_models.ConvolutionNeuralNetworkRegression.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the foward pass for a system,
+which contains the featurized molecular components and the associated measurement/label.
+Since only the featurized system is needed, the first element is retrieved.
+In this case, the ligand is a 2D array of shape (<cite>nb of character</cite>, <cite>length of smiles</cite>).</p>
+<div class="admonition-notes admonition">
+<p class="admonition-title">Notes</p>
+<p>More information about how featurization are stored can be found at
+<a class="reference external" href="https://github.com/openkinome/experiments-binding-affinity/blob/master/features/featurize-template.ipynb">https://github.com/openkinome/experiments-binding-affinity/blob/master/features/featurize-template.ipynb</a> .</p>
+</div>
+</dd></dl>
+</dd></dl>
+<dl class="class">
+<dt id="kinoml.ml.torch_models.ConvolutionNeuralNetworkRegressionProteinInformed">
+<em class="property">class </em><code class="sig-prename descclassname">kinoml.ml.torch_models.</code><code class="sig-name descname">ConvolutionNeuralNetworkRegressionProteinInformed</code><span class="sig-paren">(</span><em class="sig-param">input_shape</em>, <em class="sig-param">embedding_shape=300</em>, <em class="sig-param">kernel_shape=10</em>, <em class="sig-param">hidden_shape=100</em>, <em class="sig-param">output_shape=1</em>, <em class="sig-param">activation=F.relu</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.torch_models.ConvolutionNeuralNetworkRegressionProteinInformed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#kinoml.ml.torch_models._BaseModule" title="kinoml.ml.torch_models._BaseModule"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.ml.torch_models._BaseModule</span></code></a></p>
+<p>Builds a Convolutional Neural Network and a feed-forward pass for a protein-ligand setting.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input_shape</strong> (<em>tuple</em>) – Dimension of input tensors, for the ligand and the protein.</p></li>
+<li><p><strong>embedding_shape</strong> (<em>int</em><em>, </em><em>default=200</em>) – Dimension of the embedding after convolution.</p></li>
+<li><p><strong>kernel_shape</strong> (<em>int</em><em>, </em><em>default=10</em>) – Size of the kernel for the convolution.</p></li>
+<li><p><strong>hidden_shape</strong> (<em>int</em><em>, </em><em>default=100</em>) – Number of units in the hidden layer.</p></li>
+<li><p><strong>output_shape</strong> (<em>int</em><em>, </em><em>default=1</em>) – Size of the last unit, representing delta_g_over_kt in our setting.</p></li>
+<li><p><strong>activation</strong> (<em>torch function</em><em>, </em><em>default=relu</em>) – The activation function used in the hidden (only!) layer of the network.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="kinoml.ml.torch_models.ConvolutionNeuralNetworkRegressionProteinInformed.forward">
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">system</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.torch_models.ConvolutionNeuralNetworkRegressionProteinInformed.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the foward pass for given a system,
+which contains the featurized molecular components and the associated measurement/label.
+In this case, the input is composed of two entities:
+ligand and protein, so the two first elements are retrieved.
+In this case, the ligand is a 2D array of shape (<cite>nb of character</cite>, <cite>length of smiles</cite>)
+and the protein a 2D array of shape (<cite>nb of residues</cite>, <cite>length of sequence</cite>)</p>
+<div class="admonition-notes admonition">
+<p class="admonition-title">Notes</p>
+<p>More information about how featurization are stored can be found at
+<a class="reference external" href="https://github.com/openkinome/experiments-binding-affinity/blob/master/features/featurize-template.ipynb">https://github.com/openkinome/experiments-binding-affinity/blob/master/features/featurize-template.ipynb</a> .</p>
+</div>
+</dd></dl>
+</dd></dl>
+<dl class="class">
+<dt id="kinoml.ml.torch_models.NeuralNetworkRegressionProteinInformed">
+<em class="property">class </em><code class="sig-prename descclassname">kinoml.ml.torch_models.</code><code class="sig-name descname">NeuralNetworkRegressionProteinInformed</code><span class="sig-paren">(</span><em class="sig-param">input_shape</em>, <em class="sig-param">embedding_shape_ligand=300</em>, <em class="sig-param">embedding_shape_protein=10</em>, <em class="sig-param">kernel_shape=10</em>, <em class="sig-param">hidden_shape=100</em>, <em class="sig-param">output_shape=1</em>, <em class="sig-param">activation=F.relu</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.torch_models.NeuralNetworkRegressionProteinInformed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#kinoml.ml.torch_models._BaseModule" title="kinoml.ml.torch_models._BaseModule"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.ml.torch_models._BaseModule</span></code></a></p>
+<p>Builds a Neural Network and a feed-forward pass for a protein-ligand setting.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input_shape</strong> (<em>tuple</em>) – Dimension of input tensors, for the ligand and the protein.</p></li>
+<li><p><strong>embedding_shape_ligand</strong> (<em>int</em><em>, </em><em>default=300</em>) – Dimension of the embedding for the ligand.</p></li>
+<li><p><strong>embedding_shape_protein</strong> (<em>int</em><em>, </em><em>default=10</em>) – Dimension of the embedding for the protein.</p></li>
+<li><p><strong>kernel_shape</strong> (<em>int</em><em>, </em><em>default=10</em>) – Size of the kernel for the convolution.</p></li>
+<li><p><strong>hidden_shape</strong> (<em>int</em><em>, </em><em>default=100</em>) – Number of units in the hidden layer.</p></li>
+<li><p><strong>output_shape</strong> (<em>int</em><em>, </em><em>default=1</em>) – Size of the last unit, representing delta_g_over_kt in our setting.</p></li>
+<li><p><strong>activation</strong> (<em>torch function</em><em>, </em><em>default=relu</em>) – The activation function used in the hidden (only!) layer of the network.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="kinoml.ml.torch_models.NeuralNetworkRegressionProteinInformed.forward">
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">system</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.torch_models.NeuralNetworkRegressionProteinInformed.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the foward pass for given a system,
+which contains the featurized molecular components and the associated measurement/label.
+In this case, the input is composed of two entities:
+ligand and protein, so the two first elements are retrieved.
+In this case, the ligand is a 1D array of shape (<cite>length of fingerprint</cite>),
+and the protein a 1D array of shape (<cite>length of sequence composition</cite>).</p>
+<div class="admonition-notes admonition">
+<p class="admonition-title">Notes</p>
+<p>More information about how featurization are stored can be found at
+<a class="reference external" href="https://github.com/openkinome/experiments-binding-affinity/blob/master/features/featurize-template.ipynb">https://github.com/openkinome/experiments-binding-affinity/blob/master/features/featurize-template.ipynb</a> .</p>
+</div>
 </dd></dl>
 </dd></dl>
 </section>
