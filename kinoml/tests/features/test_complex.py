@@ -126,7 +126,7 @@ def test_OEHybridDockingFeaturizer(
     from kinoml.features.complexes import OEHybridDockingFeaturizer
 
     with resources.path(package, resource_list[0]) as loop_db:
-        featurizer = OEHybridDockingFeaturizer(loop_db=loop_db, use_multiprocessing=False)
+        featurizer = OEHybridDockingFeaturizer(loop_db=loop_db)
         ligand = Ligand.from_smiles(smiles=smiles, name="LIG")
         base_protein = BaseProtein(name="PsaA")
         if uniprot_id:
@@ -205,7 +205,7 @@ def test_OEFredDockingFeaturizer(
     from kinoml.features.complexes import OEFredDockingFeaturizer
 
     with resources.path(package, resource_list[0]) as loop_db:
-        featurizer = OEFredDockingFeaturizer(loop_db=loop_db, use_multiprocessing=False)
+        featurizer = OEFredDockingFeaturizer(loop_db=loop_db)
         ligand = Ligand.from_smiles(smiles=smiles, name="LIG")
         base_protein = BaseProtein(name="PsaA")
         base_protein.pocket_resids = pocket_resids
