@@ -114,10 +114,6 @@ class OEComplexFeaturizer(OEBaseModelingFeaturizer):
             protein = self._process_protein(protein, system_dict["protein_sequence"])
 
         logging.debug("Assembling components ...")
-        from ..modeling.OEModeling import write_molecules
-        write_molecules([protein], "/home/david/data/protein.pdb")
-        write_molecules([solvent], "/home/david/data/solvent.pdb")
-        write_molecules([ligand], "/home/david/data/ligand.pdb")
         protein_ligand_complex = self._assemble_components(protein, solvent, ligand)
 
         logging.debug("Updating pdb header ...")
