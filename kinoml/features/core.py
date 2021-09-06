@@ -838,14 +838,120 @@ class OEBaseModelingFeaturizer(ParallelBaseFeaturizer):
             self.output_dir = Path(output_dir).expanduser().resolve()
             self.output_dir.mkdir(parents=True, exist_ok=True)
 
-    def _get_design_unit(self, system: Union[ProteinSystem, ProteinLigandComplex]) -> oechem.OEDesignUnit:
+    def _interpret_system(self, system: Union[ProteinSystem, ProteinLigandComplex]) -> dict:
         """
-        Get an OpenEye design unit from a system.
+        Interpret the attributes of the given system components and store them in a dictionary.
 
         Parameters
         ----------
         system: ProteinSystem or ProteinLigandComplex
-            A system with a protein component and optionally a ligand component.
+            The system to interpret.
+
+        Returns
+        -------
+        : dict
+            A dictionary containing the content of the system components.
+        """
+
+        from ..utils import FileDownloader, LocalFileStorage
+
+        system_dict = {
+            "protein_name": None,
+            "protein_pdb_id": None,
+            "protein_path": None,
+            "protein_sequence": None,
+            "protein_uniprot_id": None,
+            "protein_chain_id": None,
+            "protein_alternate_location": None,
+            "protein_expo_id": None,
+            "ligand_name": None
+        }
+
+        logging.debug("Interpreting protein component ...")
+        if hasattr(system.protein, "name"):
+            system_dict["protein_name"] = system.protein.name
+
+        if hasattr(system.protein, "pdb_id"):
+            system_dict["protein_path"] = LocalFileStorage.rcsb_structure_pdb(
+                system.protein.pdb_id, self.cache_dir
+            )
+            if not system_dict["protein_path"].is_file():
+                logging.debug(
+                    f"Downloading protein structure {system.protein.pdb_id} from PDB ..."
+                )
+                FileDownloader.rcsb_structure_pdb(system.protein.pdb_id, self.cache_dir)
+        elif hasattr(system.protein, "path"):
+            system_dict["protein_path"] = Path(system.protein.path).expanduser().resolve()
+        else:
+            raise AttributeError(
+                f"The {self.__class__.__name__} requires systems with protein components having a"
+                f" `pdb_id` or `path` attribute."
+            )
+
+        if not hasattr(system.protein, "sequence"):
+            if hasattr(system.protein, "uniprot_id"):
+                logging.debug(
+                    f"Retrieving amino acid sequence details for UniProt entry "
+                    f"{system.protein.uniprot_id} ..."
+                )
+                system_dict["protein_sequence"] = AminoAcidSequence.from_uniprot(
+                    system.protein.uniprot_id
+                )
+                system_dict["protein_uniprot_id"] = system.protein.uniprot_id
+        else:
+            if not isinstance(system.protein.sequence, AminoAcidSequence):
+                raise AttributeError(
+                    f"The {self.__class__.__name__} only accepts systems with protein components whose"
+                    f" `sequence` attribute is an instance of `core.sequences.AminoAcidSequence`."
+                )
+            else:
+                system_dict["protein_sequence"] = system.protein.sequence
+
+        if hasattr(system.protein, "chain_id"):
+            system_dict["protein_chain_id"] = system.protein.chain_id
+
+        if hasattr(system.protein, "alternate_location"):
+            system_dict["protein_alternate_location"] = system.protein.alternate_location
+
+        if hasattr(system.protein, "expo_id"):
+            system_dict["protein_expo_id"] = system.protein.expo_id
+
+        if hasattr(system, "ligand"):
+            logging.debug("Interpreting ligand component ...")
+            if hasattr(system.ligand, "name"):
+                system_dict["ligand_name"] = system.ligand.name
+
+        return system_dict
+
+    def _get_design_unit(
+            self,
+            structure: oechem.OEMolBase,
+            chain_id: Union[str, None],
+            alternate_location: Union[str, None],
+            has_ligand: bool,
+            ligand_name: Union[str, None],
+            model_loops_and_caps: bool,
+    ) -> oechem.OEDesignUnit:
+        """
+        Get an OpenEye design unit based on the given input.
+
+        Parameters
+        ----------
+        structure: oechem.OEMolBase
+            An OpenEye molecule holding the protein structure to prepare.
+        chain_id: str or None
+            The chain ID of interest.
+        alternate_location: str or None
+            The alternate location of interest.
+        has_ligand: bool
+            If design unit generation should consider ligands. If True, design units will be only
+            generated for protein ligand complexes. If False, design units will not consider
+            co-crystallized ligands.
+        ligand_name: str or None
+            The ligand expo ID bound to the protein of interest. Design units will be filtered to
+            contain the respective ligand.
+        model_loops_and_caps: bool
+            If loops and caps should be modeled.
 
         Returns
         -------
@@ -854,57 +960,34 @@ class OEBaseModelingFeaturizer(ParallelBaseFeaturizer):
         """
         from openeye import oechem
 
-        from ..modeling.OEModeling import prepare_complex, prepare_protein
+        from ..modeling.OEModeling import prepare_structure
         from ..utils import LocalFileStorage, sha256_objects
-
-        structure = self._read_protein_structure(system.protein)
 
         design_unit_path = LocalFileStorage.featurizer_result(
             self.__class__.__name__,
-            sha256_objects([self.loop_db, system]),
+            sha256_objects([
+                self.loop_db,
+                structure,
+                chain_id,
+                alternate_location,
+                has_ligand,
+                ligand_name,
+                model_loops_and_caps,
+            ]),
             "oedu",
             self.cache_dir,
         )
         if not design_unit_path.is_file():
             logging.debug("Generating design unit ...")
-            if hasattr(system.protein, "sequence"):
-                # model loops and caps later separately
-                if hasattr(system.protein, "expo_id"):
-                    design_unit = prepare_complex(
-                        structure,
-                        loop_db=None,
-                        ligand_name=getattr(system.protein, "expo_id", None),
-                        chain_id=getattr(system.protein, "chain_id", None),
-                        alternate_location=getattr(system.protein, "alternate_location", None),
-                        cap_termini=False
-                    )
-                else:
-                    design_unit = prepare_protein(
-                        structure,
-                        loop_db=None,
-                        chain_id=getattr(system.protein, "chain_id", None),
-                        alternate_location=getattr(system.protein, "alternate_location", None),
-                        cap_termini=False,
-                    )
-            else:
-                # model loops and caps with built in OESpruce capabilities
-                if hasattr(system.protein, "expo_id"):
-                    design_unit = prepare_complex(
-                        structure,
-                        loop_db=self.loop_db,
-                        ligand_name=getattr(system.protein, "expo_id", None),
-                        chain_id=getattr(system.protein, "chain_id", None),
-                        alternate_location=getattr(system.protein, "alternate_location", None),
-                        cap_termini=True
-                    )
-                else:
-                    design_unit = prepare_protein(
-                        structure,
-                        loop_db=self.loop_db,
-                        chain_id=getattr(system.protein, "chain_id", None),
-                        alternate_location=getattr(system.protein, "alternate_location", None),
-                        cap_termini=True
-                    )
+            design_unit = prepare_structure(
+                structure,
+                loop_db=self.loop_db if model_loops_and_caps else None,
+                has_ligand=has_ligand,
+                ligand_name=ligand_name,
+                chain_id=chain_id,
+                alternate_location=alternate_location,
+                cap_termini=True if model_loops_and_caps else False
+            )
             logging.debug("Writing design unit ...")
             oechem.OEWriteDesignUnit(str(design_unit_path), design_unit)
         # re-reading design unit helps proper capping of e.g. 2itz
@@ -915,67 +998,10 @@ class OEBaseModelingFeaturizer(ParallelBaseFeaturizer):
 
         return design_unit
 
-    def _read_protein_structure(self, protein: BaseProtein) -> oechem.OEGraphMol:
-        """
-        Interpret the given protein component and retrieve an OpenEye molecule holding the protein
-        structure.
-
-        Parameters
-        ----------
-        protein: BaseProtein
-            The protein component.
-
-        Returns
-        -------
-        structure: oechem.OEGraphMol
-            An OpenEye molecule holding the protein structure.
-        """
-        from ..modeling.OEModeling import read_molecules
-        from ..utils import FileDownloader, LocalFileStorage
-
-        logging.debug("Checking for existing attributes ...")
-        if not hasattr(protein, "pdb_id") and not hasattr(protein, "path"):
-            raise AttributeError(
-                f"The {self.__class__.__name__} requires systems with protein components having a"
-                f" `pdb_id` or `path` attribute."
-            )
-
-        logging.debug("Interpreting protein structure ...")
-        if hasattr(protein, "pdb_id"):
-            protein.path = LocalFileStorage.rcsb_structure_pdb(protein.pdb_id, self.cache_dir)
-            if not protein.path.is_file():
-                logging.debug(
-                    f"Downloading protein structure {protein.pdb_id} from PDB ..."
-                )
-                FileDownloader.rcsb_structure_pdb(protein.pdb_id, self.cache_dir)
-
-        if type(protein.path) == str:
-            logging.debug(f"Converting given path to Path object ...")
-            protein.path = Path(protein.path).expanduser().resolve()
-
-        logging.debug(f"Reading protein structure from {protein.path} ...")
-        structure = read_molecules(protein.path)[0]
-
-        logging.debug(f"Interpreting protein sequence ...")
-        if not hasattr(protein, "sequence"):
-            if hasattr(protein, "uniprot_id"):
-                logging.debug(
-                    f"Retrieving amino acid sequence details for UniProt entry "
-                    f"{protein.uniprot_id} ..."
-                )
-                protein.sequence = AminoAcidSequence.from_uniprot(protein.uniprot_id)
-        else:
-            if not isinstance(protein.sequence, AminoAcidSequence):
-                raise AttributeError(
-                    f"The {self.__class__.__name__} only accepts systems with protein components whose"
-                    f" `sequence` attribute is an instance of `core.sequences.AminoAcidSequence`."
-                )
-
-        return structure
-
     @staticmethod
     def _get_components(
-        design_unit: oechem.OEDesignUnit
+            design_unit: oechem.OEDesignUnit,
+            chain_id: Union[str, None],
     ) -> Tuple[oechem.OEGraphMol(), oechem.OEGraphMol(), oechem.OEGraphMol()]:
         """
         Get protein, solvent and ligand components from an OpenEye design unit.
@@ -984,6 +1010,8 @@ class OEBaseModelingFeaturizer(ParallelBaseFeaturizer):
         ----------
         design_unit: oechem.OEDesignUnit
             The OpenEye design unit to extract components from.
+        chain_id: str or None
+            The chain ID of interest.
 
         Returns
         -------
@@ -992,12 +1020,26 @@ class OEBaseModelingFeaturizer(ParallelBaseFeaturizer):
         """
         from openeye import oechem
 
+        from ..modeling.OEModeling import select_chain
+
         protein, solvent, ligand = oechem.OEGraphMol(), oechem.OEGraphMol(), oechem.OEGraphMol()
 
         logging.debug("Extracting molecular components ...")
         design_unit.GetProtein(protein)
         design_unit.GetSolvent(solvent)
         design_unit.GetLigand(ligand)
+
+        if chain_id:  # some design units can contain multiple chains
+            logging.debug("Selecting chain ...")
+            protein = select_chain(protein, chain_id)
+            try:
+                solvent = select_chain(solvent, chain_id)
+            except ValueError:
+                logging.debug("No solvent atoms found in given chain.")
+            try:
+                ligand = select_chain(ligand, chain_id)
+            except ValueError:
+                logging.debug("No ligand atoms found in given chain.")
 
         # delete protein atoms with no name (found in prepared protein of 4ll0)
         for atom in protein.GetAtoms():
@@ -1032,7 +1074,6 @@ class OEBaseModelingFeaturizer(ParallelBaseFeaturizer):
             self,
             protein_structure: oechem.OEMolBase,
             amino_acid_sequence: AminoAcidSequence,
-            chain_id: Union[str, None] = None
     ) -> oechem.OEMolBase:
         """
         Process a protein a structure according to the given amino acid sequence.
@@ -1043,8 +1084,6 @@ class OEBaseModelingFeaturizer(ParallelBaseFeaturizer):
             An OpenEye molecule holding the protein structure to process.
         amino_acid_sequence: core.sequences.AminoAcidSequence
             The amino acid sequence with associated metadata.
-        chain_id: str or None
-            The chain ID of the protein. Other chains will be deleted.
 
         Returns
         -------
@@ -1053,7 +1092,6 @@ class OEBaseModelingFeaturizer(ParallelBaseFeaturizer):
         """
         from ..modeling.OEModeling import (
             read_molecules,
-            select_chain,
             assign_caps,
             apply_deletions,
             apply_insertions,
@@ -1068,17 +1106,13 @@ class OEBaseModelingFeaturizer(ParallelBaseFeaturizer):
 
         processed_protein_path = LocalFileStorage.featurizer_result(
             self.__class__.__name__,
-            sha256_objects([self.loop_db, protein_structure, amino_acid_sequence, chain_id]),
+            sha256_objects([self.loop_db, protein_structure, amino_acid_sequence]),
             "oeb",
             self.cache_dir,
         )
         if processed_protein_path.is_file():
             logging.debug("Reading processed protein from file ...")
             return read_molecules(processed_protein_path)[0]
-
-        if chain_id:
-            logging.debug(f"Deleting all chains but {chain_id} ...")
-            protein_structure = select_chain(protein_structure, chain_id)
 
         logging.debug(f"Deleting residues with clashing side chains ...")  # e.g. 2j5f, 4wd5
         protein_structure = delete_clashing_sidechains(protein_structure)

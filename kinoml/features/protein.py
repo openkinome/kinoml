@@ -4,10 +4,10 @@ Featurizers that mostly concern protein-based models
 from __future__ import annotations
 from collections import Counter
 import logging
+
 import numpy as np
 
 from .core import ParallelBaseFeaturizer, BaseOneHotEncodingFeaturizer, OEBaseModelingFeaturizer
-from ..core.proteins import ProteinStructure
 from ..core.systems import System, ProteinSystem
 
 
@@ -133,15 +133,31 @@ class OEProteinStructureFeaturizer(OEBaseModelingFeaturizer):
         : universe
             An MDAnalysis universe of the featurized system.
         """
+        import MDAnalysis as mda
+
+        from ..modeling.OEModeling import read_molecules
+
+        logging.debug("Interpreting system ...")
+        system_dict = self._interpret_system(system)
+
+        logging.debug("Reading structure ...")
+        structure = read_molecules(system_dict["protein_path"])[0]
 
         logging.debug("Preparing protein structure ...")
-        design_unit = self._get_design_unit(system)
+        design_unit = self._get_design_unit(
+            structure=structure,
+            chain_id=system_dict["protein_chain_id"],
+            alternate_location=system_dict["protein_alternate_location"],
+            has_ligand=True if system_dict["protein_expo_id"] else False,
+            ligand_name=system_dict["protein_expo_id"],
+            model_loops_and_caps=False if system_dict["protein_sequence"] else True,
+        )  # if sequence is given model loops and caps separately later
 
         logging.debug("Extracting design unit components ...")
-        protein, solvent = self._get_components(design_unit)[:-1]
+        protein, solvent = self._get_components(design_unit, system_dict["protein_chain_id"])[:-1]
 
-        if hasattr(system.protein, "sequence"):
-            protein = self._process_protein(protein, system.protein.sequence)
+        if system_dict["protein_sequence"]:
+            protein = self._process_protein(protein, system_dict["protein_sequence"])
 
         logging.debug("Assembling components ...")
         solvated_protein = self._assemble_components(protein, solvent)
@@ -156,15 +172,16 @@ class OEProteinStructureFeaturizer(OEBaseModelingFeaturizer):
         file_path = self._write_results(
             solvated_protein,
             "_".join([
-                f"{system.protein.name}",
-                f"{system.protein.pdb_id if hasattr(system.protein, 'pdb_id') else system.protein.path.stem}",
-                f"chain{getattr(system.protein, 'chain_id', None)}",
-                f"altloc{getattr(system.protein, 'alternate_location', None)}"
+                system_dict["protein_name"],
+                system_dict["protein_pdb_id"] if system_dict["protein_pdb_id"]
+                else system_dict["protein_path"].stem,
+                f"chain{system_dict['protein_chain_id']}",
+                f"altloc{system_dict['protein_alternate_location']}"
             ])
         )
 
         logging.debug("Generating new MDAnalysis universe ...")
-        structure = ProteinStructure.from_file(file_path)
+        structure = mda.Universe(file_path, in_memory=True)
 
         if not self.output_dir:
             logging.debug("Removing structure file ...")
