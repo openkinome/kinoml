@@ -59,7 +59,7 @@ def test_OEProteinStructureFeaturizer(
     from kinoml.features.protein import OEProteinStructureFeaturizer
 
     with resources.path(package, resource_list[0]) as loop_db:
-        featurizer = OEProteinStructureFeaturizer(loop_db=loop_db, use_multiprocessing=False)
+        featurizer = OEProteinStructureFeaturizer(loop_db=loop_db)
         base_protein = BaseProtein(name="PsaA")
         if uniprot_id:
             base_protein.uniprot_id = uniprot_id
