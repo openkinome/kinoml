@@ -864,6 +864,7 @@ class OEBaseModelingFeaturizer(ParallelBaseFeaturizer):
             "protein_chain_id": None,
             "protein_alternate_location": None,
             "protein_expo_id": None,
+            "ligand_name": None
         }
 
         logging.debug("Interpreting protein component ...")
@@ -915,6 +916,11 @@ class OEBaseModelingFeaturizer(ParallelBaseFeaturizer):
         if hasattr(system.protein, "expo_id"):
             system_dict["protein_expo_id"] = system.protein.expo_id
 
+        if hasattr(system, "ligand"):
+            logging.debug("Interpreting ligand component ...")
+            if hasattr(system.ligand, "name"):
+                system_dict["ligand_name"] = system.ligand.name
+
         return system_dict
 
     def _get_design_unit(
@@ -922,6 +928,7 @@ class OEBaseModelingFeaturizer(ParallelBaseFeaturizer):
             structure: oechem.OEMolBase,
             chain_id: Union[str, None],
             alternate_location: Union[str, None],
+            has_ligand: bool,
             ligand_name: Union[str, None],
             model_loops_and_caps: bool,
     ) -> oechem.OEDesignUnit:
@@ -931,13 +938,18 @@ class OEBaseModelingFeaturizer(ParallelBaseFeaturizer):
         Parameters
         ----------
         structure: oechem.OEMolBase
-            An openeye molecule holding the protein structure to prepare.
+            An OpenEye molecule holding the protein structure to prepare.
         chain_id: str or None
             The chain ID of interest.
         alternate_location: str or None
             The alternate location of interest.
+        has_ligand: bool
+            If design unit generation should consider ligands. If True, design units will be only
+            generated for protein ligand complexes. If False, design units will not consider
+            co-crystallized ligands.
         ligand_name: str or None
-            The ligand expo ID bound to the protein of interest.
+            The ligand expo ID bound to the protein of interest. Design units will be filtered to
+            contain the respective ligand.
         model_loops_and_caps: bool
             If loops and caps should be modeled.
 
@@ -958,6 +970,7 @@ class OEBaseModelingFeaturizer(ParallelBaseFeaturizer):
                 structure,
                 chain_id,
                 alternate_location,
+                has_ligand,
                 ligand_name,
                 model_loops_and_caps,
             ]),
@@ -969,7 +982,7 @@ class OEBaseModelingFeaturizer(ParallelBaseFeaturizer):
             design_unit = prepare_structure(
                 structure,
                 loop_db=self.loop_db if model_loops_and_caps else None,
-                has_ligand=True if ligand_name else False,
+                has_ligand=has_ligand,
                 ligand_name=ligand_name,
                 chain_id=chain_id,
                 alternate_location=alternate_location,
@@ -987,7 +1000,8 @@ class OEBaseModelingFeaturizer(ParallelBaseFeaturizer):
 
     @staticmethod
     def _get_components(
-        design_unit: oechem.OEDesignUnit
+            design_unit: oechem.OEDesignUnit,
+            chain_id: Union[str, None],
     ) -> Tuple[oechem.OEGraphMol(), oechem.OEGraphMol(), oechem.OEGraphMol()]:
         """
         Get protein, solvent and ligand components from an OpenEye design unit.
@@ -996,6 +1010,8 @@ class OEBaseModelingFeaturizer(ParallelBaseFeaturizer):
         ----------
         design_unit: oechem.OEDesignUnit
             The OpenEye design unit to extract components from.
+        chain_id: str or None
+            The chain ID of interest.
 
         Returns
         -------
@@ -1004,12 +1020,26 @@ class OEBaseModelingFeaturizer(ParallelBaseFeaturizer):
         """
         from openeye import oechem
 
+        from ..modeling.OEModeling import select_chain
+
         protein, solvent, ligand = oechem.OEGraphMol(), oechem.OEGraphMol(), oechem.OEGraphMol()
 
         logging.debug("Extracting molecular components ...")
         design_unit.GetProtein(protein)
         design_unit.GetSolvent(solvent)
         design_unit.GetLigand(ligand)
+
+        if chain_id:  # some design units can contain multiple chains
+            logging.debug("Selecting chain ...")
+            protein = select_chain(protein, chain_id)
+            try:
+                solvent = select_chain(solvent, chain_id)
+            except ValueError:
+                logging.debug("No solvent atoms found in given chain.")
+            try:
+                ligand = select_chain(ligand, chain_id)
+            except ValueError:
+                logging.debug("No ligand atoms found in given chain.")
 
         # delete protein atoms with no name (found in prepared protein of 4ll0)
         for atom in protein.GetAtoms():
@@ -1044,7 +1074,6 @@ class OEBaseModelingFeaturizer(ParallelBaseFeaturizer):
             self,
             protein_structure: oechem.OEMolBase,
             amino_acid_sequence: AminoAcidSequence,
-            chain_id: Union[str, None] = None
     ) -> oechem.OEMolBase:
         """
         Process a protein a structure according to the given amino acid sequence.
@@ -1055,8 +1084,6 @@ class OEBaseModelingFeaturizer(ParallelBaseFeaturizer):
             An OpenEye molecule holding the protein structure to process.
         amino_acid_sequence: core.sequences.AminoAcidSequence
             The amino acid sequence with associated metadata.
-        chain_id: str or None
-            The chain ID of the protein. Other chains will be deleted.
 
         Returns
         -------
@@ -1065,7 +1092,6 @@ class OEBaseModelingFeaturizer(ParallelBaseFeaturizer):
         """
         from ..modeling.OEModeling import (
             read_molecules,
-            select_chain,
             assign_caps,
             apply_deletions,
             apply_insertions,
@@ -1080,17 +1106,13 @@ class OEBaseModelingFeaturizer(ParallelBaseFeaturizer):
 
         processed_protein_path = LocalFileStorage.featurizer_result(
             self.__class__.__name__,
-            sha256_objects([self.loop_db, protein_structure, amino_acid_sequence, chain_id]),
+            sha256_objects([self.loop_db, protein_structure, amino_acid_sequence]),
             "oeb",
             self.cache_dir,
         )
         if processed_protein_path.is_file():
             logging.debug("Reading processed protein from file ...")
             return read_molecules(processed_protein_path)[0]
-
-        if chain_id:
-            logging.debug(f"Deleting all chains but {chain_id} ...")
-            protein_structure = select_chain(protein_structure, chain_id)
 
         logging.debug(f"Deleting residues with clashing side chains ...")  # e.g. 2j5f, 4wd5
         protein_structure = delete_clashing_sidechains(protein_structure)
