@@ -4,9 +4,8 @@ Featurizers that mostly concern protein-based models
 from __future__ import annotations
 from collections import Counter
 import logging
-import numpy as np
 
-import MDAnalysis as mda
+import numpy as np
 
 from .core import ParallelBaseFeaturizer, BaseOneHotEncodingFeaturizer, OEBaseModelingFeaturizer
 from ..core.systems import System, ProteinSystem
@@ -134,6 +133,8 @@ class OEProteinStructureFeaturizer(OEBaseModelingFeaturizer):
         : universe
             An MDAnalysis universe of the featurized system.
         """
+        import MDAnalysis as mda
+
         from ..modeling.OEModeling import read_molecules
 
         logging.debug("Interpreting system ...")
@@ -147,19 +148,16 @@ class OEProteinStructureFeaturizer(OEBaseModelingFeaturizer):
             structure=structure,
             chain_id=system_dict["protein_chain_id"],
             alternate_location=system_dict["protein_alternate_location"],
+            has_ligand=True if system_dict["protein_expo_id"] else False,
             ligand_name=system_dict["protein_expo_id"],
             model_loops_and_caps=False if system_dict["protein_sequence"] else True,
         )  # if sequence is given model loops and caps separately later
 
         logging.debug("Extracting design unit components ...")
-        protein, solvent = self._get_components(design_unit)[:-1]
+        protein, solvent = self._get_components(design_unit, system_dict["protein_chain_id"])[:-1]
 
         if system_dict["protein_sequence"]:
-            protein = self._process_protein(
-                protein,
-                system_dict["protein_sequence"],
-                system_dict["protein_chain_id"]
-            )
+            protein = self._process_protein(protein, system_dict["protein_sequence"])
 
         logging.debug("Assembling components ...")
         solvated_protein = self._assemble_components(protein, solvent)
