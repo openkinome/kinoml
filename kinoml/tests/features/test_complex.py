@@ -50,7 +50,7 @@ def test_OEComplexFeaturizer(
     from kinoml.features.complexes import OEComplexFeaturizer
 
     with resources.path(package, resource_list[0]) as loop_db:
-        featurizer = OEComplexFeaturizer(loop_db=loop_db, use_multiprocessing=False)
+        featurizer = OEComplexFeaturizer(loop_db=loop_db)
         ligand = Ligand(name="LIG")
         base_protein = BaseProtein(name="PsaA")
         if uniprot_id:
