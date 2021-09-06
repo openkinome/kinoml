@@ -8,10 +8,10 @@ import logging
 from pathlib import Path
 from typing import Union, Tuple, Iterable, List
 
+import MDAnalysis as mda
 from MDAnalysis.core import universe
 
 from .core import ParallelBaseFeaturizer
-from ..core.proteins import ProteinStructure
 from ..core.sequences import Biosequence
 from ..core.systems import ProteinSystem, ProteinLigandComplex
 
@@ -123,7 +123,7 @@ class OEHybridDockingFeaturizer(ParallelBaseFeaturizer):
         )
 
         logging.debug("Generating new MDAnalysis universe ...")
-        structure = ProteinStructure.from_file(file_path)
+        structure = mda.Universe(file_path, in_memory=True)
 
         if not self.output_dir:
             logging.debug("Removing structure file ...")
@@ -860,7 +860,7 @@ class OEKLIFSKinaseApoFeaturizer(OEHybridDockingFeaturizer):
         )
 
         logging.debug("Generating new MDAnalysis universe ...")
-        structure = ProteinStructure.from_file(file_path)
+        structure = mda.Universe(file_path, in_memory=True)
 
         if not self.output_dir:
             logging.debug("Removing structure file ...")
@@ -1602,7 +1602,7 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEKLIFSKinaseApoFeaturizer):
         )
 
         logging.debug("Generating new MDAnalysis universe ...")
-        structure = ProteinStructure.from_file(file_path)
+        structure = mda.Universe(file_path, in_memory=True)
 
         if not self.output_dir:
             logging.debug("Removing structure file ...")
