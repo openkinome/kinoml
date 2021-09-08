@@ -94,8 +94,10 @@ def pose_molecules(
     # initialize receptor
     options = oedocking.OEPositOptions()
     options.SetIgnoreNitrogenStereo(True)  # nitrogen stereo centers can be problematic
-    options.SetPoseRelaxMode(oedocking.OEPoseRelaxMode_ALL)
-    poser = oedocking.OEPosit()
+    options.SetPoseRelaxMode(
+        oedocking.OEPoseRelaxMode_NONE
+    )  # relaxation is slow and would also affect the protein, which is currently not returned
+    poser = oedocking.OEPosit(options)
     poser.AddReceptor(design_unit)
 
     posed_molecules = list()
@@ -111,8 +113,7 @@ def pose_molecules(
             result = oedocking.OESinglePoseResult()
             return_code = poser.Dock(result, conformations)
             if return_code != oedocking.OEDockingReturnCode_Success:
-                # TODO: Maybe something for logging
-                print(
+                logging.debug(
                     f"Posing failed for molecule with title {conformations.GetTitle()} with error code "
                     f"{oedocking.OEDockingReturnCodeGetName(return_code)}."
                 )
@@ -196,8 +197,7 @@ def run_docking(
             # dock molecule
             return_code = dock.DockMultiConformerMolecule(docked_mol, conformations, num_poses)
             if return_code != oedocking.OEDockingReturnCode_Success:
-                # TODO: Maybe something for logging
-                print(
+                logging.debug(
                     f"Docking failed for molecule with title {conformations.GetTitle()} with error code "
                     f"{oedocking.OEDockingReturnCodeGetName(return_code)}."
                 )
