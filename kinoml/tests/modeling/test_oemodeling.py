@@ -549,7 +549,7 @@ def test_generate_enantiomers(smiles, n_enantiomers):
     [
         (
             "CCC(C)C(C)=O",
-            5
+            1
         ),
         (
             "C1CCN(C1)CCOC2=C3COCC=CCOCC4=CC(=CC=C4)C5=NC(=NC=C5)NC(=C3)C=C2",
@@ -559,8 +559,12 @@ def test_generate_enantiomers(smiles, n_enantiomers):
 )
 def test_generate_conformations(smiles, n_conformations):
     """Compare results to expected number of conformations."""
+    from openeye import oeomega
+
     molecule = read_smiles(smiles)
-    conformations = generate_conformations(molecule, max_conformations=5)
+    options = oeomega.OEOmegaOptions()
+    options.SetMaxConfs(n_conformations)
+    conformations = generate_conformations(molecule, options)
     assert conformations.NumConfs() == n_conformations
 
 
@@ -579,8 +583,12 @@ def test_generate_conformations(smiles, n_conformations):
 )
 def test_generate_reasonable_conformations(smiles, n_conformations_list):
     """Compare results to expected number of isomers and conformations."""
+    from openeye import oeomega
+
     molecule = read_smiles(smiles)
-    conformations_ensemble = generate_reasonable_conformations(molecule, max_conformations=5)
+    options = oeomega.OEOmegaOptions()
+    options.SetMaxConfs(5)
+    conformations_ensemble = generate_reasonable_conformations(molecule, options)
     assert len(conformations_ensemble) == len(n_conformations_list)
     for conformations, n_conformations in zip(conformations_ensemble, n_conformations_list):
         assert conformations.NumConfs() == n_conformations
@@ -603,10 +611,15 @@ def test_generate_reasonable_conformations(smiles, n_conformations_list):
 )
 def test_overlay_molecules(reference_smiles, fit_smiles, comparator):
     """Compare results to have a TanimotoCombo score bigger or smaller than 1."""
+    from openeye import oeomega
+
     reference_molecule = read_smiles(reference_smiles)
-    reference_molecule = generate_conformations(reference_molecule, max_conformations=1)
+    options = oeomega.OEOmegaOptions()
+    options.SetMaxConfs(1)
+    reference_molecule = generate_conformations(reference_molecule, options)
     fit_molecule = read_smiles(fit_smiles)
-    fit_molecule = generate_conformations(fit_molecule, max_conformations=10)
+    options.SetMaxConfs(10)
+    fit_molecule = generate_conformations(fit_molecule, options)
     score, overlay = overlay_molecules(reference_molecule, fit_molecule)
     if comparator == ">":
         assert score > 1

@@ -2,7 +2,7 @@ import logging
 from pathlib import Path
 from typing import List, Set, Union, Iterable, Tuple, Dict
 
-from openeye import oechem, oegrid
+from openeye import oechem, oegrid, oeomega
 from scipy.spatial import cKDTree
 
 # TODO: Add space before Parameters and Returns in docstring, check with numpy standard
@@ -765,8 +765,6 @@ def generate_enantiomers(
     enantiomers: list of oechem.OEMolBase
         A list of OpenEye molecules holding the enantiomers.
     """
-    from openeye import oeomega
-
     flipper_options = oeomega.OEFlipperOptions()
     flipper_options.SetMaxCenters(max_centers)
     flipper_options.SetEnumSpecifiedStereo(force_flip)
@@ -782,8 +780,7 @@ def generate_enantiomers(
 
 def generate_conformations(
         molecule: oechem.OEMolBase,
-        max_conformations: int = 1000,
-        dense: bool = False
+        options: oeomega.OEOmegaOptions = oeomega.OEOmegaOptions(oeomega.OEOmegaSampling_Classic)
 ) -> oechem.OEMCMolBase:
     """
     Generate conformations of a given molecule.
@@ -792,34 +789,27 @@ def generate_conformations(
     ----------
     molecule: oechem.OEMolBase
         An OpenEye molecule.
-    max_conformations: int
-        Maximal number of conformations to generate.
-    dense: bool
-        If densely sampled conformers should be generated. Will overwrite max_conformations settings.
+    options: oeomega.OEOmegaOptions, default=oeomega.OEOmegaOptions(oeomega.OEOmegaSampling_Classic)
+        Options for generating conformations. If the given molecule is a macrocycle only the
+        maximal number of conformations will be changed from the defaults defined in
+        `oeomega.OEMacrocycleOmegaOptions()`.
 
     Returns
     -------
     conformations: oechem.OEMCMolBase
         An OpenEye multi-conformer molecule holding the generated conformations.
     """
-    from openeye import oeomega
-
     if oeomega.OEIsMacrocycle(molecule):
         omega_options = oeomega.OEMacrocycleOmegaOptions()
-        if dense:  # inspired by oeomega.OEOmegaSampling_Dense
-            omega_options.SetMaxConfs(20000)
+        # check if range is specified, e.g. via oeomega.OEOmegaSampling_Pose
+        conformation_range = options.GetMaxConfRange()
+        if len(conformation_range) > 0:
+            omega_options.SetMaxConfs(conformation_range[-1])
         else:
-            omega_options.SetMaxConfs(max_conformations)
+            omega_options.SetMaxConfs(options.GetMaxConfs())
         omega = oeomega.OEMacrocycleOmega(omega_options)
     else:
-        if dense:
-            omega_options = oeomega.OEOmegaOptions(oeomega.OEOmegaSampling_Dense)
-        else:
-            omega_options = oeomega.OEOmegaOptions()
-            omega_options.SetMaxSearchTime(60.0)  # time out
-            omega_options.SetMaxConfs(max_conformations)
-        omega = oeomega.OEOmega(omega_options)
-        omega.SetStrictStereo(False)
+        omega = oeomega.OEOmega(options)
 
     conformations = oechem.OEMol(molecule)
     omega.Build(conformations)
@@ -829,8 +819,7 @@ def generate_conformations(
 
 def generate_reasonable_conformations(
         molecule: oechem.OEMolBase,
-        max_conformations: int = 1000,
-        dense: bool = False,
+        options: oeomega.OEOmegaOptions = oeomega.OEOmegaOptions(oeomega.OEOmegaSampling_Classic),
         pKa_norm: bool = True,
 ) -> List[oechem.OEMCMolBase]:
     """
@@ -840,10 +829,10 @@ def generate_reasonable_conformations(
     ----------
     molecule: oechem.OEMolBase
         An OpenEye molecule.
-    max_conformations: int
-        Maximal number of conformations to generate per isomer. Will overwrite max_conformations settings.
-    dense: bool
-        If densely sampled conformers should be generated.
+    options: oeomega.OEOmegaOptions, default=oeomega.OEOmegaOptions(oeomega.OEOmegaSampling_Classic)
+        Options for generating conformations. If the given molecule is a macrocycle only the
+        maximal number of conformations will be changed from the defaults defined in
+        `oeomega.OEMacrocycleOmegaOptions()`.
     pKa_norm: bool
         Assign the predominant ionization state at pH ~7.4.
 
@@ -857,11 +846,7 @@ def generate_reasonable_conformations(
     tautomers = generate_tautomers(molecule, pKa_norm=pKa_norm)
     enantiomers = [generate_enantiomers(tautomer) for tautomer in tautomers]
     conformations_ensemble = [
-        generate_conformations(
-            enantiomer,
-            max_conformations=max_conformations,
-            dense=dense
-        )
+        generate_conformations(enantiomer, options)
         for enantiomer in itertools.chain.from_iterable(enantiomers)
     ]
     return conformations_ensemble

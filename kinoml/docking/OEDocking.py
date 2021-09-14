@@ -1,3 +1,4 @@
+import logging
 from typing import List, Union
 
 from openeye import oechem
@@ -83,7 +84,7 @@ def pose_molecules(
     posed_molecules: list of oechem.OEGraphMol or None
         A list of OpenEye molecules holding the docked molecules.
     """
-    from openeye import oedocking
+    from openeye import oedocking, oeomega
     from ..modeling.OEModeling import generate_reasonable_conformations
 
     def probability(molecule: oechem.OEGraphMol):
@@ -105,7 +106,9 @@ def pose_molecules(
     for molecule in molecules:
         # tautomers, enantiomers, conformations
         conformations_ensemble = generate_reasonable_conformations(
-            molecule, dense=True, pKa_norm=pKa_norm
+            molecule,
+            oeomega.OEOmegaOptions(oeomega.OEOmegaSampling_Pose),
+            pKa_norm=pKa_norm
         )
 
         posed_conformations = list()
@@ -167,7 +170,7 @@ def run_docking(
     docked_molecules: list of oechem.OEGraphMol or None
         A list of OpenEye molecules holding the docked molecules.
     """
-    from openeye import oedocking
+    from openeye import oedocking, oeomega
     from ..modeling.OEModeling import generate_reasonable_conformations
 
     # initialize receptor
@@ -186,7 +189,9 @@ def run_docking(
     for molecule in molecules:
         # tautomers, enantiomers, conformations
         conformations_ensemble = generate_reasonable_conformations(
-            molecule, dense=True, pKa_norm=pKa_norm
+            molecule,
+            options=oeomega.OEOmegaOptions(oeomega.OEOmegaSampling_Pose),
+            pKa_norm=pKa_norm
         )
 
         docked_conformations = list()
