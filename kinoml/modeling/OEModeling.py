@@ -498,6 +498,20 @@ def prepare_structure(
                 return True
         return False
 
+    def _update_ligand(design_unit, resname):
+        """Update ligand of the design unit."""
+        components = oechem.OEGraphMol()
+        design_unit.GetComponents(components, oechem.OEDesignUnitComponents_All)
+        components = split_molecule_components(components)
+        for component in components:
+            residue = oechem.OEAtomGetResidue(component.GetAtoms().next())
+            if residue.GetName() == resname:
+                oechem.OEUpdateDesignUnit(
+                    design_unit, component, oechem.OEDesignUnitComponents_Ligand
+                )
+                return True
+        return False
+
     def _contains_ligand(design_unit, resname):
         """Returns True if the design unit contains a ligand with given residue name."""
         ligand = oechem.OEGraphMol()
@@ -506,6 +520,10 @@ def prepare_structure(
         for hier_residue in hier_view.GetResidues():
             if hier_residue.GetResidueName() == resname:
                 return True
+
+        if _update_ligand(design_unit, resname):
+            return True
+        
         return False
 
     # delete short protein segments, which make the alignment error prone
