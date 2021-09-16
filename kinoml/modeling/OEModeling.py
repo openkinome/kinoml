@@ -535,6 +535,8 @@ def prepare_structure(
 
     structure_metadata = oespruce.OEStructureMetadata()
     design_unit_options = oespruce.OEMakeDesignUnitOptions()
+    # set minimal number of ligand atoms to 5, e.g. a 5-membered ring fragment
+    design_unit_options.GetSplitOptions().SetMinLigAtoms(5)
     # also consider alternate locations outside binding pocket, important for later filtering
     design_unit_options.GetPrepOptions().GetEnumerateSitesOptions().SetCollapseNonSiteAlts(False)
     # alignment options, only matches are important
