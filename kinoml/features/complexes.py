@@ -5,7 +5,6 @@ subclasses thereof
 import logging
 
 from .core import OEBaseModelingFeaturizer
-from ..core.proteins import ProteinStructure
 from ..core.systems import ProteinLigandComplex
 
 
@@ -58,6 +57,9 @@ class OEComplexFeaturizer(OEBaseModelingFeaturizer):
     output_dir: str, Path or None, default=None
         Path to directory used for saving output files. If None, output structures will not be
         saved.
+    raise_errors: bool, default=False
+        If False, will try to catch errors and return None, else featurization will stop when Error is raised.
+
 
     Note
     ----

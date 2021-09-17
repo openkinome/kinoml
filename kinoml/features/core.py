@@ -14,7 +14,6 @@ from typing import Callable, Hashable, Iterable, Sequence, Union, Tuple, List
 import numpy as np
 from tqdm.auto import tqdm
 
-from ..core.components import BaseProtein
 from ..core.sequences import AminoAcidSequence
 from ..core.systems import System, ProteinSystem, ProteinLigandComplex
 
