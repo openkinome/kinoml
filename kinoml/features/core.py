@@ -874,12 +874,27 @@ class OEBaseModelingFeaturizer(ParallelBaseFeaturizer):
         if hasattr(system.protein, "pdb_id"):
             system_dict["protein_path"] = LocalFileStorage.rcsb_structure_pdb(
                 system.protein.pdb_id, self.cache_dir
-            )
+            )  # try to download PDB file
             if not system_dict["protein_path"].is_file():
                 logging.debug(
                     f"Downloading protein structure {system.protein.pdb_id} from PDB ..."
                 )
                 FileDownloader.rcsb_structure_pdb(system.protein.pdb_id, self.cache_dir)
+
+            if not system_dict["protein_path"].is_file():
+                system_dict["protein_path"] = LocalFileStorage.rcsb_structure_cif(
+                    system.protein.pdb_id, self.cache_dir
+                )  # try to download CIF file
+                if not system_dict["protein_path"].is_file():
+                    logging.debug(
+                        f"Downloading protein structure {system.protein.pdb_id} from PDB in CIF"
+                        f" format ..."
+                    )
+                    FileDownloader.rcsb_structure_cif(system.protein.pdb_id, self.cache_dir)
+
+            if not system_dict["protein_path"].is_file():
+                raise ValueError("Could not download structure from PDB.")
+
         elif hasattr(system.protein, "path"):
             system_dict["protein_path"] = Path(system.protein.path).expanduser().resolve()
         else:

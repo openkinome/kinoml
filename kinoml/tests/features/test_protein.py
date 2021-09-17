@@ -31,6 +31,16 @@ import pytest
         ),
         (
             "kinoml.data.proteins",
+            ["kinoml_tests_4f8o_spruce.loop_db", "4f8o.cif"],
+            None,
+            None,
+            None,
+            None,
+            None,
+            240  # TODO: adds cap on residue 1, submit bug report
+        ),
+        (
+            "kinoml.data.proteins",
             ["kinoml_tests_4f8o_spruce.loop_db", "4f8o_edit.pdb"],
             None,
             "P31522",

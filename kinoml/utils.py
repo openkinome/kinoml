@@ -42,6 +42,11 @@ class LocalFileStorage:
         return file_path
 
     @staticmethod
+    def rcsb_structure_cif(pdb_id, directory=DIRECTORY):
+        file_path = directory / f"rcsb_{pdb_id}.cif"
+        return file_path
+
+    @staticmethod
     def rcsb_ligand_sdf(pdb_id, chemical_id, chain, altloc, directory=DIRECTORY):
         file_path = directory / f"rcsb_{pdb_id}_{chemical_id}_{chain}_{altloc}.sdf"
         return file_path
@@ -91,6 +96,11 @@ class FileDownloader:
     def rcsb_structure_pdb(pdb_id, directory=DIRECTORY):
         url = f"https://files.rcsb.org/download/{pdb_id}.pdb"
         download_file(url, LocalFileStorage.rcsb_structure_pdb(pdb_id, directory))
+
+    @staticmethod
+    def rcsb_structure_cif(pdb_id, directory=DIRECTORY):
+        url = f"https://files.rcsb.org/download/{pdb_id}.cif"
+        download_file(url, LocalFileStorage.rcsb_structure_cif(pdb_id, directory))
 
     @staticmethod
     def rcsb_electron_density_mtz(pdb_id, directory=DIRECTORY):

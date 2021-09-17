@@ -124,7 +124,14 @@ def test_read_smiles(smiles, add_hydrogens, expectation, n_atoms):
             "4f8o.pdb",
             True,
             does_not_raise(),
-            [2497],
+            [2497],# TODO: doesnt match number in file
+        ),
+        (
+            "kinoml.data.proteins",
+            "4f8o.cif",
+            True,
+            does_not_raise(),
+            [2498],  # TODO: doesnt match number in file
         ),
         (
             "kinoml.data.electron_densities",

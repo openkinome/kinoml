@@ -104,6 +104,17 @@ def test_OEComplexFeaturizer(
             "c1cc(ccc1CCN)S(=O)(=O)F",
             24
         ),
+        (
+            "kinoml.data.proteins",
+            ["kinoml_tests_4f8o_spruce.loop_db", "4f8o.cif"],
+            None,
+            None,
+            None,
+            None,
+            None,
+            "c1cc(ccc1CCN)S(=O)(=O)F",
+            24
+        ),
     ],
 )
 def test_OEHybridDockingFeaturizer(
