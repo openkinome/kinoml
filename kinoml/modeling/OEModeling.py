@@ -498,7 +498,7 @@ def prepare_structure(
                 return True
         return False
 
-    def _update_ligand(design_unit, resname):
+    def _update_ligand(design_unit, resname, chain_id):
         """Update ligand of the design unit."""
         components = oechem.OEGraphMol()
         design_unit.GetComponents(components, oechem.OEDesignUnitComponents_All)
@@ -506,22 +506,35 @@ def prepare_structure(
         for component in components:
             residue = oechem.OEAtomGetResidue(component.GetAtoms().next())
             if residue.GetName() == resname:
-                oechem.OEUpdateDesignUnit(
-                    design_unit, component, oechem.OEDesignUnitComponents_Ligand
-                )
-                return True
+                if chain_id:
+                    if residue.GetChainID() == chain_id:
+                        oechem.OEUpdateDesignUnit(
+                            design_unit, component, oechem.OEDesignUnitComponents_Ligand
+                        )
+                        return True
+                else:
+                    oechem.OEUpdateDesignUnit(
+                        design_unit, component, oechem.OEDesignUnitComponents_Ligand
+                    )
+                    return True
         return False
 
-    def _contains_ligand(design_unit, resname):
-        """Returns True if the design unit contains a ligand with given residue name."""
+    def _contains_ligand(design_unit, resname, chain_id):
+        """
+        Returns True if the design unit contains a ligand with given residue name and Chain ID.
+        """
         ligand = oechem.OEGraphMol()
         design_unit.GetLigand(ligand)
         hier_view = oechem.OEHierView(ligand)
         for hier_residue in hier_view.GetResidues():
             if hier_residue.GetResidueName() == resname:
-                return True
+                if chain_id:
+                    if hier_residue.GetOEResidue().GetChainID() == chain_id:
+                        return True
+                else:
+                    return True
 
-        if _update_ligand(design_unit, resname):
+        if _update_ligand(design_unit, resname, chain_id):
             return True
         
         return False
@@ -535,6 +548,8 @@ def prepare_structure(
 
     structure_metadata = oespruce.OEStructureMetadata()
     design_unit_options = oespruce.OEMakeDesignUnitOptions()
+    # turn off superposition
+    design_unit_options.SetSuperpose(False)
     # set minimal number of ligand atoms to 5, e.g. a 5-membered ring fragment
     design_unit_options.GetSplitOptions().SetMinLigAtoms(5)
     # also consider alternate locations outside binding pocket, important for later filtering
@@ -581,11 +596,13 @@ def prepare_structure(
 
     # filter design units for ligand of interest
     if ligand_name is not None:
-        logging.debug(f"Filtering design units for ligand with name {ligand_name} ...")
+        logging.debug(
+            f"Filtering design units for ligand with name {ligand_name} and chain ID {chain_id}..."
+        )
         design_units = [
             design_unit
             for design_unit in design_units
-            if _contains_ligand(design_unit, ligand_name)
+            if _contains_ligand(design_unit, ligand_name, chain_id)
         ]
 
     # filter design units for chain of interest
