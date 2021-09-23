@@ -495,17 +495,43 @@ def prepare_structure(
 
     def _contains_chain(design_unit, chain_id):
         """Returns True if the design unit contains protein residues with given chain ID."""
-        all_components = oechem.OEGraphMol()
-        design_unit.GetComponents(all_components, oechem.OEDesignUnitComponents_All)
-        hier_view = oechem.OEHierView(all_components)
+        protein = oechem.OEGraphMol()
+        design_unit.GetProtein(protein)
+        hier_view = oechem.OEHierView(protein)
         for hier_chain in hier_view.GetChains():
             if hier_chain.GetChainID() == chain_id:
                 return True
         return False
 
+    def _update_ligand(design_unit, resname, chain_id):
+        """Update ligand of the design unit."""
+        chain_ids = []
+        if not chain_id:  # get chain ID(s) from protein
+            protein = oechem.OEGraphMol()
+            design_unit.GetProtein(protein)
+            hier_view = oechem.OEHierView(protein)
+            for hier_chain in hier_view.GetChains():
+                chain_ids.append(hier_chain.GetChainID())
+        else:
+            chain_ids.append(chain_id)
+
+        components = oechem.OEGraphMol()
+        design_unit.GetComponents(components, oechem.OEDesignUnitComponents_All)
+        components = split_molecule_components(components)
+        for component in components:
+            residue = oechem.OEAtomGetResidue(component.GetAtoms().next())
+            if residue.GetName() == resname:
+                if residue.GetChainID() in chain_ids:
+                    oechem.OEUpdateDesignUnit(
+                        design_unit, component, oechem.OEDesignUnitComponents_Ligand
+                    )
+                    return True
+
+        return False
+
     def _contains_ligand(design_unit, resname, chain_id):
         """
-        Returns True if the design unit contains a ligand with given residue name and Chain ID.
+        Returns True if the design unit contains a ligand with given residue name and chain ID.
         """
         ligand = oechem.OEGraphMol()
         design_unit.GetLigand(ligand)
@@ -517,6 +543,9 @@ def prepare_structure(
                         return True
                 else:
                     return True
+
+        if _update_ligand(design_unit, resname, chain_id):  # e.g. ANP of 3sls
+            return True
         
         return False
 
