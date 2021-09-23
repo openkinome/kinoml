@@ -252,10 +252,15 @@ def remove_non_protein(
     selection: oechem.OEMolBase
         An OpenEye molecule holding the filtered structure.
     """
+    non_standards_amino_acids = [  # Nagata 2014 (10.1093/bioinformatics/btu106)
+        "ABA", "CSO", "CSD", "CME", "OCS", "KCX", "LLP", "MLY", "M3L", "MSE", "PCA", "HYP", "SEP",
+        "TPO", "PTR"
+    ]
     if exceptions is None:
         exceptions = []
     if remove_water is False:
         exceptions.append("HOH")
+    exceptions += non_standards_amino_acids
 
     # do not change input mol
     selection = molecule.CreateCopy()
@@ -498,27 +503,6 @@ def prepare_structure(
                 return True
         return False
 
-    def _update_ligand(design_unit, resname, chain_id):
-        """Update ligand of the design unit."""
-        components = oechem.OEGraphMol()
-        design_unit.GetComponents(components, oechem.OEDesignUnitComponents_All)
-        components = split_molecule_components(components)
-        for component in components:
-            residue = oechem.OEAtomGetResidue(component.GetAtoms().next())
-            if residue.GetName() == resname:
-                if chain_id:
-                    if residue.GetChainID() == chain_id:
-                        oechem.OEUpdateDesignUnit(
-                            design_unit, component, oechem.OEDesignUnitComponents_Ligand
-                        )
-                        return True
-                else:
-                    oechem.OEUpdateDesignUnit(
-                        design_unit, component, oechem.OEDesignUnitComponents_Ligand
-                    )
-                    return True
-        return False
-
     def _contains_ligand(design_unit, resname, chain_id):
         """
         Returns True if the design unit contains a ligand with given residue name and Chain ID.
@@ -533,9 +517,6 @@ def prepare_structure(
                         return True
                 else:
                     return True
-
-        if _update_ligand(design_unit, resname, chain_id):
-            return True
         
         return False
 
