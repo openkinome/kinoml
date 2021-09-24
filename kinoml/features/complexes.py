@@ -67,14 +67,14 @@ class OEComplexFeaturizer(OEBaseModelingFeaturizer):
     If the ligand of interest is covalently bonded to the protein, the covalent bond will be
     broken. This may lead to the transformation of the ligand into a radical.
     """
-    from MDAnalysis.core import universe
+    from MDAnalysis.core.universe import Universe
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
     _SUPPORTED_TYPES = (ProteinLigandComplex,)
 
-    def _featurize_one(self, system: ProteinLigandComplex) -> universe:
+    def _featurize_one(self, system: ProteinLigandComplex) -> Universe:
         """
         Prepare a protein structure.
 
@@ -85,7 +85,7 @@ class OEComplexFeaturizer(OEBaseModelingFeaturizer):
 
         Returns
         -------
-        : universe
+        : Universe
             An MDAnalysis universe of the featurized system.
         """
         import MDAnalysis as mda
@@ -212,7 +212,7 @@ class OEHybridDockingFeaturizer(OEBaseModelingFeaturizer):
     The provided protein must have a co-crystallized ligand to allow docking with OpenEye's
     Hybrid method.
     """
-    from MDAnalysis.core import universe
+    from MDAnalysis.core.universe import Universe
 
     def __init__(self, pKa_norm: bool = True, **kwargs):
         super().__init__(**kwargs)
@@ -220,7 +220,7 @@ class OEHybridDockingFeaturizer(OEBaseModelingFeaturizer):
 
     _SUPPORTED_TYPES = (ProteinLigandComplex,)
 
-    def _featurize_one(self, system: ProteinLigandComplex) -> Union[universe, None]:
+    def _featurize_one(self, system: ProteinLigandComplex) -> Union[Universe, None]:
         """
         Prepare a protein structure and dock a ligand using OpenEye's Hybrid method.
 
@@ -231,7 +231,7 @@ class OEHybridDockingFeaturizer(OEBaseModelingFeaturizer):
 
         Returns
         -------
-        : universe or None
+        : Universe or None
             An MDAnalysis universe of the featurized system. None if no docking pose was found.
         """
         import MDAnalysis as mda
@@ -376,7 +376,7 @@ class OEFredDockingFeaturizer(OEBaseModelingFeaturizer):
         Assign the predominant ionization state of the molecules to dock at pH ~7.4. If False,
         the ionization state of the input molecules will be conserved.
     """
-    from MDAnalysis.core import universe
+    from MDAnalysis.core.universe import Universe
 
     def __init__(self, pKa_norm: bool = True, **kwargs):
         super().__init__(**kwargs)
@@ -384,7 +384,7 @@ class OEFredDockingFeaturizer(OEBaseModelingFeaturizer):
 
     _SUPPORTED_TYPES = (ProteinLigandComplex,)
 
-    def _featurize_one(self, system: ProteinLigandComplex) -> Union[universe, None]:
+    def _featurize_one(self, system: ProteinLigandComplex) -> Union[Universe, None]:
         """
         Prepare a protein structure and dock a ligand using OpenEye's Fred method.
 
@@ -395,7 +395,7 @@ class OEFredDockingFeaturizer(OEBaseModelingFeaturizer):
 
         Returns
         -------
-        : universe or None
+        : Universe or None
             An MDAnalysis universe of the featurized system. None if no docking pose was found.
         """
         import MDAnalysis as mda
@@ -557,7 +557,7 @@ class OEPositDockingFeaturizer(OEBaseModelingFeaturizer):
     The provided protein must have a co-crystallized ligand to allow docking with OpenEye's
     Posit method.
     """
-    from MDAnalysis.core import universe
+    from MDAnalysis.core.universe import Universe
 
     def __init__(self, pKa_norm: bool = True, **kwargs):
         super().__init__(**kwargs)
@@ -565,7 +565,7 @@ class OEPositDockingFeaturizer(OEBaseModelingFeaturizer):
 
     _SUPPORTED_TYPES = (ProteinLigandComplex,)
 
-    def _featurize_one(self, system: ProteinLigandComplex) -> Union[universe, None]:
+    def _featurize_one(self, system: ProteinLigandComplex) -> Union[Universe, None]:
         """
         Prepare a protein structure and dock a ligand using OpenEye's Posit method.
 
@@ -576,7 +576,7 @@ class OEPositDockingFeaturizer(OEBaseModelingFeaturizer):
 
         Returns
         -------
-        : universe or None
+        : Universe or None
             An MDAnalysis universe of the featurized system. None if no docking pose was found.
         """
         import MDAnalysis as mda

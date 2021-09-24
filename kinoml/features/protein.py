@@ -112,14 +112,14 @@ class OEProteinStructureFeaturizer(OEBaseModelingFeaturizer):
         Path to directory used for saving output files. If None, output structures will not be
         saved.
     """
-    from MDAnalysis.core import universe
+    from MDAnalysis.core.universe import Universe
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
     _SUPPORTED_TYPES = (ProteinSystem,)
 
-    def _featurize_one(self, system: ProteinSystem) -> universe:
+    def _featurize_one(self, system: ProteinSystem) -> Universe:
         """
         Prepare a protein structure.
 
@@ -130,7 +130,7 @@ class OEProteinStructureFeaturizer(OEBaseModelingFeaturizer):
 
         Returns
         -------
-        : universe
+        : Universe
             An MDAnalysis universe of the featurized system.
         """
         import MDAnalysis as mda
