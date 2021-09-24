@@ -219,7 +219,7 @@ class OEHybridDockingFeaturizer(OEBaseModelingFeaturizer):
 
     _SUPPORTED_TYPES = (ProteinLigandComplex,)
 
-    def _featurize_one(self, system: ProteinLigandComplex) -> universe:
+    def _featurize_one(self, system: ProteinLigandComplex) -> Union[universe, None]:
         """
         Prepare a protein structure and dock a ligand using OpenEye's Hybrid method.
 
@@ -230,8 +230,8 @@ class OEHybridDockingFeaturizer(OEBaseModelingFeaturizer):
 
         Returns
         -------
-        : universe
-            An MDAnalysis universe of the featurized system.
+        : universe or None
+            An MDAnalysis universe of the featurized system. None if no docking pose was found.
         """
         import MDAnalysis as mda
         from openeye import oechem, oedocking
@@ -269,11 +269,16 @@ class OEHybridDockingFeaturizer(OEBaseModelingFeaturizer):
             oedocking.OEMakeReceptor(design_unit)
 
         logging.debug("Performing docking ...")
-        docking_pose = hybrid_docking(
+        docking_poses = hybrid_docking(
             design_unit,
             [read_smiles(system.ligand.to_smiles())],
             pKa_norm=self.pKa_norm
-        )[0]
+        )
+        if not docking_poses:
+            logging.debug("No docking pose found, returning None!")
+            return None
+        else:
+            docking_pose = docking_poses[0]
         # generate residue information
         oechem.OEPerceiveResidues(docking_pose, oechem.OEPreserveResInfo_None)
 
@@ -378,7 +383,7 @@ class OEFredDockingFeaturizer(OEBaseModelingFeaturizer):
 
     _SUPPORTED_TYPES = (ProteinLigandComplex,)
 
-    def _featurize_one(self, system: ProteinLigandComplex) -> universe:
+    def _featurize_one(self, system: ProteinLigandComplex) -> Union[universe, None]:
         """
         Prepare a protein structure and dock a ligand using OpenEye's Fred method.
 
@@ -389,8 +394,8 @@ class OEFredDockingFeaturizer(OEBaseModelingFeaturizer):
 
         Returns
         -------
-        : universe
-            An MDAnalysis universe of the featurized system.
+        : universe or None
+            An MDAnalysis universe of the featurized system. None if no docking pose was found.
         """
         import MDAnalysis as mda
         from openeye import oechem, oedocking
@@ -442,11 +447,16 @@ class OEFredDockingFeaturizer(OEBaseModelingFeaturizer):
         oedocking.OEMakeReceptor(design_unit, receptor_options)
 
         logging.debug("Performing docking ...")
-        docking_pose = fred_docking(
+        docking_poses = fred_docking(
             design_unit,
             [read_smiles(system.ligand.to_smiles())],
             pKa_norm=self.pKa_norm
-        )[0]
+        )
+        if not docking_poses:
+            logging.debug("No docking pose found, returning None!")
+            return None
+        else:
+            docking_pose = docking_poses[0]
         # generate residue information
         oechem.OEPerceiveResidues(docking_pose, oechem.OEPreserveResInfo_None)
 
@@ -554,7 +564,7 @@ class OEPositDockingFeaturizer(OEBaseModelingFeaturizer):
 
     _SUPPORTED_TYPES = (ProteinLigandComplex,)
 
-    def _featurize_one(self, system: ProteinLigandComplex) -> universe:
+    def _featurize_one(self, system: ProteinLigandComplex) -> Union[universe, None]:
         """
         Prepare a protein structure and dock a ligand using OpenEye's Posit method.
 
@@ -565,8 +575,8 @@ class OEPositDockingFeaturizer(OEBaseModelingFeaturizer):
 
         Returns
         -------
-        : universe
-            An MDAnalysis universe of the featurized system.
+        : universe or None
+            An MDAnalysis universe of the featurized system. None if no docking pose was found.
         """
         import MDAnalysis as mda
         from openeye import oechem, oedocking
@@ -604,11 +614,16 @@ class OEPositDockingFeaturizer(OEBaseModelingFeaturizer):
             oedocking.OEMakeReceptor(design_unit)
 
         logging.debug("Performing docking ...")
-        docking_pose = pose_molecules(
+        docking_poses = pose_molecules(
             design_unit,
             [read_smiles(system.ligand.to_smiles())],
             pKa_norm=self.pKa_norm
-        )[0]
+        )
+        if not docking_poses:
+            logging.debug("No docking pose found, returning None!")
+            return None
+        else:
+            docking_pose = docking_poses[0]
         # generate residue information
         oechem.OEPerceiveResidues(docking_pose, oechem.OEPreserveResInfo_None)
 
