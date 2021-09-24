@@ -3,6 +3,7 @@ Featurizers that can only get applied to ProteinLigandComplexes or
 subclasses thereof
 """
 import logging
+from typing import Union
 
 from .core import OEBaseModelingFeaturizer
 from ..core.systems import ProteinLigandComplex
