@@ -124,16 +124,18 @@ def pose_molecules(
             else:
                 posed_conformation = result.GetPose()
 
-            # store probability and store pose
-            oechem.OESetSDData(
-                posed_conformation, "POSIT::Probability", str(result.GetProbability())
-            )
-            posed_conformations.append(oechem.OEGraphMol(posed_conformation))
+                # store probability and pose
+                oechem.OESetSDData(
+                    posed_conformation, "POSIT::Probability", str(result.GetProbability())
+                )
+                posed_conformations.append(oechem.OEGraphMol(posed_conformation))
 
         # sort all conformations of all tautomers and enantiomers by score
         posed_conformations.sort(key=probability, reverse=True)
 
-        posed_molecules.append(posed_conformations[0])
+        # keep conformation with highest probability
+        if len(posed_conformations) > 0:
+            posed_molecules.append(posed_conformations[0])
 
     if len(posed_molecules) == 0:
         # TODO: returning None when something goes wrong
