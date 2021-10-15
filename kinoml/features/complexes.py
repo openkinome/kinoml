@@ -618,7 +618,8 @@ class OEPositDockingFeaturizer(OEBaseModelingFeaturizer):
         docking_poses = pose_molecules(
             design_unit,
             [read_smiles(system.ligand.to_smiles())],
-            pKa_norm=self.pKa_norm
+            pKa_norm=self.pKa_norm,
+            score_pose=True,
         )
         if not docking_poses:
             logging.debug("No docking pose found, returning None!")
