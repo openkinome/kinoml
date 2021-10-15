@@ -273,7 +273,8 @@ class OEHybridDockingFeaturizer(OEBaseModelingFeaturizer):
         docking_poses = hybrid_docking(
             design_unit,
             [read_smiles(system.ligand.to_smiles())],
-            pKa_norm=self.pKa_norm
+            pKa_norm=self.pKa_norm,
+            num_poses=5,
         )
         if not docking_poses:
             logging.debug("No docking pose found, returning None!")
@@ -312,6 +313,26 @@ class OEHybridDockingFeaturizer(OEBaseModelingFeaturizer):
         if not self.output_dir:
             logging.debug("Removing structure file ...")
             file_path.unlink()
+        else:
+            # write all generated docking poses
+            logging.debug("Writing poses ...")
+            from ..modeling.OEModeling import write_molecules
+            from ..utils import LocalFileStorage
+            protein_name = "_".join([
+                system_dict["protein_name"],
+                system_dict["protein_pdb_id"] if system_dict["protein_pdb_id"]
+                else system_dict["protein_path"].stem,
+                f"chain{system_dict['protein_chain_id']}",
+                f"altloc{system_dict['protein_alternate_location']}"
+            ])
+            for i, docking_pose in enumerate(docking_poses, start=1):
+                ligand_path = LocalFileStorage.featurizer_result(
+                    self.__class__.__name__,
+                    f"{protein_name}_{system.ligand.name}_pose_{i}",
+                    "sdf",
+                    self.output_dir,
+                )
+                write_molecules([docking_pose], ligand_path)
 
         return structure
 
@@ -451,7 +472,8 @@ class OEFredDockingFeaturizer(OEBaseModelingFeaturizer):
         docking_poses = fred_docking(
             design_unit,
             [read_smiles(system.ligand.to_smiles())],
-            pKa_norm=self.pKa_norm
+            pKa_norm=self.pKa_norm,
+            num_poses=5,
         )
         if not docking_poses:
             logging.debug("No docking pose found, returning None!")
@@ -490,6 +512,26 @@ class OEFredDockingFeaturizer(OEBaseModelingFeaturizer):
         if not self.output_dir:
             logging.debug("Removing structure file ...")
             file_path.unlink()
+        else:
+            # write all generated docking poses
+            logging.debug("Writing poses ...")
+            from ..modeling.OEModeling import write_molecules
+            from ..utils import LocalFileStorage
+            protein_name = "_".join([
+                system_dict["protein_name"],
+                system_dict["protein_pdb_id"] if system_dict["protein_pdb_id"]
+                else system_dict["protein_path"].stem,
+                f"chain{system_dict['protein_chain_id']}",
+                f"altloc{system_dict['protein_alternate_location']}"
+            ])
+            for i, docking_pose in enumerate(docking_poses, start=1):
+                ligand_path = LocalFileStorage.featurizer_result(
+                    self.__class__.__name__,
+                    f"{protein_name}_{system.ligand.name}_pose_{i}",
+                    "sdf",
+                    self.output_dir,
+                )
+                write_molecules([docking_pose], ligand_path)
 
         return structure
 
