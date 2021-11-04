@@ -66,6 +66,7 @@ def pose_molecules(
         design_unit: oechem.OEDesignUnit,
         molecules: List[oechem.OEMolBase],
         pKa_norm: bool = True,
+        score_pose: bool = False,
 ) -> Union[List[oechem.OEGraphMol], None]:
     """
     Generate a binding pose of molecules in a prepared receptor with OpenEye's Posit method.
@@ -78,6 +79,8 @@ def pose_molecules(
         A list of OpenEye molecules holding prepared molecules for docking.
     pKa_norm: bool, default=True
         Assign the predominant ionization state at pH ~7.4.
+    score_pose: bool, default=False
+        Score the best docking pose per ligand and add the proper SD tag.
 
     Returns
     -------
@@ -130,12 +133,19 @@ def pose_molecules(
                 )
                 posed_conformations.append(oechem.OEGraphMol(posed_conformation))
 
-        # sort all conformations of all tautomers and enantiomers by score
+        # sort poses of all tautomers and enantiomers by score
         posed_conformations.sort(key=probability, reverse=True)
 
         # keep conformation with highest probability
         if len(posed_conformations) > 0:
-            posed_molecules.append(posed_conformations[0])
+            best_pose = posed_conformations[0]
+            if score_pose:
+                # calculate and store ChemGauss4 docking score
+                pose_scorer = oedocking.OEScore(oedocking.OEScoreType_Chemgauss4)
+                pose_scorer.Initialize(design_unit)
+                pose_scorer.ScoreLigand(best_pose)
+                oedocking.OESetSDScore(best_pose, pose_scorer, pose_scorer.GetName())
+            posed_molecules.append(best_pose)
 
     if len(posed_molecules) == 0:
         # TODO: returning None when something goes wrong
