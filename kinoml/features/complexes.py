@@ -533,10 +533,28 @@ class OEPositDockingFeaturizer(OEBaseModelingFeaturizer):
     molecular structure to dock, e.g. a Ligand object from `core.ligands` initiated as
     Ligand.from_smiles("CCOCCC").
 
-    Additionally, the ligand component can have the following optional attributes:
+    Additionally, the ligand component can have the following optional attributes. The
+    docking_template attributes can be used to transfer a ligand from another protein:ligand
+    complex to bias the docking with Posit into the protein structure specified via the `path` or
+    `pdb_id` attributes listed above. The docking template will thereby be superposed to the
+    protein structure. Hence, they need to have a sufficient sequence similarity to allow a proper
+    superposition.
 
      - `name`: A string specifying the name of the ligand, will be used for generating the
        output file name.
+     - `docking_template_pdb_id` - A string specifying a PDB entry with a co-crystallized ligand
+       that should be used to bias the docking with Posit into the protein structure specified
+       above.
+     - `docking_template_path` - The path to a structure file with a co-crystallized ligand that
+       should be used to bias the docking with Posit into the protein structure specified above.
+     - `docking_template_expo_id` - A string specifying the ligand to transfer to bias Posit
+       docking. This is especially useful if multiple ligands are present in a PDB structure.
+     - `docking_template_chain_id` - A string specifying which chain should be used. This is
+       especially useful if multiple chains are present in the given PDB structure. If not given
+       this may lead to unexpected behavior during superposition of the docking_template to the
+       actual protein structure.
+     - `docking_template_alternate_location` - A string specifying which alternate location should
+       be used.
 
     Parameters
     ----------
@@ -583,7 +601,12 @@ class OEPositDockingFeaturizer(OEBaseModelingFeaturizer):
         from openeye import oechem, oedocking
 
         from ..docking.OEDocking import pose_molecules
-        from ..modeling.OEModeling import read_smiles, read_molecules
+        from ..modeling.OEModeling import (
+            read_smiles,
+            read_molecules,
+            select_chain,
+            superpose_proteins
+        )
 
         logging.debug("Interpreting system ...")
         system_dict = self._interpret_system(system)
@@ -609,6 +632,44 @@ class OEPositDockingFeaturizer(OEBaseModelingFeaturizer):
         if system_dict["protein_sequence"]:
             protein = self._process_protein(protein, system_dict["protein_sequence"])
             oechem.OEUpdateDesignUnit(design_unit, protein, oechem.OEDesignUnitComponents_Protein)
+
+        if system_dict["docking_template_path"]:
+            logging.debug("Preparing docking template ...")
+            docking_template = read_molecules(system_dict["docking_template_path"])[0]
+            docking_template_du = self._get_design_unit(
+                structure=docking_template,
+                chain_id=system_dict["docking_template_chain_id"],
+                alternate_location=system_dict["docking_template_alternate_location"],
+                has_ligand=True,
+                ligand_name=system_dict["docking_template_expo_id"],
+                model_loops_and_caps=False,
+            )
+
+            logging.debug("Retrieving docking template components ...")
+            docking_template_du.GetComponents(
+                docking_template,
+                oechem.OEDesignUnitComponents_Protein | oechem.OEDesignUnitComponents_Ligand
+            )
+
+            if system_dict["docking_template_chain_id"]:
+                logging.debug("Selecting chain of docking template ...")
+                docking_template = select_chain(
+                    docking_template, system_dict["docking_template_chain_id"]
+                )
+
+            logging.debug("Superposing docking template to protein structure ...")
+            docking_template = superpose_proteins(protein, docking_template)
+
+            logging.debug("Extracting docking template ligand ...")
+            split_options = oechem.OESplitMolComplexOptions()
+            docking_template_ligand = list(oechem.OEGetMolComplexComponents(
+                docking_template, split_options, split_options.GetLigandFilter())
+            )[0]
+
+            logging.debug("Transferring docking template ligand to protein structure ...")
+            oechem.OEUpdateDesignUnit(
+                design_unit, docking_template_ligand, oechem.OEDesignUnitComponents_Ligand
+            )
 
         if not design_unit.HasReceptor():
             logging.debug("Preparing receptor for docking ...")
@@ -640,6 +701,11 @@ class OEPositDockingFeaturizer(OEBaseModelingFeaturizer):
         )
 
         logging.debug("Writing results ...")
+        docking_template_name = None
+        if system_dict["docking_template_pdb_id"]:
+            docking_template_name = system_dict["docking_template_pdb_id"]
+        elif system_dict["docking_template_path"]:
+            docking_template_name = system_dict["docking_template_path"].stem
         file_path = self._write_results(
             protein_ligand_complex,
             "_".join([
@@ -647,7 +713,8 @@ class OEPositDockingFeaturizer(OEBaseModelingFeaturizer):
                 system_dict["protein_pdb_id"] if system_dict["protein_pdb_id"]
                 else system_dict["protein_path"].stem,
                 f"chain{system_dict['protein_chain_id']}",
-                f"altloc{system_dict['protein_alternate_location']}"
+                f"altloc{system_dict['protein_alternate_location']}",
+                f"docking-template{docking_template_name}"
             ]),
             system.ligand.name,
         )
