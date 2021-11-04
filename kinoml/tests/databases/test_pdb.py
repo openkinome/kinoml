@@ -2,6 +2,7 @@
 Test pdb functionalities of `kinoml.databases`
 """
 from contextlib import contextmanager
+from pathlib import PosixPath
 import pytest
 
 
@@ -41,27 +42,27 @@ def test_smiles_from_pdb(pdb_ids, expectation, smiles_list):
 
 
 @pytest.mark.parametrize(
-    "pdb_id, success",
+    "pdb_id, return_type",
     [
         (
             "4YNE",  # PDB and CIF format available
-            True,
+            PosixPath,
         ),
         (
             "1BOS",  # only CIF format available
-            True,
+            PosixPath,
         ),
         (
             "XXXX",  # wrong code
-            False,
+            bool,
         ),
     ],
 )
-def test_download_pdb_structure(pdb_id, success):
+def test_download_pdb_structure(pdb_id, return_type):
     """Try to download PDB structures."""
     from tempfile import TemporaryDirectory
 
     from kinoml.databases.pdb import download_pdb_structure
 
     with TemporaryDirectory() as temporary_directory:
-        assert download_pdb_structure(pdb_id, temporary_directory) == success
+        assert isinstance(download_pdb_structure(pdb_id, temporary_directory), return_type)

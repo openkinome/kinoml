@@ -51,8 +51,8 @@ def download_pdb_structure(pdb_id, directory=user_cache_dir()):
 
     Returns
     -------
-    : bool
-        True if successful, else False.
+    : Path or False
+        The path to the the download file if successful, else False.
     """
     from pathlib import Path
 
@@ -64,16 +64,16 @@ def download_pdb_structure(pdb_id, directory=user_cache_dir()):
     pdb_path = LocalFileStorage.rcsb_structure_pdb(pdb_id, directory)
     if not pdb_path.is_file():
         if FileDownloader.rcsb_structure_pdb(pdb_id, directory):
-            return True
+            return pdb_path
     else:
-        return True
+        return pdb_path
 
     # check for structure in CIF format
     cif_path = LocalFileStorage.rcsb_structure_cif(pdb_id, directory)
     if not cif_path.is_file():
         if FileDownloader.rcsb_structure_cif(pdb_id, directory):
-            return True
+            return cif_path
     else:
-        return True
+        return cif_path
 
     return False
