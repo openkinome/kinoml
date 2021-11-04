@@ -52,7 +52,7 @@ def download_pdb_structure(pdb_id, directory=user_cache_dir()):
     Returns
     -------
     : Path or False
-        The path to the the download file if successful, else False.
+        The path to the the downloaded file if successful, else False.
     """
     from pathlib import Path
 
