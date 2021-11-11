@@ -1088,9 +1088,10 @@ class OEBaseModelingFeaturizer(ParallelBaseFeaturizer):
             self,
             protein_structure: oechem.OEMolBase,
             amino_acid_sequence: AminoAcidSequence,
+            ligand: Union[oechem.OEMolBase, None] = None,
     ) -> oechem.OEMolBase:
         """
-        Process a protein a structure according to the given amino acid sequence.
+        Process a protein structure according to the given amino acid sequence.
 
         Parameters
         ----------
@@ -1098,6 +1099,8 @@ class OEBaseModelingFeaturizer(ParallelBaseFeaturizer):
             An OpenEye molecule holding the protein structure to process.
         amino_acid_sequence: core.sequences.AminoAcidSequence
             The amino acid sequence with associated metadata.
+        ligand: oechem.OEMolBase or None, default=None
+            An OpenEye molecule that should be checked for heavy atom clashes with built insertions.
 
         Returns
         -------
@@ -1155,7 +1158,12 @@ class OEBaseModelingFeaturizer(ParallelBaseFeaturizer):
 
         if self.loop_db:
             logging.debug("Applying insertions to protein structure ...")
-            protein_structure = apply_insertions(protein_structure, amino_acid_sequence, self.loop_db)
+            protein_structure = apply_insertions(
+                protein_structure,
+                amino_acid_sequence,
+                self.loop_db,
+                ligand,
+            )
 
         logging.debug("Checking protein structure sequence termini ...")
         real_termini = []

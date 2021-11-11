@@ -114,7 +114,7 @@ class OEComplexFeaturizer(OEBaseModelingFeaturizer):
         )
 
         if system_dict["protein_sequence"]:
-            protein = self._process_protein(protein, system_dict["protein_sequence"])
+            protein = self._process_protein(protein, system_dict["protein_sequence"], ligand)
 
         logging.debug("Assembling components ...")
         protein_ligand_complex = self._assemble_components(protein, solvent, ligand)
