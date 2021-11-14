@@ -662,6 +662,7 @@ class OEPositDockingFeaturizer(OEBaseModelingFeaturizer):
 
             logging.debug("Extracting docking template ligand ...")
             split_options = oechem.OESplitMolComplexOptions()
+            split_options.SetSplitCovalent(True)
             docking_template_ligand = list(oechem.OEGetMolComplexComponents(
                 docking_template, split_options, split_options.GetLigandFilter())
             )[0]
