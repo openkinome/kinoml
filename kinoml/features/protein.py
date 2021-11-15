@@ -4,6 +4,7 @@ Featurizers that mostly concern protein-based models
 from __future__ import annotations
 from collections import Counter
 import logging
+from typing import Union
 
 import numpy as np
 
@@ -119,7 +120,7 @@ class OEProteinStructureFeaturizer(OEBaseModelingFeaturizer):
 
     _SUPPORTED_TYPES = (ProteinSystem,)
 
-    def _featurize_one(self, system: ProteinSystem) -> Universe:
+    def _featurize_one(self, system: ProteinSystem) -> Union[Universe, None]:
         """
         Prepare a protein structure.
 
@@ -130,8 +131,8 @@ class OEProteinStructureFeaturizer(OEBaseModelingFeaturizer):
 
         Returns
         -------
-        : Universe
-            An MDAnalysis universe of the featurized system.
+        : Universe or None
+            An MDAnalysis universe of the featurized system. None if no design unit was found.
         """
         import MDAnalysis as mda
 
@@ -152,6 +153,9 @@ class OEProteinStructureFeaturizer(OEBaseModelingFeaturizer):
             ligand_name=system_dict["protein_expo_id"],
             model_loops_and_caps=False if system_dict["protein_sequence"] else True,
         )  # if sequence is given model loops and caps separately later
+        if not design_unit:
+            logging.debug("No design unit found, returning None!")
+            return None
 
         logging.debug("Extracting design unit components ...")
         protein, solvent = self._get_components(design_unit, system_dict["protein_chain_id"])[:-1]

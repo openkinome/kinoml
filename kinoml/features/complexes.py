@@ -74,7 +74,7 @@ class OEComplexFeaturizer(OEBaseModelingFeaturizer):
 
     _SUPPORTED_TYPES = (ProteinLigandComplex,)
 
-    def _featurize_one(self, system: ProteinLigandComplex) -> Universe:
+    def _featurize_one(self, system: ProteinLigandComplex) -> Union[Universe, None]:
         """
         Prepare a protein structure.
 
@@ -85,8 +85,8 @@ class OEComplexFeaturizer(OEBaseModelingFeaturizer):
 
         Returns
         -------
-        : Universe
-            An MDAnalysis universe of the featurized system.
+        : Universe or None
+            An MDAnalysis universe of the featurized system. None if no design unit was found.
         """
         import MDAnalysis as mda
 
@@ -107,6 +107,9 @@ class OEComplexFeaturizer(OEBaseModelingFeaturizer):
             ligand_name=system_dict["protein_expo_id"],
             model_loops_and_caps=False if system_dict["protein_sequence"] else True,
         )  # if sequence is given model loops and caps separately later
+        if not design_unit:
+            logging.debug("No design unit found, returning None!")
+            return None
 
         logging.debug("Extracting design unit components ...")
         protein, solvent, ligand = self._get_components(
@@ -232,7 +235,8 @@ class OEHybridDockingFeaturizer(OEBaseModelingFeaturizer):
         Returns
         -------
         : Universe or None
-            An MDAnalysis universe of the featurized system. None if no docking pose was found.
+            An MDAnalysis universe of the featurized system. None if no design unit or docking
+            pose was found.
         """
         import MDAnalysis as mda
         from openeye import oechem, oedocking
@@ -255,6 +259,9 @@ class OEHybridDockingFeaturizer(OEBaseModelingFeaturizer):
             ligand_name=system_dict["protein_expo_id"],
             model_loops_and_caps=False if system_dict["protein_sequence"] else True,
         )  # if sequence is given model loops and caps separately later
+        if not design_unit:
+            logging.debug("No design unit found, returning None!")
+            return None
 
         logging.debug("Extracting design unit components ...")
         protein, solvent, ligand = self._get_components(
@@ -396,7 +403,8 @@ class OEFredDockingFeaturizer(OEBaseModelingFeaturizer):
         Returns
         -------
         : Universe or None
-            An MDAnalysis universe of the featurized system. None if no docking pose was found.
+            An MDAnalysis universe of the featurized system. None if no design unit or docking
+            pose was found.
         """
         import MDAnalysis as mda
         from openeye import oechem, oedocking
@@ -424,6 +432,9 @@ class OEFredDockingFeaturizer(OEBaseModelingFeaturizer):
         protein, solvent, ligand = self._get_components(
             design_unit, system_dict["protein_chain_id"]
         )
+        if not design_unit:
+            logging.debug("No design unit found, returning None!")
+            return None
 
         logging.debug("Defining binding site ...")
         box_molecule = resids_to_box_molecule(protein, system.protein.pocket_resids)
@@ -595,7 +606,8 @@ class OEPositDockingFeaturizer(OEBaseModelingFeaturizer):
         Returns
         -------
         : Universe or None
-            An MDAnalysis universe of the featurized system. None if no docking pose was found.
+            An MDAnalysis universe of the featurized system. None if no design unit or docking
+            pose was found.
         """
         import MDAnalysis as mda
         from openeye import oechem, oedocking
@@ -623,6 +635,9 @@ class OEPositDockingFeaturizer(OEBaseModelingFeaturizer):
             ligand_name=system_dict["protein_expo_id"],
             model_loops_and_caps=False if system_dict["protein_sequence"] else True,
         )  # if sequence is given model loops and caps separately later
+        if not design_unit:
+            logging.debug("No design unit found, returning None!")
+            return None
 
         logging.debug("Extracting design unit components ...")
         protein, solvent, ligand = self._get_components(
@@ -644,6 +659,9 @@ class OEPositDockingFeaturizer(OEBaseModelingFeaturizer):
                 ligand_name=system_dict["docking_template_expo_id"],
                 model_loops_and_caps=False,
             )
+            if not docking_template_du:
+                logging.debug("No design unit found for docking template, returning None!")
+                return None
 
             logging.debug("Retrieving docking template components ...")
             docking_template_du.GetComponents(
