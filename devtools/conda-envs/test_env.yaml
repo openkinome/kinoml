@@ -27,6 +27,7 @@ dependencies:
   - papermill 2.2.*
   - matplotlib-base
   - ruamel.yaml
+  - mdanalysis >=2.0.0
 
   # Development
   - jupyterlab
@@ -54,8 +55,6 @@ dependencies:
       - https://github.com/ValentinFigue/Sklearn_PyTorch/archive/1b56a43e41de331ecdf73d08418f75bb34c9fa06.tar.gz
       # OpenCADD
       - https://github.com/volkamerlab/opencadd/archive/master.tar.gz
-      # ProDy
-      - prody==1.10.11
       # Docs
       # core
       - sphinx~=2.4.0
@@ -75,5 +74,3 @@ dependencies:
       - sphinx-material
       # local building
       - sphinx-autobuild
-      # no stable release yet with support for serialization
-      - MDAnalysis==2.0.0b0

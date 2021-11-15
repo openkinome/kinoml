@@ -8,10 +8,10 @@ import logging
 from pathlib import Path
 from typing import Union, Tuple, Iterable, List
 
+import MDAnalysis as mda
 from MDAnalysis.core import universe
 
 from .core import ParallelBaseFeaturizer
-from ..core.proteins import ProteinStructure
 from ..core.sequences import Biosequence
 from ..core.systems import ProteinSystem, ProteinLigandComplex
 
@@ -131,7 +131,7 @@ class OEHybridDockingFeaturizer(ParallelBaseFeaturizer):
         )
 
         logging.debug("Generating new MDAnalysis universe ...")
-        structure = ProteinStructure.from_file(file_path)
+        structure = mda.Universe(file_path, in_memory=True)
 
         if not self.output_dir:
             logging.debug("Removing structure file ...")
@@ -900,7 +900,7 @@ class OEKLIFSKinaseApoFeaturizer(OEHybridDockingFeaturizer):
         )
 
         logging.debug("Generating new MDAnalysis universe ...")
-        structure = ProteinStructure.from_file(file_path)
+        structure = mda.Universe(file_path, in_memory=True)
 
         if not self.output_dir:
             logging.debug("Removing structure file ...")
@@ -1309,7 +1309,7 @@ class OEKLIFSKinaseApoFeaturizer(OEHybridDockingFeaturizer):
             kinase_structure = select_chain(kinase_structure, chain_id)
 
         logging.debug(
-            f"Deleting residues with clashing side chains ..."
+            "Deleting residues with clashing side chains ..."
         )  # e.g. 2j5f, 4wd5
         kinase_structure = delete_clashing_sidechains(kinase_structure)
 
@@ -1555,7 +1555,7 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEKLIFSKinaseApoFeaturizer):
         )
 
         logging.debug(
-            f"Adding attributes to BaseProtein ..."
+            "Adding attributes to BaseProtein ..."
         )  # TODO: bad idea in a library
         system.protein.pdb_id = protein_template["structure.pdb_id"]
         system.protein.path = LocalFileStorage.rcsb_structure_pdb(
@@ -1567,7 +1567,7 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEKLIFSKinaseApoFeaturizer):
             )
         )
 
-        logging.debug(f"Interpreting system ...")
+        logging.debug("Interpreting system ...")
         ligand, kinase_structure, electron_density = self._interpret_system(system)
 
         logging.debug(
@@ -1647,10 +1647,10 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEKLIFSKinaseApoFeaturizer):
             and ligand_template["structure.pdb_id"]
             == protein_template["structure.pdb_id"]
         ):
-            logging.debug(f"Found co-crystallized ligand ...")
+            logging.debug("Found co-crystallized ligand ...")
             docking_pose = prepared_ligand_template
         else:
-            logging.debug(f"Creating artificial hybrid receptor ...")
+            logging.debug("Creating artificial hybrid receptor ...")
             hybrid_receptor = create_hybrid_receptor(
                 processed_kinase_domain, prepared_ligand_template
             )
@@ -1696,7 +1696,7 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEKLIFSKinaseApoFeaturizer):
         )
 
         logging.debug("Generating new MDAnalysis universe ...")
-        structure = ProteinStructure.from_file(file_path)
+        structure = mda.Universe(file_path, in_memory=True)
 
         if not self.output_dir:
             logging.debug("Removing structure file ...")
