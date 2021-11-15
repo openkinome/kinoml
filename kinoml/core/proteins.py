@@ -5,7 +5,7 @@ import logging
 
 from .components import BaseProtein, BaseStructure
 from .sequences import Biosequence
-from ..utils import download_file, APPDIR
+from ..utils import APPDIR
 
 logger = logging.getLogger(__name__)
 
