@@ -30,8 +30,9 @@ dependencies:
   - watermark
 
   # pytorch
-  - pytorch
-  - pytorch_geometric
+  - pytorch >= 1.8.0
+  - pyg
+  # - pytorch_geometric
 
   # structural modeling
   #- modeller
