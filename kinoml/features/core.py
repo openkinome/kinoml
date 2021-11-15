@@ -957,7 +957,7 @@ class OEBaseModelingFeaturizer(ParallelBaseFeaturizer):
             has_ligand: bool,
             ligand_name: Union[str, None],
             model_loops_and_caps: bool,
-    ) -> oechem.OEDesignUnit:
+    ) -> Union[oechem.OEDesignUnit, None]:
         """
         Get an OpenEye design unit based on the given input.
 
@@ -981,8 +981,8 @@ class OEBaseModelingFeaturizer(ParallelBaseFeaturizer):
 
         Returns
         -------
-        design_unit: oechem.OEDesignUnit
-            The design unit.
+        design_unit: oechem.OEDesignUnit or None
+            The design unit or None if no design unit was found.
         """
         from openeye import oechem
 
@@ -1005,15 +1005,18 @@ class OEBaseModelingFeaturizer(ParallelBaseFeaturizer):
         )
         if not design_unit_path.is_file():
             logging.debug("Generating design unit ...")
-            design_unit = prepare_structure(
-                structure,
-                loop_db=self.loop_db if model_loops_and_caps else None,
-                has_ligand=has_ligand,
-                ligand_name=ligand_name,
-                chain_id=chain_id,
-                alternate_location=alternate_location,
-                cap_termini=True if model_loops_and_caps else False
-            )
+            try:
+                design_unit = prepare_structure(
+                    structure,
+                    loop_db=self.loop_db if model_loops_and_caps else None,
+                    has_ligand=has_ligand,
+                    ligand_name=ligand_name,
+                    chain_id=chain_id,
+                    alternate_location=alternate_location,
+                    cap_termini=True if model_loops_and_caps else False
+                )
+            except ValueError:
+                return None
             logging.debug("Writing design unit ...")
             oechem.OEWriteDesignUnit(str(design_unit_path), design_unit)
         # re-reading design unit helps proper capping of e.g. 2itz
