@@ -48,9 +48,7 @@ class PrefeaturizedTorchDataset(_NativeTorchDataset):
         measurements,
         observation_model: callable = _null_observation_model,
     ):
-        assert len(systems) == len(
-            measurements
-        ), "Systems and Measurements must match in size!"
+        assert len(systems) == len(measurements), "Systems and Measurements must match in size!"
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
         # note we are using as_tensor to _avoid_ copies if possible
         self.systems = systems
@@ -59,9 +57,7 @@ class PrefeaturizedTorchDataset(_NativeTorchDataset):
 
     def __getitem__(self, index):
         X = torch.tensor(self.systems[index], device=self.device, dtype=torch.float)
-        y = torch.tensor(
-            self.measurements[index], device=self.device, dtype=torch.float
-        )
+        y = torch.tensor(self.measurements[index], device=self.device, dtype=torch.float)
         return X, y
 
     def __len__(self):
@@ -115,9 +111,7 @@ class TorchDataset(PrefeaturizedTorchDataset):
         self.featurizer = featurizer
 
     def estimate_input_size(self):
-        return (
-            self.featurizer(self.systems[0]).featurizations[self.featurizer.name].shape
-        )
+        return self.featurizer(self.systems[0]).featurizations[self.featurizer.name].shape
 
     def __getitem__(self, index):
         """
@@ -191,9 +185,7 @@ class XyTorchDataset(_NativeTorchDataset):
         y = torch.as_tensor(data["y"])
         if "idx_train" in data:
             indices = {
-                key[4:]: data[key]
-                for key in ["idx_train", "idx_test", "idx_val"]
-                if key in data
+                key[4:]: data[key] for key in ["idx_train", "idx_test", "idx_val"] if key in data
             }
         else:
             indices = {"train": True}
@@ -315,9 +307,7 @@ class MultiXTorchDataset(_NativeTorchDataset):
             data = dict(tqdm(data.items(), desc=f"Loading {name}"))
         if "idx_train" in data:
             indices = {
-                key[4:]: data[key]
-                for key in ["idx_train", "idx_test", "idx_val"]
-                if key in data
+                key[4:]: data[key] for key in ["idx_train", "idx_test", "idx_val"] if key in data
             }
         else:
             indices = {"train": True}
@@ -529,9 +519,7 @@ def _accessor_to_indices(accessor, full_size):
             elif isinstance(accessor[0], bool):
                 indices = [i for i, value in enumerate(accessor) if value]
         elif isinstance(accessor, slice):
-            indices = range(
-                accessor.start or 0, accessor.stop or full_size, accessor.step or 1
-            )
+            indices = range(accessor.start or 0, accessor.stop or full_size, accessor.step or 1)
         elif isinstance(accessor, int):
             indices = [accessor]
             single_item = True

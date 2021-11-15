@@ -191,9 +191,7 @@ class Biosequence(str):
 
         # Reverse alphabetical order (substitutions will come first)
         mutated = self
-        for mutation in sorted(
-            mutations, key=lambda m: mutation_count[m], reverse=True
-        ):
+        for mutation in sorted(mutations, key=lambda m: mutation_count[m], reverse=True):
             if None in (mutation, mutation_types[mutation]):
                 continue
             operation = getattr(mutated, f"_mutate_with_{mutation_types[mutation]}")
@@ -353,9 +351,7 @@ class AminoAcidSequence(Biosequence):
         import requests
         import json
 
-        response = requests.get(
-            f"https://www.ebi.ac.uk/proteins/api/proteins/{uniprot_id}"
-        )
+        response = requests.get(f"https://www.ebi.ac.uk/proteins/api/proteins/{uniprot_id}")
         response = json.loads(response.text)
 
         return response

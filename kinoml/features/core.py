@@ -244,11 +244,7 @@ class ParallelBaseFeaturizer(BaseFeaturizer):
             except AttributeError as e:
                 return False
 
-        return {
-            name: value
-            for name, value in self.__dict__.items()
-            if is_serializable(value)
-        }
+        return {name: value for name, value in self.__dict__.items() if is_serializable(value)}
 
     def __setstate__(self, state):
         """Only preserve object fields that are serializable."""
@@ -291,9 +287,7 @@ class ParallelBaseFeaturizer(BaseFeaturizer):
                 self.n_processes = 1
             if self.n_processes == 1:
                 # featurize in a serial fashion
-                features = [
-                    self._featurize_one(s) for s in tqdm(systems, desc=self.name)
-                ]
+                features = [self._featurize_one(s) for s in tqdm(systems, desc=self.name)]
             else:
                 # featurize in a parallel fashion
                 func = partial(self._featurize_one)
@@ -330,9 +324,7 @@ class Pipeline(BaseFeaturizer):
         self.featurizers = featurizers
         self._shortname = shortname
 
-    def _featurize(
-        self, systems: Iterable[System], keep: bool = True
-    ) -> Iterable[object]:
+    def _featurize(self, systems: Iterable[System], keep: bool = True) -> Iterable[object]:
         """
         Given a list of featurizers, apply them sequentially
         on the systems (e.g. featurizer A returns X, and X is
@@ -377,9 +369,7 @@ class Pipeline(BaseFeaturizer):
         ``ValueError`` if ``f.supports()`` fails and ``raise_errors`` is ``True``.
         """
         return all(
-            f.supports(s, raise_errors=raise_errors)
-            for f in self.featurizers
-            for s in systems
+            f.supports(s, raise_errors=raise_errors) for f in self.featurizers for s in systems
         )
 
     @property
@@ -692,9 +682,7 @@ class HashFeaturizer(BaseFeaturizer):
         Normalizes the hash to obtain a value in the unit interval
     """
 
-    def __init__(
-        self, getter: Callable[[System], str] = None, normalize=True, **kwargs
-    ):
+    def __init__(self, getter: Callable[[System], str] = None, normalize=True, **kwargs):
         super().__init__(**kwargs)
         self.getter = getter or self._getter
         self.normalize = normalize
@@ -745,9 +733,7 @@ class CallableFeaturizer(BaseFeaturizer):
         for each system.
     """
 
-    def __init__(
-        self, func: Callable[[System], System | np.array] | str = None, **kwargs
-    ):
+    def __init__(self, func: Callable[[System], System | np.array] | str = None, **kwargs):
         super().__init__(**kwargs)
         if func is None:
             func = self._default_func

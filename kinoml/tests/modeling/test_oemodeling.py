@@ -479,13 +479,9 @@ def test_generate_conformations(smiles, n_conformations):
 def test_generate_reasonable_conformations(smiles, n_conformations_list):
     """Compare results to expected number of isomers and conformations."""
     molecule = read_smiles(smiles)
-    conformations_ensemble = generate_reasonable_conformations(
-        molecule, max_conformations=5
-    )
+    conformations_ensemble = generate_reasonable_conformations(molecule, max_conformations=5)
     assert len(conformations_ensemble) == len(n_conformations_list)
-    for conformations, n_conformations in zip(
-        conformations_ensemble, n_conformations_list
-    ):
+    for conformations, n_conformations in zip(conformations_ensemble, n_conformations_list):
         assert conformations.NumConfs() == n_conformations
 
 
@@ -606,9 +602,7 @@ def test_get_sequence(package, resource, sequence):
         ),
     ],
 )
-def test_get_structure_sequence_alignment(
-    package, resource, sequence, expected_alignment
-):
+def test_get_structure_sequence_alignment(package, resource, sequence, expected_alignment):
     """Compare results to expected sequence alignment."""
     with resources.path(package, resource) as path:
         structure = read_molecules(str(path))[0]
@@ -671,9 +665,7 @@ def test_apply_deletions(
         structure = read_molecules(str(path))[0]
         structure = remove_non_protein(structure, remove_water=True)
         with expectation:
-            structure_with_deletions = apply_deletions(
-                structure, sequence, delete_n_anchors
-            )
+            structure_with_deletions = apply_deletions(structure, sequence, delete_n_anchors)
             sequence_with_deletions = get_sequence(structure_with_deletions)
             assert sequence_with_deletions == expected_sequence
 
@@ -694,9 +686,7 @@ def test_apply_insertions(package_list, resource_list, sequence):
         with resources.path(package_list[1], resource_list[1]) as loop_db_path:
             structure = read_molecules(str(pdb_path))[0]
             structure = remove_non_protein(structure, remove_water=True)
-            structure_with_insertions = apply_insertions(
-                structure, sequence, loop_db_path
-            )
+            structure_with_insertions = apply_insertions(structure, sequence, loop_db_path)
             sequence_with_insertions = get_sequence(structure_with_insertions)
             assert sequence_with_insertions == sequence
 
@@ -738,9 +728,7 @@ def test_apply_mutations(
         structure = read_molecules(str(pdb_path))[0]
         structure = remove_non_protein(structure, remove_water=True)
         with expectation:
-            structure_with_mutations = apply_mutations(
-                structure, sequence, delete_fallback
-            )
+            structure_with_mutations = apply_mutations(structure, sequence, delete_fallback)
             sequence_with_mutations = get_sequence(structure_with_mutations)
             assert sequence_with_mutations == expected_sequence
 
@@ -894,9 +882,7 @@ def test_renumber_structure(package, resource, residue_ids, expectation):
         with expectation:
             structure = renumber_structure(structure, residue_ids)
             hierview = oechem.OEHierView(structure)
-            new_residue_ids = [
-                residue.GetResidueNumber() for residue in hierview.GetResidues()
-            ]
+            new_residue_ids = [residue.GetResidueNumber() for residue in hierview.GetResidues()]
             assert len(residue_ids) == len(new_residue_ids)
             assert all([True for x, y in zip(residue_ids, new_residue_ids) if x == y])
 
@@ -943,19 +929,11 @@ def test_superpose_protein(package_list, resource_list, residues, chain_id):
             superposed_structure = superpose_proteins(
                 reference_structure, fit_structure, residues, chain_id
             )
-            superposed_protein = remove_non_protein(
-                superposed_structure, remove_water=True
-            )
-            reference_protein = remove_non_protein(
-                reference_structure, remove_water=True
-            )
-            superposed_protein_center = np.mean(
-                get_atom_coordinates(superposed_protein)
-            )
+            superposed_protein = remove_non_protein(superposed_structure, remove_water=True)
+            reference_protein = remove_non_protein(reference_structure, remove_water=True)
+            superposed_protein_center = np.mean(get_atom_coordinates(superposed_protein))
             reference_protein_center = np.mean(get_atom_coordinates(reference_protein))
-            assert (
-                np.linalg.norm(superposed_protein_center - reference_protein_center) < 1
-            )
+            assert np.linalg.norm(superposed_protein_center - reference_protein_center) < 1
 
 
 @pytest.mark.parametrize(
@@ -1110,9 +1088,5 @@ def test_residue_ids_to_residue_names(
     with resources.path(package, resource) as path:
         structure = read_molecules(str(path))[0]
         with expectation:
-            found_residue_names = residue_ids_to_residue_names(
-                structure, residue_ids, chain_id
-            )
-            assert all(
-                [True for x, y in zip(found_residue_names, residue_names) if x == y]
-            )
+            found_residue_names = residue_ids_to_residue_names(structure, residue_ids, chain_id)
+            assert all([True for x, y in zip(found_residue_names, residue_names) if x == y])

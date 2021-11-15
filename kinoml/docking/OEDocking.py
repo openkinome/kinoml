@@ -269,9 +269,7 @@ def run_docking(
             docked_mol = oechem.OEMol()
 
             # dock molecule
-            return_code = dock.DockMultiConformerMolecule(
-                docked_mol, conformations, num_poses
-            )
+            return_code = dock.DockMultiConformerMolecule(docked_mol, conformations, num_poses)
             if return_code != oedocking.OEDockingReturnCode_Success:
                 # TODO: Maybe something for logging
                 print(
@@ -328,9 +326,7 @@ def hybrid_docking(
     from openeye import oedocking
 
     dock_method = oedocking.OEDockMethod_Hybrid2
-    docked_molecules = run_docking(
-        hybrid_receptor, molecules, dock_method, num_poses, pKa_norm
-    )
+    docked_molecules = run_docking(hybrid_receptor, molecules, dock_method, num_poses, pKa_norm)
 
     return docked_molecules
 
@@ -363,8 +359,6 @@ def chemgauss_docking(
     from openeye import oedocking
 
     dock_method = oedocking.OEDockMethod_Chemgauss4
-    docked_molecules = run_docking(
-        receptor, molecules, dock_method, num_poses, pKa_norm
-    )
+    docked_molecules = run_docking(receptor, molecules, dock_method, num_poses, pKa_norm)
 
     return docked_molecules

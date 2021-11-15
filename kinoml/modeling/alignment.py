@@ -34,12 +34,8 @@ def sequence_similarity(
 
     substitution_matrix = substitution_matrices.load(substitution_matrix)
     # replace any characters unknown to the substitution matrix by *
-    sequence1_clean = "".join(
-        [x if x in substitution_matrix.alphabet else "*" for x in sequence1]
-    )
-    sequence2_clean = "".join(
-        [x if x in substitution_matrix.alphabet else "*" for x in sequence2]
-    )
+    sequence1_clean = "".join([x if x in substitution_matrix.alphabet else "*" for x in sequence1])
+    sequence2_clean = "".join([x if x in substitution_matrix.alphabet else "*" for x in sequence2])
     score = pairwise2.align.globalds(
         sequence1_clean,
         sequence2_clean,
