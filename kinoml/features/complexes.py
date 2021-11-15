@@ -606,8 +606,8 @@ class OEPositDockingFeaturizer(OEBaseModelingFeaturizer):
         Returns
         -------
         : Universe or None
-            An MDAnalysis universe of the featurized system. None if no design unit or docking
-            pose was found.
+            An MDAnalysis universe of the featurized system. None if no design unit, docking
+            template ligand or docking pose was found.
         """
         import MDAnalysis as mda
         from openeye import oechem, oedocking
@@ -681,9 +681,13 @@ class OEPositDockingFeaturizer(OEBaseModelingFeaturizer):
             logging.debug("Extracting docking template ligand ...")
             split_options = oechem.OESplitMolComplexOptions()
             split_options.SetSplitCovalent(True)
-            docking_template_ligand = list(oechem.OEGetMolComplexComponents(
-                docking_template, split_options, split_options.GetLigandFilter())
-            )[0]
+            try:
+                docking_template_ligand = list(oechem.OEGetMolComplexComponents(
+                    docking_template, split_options, split_options.GetLigandFilter())
+                )[0]
+            except IndexError:
+                logging.debug("No docking template ligand could be extracted, returning None!")
+                return None
 
             logging.debug("Transferring docking template ligand to protein structure ...")
             oechem.OEUpdateDesignUnit(
