@@ -34,7 +34,7 @@ dependencies:
   - watermark
 
   # pytorch
-  - pytorch >= 1.8.0
+  - pytorch >=1.8.0
   - pyg
   # - pytorch_geometric
 
