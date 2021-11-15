@@ -57,7 +57,7 @@ jobs:
       - name: Run pylint
         shell: bash -l {0}
         run: |
-          pylint kinoml/
+          pylint --disable=W kinoml/
 
       - name: Run black check
         shell: bash -l {0}
