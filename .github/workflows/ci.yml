@@ -26,10 +26,10 @@ jobs:
             python-version: "3.9"
             conda-installer: https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-Linux-x86_64.sh
 
-          - name: Linux, Python 3.9
-            os: ubuntu-latest
-            python-version: "3.9"
-            conda-installer: https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-Linux-x86_64.sh
+          # - name: Linux, Python 3.9
+          #   os: ubuntu-latest
+          #   python-version: "3.9"
+          #   conda-installer: https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-Linux-x86_64.sh
 
           - name: MacOS, Python 3.9
             os: macOS-latest
