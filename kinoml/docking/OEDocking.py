@@ -137,9 +137,9 @@ def create_box_receptor(
 
 
 def pose_molecules(
-        receptor: oechem.OEMolBase,
-        molecules: List[oechem.OEMolBase],
-        pKa_norm: bool = True,
+    receptor: oechem.OEMolBase,
+    molecules: List[oechem.OEMolBase],
+    pKa_norm: bool = True,
 ) -> Union[List[oechem.OEGraphMol], None]:
     """
     Generate a binding pose of molecules in a prepared receptor with OpenEye's Posit method.
@@ -214,11 +214,11 @@ def pose_molecules(
 
 
 def run_docking(
-        receptor: oechem.OEMolBase,
-        molecules: List[oechem.OEMolBase],
-        dock_method: int,
-        num_poses: int = 1,
-        pKa_norm: bool = True,
+    receptor: oechem.OEMolBase,
+    molecules: List[oechem.OEMolBase],
+    dock_method: int,
+    num_poses: int = 1,
+    pKa_norm: bool = True,
 ) -> Union[List[oechem.OEGraphMol], None]:
     """
     Dock molecules into a prepared receptor.
@@ -299,10 +299,10 @@ def run_docking(
 
 
 def hybrid_docking(
-        hybrid_receptor: oechem.OEMolBase,
-        molecules: List[oechem.OEMolBase],
-        num_poses: int = 1,
-        pKa_norm: bool = True,
+    hybrid_receptor: oechem.OEMolBase,
+    molecules: List[oechem.OEMolBase],
+    num_poses: int = 1,
+    pKa_norm: bool = True,
 ) -> Union[List[oechem.OEGraphMol], None]:
     """
     Dock molecules into a prepared receptor holding protein and ligand structure.
@@ -332,10 +332,10 @@ def hybrid_docking(
 
 
 def chemgauss_docking(
-        receptor: oechem.OEMolBase,
-        molecules: List[oechem.OEMolBase],
-        num_poses: int = 1,
-        pKa_norm: bool = True,
+    receptor: oechem.OEMolBase,
+    molecules: List[oechem.OEMolBase],
+    num_poses: int = 1,
+    pKa_norm: bool = True,
 ) -> Union[List[oechem.OEGraphMol], None]:
     """
     Dock molecules into a prepared receptor holding a protein structure.

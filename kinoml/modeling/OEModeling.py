@@ -117,7 +117,9 @@ def read_electron_density(path: Union[str, Path]) -> oegrid.OESkewGrid:
         electron_density = None
 
     if electron_density is None:
-        raise ValueError("Not a valid electron density file or wrong format. Only MTZ is currently supported.")
+        raise ValueError(
+            "Not a valid electron density file or wrong format. Only MTZ is currently supported."
+        )
 
     return electron_density
 
@@ -179,9 +181,9 @@ def select_chain(molecule: oechem.OEMolBase, chain_id: str) -> oechem.OEMolBase:
 
 
 def select_altloc(
-        molecule: oechem.OEMolBase,
-        altloc_id: str,
-        altloc_fallback: bool = True,
+    molecule: oechem.OEMolBase,
+    altloc_id: str,
+    altloc_fallback: bool = True,
 ) -> oechem.OEMolBase:
     """
     Select an alternate location from an OpenEye molecule.
@@ -224,16 +226,16 @@ def select_altloc(
     # remove alternate location identifiers
     oechem.OEPerceiveResidues(
         selection,
-        oechem.OEPreserveResInfo_All - oechem.OEPreserveResInfo_AlternateLocation
+        oechem.OEPreserveResInfo_All - oechem.OEPreserveResInfo_AlternateLocation,
     )
 
     return selection
 
 
 def remove_non_protein(
-        molecule: oechem.OEMolBase,
-        exceptions: Union[None, List[str]] = None,
-        remove_water: bool = False,
+    molecule: oechem.OEMolBase,
+    exceptions: Union[None, List[str]] = None,
+    remove_water: bool = False,
 ) -> oechem.OEMolBase:
     """
     Remove non-protein atoms from an OpenEye molecule. Water will be kept by default.
@@ -270,10 +272,7 @@ def remove_non_protein(
 
 
 def delete_residue(
-        structure: oechem.OEMolBase,
-        chain_id: str,
-        residue_name: str,
-        residue_id: int
+    structure: oechem.OEMolBase, chain_id: str, residue_name: str, residue_id: int
 ) -> oechem.OEGraphMol:
     """
     Delete a residue from an OpenEye molecule.
@@ -317,8 +316,8 @@ def delete_residue(
 
 
 def get_expression_tags(
-        structure: oechem.OEMolBase,
-        labels: Iterable[str] = ("EXPRESSION TAG", "CLONING ARTIFACT"),
+    structure: oechem.OEMolBase,
+    labels: Iterable[str] = ("EXPRESSION TAG", "CLONING ARTIFACT"),
 ) -> List[Dict]:
     """
     Get the chain id, residue name and residue id of residues in expression tags from a protein structure listed in the
@@ -338,7 +337,9 @@ def get_expression_tags(
     """
     # retrieve "SEQADV" records from PDB header
     pdb_data_pairs = oechem.OEGetPDBDataPairs(structure)
-    seqadv_records = [datapair.GetValue() for datapair in pdb_data_pairs if datapair.GetTag() == "SEQADV"]
+    seqadv_records = [
+        datapair.GetValue() for datapair in pdb_data_pairs if datapair.GetTag() == "SEQADV"
+    ]
     expression_tag_labels = [
         seqadv_record
         for seqadv_record in seqadv_records
@@ -352,7 +353,7 @@ def get_expression_tags(
             {
                 "chain_id": label[10],
                 "residue_name": label[6:9],
-                "residue_id": int(label[12:16])
+                "residue_id": int(label[12:16]),
             }
         )
 
@@ -360,8 +361,7 @@ def get_expression_tags(
 
 
 def assign_caps(
-        structure: oechem.OEMolBase,
-        real_termini: Union[Iterable[int] or None] = None
+    structure: oechem.OEMolBase, real_termini: Union[Iterable[int] or None] = None
 ) -> oechem.OEMolBase:
     """
     Cap N and C termini of the given input structure. Real termini can be protected from capping by providing the
@@ -419,15 +419,15 @@ def assign_caps(
 
 
 def prepare_structure(
-        structure: oechem.OEMolBase,
-        has_ligand: bool = False,
-        electron_density: Union[oegrid.OESkewGrid, None] = None,
-        loop_db: Union[str, None] = None,
-        ligand_name: Union[str, None] = None,
-        chain_id: Union[str, None] = None,
-        alternate_location: Union[str, None] = None,
-        cap_termini: bool = True,
-        real_termini: Union[List[int], None] = None,
+    structure: oechem.OEMolBase,
+    has_ligand: bool = False,
+    electron_density: Union[oegrid.OESkewGrid, None] = None,
+    loop_db: Union[str, None] = None,
+    ligand_name: Union[str, None] = None,
+    chain_id: Union[str, None] = None,
+    alternate_location: Union[str, None] = None,
+    cap_termini: bool = True,
+    real_termini: Union[List[int], None] = None,
 ) -> oechem.OEDesignUnit:
     """
     Prepare an OpenEye molecule holding a protein ligand complex for docking.
@@ -504,8 +504,12 @@ def prepare_structure(
     design_unit_options.GetPrepOptions().GetBuildOptions().GetLoopBuilderOptions().SetSeqAlignMethod(
         oechem.OESeqAlignmentMethod_Identity
     )
-    design_unit_options.GetPrepOptions().GetBuildOptions().GetLoopBuilderOptions().SetSeqAlignGapPenalty(-1)
-    design_unit_options.GetPrepOptions().GetBuildOptions().GetLoopBuilderOptions().SetSeqAlignExtendPenalty(0)
+    design_unit_options.GetPrepOptions().GetBuildOptions().GetLoopBuilderOptions().SetSeqAlignGapPenalty(
+        -1
+    )
+    design_unit_options.GetPrepOptions().GetBuildOptions().GetLoopBuilderOptions().SetSeqAlignExtendPenalty(
+        0
+    )
     # capping options, capping done separately
     design_unit_options.GetPrepOptions().GetBuildOptions().SetCapCTermini(False)
     design_unit_options.GetPrepOptions().GetBuildOptions().SetCapNTermini(False)
@@ -522,9 +526,7 @@ def prepare_structure(
     if has_ligand:
         if electron_density is None:
             design_units = list(
-                oespruce.OEMakeDesignUnits(
-                    structure, structure_metadata, design_unit_options
-                )
+                oespruce.OEMakeDesignUnits(structure, structure_metadata, design_unit_options)
             )
         else:
             design_units = list(
@@ -534,9 +536,7 @@ def prepare_structure(
             )
     else:
         design_units = list(
-            oespruce.OEMakeBioDesignUnits(
-                structure, structure_metadata, design_unit_options
-            )
+            oespruce.OEMakeBioDesignUnits(structure, structure_metadata, design_unit_options)
         )
 
     # filter design units for ligand of interest
@@ -552,13 +552,13 @@ def prepare_structure(
     if chain_id is not None:
         logging.debug(f"Filtering design units for chain with ID {chain_id} ...")
         design_units = [
-            design_unit
-            for design_unit in design_units
-            if _contains_chain(design_unit, chain_id)
+            design_unit for design_unit in design_units if _contains_chain(design_unit, chain_id)
         ]
 
     if len(design_units) == 0:
-        raise ValueError("No design unit found with given chain ID, ligand name and alternate location.")
+        raise ValueError(
+            "No design unit found with given chain ID, ligand name and alternate location."
+        )
     else:
         design_unit = design_units[0]
 
@@ -572,14 +572,14 @@ def prepare_structure(
 
 
 def prepare_complex(
-        protein_ligand_complex: oechem.OEMolBase,
-        electron_density: Union[oegrid.OESkewGrid, None] = None,
-        loop_db: Union[str, None] = None,
-        ligand_name: Union[str, None] = None,
-        chain_id: Union[str, None] = None,
-        alternate_location: Union[str, None] = None,
-        cap_termini: bool = True,
-        real_termini: Union[List[int], None] = None,
+    protein_ligand_complex: oechem.OEMolBase,
+    electron_density: Union[oegrid.OESkewGrid, None] = None,
+    loop_db: Union[str, None] = None,
+    ligand_name: Union[str, None] = None,
+    chain_id: Union[str, None] = None,
+    alternate_location: Union[str, None] = None,
+    cap_termini: bool = True,
+    real_termini: Union[List[int], None] = None,
 ) -> oechem.OEDesignUnit:
     """
     Prepare an OpenEye molecule holding a protein ligand complex for docking.
@@ -629,12 +629,12 @@ def prepare_complex(
 
 
 def prepare_protein(
-        protein: oechem.OEMolBase,
-        loop_db: Union[str, None] = None,
-        chain_id: Union[str, None] = None,
-        alternate_location: Union[str, None] = None,
-        cap_termini: bool = True,
-        real_termini: Union[List[int], None] = None,
+    protein: oechem.OEMolBase,
+    loop_db: Union[str, None] = None,
+    chain_id: Union[str, None] = None,
+    alternate_location: Union[str, None] = None,
+    cap_termini: bool = True,
+    real_termini: Union[List[int], None] = None,
 ) -> oechem.OEDesignUnit:
     """
     Prepare an OpenEye molecule holding a protein structure for docking.
@@ -677,10 +677,10 @@ def prepare_protein(
 
 
 def generate_tautomers(
-        molecule: Union[oechem.OEMolBase, oechem.OEMCMolBase],
-        max_generate: int = 4096,
-        max_return: int = 16,
-        pKa_norm: bool = True,
+    molecule: Union[oechem.OEMolBase, oechem.OEMCMolBase],
+    max_generate: int = 4096,
+    max_return: int = 16,
+    pKa_norm: bool = True,
 ) -> List[Union[oechem.OEMolBase, oechem.OEMCMolBase]]:
     """
     Generate reasonable tautomers of a given molecule.
@@ -712,19 +712,17 @@ def generate_tautomers(
     tautomer_options.SetMaxZoneSize(50)
     tautomer_options.SetApplyWarts(True)
     tautomers = [
-        tautomer for tautomer
-        in oequacpac.OEGetReasonableTautomers(
-            molecule, tautomer_options, pKa_norm
-        )
+        tautomer
+        for tautomer in oequacpac.OEGetReasonableTautomers(molecule, tautomer_options, pKa_norm)
     ]  # ToDo: report unexpected behavior, with pKa_norm set False, positively charged imidazole become neutral
     return tautomers
 
 
 def generate_enantiomers(
-        molecule: oechem.OEMolBase,
-        max_centers: int = 12,
-        force_flip: bool = False,
-        enumerate_nitrogens: bool = True,
+    molecule: oechem.OEMolBase,
+    max_centers: int = 12,
+    force_flip: bool = False,
+    enumerate_nitrogens: bool = True,
 ) -> List[oechem.OEMolBase]:
     """
     Generate enantiomers of a given molecule.
@@ -753,17 +751,12 @@ def generate_enantiomers(
     flipper_options.SetEnumNitrogen(enumerate_nitrogens)
     flipper_options.SetWarts(True)
 
-    enantiomers = [
-        enantiomer for enantiomer
-        in oeomega.OEFlipper(molecule, flipper_options)
-    ]
+    enantiomers = [enantiomer for enantiomer in oeomega.OEFlipper(molecule, flipper_options)]
     return enantiomers
 
 
 def generate_conformations(
-        molecule: oechem.OEMolBase,
-        max_conformations: int = 1000,
-        dense: bool = False
+    molecule: oechem.OEMolBase, max_conformations: int = 1000, dense: bool = False
 ) -> oechem.OEMCMolBase:
     """
     Generate conformations of a given molecule.
@@ -808,10 +801,10 @@ def generate_conformations(
 
 
 def generate_reasonable_conformations(
-        molecule: oechem.OEMolBase,
-        max_conformations: int = 1000,
-        dense: bool = False,
-        pKa_norm: bool = True,
+    molecule: oechem.OEMolBase,
+    max_conformations: int = 1000,
+    dense: bool = False,
+    pKa_norm: bool = True,
 ) -> List[oechem.OEMCMolBase]:
     """
     Generate conformations of reasonable enantiomers and tautomers of a given molecule.
@@ -837,19 +830,15 @@ def generate_reasonable_conformations(
     tautomers = generate_tautomers(molecule, pKa_norm=pKa_norm)
     enantiomers = [generate_enantiomers(tautomer) for tautomer in tautomers]
     conformations_ensemble = [
-        generate_conformations(
-            enantiomer,
-            max_conformations=max_conformations,
-            dense=dense
-        )
+        generate_conformations(enantiomer, max_conformations=max_conformations, dense=dense)
         for enantiomer in itertools.chain.from_iterable(enantiomers)
     ]
     return conformations_ensemble
 
 
 def overlay_molecules(
-        reference_molecule: oechem.OEMolBase,
-        fit_molecule: oechem.OEMCMolBase,
+    reference_molecule: oechem.OEMolBase,
+    fit_molecule: oechem.OEMCMolBase,
 ) -> (float, List[oechem.OEGraphMol]):
     """
     Overlay a multi-conformer molecule to a single-conformer molecule and calculate the TanimotoCombo score.
@@ -917,10 +906,7 @@ def enumerate_isomeric_smiles(molecule: oechem.OEMolBase) -> Set[str]:
     return smiles_set
 
 
-def are_identical_molecules(
-        molecule1: oechem.OEMolBase,
-        molecule2: oechem.OEMolBase
-) -> bool:
+def are_identical_molecules(molecule1: oechem.OEMolBase, molecule2: oechem.OEMolBase) -> bool:
     """
     Check if two OpenEye molecules are identical.
 
@@ -967,9 +953,7 @@ def get_sequence(structure: oechem.OEMolBase) -> str:
         residue = hier_residue.GetOEResidue()
         if oechem.OEIsStandardProteinResidue(residue) and not residue.IsHetAtom():
             sequence.append(
-                oechem.OEGetAminoAcidCode(
-                    oechem.OEGetResidueIndex(residue.GetName().strip())
-                )
+                oechem.OEGetAminoAcidCode(oechem.OEGetResidueIndex(residue.GetName().strip()))
             )
         else:
             sequence.append("X")
@@ -980,8 +964,7 @@ def get_sequence(structure: oechem.OEMolBase) -> str:
 
 
 def get_structure_sequence_alignment(
-        structure: oechem.OEMolBase,
-        sequence: str
+    structure: oechem.OEMolBase, sequence: str
 ) -> Tuple[str, str]:
     """
     Generate an alignment between a protein structure and an amino acid sequence. The provided protein structure should
@@ -1017,10 +1000,7 @@ def get_structure_sequence_alignment(
     # align template and target sequences
     target_sequence = get_sequence(structure)
     sequence_aligned, structure_sequence_aligned = pairwise2.align.globalxs(
-        sequence,
-        target_sequence,
-        open=-1,
-        extend=0
+        sequence, target_sequence, open=-1, extend=0
     )[0][:2]
 
     # correct alignments involving gaps
@@ -1028,50 +1008,51 @@ def get_structure_sequence_alignment(
     structure_residues = list(hierview.GetResidues())
     gaps = re.finditer("[^-][-]+[^-]", structure_sequence_aligned)
     for gap in gaps:
-        gap_start = gap.start() - structure_sequence_aligned[:gap.start() + 1].count("-")
+        gap_start = gap.start() - structure_sequence_aligned[: gap.start() + 1].count("-")
         start_residue = structure_residues[gap_start - 1]
         end_residue = structure_residues[gap_start]
-        gap_sequence = sequence_aligned[gap.start():gap.end() - 2]
+        gap_sequence = sequence_aligned[gap.start() : gap.end() - 2]
         # check for connected residues, which could indicate a wrong alignment
         # e.g. ABEDEFG     ABEDEFG
         #      ABE--FG <-> AB--EFG
-        if _connected_residues(structure_residues[gap_start],
-                               structure_residues[gap_start + 1]):
+        if _connected_residues(structure_residues[gap_start], structure_residues[gap_start + 1]):
             # check if gap involves last residue but is connected
             if gap.end() == len(structure_sequence_aligned):
                 structure_sequence_aligned = (
-                        structure_sequence_aligned[:gap.start() + 1] +
-                        gap.group()[1:][::-1] +
-                        structure_sequence_aligned[gap.end():]
+                    structure_sequence_aligned[: gap.start() + 1]
+                    + gap.group()[1:][::-1]
+                    + structure_sequence_aligned[gap.end() :]
                 )
             else:
                 # check two ways to invert gap
-                if not _connected_residues(structure_residues[gap_start - 1],
-                                           structure_residues[gap_start]):
+                if not _connected_residues(
+                    structure_residues[gap_start - 1], structure_residues[gap_start]
+                ):
                     # i.e. ABEDEFG     ABEDEFG
                     #      ABE--FG --> AB--EFG
                     structure_sequence_aligned = (
-                            structure_sequence_aligned[:gap.start()] +
-                            gap.group()[:-1][::-1] +
-                            structure_sequence_aligned[gap.end() - 1:]
+                        structure_sequence_aligned[: gap.start()]
+                        + gap.group()[:-1][::-1]
+                        + structure_sequence_aligned[gap.end() - 1 :]
                     )
-                elif not _connected_residues(structure_residues[gap_start + 1],
-                                             structure_residues[gap_start + 2]):
+                elif not _connected_residues(
+                    structure_residues[gap_start + 1], structure_residues[gap_start + 2]
+                ):
                     # i.e. ABEDEFG     ABEDEFG
                     #      AB--EFG --> AB--EFG
                     structure_sequence_aligned = (
-                            structure_sequence_aligned[:gap.start() + 1] +
-                            gap.group()[1:][::-1] +
-                            structure_sequence_aligned[gap.end():]
+                        structure_sequence_aligned[: gap.start() + 1]
+                        + gap.group()[1:][::-1]
+                        + structure_sequence_aligned[gap.end() :]
                     )
                 else:
                     # i.e. ABEDEFG     ABEDEFG
                     #      AB**EFG --> AB--EFG
                     logging.debug(
-                        f"Alignment contains insertion with sequence {gap_sequence}" +
-                        f" between bonded residues {start_residue.GetResidueNumber()}" +
-                        f" and {end_residue.GetResidueNumber()}, " +
-                        "keeping original alignment ..."
+                        f"Alignment contains insertion with sequence {gap_sequence}"
+                        + f" between bonded residues {start_residue.GetResidueNumber()}"
+                        + f" and {end_residue.GetResidueNumber()}, "
+                        + "keeping original alignment ..."
                     )
                     continue
             logging.debug("Corrected sequence gap ...")
@@ -1080,9 +1061,9 @@ def get_structure_sequence_alignment(
 
 
 def apply_deletions(
-        target_structure: oechem.OEMolBase,
-        template_sequence: str,
-        delete_n_anchors: int = 2,
+    target_structure: oechem.OEMolBase,
+    template_sequence: str,
+    delete_n_anchors: int = 2,
 ) -> oechem.OEMolBase:
     """
     Apply deletions to a protein structure according to an amino acid sequence. The provided protein structure should
@@ -1119,24 +1100,29 @@ def apply_deletions(
     structure_with_deletions = target_structure.CreateCopy()
 
     # align template and target sequences
-    target_sequence_aligned, template_sequence_aligned = get_structure_sequence_alignment(
-        structure_with_deletions, template_sequence
-    )
+    (
+        target_sequence_aligned,
+        template_sequence_aligned,
+    ) = get_structure_sequence_alignment(structure_with_deletions, template_sequence)
     logging.debug(f"Template sequence:\n{template_sequence_aligned}")
     logging.debug(f"Target sequence:\n{target_sequence_aligned}")
     hierview = oechem.OEHierView(structure_with_deletions)
     structure_residues = list(hierview.GetResidues())
     insertions = re.finditer(
         "^[-]+|[^-]{" + str(delete_n_anchors) + "}[-]+[^-]{" + str(delete_n_anchors) + "}|[-]+$",
-        template_sequence_aligned
+        template_sequence_aligned,
     )
     for insertion in insertions:
-        insertion_start = insertion.start() - target_sequence_aligned[:insertion.start()].count("-")
-        insertion_end = insertion.end() - target_sequence_aligned[:insertion.end()].count("-")
+        insertion_start = insertion.start() - target_sequence_aligned[: insertion.start()].count(
+            "-"
+        )
+        insertion_end = insertion.end() - target_sequence_aligned[: insertion.end()].count("-")
         insertion_residues = structure_residues[insertion_start:insertion_end]
-        logging.debug(f"Found insertion! Deleting residues "
-                      f"{insertion_residues[0].GetResidueNumber()}-"
-                      f"{insertion_residues[-1].GetResidueNumber()} ...")
+        logging.debug(
+            f"Found insertion! Deleting residues "
+            f"{insertion_residues[0].GetResidueNumber()}-"
+            f"{insertion_residues[-1].GetResidueNumber()} ..."
+        )
         # delete atoms
         for insertion_residue in insertion_residues:
             for atom in insertion_residue.GetAtoms():
@@ -1146,9 +1132,9 @@ def apply_deletions(
 
 
 def apply_insertions(
-        target_structure: oechem.OEMolBase,
-        template_sequence: str,
-        loop_db: Union[str, Path],
+    target_structure: oechem.OEMolBase,
+    template_sequence: str,
+    loop_db: Union[str, Path],
 ) -> oechem.OEMolBase:
     """
     Apply insertions to a protein structure according to an amino acid sequence. The provided protein structure should
@@ -1184,9 +1170,9 @@ def apply_insertions(
                         bonded_residue = oechem.OEAtomGetResidue(bonded_atom)
                         if bonded_residue.GetResidueNumber() == residue2.GetResidueNumber():
                             logging.debug(
-                                "Breaking bond between residues " +
-                                f"{residue1.GetResidueNumber()} and " +
-                                f"{residue2.GetResidueNumber()}"
+                                "Breaking bond between residues "
+                                + f"{residue1.GetResidueNumber()} and "
+                                + f"{residue2.GetResidueNumber()}"
                             )
                             protein.DeleteBond(bond)
         return protein
@@ -1204,8 +1190,10 @@ def apply_insertions(
     while True:
         reinitialize = False
         # align template and target sequences
-        target_sequence_aligned, template_sequence_aligned = get_structure_sequence_alignment(
-            structure_with_insertions, template_sequence)
+        (
+            target_sequence_aligned,
+            template_sequence_aligned,
+        ) = get_structure_sequence_alignment(structure_with_insertions, template_sequence)
         logging.debug(f"Template sequence:\n{template_sequence_aligned}")
         logging.debug(f"Target sequence:\n{target_sequence_aligned}")
         hierview = oechem.OEHierView(structure_with_insertions)
@@ -1213,23 +1201,25 @@ def apply_insertions(
         gaps = list(re.finditer("[^-][-]+[^-]", target_sequence_aligned))
         gaps = sorted(gaps, key=lambda match: len(match.group()))
         for gap in gaps:
-            gap_start = gap.start() - target_sequence_aligned[:gap.start() + 1].count("-")
+            gap_start = gap.start() - target_sequence_aligned[: gap.start() + 1].count("-")
             start_residue = structure_residues[gap_start]
             end_residue = structure_residues[gap_start + 1]
-            gap_sequence = template_sequence_aligned[gap.start() + 1:gap.end() - 1]
+            gap_sequence = template_sequence_aligned[gap.start() + 1 : gap.end() - 1]
             loop_conformations = oechem.OEMol()
-            logging.debug(f"Trying to build loop {gap_sequence} " +
-                          f"between residues {start_residue.GetResidueNumber()}" +
-                          f" and {end_residue.GetResidueNumber()} ...")
+            logging.debug(
+                f"Trying to build loop {gap_sequence} "
+                + f"between residues {start_residue.GetResidueNumber()}"
+                + f" and {end_residue.GetResidueNumber()} ..."
+            )
             # build loop and reinitialize if successful
             if oespruce.OEBuildSingleLoop(
-                    loop_conformations,
-                    structure_with_insertions,
-                    gap_sequence,
-                    start_residue.GetOEResidue(),
-                    end_residue.GetOEResidue(),
-                    sidechain_options,
-                    loop_options
+                loop_conformations,
+                structure_with_insertions,
+                gap_sequence,
+                start_residue.GetOEResidue(),
+                end_residue.GetOEResidue(),
+                sidechain_options,
+                loop_options,
             ):
                 logging.debug("Successfully built loop conformations!")
                 for i, loop_conformation in enumerate(loop_conformations.GetConfs()):
@@ -1255,9 +1245,7 @@ def apply_insertions(
                 # break bond between residues next to insertion
                 # important if an isoform specific insertion failed
                 structure_with_insertions = _disconnect_residues(
-                    structure_with_insertions,
-                    start_residue,
-                    end_residue
+                    structure_with_insertions, start_residue, end_residue
                 )
         # leave while loop
         if not reinitialize:
@@ -1275,9 +1263,9 @@ def apply_insertions(
 
 
 def apply_mutations(
-        target_structure: oechem.OEMolBase,
-        template_sequence: str,
-        fallback_delete: bool = True,
+    target_structure: oechem.OEMolBase,
+    template_sequence: str,
+    fallback_delete: bool = True,
 ) -> oechem.OEMolBase:
     """
     Mutate a protein structure according to an amino acid sequence. The provided protein structure should only contain
@@ -1314,15 +1302,17 @@ def apply_mutations(
     while True:
         altered = False
         # align template and target sequences
-        target_sequence_aligned, template_sequence_aligned = get_structure_sequence_alignment(
-            structure_with_mutations, template_sequence)
+        (
+            target_sequence_aligned,
+            template_sequence_aligned,
+        ) = get_structure_sequence_alignment(structure_with_mutations, template_sequence)
         logging.debug(f"Template sequence:\n{template_sequence_aligned}")
         logging.debug(f"Target sequence:\n{target_sequence_aligned}")
         hierview = oechem.OEHierView(structure_with_mutations)
         structure_residues = hierview.GetResidues()
         # adjust target structure to match template sequence
         for template_sequence_residue, target_sequence_residue in zip(
-                template_sequence_aligned, target_sequence_aligned
+            template_sequence_aligned, target_sequence_aligned
         ):
             # check for mutations if no gap
             if target_sequence_residue != "-":
@@ -1334,11 +1324,13 @@ def apply_mutations(
                         three_letter_code = oechem.OEGetResidueName(
                             oechem.OEGetResidueIndexFromCode(template_sequence_residue)
                         )
-                        logging.debug("Trying to perform mutation " +
-                                      f"{oeresidue.GetName()}{oeresidue.GetResidueNumber()}" +
-                                      f"{three_letter_code} ...")
+                        logging.debug(
+                            "Trying to perform mutation "
+                            + f"{oeresidue.GetName()}{oeresidue.GetResidueNumber()}"
+                            + f"{three_letter_code} ..."
+                        )
                         if oespruce.OEMutateResidue(
-                                structure_with_mutations, oeresidue, three_letter_code
+                            structure_with_mutations, oeresidue, three_letter_code
                         ):
                             logging.debug("Successfully mutated residue!")
                             # break loop and reinitialize
@@ -1349,15 +1341,19 @@ def apply_mutations(
                                 logging.debug("Mutation failed! Deleting residue ...")
                                 atom_functor = oechem.OEOrAtom(
                                     # if residue was not mutated
-                                    oechem.OEAtomMatchResidue([
-                                        f"{oeresidue.GetName()}:{oeresidue.GetResidueNumber()}"
-                                        f":.*:{oeresidue.GetChainID()}:.*"
-                                    ]),
+                                    oechem.OEAtomMatchResidue(
+                                        [
+                                            f"{oeresidue.GetName()}:{oeresidue.GetResidueNumber()}"
+                                            f":.*:{oeresidue.GetChainID()}:.*"
+                                        ]
+                                    ),
                                     # if residue was mutated but side chain chopped of
-                                    oechem.OEAtomMatchResidue([
-                                        f"{three_letter_code}:{oeresidue.GetResidueNumber()}"
-                                        f":.*:{oeresidue.GetChainID()}:.*"
-                                    ])
+                                    oechem.OEAtomMatchResidue(
+                                        [
+                                            f"{three_letter_code}:{oeresidue.GetResidueNumber()}"
+                                            f":.*:{oeresidue.GetChainID()}:.*"
+                                        ]
+                                    ),
                                 )
                                 for atom in structure_with_mutations.GetAtoms(atom_functor):
                                     structure_with_mutations.DeleteAtom(atom)
@@ -1366,9 +1362,9 @@ def apply_mutations(
                                 break
                             else:
                                 raise ValueError(
-                                    f"Mutation {oeresidue.GetName()}" +
-                                    f"{oeresidue.GetResidueNumber()}" +
-                                    f"{three_letter_code} failed!"
+                                    f"Mutation {oeresidue.GetName()}"
+                                    + f"{oeresidue.GetResidueNumber()}"
+                                    + f"{three_letter_code} failed!"
                                 )
         # leave while loop if no changes were introduced
         if not altered:
@@ -1386,7 +1382,7 @@ def apply_mutations(
 
 
 def delete_partial_residues(
-        structure: oechem.OEMolBase,
+    structure: oechem.OEMolBase,
 ) -> oechem.OEMolBase:
     """
     Delete residues with missing sidechain or backbone atoms. The backbone is considered complete
@@ -1424,7 +1420,7 @@ def delete_partial_residues(
         structure_residue = hier_view.GetResidue(
             incomplete_residue.GetChainID(),
             incomplete_residue.GetName(),
-            incomplete_residue.GetResidueNumber()
+            incomplete_residue.GetResidueNumber(),
         )
         for atom in structure_residue.GetAtoms():
             processed_structure.DeleteAtom(atom)
@@ -1487,8 +1483,7 @@ def delete_short_protein_segments(structure: oechem.OEMolBase) -> oechem.OEMolBa
 
 
 def delete_clashing_sidechains(
-        structure: oechem.OEMolBase,
-        cutoff: float = 2.0
+    structure: oechem.OEMolBase, cutoff: float = 2.0
 ) -> oechem.OEMolBase:
     """
     Delete side chains that are clashing with other atoms of the given structure.
@@ -1518,11 +1513,7 @@ def delete_clashing_sidechains(
 
     # get all heavy atoms and create a KD tree for querying
     heavy_atoms = oechem.OEGraphMol()
-    oechem.OESubsetMol(
-        heavy_atoms,
-        processed_structure,
-        oechem.OEIsHeavy()
-    )
+    oechem.OESubsetMol(heavy_atoms, processed_structure, oechem.OEIsHeavy())
     heavy_atom_coordinates_dict = heavy_atoms.GetCoords()
     heavy_atom_tree = cKDTree(list(heavy_atom_coordinates_dict.values()))
     backbone_functor = oechem.OEIsBackboneAtom(includeTerminalOxygen=True)
@@ -1530,15 +1521,11 @@ def delete_clashing_sidechains(
     hierview = oechem.OEHierView(heavy_atoms)
     for residue in hierview.GetResidues():
         # get atom indices and coordinates
-        non_backbone_atoms = [
-            atom for atom in residue.GetAtoms() if not backbone_functor(atom)
-        ]
+        non_backbone_atoms = [atom for atom in residue.GetAtoms() if not backbone_functor(atom)]
         if len(non_backbone_atoms) == 0:
             # e.g. in case of a residue with missing sidechain
             continue
-        non_backbone_atom_indices = [
-            atom.GetIdx() for atom in non_backbone_atoms
-        ]
+        non_backbone_atom_indices = [atom.GetIdx() for atom in non_backbone_atoms]
         non_backbone_coordinates = [
             heavy_atom_coordinates_dict[index] for index in non_backbone_atom_indices
         ]
@@ -1553,34 +1540,40 @@ def delete_clashing_sidechains(
         for atom in non_backbone_atoms:
             for neighboring_atom in atom.GetAtoms():
                 if neighboring_atom.GetIdx() not in non_backbone_atom_indices:
-                    if distance.euclidean(
-                        heavy_atom_coordinates_dict[atom.GetIdx()],
-                        heavy_atom_coordinates_dict[neighboring_atom.GetIdx()]
-                    ) < cutoff:
+                    if (
+                        distance.euclidean(
+                            heavy_atom_coordinates_dict[atom.GetIdx()],
+                            heavy_atom_coordinates_dict[neighboring_atom.GetIdx()],
+                        )
+                        < cutoff
+                    ):
                         n_additional_clashes += 1
         # check if more atoms are within cutoff than number of sidechain atoms
         # as well as additional expected clashes
-        if len([x for x in potential_clashes if len(x) > 0]) > \
-                len(non_backbone_atom_indices) + n_additional_clashes:
+        if (
+            len([x for x in potential_clashes if len(x) > 0])
+            > len(non_backbone_atom_indices) + n_additional_clashes
+        ):
             residue = residue.GetOEResidue()
             residue_name = residue.GetName()
             residue_id = residue.GetResidueNumber()
             chain_id = residue.GetChainID()
             logging.debug(
-                f"Deleting clashing sidechain of {residue_name}" +
-                f"{residue_id} {chain_id} ..."
+                f"Deleting clashing sidechain of {residue_name}" + f"{residue_id} {chain_id} ..."
             )
             # deleting sidechain atoms
-            for atom in processed_structure.GetAtoms(oechem.OEAtomMatchResidue([
-                f"{residue_name}:{residue_id}:.*:{chain_id}:.*:.*"
-            ])):
+            for atom in processed_structure.GetAtoms(
+                oechem.OEAtomMatchResidue([f"{residue_name}:{residue_id}:.*:{chain_id}:.*:.*"])
+            ):
                 if not backbone_functor(atom):
                     processed_structure.DeleteAtom(atom)
 
     return processed_structure
 
 
-def get_atom_coordinates(molecule: oechem.OEMolBase) -> List[Tuple[float, float, float]]:
+def get_atom_coordinates(
+    molecule: oechem.OEMolBase,
+) -> List[Tuple[float, float, float]]:
     """
     Retrieve the atom coordinates of an OpenEye molecule.
 
@@ -1596,15 +1589,12 @@ def get_atom_coordinates(molecule: oechem.OEMolBase) -> List[Tuple[float, float,
     """
     coordinates_dict = molecule.GetCoords()
     # get atom coordinates in order of atom indices
-    coordinates = [
-        coordinates_dict[key] for key in sorted(coordinates_dict.keys())
-    ]
+    coordinates = [coordinates_dict[key] for key in sorted(coordinates_dict.keys())]
     return coordinates
 
 
 def renumber_structure(
-        target_structure: oechem.OEMolBase,
-        residue_ids: Iterable[int]
+    target_structure: oechem.OEMolBase, residue_ids: Iterable[int]
 ) -> oechem.OEGraphMol:
     """
     Renumber the residues of a protein structure according to the given list of residue IDs.
@@ -1638,8 +1628,8 @@ def renumber_structure(
     # check for matching number of residues
     if len(structure_residues) != len(residue_ids):
         raise ValueError(
-            "Number of given residue IDs does not match number of residues in the given " +
-            "structure."
+            "Number of given residue IDs does not match number of residues in the given "
+            + "structure."
         )
 
     # check for matching number of residues
@@ -1657,11 +1647,11 @@ def renumber_structure(
 
 
 def superpose_proteins(
-        reference_protein: oechem.OEMolBase,
-        fit_protein: oechem.OEMolBase,
-        residues: Iterable = tuple(),
-        chain_id: str = " ",
-        insertion_code: str = " "
+    reference_protein: oechem.OEMolBase,
+    fit_protein: oechem.OEMolBase,
+    residues: Iterable = tuple(),
+    chain_id: str = " ",
+    insertion_code: str = " ",
 ) -> oechem.OEMolBase:
     """
     Superpose a protein structure onto a reference protein. The superposition
@@ -1709,9 +1699,9 @@ def superpose_proteins(
 
 
 def update_residue_identifiers(
-        structure: oechem.OEMolBase,
-        keep_protein_residue_ids: bool = True,
-        keep_chain_ids: bool = False,
+    structure: oechem.OEMolBase,
+    keep_protein_residue_ids: bool = True,
+    keep_chain_ids: bool = False,
 ) -> oechem.OEMolBase:
     """
     Update the atom, residue and chain IDs of the given molecular structure. All residues become
@@ -1738,13 +1728,13 @@ def update_residue_identifiers(
     # residue names, atom names, chain id, record type, insert code,
     # alternate location
     preserved_info = (
-            oechem.OEPreserveResInfo_ResidueNumber
-            | oechem.OEPreserveResInfo_ResidueName
-            | oechem.OEPreserveResInfo_AtomName
-            | oechem.OEPreserveResInfo_ChainID
-            | oechem.OEPreserveResInfo_HetAtom
-            | oechem.OEPreserveResInfo_InsertCode
-            | oechem.OEPreserveResInfo_AlternateLocation
+        oechem.OEPreserveResInfo_ResidueNumber
+        | oechem.OEPreserveResInfo_ResidueName
+        | oechem.OEPreserveResInfo_AtomName
+        | oechem.OEPreserveResInfo_ChainID
+        | oechem.OEPreserveResInfo_HetAtom
+        | oechem.OEPreserveResInfo_InsertCode
+        | oechem.OEPreserveResInfo_AlternateLocation
     )
     oechem.OEPerceiveResidues(structure, preserved_info)
 
@@ -1804,13 +1794,13 @@ def update_residue_identifiers(
     # residue names, atom names, chain id, record type, insert code,
     # alternate location
     preserved_info = (
-            oechem.OEPreserveResInfo_ResidueNumber
-            | oechem.OEPreserveResInfo_ResidueName
-            | oechem.OEPreserveResInfo_AtomName
-            | oechem.OEPreserveResInfo_ChainID
-            | oechem.OEPreserveResInfo_HetAtom
-            | oechem.OEPreserveResInfo_InsertCode
-            | oechem.OEPreserveResInfo_AlternateLocation
+        oechem.OEPreserveResInfo_ResidueNumber
+        | oechem.OEPreserveResInfo_ResidueName
+        | oechem.OEPreserveResInfo_AtomName
+        | oechem.OEPreserveResInfo_ChainID
+        | oechem.OEPreserveResInfo_HetAtom
+        | oechem.OEPreserveResInfo_InsertCode
+        | oechem.OEPreserveResInfo_AlternateLocation
     )
     oechem.OEPerceiveResidues(structure, preserved_info)
 
@@ -1847,9 +1837,9 @@ def split_molecule_components(molecule: oechem.OEMolBase) -> List[oechem.OEGraph
 
 
 def residue_ids_to_residue_names(
-        structure: oechem.OEMolBase,
-        residue_ids: List[int],
-        chain_id: Union[None, str] = None
+    structure: oechem.OEMolBase,
+    residue_ids: List[int],
+    chain_id: Union[None, str] = None,
 ) -> List[str]:
     """
     Get the corresponding residue names for a list of residue IDs and a give OpenEye molecule
@@ -1881,9 +1871,9 @@ def residue_ids_to_residue_names(
         chain_id = ".*"
     for resid in residue_ids:
         predicate = oechem.OEAtomMatchResidue(f".*:{resid}:.*:{chain_id}:.*:.*")
-        selection_residue_names = set([
-            oechem.OEAtomGetResidue(atom).GetName() for atom in structure.GetAtoms(predicate)
-        ])
+        selection_residue_names = set(
+            [oechem.OEAtomGetResidue(atom).GetName() for atom in structure.GetAtoms(predicate)]
+        )
         if len(selection_residue_names) == 0:
             raise ValueError(f"No residue found for residue ID {resid}.")
         elif len(selection_residue_names) > 1:

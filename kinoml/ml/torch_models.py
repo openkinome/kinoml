@@ -53,9 +53,7 @@ class NeuralNetworkRegression(_BaseModule):
         The activation function used in the hidden (only!) layer of the network.
     """
 
-    def __init__(
-        self, input_shape, hidden_shape=100, output_shape=1, activation=F.relu
-    ):
+    def __init__(self, input_shape, hidden_shape=100, output_shape=1, activation=F.relu):
         super().__init__()
 
         self._activation = activation
@@ -194,9 +192,7 @@ class ConvolutionNeuralNetworkRegression(_BaseModule):
 
         self.input_shape = input_shape
         self.nb_character = self.input_shape[0]  # nb of characters in the dictionary
-        self.length_sequence = self.input_shape[
-            1
-        ]  # length of the sequence, here smiles
+        self.length_sequence = self.input_shape[1]  # length of the sequence, here smiles
         self.embedding_shape = embedding_shape
         self.kernel_shape = kernel_shape
         self.hidden_shape = hidden_shape
@@ -208,9 +204,7 @@ class ConvolutionNeuralNetworkRegression(_BaseModule):
             out_channels=self.embedding_shape,
             kernel_size=self.kernel_shape,
         )
-        self.temp = (
-            self.length_sequence - self.kernel_shape + 1
-        ) * self.embedding_shape
+        self.temp = (self.length_sequence - self.kernel_shape + 1) * self.embedding_shape
         self.fully_connected_1 = nn.Linear(self.temp, self.hidden_shape)
         self.fully_connected_out = nn.Linear(self.hidden_shape, self.output_shape)
 
@@ -286,9 +280,7 @@ class ConvolutionNeuralNetworkRegressionProteinInformed(_BaseModule):
             out_channels=self.embedding_shape,
             kernel_size=self.kernel_shape,
         )
-        self.temp_ligand = (
-            self.input_shape[0][1] - self.kernel_shape + 1
-        ) * self.embedding_shape
+        self.temp_ligand = (self.input_shape[0][1] - self.kernel_shape + 1) * self.embedding_shape
 
         # Convolution on protein
         self.convolution_protein = nn.Conv1d(
@@ -296,13 +288,9 @@ class ConvolutionNeuralNetworkRegressionProteinInformed(_BaseModule):
             out_channels=self.embedding_shape,
             kernel_size=self.kernel_shape,
         )
-        self.temp_protein = (
-            self.input_shape[1][1] - self.kernel_shape + 1
-        ) * self.embedding_shape
+        self.temp_protein = (self.input_shape[1][1] - self.kernel_shape + 1) * self.embedding_shape
 
-        self.fully_connected_1 = nn.Linear(
-            self.temp_ligand + self.temp_protein, self.hidden_shape
-        )
+        self.fully_connected_1 = nn.Linear(self.temp_ligand + self.temp_protein, self.hidden_shape)
         self.fully_connected_out = nn.Linear(self.hidden_shape, self.output_shape)
 
     def forward(self, system):
@@ -381,13 +369,9 @@ class NeuralNetworkRegressionProteinInformed(_BaseModule):
         self._activation = activation
 
         # Fully connected layer on ligand
-        self.fully_connected_ligand = nn.Linear(
-            self.input_shape[0], self.embedding_shape_ligand
-        )
+        self.fully_connected_ligand = nn.Linear(self.input_shape[0], self.embedding_shape_ligand)
         # Fully connected layer on protein
-        self.fully_connected_protein = nn.Linear(
-            self.input_shape[1], self.embedding_shape_protein
-        )
+        self.fully_connected_protein = nn.Linear(self.input_shape[1], self.embedding_shape_protein)
 
         # Ligand - protein
         self.ligand_protein = self.embedding_shape_ligand + self.embedding_shape_protein
