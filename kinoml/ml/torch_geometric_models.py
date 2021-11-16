@@ -33,7 +33,14 @@ class GraphConvolutionNeuralNetwork(_BaseModule):
         # Take the first batch [0]
         return input_sample[0].num_node_features
 
-    def __init__(self, input_shape, embedding_shape=100, hidden_shape=50, output_shape=1, activation=F.relu):
+    def __init__(
+        self,
+        input_shape,
+        embedding_shape=100,
+        hidden_shape=50,
+        output_shape=1,
+        activation=F.relu,
+    ):
         super().__init__()
         self.input_shape = input_shape
         self.embedding_shape = embedding_shape
@@ -53,4 +60,3 @@ class GraphConvolutionNeuralNetwork(_BaseModule):
         x = self._activation(self.GraphConvLayer2(x, edge_index))
         x = global_mean_pool(x, batch)
         return self.linear(x)
-

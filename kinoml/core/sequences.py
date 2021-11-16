@@ -330,8 +330,8 @@ class AminoAcidSequence(Biosequence):
                 "begin": sequence_details["begin"],
                 "end": sequence_details["end"],
                 "true_N_terminus": sequence_details["true_N_terminus"],
-                "true_C_terminus": sequence_details["true_C_terminus"]
-            }
+                "true_C_terminus": sequence_details["true_C_terminus"],
+            },
         )
         return amino_acid_sequence
 
@@ -376,7 +376,7 @@ class AminoAcidSequence(Biosequence):
             "begin": 1,
             "end": response["sequence"]["length"],
             "true_N_terminus": True,
-            "true_C_terminus": True
+            "true_C_terminus": True,
         }
         return sequence_details
 
@@ -419,7 +419,7 @@ class KinaseDomainAminoAcidSequence(AminoAcidSequence):
         true_C_terminus = False
         if end == len(sequence):
             true_C_terminus = True
-        kinase_domain_sequence = sequence[begin - 1: end]
+        kinase_domain_sequence = sequence[begin - 1 : end]
 
         sequence_details = {
             "sequence": kinase_domain_sequence,
@@ -427,6 +427,6 @@ class KinaseDomainAminoAcidSequence(AminoAcidSequence):
             "begin": begin,
             "end": end,
             "true_N_terminus": true_N_terminus,
-            "true_C_terminus": true_C_terminus
+            "true_C_terminus": true_C_terminus,
         }
         return sequence_details
