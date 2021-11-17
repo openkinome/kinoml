@@ -3,6 +3,7 @@ channels:
   - conda-forge
   - openeye
   - salilab
+  - pyg
 dependencies:
   # base depends
   - python
