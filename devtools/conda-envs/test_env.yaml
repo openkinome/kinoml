@@ -2,7 +2,6 @@ name: test
 channels:
   - conda-forge
   - openeye
-  - salilab
   - pyg
 dependencies:
   # base depends
@@ -15,32 +14,28 @@ dependencies:
   - tqdm
   - openff-toolkit >=0.9
   - xgboost
-  - openeye-toolkits >=2020.2.0 # segfaults
+  - openeye-toolkits >=2020.2.0
   - biotite
   - bravado
   - biopandas
   - awkward
   - pyarrow
+  - mdanalysis >=2.0.0
+  - opencadd
+  - matplotlib-base
+  - ruamel.yaml
 
   # distributed computing
   - dask
   - dask-jobqueue
-  - papermill 2.2.*
-  - matplotlib-base
-  - ruamel.yaml
-  - mdanalysis >=2.0.0
 
   # reproducible workflows
-  - papermill
+  - papermill 2.2.*
   - watermark
 
   # pytorch
   - pytorch >=1.8.0
   - pyg
-  # - pytorch_geometric
-
-  # structural modeling
-  #- modeller
 
   # development
   - jupyterlab
@@ -53,25 +48,4 @@ dependencies:
 
   - pip:
       # PyTorch trees
-      #- https://github.com/ValentinFigue/Sklearn_PyTorch/archive/1b56a43e41de331ecdf73d08418f75bb34c9fa06.tar.gz # causes incompatible torch to be installed via pip
-      # OpenCADD
-      - https://github.com/volkamerlab/opencadd/archive/master.tar.gz
-      # Docs
-      # core
-      - sphinx~=2.4.0
-      - nbsphinx
-      - sphinx-notfound-page
-      - sphinx-version-warning
-      - sphinx-prompt
-      - sphinxemoji
-      - sphinx-copybutton
-      - sphinx-autoapi
-      - myst-parser[sphinx]
-      - sphinxcontrib-httpdomain
-      - sphinx-last-updated-by-git
-      - linkify-it-py
-      - sphinx-panels
-      # themes
-      - sphinx-material
-      # local building
-      - sphinx-autobuild
+      - https://github.com/ValentinFigue/Sklearn_PyTorch/archive/1b56a43e41de331ecdf73d08418f75bb34c9fa06.tar.gz
