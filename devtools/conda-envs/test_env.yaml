@@ -2,7 +2,6 @@ name: test
 channels:
   - conda-forge
   - openeye
-  - pyg
 dependencies:
   # base depends
   - python
@@ -35,7 +34,7 @@ dependencies:
 
   # pytorch
   - pytorch >=1.8.0
-  - pyg
+  - pytorch_geometric
 
   # development
   - jupyterlab
