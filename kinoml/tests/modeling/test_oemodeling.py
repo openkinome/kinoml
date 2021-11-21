@@ -10,7 +10,7 @@ from bravado_core.exception import SwaggerMappingError
 from kinoml.modeling.OEModeling import (
     read_smiles,
     read_molecules,
-    read_electron_density,
+    #read_electron_density,
     write_molecules,
     select_chain,
     select_altloc,
@@ -142,29 +142,29 @@ def test_read_molecules(package, resource, add_hydrogens, expectation, n_atoms_l
                 assert molecule.NumAtoms() == n_atoms
 
 
-@pytest.mark.parametrize(
-    "package, resource, expectation, n_grid_points",
-    [
-        (
-            "kinoml.data.electron_densities",
-            "4f8o_phases.mtz",
-            does_not_raise(),
-            396011,
-        ),
-        (
-            "kinoml.data.proteins",
-            "4f8o.pdb",
-            pytest.raises(ValueError),
-            0,
-        ),
-    ],
-)
-def test_read_electron_density(package, resource, expectation, n_grid_points):
-    """Compare results to expected number of grip points in the interpreted electron density."""
-    with resources.path(package, resource) as path:
-        with expectation:
-            electron_density = read_electron_density(path)
-            assert electron_density.GetSize() == n_grid_points
+#@pytest.mark.parametrize(
+#    "package, resource, expectation, n_grid_points",
+#    [
+#        (
+#            "kinoml.data.electron_densities",
+#            "4f8o_phases.mtz",
+#            does_not_raise(),
+#            396011,
+#        ),
+#        (
+#            "kinoml.data.proteins",
+#            "4f8o.pdb",
+#            pytest.raises(ValueError),
+#            0,
+#        ),
+#    ],
+#)
+#def test_read_electron_density(package, resource, expectation, n_grid_points):
+#    """Compare results to expected number of grip points in the interpreted electron density."""
+#    with resources.path(package, resource) as path:
+#        with expectation:
+#            electron_density = read_electron_density(path)
+#            assert electron_density.GetSize() == n_grid_points
 
 
 @pytest.mark.parametrize(
