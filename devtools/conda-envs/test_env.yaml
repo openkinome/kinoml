@@ -1,6 +1,5 @@
 name: test
 channels:
-  - pytorch
   - pyg
   - conda-forge
   - openeye
