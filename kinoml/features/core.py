@@ -851,8 +851,7 @@ class OEBaseModelingFeaturizer(ParallelBaseFeaturizer):
         : dict
             A dictionary containing the content of the system components.
         """
-
-        from ..utils import FileDownloader, LocalFileStorage
+        from ..databases.pdb import download_pdb_structure
 
         system_dict = {
             "protein_name": None,
@@ -863,7 +862,12 @@ class OEBaseModelingFeaturizer(ParallelBaseFeaturizer):
             "protein_chain_id": None,
             "protein_alternate_location": None,
             "protein_expo_id": None,
-            "ligand_name": None
+            "ligand_name": None,
+            "docking_template_pdb_id": None,
+            "docking_template_path": None,
+            "docking_template_expo_id": None,
+            "docking_template_chain_id": None,
+            "docking_template_alternate_location": None,
         }
 
         logging.debug("Interpreting protein component ...")
@@ -871,29 +875,13 @@ class OEBaseModelingFeaturizer(ParallelBaseFeaturizer):
             system_dict["protein_name"] = system.protein.name
 
         if hasattr(system.protein, "pdb_id"):
-            system_dict["protein_path"] = LocalFileStorage.rcsb_structure_pdb(
+            system_dict["protein_path"] = download_pdb_structure(
                 system.protein.pdb_id, self.cache_dir
-            )  # try to download PDB file
-            if not system_dict["protein_path"].is_file():
-                logging.debug(
-                    f"Downloading protein structure {system.protein.pdb_id} from PDB ..."
+            )
+            if not system_dict["protein_path"]:
+                raise ValueError(
+                    f"Could not download structure for PDB entry {system.protein.pdb_id}."
                 )
-                FileDownloader.rcsb_structure_pdb(system.protein.pdb_id, self.cache_dir)
-
-            if not system_dict["protein_path"].is_file():
-                system_dict["protein_path"] = LocalFileStorage.rcsb_structure_cif(
-                    system.protein.pdb_id, self.cache_dir
-                )  # try to download CIF file
-                if not system_dict["protein_path"].is_file():
-                    logging.debug(
-                        f"Downloading protein structure {system.protein.pdb_id} from PDB in CIF"
-                        f" format ..."
-                    )
-                    FileDownloader.rcsb_structure_cif(system.protein.pdb_id, self.cache_dir)
-
-            if not system_dict["protein_path"].is_file():
-                raise ValueError("Could not download structure from PDB.")
-
         elif hasattr(system.protein, "path"):
             system_dict["protein_path"] = Path(system.protein.path).expanduser().resolve()
         else:
@@ -935,6 +923,30 @@ class OEBaseModelingFeaturizer(ParallelBaseFeaturizer):
             if hasattr(system.ligand, "name"):
                 system_dict["ligand_name"] = system.ligand.name
 
+            if hasattr(system.ligand, "docking_template_pdb_id"):
+                system_dict["docking_template_pdb_id"] = system.ligand.docking_template_pdb_id
+                system_dict["docking_template_path"] = download_pdb_structure(
+                    system.ligand.docking_template_pdb_id, self.cache_dir
+                )
+                if not system_dict["docking_template_path"]:
+                    raise ValueError(
+                        f"Could not download structure for PDB entry "
+                        f"{system.ligand.docking_template_pdb_id}."
+                    )
+
+            elif hasattr(system.ligand, "docking_template_path"):
+                system_dict["docking_template_path"] = system.ligand.docking_template_path
+
+            if hasattr(system.ligand, "docking_template_expo_id"):
+                system_dict["docking_template_expo_id"] = system.ligand.docking_template_expo_id
+
+            if hasattr(system.ligand, "docking_template_chain_id"):
+                system_dict["docking_template_chain_id"] = system.ligand.docking_template_chain_id
+
+            if hasattr(system.ligand, "docking_template_alternate_location"):
+                system_dict["docking_template_alternate_location"] = \
+                    system.ligand.docking_template_alternate_location
+
         return system_dict
 
     def _get_design_unit(
@@ -945,7 +957,7 @@ class OEBaseModelingFeaturizer(ParallelBaseFeaturizer):
             has_ligand: bool,
             ligand_name: Union[str, None],
             model_loops_and_caps: bool,
-    ) -> oechem.OEDesignUnit:
+    ) -> Union[oechem.OEDesignUnit, None]:
         """
         Get an OpenEye design unit based on the given input.
 
@@ -969,8 +981,8 @@ class OEBaseModelingFeaturizer(ParallelBaseFeaturizer):
 
         Returns
         -------
-        design_unit: oechem.OEDesignUnit
-            The design unit.
+        design_unit: oechem.OEDesignUnit or None
+            The design unit or None if no design unit was found.
         """
         from openeye import oechem
 
@@ -993,15 +1005,18 @@ class OEBaseModelingFeaturizer(ParallelBaseFeaturizer):
         )
         if not design_unit_path.is_file():
             logging.debug("Generating design unit ...")
-            design_unit = prepare_structure(
-                structure,
-                loop_db=self.loop_db if model_loops_and_caps else None,
-                has_ligand=has_ligand,
-                ligand_name=ligand_name,
-                chain_id=chain_id,
-                alternate_location=alternate_location,
-                cap_termini=True if model_loops_and_caps else False
-            )
+            try:
+                design_unit = prepare_structure(
+                    structure,
+                    loop_db=self.loop_db if model_loops_and_caps else None,
+                    has_ligand=has_ligand,
+                    ligand_name=ligand_name,
+                    chain_id=chain_id,
+                    alternate_location=alternate_location,
+                    cap_termini=True if model_loops_and_caps else False
+                )
+            except ValueError:
+                return None
             logging.debug("Writing design unit ...")
             oechem.OEWriteDesignUnit(str(design_unit_path), design_unit)
         # re-reading design unit helps proper capping of e.g. 2itz
