@@ -1,5 +1,7 @@
 from typing import Iterable
 
+from appdirs import user_cache_dir
+
 
 def smiles_from_pdb(ligand_ids: Iterable[str]) -> dict:
     """
@@ -33,3 +35,45 @@ def smiles_from_pdb(ligand_ids: Iterable[str]) -> dict:
             pass
 
     return ligands
+
+
+def download_pdb_structure(pdb_id, directory=user_cache_dir()):
+    """
+    Download a PDB structure. If the structure is not available in PDB format, it will be download
+    in CIF format.
+
+    Parameters
+    ----------
+    pdb_id: str
+        The PDB ID of interest.
+    directory: str or Path, default=user_cache_dir
+        The directory for saving the downloaded structure.
+
+    Returns
+    -------
+    : Path or False
+        The path to the the downloaded file if successful, else False.
+    """
+    from pathlib import Path
+
+    from ..utils import LocalFileStorage, FileDownloader
+
+    directory = Path(directory)
+
+    # check for structure in PDB format
+    pdb_path = LocalFileStorage.rcsb_structure_pdb(pdb_id, directory)
+    if not pdb_path.is_file():
+        if FileDownloader.rcsb_structure_pdb(pdb_id, directory):
+            return pdb_path
+    else:
+        return pdb_path
+
+    # check for structure in CIF format
+    cif_path = LocalFileStorage.rcsb_structure_cif(pdb_id, directory)
+    if not cif_path.is_file():
+        if FileDownloader.rcsb_structure_cif(pdb_id, directory):
+            return cif_path
+    else:
+        return cif_path
+
+    return False

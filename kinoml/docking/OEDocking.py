@@ -133,7 +133,7 @@ def pose_molecules(
                 )
                 posed_conformations.append(oechem.OEGraphMol(posed_conformation))
 
-        # sort all conformations of all tautomers and enantiomers by score
+        # sort poses of all tautomers and enantiomers by score
         posed_conformations.sort(key=probability, reverse=True)
 
         # keep conformation with highest probability

@@ -1201,6 +1201,7 @@ def apply_insertions(
         target_structure: oechem.OEMolBase,
         template_sequence: str,
         loop_db: Union[str, Path],
+        ligand: Union[oechem.OEMolBase, None] = None,
 ) -> oechem.OEMolBase:
     """
     Apply insertions to a protein structure according to an amino acid sequence. The provided protein structure should
@@ -1215,6 +1216,8 @@ def apply_insertions(
         structure sequence.
     loop_db: str or Path
         The path to the loop database used by OESpruce to model missing loops.
+    ligand: oechem.OEMolBase or None, default=None
+        An OpenEye molecule that should be checked for heavy atom clashes with built insertions.
 
     Returns
     -------
@@ -1243,8 +1246,11 @@ def apply_insertions(
                             protein.DeleteBond(bond)
         return protein
 
-    # do not change input structure
+    # do not change input structures
     structure_with_insertions = target_structure.CreateCopy()
+    if ligand is not None:
+        ligand_heavy_atoms = ligand.CreateCopy()
+        oechem.OESuppressHydrogens(ligand_heavy_atoms)
 
     sidechain_options = oespruce.OESidechainBuilderOptions()
     loop_options = oespruce.OELoopBuilderOptions()
@@ -1291,6 +1297,15 @@ def apply_insertions(
                     loop_conformation = delete_clashing_sidechains(loop_conformation)
                     oespruce.OEBuildSidechains(loop_conformation)
                     clashes = len(oespruce.OEGetPartialResidues(loop_conformation))
+                    if ligand is not None:  # check for clashes with ligand
+                        loop_conformation_heavy_atoms = loop_conformation.CreateCopy()
+                        oechem.OESuppressHydrogens(loop_conformation_heavy_atoms)
+                        clashes += len(list(
+                            oechem.OEGetNearestNbrs(
+                                loop_conformation_heavy_atoms,
+                                ligand_heavy_atoms, 2
+                            )
+                        ))
                     if clashes == 0:
                         # break conformation evaluation
                         structure_with_insertions = loop_conformation
