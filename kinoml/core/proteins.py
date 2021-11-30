@@ -5,7 +5,7 @@ import logging
 
 from .components import BaseProtein, BaseStructure
 from .sequences import Biosequence
-from ..utils import download_file, APPDIR
+from ..utils import APPDIR
 
 logger = logging.getLogger(__name__)
 
@@ -42,47 +42,6 @@ class UniprotProtein(BaseProtein):
     def __init__(self, uniprot_id, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.uniprot_id = uniprot_id
-
-
-class FileProtein(BaseProtein):
-    """
-    @schallerdavid: docstrings pending
-    """
-
-    def __init__(self, path, electron_density_path=None, metadata=None, name="", *args, **kwargs):
-        super().__init__(name=name, metadata=metadata, *args, **kwargs)
-        if str(path).startswith("http"):
-            from appdirs import user_cache_dir
-
-            # TODO: where to save, how to name
-            self.path = f"{user_cache_dir()}/{self.name}.{path.split('.')[-1]}"
-            download_file(path, self.path)
-        else:
-            self.path = path
-        self.electron_density_path = electron_density_path
-        if electron_density_path is not None:
-            if electron_density_path.starswith("http"):
-                from appdirs import user_cache_dir
-
-                # TODO: where to save, how to name
-                self.electron_density_path = (
-                    f"{user_cache_dir()}/{self.name}.{path.split('.')[-1]}"
-                )
-                download_file(path, self.path)
-
-
-class PDBProtein(FileProtein):
-    """
-    @schallerdavid: docstrings pending
-    """
-
-    def __init__(self, pdb_id, path="", metadata=None, name="", *args, **kwargs):
-        super().__init__(path=path, metadata=metadata, name=name, *args, **kwargs)
-        from ..utils import LocalFileStorage
-
-        self.pdb_id = pdb_id
-        self.path = LocalFileStorage.rcsb_structure_pdb(pdb_id)
-        self.electron_density_path = LocalFileStorage.rcsb_electron_density_mtz(pdb_id)
 
 
 class ProteinStructure(BaseProtein, BaseStructure):

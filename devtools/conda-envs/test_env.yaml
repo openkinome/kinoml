@@ -1,69 +1,53 @@
 name: test
 channels:
+  - pytorch
+  - pyg
   - conda-forge
   - openeye
-  - salilab
 dependencies:
-  # Base depends
+  # base depends
   - python
   - pip
   - pandas
   - requests
   - pint
   - appdirs
-  - mdanalysis
   - tqdm
   - openff-toolkit >=0.9
   - xgboost
-  - openeye-toolkits >=2020
-  - modeller
+  - openeye-toolkits >=2020.2.0
   - biotite
+  - bravado
+  - biopandas
+  - awkward
+  - pyarrow
+  - mdanalysis >=2.0.0
+  - opencadd
+  - matplotlib-base
+  - ruamel.yaml
+
+  # distributed computing
+  - dask
+  - dask-jobqueue
+
+  # reproducible workflows
+  - papermill 2.2.*
   - watermark
 
-  # Development
+  # pytorch
+  - pytorch >=1.8.0
+  - pyg
+  - pytorch-lightning
+
+  # development
   - jupyterlab
   - nglview
 
-  # Testing
+  # testing
   - pytest
   - pytest-cov
   - codecov
 
   - pip:
-      # Torch
-      - --find-links https://download.pytorch.org/whl/torch_stable.html
-      - torch==1.7.1
-      - torchvision==0.8.2
-      - torchaudio==0.7.2
-      # Torch geometric
-      - --find-links https://pytorch-geometric.com/whl/torch-1.7.0.html
-      - torch-geometric
-      - torch-scatter
-      - torch-sparse
-      - torch-cluster
-      - torch-spline-conv
-      # Lightning
-      - pytorch-lightning
       # PyTorch trees
       - https://github.com/ValentinFigue/Sklearn_PyTorch/archive/1b56a43e41de331ecdf73d08418f75bb34c9fa06.tar.gz
-      - https://github.com/volkamerlab/klifs_utils/archive/master.tar.gz
-      - prody==1.10.11
-      # Docs
-      # core
-      - sphinx~=2.4.0
-      - nbsphinx
-      - sphinx-notfound-page
-      - sphinx-version-warning
-      - sphinx-prompt
-      - sphinxemoji
-      - sphinx-copybutton
-      - sphinx-autoapi
-      - myst-parser[sphinx]
-      - sphinxcontrib-httpdomain
-      - sphinx-last-updated-by-git
-      - linkify-it-py
-      - sphinx-panels
-      # themes
-      - sphinx-material
-      # local building
-      - sphinx-autobuild

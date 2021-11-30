@@ -164,23 +164,56 @@ class ObservationModelMeasurement(BaseMeasurement):
         raise NotImplementedError("Implement in your subclass!")
 
     @classmethod
-    def loss_adapter(cls, backend="xgboost", loss="mse"):
+    def loss_adapter(cls, backend="pytorch"):
         """
         Some frameworks require objective functions to include the
         observation model transformation in the same callable. This
         method provides a factory of such methods.
         """
-        return cls._loss_adapter(backend=backend, loss=loss)
+        try:
+            return getattr(cls, f"_loss_adapter_{backend}")
+        except AttributeError:
+            msg = f"Adapter for backend `{backend}` is not available for `{cls}` types"
+            raise NotImplementedError(msg)
+
+    @staticmethod
+    def _loss_adapter_generic(
+        predicted,
+        observed,
+        loss_func,
+        loss_kwargs=None,
+        pre_loss_func=None,
+        pre_loss_kwargs=None,
+        post_loss_func=None,
+        post_loss_kwargs=None,
+    ):
+        if pre_loss_func is not None:
+            pre_loss_kwargs = pre_loss_kwargs or {}
+            predicted = pre_loss_func(predicted, **pre_loss_kwargs)
+
+        loss_kwargs = loss_kwargs or {}
+        loss = loss_func(predicted, observed, **loss_kwargs)
+
+        if post_loss_func is not None:
+            post_loss_kwargs = post_loss_kwargs or {}
+            loss = post_loss_func(loss, **post_loss_kwargs)
+
+        return loss
 
     @classmethod
-    def _loss_adapter(cls, backend="xgboost", loss="mse"):
-        try:
-            method = getattr(cls, f"_loss_adapter_{backend}__{loss}")
-        except AttributeError:
-            msg = f"Adapter for backend `{backend}` and loss `{loss}` is not available for `{cls}` types"
-            raise NotImplementedError(msg)
-        else:
-            return method
+    def _loss_adapter_pytorch(cls, predicted, observed, loss_func, **kwargs):
+        kwargs["pre_loss_func"] = cls._observation_model_pytorch
+        kwargs["post_loss_func"] = cls._post_loss_adapter
+        return cls._loss_adapter_generic(
+            predicted=predicted,
+            observed=observed,
+            loss_func=loss_func,
+            **kwargs,
+        )
+
+    @staticmethod
+    def _post_loss_adapter(loss, **kwargs):
+        return loss
 
 
 class PercentageDisplacementMeasurement(ObservationModelMeasurement):
@@ -238,9 +271,12 @@ class PercentageDisplacementMeasurement(ObservationModelMeasurement):
     _observation_model_xgboost = _observation_model_numpy
 
     @staticmethod
-    def _loss_adapter_xgboost__mse(
-        labels, dG_over_KT, inhibitor_conc=1, standard_conc=1, **kwargs
-    ):
+    def _post_loss_adapter(loss, **kwargs):
+        #  TODO: Revisit which kind of weighting is needed here
+        return loss
+
+    @staticmethod
+    def _loss_adapter_xgboost_mse(labels, dG_over_KT, inhibitor_conc=1, standard_conc=1, **kwargs):
         r"""
         Return the gradient and the hessian of the loss defined by
 
@@ -333,7 +369,7 @@ class pIC50Measurement(ObservationModelMeasurement):
     _observation_model_xgboost = _observation_model_pytorch
 
     @staticmethod
-    def _loss_adapter_xgboost__mse(
+    def _loss_adapter_xgboost_mse(
         labels,
         dG_over_KT,
         substrate_conc=1e-6,
@@ -360,6 +396,11 @@ class pIC50Measurement(ObservationModelMeasurement):
         hess_loss = np.full(grad_loss.shape, 1 / (LN10 * LN10))
 
         return grad_loss.astype("float32"), hess_loss.astype("float32")
+
+    @staticmethod
+    def _post_loss_adapter(loss, **kwargs):
+        #  TODO: Revisit which kind of weighting is needed here
+        return loss
 
     def check(self):
         super().check()
@@ -394,7 +435,7 @@ class pKiMeasurement(ObservationModelMeasurement):
     _observation_model_xgboost = _observation_model_pytorch
 
     @staticmethod
-    def _loss_adapter_xgboost__mse(labels, dG_over_KT, standard_conc=1, **kwargs):
+    def _loss_adapter_xgboost_mse(labels, dG_over_KT, standard_conc=1, **kwargs):
         r"""
         Return the gradient and the hessian of the loss defined by
 
@@ -406,6 +447,11 @@ class pKiMeasurement(ObservationModelMeasurement):
         hess_loss = np.full(grad_loss.shape, 1 / (LN10 * LN10))
 
         return grad_loss.astype("float32"), hess_loss.astype("float32")
+
+    @staticmethod
+    def _post_loss_adapter(loss, **kwargs):
+        #  TODO: Revisit which kind of weighting is needed here
+        return loss
 
     def check(self):
         super().check()
@@ -441,7 +487,7 @@ class pKdMeasurement(ObservationModelMeasurement):
     _observation_model_xgboost = _observation_model_pytorch
 
     @staticmethod
-    def _loss_adapter_xgboost__mse(labels, dG_over_KT, standard_conc=1, **kwargs):
+    def _loss_adapter_xgboost_mse(labels, dG_over_KT, standard_conc=1, **kwargs):
         r"""
         Return the gradient and the hessian of the loss defined by
 
@@ -453,6 +499,11 @@ class pKdMeasurement(ObservationModelMeasurement):
         hess_loss = np.full(grad_loss.shape, 1 / (LN10 * LN10))
 
         return grad_loss.astype("float32"), hess_loss.astype("float32")
+
+    @staticmethod
+    def _post_loss_adapter(loss, **kwargs):
+        #  TODO: Revisit which kind of weighting is needed here
+        return loss
 
     def check(self):
         super().check()

@@ -3,13 +3,12 @@ Featurizers that mostly concern ligand-based models
 """
 
 from __future__ import annotations
-from functools import lru_cache
 from typing import Union, Iterable
 
 import numpy as np
 import rdkit
 
-from .core import BaseFeaturizer, BaseOneHotEncodingFeaturizer
+from .core import ParallelBaseFeaturizer, BaseOneHotEncodingFeaturizer
 from ..core.systems import System
 from ..core.ligands import (
     BaseLigand,
@@ -20,12 +19,15 @@ from ..core.ligands import (
 )
 
 
-class SingleLigandFeaturizer(BaseFeaturizer):
+class SingleLigandFeaturizer(ParallelBaseFeaturizer):
     """
     Provides a minimally useful ``._supports()`` method for all Ligand-like featurizers.
     """
 
     _COMPATIBLE_LIGAND_TYPES = (BaseLigand,)
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
     def _supports(self, system: System) -> bool:
         """
@@ -91,8 +93,8 @@ class SmilesToLigandFeaturizer(SingleLigandFeaturizer):
 
     _COMPATIBLE_LIGAND_TYPES = (SmilesLigand,)
 
-    def __init__(self, ligand_type: str = "rdkit", *args, **kwargs):
-        super().__init__(self, *args, **kwargs)
+    def __init__(self, ligand_type: str = "rdkit", **kwargs):
+        super().__init__(**kwargs)
         if ligand_type == "rdkit":
             self._LigandType = RDKitLigand
         elif ligand_type == "openforcefield":
@@ -102,17 +104,12 @@ class SmilesToLigandFeaturizer(SingleLigandFeaturizer):
                 f"Ligand type `{ligand_type}` is not one of ['rkdit', 'openforcefield']"
             )
 
-    @lru_cache(maxsize=1000)
-    def _featurize_one(
-        self, system: Iterable[System], options: dict
-    ) -> RDKitLigand | OpenForceFieldLigand:
+    def _featurize_one(self, system: System) -> RDKitLigand | OpenForceFieldLigand:
         """
         Parameters
         ----------
         system : System
             The System to be featurized.
-        options : dict
-            Unused
 
         Returns
         -------
@@ -138,13 +135,12 @@ class MorganFingerprintFeaturizer(SingleLigandFeaturizer):
 
     _COMPATIBLE_LIGAND_TYPES = (OpenForceFieldLigand, OpenForceFieldLikeLigand)
 
-    def __init__(self, radius: int = 2, nbits: int = 512, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, radius: int = 2, nbits: int = 512, **kwargs):
+        super().__init__(**kwargs)
         self.radius = radius
         self.nbits = nbits
 
-    @lru_cache(maxsize=1000)
-    def _featurize_one(self, system: System, options: dict) -> np.ndarray:
+    def _featurize_one(self, system: System) -> np.ndarray:
         """
         Parameters
         ----------
@@ -163,7 +159,7 @@ class MorganFingerprintFeaturizer(SingleLigandFeaturizer):
         # otherwise, we should force that behaviour ourselves!
         ligand = self._find_ligand(system).to_rdkit()
         fp = Morgan(ligand, radius=self.radius, nBits=self.nbits)
-        return np.asarray(fp, dtype="uint8")
+        return np.asarray(fp, dtype="int64")
 
 
 class OneHotSMILESFeaturizer(BaseOneHotEncodingFeaturizer, SingleLigandFeaturizer):
@@ -190,6 +186,9 @@ class OneHotSMILESFeaturizer(BaseOneHotEncodingFeaturizer, SingleLigandFeaturize
         "LR$"  # single-char representation of Cl, Br, @@
     )
 
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
     def _retrieve_sequence(self, system: System) -> str:
         """
         Get SMILES string from a `Ligand`-like component and postprocesses it.
@@ -212,6 +211,9 @@ class OneHotRawSMILESFeaturizer(OneHotSMILESFeaturizer):
     """
 
     _COMPATIBLE_LIGAND_TYPES = (OpenForceFieldLigand, OpenForceFieldLikeLigand)
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
     def _retrieve_sequence(self, system: System) -> str:
         """
@@ -291,13 +293,12 @@ class GraphLigandFeaturizer(SingleLigandFeaturizer):
     ]
     _COMPATIBLE_LIGAND_TYPES = (OpenForceFieldLigand, OpenForceFieldLikeLigand)
 
-    def __init__(self, max_in_ring_size: int = 10, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, max_in_ring_size: int = 10, **kwargs):
+        super().__init__(**kwargs)
         self.max_in_ring_size = max_in_ring_size
         self._hybridization_names = sorted(rdkit.Chem.rdchem.HybridizationType.names)
 
-    @lru_cache(maxsize=1000)
-    def _featurize_one(self, system: System, options: dict) -> tuple:
+    def _featurize_one(self, system: System) -> tuple:
         """
         Featurizes ligands contained in a System as a labeled graph.
 

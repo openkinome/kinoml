@@ -57,6 +57,16 @@ class LocalFileStorage:
         return file_path
 
     @staticmethod
+    def klifs_structure_db(directory=DIRECTORY):
+        file_path = directory / "klifs_structure_db.csv"
+        return file_path
+
+    @staticmethod
+    def klifs_kinase_db(directory=DIRECTORY):
+        file_path = directory / "klifs_kinase_db.csv"
+        return file_path
+
+    @staticmethod
     def featurizer_result(featurizer_name, result_details, file_format, directory=DIRECTORY):
         file_path = directory / f"kinoml_{featurizer_name}_{result_details}.{file_format}"
         return file_path
@@ -73,15 +83,19 @@ class FileDownloader:
     Download and store files locally.
     """
 
-    @staticmethod
-    def rcsb_structure_pdb(pdb_id):
-        url = f"https://files.rcsb.org/download/{pdb_id}.pdb"
-        download_file(url, LocalFileStorage.rcsb_structure_pdb(pdb_id))
+    from appdirs import user_cache_dir
+
+    DIRECTORY = Path(user_cache_dir())
 
     @staticmethod
-    def rcsb_electron_density_mtz(pdb_id):
+    def rcsb_structure_pdb(pdb_id, directory=DIRECTORY):
+        url = f"https://files.rcsb.org/download/{pdb_id}.pdb"
+        download_file(url, LocalFileStorage.rcsb_structure_pdb(pdb_id, directory))
+
+    @staticmethod
+    def rcsb_electron_density_mtz(pdb_id, directory=DIRECTORY):
         url = f"https://edmaps.rcsb.org/coefficients/{pdb_id}.mtz"
-        download_file(url, LocalFileStorage.rcsb_electron_density_mtz(pdb_id))
+        download_file(url, LocalFileStorage.rcsb_electron_density_mtz(pdb_id, directory))
 
 
 def datapath(path: str) -> Path:
@@ -334,14 +348,3 @@ def import_object(import_path: str):
         module = import_module(module_str)
         return getattr(module, obj_str)
     return import_module(import_path)
-
-
-class Hashabledict(dict):
-    """
-    A dictionary that can be hashed so it can be used in
-    multiprocessing contexts. It shouldn't be modified
-    after instantiation!
-    """
-
-    def __hash__(self):
-        return hash((frozenset(self), frozenset(self.values())))

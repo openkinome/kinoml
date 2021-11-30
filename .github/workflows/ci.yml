@@ -1,0 +1,111 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - "master"
+      - "maintenance/.+"
+  pull_request:
+    branches:
+      - "master"
+      - "maintenance/.+"
+  schedule:
+    # Run a cron job once daily
+    - cron: "0 0 * * *"
+
+jobs:
+  test:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Linux, Python 3.7
+            os: ubuntu-latest
+            python-version: "3.7"
+            conda-installer: https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-Linux-x86_64.sh
+
+          - name: Linux, Python 3.8
+            os: ubuntu-latest
+            python-version: "3.8"
+            conda-installer: https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-Linux-x86_64.sh
+
+          - name: Linux, Python 3.9
+            os: ubuntu-latest
+            python-version: "3.9"
+            conda-installer: https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-Linux-x86_64.sh
+
+          - name: MacOS, Python 3.7
+            os: macOS-latest
+            python-version: "3.7"
+            conda-installer: https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-MacOSX-x86_64.sh
+
+          - name: MacOS, Python 3.8
+            os: macOS-latest
+            python-version: "3.8"
+            conda-installer: https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-MacOSX-x86_64.sh
+
+          - name: MacOS, Python 3.9
+            os: macOS-latest
+            python-version: "3.9"
+            conda-installer: https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-MacOSX-x86_64.sh
+
+
+    env:
+      OE_LICENSE: ${{ github.workspace }}/oe_license.txt
+      MODELLER_LICENSE: ${{ secrets.MODELLER_LICENSE }}
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: conda-incubator/setup-miniconda@v2
+        with:
+          installer-url: ${{ matrix.conda-installer }}
+          python-version: ${{ matrix.python-version }}
+          activate-environment: test
+          channel-priority: true
+          environment-file: devtools/conda-envs/test_env.yaml
+          auto-activate-base: false
+          use-mamba: true
+
+      - name: Additional info about the build
+        shell: bash
+        run: |
+          uname -a
+          df -h
+          ulimit -a
+
+      - name: Environment Information
+        shell: bash -l {0}
+        run: |
+          conda info --all
+          conda list
+          mamba --version
+
+      - name: Decrypt and check OE license
+        shell: bash -l {0}
+        env:
+          OE_LICENSE_TEXT: ${{ secrets.OE_LICENSE }}
+        run: |
+          echo "${OE_LICENSE_TEXT}" > ${OE_LICENSE}
+          python -c "import openeye; assert openeye.OEChemIsLicensed()"
+
+      - name: Install package
+        shell: bash -l {0}
+        run: |
+          python -m pip install --no-deps .
+
+      - name: Run tests
+        shell: bash -l {0}
+        run: |
+          pytest -v --cov=kinoml --cov-report=xml --color=yes kinoml/tests/ -k "not read_electron_density"
+
+      - name: CodeCov
+        uses: codecov/codecov-action@v1
+        if: always()
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          file: ./coverage.xml
+          flags: unittests
+          yml: ./.codecov.yml
