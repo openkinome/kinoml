@@ -39,6 +39,8 @@ class SCHRODINGERComplexFeaturizer(ParallelBaseFeaturizer):
      - `uniprot_id`: A string specifying the UniProt ID that will be used to fetch the amino acid
        sequence from UniProt, which will be used for modeling the protein. This will supersede the
        sequence information given in the PDB header.
+     - `sequence`: A string specifying the amino acid sequence in single letter codes to be used
+       during loop modeling and for mutations.
 
     The ligand component can be a BaseLigand without any further attributes. Additionally, the
     ligand component can have the following optional attributes:
@@ -67,13 +69,16 @@ class SCHRODINGERComplexFeaturizer(ParallelBaseFeaturizer):
 
         super().__init__(**kwargs)
         self.cache_dir = Path(user_cache_dir())
-        self.output_dir = None
         if cache_dir:
             self.cache_dir = Path(cache_dir).expanduser().resolve()
         self.cache_dir.mkdir(parents=True, exist_ok=True)
         if output_dir:
             self.output_dir = Path(output_dir).expanduser().resolve()
             self.output_dir.mkdir(parents=True, exist_ok=True)
+            self.save_output = True
+        else:
+            self.output_dir = Path(user_cache_dir())
+            self.save_output = False
 
     _SUPPORTED_TYPES = (ProteinLigandComplex,)
 
@@ -84,12 +89,12 @@ class SCHRODINGERComplexFeaturizer(ParallelBaseFeaturizer):
         import os
 
         try:
-            os.environ["SCHRODINGER"]
+            self.schrodinger = os.environ["SCHRODINGER"]
         except KeyError:
             raise KeyError("Cannot find the SCHRODINGER variable!")
         return
 
-    def _featurize_one(self, system: ProteinLigandComplex) -> Union[Universe, None]:
+    def _featurize_one(self, system: ProteinLigandComplex) -> Universe:
         """
         Prepare a protein structure.
 
@@ -101,18 +106,47 @@ class SCHRODINGERComplexFeaturizer(ParallelBaseFeaturizer):
         Returns
         -------
         : Universe or None
-            An MDAnalysis universe of the featurized system. None if no design unit was found.
+            An MDAnalysis universe of the featurized system.
         """
+        import MDAnalysis as mda
+
+        from ..modeling.SCHRODINGERModeling import run_prepwizard
+        from ..utils import LocalFileStorage
+
         logging.debug("Interpreting system ...")
         system_dict = self._interpret_system(system)
+
+        complex_path = LocalFileStorage.featurizer_result(
+            self.__class__.__name__,
+            f"{system_dict['protein_name']}_{system_dict['ligand_name']}_complex",
+            "pdb",
+            self.output_dir,
+        )
+
+        run_prepwizard(
+            schrodinger_directory=self.schrodinger,
+            input_file=system_dict["protein_path"],
+            output_file=complex_path,
+            cap_termini=True,
+            build_loops=True,
+            sequence=system_dict["protein_sequence"],
+            protein_pH="neutral",
+            epik_pH=7.4,
+            force_field="3",
+        )
 
         # ToDo: select chain
         # ToDo: select alternate location
         # ToDo: select ligand
         # ToDo: delete expression tags
-        # ToDo: Run prepwizard
 
-        return None
+        logging.debug("Generating new MDAnalysis universe ...")
+        structure = mda.Universe(complex_path, in_memory=True)
+
+        if not self.save_output:
+            complex_path.unlink()
+
+        return structure
 
     def _interpret_system(self, system: ProteinLigandComplex) -> dict:
         """
@@ -129,14 +163,14 @@ class SCHRODINGERComplexFeaturizer(ParallelBaseFeaturizer):
             A dictionary containing the content of the system components.
         """
         from ..databases.pdb import download_pdb_structure
-        from ..databases.uniprot import download_fasta_file
+        from ..core.sequences import AminoAcidSequence
 
         system_dict = {
             "protein_name": None,
             "protein_pdb_id": None,
             "protein_path": None,
+            "protein_sequence": None,
             "protein_uniprot_id": None,
-            "protein_fasta_path": None,
             "protein_chain_id": None,
             "protein_alternate_location": None,
             "protein_expo_id": None,
@@ -162,18 +196,14 @@ class SCHRODINGERComplexFeaturizer(ParallelBaseFeaturizer):
                 f"The {self.__class__.__name__} requires systems with protein components having a"
                 f" `pdb_id` or `path` attribute."
             )
-
-        if hasattr(system.protein, "uniprot_id"):
-            logging.debug(
-                f"Retrieving amino acid sequence details for UniProt entry "
-                f"{system.protein.uniprot_id} ..."
-            )
-            system_dict["protein_fasta_path"] = download_fasta_file(
-                system.protein.uniprot_id, self.cache_dir
-            )
-            if not system_dict["protein_fasta_path"]:
-                raise ValueError(
-                    f"Could not download fasta file for UniProt entry {system.protein.uniprot_id}."
+        if not hasattr(system.protein, "sequence"):
+            if hasattr(system.protein, "uniprot_id"):
+                logging.debug(
+                    f"Retrieving amino acid sequence details for UniProt entry "
+                    f"{system.protein.uniprot_id} ..."
+                )
+                system_dict["protein_sequence"] = AminoAcidSequence.from_uniprot(
+                    system.protein.uniprot_id
                 )
 
         if hasattr(system.protein, "chain_id"):
