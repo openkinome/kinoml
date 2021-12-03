@@ -42,7 +42,7 @@ def run_prepwizard(
     schrodinger_directory = Path(schrodinger_directory)
     executable = str(schrodinger_directory / "utilities/prepwizard")
     standard_arguments = [
-        str(input_file), str(output_file), "-HOST", "-WAIT", "localhost", "-keepfarwat",
+        str(input_file), str(output_file), "-HOST", "localhost", "-WAIT", "-keepfarwat",
         "-disulfides", "-glycosylation", "-palmitoylation", "-mse", "-fillsidechains",
         "-samplewater", "-pH", protein_pH, "--propka_pH", "-minimize_adj_h", "-epik_pH",
         str(epik_pH), "-f", force_field,
