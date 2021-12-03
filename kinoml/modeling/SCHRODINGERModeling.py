@@ -65,6 +65,8 @@ def run_prepwizard(
                 [executable] + standard_arguments + optional_arguments + ["-fasta_file", fasta_file.name]
             )
     else:
+        for arg in [executable] + standard_arguments + optional_arguments:
+            print(arg, type(arg))
         subprocess.run(
             [executable] + standard_arguments + optional_arguments
         )
