@@ -36,7 +36,7 @@ def run_prepwizard(
         The pH used during protonation of the protein ('very_low', 'low', 'neutral', 'high').
     epik_pH: float, default=7.4
         The pH used during protonation of the ligand.
-    force_field: int, default=3
+    force_field: str, default='3'
         Force field to use during minimization (2005, 3)
     """
     schrodinger_directory = Path(schrodinger_directory)
@@ -44,7 +44,7 @@ def run_prepwizard(
     standard_arguments = [
         input_file, output_file, "-HOST", "-WAIT", "localhost", "-keepfarwat", "-disulfides",
         "-glycosylation", "-palmitoylation", "-mse", "-fillsidechains", "-samplewater", "-pH",
-        protein_pH, "--propka_pH", "-minimize_adj_h", "-epik_pH", epik_pH, "-f", force_field,
+        protein_pH, "--propka_pH", "-minimize_adj_h", "-epik_pH", str(epik_pH), "-f", force_field,
 
     ]
     optional_arguments = []
