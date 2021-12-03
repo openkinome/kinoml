@@ -49,7 +49,6 @@ def run_prepwizard(
         "-disulfides", "-glycosylation", "-palmitoylation", "-mse", "-fillsidechains",
         "-samplewater", "-pH", protein_pH, "-propka_pH", str(propka_pH), "-minimize_adj_h",
         "-epik_pH", str(epik_pH), "-f", force_field,
-
     ]
     optional_arguments = []
     if cap_termini:
