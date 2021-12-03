@@ -1,3 +1,4 @@
+import logging
 from pathlib import Path
 import subprocess
 from tempfile import NamedTemporaryFile
@@ -66,7 +67,7 @@ def run_prepwizard(
             )
     else:
         for arg in [executable] + standard_arguments + optional_arguments:
-            print(arg, type(arg))
+            logging.debug(arg, type(arg))
         subprocess.run(
             [executable] + standard_arguments + optional_arguments
         )
