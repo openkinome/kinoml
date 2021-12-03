@@ -12,6 +12,7 @@ def run_prepwizard(
     build_loops: bool = True,
     sequence: Union[str, None] = None,
     protein_pH: str = "neutral",
+    propka_pH: float = 7.4,
     epik_pH: float = 7.4,
     force_field: str = "3",
 ):
@@ -34,6 +35,8 @@ def run_prepwizard(
         The amino acid sequence in single letter codes that should be used for loop building.
     protein_pH: str, default='neutral'
         The pH used during protonation of the protein ('very_low', 'low', 'neutral', 'high').
+    propka_pH: float, default=7.4
+        Run PROPKA at given pH.
     epik_pH: float, default=7.4
         The pH used during protonation of the ligand.
     force_field: str, default='3'
@@ -44,8 +47,8 @@ def run_prepwizard(
     standard_arguments = [
         str(input_file), str(output_file), "-HOST", "localhost", "-WAIT", "-keepfarwat",
         "-disulfides", "-glycosylation", "-palmitoylation", "-mse", "-fillsidechains",
-        "-samplewater", "-pH", protein_pH, "--propka_pH", "-minimize_adj_h", "-epik_pH",
-        str(epik_pH), "-f", force_field,
+        "-samplewater", "-pH", protein_pH, "-propka_pH", str(propka_pH), "-minimize_adj_h",
+        "-epik_pH", str(epik_pH), "-f", force_field,
 
     ]
     optional_arguments = []

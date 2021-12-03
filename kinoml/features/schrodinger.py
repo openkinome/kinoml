@@ -131,6 +131,7 @@ class SCHRODINGERComplexFeaturizer(ParallelBaseFeaturizer):
             build_loops=True,
             sequence=system_dict["protein_sequence"],
             protein_pH="neutral",
+            propka_pH=7.4,
             epik_pH=7.4,
             force_field="3",
         )
