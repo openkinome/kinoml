@@ -40,7 +40,7 @@ def run_prepwizard(
         Force field to use during minimization (2005, 3)
     """
     schrodinger_directory = Path(schrodinger_directory)
-    executable = schrodinger_directory / "utilities/prepwizard"
+    executable = str(schrodinger_directory / "utilities/prepwizard")
     standard_arguments = [
         str(input_file), str(output_file), "-HOST", "-WAIT", "localhost", "-keepfarwat",
         "-disulfides", "-glycosylation", "-palmitoylation", "-mse", "-fillsidechains",
