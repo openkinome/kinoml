@@ -94,7 +94,7 @@ class SCHRODINGERComplexFeaturizer(ParallelBaseFeaturizer):
             raise KeyError("Cannot find the SCHRODINGER variable!")
         return
 
-    def _featurize_one(self, system: ProteinLigandComplex) -> Universe:
+    def _featurize_one(self, system: ProteinLigandComplex) -> Union[Universe, None]:
         """
         Prepare a protein structure.
 
@@ -106,7 +106,7 @@ class SCHRODINGERComplexFeaturizer(ParallelBaseFeaturizer):
         Returns
         -------
         : Universe or None
-            An MDAnalysis universe of the featurized system.
+            An MDAnalysis universe of the featurized system or None if not successful.
         """
         import MDAnalysis as mda
 
@@ -142,7 +142,10 @@ class SCHRODINGERComplexFeaturizer(ParallelBaseFeaturizer):
         # ToDo: delete expression tags
 
         logging.debug("Generating new MDAnalysis universe ...")
-        structure = mda.Universe(complex_path, in_memory=True)
+        try:
+            structure = mda.Universe(complex_path, in_memory=True)
+        except FileNotFoundError:
+            return None
 
         if not self.save_output:
             complex_path.unlink()
