@@ -127,7 +127,7 @@ class SCHRODINGERComplexFeaturizer(ParallelBaseFeaturizer):
             self.output_dir,
         )
         
-        for _ in enumerate(self.max_retry):
+        for _ in range(self.max_retry):
             run_prepwizard(
                 schrodinger_directory=self.schrodinger,
                 input_file=system_dict["protein_path"],
