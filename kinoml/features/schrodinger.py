@@ -56,6 +56,8 @@ class SCHRODINGERComplexFeaturizer(ParallelBaseFeaturizer):
     output_dir: str, Path or None, default=None
         Path to directory used for saving output files. If None, output structures will not be
         saved.
+    max_retry: int, default=3
+        The maximal number of attempts to try running the prepwizard step.
     """
     from MDAnalysis.core.universe import Universe
 
@@ -63,6 +65,7 @@ class SCHRODINGERComplexFeaturizer(ParallelBaseFeaturizer):
             self,
             cache_dir: Union[str, Path, None] = None,
             output_dir: Union[str, Path, None] = None,
+            max_retry: int = 3,
             **kwargs,
     ):
         from appdirs import user_cache_dir
@@ -79,6 +82,7 @@ class SCHRODINGERComplexFeaturizer(ParallelBaseFeaturizer):
         else:
             self.output_dir = Path(user_cache_dir())
             self.save_output = False
+        self.max_retry = max_retry
 
     _SUPPORTED_TYPES = (ProteinLigandComplex,)
 
@@ -122,19 +126,24 @@ class SCHRODINGERComplexFeaturizer(ParallelBaseFeaturizer):
             "pdb",
             self.output_dir,
         )
-
-        run_prepwizard(
-            schrodinger_directory=self.schrodinger,
-            input_file=system_dict["protein_path"],
-            output_file=complex_path,
-            cap_termini=True,
-            build_loops=True,
-            sequence=system_dict["protein_sequence"],
-            protein_pH="neutral",
-            propka_pH=7.4,
-            epik_pH=7.4,
-            force_field="3",
-        )
+        
+        for _ in enumerate(self.max_retry):
+            run_prepwizard(
+                schrodinger_directory=self.schrodinger,
+                input_file=system_dict["protein_path"],
+                output_file=complex_path,
+                cap_termini=True,
+                build_loops=True,
+                sequence=system_dict["protein_sequence"],
+                protein_pH="neutral",
+                propka_pH=7.4,
+                epik_pH=7.4,
+                force_field="3",
+            )
+            if complex_path.is_file():
+                break
+        if not complex_path.is_file():
+            return None
 
         # ToDo: select chain
         # ToDo: select alternate location
@@ -142,10 +151,7 @@ class SCHRODINGERComplexFeaturizer(ParallelBaseFeaturizer):
         # ToDo: delete expression tags
 
         logging.debug("Generating new MDAnalysis universe ...")
-        try:
-            structure = mda.Universe(complex_path, in_memory=True)
-        except FileNotFoundError:
-            return None
+        structure = mda.Universe(complex_path, in_memory=True)
 
         if not self.save_output:
             complex_path.unlink()
