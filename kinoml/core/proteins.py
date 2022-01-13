@@ -29,21 +29,6 @@ class AminoAcidSequence(BaseProtein, Biosequence):
         Biosequence.__init__(self)
 
 
-class UniprotProtein(BaseProtein):
-    """
-    A protein represented by its UniProt ID, uniquely.
-
-    Parameters
-    ----------
-    uniprot_id : str
-        Uniprot ID for this protein
-    """
-
-    def __init__(self, uniprot_id, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.uniprot_id = uniprot_id
-
-
 class ProteinStructure(BaseProtein, BaseStructure):
     """
     Structural representation of a protein
