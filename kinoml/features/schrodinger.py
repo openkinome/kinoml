@@ -123,7 +123,7 @@ class SCHRODINGERComplexFeaturizer(ParallelBaseFeaturizer):
         complex_path = LocalFileStorage.featurizer_result(
             self.__class__.__name__,
             f"{system_dict['protein_name']}_{system_dict['ligand_name']}_complex",
-            "pdb",
+            "mae",
             self.output_dir,
         )
         
