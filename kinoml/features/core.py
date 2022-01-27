@@ -134,12 +134,15 @@ class BaseFeaturizer:
             The same systems as passed, but with ``.featurizations`` extended with
             the calculated features in two entries: the featurizer name and ``last``.
         """
-        # TODO: Define self.id() to provide a unique key per class name and chosen init args
+        filtered_systems = []
         for system, feature in zip(systems, features):
+            if feature is None:
+                continue
             system.featurizations["last"] = feature
             if keep:
                 system.featurizations[self.name] = feature
-        return systems
+            filtered_systems.append(system)
+        return filtered_systems
 
     def supports(self, *systems: System, raise_errors: bool = True) -> bool:
         """
