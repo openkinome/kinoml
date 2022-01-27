@@ -4,13 +4,13 @@
 
 import logging
 
-from .components import MolecularComponent
+from .components import BaseLigand
 
 
 logger = logging.getLogger(__name__)
 
 
-class Ligand(MolecularComponent):
+class Ligand(BaseLigand):
     """
     General small molecule object supporting RDKit, OpenForceField and OpenEye toolkits. During
     initialization attributes are stored as given:

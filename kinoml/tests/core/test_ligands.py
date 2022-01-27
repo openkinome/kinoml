@@ -9,11 +9,11 @@ def test_ligand():
     import rdkit
 
     from kinoml.core.ligands import Ligand
-    from kinoml.core.components import MolecularComponent
+    from kinoml.core.components import BaseLigand
 
     smiles = "CCCCC"
     ligand = Ligand(smiles=smiles)
-    assert isinstance(ligand, MolecularComponent)
+    assert isinstance(ligand, BaseLigand)
     assert isinstance(ligand.to_rdkit(), rdkit.Chem.Mol)
     assert isinstance(ligand.to_off(), Molecule)
     assert isinstance(ligand.to_openeye(), oechem.OEGraphMol)

@@ -20,3 +20,15 @@ class MolecularComponent:
 
     def __repr__(self) -> str:
         return f"<{self.__class__.__name__} name={self.name}>"
+
+
+class BaseLigand(MolecularComponent):
+    """
+    Base class for all ligand-like entities.
+    """
+
+
+class BaseProtein(MolecularComponent):
+    """
+    Base class for all protein-like entities.
+    """
