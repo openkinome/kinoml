@@ -10,7 +10,7 @@ from tqdm.auto import tqdm
 from .core import MultiDatasetProvider
 from ..core.conditions import AssayConditions
 from ..core.proteins import AminoAcidSequence
-from ..core.ligands import SmilesLigand
+from ..core.ligands import Ligand
 from ..core.systems import ProteinLigandComplex
 from ..core.measurements import pIC50Measurement, pKiMeasurement, pKdMeasurement
 
@@ -88,8 +88,7 @@ class ChEMBLDatasetProvider(MultiDatasetProvider):
                     )
                     kinases[kinase_key] = kinase
                 if ligand_key not in ligands:
-                    metadata = {"chembl_compound": None}  # TODO
-                    ligands[ligand_key] = SmilesLigand(ligand_key, name=ligand_key)
+                    ligands[ligand_key] = Ligand(smiles=ligand_key, name=ligand_key)
                 if system_key not in systems:
                     systems[system_key] = ProteinLigandComplex(
                         [kinases[kinase_key], ligands[ligand_key]]

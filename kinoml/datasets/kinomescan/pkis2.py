@@ -7,7 +7,7 @@ import pandas as pd
 from .utils import KINOMEScanMapper
 from .core import KinomeScanDatasetProvider
 from ...core.proteins import AminoAcidSequence
-from ...core.ligands import SmilesLigand
+from ...core.ligands import Ligand
 from ...core.systems import ProteinLigandComplex
 from ...core.measurements import BaseMeasurement, PercentageDisplacementMeasurement
 from ...core.conditions import BaseConditions, AssayConditions
@@ -84,7 +84,7 @@ class PKIS2DatasetProvider(KinomeScanDatasetProvider):
         for smiles in df.index:
             # We only read the SMILES for now. Promoting to full-fledged objects
             # can be done through featurizers (see SmilesToLigandFeaturizer)
-            ligand = SmilesLigand.from_smiles(smiles, name=smiles)
+            ligand = Ligand(smiles=smiles, name=smiles)
             ligands.append(ligand)
 
         lol = list(df.itertuples(index=False, name=None))  # FIXME: This might be dangerous

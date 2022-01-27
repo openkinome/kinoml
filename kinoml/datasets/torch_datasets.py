@@ -3,11 +3,8 @@ Helper classes to convert between DatasetProvider objects and
 Dataset-like objects native to the PyTorch ecosystem
 """
 from collections import defaultdict
-from functools import lru_cache
-from os import close
 from typing import List
 from pathlib import Path
-from functools import lru_cache
 
 import numpy as np
 import awkward as ak

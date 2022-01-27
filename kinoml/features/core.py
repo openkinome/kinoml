@@ -12,7 +12,7 @@ from functools import partial
 import numpy as np
 from tqdm.auto import tqdm
 
-from ..core.systems import System
+from ..core.systems import System, LigandSystem, ProteinLigandComplex
 
 
 class BaseFeaturizer:
@@ -537,6 +537,10 @@ class TupleOfArrays(Pipeline):
 
 
 class BaseOneHotEncodingFeaturizer(ParallelBaseFeaturizer):
+    """
+    Base class for Featurizers concerning one hot encoding.
+    """
+
     ALPHABET = None
 
     def __init__(self, dictionary: dict = None, **kwargs):
@@ -547,16 +551,14 @@ class BaseOneHotEncodingFeaturizer(ParallelBaseFeaturizer):
         if not self.dictionary:
             raise ValueError("This featurizer requires a populated dictionary!")
 
-    def _featurize_one(self, system: System) -> np.ndarray:
+    def _featurize_one(self, system: Union[LigandSystem, ProteinLigandComplex]) -> np.ndarray:
         """
         One hot encode one system.
 
         Parameters
         ----------
-        system : System
+        system: LigandSystem or ProteinLigandComplex
             The System to be featurized.
-        options : dict
-            Unused
 
         Returns
         -------
