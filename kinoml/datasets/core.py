@@ -5,7 +5,6 @@ Base classes for ``DatasetProvider``-like objects
 import logging
 from typing import Iterable
 from collections import defaultdict
-import multiprocessing
 from urllib.request import urlopen
 import shutil
 from pathlib import Path
@@ -13,7 +12,6 @@ import os
 
 import numpy as np
 import pandas as pd
-from tqdm.auto import tqdm
 import awkward as ak
 
 from ..core.measurements import BaseMeasurement
