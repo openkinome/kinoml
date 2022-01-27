@@ -549,6 +549,19 @@ def prepare_structure(
         
         return False
 
+    # delete expression tags
+    expression_tags = get_expression_tags(structure)
+    for expression_tag in expression_tags:
+        try:
+            structure = delete_residue(
+                structure,
+                chain_id=expression_tag["chain_id"],
+                residue_name=expression_tag["residue_name"],
+                residue_id=expression_tag["residue_id"],
+            )
+        except ValueError:
+            pass  # wrong chain or not resolved
+
     # delete short protein segments, which make the alignment error prone
     structure = delete_short_protein_segments(structure)
 
