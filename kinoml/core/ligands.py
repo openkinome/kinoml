@@ -4,7 +4,6 @@
 
 import logging
 
-import rdkit
 from .components import MolecularComponent
 
 
@@ -52,7 +51,7 @@ class Ligand(MolecularComponent):
         self._off_mol = off_mol
         self._openeye_mol = openeye_mol
 
-    def to_rdkit(self) -> rdkit.Chem.Mol:
+    def to_rdkit(self):
         """
         Export an RDKit molecule.
 
@@ -133,6 +132,7 @@ class Ligand(MolecularComponent):
                     "initialized with one of the following attributes:\nsmiles\nsdf_path\n"
                     "rdkit_mol\noff_mol\nopeneye_mol"
                 )
+        return self._openeye_mol
 
     def to_smiles(self, toolkit="RDKit") -> str:
         """
