@@ -5,254 +5,165 @@
 import logging
 
 import rdkit
-from openff.toolkit.topology import Molecule as _OpenForceFieldMolecule
-
-from .components import BaseLigand
+from .components import MolecularComponent
 
 
 logger = logging.getLogger(__name__)
 
 
-class OpenForceFieldLigand(BaseLigand, _OpenForceFieldMolecule):
-
+class Ligand(MolecularComponent):
     """
-    Small molecule object based on the OpenForceField toolkit.
+    General small molecule object supporting RDKit, OpenForceField and OpenEye toolkits. During
+    initialization attributes are stored as given:
 
-    Instantiation usually happens through a ``.from_xxxx()``
-    class method.
+    >>> ligand = Ligand(smiles='CCC')
+
+    Use one of the following methods to get a molecular representation of your favorite toolkit:
+
+    >>> rdkit_mol = Ligand.to_rdkit()
+    >>> off_mol = Ligand.to_off()
+    >>> openeye_mol = Ligand.to_openeye()
 
     Parameters
-    ----------
-    metadata : dict
-        Metadata for this molecule, like provenance information
-        or the original SMILES string used to instantiate the object.
-
-    Examples
-    --------
-    >>> ligand = OpenForceFieldLigand.from_smiles("CCCC")
+    ---------
+    name: str, default=''
+        The name of the small molecule.
+    smiles: str, default=''
+        A SMILES string.
+    sdf_path: str or Path, default=''
+        The path to the small molecule file in SDF format.
+    rdkit_mol: rdkit.Chem.Mol or None, default=None
+        An RDKit molecule.
+    off_mol: openff.toolkit.topology.Molecule or None, default=None
+        An OpenForceField molecule.
+    openeye_mol: oechem.OEGraphMol or None, default=None
+        An OpenEye molecule.
+    metadata: dict or None, defualt=None
+        Additional metadata.
     """
-
-    def __init__(self, metadata=None, name="", *args, **kwargs):
-        _OpenForceFieldMolecule.__init__(self, *args, **kwargs)
-        BaseLigand.__init__(self, name=name, metadata=metadata)
-
-    @classmethod
-    def from_smiles(
-        cls, smiles, name=None, allow_undefined_stereo=True, **kwargs
-    ):  # pylint: disable=arguments-differ
-        """
-        Same as `openff.toolkit.topology.Molecule`, but adding
-        information about the original SMILES to ``.metadata`` dict.
-
-        Parameters
-        ----------
-        smiles : str
-            SMILES representation of the ligand. This string will
-            be stored in the ``metadata`` attribute under the
-            ``smiles`` key.
-        name : str, optional
-            An easily identifiable name for the molecule. If not given,
-            ``smiles`` is used.
-        """
-        self = super().from_smiles(smiles, allow_undefined_stereo=allow_undefined_stereo, **kwargs)
-        if name is None:
-            name = smiles
-        super().__init__(self, name=name, metadata={"smiles": smiles})
-        return self
-
-    def to_dict(self):
-        """
-        Dict representation of the Molecule, including the ``metadata``
-        dictionary.
-        """
-        d = super().to_dict()
-        d["metadata"] = self.metadata.copy()
-        return d
-
-    def _initialize_from_dict(self, molecule_dict):
-        """
-        Same as Molecule's method, but including the ``metadata`` dict.
-        """
-        super()._initialize_from_dict(molecule_dict)
-        self.metadata = molecule_dict["metadata"].copy()
-
-
-# Alias OpenForceFieldLigand to Ligand
-Ligand = OpenForceFieldLigand
-
-
-class OpenForceFieldLikeLigand(BaseLigand):
-    """
-    Ligand-like object that implements the bits of the
-    OpenForceField API we use more commonly.
-
-    The attributes of the wrapped object are forwarded
-    to ``self._molecule`` via ``__getattr__`` to provide
-    most of the native behaviour.
-
-    This is only the base class; use concrete subclasses
-    for full functionality.
-
-    Parameters
-    ----------
-    molecule : object, depends on subclass
-        The molecular object to be wrapped, under ``._molecule``.
-    metadata : dict, optional
-        Metadata dictionary
-    name : str, optional
-        Easily identifiable name for this ligand
-    """
-
-    def __init__(self, molecule, metadata=None, name="", *args, **kwargs):
-        super().__init__(name=name, metadata=metadata)
-        self._molecule = molecule
-
-    def __getattr__(self, attr):
-        """
-        Forward attribute access to the wrapped ``._molecule`` object
-        """
-        if attr in {"__getstate__", "__setstate__"}:
-            return super().__getattr__(self, attr)
-        return getattr(self._molecule, attr)
-
-    @classmethod
-    def from_smiles(cls, smiles, name=None, **kwargs):
-        """
-        Create object from SMILES
-        """
-        raise NotImplementedError("Use ``OpenForceFieldLigand`` or implement API in a subclass")
+    def __init__(
+            self, name="", smiles="", sdf_path="", rdkit_mol=None, off_mol=None, openeye_mol=None,
+            metadata=None, *args, **kwargs
+    ):
+        super().__init__(name=name, metadata=metadata, *args, **kwargs)
+        self._smiles = smiles
+        self._sdf_path = sdf_path
+        self._rdkit_mol = rdkit_mol
+        self._off_mol = off_mol
+        self._openeye_mol = openeye_mol
 
     def to_rdkit(self) -> rdkit.Chem.Mol:
         """
-        Export Molecule to RDKit ``Mol``
+        Export an RDKit molecule.
 
         Returns
         -------
-        rdkit.Chem.Mol
+            : rdkit.Chem.Mol
         """
-        raise NotImplementedError("Use ``OpenForceFieldLigand`` or implement API in a subclass")
+        if not self._rdkit_mol:
+            if self._sdf_path:
+                from rdkit import Chem
+                supplier = Chem.SDMolSupplier(self._sdf_path)
+                self._rdkit_mol = next(supplier)
+            elif self._smiles:
+                from rdkit import Chem
+                self._rdkit_mol = Chem.MolFromSmiles(self._smiles)
+            elif self._off_mol:
+                self._rdkit_mol = self._off_mol.to_rdkit()
+            elif self._openeye_mol:
+                from openff.toolkit.topology import Molecule
+                self._rdkit_mol = Molecule.from_openeye(self._openeye_mol).to_rdkit()
+            else:
+                raise ValueError(
+                    "To allow access to RDKit molecules, the `Ligand` object needs to be "
+                    "initialized with one of the following attributes:\nsmiles\nsdf_path\n"
+                    "rdkit_mol\noff_mol\nopeneye_mol"
+                )
+        return self._rdkit_mol
 
-    def to_smiles(self) -> str:
+    def to_off(self):
         """
-        Export Molecule to (canonical) SMILES string.
+        Export an OpenForceField molecule.
 
         Returns
         -------
-        str
+            : openff.toolkit.topology.Molecule
         """
-        raise NotImplementedError("Use ``OpenForceFieldLigand`` or implement API in a subclass")
+        if not self._off_mol:
+            from openff.toolkit.topology import Molecule
+            if self._sdf_path:
+                self._off_mol = Molecule.from_file(self._sdf_path)
+            elif self._smiles:
+                self._off_mol = Molecule.from_smiles(self._smiles, allow_undefined_stereo=True)
+            elif self._rdkit_mol:
+                self._off_mol = Molecule.from_rdkit(self._rdkit_mol)
+            elif self._openeye_mol:
+                self._off_mol = Molecule.from_openeye(self._openeye_mol)
+            else:
+                raise ValueError(
+                    "To allow access to OpenForceField molecules, the `Ligand` object needs to be "
+                    "initialized with one of the following attributes:\nsmiles\nsdf_path\n"
+                    "rdkit_mol\noff_mol\nopeneye_mol\noff_mol"
+                )
+        return self._off_mol
 
-
-class RDKitLigand(OpenForceFieldLikeLigand):
-
-    """
-    Wrapper for RDKit molecules using some parts of the OpenForceField API
-
-    Note
-    ----
-    TODO: Implement other parts of the OFF Molecule API
-    """
-
-    @classmethod
-    def from_smiles(
-        cls, smiles: str, name: str = None, **kwargs
-    ):  # pylint: disable=arguments-differ
+    def to_openeye(self):
         """
-        Create an RDKitLigand instance from a SMILES string
+        Export an OpenEye molecule.
+
+        Returns
+        -------
+            : oechem.OEGraphMol
+        """
+        if not self._openeye_mol:
+            if self._sdf_path:
+                from ..modeling.OEModeling import read_molecules
+                self._openeye_mol = read_molecules(self._sdf_path)[0]
+            elif self._smiles:
+                from ..modeling.OEModeling import read_smiles
+                self._openeye_mol = read_smiles(self._smiles)
+            elif self._off_mol:
+                self._openeye_mol = self._off_mol.to_openeye()
+            elif self._rdkit_mol:
+                from openff.toolkit.topology import Molecule
+                self._openeye_mol = Molecule.from_rdkit(self._rdkit_mol).to_openeye()
+            else:
+                raise ValueError(
+                    "To allow access to OpenEye molecules, the `Ligand` object needs to be "
+                    "initialized with one of the following attributes:\nsmiles\nsdf_path\n"
+                    "rdkit_mol\noff_mol\nopeneye_mol"
+                )
+
+    def to_smiles(self, toolkit="RDKit") -> str:
+        """
+        Export Molecule to a canonical isomeric SMILES string.
 
         Parameters
         ----------
-        smiles : str
-            SMILES sequence encoding the required molecule
-        name : str, optional
-            Identifier for the molecule. If not given, ``smiles``
-            will be used.
-
-        Note
-        ----
-        The ``metadata`` dictionary will be populated with a
-        ``smiles`` entry containing the input ``smiles`` string.
-        """
-        from rdkit.Chem import MolFromSmiles
-
-        molecule = MolFromSmiles(smiles)
-        if name is None:
-            name = smiles
-        return cls(molecule, name=name, metadata={"smiles": smiles})
-
-    def to_rdkit(self) -> rdkit.Chem.Mol:
-        """
-        Return the underlying RDKit ``Mol`` object, with no further
-        modifications.
+        toolkit: str, default='RDKit'
+            The toolkit to use for generating the canonical smiles ('RDKit', 'off', 'openeye').
 
         Returns
         -------
-        rdkit.Chem.Mol
+            : str
+            The canonical isomeric SMILES string.
         """
-        return self._molecule
-
-    def to_smiles(self) -> str:
-        """
-        Return canonicalized SMILES, as provided by RDKit.
-
-        Note
-        ----
-        More info: https://www.rdkit.org/docs/GettingStartedInPython.html#writing-molecules
-        """
-        from rdkit.Chem import MolToSmiles
-
-        return MolToSmiles(self._molecule)
-
-
-class SmilesLigand(OpenForceFieldLikeLigand):
-    """
-    Wrap a SMILES string in an OpenForceField-like API.
-
-    The underlying ``._molecule`` is just the SMILES string,
-    with no preprocessing.
-    """
-
-    @classmethod
-    def from_smiles(
-        cls, smiles: str, name: str = None, **kwargs
-    ):  # pylint: disable=arguments-differ
-        """
-        Initialize a SmilesLigand object using ``smiles`` as input.
-
-        Parameters
-        ----------
-        smiles : str
-            The SMILES string to wrap
-        name : str, optional
-            Identifier for this molecule. If not given, ``smiles``
-            will be used
-
-        Note
-        ----
-        The ``metadata`` dictionary will also contain a ``smiles``
-        key containing the input SMILES, for API compatibility reasons.
-        """
-        return cls(smiles, name=name or smiles, metadata={"smiles": smiles})
-
-    def to_rdkit(self) -> rdkit.Chem.Mol:
-        """
-        Export this SMILES string as an RDKit ``Mol``.
-
-        Returns
-        -------
-        rdkit.Chem.Mol
-        """
-        return RDKitLigand.from_smiles(self._molecule).to_rdkit()
-
-    def to_smiles(self) -> str:
-        """
-        Create an RDKit ``Mol`` and export it as canonical SMILES
-        representation. If you want the RAW smiles, use
-        ``.metadata["smiles"]``.
-
-        Returns
-        -------
-        str
-            Canonical SMILES
-        """
-        return RDKitLigand.from_smiles(self._molecule).to_smiles()
+        if toolkit == "RDKit":
+            from rdkit import Chem
+            if not self._rdkit_mol:
+                self.to_rdkit()
+            return Chem.MolToSmiles(self._rdkit_mol, allHsExplicit=False)
+        elif toolkit == "off":
+            if not self._off_mol:
+                self.to_off()
+            return self._off_mol.to_smiles(explicit_hydrogens=False)
+        elif toolkit == "openeye":
+            from openeye import oechem
+            if not self._openeye_mol:
+                self.to_openeye()
+            return oechem.OEMolToSmiles(self._openeye_mol)
+        else:
+            raise ValueError(
+                "Provide a supported toolkit to export the SMILES string, i.e. 'RDKit', 'off' or "
+                "'openeye'."
+            )
