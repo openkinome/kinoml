@@ -4,15 +4,19 @@ new representations of the molecular entities and their associated measurements.
 """
 from __future__ import annotations
 
-from typing import Callable, Hashable, Iterable, Sequence, Union
-import hashlib
-from multiprocessing import Pool, cpu_count
 from functools import partial
+import hashlib
+import logging
+from multiprocessing import Pool, cpu_count
+from typing import Callable, Hashable, Iterable, Sequence, Union
 
 import numpy as np
 from tqdm.auto import tqdm
 
 from ..core.systems import System, LigandSystem, ProteinLigandComplex
+
+
+logger = logging.getLogger(__name__)
 
 
 class BaseFeaturizer:
@@ -112,31 +116,34 @@ class BaseFeaturizer:
     def _post_featurize(
         self,
         systems: Iterable[System],
-        features: Iterable[System | np.array],
+        features: Iterable,
         keep: bool = True,
     ) -> Iterable[System]:
         """
-        Run after featurizing all systems. You shouldn't need to redefine this method
+        Run after featurizing all systems. Systems with a feature of None will be removed.
+        You shouldn't need to redefine this method
 
         Parameters
         ----------
-        systems : list of System
+        systems: list of System
             The systems being featurized
-        features : list of System or array
+        features: iterable
             The features returned by ``self._featurize``
-        keep : bool, optional=True
+        keep: bool, optional=True
             Whether to store the current featurizer in the ``system.featurizations``
             dictionary with its own key (``self.name``), in addition to ``last``.
 
         Returns
         -------
-        systems
+        filtered_systems: systems
             The same systems as passed, but with ``.featurizations`` extended with
             the calculated features in two entries: the featurizer name and ``last``.
+            Systems with a feature of None will be removed.
         """
         filtered_systems = []
         for system, feature in zip(systems, features):
             if feature is None:
+                logger.debug(f"{self.__class__.__name__} failed for {system}")
                 continue
             system.featurizations["last"] = feature
             if keep:
@@ -551,7 +558,9 @@ class BaseOneHotEncodingFeaturizer(ParallelBaseFeaturizer):
         if not self.dictionary:
             raise ValueError("This featurizer requires a populated dictionary!")
 
-    def _featurize_one(self, system: Union[LigandSystem, ProteinLigandComplex]) -> np.ndarray:
+    def _featurize_one(
+            self, system: Union[LigandSystem, ProteinLigandComplex]
+    ) -> Union[np.ndarray, None]:
         """
         One hot encode one system.
 
@@ -562,9 +571,11 @@ class BaseOneHotEncodingFeaturizer(ParallelBaseFeaturizer):
 
         Returns
         -------
-        array
+            : array or None
         """
         sequence = self._retrieve_sequence(system)
+        if sequence == "":
+            return None
         return self.one_hot_encode(sequence, self.dictionary)
 
     def _retrieve_sequence(self, system: System):
