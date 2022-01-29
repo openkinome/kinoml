@@ -8,26 +8,17 @@ from ...core.proteins import AminoAcidSequence
 
 def test_biosequence_mutation():
     s = Biosequence("ATCGTHCTCH")
-    assert s.mutate("C3P") == "ATPGTHCTCH"
-    assert s.mutate("T2-T5del") == "ATTHCTCH"
-    assert s.mutate("5Tins") == "ATCGTTHCTCH"
-    assert s.mutate("A1T", "T2A") == "TACGTHCTCH"
-    assert s.mutate("A1T", "T2A", "3Tins") == "TACTGTHCTCH"
-    assert s.mutate("A1T", "T2A", "T2-G4del") == "TAGTHCTCH"
+    s.substitute("C3P")
+    assert s.sequence == "ATPGTHCTCH"
+    s.delete(2, 5)
+    assert s.sequence == "AHCTCH"
+    s.delete(2, 5, insert="AA")
+    assert s.sequence == "AAAH"
+    s.insert(5, "T")
+    assert s.sequence == "AAAHT"
 
 
-def test_biosequence_cut():
-    s = Biosequence("ATCGTHCTCH")
-    assert s.cut("T2", "T8") == "TCGTHCT"
-
-
-def test_biosequence_from_ncbi():
-    accession = "NP_005148.2"
-    s = AminoAcidSequence.from_ncbi(accession)
-    assert accession in s.name
-    assert s.metadata["accession"] == accession
-
-
-def test_biosequences_from_ncbis():
-    ss = AminoAcidSequence.from_ncbi("NP_005148.2", "NP_001607.1")
-    assert len(ss) == 2
+def test_aminoacidsequence_fetching():
+    s1 = AminoAcidSequence(uniprot_id="P00519-1")
+    s2 = AminoAcidSequence(ncbi_id="NP_005148.2")
+    assert s1.sequence == s2.sequence
