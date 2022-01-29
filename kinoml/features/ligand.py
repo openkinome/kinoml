@@ -50,7 +50,7 @@ class SingleLigandFeaturizer(ParallelBaseFeaturizer):
             The RDKit molecule or None if something goes wrong.
         """
         try:
-            rdkit_mol = ligand.to_rdkit()
+            rdkit_mol = ligand.rdkit_mol
         except OSError:
             rdkit_mol = None
         return rdkit_mol
@@ -71,7 +71,7 @@ class SingleLigandFeaturizer(ParallelBaseFeaturizer):
             The OpenForceField molecule or None if something goes wrong.
         """
         try:
-            openff_mol = ligand.to_openff()
+            openff_mol = ligand.openff_mol
         except (FileNotFoundError, SMILESParseError):
             openff_mol = None
         return openff_mol
@@ -92,7 +92,7 @@ class SingleLigandFeaturizer(ParallelBaseFeaturizer):
             The OpenEye molecule or None if something goes wrong.
         """
         try:
-            openeye_mol = ligand.to_openff()
+            openeye_mol = ligand.openeye_mol
         except ValueError:
             openeye_mol = None
         return openeye_mol
@@ -178,14 +178,14 @@ class OneHotSMILESFeaturizer(BaseOneHotEncodingFeaturizer, SingleLigandFeaturize
         rdkit_mol = self.get_rdkit_mol(system.ligand)
         if rdkit_mol is None:
             return ""
-        smiles = system.ligand.to_smiles(toolkit="rdkit")
+        smiles = system.ligand.get_canonical_smiles(toolkit="rdkit")
         return smiles.replace("Cl", "L").replace("Br", "R").replace("@@", "$")
 
 
 class OneHotRawSMILESFeaturizer(OneHotSMILESFeaturizer):
     """
-    Like ``OneHotSMILESFeaturizer``, but instead of using ``ligand.to_smiles()``
-    to obtain the canonical SMILES from the ligand, it relies on the stored ``_smiles``
+    Like ``OneHotSMILESFeaturizer``, but instead of using ``ligand.get_canonical_smiles()``
+    to obtain the canonical SMILES from the ligand, it relies on the stored ``smiles``
     attribute (most possibly the original SMILES contained in the dataset).
 
     This should only be used for debugging purposes.
@@ -207,7 +207,7 @@ class OneHotRawSMILESFeaturizer(OneHotSMILESFeaturizer):
             The system being featurized
         """
 
-        return system.ligand._smiles.replace("Cl", "L").replace("Br", "R").replace("@@", "$")
+        return system.ligand.smiles.replace("Cl", "L").replace("Br", "R").replace("@@", "$")
 
 
 class GraphLigandFeaturizer(SingleLigandFeaturizer):

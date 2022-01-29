@@ -17,11 +17,11 @@ class Ligand(BaseLigand):
 
     >>> ligand = Ligand(smiles='CCC')
 
-    Use one of the following methods to get a molecular representation of your favorite toolkit:
+    Use one of the following attributes to get a molecular representation of your favorite toolkit:
 
-    >>> rdkit_mol = Ligand.to_rdkit()
-    >>> openff_mol = Ligand.to_openff()
-    >>> openeye_mol = Ligand.to_openeye()
+    >>> rdkit_mol = Ligand.rdkit_mol
+    >>> openff_mol = Ligand.openff_mol
+    >>> openeye_mol = Ligand.openeye_mol
 
     Parameters
     ---------
@@ -45,28 +45,30 @@ class Ligand(BaseLigand):
             metadata=None, *args, **kwargs
     ):
         super().__init__(name=name, metadata=metadata, *args, **kwargs)
-        self._smiles = smiles
-        self._sdf_path = sdf_path
+        self.smiles = smiles
+        self.sdf_path = sdf_path
         self._rdkit_mol = rdkit_mol
         self._openff_mol = openff_mol
         self._openeye_mol = openeye_mol
 
-    def to_rdkit(self):
-        """
-        Export an RDKit molecule.
+    @property
+    def rdkit_mol(self):
+        return self._rdkit_mol
 
-        Returns
-        -------
-            : rdkit.Chem.Mol
-        """
+    @rdkit_mol.setter
+    def rdkit_mol(self, new_value):
+        self._rdkit_mol = new_value
+
+    @rdkit_mol.getter
+    def rdkit_mol(self):
         if not self._rdkit_mol:
-            if self._sdf_path:
+            if self.sdf_path:
                 from rdkit import Chem
-                supplier = Chem.SDMolSupplier(self._sdf_path)
+                supplier = Chem.SDMolSupplier(self.sdf_path)
                 self._rdkit_mol = next(supplier)
-            elif self._smiles:
+            elif self.smiles:
                 from rdkit import Chem
-                self._rdkit_mol = Chem.MolFromSmiles(self._smiles)
+                self._rdkit_mol = Chem.MolFromSmiles(self.smiles)
             elif self._openff_mol:
                 self._rdkit_mol = self._openff_mol.to_rdkit()
             elif self._openeye_mol:
@@ -80,20 +82,22 @@ class Ligand(BaseLigand):
                 )
         return self._rdkit_mol
 
-    def to_openff(self):
-        """
-        Export an OpenForceField molecule.
+    @property
+    def openff_mol(self):
+        return self._openff_mol
 
-        Returns
-        -------
-            : openff.toolkit.topology.Molecule
-        """
+    @openff_mol.setter
+    def openff_mol(self, new_value):
+        self._openff_mol = new_value
+
+    @openff_mol.getter
+    def openff_mol(self):
         if not self._openff_mol:
             from openff.toolkit.topology import Molecule
-            if self._sdf_path:
-                self._openff_mol = Molecule.from_file(self._sdf_path)
-            elif self._smiles:
-                self._openff_mol = Molecule.from_smiles(self._smiles, allow_undefined_stereo=True)
+            if self.sdf_path:
+                self._openff_mol = Molecule.from_file(self.sdf_path)
+            elif self.smiles:
+                self._openff_mol = Molecule.from_smiles(self.smiles, allow_undefined_stereo=True)
             elif self._rdkit_mol:
                 self._openff_mol = Molecule.from_rdkit(self._rdkit_mol)
             elif self._openeye_mol:
@@ -106,21 +110,23 @@ class Ligand(BaseLigand):
                 )
         return self._openff_mol
 
-    def to_openeye(self):
-        """
-        Export an OpenEye molecule.
+    @property
+    def openeye_mol(self):
+        return self._openeye_mol
 
-        Returns
-        -------
-            : oechem.OEGraphMol
-        """
+    @openeye_mol.setter
+    def openeye_mol(self, new_value):
+        self._openeye_mol = new_value
+
+    @openeye_mol.getter
+    def openeye_mol(self):
         if not self._openeye_mol:
-            if self._sdf_path:
+            if self.sdf_path:
                 from ..modeling.OEModeling import read_molecules
-                self._openeye_mol = read_molecules(self._sdf_path)[0]
-            elif self._smiles:
+                self._openeye_mol = read_molecules(self.sdf_path)[0]
+            elif self.smiles:
                 from ..modeling.OEModeling import read_smiles
-                self._openeye_mol = read_smiles(self._smiles)
+                self._openeye_mol = read_smiles(self.smiles)
             elif self._openff_mol:
                 self._openeye_mol = self._openff_mol.to_openeye()
             elif self._rdkit_mol:
@@ -134,14 +140,14 @@ class Ligand(BaseLigand):
                 )
         return self._openeye_mol
 
-    def to_smiles(self, toolkit="rdkit") -> str:
+    def get_canonical_smiles(self, toolkit="rdkit") -> str:
         """
-        Export Molecule to a canonical isomeric SMILES string.
+        Generate a canonical isomeric SMILES string.
 
         Parameters
         ----------
         toolkit: str, default='rdkit'
-            The toolkit to use for generating the canonical smiles ('rdkit', 'openff', 'openeye').
+            The toolkit to use for generating the canonical SMILES ('rdkit', 'openff', 'openeye').
 
         Returns
         -------
@@ -150,18 +156,12 @@ class Ligand(BaseLigand):
         """
         if toolkit == "rdkit":
             from rdkit import Chem
-            if not self._rdkit_mol:
-                self.to_rdkit()
-            return Chem.MolToSmiles(self._rdkit_mol, allHsExplicit=False)
+            return Chem.MolToSmiles(self.rdkit_mol, allHsExplicit=False)
         elif toolkit == "openff":
-            if not self._openff_mol:
-                self.to_openff()
-            return self._openff_mol.to_smiles(explicit_hydrogens=False)
+            return self.openff_mol.to_smiles(explicit_hydrogens=False)
         elif toolkit == "openeye":
             from openeye import oechem
-            if not self._openeye_mol:
-                self.to_openeye()
-            return oechem.OEMolToSmiles(self._openeye_mol)
+            return oechem.OEMolToSmiles(self.openeye_mol)
         else:
             raise ValueError(
                 "Provide a supported toolkit to export the SMILES string, i.e. 'rdkit', 'openff' or "

@@ -14,7 +14,8 @@ def test_ligand():
     smiles = "CCCCC"
     ligand = Ligand(smiles=smiles)
     assert isinstance(ligand, BaseLigand)
-    assert isinstance(ligand.to_rdkit(), rdkit.Chem.Mol)
-    assert isinstance(ligand.to_openff(), Molecule)
-    assert isinstance(ligand.to_openeye(), oechem.OEGraphMol)
-    assert isinstance(ligand.to_smiles(), str)
+    assert isinstance(ligand.rdkit_mol, rdkit.Chem.Mol)
+    assert isinstance(ligand.openff_mol, Molecule)
+    assert isinstance(ligand.openeye_mol, oechem.OEGraphMol)
+    assert isinstance(ligand.smiles, str)
+    assert isinstance(ligand.get_canonical_smiles(), str)
