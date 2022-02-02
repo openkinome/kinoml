@@ -50,10 +50,10 @@ class Biosequence(object):
     @sequence.getter
     def sequence(self):
         if len(self._sequence) == 0:
-            self._query_sources()
+            self._query_sequence_sources()
         return self._sequence
 
-    def _query_sources(self):
+    def _query_sequence_sources(self):
         """
         Query available sources for sequence details. Overwrite method in subclasses to fetch
         data.
@@ -204,7 +204,7 @@ class AminoAcidSequence(Biosequence):
         self.uniprot_id = uniprot_id
         self.ncbi_id = ncbi_id
 
-    def _query_sources(self):
+    def _query_sequence_sources(self):
         """
         Query available sources for sequence details. Add additional methods below to allow
         fetching from other sources.

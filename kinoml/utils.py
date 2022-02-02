@@ -42,6 +42,11 @@ class LocalFileStorage:
         return file_path
 
     @staticmethod
+    def rcsb_structure_cif(pdb_id, directory=DIRECTORY):
+        file_path = directory / f"rcsb_{pdb_id}.cif"
+        return file_path
+
+    @staticmethod
     def rcsb_ligand_sdf(pdb_id, chemical_id, chain, altloc, directory=DIRECTORY):
         file_path = directory / f"rcsb_{pdb_id}_{chemical_id}_{chain}_{altloc}.sdf"
         return file_path
@@ -90,12 +95,17 @@ class FileDownloader:
     @staticmethod
     def rcsb_structure_pdb(pdb_id, directory=DIRECTORY):
         url = f"https://files.rcsb.org/download/{pdb_id}.pdb"
-        download_file(url, LocalFileStorage.rcsb_structure_pdb(pdb_id, directory))
+        return download_file(url, LocalFileStorage.rcsb_structure_pdb(pdb_id, directory))
+
+    @staticmethod
+    def rcsb_structure_cif(pdb_id, directory=DIRECTORY):
+        url = f"https://files.rcsb.org/download/{pdb_id}.cif"
+        return download_file(url, LocalFileStorage.rcsb_structure_cif(pdb_id, directory))
 
     @staticmethod
     def rcsb_electron_density_mtz(pdb_id, directory=DIRECTORY):
         url = f"https://edmaps.rcsb.org/coefficients/{pdb_id}.mtz"
-        download_file(url, LocalFileStorage.rcsb_electron_density_mtz(pdb_id, directory))
+        return download_file(url, LocalFileStorage.rcsb_electron_density_mtz(pdb_id, directory))
 
 
 def datapath(path: str) -> Path:
@@ -159,20 +169,26 @@ class defaultdictwithargs(defaultdict):
 def download_file(url: str, path: str):
     """
     Download a file and save it locally.
-
     Parameters
     ----------
     url: str
         URL for downloading data.
     path: str
         Path to save downloaded data.
+    Returns
+    -------
+    : bool
+        True if successful, else False.
     """
     import requests
 
     response = requests.get(url)
-    with open(path, "wb") as write_file:
-        write_file.write(response.content)
-        # TODO: check if successful, e.g. response.ok
+    if response.status_code == 200:
+        with open(path, "wb") as write_file:
+            write_file.write(response.content)
+        return True
+
+    return False
 
 
 def seed_everything(seed=1234):
