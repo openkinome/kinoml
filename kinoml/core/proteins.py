@@ -35,16 +35,17 @@ class Protein(BaseProtein, AminoAcidSequence):
             name=name,
             sequence=sequence,
             uniprot_id=uniprot_id,
+            # ncbi
             metadata=metadata,
             **kwargs
         )
-        self.pdb_id = pdb_id
+        self.pdb_id = pdb_id  # only pdb_id is lazy
         self.file_path = file_path
         self.chain_id = chain_id
         self.alternate_location = alternate_location
         self.ligand_name = ligand_name
-        self._mda_mol = mda_mol
-        self._openeye_mol = openeye_mol
+        self._mda_mol = mda_mol  # write mdanaylsis
+        self._openeye_mol = openeye_mol  # to_openff, to_mdanalysis, to_openeye
 
     @property
     def mda_mol(self):
