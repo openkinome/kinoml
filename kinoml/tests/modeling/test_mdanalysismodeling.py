@@ -232,3 +232,24 @@ def test_delete_alterations(package, resource, sequence, expected_sequence):
         structure_with_deletions = delete_alterations(structure, sequence)
         new_sequence = get_sequence(structure_with_deletions)
         assert new_sequence == expected_sequence
+
+
+@pytest.mark.parametrize(
+    "package, resource, sequence",
+    [
+        (  # delete last three residues
+            "kinoml.data.proteins",
+            "4f8o_edit.pdb",
+            "MNTFHVDFAPNTGEIFAGKQPGDVTMFTLTMGDTAPHGGWRLIPTGDSKGGYMISADGDYVGLYSYMMSWVGIDNNWYINDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTV",
+        ),
+    ],
+)
+def test_delete_short_protein_segments(package, resource, sequence):
+    """Compare results to expected sequence."""
+    from kinoml.modeling.MDAnalysisModeling import (
+        read_molecule, delete_short_protein_segments, get_sequence
+    )
+    with resources.path(package, resource) as path:
+        structure = read_molecule(str(path))
+        structure = delete_short_protein_segments(structure)
+        assert get_sequence(structure) == sequence

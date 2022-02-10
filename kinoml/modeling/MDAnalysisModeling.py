@@ -393,3 +393,52 @@ def delete_alterations(
     selection = molecule.select_atoms(selection_command)
 
     return Merge(selection)
+
+
+def delete_short_protein_segments(
+        molecule: Union[Universe, AtomGroup], cutoff: int = 3
+) -> Universe:
+    """
+    Delete protein segments consisting of 3 or less residues.
+
+    Parameters
+    ----------
+    molecule: MDAnalysis.core.universe.Universe or MDAnalysis.core.groups.Atomgroup
+        An MDAnalysis molecule holding a protein with possibly short segments.
+    cutoff: int, default=3
+        The upper bound defining a short protein segment.
+
+    Returns
+    -------
+    : MDAnalysis.core.universe.Universe
+        An MDAnalysis molecule holding the protein without short segments.
+    """
+    protein = molecule.select_atoms("protein")
+
+    segments = []
+    segment = []
+    for residue in protein.residues:
+        n_peptide_bonds = sum([
+            1 for bond in residue.get_connections(typename="bonds", outside=True)
+            if tuple(bond.atoms.names) == ("C", "N")  # peptide bond
+        ])
+        if n_peptide_bonds == 0:
+            segments.append([residue])
+        else:
+            segment.append(residue)
+        if n_peptide_bonds == 1 and len(segment) > 1:
+            segments.append(segment)
+            segment = []
+
+    residues_to_delete = []
+    for segment in segments:
+        if len(segment) <= cutoff:
+            residues_to_delete += segment
+
+    selection_command = "not (" + " or ".join([
+        f"(resname {residue.resname} and resid {residue.resid} and chainID {residue.segid})"
+        for residue in residues_to_delete
+    ]) + ")"
+    selection = molecule.select_atoms(selection_command)
+
+    return Merge(selection)
