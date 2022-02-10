@@ -1111,7 +1111,7 @@ def apply_deletions(
     insertions = re.finditer(
         "^[-]+|[^-]{" + str(delete_n_anchors) + "}[-]+[^-]{" + str(delete_n_anchors) + "}|[-]+$",
         template_sequence_aligned,
-    )
+    )  # TODO: check how this behaves for A--BCDE with delete_n_anchors=2
     for insertion in insertions:
         insertion_start = insertion.start() - target_sequence_aligned[: insertion.start()].count(
             "-"
