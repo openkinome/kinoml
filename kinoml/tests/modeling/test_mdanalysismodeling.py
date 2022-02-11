@@ -224,7 +224,6 @@ def test_get_structure_sequence_alignment(package, resource, sequence, expected_
             assert sequence1 == sequence2
 
 
-a = "MNTFHVDFAPNTGEIFAGKQPGDVTMFTLTMGDTAPHGGWRLIPTGDSKGGYMISADGDYVGLYSYMMSWVGIDNNWYINDDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVKQGL"
 @pytest.mark.parametrize(
     "package, resource, sequence, delete_n_anchors, short_protein_segments_cutoff, expected_sequence",
     [
@@ -255,7 +254,6 @@ a = "MNTFHVDFAPNTGEIFAGKQPGDVTMFTLTMGDTAPHGGWRLIPTGDSKGGYMISADGDYVGLYSYMMSWVGIDN
         (  # insertion at beginng and end, one leading to short protein segment
             "kinoml.data.proteins",
             "4f8o.pdb",
-            #MNTFHVDFAPNTGEIFAGKQPGDVTMFTLTMGDTAPHGGWRLIPTGDSKGGYMISADGDYVGLYSYMMSWVGIDNNWYINDDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVKQGL
             "TFHVDFAPNTGEIFAGKQPGDVTMFTLTMGDTAPHGGWRLIPTGDSKGGYMISADGDYVGLYSYMMSWVGIDNNWYINDDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVGL",
             2,
             3,
@@ -319,3 +317,101 @@ def test_delete_short_protein_segments(package, resource, sequence):
         structure = read_molecule(str(path))
         structure = delete_short_protein_segments(structure)
         assert get_sequence(structure) == sequence
+
+
+@pytest.mark.parametrize(
+    "package, resource, sequence, expected_residue_ids",
+    [
+        (  # same sequence
+            "kinoml.data.proteins",
+            "4f8o.pdb",
+            "MNTFHVDFAPNTGEIFAGKQPGDVTMFTLTMGDTAPHGGWRLIPTGDSKGGYMISADGDYVGLYSYMMSWVGIDNNWYINDDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVKQGL",
+            list(range(1, 139)),
+        ),
+        (  # additional 3 residues at the beginning
+            "kinoml.data.proteins",
+            "4f8o.pdb",
+            "AAAMNTFHVDFAPNTGEIFAGKQPGDVTMFTLTMGDTAPHGGWRLIPTGDSKGGYMISADGDYVGLYSYMMSWVGIDNNWYINDDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVKQGL",
+            list(range(4, 142)),
+        ),
+        (  # additional 3 residues at position 5
+            "kinoml.data.proteins",
+            "4f8o.pdb",
+            "MNTFHAAAVDFAPNTGEIFAGKQPGDVTMFTLTMGDTAPHGGWRLIPTGDSKGGYMISADGDYVGLYSYMMSWVGIDNNWYINDDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVKQGL",
+            list(range(1, 6)) + list(range(9, 142)),
+        ),
+    ],
+)
+def test_renumber_protein_residues(package, resource, sequence, expected_residue_ids):
+    """Compare results to expected residue IDs."""
+    from kinoml.modeling.MDAnalysisModeling import (
+        read_molecule, remove_non_protein, renumber_protein_residues
+    )
+    with resources.path(package, resource) as path:
+        structure = read_molecule(str(path))
+        protein = remove_non_protein(structure, remove_water=True)
+        protein = renumber_protein_residues(protein, sequence)
+        assert all([True for x, y in zip(expected_residue_ids, protein.residues.resids) if x == y])
+
+
+@pytest.mark.parametrize(
+    "package, resource, keep_protein_residue_ids, keep_chain_ids, expected_residue_ids, "
+    "expected_atom_ids, expected_chain_ids",
+    [
+        (
+            "kinoml.data.proteins",
+            "4f8o.pdb",
+            True,
+            True,
+            list(range(1, 246)),
+            list(range(1, 2477)),
+            ["A", "B"]
+        ),
+        (
+            "kinoml.data.proteins",
+            "4f8o.pdb",
+            False,
+            False,
+            list(range(1, 246)),
+            list(range(1, 2477)),
+            ["A"]
+        ),
+        (
+            "kinoml.data.proteins",
+            "4f8o_edit.pdb",
+            False,
+            True,
+            list(range(1, 137)),
+            list(range(1, 2046)),
+            ["A"]
+        ),
+        (
+            "kinoml.data.proteins",
+            "4f8o_edit.pdb",
+            True,
+            False,
+            [x for x in range(1, 139) if x not in [82, 135]],
+            list(range(1, 2046)),
+            ["A"]
+        ),
+    ],
+)
+def test_update_residue_identifiers(
+        package, resource, keep_protein_residue_ids, keep_chain_ids, expected_residue_ids,
+        expected_atom_ids, expected_chain_ids
+):
+    """Compare results to expected identifiers."""
+    from kinoml.modeling.MDAnalysisModeling import read_molecule, update_residue_identifiers
+    with resources.path(package, resource) as path:
+        structure = read_molecule(str(path))
+        structure = update_residue_identifiers(structure, keep_protein_residue_ids, keep_chain_ids)
+        assert all([
+            True for x, y in zip(expected_residue_ids, structure.residues.resids) if x == y
+        ])
+        assert all([
+            True for x, y in zip(expected_chain_ids, sorted(set(structure.segments.segids)))
+            if x == y
+        ])
+        assert all([
+            True for x, y in zip(expected_atom_ids, structure.atoms.indices) if x == y
+        ])

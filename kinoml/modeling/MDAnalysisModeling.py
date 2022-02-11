@@ -459,7 +459,8 @@ def delete_short_protein_segments(
         molecule: Union[Universe, AtomGroup], cutoff: int = 3
 ) -> Universe:
     """
-    Delete protein segments consisting of 3 or less residues.
+    Delete protein segments consisting of 3 or less residues. Needs to have bonding information
+    to work correctly.
 
     Parameters
     ----------
@@ -497,5 +498,115 @@ def delete_short_protein_segments(
 
     if len(residues_to_delete) > 0:
         molecule = delete_residues(molecule, residues_to_delete)
+
+    return Merge(molecule.atoms)
+
+
+def renumber_protein_residues(
+        molecule: Union[Universe, AtomGroup], template_sequence: str
+) -> Universe:
+    """
+    Renumber a protein structure according to the provided sequence.
+
+    Parameters
+    ----------
+    molecule: MDAnalysis.core.universe.Universe or MDAnalysis.core.groups.Atomgroup
+        An MDAnalysis molecule holding a protein structure.
+    template_sequence: str
+        The amino acid sequence to use for renumbering.
+
+    Returns
+    -------
+    : MDAnalysis.core.universe.Universe
+        An MDAnalysis molecule holding the renumbered protein structure.
+    """
+    # create a Universe from given molecule
+    molecule = Merge(molecule.atoms)
+
+    target_sequence_aligned, template_sequence_aligned = get_structure_sequence_alignment(
+        molecule, template_sequence
+    )
+
+    target_sequence_counter = 0
+    resids = []
+    for i, (target_sequence_residue, template_sequence_residue) in enumerate(
+            zip(target_sequence_aligned, template_sequence_aligned), start=1
+    ):
+        if target_sequence_residue != "-":
+            resids.append(i)
+            target_sequence_counter += 1
+    molecule.add_TopologyAttr("resid", resids)
+
+    return molecule
+
+
+def update_residue_identifiers(
+        molecule: Union[Universe, AtomGroup],
+        keep_protein_residue_ids: bool = True,
+        keep_chain_ids: bool = False,
+) -> Universe:
+    """
+    Update the atom, residue and chain IDs of the given molecular structure. All residues become
+    part of chain A, unless 'keep_chain_ids' is set True. Atom IDs will start from 1. Residue IDs
+    will start from 1, except 'keep_protein_residue_ids' is set True. This is especially useful, if
+    molecules were merged, which can result in overlapping atom and residue IDs as well as
+    separate chains.
+
+    Parameters
+    ----------
+    molecule: MDAnalysis.core.universe.Universe or MDAnalysis.core.groups.Atomgroup
+        The MDAnalysis molecule structure for updating atom and residue ids.
+    keep_protein_residue_ids: bool
+        If the protein residues should be kept.
+    keep_chain_ids: bool
+        If the chain IDS should be kept.
+
+    Returns
+    -------
+    : MDAnalysis.core.universe.Universe
+        The MDAnalysis molecule structure with updated atom and residue ids.
+    """
+    # create new Universe
+    molecule = Merge(molecule.atoms)
+    highest_resid = 1
+
+    # update protein resids
+    protein = molecule.select_atoms("protein")
+    if len(protein.residues) > 0:
+        protein = Merge(protein.atoms)
+        if not keep_protein_residue_ids:
+            protein_resids = list(range(1, len(protein.residues) + 1))
+            protein.add_TopologyAttr("resid", protein_resids)
+        highest_resid = protein.residues[-1].resid
+
+    # update resids of non-protein residues except water
+    hetero = molecule.select_atoms("not protein and not resname HOH")
+    if len(hetero.residues) > 0:
+        hetero = Merge(hetero.atoms)
+        hetero_resids = list(range(
+            highest_resid + 1, len(hetero.residues) + highest_resid + 1
+        ))
+        hetero.add_TopologyAttr("resid", hetero_resids)
+        highest_resid = hetero.residues[-1].resid
+
+    # update water resids
+    water = molecule.select_atoms("resname HOH")
+    if len(water.residues) > 0:
+        water = Merge(water.atoms)
+        water_resids = list(range(
+            highest_resid + 1, len(water.residues) + highest_resid + 1
+        ))
+        water.add_TopologyAttr("resid", water_resids)
+
+    # merge everything into a single Universe
+    components = [component for component in [protein, hetero, water] if len(component.atoms) > 0]
+    molecule = Merge(components[0].atoms)
+    if len(components) > 1:
+        for component in components[1:]:
+            molecule = Merge(molecule.atoms, component.atoms)
+
+    # update chain ID
+    if not keep_chain_ids:
+        molecule.add_TopologyAttr("segid", ["A"] * len(molecule.segments))
 
     return Merge(molecule.atoms)
