@@ -100,6 +100,35 @@ def test_remove_non_protein(package, resource, exceptions, remove_water, n_atoms
 
 
 @pytest.mark.parametrize(
+    "package, resource, expected_sequence",
+    [
+        (
+            "kinoml.data.proteins",
+            "4f8o.pdb",
+            "MNTFHNTGEIFAGKQMFTLTMGDTAPHGGWRLIPTGDSKGGYMISADGDYVGLYSYMMSWVGIDNNWYINDDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVKQGLXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+        ),
+        (
+            "kinoml.data.proteins",
+            "4f8o_edit.pdb",
+            "MNTFHNTGEIFAGKQMFTLTMGDTAPHGGWRLIPTGDSKGGYMISADGDYVGLYSYMMSWVGIDNNWYINDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVQGL"
+        ),
+    ],
+)
+def test_delete_residues(package, resource, expected_sequence):
+    """Compare results to expected sequence."""
+    from kinoml.modeling.MDAnalysisModeling import read_molecule, delete_residues, get_sequence
+
+    with resources.path(package, resource) as path:
+        molecule = read_molecule(str(path))
+        molecule = delete_residues(
+            molecule,
+            list(molecule.residues[5:10]) + list(molecule.residues[20:25])
+        )
+        sequence = get_sequence(molecule)
+        assert sequence == expected_sequence
+
+
+@pytest.mark.parametrize(
     "package, resource, n_atoms",
     [
         ("kinoml.data.proteins", "4f8o.pdb", 2455),
@@ -195,30 +224,65 @@ def test_get_structure_sequence_alignment(package, resource, sequence, expected_
             assert sequence1 == sequence2
 
 
+a = "MNTFHVDFAPNTGEIFAGKQPGDVTMFTLTMGDTAPHGGWRLIPTGDSKGGYMISADGDYVGLYSYMMSWVGIDNNWYINDDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVKQGL"
 @pytest.mark.parametrize(
-    "package, resource, sequence, expected_sequence",
+    "package, resource, sequence, delete_n_anchors, short_protein_segments_cutoff, expected_sequence",
     [
-        (  # delete insertion at residue 4
+        (  # don't do anything
             "kinoml.data.proteins",
             "4f8o.pdb",
-            "MNTHVDFAPNTGEIFAGKQPGDVTMFTLTMGDTAPHGGWRLIPTGDSKGGYMISADGDYVGLYSYMMSWVGIDNNWYINDDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVKQGL",
-            "MNTHVDFAPNTGEIFAGKQPGDVTMFTLTMGDTAPHGGWRLIPTGDSKGGYMISADGDYVGLYSYMMSWVGIDNNWYINDDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVKQGL",
+            "MNTFHVDFAPNTGEIFAGKQPGDVTMFTLTMGDTAPHGGWRLIPTGDSKGGYMISADGDYVGLYSYMMSWVGIDNNWYINDDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVKQGL",
+            2,
+            3,
+            "MNTFHVDFAPNTGEIFAGKQPGDVTMFTLTMGDTAPHGGWRLIPTGDSKGGYMISADGDYVGLYSYMMSWVGIDNNWYINDDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVKQGL",
         ),
-        (  # delete mutation at residue 1
+        (  # mutation in the middle
             "kinoml.data.proteins",
             "4f8o.pdb",
-            "ANTFHVDFAPNTGEIFAGKQPGDVTMFTLTMGDTAPHGGWRLIPTGDSKGGYMISADGDYVGLYSYMMSWVGIDNNWYINDDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVKQGL",
-            "NTFHVDFAPNTGEIFAGKQPGDVTMFTLTMGDTAPHGGWRLIPTGDSKGGYMISADGDYVGLYSYMMSWVGIDNNWYINDDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVKQGL",
+            "MNTFHIDFAPNTGEIFAGKQPGDVTMFTLTMGDTAPHGGWRLIPTGDSKGGYMISADGDYVGLYSYMMSWVGIDNNWYINDDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVKQGL",
+            2,
+            3,
+            "MNTFHDFAPNTGEIFAGKQPGDVTMFTLTMGDTAPHGGWRLIPTGDSKGGYMISADGDYVGLYSYMMSWVGIDNNWYINDDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVKQGL",
         ),
-        (  # delete insertion at residue 1 and mutation at residue 4
+        (  # mutation at the beginning leads to short protein segment
             "kinoml.data.proteins",
             "4f8o.pdb",
-            "NTWHVDFAPNTGEIFAGKQPGDVTMFTLTMGDTAPHGGWRLIPTGDSKGGYMISADGDYVGLYSYMMSWVGIDNNWYINDDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVKQGL",
-            "NTHVDFAPNTGEIFAGKQPGDVTMFTLTMGDTAPHGGWRLIPTGDSKGGYMISADGDYVGLYSYMMSWVGIDNNWYINDDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVKQGL",
+            "MNTWHVDFAPNTGEIFAGKQPGDVTMFTLTMGDTAPHGGWRLIPTGDSKGGYMISADGDYVGLYSYMMSWVGIDNNWYINDDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVKQGL",
+            2,
+            3,
+            "HVDFAPNTGEIFAGKQPGDVTMFTLTMGDTAPHGGWRLIPTGDSKGGYMISADGDYVGLYSYMMSWVGIDNNWYINDDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVKQGL",
+        ),
+        (  # insertion at beginng and end, one leading to short protein segment
+            "kinoml.data.proteins",
+            "4f8o.pdb",
+            #MNTFHVDFAPNTGEIFAGKQPGDVTMFTLTMGDTAPHGGWRLIPTGDSKGGYMISADGDYVGLYSYMMSWVGIDNNWYINDDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVKQGL
+            "TFHVDFAPNTGEIFAGKQPGDVTMFTLTMGDTAPHGGWRLIPTGDSKGGYMISADGDYVGLYSYMMSWVGIDNNWYINDDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVGL",
+            2,
+            3,
+            "TFHVDFAPNTGEIFAGKQPGDVTMFTLTMGDTAPHGGWRLIPTGDSKGGYMISADGDYVGLYSYMMSWVGIDNNWYINDDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTV",
+        ),
+        (  # mutation and insertion somewhere in the middle with deletion of anchoring residues
+            "kinoml.data.proteins",
+            "4f8o.pdb",
+            "MNTFHVDFAPNHGEIFAGKQPGDMFTLTMGDTAPHGGWRLIPTGDSKGGYMISADGDYVGLYSYMMSWVGIDNNWYINDDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVKQGL",
+            2,
+            3,
+            "MNTFHVDFAPNGEIFAGKQPTLTMGDTAPHGGWRLIPTGDSKGGYMISADGDYVGLYSYMMSWVGIDNNWYINDDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVKQGL",
+        ),
+        (  # mutation and insertion somewhere in the middle without deletion of anchoring residues
+            "kinoml.data.proteins",
+            "4f8o.pdb",
+            "MNTFHVDFAPNHGEIFAGKQPGDMFTLTMGDTAPHGGWRLIPTGDSKGGYMISADGDYVGLYSYMMSWVGIDNNWYINDDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVKQGL",
+            0,
+            3,
+            "MNTFHVDFAPNGEIFAGKQPGDMFTLTMGDTAPHGGWRLIPTGDSKGGYMISADGDYVGLYSYMMSWVGIDNNWYINDDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVKQGL",
         ),
     ],
 )
-def test_delete_alterations(package, resource, sequence, expected_sequence):
+def test_delete_alterations(
+        package, resource, sequence, delete_n_anchors, short_protein_segments_cutoff,
+        expected_sequence
+):
     """Compare results to expected sequence."""
     from kinoml.modeling.MDAnalysisModeling import (
         read_molecule,
@@ -229,7 +293,9 @@ def test_delete_alterations(package, resource, sequence, expected_sequence):
     with resources.path(package, resource) as path:
         structure = read_molecule(str(path))
         structure = remove_non_protein(structure, remove_water=True)
-        structure_with_deletions = delete_alterations(structure, sequence)
+        structure_with_deletions = delete_alterations(
+            structure, sequence, delete_n_anchors, short_protein_segments_cutoff
+        )
         new_sequence = get_sequence(structure_with_deletions)
         assert new_sequence == expected_sequence
 

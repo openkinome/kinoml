@@ -1,9 +1,9 @@
 import logging
 from pathlib import Path
-from typing import List, Union, Tuple
+from typing import Iterable, Tuple, Union
 
-from MDAnalysis.core.universe import Universe, Merge
-from MDAnalysis.core.groups import AtomGroup
+from MDAnalysis.core.universe import Merge, Universe
+from MDAnalysis.core.groups import AtomGroup, Residue
 
 
 logger = logging.getLogger(__name__)
@@ -131,7 +131,7 @@ def select_altloc(
 
 def remove_non_protein(
     molecule: Union[Universe, AtomGroup],
-    exceptions: Union[None, List[str]] = None,
+    exceptions: Union[None, Iterable[str]] = None,
     only_standard_amino_acids: bool = True,
     remove_water: bool = False,
 ) -> Universe:
@@ -142,7 +142,7 @@ def remove_non_protein(
     ----------
     molecule: MDAnalysis.core.universe.Universe or MDAnalysis.core.groups.Atomgroup
         An MDAnalysis molecule holding a molecular structure.
-    exceptions: None or list of str
+    exceptions: None or iterable of str
         Exceptions that should not be removed.
     only_standard_amino_acids: bool, default=True
         If only standard amino acids shell be retained, .i.e. ALA, ARG, ASN, ASP, CYS, GLN, GLU,
@@ -177,6 +177,30 @@ def remove_non_protein(
         ])
 
     selection = molecule.select_atoms(selection_command)
+    return Merge(selection)
+
+
+def delete_residues(molecule: Universe, residues: Iterable[Residue]):
+    """
+    Delete residues from an MDAnalysis molecule.
+
+    Parameters
+    ----------
+    molecule: MDAnalysis.core.universe.Universe or MDAnalysis.core.groups.Atomgroup
+        An MDAnalysis molecule holding a molecular structure.
+    residues: iterable of MDAnalysis.core.groups.Residue
+
+    Returns
+    -------
+    : MDAnalysis.core.universe.Universe
+        An MDAnalysis molecule holding a molecular structure without given residues.
+    """
+    selection_command = "not (" + " or ".join([
+        f"(resname {residue.resname} and resid {residue.resid} and chainID {residue.segid})"
+        for residue in residues
+    ]) + ")"
+    selection = molecule.select_atoms(selection_command)
+
     return Merge(selection)
 
 
@@ -354,6 +378,8 @@ def get_structure_sequence_alignment(
 def delete_alterations(
         molecule: Union[Universe, AtomGroup],
         sequence: str,
+        delete_n_anchors: int = 2,
+        short_protein_segments_cutoff: int = 3,
 ) -> Universe:
     """
     Delete residues from an MDAnalysis molecule that are not covered by the given sequence, i.e.
@@ -366,17 +392,25 @@ def delete_alterations(
         An MDAnalysis molecule holding a protein structure.
     sequence: str
         A one letter amino acid sequence.
+    delete_n_anchors: int, default=2
+        The number of anchoring residues to delete when deleting insertions.
+    short_protein_segments_cutoff: int, default=3
+        If deleting residues will lead to short protein segments, delete these segments with a
+        length up to the specified cutoff.
 
     Returns
     -------
     : MDAnalysis.core.universe.Universe
         An MDAnalysis molecule holding a protein structure without alterations deleted.
     """
+    import re
+
     target_sequence_aligned, template_sequence_aligned = get_structure_sequence_alignment(
         molecule, sequence
     )
     residues = list(molecule.residues)
     residues_to_delete = set()
+    # delete substitutions and insertions
     target_residue_counter = 0
     for target_sequence_residue, template_sequence_residue in zip(
             target_sequence_aligned, template_sequence_aligned
@@ -386,13 +420,39 @@ def delete_alterations(
             if template_sequence_residue != target_sequence_residue:
                 residues_to_delete.add(residues[target_residue_counter - 1])
 
-    selection_command = "not (" + " or ".join([
-        f"(resname {residue.resname} and resid {residue.resid} and chainID {residue.segid})"
-        for residue in residues_to_delete
-    ]) + ")"
-    selection = molecule.select_atoms(selection_command)
+    # delete anchoring residues of insertions if required
+    if delete_n_anchors > 0:
+        terminus_length_cutoff = delete_n_anchors + short_protein_segments_cutoff
+        regex = (
+            # insertion at beginning considering anchoring sequence and short protein segments
+            "^[^-]{1," + str(terminus_length_cutoff) + "}[-]+"
+            # insertions within sequence considering anchoring sequence and short protein segments
+            "|(?<=[^-]{" + str(short_protein_segments_cutoff + 1) + "})"  # not too close at begin
+            "[^-]{" + str(delete_n_anchors) + "}[-]+[^-]{" + str(delete_n_anchors) + "}"  # match
+            + "(?=[^-]{" + str(short_protein_segments_cutoff + 1) + "})"  # not too close at end
+            # insertion at the end considering anchoring sequence and short protein segments
+            "|[-]+[^-]{1," + str(terminus_length_cutoff) + "}$"
+        )
+        insertions = re.finditer(regex, template_sequence_aligned)
+        for insertion in insertions:
+            insertion_start = insertion.start() - \
+                              target_sequence_aligned[: insertion.start()].count("-")
+            insertion_end = insertion.end() - target_sequence_aligned[: insertion.end()].count("-")
+            residues_to_delete.update(molecule.residues[insertion_start:insertion_end])
 
-    return Merge(selection)
+    if len(residues_to_delete) > 0:
+        residues_to_delete_text = ", ".join([
+            f"{residue.resname}{residue.resid}{residue.segid}" for residue in residues_to_delete
+        ])
+        logger.debug(
+            f"Deleting alterations: {residues_to_delete_text}"
+        )
+        molecule = delete_residues(molecule, residues_to_delete)
+
+    if short_protein_segments_cutoff > 0:
+        molecule = delete_short_protein_segments(molecule, short_protein_segments_cutoff)
+
+    return Merge(molecule.atoms)
 
 
 def delete_short_protein_segments(
@@ -435,10 +495,7 @@ def delete_short_protein_segments(
         if len(segment) <= cutoff:
             residues_to_delete += segment
 
-    selection_command = "not (" + " or ".join([
-        f"(resname {residue.resname} and resid {residue.resid} and chainID {residue.segid})"
-        for residue in residues_to_delete
-    ]) + ")"
-    selection = molecule.select_atoms(selection_command)
+    if len(residues_to_delete) > 0:
+        molecule = delete_residues(molecule, residues_to_delete)
 
-    return Merge(selection)
+    return Merge(molecule.atoms)
