@@ -132,6 +132,8 @@ class SCHRODINGERComplexFeaturizer(ParallelBaseFeaturizer):
         prepared_structure_path = self._prepare_structure(
             system_dict["protein_path"], system_dict["protein_sequence"]
         )
+        if not prepared_structure_path:
+            return None
 
         prepared_structure = self._postprocess_structure(
             pdb_path=prepared_structure_path,
