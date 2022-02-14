@@ -320,9 +320,8 @@ class SCHRODINGERComplexFeaturizer(ParallelBaseFeaturizer):
 
             for i in range(self.max_retry):
                 logger.debug(f"Running prepwizard trial {i + 1}...")
-                mae_file_path = prepared_structure_path.rename(
-                        prepared_structure_path.with_suffix('.mae')
-                    )
+                mae_file_path = prepared_structure_path.parent / \
+                    f"{prepared_structure_path.name}.mae"
                 run_prepwizard(
                     schrodinger_directory=self.schrodinger,
                     input_file=input_file,
