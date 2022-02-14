@@ -70,3 +70,29 @@ def run_prepwizard(
         )
 
     return
+
+
+def mae_to_pdb(
+        schrodinger_directory: Union[str, Path],
+        mae_file_path: Union[str, Path],
+        pdb_file_path: Union[str, Path]
+):
+    """
+    Convert a structure file from MAE to PDB format.
+
+    Parameters
+    ----------
+    schrodinger_directory: str or pathlib.Path
+        The path to the directory of the Schrodinger installation.
+    mae_file_path: str or pathlib.Path
+        The path to the input file in MAE format.
+    pdb_file_path: str or pathlib.Path
+        The path to the output file in PDB format.
+    """
+    schrodinger_directory = Path(schrodinger_directory)
+    arguments = [
+        str(schrodinger_directory / "utilities/pdbconvert"),  # executable
+        "-imae", str(mae_file_path), "-opdb", str(pdb_file_path),  # file paths
+    ]
+    subprocess.run(arguments)
+    return

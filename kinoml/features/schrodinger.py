@@ -11,6 +11,9 @@ from .core import ParallelBaseFeaturizer
 from ..core.systems import ProteinLigandComplex
 
 
+logger = logging.getLogger(__name__)
+
+
 class SCHRODINGERComplexFeaturizer(ParallelBaseFeaturizer):
     """
     Given systems with exactly one protein and one ligand, prepare the complex structure by:
@@ -112,51 +115,43 @@ class SCHRODINGERComplexFeaturizer(ParallelBaseFeaturizer):
         : Universe or None
             An MDAnalysis universe of the featurized system or None if not successful.
         """
-        import MDAnalysis as mda
-
-        from ..modeling.SCHRODINGERModeling import run_prepwizard
         from ..utils import LocalFileStorage
 
-        logging.debug("Interpreting system ...")
+        logger.debug("Interpreting system ...")
         system_dict = self._interpret_system(system)
 
-        complex_path = LocalFileStorage.featurizer_result(
-            self.__class__.__name__,
-            f"{system_dict['protein_name']}_{system_dict['ligand_name']}_complex",
-            "mae",
-            self.output_dir,
-        )
-        
-        for _ in range(self.max_retry):
-            run_prepwizard(
-                schrodinger_directory=self.schrodinger,
-                input_file=system_dict["protein_path"],
-                output_file=complex_path,
-                cap_termini=True,
-                build_loops=True,
+        if system_dict["protein_sequence"]:
+            system_dict["protein_path"] = self._preprocess_structure(
+                pdb_path=system_dict["protein_path"],
+                chain_id=system_dict["protein_chain_id"],
+                alternate_location=system_dict["protein_alternate_location"],
+                expo_id=system_dict["protein_expo_id"],
                 sequence=system_dict["protein_sequence"],
-                protein_pH="neutral",
-                propka_pH=7.4,
-                epik_pH=7.4,
-                force_field="3",
             )
-            if complex_path.is_file():
-                break
-        if not complex_path.is_file():
-            return None
 
-        # ToDo: select chain
-        # ToDo: select alternate location
-        # ToDo: select ligand
-        # ToDo: delete expression tags
+        prepared_structure_path = self._prepare_structure(
+            system_dict["protein_path"], system_dict["protein_sequence"]
+        )
 
-        logging.debug("Generating new MDAnalysis universe ...")
-        structure = mda.Universe(complex_path, in_memory=True)
+        prepared_structure = self._postprocess_structure(
+            pdb_path=prepared_structure_path,
+            chain_id=system_dict["protein_chain_id"],
+            alternate_location=system_dict["protein_alternate_location"],
+            expo_id=system_dict["protein_expo_id"],
+            sequence=system_dict["protein_sequence"],
+        )
 
-        if not self.save_output:
-            complex_path.unlink()
+        if self.save_output:
+            logging.debug("Saving results ...")
+            complex_path = LocalFileStorage.featurizer_result(
+                self.__class__.__name__,
+                f"{system_dict['protein_name']}_{system_dict['ligand_name']}_complex",
+                "pdb",
+                self.output_dir,
+            )
+            prepared_structure.atoms.write(complex_path)
 
-        return structure
+        return prepared_structure
 
     def _interpret_system(self, system: ProteinLigandComplex) -> dict:
         """
@@ -187,7 +182,7 @@ class SCHRODINGERComplexFeaturizer(ParallelBaseFeaturizer):
             "ligand_name": None,
         }
 
-        logging.debug("Interpreting protein component ...")
+        logger.debug("Interpreting protein component ...")
         if hasattr(system.protein, "name"):
             system_dict["protein_name"] = system.protein.name
 
@@ -208,7 +203,7 @@ class SCHRODINGERComplexFeaturizer(ParallelBaseFeaturizer):
             )
         if not hasattr(system.protein, "sequence"):
             if hasattr(system.protein, "uniprot_id"):
-                logging.debug(
+                logger.debug(
                     f"Retrieving amino acid sequence details for UniProt entry "
                     f"{system.protein.uniprot_id} ..."
                 )
@@ -225,8 +220,165 @@ class SCHRODINGERComplexFeaturizer(ParallelBaseFeaturizer):
         if hasattr(system.protein, "expo_id"):
             system_dict["protein_expo_id"] = system.protein.expo_id
 
-        logging.debug("Interpreting ligand component ...")
+        logger.debug("Interpreting ligand component ...")
         if hasattr(system.ligand, "name"):
             system_dict["ligand_name"] = system.ligand.name
 
         return system_dict
+
+    def _preprocess_structure(
+            self,
+            pdb_path: Union[str, Path],
+            chain_id: Union[str, None],
+            alternate_location: Union[str, None],
+            expo_id: Union[str, None],
+            sequence: str,
+    ):
+        from MDAnalysis.core.universe import Merge
+
+        from ..modeling.MDAnalysisModeling import (
+            read_molecule,
+            select_chain,
+            select_altloc,
+            remove_non_protein,
+            delete_expression_tags,
+            delete_short_protein_segments,
+            delete_alterations,
+            renumber_protein_residues,
+        )
+        from ..utils import LocalFileStorage, sha256_objects
+
+        clean_structure_path = LocalFileStorage.featurizer_result(
+            self.__class__.__name__,
+            sha256_objects(
+                [pdb_path, chain_id, alternate_location, expo_id, sequence]
+            ),
+            "pdb",
+            self.cache_dir,
+        )
+
+        if not clean_structure_path.is_file():
+            logger.debug("Cleaning structure ...")
+
+            logger.debug("Reading structure from PDB file ...")
+            structure = read_molecule(pdb_path)
+
+            if chain_id:
+                logger.debug(f"Selecting chain {chain_id} ...")
+                structure = select_chain(structure, chain_id)
+
+            if alternate_location:
+                logger.debug(f"Selecting alternate location {alternate_location} ...")
+                structure = select_altloc(structure, alternate_location)
+
+            if expo_id:
+                logger.debug(f"Selecting ligand {expo_id} ...")
+                structure = remove_non_protein(structure, exceptions=[expo_id])
+
+            logger.debug("Deleting expression tags ...")
+            structure = delete_expression_tags(structure, pdb_path)
+
+            logger.debug("Splitting protein and non-protein ...")
+            protein = structure.select_atoms("protein")
+            not_protein = structure.select_atoms("not protein")
+
+            logger.debug("Deleting short protein segments ...")
+            protein = delete_short_protein_segments(protein)
+
+            logger.debug("Deleting alterations in protein ...")
+            protein = delete_alterations(protein, sequence)
+
+            logger.debug("Deleting short protein segments 2 ...")
+            protein = delete_short_protein_segments(protein)
+
+            logger.debug("Renumbering protein residues ...")
+            protein = renumber_protein_residues(protein, sequence)
+
+            logger.debug("Merging cleaned protein and non-protein ...")
+            structure = Merge(protein.atoms, not_protein.atoms)
+
+            logger.debug("Writing cleaned structure ...")
+            structure.atoms.write(clean_structure_path)
+        else:
+            logger.debug("Found cached cleaned structure ...")
+
+        return clean_structure_path
+
+    def _prepare_structure(self, input_file, sequence):
+
+        from ..modeling.SCHRODINGERModeling import run_prepwizard, mae_to_pdb
+        from ..utils import LocalFileStorage, sha256_objects
+
+        prepared_structure_path = LocalFileStorage.featurizer_result(
+            self.__class__.__name__,
+            sha256_objects([input_file, sequence]),
+            "pdb",
+            self.cache_dir,
+        )
+
+        if not prepared_structure_path.is_file():
+
+            for i in range(self.max_retry):
+                logger.debug(f"Running prepwizard trial {i + 1}...")
+                mae_file_path = prepared_structure_path.rename(
+                        prepared_structure_path.with_suffix('.mae')
+                    )
+                run_prepwizard(
+                    schrodinger_directory=self.schrodinger,
+                    input_file=input_file,
+                    output_file=mae_file_path,
+                    cap_termini=True,
+                    build_loops=True,
+                    sequence=sequence,
+                    protein_pH="neutral",
+                    propka_pH=7.4,
+                    epik_pH=7.4,
+                    force_field="3",
+                )
+                if prepared_structure_path.is_file():
+                    mae_to_pdb(self.schrodinger, mae_file_path, prepared_structure_path)
+                    break
+        else:
+            logger.debug("Found cached prepared structure ...")
+
+        if not prepared_structure_path.is_file():
+            logger.debug("Running prepwizard was not successful, returning None ...")
+            return None
+
+        return prepared_structure_path
+
+    @staticmethod
+    def _postprocess_structure(
+            pdb_path,
+            chain_id,
+            alternate_location,
+            expo_id,
+            sequence,
+    ):
+
+        from ..modeling.MDAnalysisModeling import (
+            read_molecule,
+            select_chain,
+            select_altloc,
+            remove_non_protein,
+            update_residue_identifiers
+        )
+
+        logger.debug("Loading prepared structure ...")
+        prepared_structure = read_molecule(pdb_path)
+
+        if not sequence:
+            if chain_id:
+                logger.debug(f"Selecting chain {chain_id} ...")
+                prepared_structure = select_chain(prepared_structure, chain_id)
+            if alternate_location:
+                logger.debug(f"Selecting alternate location {alternate_location} ...")
+                prepared_structure = select_altloc(prepared_structure, alternate_location)
+            if expo_id:
+                logger.debug(f"Selecting ligand {expo_id} ...")
+                prepared_structure = remove_non_protein(prepared_structure, exceptions=[expo_id])
+
+        logger.debug("Updating residue identifiers ...")
+        prepared_structure = update_residue_identifiers(prepared_structure)
+
+        return prepared_structure
