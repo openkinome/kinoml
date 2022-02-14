@@ -334,7 +334,7 @@ class SCHRODINGERComplexFeaturizer(ParallelBaseFeaturizer):
                     epik_pH=7.4,
                     force_field="3",
                 )
-                if prepared_structure_path.is_file():
+                if mae_file_path.is_file():
                     mae_to_pdb(self.schrodinger, mae_file_path, prepared_structure_path)
                     break
         else:
