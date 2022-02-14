@@ -6,7 +6,7 @@ from appdirs import user_cache_dir
 
 def download_fasta_file(
     uniprot_id: str, directory: Union[Path, str] = user_cache_dir()
-) -> Union[Path, False]:
+) -> Union[Path, bool]:
     """
     Download a fasta file for a given UniProt identifier.
 
@@ -19,7 +19,7 @@ def download_fasta_file(
 
     Returns
     -------
-    : Path or False
+    : Path or bool
         The path to the downloaded file, False if not successful.
     """
     from ..utils import download_file
