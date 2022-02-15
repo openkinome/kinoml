@@ -115,6 +115,7 @@ class SCHRODINGERComplexFeaturizer(ParallelBaseFeaturizer):
         : Universe or None
             An MDAnalysis universe of the featurized system or None if not successful.
         """
+        from ..modeling.MDAnalysisModeling import write_molecule
         from ..utils import LocalFileStorage
 
         logger.debug("Interpreting system ...")
@@ -151,7 +152,7 @@ class SCHRODINGERComplexFeaturizer(ParallelBaseFeaturizer):
                 "pdb",
                 self.output_dir,
             )
-            prepared_structure.atoms.write(complex_path)
+            write_molecule(prepared_structure.atoms, complex_path)
 
         return prepared_structure
 
@@ -247,6 +248,7 @@ class SCHRODINGERComplexFeaturizer(ParallelBaseFeaturizer):
             delete_short_protein_segments,
             delete_alterations,
             renumber_protein_residues,
+            write_molecule,
         )
         from ..utils import LocalFileStorage, sha256_objects
 
@@ -300,7 +302,7 @@ class SCHRODINGERComplexFeaturizer(ParallelBaseFeaturizer):
             structure = Merge(protein.atoms, not_protein.atoms)
 
             logger.debug("Writing cleaned structure ...")
-            structure.atoms.write(clean_structure_path)
+            write_molecule(structure.atoms, clean_structure_path)
         else:
             logger.debug("Found cached cleaned structure ...")
 

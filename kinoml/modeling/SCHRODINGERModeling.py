@@ -75,8 +75,7 @@ def run_prepwizard(
 def mae_to_pdb(
         schrodinger_directory: Union[str, Path],
         mae_file_path: Union[str, Path],
-        pdb_file_path: Union[str, Path],
-        delete_segid: bool = True,
+        pdb_file_path: Union[str, Path]
 ):
     """
     Convert a structure file from MAE to PDB format.
@@ -89,8 +88,6 @@ def mae_to_pdb(
         The path to the input file in MAE format.
     pdb_file_path: str or pathlib.Path
         The path to the output file in PDB format.
-    delete_segid: bool, default=True
-        If segid shell be deleted from PDB file.
     """
     schrodinger_directory = Path(schrodinger_directory)
     arguments = [
@@ -98,16 +95,4 @@ def mae_to_pdb(
         "-imae", str(mae_file_path), "-opdb", str(pdb_file_path),  # file paths
     ]
     subprocess.run(arguments)
-
-    # remove segid added by prepwizard
-    if delete_segid:
-        lines = []
-        with open(pdb_file_path, "r") as read_file:
-            for line in read_file.readlines():
-                if line.startswith(("ATOM", "HETATM")):
-                    line = line[:72] + " " + line[73:]
-                lines.append(line)
-        with open(pdb_file_path, "w") as write_file:
-            write_file.write("".join(lines))
-
     return

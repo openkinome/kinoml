@@ -60,6 +60,39 @@ def read_molecule(path: Union[str, Path], guess_bonds: bool = True) -> Universe:
     return molecule
 
 
+def write_molecule(
+        molecule: Union[AtomGroup], file_path: Union[str, Path], delete_segid: bool = True
+):
+    """
+    Write an AtomGroup to a file. If written in PDB format and delete_segid is True the segid will
+    be deleted from the PDB file.
+    (https://docs.mdanalysis.org/1.0.0/documentation_pages/coordinates/PDB.html)
+
+    Parameters
+    ----------
+    molecule: MDAnalysis.core.groups.Atomgroup
+        An MDAnalysis molecule holding a molecular structure.
+    file_path: str or pathlib.Path
+        The path to the output file.
+    delete_segid: bool, default=True
+        If the segid shell be deleted in case of PDB format.
+        (https://docs.mdanalysis.org/1.0.0/documentation_pages/coordinates/PDB.html)
+    """
+    molecule.write(file_path)
+
+    if str(file_path).endswith("pdb") and delete_segid:
+        lines = []
+        with open(file_path, "r") as read_file:
+            for line in read_file.readlines():
+                if line.startswith(("ATOM", "HETATM")):
+                    line = line[:67] + "         " + line[76:]
+                lines.append(line)
+        with open(file_path, "w") as write_file:
+            write_file.write("".join(lines))
+
+    return
+
+
 def select_chain(molecule: Union[Universe, AtomGroup], chain_id: str) -> Universe:
     """
     Select a chain from an MDAnalysis molecule.
