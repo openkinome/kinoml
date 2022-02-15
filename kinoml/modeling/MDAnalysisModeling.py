@@ -165,7 +165,7 @@ def remove_non_protein(
                 f"resname {resname}" for resname in standard_amino_acids
             ])
     else:
-        selection_command = "protein"
+        selection_command = "protein or resname NMA"
     # add water and exceptions to selection command
     if exceptions is None:
         exceptions = []
@@ -571,7 +571,7 @@ def update_residue_identifiers(
     highest_resid = 1
 
     # update protein resids
-    protein = molecule.select_atoms("protein")
+    protein = molecule.select_atoms("protein or resname NMA")
     if len(protein.residues) > 0:
         protein = Merge(protein.atoms)
         if not keep_protein_residue_ids:
@@ -580,7 +580,7 @@ def update_residue_identifiers(
         highest_resid = protein.residues[-1].resid
 
     # update resids of non-protein residues except water
-    hetero = molecule.select_atoms("not protein and not resname HOH")
+    hetero = molecule.select_atoms("not protein and not resname NMA and not resname HOH")
     if len(hetero.residues) > 0:
         hetero = Merge(hetero.atoms)
         hetero_resids = list(range(
