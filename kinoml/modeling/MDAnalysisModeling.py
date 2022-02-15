@@ -568,9 +568,13 @@ def update_residue_identifiers(
     """
     # create new Universe
     molecule = Merge(molecule.atoms)
-    highest_resid = 1
+
+    # update chain ID
+    if not keep_chain_ids:
+        molecule.add_TopologyAttr("segid", ["A"] * len(molecule.segments))
 
     # update protein resids
+    highest_resid = 1
     protein = molecule.select_atoms("protein or resname NMA")
     if len(protein.residues) > 0:
         protein = Merge(protein.atoms)
@@ -604,9 +608,5 @@ def update_residue_identifiers(
     if len(components) > 1:
         for component in components[1:]:
             molecule = Merge(molecule.atoms, component.atoms)
-
-    # update chain ID
-    if not keep_chain_ids:
-        molecule.add_TopologyAttr("segid", ["A"] * len(molecule.segments))
 
     return Merge(molecule.atoms)
