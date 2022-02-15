@@ -303,10 +303,36 @@ class SCHRODINGERComplexFeaturizer(ParallelBaseFeaturizer):
 
             logger.debug("Writing cleaned structure ...")
             write_molecule(structure.atoms, clean_structure_path)
+
+            logger.debug("Transfering PDB header from original structure ...")
+            self._transfer_header(pdb_path, clean_structure_path)
         else:
             logger.debug("Found cached cleaned structure ...")
 
         return clean_structure_path
+
+    @staticmethod
+    def _transfer_header(pdb_path, pdb_path2):
+
+        lines = []
+        with open(pdb_path, "r") as read_file:
+            for line in read_file.readlines():
+                if line.startswith(("ATOM", "HETATM")):
+                    break
+                lines.append(line)
+
+        header_section = True
+        with open(pdb_path2, "r") as read_file:
+            for line in read_file.readlines():
+                if line.startswith(("ATOM", "HETATM")) and header_section:
+                    header_section = False
+                if not header_section:
+                    lines.append(line)
+
+        with open(pdb_path2, "w") as write_file:
+            write_file.write("".join(lines))
+
+        return
 
     def _prepare_structure(self, input_file, sequence):
 
