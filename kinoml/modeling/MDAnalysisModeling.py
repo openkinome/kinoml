@@ -587,7 +587,7 @@ def update_residue_identifiers(
 
     # update chain ID
     if not keep_chain_ids:
-        molecule.add_TopologyAttr("segid", ["A"] * len(molecule.segments))
+        molecule.add_TopologyAttr("chainIDs", ["A"] * len(molecule.atoms))
 
     # update protein resids
     highest_resid = 1
