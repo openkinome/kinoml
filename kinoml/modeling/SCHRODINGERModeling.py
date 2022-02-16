@@ -11,6 +11,7 @@ def run_prepwizard(
     cap_termini: bool = True,
     build_loops: bool = True,
     sequence: Union[str, None] = None,
+    chain_id: str = "",
     protein_pH: str = "neutral",
     propka_pH: float = 7.4,
     epik_pH: float = 7.4,
@@ -33,6 +34,9 @@ def run_prepwizard(
         If loops should be built.
     sequence: str or None
         The amino acid sequence in single letter codes that should be used for loop building.
+        Also needs the chain_id parameter to work correctly.
+    chain_id: str, default=""
+        The chain ID of the protein that should be modeled based on the given sequence.
     protein_pH: str, default='neutral'
         The pH used during protonation of the protein ('very_low', 'low', 'neutral', 'high').
     propka_pH: float, default=7.4
@@ -59,6 +63,7 @@ def run_prepwizard(
     if sequence:  # one letter characters, 60 per line, no header
         with NamedTemporaryFile(mode="w", suffix=".fasta") as fasta_file:
             sequence = "\n".join([sequence[i:i + 60] for i in range(0, len(sequence), 60)])
+            fasta_file.write(f">entry:{chain_id}\n")
             fasta_file.write(sequence)
             fasta_file.flush()
             subprocess.run(
