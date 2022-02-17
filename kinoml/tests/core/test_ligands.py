@@ -17,6 +17,6 @@ def test_ligand():
     assert isinstance(ligand.molecule, Molecule)
     assert isinstance(ligand.molecule.to_rdkit(), rdkit.Chem.Mol)
     assert isinstance(ligand.molecule.to_openeye(), oechem.OEMol)
-    assert isinstance(ligand._smiles, type(None))
+    assert isinstance(ligand._smiles, str)
     assert isinstance(ligand.metadata["smiles"], str)
     assert isinstance(ligand.molecule.to_smiles(), str)
