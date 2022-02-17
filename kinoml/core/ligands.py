@@ -89,12 +89,17 @@ class Ligand(BaseLigand):
         """
         Get the _molecule attribute. If the _smiles attribute is given and _molecule is None, a
         new openff molecule will be created from smiles, e.g. in case of lazy instantiation.
+
+        Returns
+        ------
+        : openff.toolkit.topology.Molecule or None
+            The openff molecular representation of the ligand.
         """
         if not self._molecule and self._smiles:
             self._molecule = Molecule.from_smiles(
                 smiles=self._smiles, allow_undefined_stereo=True
             )
-            if self.name is None:
+            if not self.name:
                 self.name = self._smiles
             if self.metadata is None:
                 self.metadata = {"smiles": self._smiles}
@@ -122,13 +127,13 @@ class Ligand(BaseLigand):
             The name of the ligand.
         allow_undefined_stereo: bool, default=True
             If undefined stereo centers should be allowed.
-        **kwargs:
+        kwargs:
             Any keyword arguments allowed for the from_smiles method of the openff molecule class.
         """
         molecule = Molecule.from_smiles(
             smiles=smiles, allow_undefined_stereo=allow_undefined_stereo, **kwargs
         )
-        if name is None:
+        if not name:
             name = smiles
         return cls(molecule=molecule, name=name, metadata={"smiles": smiles})
 
@@ -152,12 +157,12 @@ class Ligand(BaseLigand):
             The name of the ligand.
         allow_undefined_stereo: bool, default=True
             If undefined stereo centers should be allowed.
-        **kwargs:
+        kwargs:
             Any keyword arguments allowed for the from_file method of the openff molecule class.
         """
         molecule = Molecule.from_file(
             file_path=file_path, allow_undefined_stereo=allow_undefined_stereo, **kwargs
         )
-        if name is None:
+        if not name:
             name = molecule.to_smiles(explicit_hydrogens=False)
         return cls(molecule=molecule, name=name, metadata={"file_path": file_path})
