@@ -87,10 +87,10 @@ class Ligand(BaseLigand):
     @molecule.getter
     def molecule(self):
         """
-        Get the _molecule attribute. If the _smiles attribute is given, a new openff molecule will
-        be created from smiles, e.g. in case of lazy instantiation.
+        Get the _molecule attribute. If the _smiles attribute is given and _molecule is None, a
+        new openff molecule will be created from smiles, e.g. in case of lazy instantiation.
         """
-        if self._smiles:
+        if not self._molecule and self._smiles:
             self._molecule = Molecule.from_smiles(
                 smiles=self._smiles, allow_undefined_stereo=True
             )
@@ -100,7 +100,6 @@ class Ligand(BaseLigand):
                 self.metadata = {"smiles": self._smiles}
             else:
                 self.metadata.update({"smiles": self._smiles})
-            self._smiles = None  # remove smiles
         return self._molecule
 
     @classmethod
