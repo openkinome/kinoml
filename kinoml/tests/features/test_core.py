@@ -108,9 +108,9 @@ def test_PadFeaturizer():
 def test_HashFeaturizer():
     system = LigandSystem([Ligand(smiles="CCC")])
     HashFeaturizer(
-        getter=lambda s: s.ligand.get_canonical_smiles(), normalize=True
+        getter=lambda s: s.ligand.molecule.to_smiles(), normalize=True
     ).featurize([system])
-    assert system.featurizations["last"] == pytest.approx(0.54818723)
+    assert system.featurizations["last"] == pytest.approx(0.62342903)
 
 
 def test_NullFeaturizer():
@@ -129,7 +129,7 @@ def test_CallableFeaturizer():
         LigandSystem([Ligand(smiles="CCC")]),
     )
     HashFeaturizer(
-        getter=lambda s: s.ligand.get_canonical_smiles(), normalize=False
+        getter=lambda s: s.ligand.molecule.to_smiles(), normalize=False
     ).featurize(systems)
     CallableFeaturizer(lambda s: scale(s.featurizations["last"].reshape((1,)))).featurize(systems)
 
