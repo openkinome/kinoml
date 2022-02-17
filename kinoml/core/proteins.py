@@ -17,15 +17,12 @@ class Protein(BaseProtein, AminoAcidSequence):
     def __init__(
             self,
             pdb_id="",
-            file_path="",
-            chain_id="",
-            alternate_location="",
-            ligand_name="",
-            mda_mol=None,
-            openeye_mol=None,
+            molecule=None,
+            toolkit="OpenEye",
             name="",
             sequence="",
-            uniprot_id=None,
+            uniprot_id="",
+            ncbi_id="",
             metadata=None,
             **kwargs
     ):
@@ -35,84 +32,78 @@ class Protein(BaseProtein, AminoAcidSequence):
             name=name,
             sequence=sequence,
             uniprot_id=uniprot_id,
-            # ncbi
+            ncbi_id=ncbi_id,
             metadata=metadata,
             **kwargs
         )
-        self.pdb_id = pdb_id  # only pdb_id is lazy
-        self.file_path = file_path
-        self.chain_id = chain_id
-        self.alternate_location = alternate_location
-        self.ligand_name = ligand_name
-        self._mda_mol = mda_mol  # write mdanaylsis
-        self._openeye_mol = openeye_mol  # to_openff, to_mdanalysis, to_openeye
+        self._pdb_id = pdb_id
+        self._molecule = molecule
+        if toolkit not in ["OpenEye", "MDAnalysis"]:
+            raise AttributeError(
+                f"Only 'MDAnalysis' and 'OpenEye' are supported, you provided '{toolkit}'."
+            )
+        self.toolkit = toolkit
 
     @property
-    def mda_mol(self):
-        return self._mda_mol
+    def pdb_id(self):
+        return self._pdb_id
 
-    @mda_mol.setter
-    def mda_mol(self, new_value):
-        self._mda_mol = new_value
+    @pdb_id.setter
+    def pdb_id(self, new_value):
+        raise AttributeError(
+            f"Do not modify pdb_id after instantiation, create a new {self.__class__.__name__} "
+            f"object instead."
+        )
 
-    @mda_mol.getter
-    def mda_mol(self):
-        if not self._mda_mol:
-            import MDAnalysis as mda
-            if self.file_path:
-                self._mda_mol = mda.Universe(self.file_path)
-            elif self.pdb_id:
-                from ..databases.pdb import download_pdb_structure
-                file_path = download_pdb_structure(self.pdb_id)
-                self._mda_mol = mda.Universe(file_path)
-            elif self._openeye_mol:
-                from tempfile import NamedTemporaryFile
-                from ..modeling.OEModeling import write_molecules
+    @property
+    def molecule(self):
+        return self._molecule
 
-                with NamedTemporaryFile(suffix="pdb") as temp_file:
-                    write_molecules([self._openeye_mol], temp_file.name)
-                    self._mda_mol = mda.Universe(temp_file.name)
+    @molecule.setter
+    def molecule(self, new_value):
+        self._molecule = new_value
+
+    @molecule.getter
+    def molecule(self):
+        if not self._molecule and self.pdb_id:
+            from ..databases.pdb import download_pdb_structure
+            file_path = download_pdb_structure(self.pdb_id)
+            if self.toolkit == "OpenEye":
+                from ..modeling.OEModeling import read_molecules
+                self._molecule = read_molecules(file_path)[0]
+            elif self.toolkit == "MDAnalysis":
+                from ..modeling.MDAnalysisModeling import read_molecule
+                self._molecule = read_molecule(file_path)
+            if self.metadata is None:
+                self.metadata = {"pdb_id": self.pdb_id}
             else:
-                raise ValueError(
-                    "To allow access to MDAnalysis molecules, the `Protein`-like object needs to "
-                    "be initialized with one of the following attributes:\npdb_id\nfile_path\n"
-                    "mda_mol\nopeneye_mol"
-                )
+                self.metadata.update({"smiles": self.pdb_id})
+        return self._molecule
 
-        return self._mda_mol
-
-    @property
-    def openeye_mol(self):
-        return self._openeye_mol
-
-    @openeye_mol.setter
-    def openeye_mol(self, new_value):
-        self._openeye_mol = new_value
-
-    @openeye_mol.getter
-    def openeye_mol(self):
-        if not self._openeye_mol:
+    @classmethod
+    def from_file(cls, file_path, name="", toolkit="OpenEye"):
+        if toolkit == "OpenEye":
             from ..modeling.OEModeling import read_molecules
-            if self.file_path:
-                self._openeye_mol = read_molecules(self.file_path)[0]
-            elif self.pdb_id:
-                from ..databases.pdb import download_pdb_structure
-                file_path = download_pdb_structure(self.pdb_id)
-                self._openeye_mol = read_molecules(file_path)
-            elif self._mda_mol:
-                from tempfile import NamedTemporaryFile
+            molecule = read_molecules(file_path)[0]
+        else:
+            from ..modeling.MDAnalysisModeling import read_molecule
+            molecule = read_molecule(file_path)
 
-                with NamedTemporaryFile(suffix="pdb") as temp_file:
-                    self._mda_mol.write(temp_file.name)
-                    self._openeye_mol = read_molecules(temp_file.name)
-            else:
-                raise ValueError(
-                    "To allow access to OpenEye molecules, the `Protein`-like object needs to "
-                    "be initialized with one of the following attributes:\npdb_id\nfile_path\n"
-                    "mda_mol\nopeneye_mol"
-                )
+        return cls(molecule=molecule, name=name, toolkit=toolkit, metadata={"file_path": file_path})
 
-        return self._openeye_mol
+    @classmethod
+    def from_pdb(cls, pdb_id, name="", toolkit="OpenEye"):
+        from ..databases.pdb import download_pdb_structure
+        file_path = download_pdb_structure(pdb_id)
+        if toolkit == "OpenEye":
+            from ..modeling.OEModeling import read_molecules
+            molecule = read_molecules(file_path)[0]
+        else:
+            from ..modeling.MDAnalysisModeling import read_molecule
+            molecule = read_molecule(file_path)
+        if not name:
+            name = pdb_id
+        return cls(molecule=molecule, name=name, toolkit=toolkit, metadata={"pdb_id": pdb_id})
 
 
 class KLIFSKinase(Protein):
@@ -123,15 +114,11 @@ class KLIFSKinase(Protein):
     def __init__(
             self,
             pdb_id="",
-            file_path="",
-            chain_id="",
-            alternate_location="",
-            ligand_name="",
-            mda_mol=None,
-            openeye_mol=None,
+            molecule=None,
+            toolkit="OpenEye",
             name="",
             sequence="",
-            uniprot_id=None,
+            uniprot_id="",
             structure_klifs_id=None,
             kinase_klifs_id=None,
             kinase_klifs_sequence=None,
@@ -142,12 +129,8 @@ class KLIFSKinase(Protein):
     ):
         super().__init__(
             pdb_id=pdb_id,
-            file_path=file_path,
-            chain_id=chain_id,
-            alternate_location=alternate_location,
-            ligand_name=ligand_name,
-            mda_mol=mda_mol,
-            openeye_mol=openeye_mol,
+            molecule=molecule,
+            toolkit=toolkit,
             name=name,
             sequence=sequence,
             uniprot_id=uniprot_id,
@@ -199,24 +182,31 @@ class KLIFSKinase(Protein):
     def kinase_klifs_sequence(self):
         if not self._kinase_klifs_sequence:
             from opencadd.databases.klifs import setup_remote
-
             remote = setup_remote()
-            if self.structure_klifs_id and not self.kinase_klifs_id:
-                structure_details = remote.structures.by_structure_klifs_id(
-                    self.structure_klifs_id
-                )
-                self.kinase_klifs_id = structure_details["kinase.klifs_id"].iloc[0]
-
-            if self.kinase_klifs_id:
-                kinase_details = remote.kinases.by_kinase_klifs_id(self.kinase_klifs_id)
-                self._kinase_klifs_sequence = kinase_details["kinase.pocket"].values[0]
-            else:
-                raise ValueError(
-                    "To allow access to the kinase KLIFS sequence, the `Kinase` object needs to "
-                    "be initialized with one of the following attributes:\nkinase_klifs_sequence"
-                    "\nkinase_klifs_id\nstructure_klifs_id"
-                )
-
+            if not self.kinase_klifs_id:
+                if self.structure_klifs_id:
+                    structure_details = remote.structures.by_structure_klifs_id(
+                        self.structure_klifs_id
+                    )
+                    self.kinase_klifs_id = structure_details["kinase.klifs_id"].iloc[0]
+                elif self.uniprot_id:
+                    all_kinases = remote.kinases.all_kinases()
+                    kinases = all_kinases[all_kinases["kinase.uniprot"] == self.uniprot_id]
+                    if len(kinases) > 0:
+                        self.kinase_klifs_id = kinases.iloc[0]["kinase.klifs_id"]
+                    else:
+                        raise ValueError(
+                            f"Could not find a kinase in KLIFS for uniprot ID '{self.uniprot_id}'."
+                        )
+                else:
+                    raise ValueError(
+                        "To allow access to the kinase KLIFS sequence, the `Kinase` object needs "
+                        "to be initialized with one of the following attributes:"
+                        "\nkinase_klifs_sequence\nkinase_klifs_id\nstructure_klifs_id"
+                        "\nuniprot_id"
+                    )
+            kinase_details = remote.kinases.by_kinase_klifs_id(self.kinase_klifs_id)
+            self._kinase_klifs_sequence = kinase_details["kinase.pocket"].values[0]
         return self._kinase_klifs_sequence
 
     @property
