@@ -198,7 +198,7 @@ class AminoAcidSequence(Biosequence):
     ALPHABET = "ACDEFGHIKLMNPQRSTVWY"
 
     def __init__(
-            self, uniprot_id=None, ncbi_id=None, sequence="", name="", metadata=None, **kwargs
+            self, uniprot_id="", ncbi_id="", sequence="", name="", metadata=None, **kwargs
     ):
         super().__init__(sequence=sequence, name=name, metadata=metadata, **kwargs)
         self.uniprot_id = uniprot_id
