@@ -3,13 +3,12 @@ Creates DatasetProvider objects from ChEMBL activity data
 """
 import random
 
-
 import pandas as pd
 from tqdm.auto import tqdm
 
 from .core import MultiDatasetProvider
 from ..core.conditions import AssayConditions
-from ..core.proteins import AminoAcidSequence
+from ..core.proteins import KLIFSKinase
 from ..core.ligands import Ligand
 from ..core.systems import ProteinLigandComplex
 from ..core.measurements import pIC50Measurement, pKiMeasurement, pKdMeasurement
@@ -80,11 +79,14 @@ class ChEMBLDatasetProvider(MultiDatasetProvider):
                 system_key = (kinase_key, ligand_key)
                 if kinase_key not in kinases:
                     metadata = {
-                        "uniprot": row["UniprotID"],
-                        "chembl_target": row["target_dictionary.chembl_id"],
+                        "uniprot_id": row["UniprotID"],
+                        "chembl_target_id": row["target_dictionary.chembl_id"],
                     }
-                    kinase = AminoAcidSequence(
-                        kinase_key, name=row["UniprotID"], metadata=metadata
+                    kinase = KLIFSKinase(
+                        sequence=kinase_key,
+                        name=row["UniprotID"],
+                        uniprot_id=row["UniprotID"],
+                        metadata=metadata
                     )
                     kinases[kinase_key] = kinase
                 if ligand_key not in ligands:
