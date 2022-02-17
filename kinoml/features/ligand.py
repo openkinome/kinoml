@@ -6,8 +6,6 @@ from __future__ import annotations
 from typing import Union
 
 import numpy as np
-from openeye import oechem
-from openff.toolkit.topology import Molecule
 from openff.toolkit.utils.exceptions import SMILESParseError
 from rdkit import Chem
 
@@ -33,69 +31,6 @@ class SingleLigandFeaturizer(ParallelBaseFeaturizer):
         super_checks = super()._supports(system)
         ligands = [c for c in system.components if isinstance(c, self._COMPATIBLE_LIGAND_TYPES)]
         return all([super_checks, len(ligands) == 1])
-
-    def get_rdkit_mol(self, ligand: Ligand) -> Union[Chem.Mol, None]:
-        """
-        Get the RDKit representation of a molecule and catch errors related to SMILES parsing or
-        file reading. Return None if something goes wrong.
-
-        Parameters
-        ----------
-        ligand: Ligand
-            The ligand object.
-
-        Returns
-        -------
-            : rdkit.Chem.Mol or None
-            The RDKit molecule or None if something goes wrong.
-        """
-        try:
-            rdkit_mol = ligand.rdkit_mol
-        except OSError:
-            rdkit_mol = None
-        return rdkit_mol
-
-    def get_openff_mol(self, ligand: Ligand) -> Union[Molecule, None]:
-        """
-        Get the OpenForceField representation of a molecule and catch errors related to SMILES
-        parsing or file reading. Return None if something goes wrong.
-
-        Parameters
-        ----------
-        ligand: Ligand
-            The ligand object.
-
-        Returns
-        -------
-            : openff.toolkit.topology.Molecule or None
-            The OpenForceField molecule or None if something goes wrong.
-        """
-        try:
-            openff_mol = ligand.openff_mol
-        except (FileNotFoundError, SMILESParseError):
-            openff_mol = None
-        return openff_mol
-
-    def get_openeye_mol(self, ligand: Ligand) -> Union[oechem.OEGraphMol, None]:
-        """
-        Get the OpenEye representation of a molecule and catch errors related to SMILES parsing
-        or file reading. Return None if something goes wrong.
-
-        Parameters
-        ----------
-        ligand: Ligand
-            The ligand object.
-
-        Returns
-        -------
-            : oechem.OEGraphMol or None
-            The OpenEye molecule or None if something goes wrong.
-        """
-        try:
-            openeye_mol = ligand.openeye_mol
-        except ValueError:
-            openeye_mol = None
-        return openeye_mol
 
 
 class MorganFingerprintFeaturizer(SingleLigandFeaturizer):
@@ -132,12 +67,15 @@ class MorganFingerprintFeaturizer(SingleLigandFeaturizer):
         -------
             : np.array or None
         """
+        from rdkit.Chem import RemoveHs
         from rdkit.Chem.AllChem import GetMorganFingerprintAsBitVect
 
-        rdkit_mol = self.get_rdkit_mol(system.ligand)
-        if rdkit_mol is None:
+        try:  # catch erroneous smiles not yet interpreted in case of lazy instantiation
+            rdkit_mol = system.ligand.molecule.to_rdkit()
+        except SMILESParseError:
             return None
 
+        rdkit_mol = RemoveHs(rdkit_mol)
         fp = GetMorganFingerprintAsBitVect(rdkit_mol, radius=self.radius, nBits=self.nbits)
         return np.asarray(fp, dtype="int64")
 
@@ -175,10 +113,10 @@ class OneHotSMILESFeaturizer(BaseOneHotEncodingFeaturizer, SingleLigandFeaturize
         Double element symbols (such as `Cl`, ``Br`` for atoms and ``@@`` for chirality)
         are replaced with single element symbols (`L`, ``R`` and ``$`` respectively).
         """
-        rdkit_mol = self.get_rdkit_mol(system.ligand)
-        if rdkit_mol is None:
+        try:  # catch erroneous smiles not yet interpreted in case of lazy instantiation
+            smiles = system.ligand.molecule.to_smiles(explicit_hydrogens=False)
+        except SMILESParseError:
             return ""
-        smiles = system.ligand.get_canonical_smiles(toolkit="rdkit")
         return smiles.replace("Cl", "L").replace("Br", "R").replace("@@", "$")
 
 
@@ -206,8 +144,11 @@ class OneHotRawSMILESFeaturizer(OneHotSMILESFeaturizer):
         system: LigandSystem or ProteinLigandComplex
             The system being featurized
         """
-
-        return system.ligand.smiles.replace("Cl", "L").replace("Br", "R").replace("@@", "$")
+        try:  # catch Ligand not initialized with SMILES
+            raw_smiles = system.ligand.metadata["smiles"]
+        except KeyError:
+            return ""
+        return raw_smiles.replace("Cl", "L").replace("Br", "R").replace("@@", "$")
 
 
 class GraphLigandFeaturizer(SingleLigandFeaturizer):
@@ -294,9 +235,14 @@ class GraphLigandFeaturizer(SingleLigandFeaturizer):
             - Graph connectivity of the molecule with shape ``(2, n_edges)``
             - Feature matrix with shape ``(n_atoms, n_features)``
         """
-        rdkit_mol = self.get_rdkit_mol(system.ligand)
-        if rdkit_mol is None:
+        from rdkit.Chem import RemoveHs
+
+        try:  # catch erroneous smiles not yet interpreted in case of lazy instantiation
+            rdkit_mol = system.ligand.molecule.to_rdkit()
+        except SMILESParseError:
             return None
+
+        rdkit_mol = RemoveHs(rdkit_mol)
         connectivity_graph = self._connectivity_COO_format(rdkit_mol)
         per_atom_features = np.array(
             [self._per_atom_features(a) for a in rdkit_mol.GetAtoms()]

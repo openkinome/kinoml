@@ -40,10 +40,6 @@ def test_single_ligand_featurizer():
     ],
 )
 def test_ligand_MorganFingerprintFeaturizer_RDKit(smiles, solution):
-    """
-    OFFTK _will_ add hydrogens to all ingested SMILES, and export a canonicalized output,
-    so the representation you get might not be the one you expect if you compute it directly.
-    """
     ligand = Ligand(smiles=smiles)
     system = LigandSystem([ligand])
     featurizer = MorganFingerprintFeaturizer(radius=2, nbits=512)
@@ -62,11 +58,6 @@ def test_ligand_MorganFingerprintFeaturizer_RDKit(smiles, solution):
     ],
 )
 def test_ligand_OneHotSMILESFeaturizer_RDKit(smiles, solution):
-    """
-    OFFTK _will_ add hydrogens to all ingested SMILES, and export a canonicalized output,
-    so the representation you get might not be the one you expect if you compute it directly.
-    That's why we use RDKitLigand here.
-    """
     ligand = Ligand(smiles=smiles)
     system = LigandSystem([ligand])
     featurizer = OneHotSMILESFeaturizer()
@@ -312,11 +303,6 @@ def test_ligand_OneHotSMILESFeaturizer_RDKit(smiles, solution):
     ],
 )
 def test_ligand_GraphLigandFeaturizer_RDKit(smiles, solution):
-    """
-    OFFTK _will_ add hydrogens to all ingested SMILES, and export a canonicalized output,
-    so the representation you get might not be the one you expect if you compute it directly.
-    That's why we use RDKitLigand here.
-    """
     ligand = Ligand(smiles=smiles)
     system = LigandSystem([ligand])
     GraphLigandFeaturizer().featurize([system])

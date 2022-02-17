@@ -3,6 +3,8 @@
 """
 
 import logging
+from pathlib import Path
+from typing import Union
 
 from openff.toolkit.topology import Molecule
 
@@ -13,22 +15,81 @@ logger = logging.getLogger(__name__)
 
 
 class Ligand(BaseLigand):
+    """
+    Create a new Ligand object. An openff representation is accessible via the molecule attribute.
 
-    def __init__(self, molecule=None, name=None, smiles=None, metadata=None, **kwargs):
+    Examples
+    --------
+
+    Create a ligand from file:
+
+    >>> ligand = Ligand.from_file("data/molecules/chloroform.sdf", name="chloroform")
+
+    Create a ligand from an openff molecule:
+
+    >>> from openff.toolkit.topology import Molecule
+    >>> molecule = Molecule.from_file("data/molecules/chloroform.sdf")
+    >>> ligand = Ligand(molecule=molecule, name="chloroform")
+
+    Create a ligand from SMILES:
+
+    >>> ligand = Ligand.from_smiles("C(Cl)(Cl)Cl", name="chloroform")
+
+    Create a ligand from SMILES with lazy instantiation:
+
+    >>> ligand = Ligand(smiles="C(Cl)(Cl)Cl", name="chloroform")
+
+    """
+    def __init__(
+            self,
+            molecule: Union[Molecule, None] = None,
+            smiles: str = "",
+            name: str = "",
+            metadata: Union[dict, None] = None,
+            **kwargs
+    ):
+        """
+        Create a new Ligand object. Lazy instantiation is possible via the smiles parameter.
+
+        Parameters
+        ----------
+        molecule: openff.toolkit.topology.Molecule or None, default=None
+            An openff representation of the ligand.
+        smiles: str, default=""
+            The SMILES representation of the ligand. Can be used for lazy instantiation, i.e. will
+            interpreted when calling the molecule attribute the first time.
+        name: str, default=""
+            The name of the ligand.
+        metadata: dict or None, default=None
+            Additional metadata of the needed for e.g. featurizers or provenance.
+        """
         BaseLigand.__init__(self, name=name, metadata=metadata, **kwargs)
         self._molecule = molecule
         self._smiles = smiles
 
     @property
     def molecule(self):
+        """Decorate molecule to modify setter and getter."""
         return self._molecule
 
     @molecule.setter
-    def molecule(self, new_value):
+    def molecule(self, new_value: Union[Molecule, None]):
+        """
+        Store a new value for molecule in the _molecule attribute.
+
+        Parameters
+        ----------
+        new_value: openff.toolkit.topology.Molecule or None
+            The new openff molecule.
+        """
         self._molecule = new_value
 
     @molecule.getter
     def molecule(self):
+        """
+        Get the _molecule attribute. If the _smiles attribute is given, a new openff molecule will
+        be created from smiles, e.g. in case of lazy instantiation.
+        """
         if self._smiles:
             self._molecule = Molecule.from_smiles(
                 smiles=self._smiles, allow_undefined_stereo=True
@@ -43,80 +104,61 @@ class Ligand(BaseLigand):
         return self._molecule
 
     @classmethod
-    def from_smiles(cls, smiles, name=None, allow_undefined_stereo=True, **kwargs):
+    def from_smiles(
+            cls,
+            smiles: str,
+            name: str = "",
+            allow_undefined_stereo: bool = True,
+            **kwargs
+    ):
+        """
+        Create a Ligand from a SMILES representation.
+
+        Parameters
+        ----------
+        smiles: str
+            smiles: str
+            The SMILES representation of the ligand.
+        name: str, default=""
+            The name of the ligand.
+        allow_undefined_stereo: bool, default=True
+            If undefined stereo centers should be allowed.
+        **kwargs:
+            Any keyword arguments allowed for the from_smiles method of the openff molecule class.
+        """
         molecule = Molecule.from_smiles(
             smiles=smiles, allow_undefined_stereo=allow_undefined_stereo, **kwargs
         )
         if name is None:
             name = smiles
-        return cls(smiles=smiles, molecule=molecule, name=name, metadata={"smiles": smiles})
+        return cls(molecule=molecule, name=name, metadata={"smiles": smiles})
 
     @classmethod
-    def from_file(cls, file_path, name=None, allow_undefined_stereo=True, **kwargs):
+    def from_file(
+            cls,
+            file_path: Union[Path, str],
+            name: str = "",
+            allow_undefined_stereo: bool = True,
+            **kwargs
+    ):
+        """
+        Create a Ligand from file.
+
+        Parameters
+        ----------
+        file_path: pathlib.Path or str
+            The path to the molecular file. For supported formats see the openff molecule
+            documentation.
+        name: str, default=""
+            The name of the ligand.
+        allow_undefined_stereo: bool, default=True
+            If undefined stereo centers should be allowed.
+        **kwargs:
+            Any keyword arguments allowed for the from_file method of the openff molecule class.
+        """
         molecule = Molecule.from_file(
             file_path=file_path, allow_undefined_stereo=allow_undefined_stereo, **kwargs
         )
         if name is None:
             name = molecule.to_smiles(explicit_hydrogens=False)
         return cls(molecule=molecule, name=name, metadata={"file_path": file_path})
-
-
-class Ligand2(BaseLigand, Molecule):
-
-    def __init__(self, molecule=None, smiles=None, name=None, metadata=None, *args, **kwargs):
-        Molecule.__init__(self, molecule, *args, **kwargs)
-        BaseLigand.__init__(self, name=name, metadata=metadata)
-        self._smiles = smiles
-
-    @classmethod
-    def from_smiles(cls, smiles, name=None, allow_undefined_stereo=True, **kwargs):
-        """
-        Same as `openff.toolkit.topology.Molecule`, but adding information about the original
-        SMILES to the ``.metadata`` dict.
-
-        Parameters
-        ----------
-        smiles: str
-            SMILES representation of the ligand. This string will be stored in the ``metadata``
-            attribute under the ``smiles`` key.
-        name: str, optional
-            An easily identifiable name for the molecule. If not given, ``smiles`` is used.
-        """
-        self = super().from_smiles(smiles, allow_undefined_stereo=allow_undefined_stereo, **kwargs)
-        if name is None:
-            name = smiles
-        super().__init__(self, name=name, metadata={"smiles": smiles})
-        return self
-
-    @classmethod
-    def from_file(cls, file_path, name=None, allow_undefined_stereo=True, **kwargs):
-        """
-        Same as `openff.toolkit.topology.Molecule`, but adding information about the file to
-        the ``.metadata`` dict.
-
-        Parameters
-        ----------
-        file_path: str or Path
-            Path to file of the ligand. This string will be stored in the ``metadata`` attribute
-            under the ``file_path`` key.
-        name: str, optional
-            An easily identifiable name for the molecule. If not given, ``file_path`` is used.
-        """
-        self = super().from_file(
-            file_path, allow_undefined_stereo=allow_undefined_stereo, **kwargs
-        )
-        if name is None:
-            name = file_path
-        super().__init__(self, name=name, metadata={"file_path": file_path})
-        return self
-
-    def to_dict(self):
-        """Dict representation of the Molecule, including the ``metadata`` dictionary."""
-        d = super().to_dict()
-        d["metadata"] = self.metadata.copy()
-        return d
-
-    def _initialize_from_dict(self, molecule_dict):
-        """Same as Molecule's method, but including the ``metadata`` dict."""
-        super()._initialize_from_dict(molecule_dict)
-        self.metadata = molecule_dict["metadata"].copy()
