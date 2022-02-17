@@ -83,7 +83,7 @@ class MorganFingerprintFeaturizer(SingleLigandFeaturizer):
 class OneHotSMILESFeaturizer(BaseOneHotEncodingFeaturizer, SingleLigandFeaturizer):
 
     """
-    One-hot encodes a ``Ligand`` from a canonical SMILES representation.
+    One-hot encodes a ``Ligand`` from a SMILES representation.
 
     Attributes
     ----------
@@ -103,52 +103,41 @@ class OneHotSMILESFeaturizer(BaseOneHotEncodingFeaturizer, SingleLigandFeaturize
         "LR$"  # single-char representation of Cl, Br, @@
     )
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
-    def _retrieve_sequence(self, system: Union[LigandSystem, ProteinLigandComplex]) -> str:
+    def __init__(self, smiles_type: str = "canonical", **kwargs):
         """
-        Get SMILES string from a `Ligand`-like component and postprocesses it.
-
-        Double element symbols (such as `Cl`, ``Br`` for atoms and ``@@`` for chirality)
-        are replaced with single element symbols (`L`, ``R`` and ``$`` respectively).
-        """
-        try:  # catch erroneous smiles not yet interpreted in case of lazy instantiation
-            smiles = system.ligand.molecule.to_smiles(explicit_hydrogens=False)
-        except SMILESParseError:
-            return ""
-        return smiles.replace("Cl", "L").replace("Br", "R").replace("@@", "$")
-
-
-class OneHotRawSMILESFeaturizer(OneHotSMILESFeaturizer):
-    """
-    Like ``OneHotSMILESFeaturizer``, but instead of using ``ligand.get_canonical_smiles()``
-    to obtain the canonical SMILES from the ligand, it relies on the stored ``smiles``
-    attribute (most possibly the original SMILES contained in the dataset).
-
-    This should only be used for debugging purposes.
-    """
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
-    def _retrieve_sequence(self, system: Union[LigandSystem, ProteinLigandComplex]) -> str:
-        """
-        Get SMILES string from a `Ligand`-like component and postprocesses it.
-
-        Double element symbols (such as `Cl`, ``Br`` for atoms and ``@@`` for chirality)
-        are replaced with single element symbols (`L`, ``R`` and ``$`` respectively).
+        One-hot encodes a ``Ligand`` from a SMILES representation.
 
         Parameters
         ----------
-        system: LigandSystem or ProteinLigandComplex
-            The system being featurized
+        smiles_type: str, default=canonical
+            The smiles type to use ('canonical' or 'raw').
         """
-        try:  # catch Ligand not initialized with SMILES
-            raw_smiles = system.ligand.metadata["smiles"]
-        except KeyError:
+        super().__init__(**kwargs)
+        if smiles_type not in ["canonical", "raw"]:
+            raise ValueError(
+                "Only 'canonical' and 'raw' are supported smiles_type, you provided "
+                f"{smiles_type}."
+            )
+        self.smiles_type = smiles_type
+
+    def _retrieve_sequence(self, system: Union[LigandSystem, ProteinLigandComplex]) -> str:
+        """
+        Get SMILES string from a `Ligand`-like component and postprocesses it.
+
+        Double element symbols (such as `Cl`, ``Br`` for atoms and ``@@`` for chirality)
+        are replaced with single element symbols (`L`, ``R`` and ``$`` respectively).
+        """
+        try:
+            if self.smiles_type == "canonical":
+                smiles = system.ligand.molecule.to_smiles(explicit_hydrogens=False)
+            else:
+                smiles = system.ligand.metadata["smiles"]
+        except SMILESParseError:  # erroneous SMILES string
             return ""
-        return raw_smiles.replace("Cl", "L").replace("Br", "R").replace("@@", "$")
+        except KeyError:  # no SMILES string given during initialization
+            return ""
+
+        return smiles.replace("Cl", "L").replace("Br", "R").replace("@@", "$")
 
 
 class GraphLigandFeaturizer(SingleLigandFeaturizer):

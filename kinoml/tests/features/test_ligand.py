@@ -39,7 +39,7 @@ def test_single_ligand_featurizer():
         ),
     ],
 )
-def test_ligand_MorganFingerprintFeaturizer_RDKit(smiles, solution):
+def test_ligand_MorganFingerprintFeaturizer(smiles, solution):
     ligand = Ligand(smiles=smiles)
     system = LigandSystem([ligand])
     featurizer = MorganFingerprintFeaturizer(radius=2, nbits=512)
@@ -57,7 +57,7 @@ def test_ligand_MorganFingerprintFeaturizer_RDKit(smiles, solution):
         ("CC", np.array([[0, 1] + [0] * 51, [0, 1] + [0] * 51])),
     ],
 )
-def test_ligand_OneHotSMILESFeaturizer_RDKit(smiles, solution):
+def test_ligand_OneHotSMILESFeaturizer(smiles, solution):
     ligand = Ligand(smiles=smiles)
     system = LigandSystem([ligand])
     featurizer = OneHotSMILESFeaturizer()
