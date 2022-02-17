@@ -518,7 +518,7 @@ class KLIFSKinase(Protein):
             structure_klifs_residues
             structure_klifs_id
         """
-        if not self._structure_klifs_residues:
+        if self._structure_klifs_residues is None:
             if self.structure_klifs_id:
                 from opencadd.databases.klifs import setup_remote
 
