@@ -185,7 +185,7 @@ class AminoAcidSequence(Biosequence):
     Examples
     --------
     Amino acid sequences can be created by providing the sequence manually or by fetching from
-    e.g. UniProt.
+    e.g. UniProt:
 
     >>> alatripeptide = AminoAcidSequence(sequence="AAA", name="alatripeptide")
     >>> alatripeptide.sequence
@@ -193,6 +193,30 @@ class AminoAcidSequence(Biosequence):
     >>> abl1 = AminoAcidSequence(uniprot_id="P00519", name="ABL1")
     >>> abl1.sequence[:5]
     "MLEIC"
+
+    Fetched sequences can be altered by providing information via metadata["mutations"], i.e.:
+     - insertions - formatted like "ins123AGA"
+     - deletions - formatted like "del12-15P" (the P stands for a proline insert (optional))
+     - substitutions - formatted like "T315A"
+
+     >>> abl1 = AminoAcidSequence(
+     >>>     uniprot_id="P00519", name="ABL1", metadata={"mutations": "T315A"}
+     >>> )
+
+     Multiple mutations can be added sequentially in a single string:
+
+     >>> abl1 = AminoAcidSequence(
+     >>>     uniprot_id="P00519", name="ABL1", metadata={"mutations": "T315A del320-22P"}
+     >>> )
+
+     An artificial contruct only consisting of a part of the sequence can be specified via
+     metadata["construct_range"]:
+     >>> abl1 = AminoAcidSequence(
+     >>>     uniprot_id="P00519",
+     >>>     name="ABL1",
+     >>>     metadata={"mutations": "T315A", "construct_range": "229-512"}
+     >>> )
+
     """
 
     ALPHABET = "ACDEFGHIKLMNPQRSTVWY"
@@ -207,12 +231,38 @@ class AminoAcidSequence(Biosequence):
     def _query_sequence_sources(self):
         """
         Query available sources for sequence details. Add additional methods below to allow
-        fetching from other sources.
+        fetching from other sources. Perform mutations etc if given via metadata.
         """
         if self.uniprot_id:
             self._query_uniprot()
         elif self.ncbi_id:
             self._query_ncbi()
+        if "mutations" in self.metadata.keys():
+            mutations = self.metadata["mutations"].split()
+            del self.metadata["mutations"]  # remove mutations, will be added subsequently
+            for mutation in mutations:
+                import re
+                if mutation.startswith("ins"):  # insertion
+                    logger.debug(f"Performing insertion {mutation} ...")
+                    match = re.search("ins(?P<position>[0-9]+)(?P<insertion>[A-Z]+)", mutation)
+                    self.insert(int(match.group("position")), match.group("insertion"))
+                elif mutation.startswith("del"):  # deletion
+                    logger.debug(f"Performing deletion {mutation} ...")
+                    match = re.search(
+                        "del(?P<first>[0-9]+)-(?P<last>[0-9]+)(?P<insertion>[A-Z]*)", mutation
+                    )
+                    self.delete(
+                        int(match.group("first")),
+                        int(match.group("last")),
+                        match.group("insertion")
+                    )
+                else:  # substitution
+                    logger.debug(f"Performing substitution {mutation} ...")
+                    self.substitute(mutation)
+        if "construct_range" in self.metadata.keys():
+            logger.debug(f"Cropping sequence to construct {self.metadata['construct_range']} ...")
+            first, last = [int(x) for x in self.metadata["construct_range"].split("-")]
+            self._sequence = self._sequence[first - 1: last]  # 1-indexed
 
     def _query_uniprot(self):
         """Fetch the amino acid sequence from UniProt."""
