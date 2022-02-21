@@ -25,7 +25,7 @@ def test_BaseFeaturizer():
     systems = [
         LigandSystem(components=[ligand]),
         LigandSystem(components=[ligand]),
-        LigandSystem(components=[ligand])
+        LigandSystem(components=[ligand]),
     ]
     featurizer = BaseFeaturizer()
     with pytest.raises(NotImplementedError):
@@ -40,7 +40,7 @@ def test_Pipeline():
     systems = [
         LigandSystem(components=[ligand]),
         LigandSystem(components=[ligand]),
-        LigandSystem(components=[ligand])
+        LigandSystem(components=[ligand]),
     ]
     featurizers = (NullFeaturizer(), NullFeaturizer())
     pipeline = Pipeline(featurizers)
@@ -107,9 +107,9 @@ def test_PadFeaturizer():
 
 def test_HashFeaturizer():
     system = LigandSystem([Ligand(smiles="CCC")])
-    HashFeaturizer(
-        getter=lambda s: s.ligand.molecule.to_smiles(), normalize=True
-    ).featurize([system])
+    HashFeaturizer(getter=lambda s: s.ligand.molecule.to_smiles(), normalize=True).featurize(
+        [system]
+    )
     assert system.featurizations["last"] == pytest.approx(0.62342903)
 
 
@@ -128,9 +128,9 @@ def test_CallableFeaturizer():
         LigandSystem([Ligand(smiles="CC")]),
         LigandSystem([Ligand(smiles="CCC")]),
     )
-    HashFeaturizer(
-        getter=lambda s: s.ligand.molecule.to_smiles(), normalize=False
-    ).featurize(systems)
+    HashFeaturizer(getter=lambda s: s.ligand.molecule.to_smiles(), normalize=False).featurize(
+        systems
+    )
     CallableFeaturizer(lambda s: scale(s.featurizations["last"].reshape((1,)))).featurize(systems)
 
     for s in systems:

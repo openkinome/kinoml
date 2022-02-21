@@ -52,17 +52,18 @@ class Protein(BaseProtein, AminoAcidSequence):
     >>> protein.sequence
 
     """
+
     def __init__(
-            self,
-            pdb_id: str = "",
-            molecule: Union[oechem.OEMol, oechem.OEGraphMol, Universe, None] = None,
-            toolkit: str = "OpenEye",
-            name: str = "",
-            sequence: str = "",
-            uniprot_id: str = "",
-            ncbi_id: str = "",
-            metadata: Union[dict, None] = None,
-            **kwargs
+        self,
+        pdb_id: str = "",
+        molecule: Union[oechem.OEMol, oechem.OEGraphMol, Universe, None] = None,
+        toolkit: str = "OpenEye",
+        name: str = "",
+        sequence: str = "",
+        uniprot_id: str = "",
+        ncbi_id: str = "",
+        metadata: Union[dict, None] = None,
+        **kwargs,
     ):
         """
         Create a new Protein object. Lazy instantiation is possible via the pdb_id parameter.
@@ -94,7 +95,7 @@ class Protein(BaseProtein, AminoAcidSequence):
             uniprot_id=uniprot_id,
             ncbi_id=ncbi_id,
             metadata=metadata,
-            **kwargs
+            **kwargs,
         )
         self._pdb_id = pdb_id
         if toolkit not in ["OpenEye", "MDAnalysis"]:
@@ -162,12 +163,15 @@ class Protein(BaseProtein, AminoAcidSequence):
         """
         if not self._molecule and self.pdb_id:
             from ..databases.pdb import download_pdb_structure
+
             file_path = download_pdb_structure(self.pdb_id)
             if self.toolkit == "OpenEye":
                 from ..modeling.OEModeling import read_molecules
+
                 self._molecule = read_molecules(file_path)[0]
             elif self.toolkit == "MDAnalysis":
                 from ..modeling.MDAnalysisModeling import read_molecule
+
                 self._molecule = read_molecule(file_path)
             if not self.name:
                 self.name = self.pdb_id
@@ -193,9 +197,11 @@ class Protein(BaseProtein, AminoAcidSequence):
         """
         if toolkit == "OpenEye":
             from ..modeling.OEModeling import read_molecules
+
             molecule = read_molecules(file_path)[0]
         else:
             from ..modeling.MDAnalysisModeling import read_molecule
+
             molecule = read_molecule(file_path)
 
         return cls(
@@ -220,12 +226,15 @@ class Protein(BaseProtein, AminoAcidSequence):
             The toolkit to use for molecular representation.
         """
         from ..databases.pdb import download_pdb_structure
+
         file_path = download_pdb_structure(pdb_id)
         if toolkit == "OpenEye":
             from ..modeling.OEModeling import read_molecules
+
             molecule = read_molecules(file_path)[0]
         else:
             from ..modeling.MDAnalysisModeling import read_molecule
+
             molecule = read_molecule(file_path)
         if not name:
             name = pdb_id
@@ -267,21 +276,21 @@ class KLIFSKinase(Protein):
     """
 
     def __init__(
-            self,
-            pdb_id: str = "",
-            molecule: Union[oechem.OEMol, oechem.OEGraphMol, Universe, None] = None,
-            toolkit: str = "OpenEye",
-            name: str = "",
-            sequence: str = "",
-            uniprot_id: str = "",
-            ncbi_id: str = "",
-            structure_klifs_id: Union[int, None] = None,
-            kinase_klifs_id: Union[int, None] = None,
-            kinase_klifs_sequence: str = "",
-            structure_klifs_sequence: str = "",
-            structure_klifs_residues: Union[pd.DataFrame, None] = None,
-            metadata: Union[dict, None] = None,
-            **kwargs
+        self,
+        pdb_id: str = "",
+        molecule: Union[oechem.OEMol, oechem.OEGraphMol, Universe, None] = None,
+        toolkit: str = "OpenEye",
+        name: str = "",
+        sequence: str = "",
+        uniprot_id: str = "",
+        ncbi_id: str = "",
+        structure_klifs_id: Union[int, None] = None,
+        kinase_klifs_id: Union[int, None] = None,
+        kinase_klifs_sequence: str = "",
+        structure_klifs_sequence: str = "",
+        structure_klifs_residues: Union[pd.DataFrame, None] = None,
+        metadata: Union[dict, None] = None,
+        **kwargs,
     ):
         super().__init__(
             pdb_id=pdb_id,
@@ -292,7 +301,7 @@ class KLIFSKinase(Protein):
             uniprot_id=uniprot_id,
             ncbi_id=ncbi_id,
             metadata=metadata,
-            **kwargs
+            **kwargs,
         )
         """
         Create a new KLIFSKinase object. Lazy instantiation is possible via the pdb_id parameter.
@@ -402,6 +411,7 @@ class KLIFSKinase(Protein):
         """
         if not self._kinase_klifs_sequence:
             from opencadd.databases.klifs import setup_remote
+
             remote = setup_remote()
             if not self.kinase_klifs_id:
                 if self.structure_klifs_id:

@@ -52,8 +52,7 @@ class MorganFingerprintFeaturizer(SingleLigandFeaturizer):
         self.nbits = nbits
 
     def _featurize_one(
-            self,
-            system: Union[LigandSystem, ProteinLigandComplex]
+        self, system: Union[LigandSystem, ProteinLigandComplex]
     ) -> Union[np.ndarray, None]:
         """
         Return the Morgan fingerprint for the given system.
@@ -207,7 +206,7 @@ class GraphLigandFeaturizer(SingleLigandFeaturizer):
         self._hybridization_names = sorted(Chem.rdchem.HybridizationType.names)
 
     def _featurize_one(
-            self, system: Union[LigandSystem, ProteinLigandComplex]
+        self, system: Union[LigandSystem, ProteinLigandComplex]
     ) -> Union[tuple, None]:
         """
         Featurizes ligands contained in a System as a labeled graph.
@@ -233,9 +232,7 @@ class GraphLigandFeaturizer(SingleLigandFeaturizer):
             return None
 
         connectivity_graph = self._connectivity_COO_format(rdkit_mol)
-        per_atom_features = np.array(
-            [self._per_atom_features(a) for a in rdkit_mol.GetAtoms()]
-        )
+        per_atom_features = np.array([self._per_atom_features(a) for a in rdkit_mol.GetAtoms()])
         return connectivity_graph, per_atom_features
 
     def _per_atom_features(self, atom) -> np.ndarray:

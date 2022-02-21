@@ -49,7 +49,7 @@ class AminoAcidCompositionFeaturizer(SingleProteinFeaturizer):
         _counter[k] = 0
 
     def _featurize_one(
-            self, system: Union[ProteinSystem, ProteinLigandComplex]
+        self, system: Union[ProteinSystem, ProteinLigandComplex]
     ) -> Union[np.array, None]:
         """
         Featurizes a protein using the residue count in the sequence.

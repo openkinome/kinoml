@@ -85,7 +85,7 @@ class Biosequence(object):
         old, position, new = search.groups()
         position = int(position)
         assert (
-                new in self.ALPHABET
+            new in self.ALPHABET
         ), f"{new} is not a valid {self.__class__.__name__} character ({self.ALPHABET})"
         if position < 1 or position > len(self.sequence):
             raise ValueError(
@@ -221,9 +221,7 @@ class AminoAcidSequence(Biosequence):
 
     ALPHABET = "ACDEFGHIKLMNPQRSTVWY"
 
-    def __init__(
-            self, uniprot_id="", ncbi_id="", sequence="", name="", metadata=None, **kwargs
-    ):
+    def __init__(self, uniprot_id="", ncbi_id="", sequence="", name="", metadata=None, **kwargs):
         super().__init__(sequence=sequence, name=name, metadata=metadata, **kwargs)
         self.uniprot_id = uniprot_id
         self.ncbi_id = ncbi_id
@@ -242,6 +240,7 @@ class AminoAcidSequence(Biosequence):
             del self.metadata["mutations"]  # remove mutations, will be added subsequently
             for mutation in mutations:
                 import re
+
                 if mutation.startswith("ins"):  # insertion
                     logger.debug(f"Performing insertion {mutation} ...")
                     match = re.search("ins(?P<position>[0-9]+)(?P<insertion>[A-Z]+)", mutation)
@@ -249,12 +248,13 @@ class AminoAcidSequence(Biosequence):
                 elif mutation.startswith("del"):  # deletion
                     logger.debug(f"Performing deletion {mutation} ...")
                     match = re.search(
-                        "del(?P<first>[0-9]+)-(?P<last>[0-9]+)(?P<insertion>[A-Z]*)", mutation
+                        "del(?P<first>[0-9]+)-(?P<last>[0-9]+)(?P<insertion>[A-Z]*)",
+                        mutation,
                     )
                     self.delete(
                         int(match.group("first")),
                         int(match.group("last")),
-                        match.group("insertion")
+                        match.group("insertion"),
                     )
                 else:  # substitution
                     logger.debug(f"Performing substitution {mutation} ...")
@@ -262,7 +262,7 @@ class AminoAcidSequence(Biosequence):
         if "construct_range" in self.metadata.keys():
             logger.debug(f"Cropping sequence to construct {self.metadata['construct_range']} ...")
             first, last = [int(x) for x in self.metadata["construct_range"].split("-")]
-            self._sequence = self._sequence[first - 1: last]  # 1-indexed
+            self._sequence = self._sequence[first - 1 : last]  # 1-indexed
 
     def _query_uniprot(self):
         """Fetch the amino acid sequence from UniProt."""

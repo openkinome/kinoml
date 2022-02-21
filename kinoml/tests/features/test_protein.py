@@ -20,13 +20,70 @@ def test_aminoacidcompositionfeaturizer():
 
     assert len(featurized_systems) == 3  # filter protein with wrong UniProt ID
     assert list(featurized_systems[0].featurizations["last"]) == [
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
     ]
     assert list(featurized_systems[1].featurizations["last"]) == [
-        1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
     ]
     assert list(featurized_systems[2].featurizations["last"]) == [
-        97, 14, 42, 90, 29, 88, 24, 33, 82, 96, 18, 40, 90, 33, 64, 120, 65, 62, 13, 30
+        97,
+        14,
+        42,
+        90,
+        29,
+        88,
+        24,
+        33,
+        82,
+        96,
+        18,
+        40,
+        90,
+        33,
+        64,
+        120,
+        65,
+        62,
+        13,
+        30,
     ]
 
 

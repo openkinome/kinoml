@@ -559,7 +559,7 @@ class BaseOneHotEncodingFeaturizer(ParallelBaseFeaturizer):
             raise ValueError("This featurizer requires a populated dictionary!")
 
     def _featurize_one(
-            self, system: Union[LigandSystem, ProteinLigandComplex]
+        self, system: Union[LigandSystem, ProteinLigandComplex]
     ) -> Union[np.ndarray, None]:
         """
         One hot encode one system.
@@ -702,7 +702,7 @@ class HashFeaturizer(BaseFeaturizer):
         super().__init__(**kwargs)
         self.getter = getter or self._getter
         self.normalize = normalize
-        self.denominator = 2 ** 256 if normalize else 1
+        self.denominator = 2**256 if normalize else 1
 
     @staticmethod
     def _getter(system):

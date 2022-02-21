@@ -72,7 +72,7 @@ class PKIS2DatasetProvider(DatasetProvider):
                 kinase = Protein(
                     name=discoverx_id,
                     ncbi_id=ncbi_id,
-                    metadata={"construct_range": f"{first}-{last}"}
+                    metadata={"construct_range": f"{first}-{last}"},
                 )
             kinases[discoverx_id] = kinase
 
@@ -93,7 +93,7 @@ class PKIS2DatasetProvider(DatasetProvider):
                 measurement = PercentageDisplacementMeasurement(
                     inhibition_value,
                     conditions=AssayConditions(pH=7.0),
-                    system=ProteinLigandComplex(components=[ligand, kinases[kinase_name]])
+                    system=ProteinLigandComplex(components=[ligand, kinases[kinase_name]]),
                 )
                 measurements.append(measurement)
 

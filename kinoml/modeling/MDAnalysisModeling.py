@@ -18,7 +18,7 @@ def read_molecule(path: Union[str, Path], guess_bonds: bool = True) -> Universe:
         Path to molecule file.
     guess_bonds: bool, default=True
         If bonds should be guessed by the van-der-Waals radius.
-    
+
     Returns
     -------
     molecule: MDAnalysis.core.universe.Universe
@@ -49,7 +49,11 @@ def read_molecule(path: Union[str, Path], guess_bonds: bool = True) -> Universe:
             io.set_structure(structure)
             io.save(tempfile.name)
             molecule = mda.Universe(
-                tempfile.name, in_memory=True, dt=0, vdwradii=vdwradii_new, guess_bonds=guess_bonds
+                tempfile.name,
+                in_memory=True,
+                dt=0,
+                vdwradii=vdwradii_new,
+                guess_bonds=guess_bonds,
             )
     else:
         molecule = mda.Universe(

@@ -86,7 +86,7 @@ class ChEMBLDatasetProvider(MultiDatasetProvider):
                         sequence=kinase_key,
                         name=row["UniprotID"],
                         uniprot_id=row["UniprotID"],
-                        metadata=metadata
+                        metadata=metadata,
                     )
                     kinases[kinase_key] = kinase
                 if ligand_key not in ligands:

@@ -40,13 +40,14 @@ class Ligand(BaseLigand):
     >>> ligand = Ligand(smiles="C(Cl)(Cl)Cl", name="chloroform")
 
     """
+
     def __init__(
-            self,
-            molecule: Union[Molecule, None] = None,
-            smiles: str = "",
-            name: str = "",
-            metadata: Union[dict, None] = None,
-            **kwargs
+        self,
+        molecule: Union[Molecule, None] = None,
+        smiles: str = "",
+        name: str = "",
+        metadata: Union[dict, None] = None,
+        **kwargs
     ):
         """
         Create a new Ligand object. Lazy instantiation is possible via the smiles parameter.
@@ -96,9 +97,7 @@ class Ligand(BaseLigand):
             The openff molecular representation of the ligand.
         """
         if not self._molecule and self._smiles:
-            self._molecule = Molecule.from_smiles(
-                smiles=self._smiles, allow_undefined_stereo=True
-            )
+            self._molecule = Molecule.from_smiles(smiles=self._smiles, allow_undefined_stereo=True)
             if not self.name:
                 self.name = self._smiles
             if self.metadata is None:
@@ -109,11 +108,7 @@ class Ligand(BaseLigand):
 
     @classmethod
     def from_smiles(
-            cls,
-            smiles: str,
-            name: str = "",
-            allow_undefined_stereo: bool = True,
-            **kwargs
+        cls, smiles: str, name: str = "", allow_undefined_stereo: bool = True, **kwargs
     ):
         """
         Create a Ligand from a SMILES representation.
@@ -139,11 +134,11 @@ class Ligand(BaseLigand):
 
     @classmethod
     def from_file(
-            cls,
-            file_path: Union[Path, str],
-            name: str = "",
-            allow_undefined_stereo: bool = True,
-            **kwargs
+        cls,
+        file_path: Union[Path, str],
+        name: str = "",
+        allow_undefined_stereo: bool = True,
+        **kwargs
     ):
         """
         Create a Ligand from file.

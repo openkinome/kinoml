@@ -5,6 +5,7 @@ from contextlib import contextmanager
 from importlib import resources
 import pytest
 
+
 @contextmanager
 def does_not_raise():
     yield
