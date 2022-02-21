@@ -225,7 +225,8 @@ class GraphLigandFeaturizer(SingleLigandFeaturizer):
         """
         try:  # catch erroneous smiles not yet interpreted in case of lazy instantiation
             # rdkit_mol = system.ligand.molecule.to_rdkit()
-            # TODO: this is a hack, investigate why number of implicit hydrogens is wrong
+            # this does not work, since openff toolkit will permit implicit hydrogens when
+            # converting to rdkit (see https://github.com/openforcefield/openff-toolkit/pull/1001)
             smiles = system.ligand.molecule.to_smiles(explicit_hydrogens=False)
             rdkit_mol = Chem.MolFromSmiles(smiles)
         except SMILESParseError:
