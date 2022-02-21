@@ -224,14 +224,14 @@ class GraphLigandFeaturizer(SingleLigandFeaturizer):
             - Graph connectivity of the molecule with shape ``(2, n_edges)``
             - Feature matrix with shape ``(n_atoms, n_features)``
         """
-        from rdkit.Chem import RemoveHs
-
         try:  # catch erroneous smiles not yet interpreted in case of lazy instantiation
-            rdkit_mol = system.ligand.molecule.to_rdkit()
+            # rdkit_mol = system.ligand.molecule.to_rdkit()
+            # TODO: this is a hack, investigate why number of implicit hydrogens is wrong
+            smiles = system.ligand.molecule.to_smiles(explicit_hydrogens=False)
+            rdkit_mol = Chem.MolFromSmiles(smiles)
         except SMILESParseError:
             return None
 
-        rdkit_mol = RemoveHs(rdkit_mol)
         connectivity_graph = self._connectivity_COO_format(rdkit_mol)
         per_atom_features = np.array(
             [self._per_atom_features(a) for a in rdkit_mol.GetAtoms()]
