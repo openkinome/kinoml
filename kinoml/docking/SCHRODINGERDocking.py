@@ -129,7 +129,7 @@ def run_glide(
 
         logger.debug("Filtering poses for appropriate number ...")
         grid_input_file_path = Path(grid_input_file.name)
-        sd_file_path = grid_input_file_path.parent / (grid_input_file_path.stem + "_lib.sdf")
+        sd_file_path = Path(".") / (grid_input_file_path.stem + "_lib.sdf")
         if not sd_file_path:
             logger.debug("No docking poses were generated during docking ...")
             return
