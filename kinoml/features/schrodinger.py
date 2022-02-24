@@ -601,7 +601,7 @@ class SCHRODINGERDockingFeaturizer(SCHRODINGERComplexFeaturizer):
 
         with NamedTemporaryFile(mode="w", suffix=".pdb") as docking_pose_pdb_path:
             logger.debug("Converting docking pose SDF to PDB ...")
-            mol = next(Chem.SDMolSupplier(docking_pose_sdf_path, removeHs=False))
+            mol = next(Chem.SDMolSupplier(str(docking_pose_sdf_path), removeHs=False))
             Chem.MolToPDBFile(mol, docking_pose_pdb_path.name)
 
             logger.debug("Readind docking pose and renaming residue ...")
