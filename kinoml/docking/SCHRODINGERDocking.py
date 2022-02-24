@@ -133,8 +133,8 @@ def run_glide(
         if not sd_file_path:
             logger.debug("No docking poses were generated during docking ...")
             return
-        supplier = Chem.SDMolSupplier(sd_file_path)
-        sd_writer = Chem.SDWriter(output_file_sdf)
+        supplier = Chem.SDMolSupplier(str(sd_file_path))
+        sd_writer = Chem.SDWriter(str(output_file_sdf))
         mol_counter_dict = {}
         for mol in supplier:
             # SDF from glide is sorted by docking score, but mols are in mixed order
