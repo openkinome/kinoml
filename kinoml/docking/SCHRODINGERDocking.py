@@ -46,7 +46,7 @@ def run_glide(
             str(input_file_mae),
             protein_file_mae.name,
             "-asl",
-            "'not protein'"
+            '"not protein"'
         ])
 
         logger.debug("Converting MAE to PDB ...")
