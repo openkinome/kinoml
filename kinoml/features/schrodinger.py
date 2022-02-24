@@ -617,7 +617,8 @@ class SCHRODINGERDockingFeaturizer(SCHRODINGERComplexFeaturizer):
             clashing_water = prepared_structure.select_atoms(
                 "(resname HOH and element O) and around 1.5 resname LIG"
             )
-            prepared_structure = delete_residues(prepared_structure, clashing_water)
+            if len(clashing_water) > 0:
+                prepared_structure = delete_residues(prepared_structure, clashing_water)
 
         write_molecule(prepared_structure.atoms, pdb_path)
 
