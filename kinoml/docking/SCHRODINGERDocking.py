@@ -4,6 +4,8 @@ import subprocess
 from tempfile import NamedTemporaryFile
 from typing import List, Union
 
+from appdirs import user_cache_dir
+
 
 logger = logging.getLogger(__name__)
 
@@ -19,6 +21,7 @@ def run_glide(
         shape_restrain: bool = True,
         macrocyles: bool = False,
         precision: str = "XP",
+        cache_dir: Union[Path, str] = user_cache_dir(),
 ):
     from rdkit import Chem
     from rdkit.Chem import AllChem
@@ -81,23 +84,27 @@ def run_glide(
 
         logger.debug("Writing input file for grid generation ...")
         grid_input_file.write(f"RECEP_FILE '{protein_file_mae.name}'\n")
-        grid_input_file.write(f"OUTPUTDIR '{str(Path(protein_file_mae.name).parent)}'\n")
         grid_input_file.write(f"REF_LIGAND_FILE '{ligand_file_pdb.name}'\n")
         grid_input_file.write("LIGAND_INDEX 1\n")
         grid_input_file.flush()
 
-        logger.debug("Generating grid for docking ...")
-        subprocess.run([
-            str(schrodinger_directory / "glide"),
-            grid_input_file.name,
-            "-HOST",
-            "localhost",
-            "-WAIT",
-            "-OVERWRITE"
-        ])
+        grid_file_path = Path(cache_dir) / (Path(grid_input_file.name).stem + ".zip")
+        if grid_file_path.is_file():
+            logger.debug("Found cached grid file ..")
+        else:
+            logger.debug("Generating grid for docking ...")
+            subprocess.run([
+                str(schrodinger_directory / "glide"),
+                grid_input_file.name,
+                "-HOST",
+                "localhost",
+                "-WAIT",
+                "-OVERWRITE"
+            ])
+            (Path(".") / (Path(grid_input_file.name).stem + ".zip")).rename(grid_file_path)
 
         logger.debug("Writing input file for docking ...")
-        docking_input_file.write(f"GRIDFILE '{grid_input_file.name}'\n")
+        docking_input_file.write(f"GRIDFILE '{str(grid_file_path)}'\n")
         docking_input_file.write(f"LIGANDFILE '{mols_file_sdf.name}'\n")
         docking_input_file.write("POSE_OUTTYPE ligandlib_sd\n")
         docking_input_file.write(f"COMPRESS_POSES False\n")
