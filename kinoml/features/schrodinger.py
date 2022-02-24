@@ -576,7 +576,8 @@ class SCHRODINGERDockingFeaturizer(SCHRODINGERComplexFeaturizer):
             n_poses=1,
             shape_restrain=self.shape_restrain,
             macrocyles=macrocycle,
-            precision="XP"
+            precision="XP",
+            cache_dir=self.cache_dir,
         )
 
         if not output_file_sdf.is_file():
