@@ -54,7 +54,7 @@ def run_glide(
         mae_to_pdb(schrodinger_directory, input_file_mae, input_file_pdb)
 
         logger.debug("Selecting and writing co-crystallized ligand ...")
-        structure = read_molecule(input_file_mae)
+        structure = read_molecule(input_file_pdb)
         ligands = structure.select_atoms(f"resname {ligand_resname}").residues
         if len(ligands) == 0:
             logger.debug(
