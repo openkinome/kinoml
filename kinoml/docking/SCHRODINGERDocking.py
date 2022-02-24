@@ -81,6 +81,7 @@ def run_glide(
 
         logger.debug("Writing input file for grid generation ...")
         grid_input_file.write(f"RECEP_FILE '{protein_file_mae.name}'\n")
+        grid_input_file.write(f"OUTPUT_DIR '{str(Path(protein_file_mae.name).parent)}'\n")
         grid_input_file.write(f"REF_LIGAND_FILE '{ligand_file_pdb.name}'\n")
         grid_input_file.write("LIGAND_INDEX 1\n")
         grid_input_file.flush()
