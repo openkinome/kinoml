@@ -1,7 +1,5 @@
 """
 Featurizers that use SCHRODINGER software.
-
-[WIP]
 """
 import logging
 from pathlib import Path
@@ -245,7 +243,34 @@ class SCHRODINGERComplexFeaturizer(ParallelBaseFeaturizer):
             alternate_location: Union[str, None],
             expo_id: Union[str, None],
             sequence: str,
-    ):
+    ) -> Path:
+        """
+        Pre-process a structure for SCHRODINGER's prepwizard with the following steps:
+         - select chain of interest
+         - select alternate location of interest
+         - remove all ligands but ligand of interest
+         - remove expression tags
+         - delete protein alterations differing from given sequence
+         - renumber protein residues according to the given sequence
+
+        Parameters
+        ----------
+        pdb_path: str or Path
+            Path to the structure file in PDB format.
+        chain_id: str or None
+            The chain ID of interest.
+        alternate_location: str or None
+            The alternate location of interest.
+        expo_id: str or None
+            The resname of the ligand of interest.
+        sequence: str
+            The amino acid sequence of the protein.
+
+        Returns
+        -------
+        : Path
+            The path to the cleaned structure.
+        """
         from MDAnalysis.core.universe import Merge
 
         from ..modeling.MDAnalysisModeling import (
@@ -323,7 +348,25 @@ class SCHRODINGERComplexFeaturizer(ParallelBaseFeaturizer):
 
         return clean_structure_path
 
-    def _prepare_structure(self, input_file, sequence):
+    def _prepare_structure(
+            self, input_file: Path, sequence: Union[str, None]
+    ) -> Union[Path, None]:
+        """
+        Prepare the structure with SCHRODINGER's prepwizard.
+
+        Parameters
+        ----------
+        input_file: Path
+            The path to the input structure file in PDB format.
+        sequence: str or None
+            The amino acid sequence of the protein. If not given, relevant information will be
+            used from the PDB header.
+
+        Returns
+        -------
+        : Path or None
+            The path to the prepared structure if successful.
+        """
 
         from ..modeling.SCHRODINGERModeling import run_prepwizard, mae_to_pdb
         from ..utils import LocalFileStorage, sha256_objects
@@ -367,12 +410,37 @@ class SCHRODINGERComplexFeaturizer(ParallelBaseFeaturizer):
 
     @staticmethod
     def _postprocess_structure(
-            prepared_structure,
-            chain_id,
-            alternate_location,
-            expo_id,
-            sequence,
+            prepared_structure: Universe,
+            chain_id: [str, None],
+            alternate_location: [str, None],
+            expo_id: [str, None],
+            sequence: [str, None],
     ):
+        """
+        Post-process a structure prepared with SCHRODINGER's prepwizard with the following steps:
+         - select the chain of interest
+         - select the alternate location of interest
+         - remove all ligands but the ligands of interest
+         - update residue identifiers, e.g. atom indices, chain ID, residue IDs of non-protein
+
+        Parameters
+        ----------
+        prepared_structure: Universe
+           The structure prepared by SCHRODINGER's prepwizard.
+        chain_id: str or None
+            The chain ID of interest. Will only be used if `sequence` is None.
+        alternate_location: str or None
+            The alternate location of interest. Will only be used if `sequence` is None.
+        expo_id: str or None
+            The resname of the ligand of interest. Will only be used if `sequence` is None.
+        sequence: str or None
+            The amino acid sequence of the protein.
+
+        Returns
+        -------
+        : Universe
+            The post-processed structure.
+        """
 
         from ..modeling.MDAnalysisModeling import (
             select_chain,
@@ -438,11 +506,15 @@ class SCHRODINGERDockingFeaturizer(SCHRODINGERComplexFeaturizer):
      - `sequence`: A string specifying the amino acid sequence in single letter codes to be used
        during loop modeling and for mutations.
 
-    The ligand component should be a BaseLigand with smiles and name attribute:
-
-     - `name`: A string specifying the name of the ligand, will be used for generating the
-       output file name.
+    The ligand component must be a BaseLigand with smiles attribute:
      - `smiles`: A SMILES representation of the molecule to dock.
+
+    Additionally, the ligand component can have the following optional attributes to customize
+    the docking:
+     - `name`: A string specifying the name of the ligand, will be used for generating the
+       output file name and as molecule title in the docking pose SDF file.
+     - `macrocycle`: A bool specifying if the ligand shell be sampled as a macrocycle during
+       docking. Docking will fail, if SCHRDODINGER does not consider the ligand a macrocycle.
 
     Parameters
     ----------
@@ -456,7 +528,7 @@ class SCHRODINGERDockingFeaturizer(SCHRODINGERComplexFeaturizer):
         If the docking shell be performed with shape restrain based on the co-crystallized
         ligand.
     max_retry: int, default=3
-        The maximal number of attempts to try running the prepwizard step.
+        The maximal number of attempts to try running the prepwizard and docking steps.
     """
     from MDAnalysis.core.universe import Universe
 
@@ -464,26 +536,14 @@ class SCHRODINGERDockingFeaturizer(SCHRODINGERComplexFeaturizer):
             self,
             cache_dir: Union[str, Path, None] = None,
             output_dir: Union[str, Path, None] = None,
-            shape_restrain: bool = True,
             max_retry: int = 3,
+            shape_restrain: bool = True,
             **kwargs,
     ):
-        from appdirs import user_cache_dir
-
-        super().__init__(**kwargs)
-        self.cache_dir = Path(user_cache_dir())
-        if cache_dir:
-            self.cache_dir = Path(cache_dir).expanduser().resolve()
-        self.cache_dir.mkdir(parents=True, exist_ok=True)
-        if output_dir:
-            self.output_dir = Path(output_dir).expanduser().resolve()
-            self.output_dir.mkdir(parents=True, exist_ok=True)
-            self.save_output = True
-        else:
-            self.output_dir = Path(user_cache_dir())
-            self.save_output = False
+        super().__init__(
+            cache_dir=cache_dir, output_dir=output_dir, max_retry=max_retry, **kwargs
+        )
         self.shape_restrain = shape_restrain
-        self.max_retry = max_retry
 
     _SUPPORTED_TYPES = (ProteinLigandComplex,)
 
@@ -555,7 +615,7 @@ class SCHRODINGERDockingFeaturizer(SCHRODINGERComplexFeaturizer):
             prepared_structure=prepared_structure,
             chain_id=system_dict["protein_chain_id"],
             alternate_location=system_dict["protein_alternate_location"],
-            expo_id=["LIG"],
+            expo_id="LIG",
             sequence=system_dict["protein_sequence"],
         )
 
@@ -571,8 +631,35 @@ class SCHRODINGERDockingFeaturizer(SCHRODINGERComplexFeaturizer):
 
         return prepared_structure
 
-    def _dock_molecule(self, mae_file, output_file_sdf, ligand_resname, smiles, macrocycle):
+    def _dock_molecule(
+            self,
+            mae_file: Path,
+            output_file_sdf: Path,
+            ligand_resname: str,
+            smiles: str,
+            macrocycle: bool
+    ) -> bool:
+        """
+        Dock the molecule into the protein with SCHRODINGER's Glide.
 
+        Parameters
+        ----------
+        mae_file: Path
+            Path to the prepared structure for docking.
+        output_file_sdf: Path
+            Path to the output docking pose in SDF format.
+        ligand_resname: str
+            The resname of the ligand defining the binding pocket.
+        smiles: str
+            The molecule to dock as SMILES representation.
+        macrocycle: bool
+            If molecule to dock shell be treated as macrocycle during docking.
+
+        Returns
+        -------
+        : bool
+            True if successful, else False.
+        """
         from ..docking.SCHRODINGERDocking import run_glide
 
         for i in range(self.max_retry):
@@ -596,7 +683,28 @@ class SCHRODINGERDockingFeaturizer(SCHRODINGERComplexFeaturizer):
         return False
 
     @staticmethod
-    def _replace_ligand(pdb_path, resname_replace, docking_pose_sdf_path):
+    def _replace_ligand(
+            pdb_path: Path,
+            resname_replace: str,
+            docking_pose_sdf_path: Path
+    ) -> Universe:
+        """
+        Replace the ligand in a PDB file with a ligand in an SDF file.
+
+        Parameters
+        ----------
+        pdb_path: Path
+            Path to the PDB file of the protein ligand complex.
+        resname_replace: str
+            The resname of the ligand that shell be removed from the structure.
+        docking_pose_sdf_path: Path
+            Path to the molecule in SDF format that shell be added to the structure.
+
+        Returns
+        -------
+        : Universe
+            The structure with replaced ligand.
+        """
         from tempfile import NamedTemporaryFile
 
         from MDAnalysis.core.universe import Merge

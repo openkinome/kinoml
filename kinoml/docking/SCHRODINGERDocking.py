@@ -15,7 +15,7 @@ def run_glide(
         input_file_mae: Union[Path, str],
         output_file_sdf: Union[Path, str],
         ligand_resname: str,
-        mols_smiles: Union[List[str]],
+        mols_smiles: List[str],
         n_poses: int = 1,
         mols_names: Union[List[str], None] = None,
         shape_restrain: bool = True,
@@ -23,6 +23,37 @@ def run_glide(
         precision: str = "XP",
         cache_dir: Union[Path, str] = user_cache_dir(),
 ):
+    """
+    Run glide for protein ligand docking.
+
+    Parameters
+    ----------
+    schrodinger_directory: Path or str
+        The path to the directory of the Schrodinger installation.
+    input_file_mae: Path or str
+        The path to the input file in MAE format containing the protein structure to dock to and a
+        co-crystallized ligand in the binding pocket of interest.
+    output_file_sdf: Path or str
+        The path to the output file of the generated in docking poses in SDF format.
+    ligand_resname: str
+        The resname of the co-crystallized ligand, which will be used for pocket definition.
+    mols_smiles: list of str
+        The molecules to dock as SMILES representation.
+    mols_names: None or list of str, default=None
+        The names of the molecules to dock. Will be used as molecule title in the SDF file. If
+        None, names will be numbers (1,..,len(mols_smiles).
+    n_poses: int, default=1
+        Number of poses to generate per molecule.
+    shape_restrain: bool, default=True
+        If the co-crystallized ligand shell be used for shape restrained docking.
+    macrocyles: bool, default=False
+        Macrocycle conformations will be sampled with an appropriate algorithm. All non-
+        macrocyclic molecules by detected by SCHRODINGER will be skipped.
+    precision: str, default="XP"
+        The docking precision to use ["HTVS", "SP", "XP"].
+    cache_dir: Path or str, default=appdirs.user_cache_dir()
+        Path to a directory for caching grids for docking.
+    """
     from rdkit import Chem
     from rdkit.Chem import AllChem
 
