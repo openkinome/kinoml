@@ -1,7 +1,11 @@
+import logging
 from pathlib import Path
 import subprocess
 from tempfile import NamedTemporaryFile
 from typing import Union
+
+
+logger = logging.getLogger(__name__)
 
 
 def run_prepwizard(
@@ -73,6 +77,11 @@ def run_prepwizard(
         subprocess.run(
             [executable] + standard_arguments + optional_arguments
         )
+
+    if logger.getEffectiveLevel() != 10:  # remove prepwizard log
+        paths = Path(".").glob(f"*{Path(input_file).stem}*")
+        for path in paths:
+            path.unlink()
 
     return
 
