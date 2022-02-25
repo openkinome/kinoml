@@ -107,7 +107,7 @@ def run_glide(
             (Path(".") / (Path(grid_input_file.name).stem + ".zip")).rename(grid_file_path)
 
         if logger.getEffectiveLevel() != 10:  # remove grid logs etc.
-            paths = Path(".").glob(f"*{grid_input_file.name}*")
+            paths = Path(".").glob(f"*{Path(grid_input_file.name).stem}*")
             for path in paths:
                 path.unlink()
 
@@ -155,7 +155,7 @@ def run_glide(
         sd_file_path.unlink()  # manually delete file
 
         if logger.getEffectiveLevel() != 10:  # remove docking logs etc.
-            paths = Path(".").glob(f"*{docking_input_file.name}*")
+            paths = Path(".").glob(f"*{docking_input_file_path.stem}*")
             for path in paths:
                 path.unlink()
 
