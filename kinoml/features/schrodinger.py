@@ -521,7 +521,7 @@ class SCHRODINGERDockingFeaturizer(SCHRODINGERComplexFeaturizer):
 
         docking_pose_path = LocalFileStorage.featurizer_result(
             self.__class__.__name__,
-            f"{system_dict['protein_name']}_{system_dict['ligand_name']}_complex",
+            f"{system_dict['protein_name']}_{system_dict['ligand_name']}_ligand",
             "sdf",
             self.output_dir,
         )

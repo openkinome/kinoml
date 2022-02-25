@@ -28,6 +28,7 @@ def run_glide(
 
     from ..modeling.MDAnalysisModeling import read_molecule
     from ..modeling.SCHRODINGERModeling import mae_to_pdb
+    from ..utils import sha256_objects
 
     if precision not in ["HTVS", "SP", "XP"]:
         raise ValueError(
@@ -88,7 +89,9 @@ def run_glide(
         grid_input_file.write("LIGAND_INDEX 1\n")
         grid_input_file.flush()
 
-        grid_file_path = Path(cache_dir) / (Path(grid_input_file.name).stem + ".zip")
+        grid_file_path = Path(cache_dir) / (
+                sha256_objects([input_file_mae, ligand_resname]) + ".zip"
+        )  # caching via hash based on input structure and chosen ligand
         if grid_file_path.is_file():
             logger.debug("Found cached grid file ..")
         else:
@@ -102,6 +105,10 @@ def run_glide(
                 "-OVERWRITE"
             ])
             (Path(".") / (Path(grid_input_file.name).stem + ".zip")).rename(grid_file_path)
+            if logger.getEffectiveLevel() != 10:  # remove log
+                log_path = (Path(".") / (Path(grid_input_file.name).stem + ".log"))
+                if log_path.is_file():
+                    log_path.unlink()
 
         logger.debug("Writing input file for docking ...")
         docking_input_file.write(f"GRIDFILE '{str(grid_file_path)}'\n")
@@ -126,6 +133,13 @@ def run_glide(
             "-WAIT",
             "-OVERWRITE"
         ])
+        if logger.getEffectiveLevel() != 10:  # remove log and csv
+            log_path = (Path(".") / (Path(docking_input_file.name).stem + ".log"))
+            csv_path = (Path(".") / (Path(docking_input_file.name).stem + ".csv"))
+            if log_path.is_file():
+                log_path.unlink()
+            if csv_path.is_file():
+                csv_path.unlink()
 
         logger.debug("Filtering poses for appropriate number ...")
         docking_input_file_path = Path(docking_input_file.name)
