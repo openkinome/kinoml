@@ -283,6 +283,12 @@ class SCHRODINGERComplexFeaturizer(ParallelBaseFeaturizer):
             if alternate_location:
                 logger.debug(f"Selecting alternate location {alternate_location} ...")
                 structure = select_altloc(structure, alternate_location)
+            else:
+                try:  # try to select altloc A, since the prepwizard will not handle altlocs
+                    structure = select_altloc(structure, "A")
+                    logger.debug(f"Selected default alternate location A.")
+                except ValueError:
+                    pass
 
             if expo_id:
                 logger.debug(f"Selecting ligand {expo_id} ...")
@@ -382,6 +388,12 @@ class SCHRODINGERComplexFeaturizer(ParallelBaseFeaturizer):
             if alternate_location:
                 logger.debug(f"Selecting alternate location {alternate_location} ...")
                 prepared_structure = select_altloc(prepared_structure, alternate_location)
+            else:
+                try:  # try to select altloc A, since the prepwizard will not handle altlocs
+                    prepared_structure = select_altloc(prepared_structure, "A")
+                    logger.debug(f"Selected default alternate location A.")
+                except ValueError:
+                    pass
             if expo_id:
                 logger.debug(f"Selecting ligand {expo_id} ...")
                 prepared_structure = remove_non_protein(prepared_structure, exceptions=[expo_id])
@@ -489,7 +501,7 @@ class SCHRODINGERDockingFeaturizer(SCHRODINGERComplexFeaturizer):
         : Universe or None
             An MDAnalysis universe of the featurized system or None if not successful.
         """
-        from ..modeling.MDAnalysisModeling import read_molecule, write_molecule
+        from ..modeling.MDAnalysisModeling import write_molecule
         from ..utils import LocalFileStorage
 
         logger.debug("Interpreting system ...")
@@ -589,7 +601,7 @@ class SCHRODINGERDockingFeaturizer(SCHRODINGERComplexFeaturizer):
         from MDAnalysis.core.universe import Merge
         from rdkit import Chem
 
-        from ..modeling.MDAnalysisModeling import read_molecule, write_molecule, delete_residues
+        from ..modeling.MDAnalysisModeling import read_molecule, delete_residues
 
         logger.debug("Removing co-crystallized ligand ...")
         prepared_structure = read_molecule(pdb_path)
