@@ -115,7 +115,7 @@ class SCHRODINGERComplexFeaturizer(ParallelBaseFeaturizer):
         : Universe or None
             An MDAnalysis universe of the featurized system or None if not successful.
         """
-        from ..modeling.MDAnalysisModeling import write_molecule
+        from ..modeling.MDAnalysisModeling import read_molecule, write_molecule
         from ..utils import LocalFileStorage
 
         logger.debug("Interpreting system ...")
@@ -136,8 +136,9 @@ class SCHRODINGERComplexFeaturizer(ParallelBaseFeaturizer):
         if not prepared_structure_path:
             return None
 
+        prepared_structure = read_molecule(prepared_structure_path)
         prepared_structure = self._postprocess_structure(
-            pdb_path=prepared_structure_path,
+            prepared_structure=prepared_structure,
             chain_id=system_dict["protein_chain_id"],
             alternate_location=system_dict["protein_alternate_location"],
             expo_id=system_dict["protein_expo_id"],
@@ -360,7 +361,7 @@ class SCHRODINGERComplexFeaturizer(ParallelBaseFeaturizer):
 
     @staticmethod
     def _postprocess_structure(
-            pdb_path,
+            prepared_structure,
             chain_id,
             alternate_location,
             expo_id,
@@ -368,15 +369,11 @@ class SCHRODINGERComplexFeaturizer(ParallelBaseFeaturizer):
     ):
 
         from ..modeling.MDAnalysisModeling import (
-            read_molecule,
             select_chain,
             select_altloc,
             remove_non_protein,
             update_residue_identifiers
         )
-
-        logger.debug("Loading prepared structure ...")
-        prepared_structure = read_molecule(pdb_path)
 
         if not sequence:
             if chain_id:
@@ -492,7 +489,7 @@ class SCHRODINGERDockingFeaturizer(SCHRODINGERComplexFeaturizer):
         : Universe or None
             An MDAnalysis universe of the featurized system or None if not successful.
         """
-        from ..modeling.MDAnalysisModeling import write_molecule
+        from ..modeling.MDAnalysisModeling import read_molecule, write_molecule
         from ..utils import LocalFileStorage
 
         logger.debug("Interpreting system ...")
@@ -536,14 +533,14 @@ class SCHRODINGERDockingFeaturizer(SCHRODINGERComplexFeaturizer):
             logger.debug("Failed to generate docking pose ...")
             return None
 
-        self._replace_ligand(
+        prepared_structure = self._replace_ligand(
             pdb_path=prepared_structure_path,
             resname_replace=system_dict["protein_expo_id"],
             docking_pose_sdf_path=docking_pose_path
         )
-
+        
         prepared_structure = self._postprocess_structure(
-            pdb_path=prepared_structure_path,
+            prepared_structure=prepared_structure,
             chain_id=system_dict["protein_chain_id"],
             alternate_location=system_dict["protein_alternate_location"],
             expo_id=["LIG"],
@@ -620,6 +617,4 @@ class SCHRODINGERDockingFeaturizer(SCHRODINGERComplexFeaturizer):
             if len(clashing_water) > 0:
                 prepared_structure = delete_residues(prepared_structure, clashing_water)
 
-        write_molecule(prepared_structure.atoms, pdb_path)
-
-        return
+        return prepared_structure
