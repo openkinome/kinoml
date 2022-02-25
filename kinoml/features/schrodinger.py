@@ -575,24 +575,25 @@ class SCHRODINGERDockingFeaturizer(SCHRODINGERComplexFeaturizer):
 
         from ..docking.SCHRODINGERDocking import run_glide
 
-        run_glide(
-            schrodinger_directory=self.schrodinger,
-            input_file_mae=mae_file,
-            output_file_sdf=output_file_sdf,
-            ligand_resname=ligand_resname,
-            mols_smiles=[smiles],
-            mols_names=["LIG"],
-            n_poses=1,
-            shape_restrain=self.shape_restrain,
-            macrocyles=macrocycle,
-            precision="XP",
-            cache_dir=self.cache_dir,
-        )
+        for i in range(self.max_retry):
+            logger.debug(f"Running docking trial {i + 1}...")
+            run_glide(
+                schrodinger_directory=self.schrodinger,
+                input_file_mae=mae_file,
+                output_file_sdf=output_file_sdf,
+                ligand_resname=ligand_resname,
+                mols_smiles=[smiles],
+                mols_names=["LIG"],
+                n_poses=1,
+                shape_restrain=self.shape_restrain,
+                macrocyles=macrocycle,
+                precision="XP",
+                cache_dir=self.cache_dir,
+            )
+            if output_file_sdf.is_file():
+                return True
 
-        if not output_file_sdf.is_file():
-            return False
-
-        return True
+        return False
 
     @staticmethod
     def _replace_ligand(pdb_path, resname_replace, docking_pose_sdf_path):
