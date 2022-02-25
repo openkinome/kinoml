@@ -105,10 +105,11 @@ def run_glide(
                 "-OVERWRITE"
             ])
             (Path(".") / (Path(grid_input_file.name).stem + ".zip")).rename(grid_file_path)
-            if logger.getEffectiveLevel() != 10:  # remove log
-                log_path = (Path(".") / (Path(grid_input_file.name).stem + ".log"))
-                if log_path.is_file():
-                    log_path.unlink()
+
+        if logger.getEffectiveLevel() != 10:  # remove grid logs etc.
+            paths = Path(".").glob(f"*{grid_input_file.name}*")
+            for path in paths:
+                path.unlink()
 
         logger.debug("Writing input file for docking ...")
         docking_input_file.write(f"GRIDFILE '{str(grid_file_path)}'\n")
@@ -133,13 +134,6 @@ def run_glide(
             "-WAIT",
             "-OVERWRITE"
         ])
-        if logger.getEffectiveLevel() != 10:  # remove log and csv
-            log_path = (Path(".") / (Path(docking_input_file.name).stem + ".log"))
-            csv_path = (Path(".") / (Path(docking_input_file.name).stem + ".csv"))
-            if log_path.is_file():
-                log_path.unlink()
-            if csv_path.is_file():
-                csv_path.unlink()
 
         logger.debug("Filtering poses for appropriate number ...")
         docking_input_file_path = Path(docking_input_file.name)
@@ -159,5 +153,10 @@ def run_glide(
                 sd_writer.write(mol)
                 mol_counter_dict[name] += 1
         sd_file_path.unlink()  # manually delete file
+
+        if logger.getEffectiveLevel() != 10:  # remove docking logs etc.
+            paths = Path(".").glob(f"*{docking_input_file.name}*")
+            for path in paths:
+                path.unlink()
 
     return
