@@ -419,7 +419,9 @@ class KLIFSKinase(Protein):
                         self.structure_klifs_id
                     )
                     self.kinase_klifs_id = structure_details["kinase.klifs_id"].iloc[0]
-                elif self.uniprot_id:
+                elif self.uniprot_id or self.ncbi_id:
+                    if not self.uniprot_id:
+                        self.uniprot_id = self.ncbi_to_uniprot(self.ncbi_id.split(".")[0])
                     all_kinases = remote.kinases.all_kinases()
                     kinases = all_kinases[all_kinases["kinase.uniprot"] == self.uniprot_id]
                     if len(kinases) > 0:

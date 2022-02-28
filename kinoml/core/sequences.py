@@ -291,6 +291,37 @@ class AminoAcidSequence(Biosequence):
         self._sequence = "".join(response.text.split("\n")[1:])
         self.metadata["sequence_source"] = "NCBI"
 
+    @staticmethod
+    def ncbi_to_uniprot(ncbi_id):
+        """
+        Convert an NCBI protein accession to the corresponding UniProt ID.
+
+        Parameters
+        ----------
+        ncbi_id: str
+            The NCBI protein accession.
+
+        Returns
+        -------
+        : str
+            The corresponding UniProt ID, empty string if not successful.
+        """
+
+        import requests
+
+        url = "https://www.uniprot.org/uploadlists/"
+        params = {
+            "from": "P_REFSEQ_AC",
+            "to": "SWISSPROT",
+            "format": "tab",
+            "query": ncbi_id
+        }
+        response = requests.get(url, params=params)
+        response = response.text.split("\n")
+        if len(response) != 3:
+            return ""
+        return response[1].split("\t")[1]
+
 
 class DNASequence(Biosequence):
     """Biosequence that only allows DNA bases."""

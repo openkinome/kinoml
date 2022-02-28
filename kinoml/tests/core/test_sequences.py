@@ -49,3 +49,12 @@ def test_aminoacidsequence_fetching_with_alterations():
     assert sequence.sequence[91] == "P"
     assert sequence.sequence[92:95] == "AAA"
     assert len(sequence.sequence) == 284
+
+
+def test_aminoacidsequence_ncbi_to_uniprot():
+    from kinoml.core.proteins import AminoAcidSequence
+
+    uniprot_id = AminoAcidSequence.ncbi_to_uniprot("NP_005148")
+    assert uniprot_id == "P00519"
+    uniprot_id = AminoAcidSequence.ncbi_to_uniprot("BBB")
+    assert uniprot_id == ""
