@@ -5,7 +5,7 @@ from typing import Union
 import pandas as pd
 
 from .core import DatasetProvider
-from ..core.proteins import Protein
+from ..core.proteins import KLIFSKinase
 from ..core.ligands import Ligand
 from ..core.systems import ProteinLigandComplex
 from ..core.measurements import PercentageDisplacementMeasurement
@@ -60,16 +60,15 @@ class PKIS2DatasetProvider(DatasetProvider):
                 continue
             discoverx_id = construct["DiscoverX Gene Symbol"]
             ncbi_id = construct["Accession Number"]
-            # TODO: map ncbi to uniprot to allow usage of KLIFSKinase
             if construct["AA Start/Stop"] == "Null":
                 # ambiguous, will consider full sequence
-                kinase = Protein(
+                kinase = KLIFSKinase(
                     name=discoverx_id,
                     ncbi_id=ncbi_id,
                 )
             else:
                 first, last = [x[1:] for x in construct["AA Start/Stop"].split("/")]
-                kinase = Protein(
+                kinase = KLIFSKinase(
                     name=discoverx_id,
                     ncbi_id=ncbi_id,
                     metadata={"construct_range": f"{first}-{last}"},
