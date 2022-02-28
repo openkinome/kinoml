@@ -118,17 +118,19 @@ def test_onehotencodedsequencefeaturizer_klifs_kinase():
         ProteinSystem([KLIFSKinase(kinase_klifs_sequence="A")]),
         ProteinSystem([KLIFSKinase(uniprot_id="P00519")]),
         ProteinSystem([KLIFSKinase(uniprot_id="xxxxx")]),
+        ProteinSystem([KLIFSKinase(ncbi_id="NP_005148.2")]),
         ProteinSystem([KLIFSKinase(kinase_klifs_id=480)]),
         ProteinSystem([KLIFSKinase(structure_klifs_id=3620)]),
     ]
     featurizer = OneHotEncodedSequenceFeaturizer(sequence_type="klifs_kinase")
     featurized_systems = featurizer.featurize(systems)
 
-    assert len(featurized_systems) == 4  # filter protein with wrong UniProt ID and empty string
+    assert len(featurized_systems) == 5  # filter protein with wrong UniProt ID and empty string
     assert list(featurized_systems[0].featurizations["last"])[0][0] == 1
     assert list(featurized_systems[1].featurizations["last"])[0][14] == 1
     assert list(featurized_systems[2].featurizations["last"])[0][14] == 1
     assert list(featurized_systems[3].featurizations["last"])[0][14] == 1
+    assert list(featurized_systems[4].featurizations["last"])[0][14] == 1
 
 
 def test_onehotencodedsequencefeaturizer_klifs_structure():
