@@ -310,12 +310,7 @@ class AminoAcidSequence(Biosequence):
         import requests
 
         url = "https://www.uniprot.org/uploadlists/"
-        params = {
-            "from": "P_REFSEQ_AC",
-            "to": "SWISSPROT",
-            "format": "tab",
-            "query": ncbi_id
-        }
+        params = {"from": "P_REFSEQ_AC", "to": "SWISSPROT", "format": "tab", "query": ncbi_id}
         response = requests.get(url, params=params)
         response = response.text.split("\n")
         if len(response) != 3:
