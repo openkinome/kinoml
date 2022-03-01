@@ -40,7 +40,10 @@ def test_aminoacidsequence_fetching_with_alterations():
 
     sequence = AminoAcidSequence(
         uniprot_id="P00519",
-        metadata={"mutations": "T315A del320-322P ins321AAA", "construct_range": "229-512",},
+        metadata={
+            "mutations": "T315A del320-322P ins321AAA",
+            "construct_range": "229-512",
+        },
     )
     assert sequence.sequence[86] == "A"
     assert sequence.sequence[91] == "P"

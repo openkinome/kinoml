@@ -181,7 +181,9 @@ def select_chain(molecule: oechem.OEMolBase, chain_id: str) -> oechem.OEMolBase:
 
 
 def select_altloc(
-    molecule: oechem.OEMolBase, altloc_id: str, altloc_fallback: bool = True,
+    molecule: oechem.OEMolBase,
+    altloc_id: str,
+    altloc_fallback: bool = True,
 ) -> oechem.OEMolBase:
     """
     Select an alternate location from an OpenEye molecule.
@@ -223,7 +225,8 @@ def select_altloc(
 
     # remove alternate location identifiers
     oechem.OEPerceiveResidues(
-        selection, oechem.OEPreserveResInfo_All - oechem.OEPreserveResInfo_AlternateLocation,
+        selection,
+        oechem.OEPreserveResInfo_All - oechem.OEPreserveResInfo_AlternateLocation,
     )
 
     return selection
@@ -313,7 +316,8 @@ def delete_residue(
 
 
 def get_expression_tags(
-    structure: oechem.OEMolBase, labels: Iterable[str] = ("EXPRESSION TAG", "CLONING ARTIFACT"),
+    structure: oechem.OEMolBase,
+    labels: Iterable[str] = ("EXPRESSION TAG", "CLONING ARTIFACT"),
 ) -> List[Dict]:
     """
     Get the chain id, residue name and residue id of residues in expression tags from a protein structure listed in the
@@ -346,7 +350,11 @@ def get_expression_tags(
     expression_tag_residues = []
     for label in expression_tag_labels:
         expression_tag_residues.append(
-            {"chain_id": label[10], "residue_name": label[6:9], "residue_id": int(label[12:16]),}
+            {
+                "chain_id": label[10],
+                "residue_name": label[6:9],
+                "residue_id": int(label[12:16]),
+            }
         )
 
     return expression_tag_residues
@@ -829,7 +837,8 @@ def generate_reasonable_conformations(
 
 
 def overlay_molecules(
-    reference_molecule: oechem.OEMolBase, fit_molecule: oechem.OEMCMolBase,
+    reference_molecule: oechem.OEMolBase,
+    fit_molecule: oechem.OEMCMolBase,
 ) -> (float, List[oechem.OEGraphMol]):
     """
     Overlay a multi-conformer molecule to a single-conformer molecule and calculate the TanimotoCombo score.
@@ -1052,7 +1061,9 @@ def get_structure_sequence_alignment(
 
 
 def apply_deletions(
-    target_structure: oechem.OEMolBase, template_sequence: str, delete_n_anchors: int = 2,
+    target_structure: oechem.OEMolBase,
+    template_sequence: str,
+    delete_n_anchors: int = 2,
 ) -> oechem.OEMolBase:
     """
     Apply deletions to a protein structure according to an amino acid sequence. The provided protein structure should
@@ -1089,9 +1100,10 @@ def apply_deletions(
     structure_with_deletions = target_structure.CreateCopy()
 
     # align template and target sequences
-    (target_sequence_aligned, template_sequence_aligned,) = get_structure_sequence_alignment(
-        structure_with_deletions, template_sequence
-    )
+    (
+        target_sequence_aligned,
+        template_sequence_aligned,
+    ) = get_structure_sequence_alignment(structure_with_deletions, template_sequence)
     logging.debug(f"Template sequence:\n{template_sequence_aligned}")
     logging.debug(f"Target sequence:\n{target_sequence_aligned}")
     hierview = oechem.OEHierView(structure_with_deletions)
@@ -1120,7 +1132,9 @@ def apply_deletions(
 
 
 def apply_insertions(
-    target_structure: oechem.OEMolBase, template_sequence: str, loop_db: Union[str, Path],
+    target_structure: oechem.OEMolBase,
+    template_sequence: str,
+    loop_db: Union[str, Path],
 ) -> oechem.OEMolBase:
     """
     Apply insertions to a protein structure according to an amino acid sequence. The provided protein structure should
@@ -1176,9 +1190,10 @@ def apply_insertions(
     while True:
         reinitialize = False
         # align template and target sequences
-        (target_sequence_aligned, template_sequence_aligned,) = get_structure_sequence_alignment(
-            structure_with_insertions, template_sequence
-        )
+        (
+            target_sequence_aligned,
+            template_sequence_aligned,
+        ) = get_structure_sequence_alignment(structure_with_insertions, template_sequence)
         logging.debug(f"Template sequence:\n{template_sequence_aligned}")
         logging.debug(f"Target sequence:\n{target_sequence_aligned}")
         hierview = oechem.OEHierView(structure_with_insertions)
@@ -1248,7 +1263,9 @@ def apply_insertions(
 
 
 def apply_mutations(
-    target_structure: oechem.OEMolBase, template_sequence: str, fallback_delete: bool = True,
+    target_structure: oechem.OEMolBase,
+    template_sequence: str,
+    fallback_delete: bool = True,
 ) -> oechem.OEMolBase:
     """
     Mutate a protein structure according to an amino acid sequence. The provided protein structure should only contain
@@ -1285,9 +1302,10 @@ def apply_mutations(
     while True:
         altered = False
         # align template and target sequences
-        (target_sequence_aligned, template_sequence_aligned,) = get_structure_sequence_alignment(
-            structure_with_mutations, template_sequence
-        )
+        (
+            target_sequence_aligned,
+            template_sequence_aligned,
+        ) = get_structure_sequence_alignment(structure_with_mutations, template_sequence)
         logging.debug(f"Template sequence:\n{template_sequence_aligned}")
         logging.debug(f"Target sequence:\n{target_sequence_aligned}")
         hierview = oechem.OEHierView(structure_with_mutations)
@@ -1363,7 +1381,9 @@ def apply_mutations(
     return structure_with_mutations
 
 
-def delete_partial_residues(structure: oechem.OEMolBase,) -> oechem.OEMolBase:
+def delete_partial_residues(
+    structure: oechem.OEMolBase,
+) -> oechem.OEMolBase:
     """
     Delete residues with missing sidechain or backbone atoms. The backbone is considered complete
     if atoms C, CA and N are present.
@@ -1551,7 +1571,9 @@ def delete_clashing_sidechains(
     return processed_structure
 
 
-def get_atom_coordinates(molecule: oechem.OEMolBase,) -> List[Tuple[float, float, float]]:
+def get_atom_coordinates(
+    molecule: oechem.OEMolBase,
+) -> List[Tuple[float, float, float]]:
     """
     Retrieve the atom coordinates of an OpenEye molecule.
 
@@ -1815,7 +1837,9 @@ def split_molecule_components(molecule: oechem.OEMolBase) -> List[oechem.OEGraph
 
 
 def residue_ids_to_residue_names(
-    structure: oechem.OEMolBase, residue_ids: List[int], chain_id: Union[None, str] = None,
+    structure: oechem.OEMolBase,
+    residue_ids: List[int],
+    chain_id: Union[None, str] = None,
 ) -> List[str]:
     """
     Get the corresponding residue names for a list of residue IDs and a give OpenEye molecule

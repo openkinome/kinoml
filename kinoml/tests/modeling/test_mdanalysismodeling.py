@@ -26,7 +26,12 @@ def does_not_raise():
             pytest.raises(IndexError),
             14,
         ),
-        ("kinoml.data.proteins", "4f8o.pdb", does_not_raise(), 2475,),  # correct pdb
+        (
+            "kinoml.data.proteins",
+            "4f8o.pdb",
+            does_not_raise(),
+            2475,
+        ),  # correct pdb
     ],
 )
 def test_read_molecule(package, resource, expectation, n_atoms):

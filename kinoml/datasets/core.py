@@ -389,7 +389,10 @@ class DatasetProvider(BaseDatasetProvider):
         return dict_of_arrays
 
     def to_awkward(
-        self, featurization_key="last", y_dtype="float32", clear_after=False,
+        self,
+        featurization_key="last",
+        y_dtype="float32",
+        clear_after=False,
     ):
         """
         Creates an awkward array out of the featurized systems

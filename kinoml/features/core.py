@@ -26,7 +26,11 @@ class BaseFeaturizer:
 
     _SUPPORTED_TYPES = (System,)
 
-    def featurize(self, systems: Iterable[System], keep=True,) -> Iterable[System]:
+    def featurize(
+        self,
+        systems: Iterable[System],
+        keep=True,
+    ) -> Iterable[System]:
         """
         Given some systems (compatible with ``_SUPPORTED_TYPES``), apply
         the featurization scheme implemented in this class.
@@ -110,7 +114,10 @@ class BaseFeaturizer:
         raise NotImplementedError("Implement in your subclass")
 
     def _post_featurize(
-        self, systems: Iterable[System], features: Iterable, keep: bool = True,
+        self,
+        systems: Iterable[System],
+        features: Iterable,
+        keep: bool = True,
     ) -> Iterable[System]:
         """
         Run after featurizing all systems. Systems with a feature of None will be removed.
@@ -623,7 +630,11 @@ class PadFeaturizer(ParallelBaseFeaturizer):
     """
 
     def __init__(
-        self, shape: Iterable[int] = "auto", key: Hashable = "last", pad_with: int = 0, **kwargs,
+        self,
+        shape: Iterable[int] = "auto",
+        key: Hashable = "last",
+        pad_with: int = 0,
+        **kwargs,
     ):
         super().__init__(**kwargs)
         self.shape = shape
@@ -691,7 +702,7 @@ class HashFeaturizer(BaseFeaturizer):
         super().__init__(**kwargs)
         self.getter = getter or self._getter
         self.normalize = normalize
-        self.denominator = 2 ** 256 if normalize else 1
+        self.denominator = 2**256 if normalize else 1
 
     @staticmethod
     def _getter(system):
@@ -798,7 +809,10 @@ class ClearFeaturizations(BaseFeaturizer):
         return system
 
     def _post_featurize(
-        self, systems: Iterable[System], features: Iterable[System | np.array], keep: bool = True,
+        self,
+        systems: Iterable[System],
+        features: Iterable[System | np.array],
+        keep: bool = True,
     ) -> Iterable[System]:
         """
         Bypass the automated population of the ``.featurizations`` dict

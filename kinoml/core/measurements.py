@@ -205,7 +205,10 @@ class ObservationModelMeasurement(BaseMeasurement):
         kwargs["pre_loss_func"] = cls._observation_model_pytorch
         kwargs["post_loss_func"] = cls._post_loss_adapter
         return cls._loss_adapter_generic(
-            predicted=predicted, observed=observed, loss_func=loss_func, **kwargs,
+            predicted=predicted,
+            observed=observed,
+            loss_func=loss_func,
+            **kwargs,
         )
 
     @staticmethod
@@ -293,12 +296,12 @@ class PercentageDisplacementMeasurement(ObservationModelMeasurement):
         summation = inhibitor_conc + temp
         difference = 100 * inhibitor_conc / summation - labels
 
-        grad_loss = constant * difference * temp / (summation ** 2)
+        grad_loss = constant * difference * temp / (summation**2)
 
-        first_term = constant * temp / (summation ** 2)
-        numerator = temp * summation - 2 * (temp ** 2)
+        first_term = constant * temp / (summation**2)
+        numerator = temp * summation - 2 * (temp**2)
 
-        hess_loss = first_term ** 2 + difference * constant * numerator / (summation ** 3)
+        hess_loss = first_term**2 + difference * constant * numerator / (summation**3)
 
         # XGBoost works only with f32
         return grad_loss.astype("float32"), hess_loss.astype("float32")
@@ -367,7 +370,12 @@ class pIC50Measurement(ObservationModelMeasurement):
 
     @staticmethod
     def _loss_adapter_xgboost_mse(
-        labels, dG_over_KT, substrate_conc=1e-6, michaelis_constant=1, standard_conc=1, **kwargs,
+        labels,
+        dG_over_KT,
+        substrate_conc=1e-6,
+        michaelis_constant=1,
+        standard_conc=1,
+        **kwargs,
     ):
         """
         In XGBoost, observation models need to be applied within the loss function. In this specific case,

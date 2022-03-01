@@ -51,10 +51,30 @@ def does_not_raise():
 @pytest.mark.parametrize(
     "smiles, add_hydrogens, expectation, n_atoms",
     [
-        ("C1=CC=NC=C1", True, does_not_raise(), 11,),
-        ("C1=CC=[NH+]C=C1", True, does_not_raise(), 12,),
-        ("CCNCC", True, does_not_raise(), 16,),
-        ("CCNCC", False, does_not_raise(), 5,),
+        (
+            "C1=CC=NC=C1",
+            True,
+            does_not_raise(),
+            11,
+        ),
+        (
+            "C1=CC=[NH+]C=C1",
+            True,
+            does_not_raise(),
+            12,
+        ),
+        (
+            "CCNCC",
+            True,
+            does_not_raise(),
+            16,
+        ),
+        (
+            "CCNCC",
+            False,
+            does_not_raise(),
+            5,
+        ),
         ("1", False, pytest.raises(ValueError), 0),
     ],
 )
@@ -68,11 +88,41 @@ def test_read_smiles(smiles, add_hydrogens, expectation, n_atoms):
 @pytest.mark.parametrize(
     "package, resource, add_hydrogens, expectation, n_atoms_list",
     [
-        ("kinoml.data.molecules", "chloroform.sdf", False, does_not_raise(), [4],),
-        ("kinoml.data.molecules", "chloroform.sdf", True, does_not_raise(), [5],),
-        ("kinoml.data.molecules", "chloroform_acetamide.sdf", True, does_not_raise(), [5, 9],),
-        ("kinoml.data.molecules", "chloroform_acetamide.pdb", True, does_not_raise(), [5, 9],),
-        ("kinoml.data.proteins", "4f8o.pdb", True, does_not_raise(), [2497],),
+        (
+            "kinoml.data.molecules",
+            "chloroform.sdf",
+            False,
+            does_not_raise(),
+            [4],
+        ),
+        (
+            "kinoml.data.molecules",
+            "chloroform.sdf",
+            True,
+            does_not_raise(),
+            [5],
+        ),
+        (
+            "kinoml.data.molecules",
+            "chloroform_acetamide.sdf",
+            True,
+            does_not_raise(),
+            [5, 9],
+        ),
+        (
+            "kinoml.data.molecules",
+            "chloroform_acetamide.pdb",
+            True,
+            does_not_raise(),
+            [5, 9],
+        ),
+        (
+            "kinoml.data.proteins",
+            "4f8o.pdb",
+            True,
+            does_not_raise(),
+            [2497],
+        ),
         (
             "kinoml.data.electron_densities",
             "4f8o_phases.mtz",
@@ -95,8 +145,18 @@ def test_read_molecules(package, resource, add_hydrogens, expectation, n_atoms_l
 @pytest.mark.parametrize(
     "package, resource, expectation, n_grid_points",
     [
-        ("kinoml.data.electron_densities", "4f8o_phases.mtz", does_not_raise(), 396011,),
-        ("kinoml.data.proteins", "4f8o.pdb", pytest.raises(ValueError), 0,),
+        (
+            "kinoml.data.electron_densities",
+            "4f8o_phases.mtz",
+            does_not_raise(),
+            396011,
+        ),
+        (
+            "kinoml.data.proteins",
+            "4f8o.pdb",
+            pytest.raises(ValueError),
+            0,
+        ),
     ],
 )
 def test_read_electron_density(package, resource, expectation, n_grid_points):
@@ -207,7 +267,15 @@ def test_remove_non_protein(package, resource, exceptions, remove_water, n_atoms
     "package, resource, chain_id, residue_name, residue_id, expectation, n_atoms",
     [
         ("kinoml.data.proteins", "4f8o.pdb", "A", "GLY", 22, does_not_raise(), 2468),
-        ("kinoml.data.proteins", "4f8o.pdb", "A", "ASP", 22, pytest.raises(ValueError), 2468,),
+        (
+            "kinoml.data.proteins",
+            "4f8o.pdb",
+            "A",
+            "ASP",
+            22,
+            pytest.raises(ValueError),
+            2468,
+        ),
     ],
 )
 def test_delete_residue(
@@ -222,7 +290,10 @@ def test_delete_residue(
 
 
 @pytest.mark.parametrize(
-    "package, resource, n_expression_tags", [("kinoml.data.proteins", "4f8o.pdb", 9),],
+    "package, resource, n_expression_tags",
+    [
+        ("kinoml.data.proteins", "4f8o.pdb", 9),
+    ],
 )
 def test_get_expression_tags(package, resource, n_expression_tags):
     """Compare results to expected number of expression tags."""
@@ -273,7 +344,16 @@ def test_assign_caps(package, resource, real_termini, caps):
             does_not_raise(),
             ["(A)", "AES"],
         ),
-        ("kinoml.data.proteins", "4f8o.pdb", False, "A", "A", None, does_not_raise(), ["(A)"],),
+        (
+            "kinoml.data.proteins",
+            "4f8o.pdb",
+            False,
+            "A",
+            "A",
+            None,
+            does_not_raise(),
+            ["(A)"],
+        ),
         (
             "kinoml.data.proteins",
             "4f8o.pdb",
@@ -297,7 +377,14 @@ def test_assign_caps(package, resource, real_termini, caps):
     ],
 )
 def test_prepare_structure(
-    package, resource, has_ligand, chain_id, altloc, ligand_name, expectation, title_contains,
+    package,
+    resource,
+    has_ligand,
+    chain_id,
+    altloc,
+    ligand_name,
+    expectation,
+    title_contains,
 ):
     """Check if returned design unit title contains expected strings."""
     with resources.path(package, resource) as path:
@@ -354,7 +441,12 @@ def test_generate_tautomers(smiles, n_tautomers):
 
 @pytest.mark.parametrize(
     "smiles, n_enantiomers",
-    [("CC(C)(C)C", 1), ("C(C)(F)Cl", 2), ("CC(Cl)CCC(O)F", 4), ("CC(Cl)CC(C)C(O)F", 8),],
+    [
+        ("CC(C)(C)C", 1),
+        ("C(C)(F)Cl", 2),
+        ("CC(Cl)CCC(O)F", 4),
+        ("CC(Cl)CC(C)C(O)F", 8),
+    ],
 )
 def test_generate_enantiomers(smiles, n_enantiomers):
     """Compare results to expected number of enantiomers."""
@@ -365,7 +457,10 @@ def test_generate_enantiomers(smiles, n_enantiomers):
 
 @pytest.mark.parametrize(
     "smiles, n_conformations",
-    [("CCC(C)C(C)=O", 5), ("C1CCN(C1)CCOC2=C3COCC=CCOCC4=CC(=CC=C4)C5=NC(=NC=C5)NC(=C3)C=C2", 5),],
+    [
+        ("CCC(C)C(C)=O", 5),
+        ("C1CCN(C1)CCOC2=C3COCC=CCOCC4=CC(=CC=C4)C5=NC(=NC=C5)NC(=C3)C=C2", 5),
+    ],
 )
 def test_generate_conformations(smiles, n_conformations):
     """Compare results to expected number of conformations."""
@@ -375,7 +470,11 @@ def test_generate_conformations(smiles, n_conformations):
 
 
 @pytest.mark.parametrize(
-    "smiles, n_conformations_list", [("FC(Cl)Br", [1, 1]), ("CC(Cl)CCC(O)F", [5, 5, 5, 5]),],
+    "smiles, n_conformations_list",
+    [
+        ("FC(Cl)Br", [1, 1]),
+        ("CC(Cl)CCC(O)F", [5, 5, 5, 5]),
+    ],
 )
 def test_generate_reasonable_conformations(smiles, n_conformations_list):
     """Compare results to expected number of isomers and conformations."""
@@ -388,7 +487,10 @@ def test_generate_reasonable_conformations(smiles, n_conformations_list):
 
 @pytest.mark.parametrize(
     "reference_smiles, fit_smiles, comparator",
-    [("C1=CC=C(C=C1)C1=CC=CC=C1", "S1C=NC=C1C1=CC=CC=C1", ">"), ("C1=CC=CC=C1", "COC", "<"),],
+    [
+        ("C1=CC=C(C=C1)C1=CC=CC=C1", "S1C=NC=C1C1=CC=CC=C1", ">"),
+        ("C1=CC=CC=C1", "COC", "<"),
+    ],
 )
 def test_overlay_molecules(reference_smiles, fit_smiles, comparator):
     """Compare results to have a TanimotoCombo score bigger or smaller than 1."""
@@ -407,7 +509,12 @@ def test_overlay_molecules(reference_smiles, fit_smiles, comparator):
 
 @pytest.mark.parametrize(
     "smiles, n_smiles",
-    [("CC(=O)C(C)O", 2), ("CCC(=O)C(C)O", 4), ("C[C@H](F)Cl", 1), ("CC(F)Cl", 2),],
+    [
+        ("CC(=O)C(C)O", 2),
+        ("CCC(=O)C(C)O", 4),
+        ("C[C@H](F)Cl", 1),
+        ("CC(F)Cl", 2),
+    ],
 )
 def test_enumerate_isomeric_smiles(smiles, n_smiles):
     """Compare results to expected number of generated isomeric SMILES strings."""
@@ -440,7 +547,11 @@ def test_are_identical_molecules(smiles1, smiles2, identical_molecules):
             "4f8o.pdb",
             "MNTFHVDFAPNTGEIFAGKQPGDVTMFTLTMGDTAPHGGWRLIPTGDSKGGYMISADGDYVGLYSYMMSWVGIDNNWYINDDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVKQGLXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
         ),
-        ("kinoml.data.molecules", "chloroform.pdb", "X",),
+        (
+            "kinoml.data.molecules",
+            "chloroform.pdb",
+            "X",
+        ),
     ],
 )
 def test_get_sequence(package, resource, sequence):
@@ -704,7 +815,16 @@ def test_delete_clashing_sidechains(package, resource, cutoff, sequence):
 
 @pytest.mark.parametrize(
     "package, resource",
-    [("kinoml.data.proteins", "4f8o.pdb",), ("kinoml.data.molecules", "chloroform.sdf",),],
+    [
+        (
+            "kinoml.data.proteins",
+            "4f8o.pdb",
+        ),
+        (
+            "kinoml.data.molecules",
+            "chloroform.sdf",
+        ),
+    ],
 )
 def test_get_atom_coordinates(package, resource):
     """
@@ -731,9 +851,24 @@ def test_get_atom_coordinates(package, resource):
     "package, resource, residue_ids, expectation",
     [
         ("kinoml.data.proteins", "4f8o.pdb", list(range(245)), does_not_raise()),
-        ("kinoml.data.molecules", "chloroform.sdf", [3], does_not_raise(),),
-        ("kinoml.data.molecules", "chloroform.sdf", [], pytest.raises(ValueError),),
-        ("kinoml.data.molecules", "chloroform.sdf", ["1"], pytest.raises(ValueError),),
+        (
+            "kinoml.data.molecules",
+            "chloroform.sdf",
+            [3],
+            does_not_raise(),
+        ),
+        (
+            "kinoml.data.molecules",
+            "chloroform.sdf",
+            [],
+            pytest.raises(ValueError),
+        ),
+        (
+            "kinoml.data.molecules",
+            "chloroform.sdf",
+            ["1"],
+            pytest.raises(ValueError),
+        ),
     ],
 )
 def test_renumber_structure(package, resource, residue_ids, expectation):
@@ -804,11 +939,51 @@ def test_superpose_protein(package_list, resource_list, residues, chain_id):
 @pytest.mark.parametrize(
     "package, resource, keep_protein_residue_ids, keep_chain_id, chain_ids, first_residue_id, last_residue_id",
     [
-        ("kinoml.data.proteins", "4f8o.pdb", True, False, ["A"], 1, 245,),
-        ("kinoml.data.proteins", "4f8o.pdb", True, True, ["A", "B"], 1, 245,),
-        ("kinoml.data.proteins", "4f8o_edit.pdb", True, True, ["A"], 1, 138,),
-        ("kinoml.data.proteins", "4f8o_edit.pdb", False, False, ["A"], 1, 136,),
-        ("kinoml.data.molecules", "chloroform.sdf", False, False, ["A"], 1, 1,),
+        (
+            "kinoml.data.proteins",
+            "4f8o.pdb",
+            True,
+            False,
+            ["A"],
+            1,
+            245,
+        ),
+        (
+            "kinoml.data.proteins",
+            "4f8o.pdb",
+            True,
+            True,
+            ["A", "B"],
+            1,
+            245,
+        ),
+        (
+            "kinoml.data.proteins",
+            "4f8o_edit.pdb",
+            True,
+            True,
+            ["A"],
+            1,
+            138,
+        ),
+        (
+            "kinoml.data.proteins",
+            "4f8o_edit.pdb",
+            False,
+            False,
+            ["A"],
+            1,
+            136,
+        ),
+        (
+            "kinoml.data.molecules",
+            "chloroform.sdf",
+            False,
+            False,
+            ["A"],
+            1,
+            1,
+        ),
     ],
 )
 def test_update_residue_identifiers(
@@ -848,9 +1023,21 @@ def test_update_residue_identifiers(
 @pytest.mark.parametrize(
     "package, resource, n_components",
     [
-        ("kinoml.data.proteins", "4f8o.pdb", 107,),
-        ("kinoml.data.proteins", "4f8o_edit.pdb", 3,),
-        ("kinoml.data.molecules", "chloroform.sdf", 1,),
+        (
+            "kinoml.data.proteins",
+            "4f8o.pdb",
+            107,
+        ),
+        (
+            "kinoml.data.proteins",
+            "4f8o_edit.pdb",
+            3,
+        ),
+        (
+            "kinoml.data.molecules",
+            "chloroform.sdf",
+            1,
+        ),
     ],
 )
 def test_split_molecule_components(package, resource, n_components):

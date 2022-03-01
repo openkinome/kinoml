@@ -66,7 +66,10 @@ class PKIS2DatasetProvider(DatasetProvider):
             ncbi_id = construct["Accession Number"]
             if construct["AA Start/Stop"] == "Null":
                 # ambiguous, will consider full sequence
-                kinase = protein_type(name=discoverx_id, ncbi_id=ncbi_id,)
+                kinase = protein_type(
+                    name=discoverx_id,
+                    ncbi_id=ncbi_id,
+                )
             else:
                 first, last = [x[1:] for x in construct["AA Start/Stop"].split("/")]
                 kinase = protein_type(

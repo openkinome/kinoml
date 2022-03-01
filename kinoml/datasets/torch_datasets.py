@@ -40,7 +40,10 @@ class PrefeaturizedTorchDataset(_NativeTorchDataset):
     """
 
     def __init__(
-        self, systems, measurements, observation_model: callable = _null_observation_model,
+        self,
+        systems,
+        measurements,
+        observation_model: callable = _null_observation_model,
     ):
         assert len(systems) == len(measurements), "Systems and Measurements must match in size!"
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -121,7 +124,10 @@ class TorchDataset(PrefeaturizedTorchDataset):
             requires_grad=True,
         )
         y = torch.tensor(
-            self.measurements[index], device=self.device, requires_grad=True, dtype=torch.float,
+            self.measurements[index],
+            device=self.device,
+            requires_grad=True,
+            dtype=torch.float,
         )
         return X, y
 

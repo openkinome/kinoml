@@ -34,7 +34,12 @@ class GraphConvolutionNeuralNetwork(_BaseModule):
         return input_sample[0].num_node_features
 
     def __init__(
-        self, input_shape, embedding_shape=100, hidden_shape=50, output_shape=1, activation=F.relu,
+        self,
+        input_shape,
+        embedding_shape=100,
+        hidden_shape=50,
+        output_shape=1,
+        activation=F.relu,
     ):
         super().__init__()
         self.input_shape = input_shape

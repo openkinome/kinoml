@@ -284,7 +284,8 @@ class GraphLigandFeaturizer(SingleLigandFeaturizer):
                 atom.GetFormalCharge(),
                 # 3. Hybridization, one-hot encoded
                 *BaseOneHotEncodingFeaturizer.one_hot_encode(
-                    [atom.GetHybridization().name], self._hybridization_names,
+                    [atom.GetHybridization().name],
+                    self._hybridization_names,
                 ).flatten(),
                 # 4. Aromaticity
                 atom.GetIsAromatic(),

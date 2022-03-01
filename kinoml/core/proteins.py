@@ -205,7 +205,10 @@ class Protein(BaseProtein, AminoAcidSequence):
             molecule = read_molecule(file_path)
 
         return cls(
-            molecule=molecule, name=name, toolkit=toolkit, metadata={"file_path": file_path},
+            molecule=molecule,
+            name=name,
+            toolkit=toolkit,
+            metadata={"file_path": file_path},
         )
 
     @classmethod
