@@ -5,10 +5,11 @@ from typing import Union
 import pandas as pd
 
 from .core import DatasetProvider
-from ..core.proteins import KLIFSKinase
+from ..core.proteins import KLIFSKinase, Protein
 from ..core.ligands import Ligand
 from ..core.systems import ProteinLigandComplex
 from ..core.measurements import PercentageDisplacementMeasurement
+from ..core.components import BaseProtein
 from ..core.conditions import AssayConditions
 from ..utils import datapath
 
@@ -38,6 +39,7 @@ class PKIS2DatasetProvider(DatasetProvider):
         path_or_url_constructs: Union[str, Path] = datapath(
             "kinomescan/DiscoverX_489_Kinase_Assay_Construct_Information.csv"
         ),
+        protein_type: BaseProtein = KLIFSKinase,
     ):
         """
         Create a PKIS2 DatasetProvider from the raw data.
@@ -48,6 +50,8 @@ class PKIS2DatasetProvider(DatasetProvider):
             CSV file with the protein-ligand measurements.
         path_or_url_constructs: str or pathlib.Path
             CSV file with the construct information.
+        protein_type: BaseProtein
+            The protein object type to use.
         """
         logger.debug("Loading CSV with construct information ...")
         constructs_df = pd.read_csv(path_or_url_constructs)
@@ -62,13 +66,10 @@ class PKIS2DatasetProvider(DatasetProvider):
             ncbi_id = construct["Accession Number"]
             if construct["AA Start/Stop"] == "Null":
                 # ambiguous, will consider full sequence
-                kinase = KLIFSKinase(
-                    name=discoverx_id,
-                    ncbi_id=ncbi_id,
-                )
+                kinase = protein_type(name=discoverx_id, ncbi_id=ncbi_id,)
             else:
                 first, last = [x[1:] for x in construct["AA Start/Stop"].split("/")]
-                kinase = KLIFSKinase(
+                kinase = protein_type(
                     name=discoverx_id,
                     ncbi_id=ncbi_id,
                     metadata={"construct_range": f"{first}-{last}"},
