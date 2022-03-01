@@ -14,21 +14,9 @@ def does_not_raise():
 @pytest.mark.parametrize(
     "pdb_ids, expectation, smiles_list",
     [
-        (
-            ["EDO"],
-            does_not_raise(),
-            ["C(CO)O"],
-        ),
-        (
-            ["---"],
-            pytest.raises(KeyError),
-            ["---"],
-        ),
-        (
-            ["EDO", "GOL"],
-            does_not_raise(),
-            ["C(CO)O", "C(C(CO)O)O"],
-        ),
+        (["EDO"], does_not_raise(), ["C(CO)O"],),
+        (["---"], pytest.raises(KeyError), ["---"],),
+        (["EDO", "GOL"], does_not_raise(), ["C(CO)O", "C(C(CO)O)O"],),
     ],
 )
 def test_smiles_from_pdb(pdb_ids, expectation, smiles_list):
@@ -44,18 +32,9 @@ def test_smiles_from_pdb(pdb_ids, expectation, smiles_list):
 @pytest.mark.parametrize(
     "pdb_id, return_type",
     [
-        (
-            "4YNE",  # PDB and CIF format available
-            PosixPath,
-        ),
-        (
-            "1BOS",  # only CIF format available
-            PosixPath,
-        ),
-        (
-            "XXXX",  # wrong code
-            bool,
-        ),
+        ("4YNE", PosixPath,),  # PDB and CIF format available
+        ("1BOS", PosixPath,),  # only CIF format available
+        ("XXXX", bool,),  # wrong code
     ],
 )
 def test_download_pdb_structure(pdb_id, return_type):

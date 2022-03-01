@@ -11,13 +11,7 @@ def root_mean_squared_error(*args, **kwargs):
 
 
 def performance(
-    predicted,
-    observed,
-    verbose=True,
-    n_boot=100,
-    confidence=0.95,
-    sample_ratio=0.8,
-    _seed=1234,
+    predicted, observed, verbose=True, n_boot=100, confidence=0.95, sample_ratio=0.8, _seed=1234,
 ):
     """
     Measure the predicted vs observed performance with different metrics (R2, MSE, MAE, RMSE).

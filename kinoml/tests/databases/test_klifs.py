@@ -14,18 +14,7 @@ def does_not_raise():
 
 @pytest.mark.parametrize(
     "uniprot_id, expectation, klifs_kinase_id",
-    [
-        (
-            "P00519",
-            does_not_raise(),
-            392,
-        ),
-        (
-            "XXXXX",
-            pytest.raises(ValueError),
-            392,
-        ),
-    ],
+    [("P00519", does_not_raise(), 392,), ("XXXXX", pytest.raises(ValueError), 392,),],
 )
 def test_klifs_kinase_from_uniprot_id(uniprot_id, expectation, klifs_kinase_id):
     """Compare klifs kinase ID for expected value."""

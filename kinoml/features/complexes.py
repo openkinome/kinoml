@@ -119,9 +119,7 @@ class OEHybridDockingFeaturizer(ParallelBaseFeaturizer):
 
         logging.debug("Writing results ...")
         file_path = self._write_results(
-            protein_ligand_complex,
-            system.protein.name,
-            system.ligand.name,
+            protein_ligand_complex, system.protein.name, system.ligand.name,
         )
 
         logging.debug("Generating new MDAnalysis universe ...")
@@ -134,8 +132,7 @@ class OEHybridDockingFeaturizer(ParallelBaseFeaturizer):
         return structure
 
     def _interpret_system(
-        self,
-        system: Union[ProteinSystem, ProteinLigandComplex],
+        self, system: Union[ProteinSystem, ProteinLigandComplex],
     ) -> Tuple[
         Union[oechem.OEGraphMol, None],
         Union[oechem.OEGraphMol, None],
@@ -499,10 +496,7 @@ class OEHybridDockingFeaturizer(ParallelBaseFeaturizer):
         return structure
 
     def _write_results(
-        self,
-        structure: oechem.OEMolBase,
-        protein_name: str,
-        ligand_name: Union[str, None],
+        self, structure: oechem.OEMolBase, protein_name: str, ligand_name: Union[str, None],
     ) -> Path:
         """
         Write the results from the Featurizer and retrieve the paths to protein or complex if a
@@ -585,18 +579,12 @@ class OEHybridDockingFeaturizer(ParallelBaseFeaturizer):
             else:
                 logging.debug("Writing protein ...")
                 protein_path = LocalFileStorage.featurizer_result(
-                    self.__class__.__name__,
-                    f"{protein_name}_protein",
-                    "oeb",
-                    self.output_dir,
+                    self.__class__.__name__, f"{protein_name}_protein", "oeb", self.output_dir,
                 )
                 write_molecules([structure], protein_path)
 
                 protein_path = LocalFileStorage.featurizer_result(
-                    self.__class__.__name__,
-                    f"{protein_name}_protein",
-                    "pdb",
-                    self.output_dir,
+                    self.__class__.__name__, f"{protein_name}_protein", "pdb", self.output_dir,
                 )
                 write_molecules([structure], protein_path)
 
@@ -604,18 +592,14 @@ class OEHybridDockingFeaturizer(ParallelBaseFeaturizer):
         else:
             if ligand_name:
                 complex_path = LocalFileStorage.featurizer_result(
-                    self.__class__.__name__,
-                    f"{protein_name}_{ligand_name}_complex",
-                    "pdb",
+                    self.__class__.__name__, f"{protein_name}_{ligand_name}_complex", "pdb",
                 )
                 write_molecules([structure], complex_path)
 
                 return complex_path
             else:
                 protein_path = LocalFileStorage.featurizer_result(
-                    self.__class__.__name__,
-                    f"{protein_name}_protein",
-                    "pdb",
+                    self.__class__.__name__, f"{protein_name}_protein", "pdb",
                 )
                 write_molecules([structure], protein_path)
 
@@ -769,9 +753,7 @@ class OEKLIFSKinaseApoFeaturizer(OEHybridDockingFeaturizer):
             )
         else:
             kinase_details = self._select_kinase_structure_by_klifs_kinase_id(
-                system.protein.klifs_kinase_id,
-                system.protein.dfg,
-                system.protein.ac_helix,
+                system.protein.klifs_kinase_id, system.protein.dfg, system.protein.ac_helix,
             )
 
         if not all(
@@ -1106,8 +1088,7 @@ class OEKLIFSKinaseApoFeaturizer(OEHybridDockingFeaturizer):
 
     @staticmethod
     def _add_kinase_pocket_similarity(
-        reference_pocket: str,
-        structures: pd.DataFrame,
+        reference_pocket: str, structures: pd.DataFrame,
     ) -> pd.DataFrame:
         """
         Add a column to the input DataFrame containing the pocket similarity between the pockets
@@ -1605,10 +1586,7 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEKLIFSKinaseApoFeaturizer):
             protein_template["kinase.klifs_name"],
             system.ligand.name,
             [
-                (
-                    "COMPND",
-                    f"\tKinase template: {protein_template['structure.pdb_id']}",
-                ),
+                ("COMPND", f"\tKinase template: {protein_template['structure.pdb_id']}",),
                 ("COMPND", f"\tLigand template: {ligand_template['structure.pdb_id']}"),
             ],
         )
@@ -2068,8 +2046,7 @@ class OEKLIFSKinaseHybridDockingFeaturizer(OEKLIFSKinaseApoFeaturizer):
             logging.debug("Selecting alternate location ...")
             try:
                 ligand_template_structure = select_altloc(
-                    ligand_template_structure,
-                    ligand_template["structure.alternate_model"],
+                    ligand_template_structure, ligand_template["structure.alternate_model"],
                 )
             except ValueError:
                 logging.debug(

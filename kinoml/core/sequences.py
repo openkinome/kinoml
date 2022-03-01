@@ -248,8 +248,7 @@ class AminoAcidSequence(Biosequence):
                 elif mutation.startswith("del"):  # deletion
                     logger.debug(f"Performing deletion {mutation} ...")
                     match = re.search(
-                        "del(?P<first>[0-9]+)-(?P<last>[0-9]+)(?P<insertion>[A-Z]*)",
-                        mutation,
+                        "del(?P<first>[0-9]+)-(?P<last>[0-9]+)(?P<insertion>[A-Z]*)", mutation,
                     )
                     self.delete(
                         int(match.group("first")),

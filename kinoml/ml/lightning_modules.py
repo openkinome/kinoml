@@ -35,11 +35,7 @@ class ObservationModelModule(pl.LightningModule):
     """WIP"""
 
     def __init__(
-        self,
-        nn_model,
-        optimizer,
-        loss_function,
-        validate=True,
+        self, nn_model, optimizer, loss_function, validate=True,
     ):
         super().__init__()
         self.nn_model = nn_model
@@ -166,9 +162,7 @@ class MultiDataModule(pl.LightningDataModule):
     def dataset_indices_by_size(self, reverse=False):
         """WIP"""
         return sorted(
-            range(len(self.datasets)),
-            key=lambda i: len(self.datasets[i]),
-            reverse=reverse,
+            range(len(self.datasets)), key=lambda i: len(self.datasets[i]), reverse=reverse,
         )
 
     @property
@@ -205,8 +199,7 @@ class MultiDataModule(pl.LightningDataModule):
     def train_dataloader(self, dataset_index=None):
         """WIP"""
         return self._build_dataloader(
-            dataset_index=dataset_index,
-            indices=self.datasets[dataset_index].indices["train"],
+            dataset_index=dataset_index, indices=self.datasets[dataset_index].indices["train"],
         )
 
     def val_dataloader(self, dataset_index=None):
@@ -216,8 +209,7 @@ class MultiDataModule(pl.LightningDataModule):
         #     for i in range(len(self.datasets))
         # ]
         return self._build_dataloader(
-            dataset_index=dataset_index,
-            indices=self.datasets[dataset_index].indices["val"],
+            dataset_index=dataset_index, indices=self.datasets[dataset_index].indices["val"],
         )
 
     def test_dataloader(self, dataset_index=None):
@@ -227,8 +219,7 @@ class MultiDataModule(pl.LightningDataModule):
         #     for i in range(len(self.datasets))
         # ]
         return self._build_dataloader(
-            dataset_index=dataset_index,
-            indices=self.datasets[dataset_index].indices["test"],
+            dataset_index=dataset_index, indices=self.datasets[dataset_index].indices["test"],
         )
 
     def get_kfold(self, nfolds=5, with_validation=True, shuffle=False, **kwargs):
@@ -239,11 +230,7 @@ class MultiDataModule(pl.LightningDataModule):
         for dataset_index in self.dataset_indices_by_size(reverse=True):
             dataset = self.datasets[dataset_index]
             all_indices = np.concatenate(
-                [
-                    dataset.indices["train"],
-                    dataset.indices["val"],
-                    dataset.indices["test"],
-                ]
+                [dataset.indices["train"], dataset.indices["val"], dataset.indices["test"],]
             )
             # Check splitting indices is the same as splitting on the dataset
             for fold_index, (train_index, val_index, test_index) in enumerate(
@@ -299,9 +286,7 @@ class CrossValidateTrainer:
             self._dataloaders["test"].append(test_loader)
             self._dataloaders["val"].append(val_loader)
             fold_trainer.fit(
-                fold_model,
-                train_dataloader=train_loader,
-                val_dataloaders=val_loader,
+                fold_model, train_dataloader=train_loader, val_dataloaders=val_loader,
             )
 
     def _patch_paths_for_kfold(self, fold_trainer, fold):

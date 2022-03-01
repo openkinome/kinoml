@@ -40,11 +40,7 @@ class System:
     """
 
     def __init__(
-        self,
-        components: Iterable[MolecularComponent],
-        strict: bool = True,
-        *args,
-        **kwargs,
+        self, components: Iterable[MolecularComponent], strict: bool = True, *args, **kwargs,
     ):
         super().__init__(*args, **kwargs)
         self.components = components

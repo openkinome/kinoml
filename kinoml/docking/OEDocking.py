@@ -108,8 +108,7 @@ def resids_to_box(
 
 
 def create_box_receptor(
-    protein: oechem.OEMolBase,
-    box_dimensions: Tuple[float, float, float, float, float, float],
+    protein: oechem.OEMolBase, box_dimensions: Tuple[float, float, float, float, float, float],
 ) -> oechem.OEGraphMol:
     """
     Create a box receptor for docking.
@@ -137,9 +136,7 @@ def create_box_receptor(
 
 
 def pose_molecules(
-    receptor: oechem.OEMolBase,
-    molecules: List[oechem.OEMolBase],
-    pKa_norm: bool = True,
+    receptor: oechem.OEMolBase, molecules: List[oechem.OEMolBase], pKa_norm: bool = True,
 ) -> Union[List[oechem.OEGraphMol], None]:
     """
     Generate a binding pose of molecules in a prepared receptor with OpenEye's Posit method.
