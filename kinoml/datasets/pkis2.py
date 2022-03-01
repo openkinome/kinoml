@@ -5,7 +5,7 @@ from typing import Union
 import pandas as pd
 
 from .core import DatasetProvider
-from ..core.proteins import KLIFSKinase, Protein
+from ..core.proteins import KLIFSKinase
 from ..core.ligands import Ligand
 from ..core.systems import ProteinLigandComplex
 from ..core.measurements import PercentageDisplacementMeasurement

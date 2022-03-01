@@ -9,7 +9,7 @@ from tqdm.auto import tqdm
 from .core import MultiDatasetProvider
 from ..core.components import BaseProtein
 from ..core.conditions import AssayConditions
-from ..core.proteins import KLIFSKinase, Protein
+from ..core.proteins import KLIFSKinase
 from ..core.ligands import Ligand
 from ..core.systems import ProteinLigandComplex
 from ..core.measurements import pIC50Measurement, pKiMeasurement, pKdMeasurement

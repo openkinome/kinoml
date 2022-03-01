@@ -89,13 +89,15 @@ class OneHotEncodedSequenceFeaturizer(BaseOneHotEncodingFeaturizer, SingleProtei
         sequence_type: str, default=full
             The sequence to use for one hot encoding ('full', 'klifs_kinase' or 'klifs_structure').
         """
-        super().__init__(**kwargs)
         if sequence_type not in ["full", "klifs_kinase", "klifs_structure"]:
             raise ValueError(
                 "Only 'full', 'klifs_kinase' and 'klifs_structure' are supported sequence_types, "
                 f"you provided {sequence_type}."
             )
         self.sequence_type = sequence_type
+        if sequence_type != "full":
+            self.ALPHABET += "-"  # add gap symbol for KLIFS sequence to ALPHABET
+        super().__init__(**kwargs)  # update ALPHABET first
 
     def _retrieve_sequence(self, system: Union[ProteinSystem, ProteinLigandComplex]) -> str:
         try:
