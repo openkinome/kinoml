@@ -81,7 +81,11 @@ def run_prepwizard(
     if logger.getEffectiveLevel() != 10:  # remove prepwizard log
         paths = Path(".").glob(f"*{Path(input_file).stem}*")
         for path in paths:
-            path.unlink()
+            try:
+                path.unlink()
+            except FileNotFoundError:
+                # may happen in multiprocessing of the same structure
+                pass
 
     return
 
