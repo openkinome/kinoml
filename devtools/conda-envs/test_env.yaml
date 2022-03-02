@@ -46,7 +46,9 @@ dependencies:
   # testing
   - pytest
   - pytest-cov
+  - pytest-xdist
   - codecov
+  - nbval
 
   - pip:
       # PyTorch trees
