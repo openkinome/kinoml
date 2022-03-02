@@ -99,7 +99,7 @@ jobs:
       - name: Run tests
         shell: bash -l {0}
         run: |
-          pytest -v --dist loadscope --numprocesses 2 --cov=kinoml --cov-report=xml --color=yes kinoml/tests/ -k "not read_electron_density"
+          pytest -v --cov=kinoml --cov-report=xml --color=yes kinoml/tests/ -k "not read_electron_density"
 
       - name: Run notebook tests
         shell: bash -l {0}
