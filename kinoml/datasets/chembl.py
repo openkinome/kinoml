@@ -27,6 +27,7 @@ class ChEMBLDatasetProvider(MultiDatasetProvider):
         cls,
         path_or_url="https://github.com/openkinome/datascripts/releases/download/v0.2/activities-chembl28_v0.2.zip",
         measurement_types=("pIC50", "pKi", "pKd"),
+        uniprot_ids=None,
         sample=None,
         protein_type: BaseProtein = KLIFSKinase,
     ):
@@ -42,6 +43,8 @@ class ChEMBLDatasetProvider(MultiDatasetProvider):
             Which measurement types must be imported from the CSV. By default, all
             three (pIC50, pKi, pKd) will be loaded, but you can choose a subset (
             e.g. ``("pIC50",)``).
+        uniprot_ids: None or list of str, default=None
+            Restrict measurements to the given UniProt IDs.
         sample: int, optional=None
             If set to larger than zero, load only N data points from the dataset.
         protein_type: BaseProtein
@@ -71,6 +74,8 @@ class ChEMBLDatasetProvider(MultiDatasetProvider):
         systems = {}
         proteins = {}
         ligands = {}
+        if uniprot_ids:
+            df = df[df["UniprotID"].isin(uniprot_ids)]
         chosen_types_labels = df["activities.standard_type"].isin(set(measurement_types))
         filtered_records = df[chosen_types_labels].to_dict("records")
         if sample is not None:
