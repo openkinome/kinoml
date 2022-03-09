@@ -16,6 +16,187 @@ from ..core.sequences import Biosequence
 from ..core.systems import ProteinSystem, ProteinLigandComplex
 
 
+logger = logging.getLogger(__name__)
+
+
+class MostSimilarPDBLigandFeaturizer(ParallelBaseFeaturizer):
+    """
+    Find the most similar co-crystallized ligand in the PDB according to a given SMILES and
+    UniProt ID.
+
+    Parameters
+    ----------
+    similarity_metric: str, default="fingerprint"
+        The similarity metric to use to detect the structure with the most similar ligand.
+    store_results_in_protein_object: bool, default=True
+        If the results shell be stored in the protein object of the system.
+    """
+    import pandas as pd
+
+    def __init__(
+            self,
+            similarity_metric: str = "fingerprint",
+            store_results_in_protein_object: bool = True,
+            **kwargs
+    ):
+        super().__init__(**kwargs)
+        if similarity_metric not in ["fingerprint"]:
+            raise ValueError(
+                "Only 'fingerprint' is allowed as similarity metric! " +
+                f"You provided {similarity_metric}."
+            )
+        self.similarity_metric = similarity_metric
+        self.store_results_in_protein_object = store_results_in_protein_object
+
+    def _featurize_one(self, system: ProteinLigandComplex) -> Tuple[str, str, str]:
+
+        pdb_ligand_entities = self._get_pdb_ligand_entities(system.protein.uniprot_id)
+
+        pdb_id, chain_id, expo_id = self._get_most_similar_pdb_ligand_entity(
+            pdb_ligand_entities,
+            system.ligand.smiles
+        )
+
+        if self.store_results_in_protein_object:
+            system.protein.pdb_id = pdb_id
+            system.protein.chain_id = chain_id
+            system.protein.expo_id = expo_id
+
+        return pdb_id, chain_id, expo_id
+
+    def _get_pdb_ligand_entities(self, uniprot_id: str) -> pd.DataFrame:
+        from biotite.database import rcsb
+        import pandas as pd
+
+        query_by_uniprot = rcsb.FieldQuery(
+            "rcsb_polymer_entity_container_identifiers."
+            "reference_sequence_identifiers.database_name",
+            exact_match="UniProt"
+        )
+        query_by_uniprot_id = rcsb.FieldQuery(
+            "rcsb_polymer_entity_container_identifiers."
+            "reference_sequence_identifiers.database_accession",
+            exact_match=uniprot_id
+        )
+        query_by_experimental_method = rcsb.FieldQuery(
+            "exptl.method",
+            exact_match="X-RAY DIFFRACTION"  # allows later sorting for resolution
+        )
+
+        results = rcsb.search(
+            rcsb.CompositeQuery(
+                [
+                    query_by_uniprot,
+                    query_by_uniprot_id,
+                    query_by_experimental_method,
+                ],
+                operator="and"
+            ),
+            return_type="non_polymer_entity"  # "polymer_instance"
+        )
+        pdb_ligand_entities = []
+        for result in results:
+            pdb_id, non_polymer_id = result.split("_")
+            expo_id, chain_id = self._get_ligand_entity_info(pdb_id, non_polymer_id)
+            resolution = self._get_pdb_resolution(pdb_id)
+
+            pdb_ligand_entities.append({
+                "pdb_id": pdb_id,
+                "expo_id": expo_id,
+                "chain_id": chain_id,
+                "resolution": resolution,
+            })
+
+        pdb_ligand_entities = pd.DataFrame(pdb_ligand_entities)
+        pdb_ligand_entities.sort_values(by="resolution", inplace=True)
+        pdb_ligand_entities = pdb_ligand_entities.groupby("expo_id").head(1)
+
+        return pdb_ligand_entities
+
+    @staticmethod
+    def _get_ligand_entity_info(pdb_id, non_polymer_id):
+        import json
+        import requests
+
+        url = f"https://data.rcsb.org/rest/v1/core/nonpolymer_entity/{pdb_id}/{non_polymer_id}"
+        response = json.loads(requests.get(url).text)
+        expo_id = response["rcsb_nonpolymer_entity_container_identifiers"]["nonpolymer_comp_id"]
+        chain_id = response["rcsb_nonpolymer_entity_container_identifiers"]["auth_asym_ids"][0]
+
+        return expo_id, chain_id
+
+    @staticmethod
+    def _get_pdb_resolution(pdb_id):
+        import json
+        import requests
+
+        url = f"https://data.rcsb.org/rest/v1/core/entry/{pdb_id}"
+        response = json.loads(requests.get(url).text)
+        resolution = float(response["pdbx_vrpt_summary"]["pdbresolution"])
+
+        return resolution
+
+    def _get_most_similar_pdb_ligand_entity(self, pdb_ligand_entities, smiles):
+        from ..databases.pdb import smiles_from_pdb
+
+        smiles_dict = smiles_from_pdb(pdb_ligand_entities["expo_id"])
+        pdb_ligand_entities["smiles"] = pdb_ligand_entities["expo_id"].map(smiles_dict)
+
+        if self.similarity_metric == "fingerprint":
+            pdb_id, chain_id, expo_id = self._get_most_similar_pdb_ligand_entity_by_fingerprint(
+                pdb_ligand_entities, smiles
+            )
+        else:
+            raise ValueError(f"Similarity metric '{self.similarity_metric}' unknown!")
+
+        return pdb_id, chain_id, expo_id
+
+    @staticmethod
+    def _get_most_similar_pdb_ligand_entity_by_fingerprint(pdb_ligand_entities, smiles):
+        import pandas as pd
+
+        from rdkit import Chem, RDLogger
+        from rdkit.Chem import AllChem, DataStructs
+
+        RDLogger.DisableLog("rdApp.*")  # disable RDKit logging
+
+        reference = Chem.MolFromSmiles(smiles)
+        reference_fingerprint = AllChem.GetMorganFingerprint(reference, 2, useFeatures=True)
+
+        pdb_ligands = [Chem.MolFromSmiles(smiles) for smiles in pdb_ligand_entities["smiles"]]
+
+        pdb_ligand_entities["rdkit_molecules"] = pdb_ligands
+
+        pdb_ligand_entities = pdb_ligand_entities[
+            pdb_ligand_entities["rdkit_molecules"].notnull()
+        ]
+
+        pd.options.mode.chained_assignment = None  # otherwise next line would raise a warning
+        pdb_ligand_entities["rdkit_fingerprint"] = [
+            AllChem.GetMorganFingerprint(rdkit_molecule, 2, useFeatures=True)
+            for rdkit_molecule in pdb_ligand_entities["rdkit_molecules"]
+        ]
+
+        pdb_ligand_entities["fingerprint_similarity"] = [
+            DataStructs.DiceSimilarity(reference_fingerprint, fingerprint)
+            for fingerprint in pdb_ligand_entities["rdkit_fingerprint"]
+        ]
+
+        pdb_ligand_entities.sort_values(
+            by="fingerprint_similarities",
+            inplace=True,
+            ascending=False
+        )
+
+        picked_ligand_entity = pdb_ligand_entities.iloc[0]
+
+        return (
+            picked_ligand_entity["pdb_id"],
+            picked_ligand_entity["chain_id"],
+            picked_ligand_entity["expo_id"]
+        )
+
+
 class OEHybridDockingFeaturizer(ParallelBaseFeaturizer):
 
     """
