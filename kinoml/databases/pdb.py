@@ -18,21 +18,28 @@ def smiles_from_pdb(ligand_ids: Iterable[str]) -> dict:
         Dictionary with PDB chemical identifier as keys and SMILES as values.
     """
     import json
+    import math
     import requests
     import urllib
 
+    ligand_ids = set(ligand_ids)
     ligands = {}
     base_url = "https://data.rcsb.org/graphql?query="
-    query = '{chem_comps(comp_ids:[' + \
-            ','.join(['"' + ligand_id + '"' for ligand_id in set(ligand_ids)]) + \
-            ']){chem_comp{id}rcsb_chem_comp_descriptor{SMILES_stereo}}}'
-    response = requests.get(base_url + urllib.parse.quote(query))
-    for ligand in json.loads(response.text)["data"]["chem_comps"]:
-        try:
-            ligands[ligand["chem_comp"]["id"]] = ligand["rcsb_chem_comp_descriptor"]["SMILES_stereo"]
-        except TypeError:
-            # missing smiles entry
-            pass
+    n_batches = math.ceil(len(ligand_ids) / 50)  # request maximal 50 smiles at a time
+    for i in range(n_batches):
+        ligand_ids_batch = ligand_ids[ligand_ids[i * 50: (i * 50) + 50]]
+        query = '{chem_comps(comp_ids:[' + \
+                ','.join(['"' + ligand_id + '"' for ligand_id in set(ligand_ids_batch)]) + \
+                ']){chem_comp{id}rcsb_chem_comp_descriptor{SMILES_stereo}}}'
+        response = requests.get(base_url + urllib.parse.quote(query))
+        for ligand in json.loads(response.text)["data"]["chem_comps"]:
+            try:
+                ligands[ligand["chem_comp"]["id"]] = ligand[
+                    "rcsb_chem_comp_descriptor"
+                ]["SMILES_stereo"]
+            except TypeError:
+                # missing smiles entry
+                pass
 
     return ligands
 
