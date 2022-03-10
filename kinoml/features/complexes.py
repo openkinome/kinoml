@@ -24,12 +24,20 @@ class MostSimilarPDBLigandFeaturizer(ParallelBaseFeaturizer):
     Find the most similar co-crystallized ligand in the PDB according to a given SMILES and
     UniProt ID.
 
+    The protein component of each system must have `uniprot_id` attribute specifying the protein
+    sequence of interest when quering the PDB for available entries.
+
+    The ligand component of each system must have a `smiles` attribute specifying the molecular
+    structure that should be used to query for the most similar co-crystallized ligand.
+
     Parameters
     ----------
     similarity_metric: str, default="fingerprint"
         The similarity metric to use to detect the structure with the most similar ligand.
     """
     import pandas as pd
+
+    _SUPPORTED_TYPES = (ProteinLigandComplex,)
 
     def __init__(
             self,
@@ -44,11 +52,27 @@ class MostSimilarPDBLigandFeaturizer(ParallelBaseFeaturizer):
             )
         self.similarity_metric = similarity_metric
 
-    def _featurize_one(self, system: ProteinLigandComplex) -> ProteinLigandComplex:
+    def _featurize_one(self, system: ProteinLigandComplex) -> Union[ProteinLigandComplex, None]:
+        """
+        Find a PDB entry with a protein of the given UniProt ID and with the most similar
+        co-crystallized ligand.
+
+        Parameters
+        ----------
+        system: ProteinLigandComplex
+            A system object holding a protein and a ligand component.
+
+        Returns
+        -------
+        : ProteinLigandComplex or None
+            The same system, but with additional protein attributes, i.e. pdb_id, chain_id and
+            expo_id. None if no suitable PDB entry was found.
+        """
 
         logger.debug("Getting available ligand entities from PDB...")
         pdb_ligand_entities = self._get_pdb_ligand_entities(system.protein.uniprot_id)
-        logger.debug(pdb_ligand_entities)
+        if len(pdb_ligand_entities) == 0:
+            return None
 
         logger.debug("Getting most similar PDB ligand entity ...")
         pdb_id, chain_id, expo_id = self._get_most_similar_pdb_ligand_entity(
@@ -71,21 +95,21 @@ class MostSimilarPDBLigandFeaturizer(ParallelBaseFeaturizer):
     ) -> Iterable[ProteinLigandComplex]:
         """
         Run after featurizing all systems. Original systems will be replaced with systems
-        returned by featurizer.
+        returned by the featurizer.
 
         Parameters
         ----------
-        systems : list of ProteinLigandComplex
+        systems: list of ProteinLigandComplex
             The systems being featurized.
-        features : list of ProteinLigandComplex
+        features: list of ProteinLigandComplex
             The features returned by ``self._featurize``, i.e. new systems.
-        keep : bool, optional=True
+        keep: bool, optional=True
             Whether to store the current featurizer in the ``system.featurizations``
             dictionary with its own key (``self.name``), in addition to ``last``.
 
         Returns
         -------
-        systems
+        : list of ProteinLigandComplex
             The new systems with ``.featurizations`` extended with the calculated features in two
             entries: the featurizer name and ``last``.
         """
@@ -97,7 +121,23 @@ class MostSimilarPDBLigandFeaturizer(ParallelBaseFeaturizer):
                 system.featurizations[self.name] = feature
         return systems
 
-    def _get_pdb_ligand_entities(self, uniprot_id: str) -> pd.DataFrame:
+    def _get_pdb_ligand_entities(self, uniprot_id: str) -> Union[pd.DataFrame, None]:
+        """
+        Get PDB ligand entities bound to protein structures of the given UniProt ID. Only X-ray
+        structures will be considered. If a ligand is co-crystallized with multiple PDB structures
+        the ligand entity with the lowest resolution will be returned.
+
+        Parameters
+        ----------
+        uniprot_id: str
+            The UniProt ID of the protein of interest.
+
+        Returns
+        -------
+        : pd.DataFrame or None
+            A DataFrame with columns `ligand_entity`, `pdb_id`, `non_polymer_id`, `chain_id`,
+            `expo_id` and `resolution`. None if no suitable ligand entities were found.
+        """
         from biotite.database import rcsb
         import pandas as pd
 
@@ -135,9 +175,12 @@ class MostSimilarPDBLigandFeaturizer(ParallelBaseFeaturizer):
                 "pdb_id": pdb_id,
                 "non_polymer_id": non_polymer_id
             })
-        pdb_ligand_entities = pd.DataFrame(pdb_ligand_entities)
+        if len(pdb_ligand_entities) == 0:
+            logger.debug(f"No ligand entities found for UniProt ID {uniprot_id}, returning None!")
+            return None
 
         logger.debug("Adding chain and expo IDs for each ligand entity ...")
+        pdb_ligand_entities = pd.DataFrame(pdb_ligand_entities)
         pdb_ligand_entities = self._add_ligand_entity_info(pdb_ligand_entities)
 
         logger.debug("Adding resolution to each ligand entity ...")
@@ -150,7 +193,23 @@ class MostSimilarPDBLigandFeaturizer(ParallelBaseFeaturizer):
         return pdb_ligand_entities
 
     @staticmethod
-    def _add_ligand_entity_info(pdb_ligand_entities: pd.DataFrame):
+    def _add_ligand_entity_info(pdb_ligand_entities: pd.DataFrame) -> pd.DataFrame:
+        """
+        Add chain and expo ID information to the PDB ligand entities dataframe.
+
+        Parameters
+        ----------
+        pdb_ligand_entities: pd.DataFrame
+            The PDB ligand entities dataframe with a column named `ligand_entity`. This column
+            must contain strings in the format '4YNE_3', i.e. the third non polymer entity of
+            PDB entry 4YNE.
+
+        Returns
+        -------
+        : pd.DataFrame
+            The same PDB ligand entities dataframe but with additional columns named `chain_id`
+            and `expo_id`. PDB ligand entities without such information are removed.
+        """
         import json
         import math
         import requests
@@ -188,7 +247,23 @@ class MostSimilarPDBLigandFeaturizer(ParallelBaseFeaturizer):
         return pdb_ligand_entities
 
     @staticmethod
-    def _add_pdb_resolution(pdb_ligand_entities: pd.DataFrame):
+    def _add_pdb_resolution(pdb_ligand_entities: pd.DataFrame) -> pd.DataFrame:
+        """
+        Add resolution information to the PDB ligand entities dataframe.
+
+        Parameters
+        ----------
+        pdb_ligand_entities: pd.DataFrame
+            The PDB ligand entities dataframe with a column named `pdb_id`. This column must
+            contain strings in the format '4YNE', i.e. PDB entry 4YNE.
+
+        Returns
+        -------
+        : pd.DataFrame
+            The same PDB ligand entities dataframe but with an additional column named
+            `resolution`. PDB ligand entities without such information will get a dummy
+            resolution of 99.9.
+        """
         import json
         import math
         import requests
@@ -219,7 +294,25 @@ class MostSimilarPDBLigandFeaturizer(ParallelBaseFeaturizer):
 
         return pdb_ligand_entities
 
-    def _get_most_similar_pdb_ligand_entity(self, pdb_ligand_entities, smiles):
+    def _get_most_similar_pdb_ligand_entity(
+            self,
+            pdb_ligand_entities: pd.DataFrame,
+            smiles: str
+    ) -> Tuple[str, str, str]:
+        """
+        Get the PDB ligand that is most similar to the given SMILES.
+
+        Parameters
+        ----------
+        pdb_ligand_entities: pd.DataFrame
+            The PDB ligand entities dataframe with columns named `pdb_id`, `chain_id` and
+            `expo_id`.
+
+        Returns
+        -------
+        : tuple of str
+            The PDB, chain and expo ID of the most similar ligand.
+        """
         from ..databases.pdb import smiles_from_pdb
 
         logger.debug(f"Retrieving SMILES for {pdb_ligand_entities['expo_id']}")
@@ -237,7 +330,24 @@ class MostSimilarPDBLigandFeaturizer(ParallelBaseFeaturizer):
         return pdb_id, chain_id, expo_id
 
     @staticmethod
-    def _get_most_similar_pdb_ligand_entity_by_fingerprint(pdb_ligand_entities, smiles):
+    def _get_most_similar_pdb_ligand_entity_by_fingerprint(
+            pdb_ligand_entities: pd.DataFrame, smiles: str
+    ) -> Tuple[str, str, str]:
+        """
+        Get the PDB ligand that is most similar to the given SMILES according to Morgan
+        Fingerprints.
+
+        Parameters
+        ----------
+        pdb_ligand_entities: pd.DataFrame
+            The PDB ligand entities dataframe with columns named `pdb_id`, `chain_id`, `expo_id`
+            and `smiles`.
+
+        Returns
+        -------
+        : tuple of str
+            The PDB, chain and expo ID of the most similar ligand.
+        """
         import pandas as pd
 
         from rdkit import Chem, RDLogger
