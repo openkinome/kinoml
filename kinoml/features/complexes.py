@@ -28,15 +28,12 @@ class MostSimilarPDBLigandFeaturizer(ParallelBaseFeaturizer):
     ----------
     similarity_metric: str, default="fingerprint"
         The similarity metric to use to detect the structure with the most similar ligand.
-    store_results_in_protein_object: bool, default=True
-        If the results shell be stored in the protein object of the system.
     """
     import pandas as pd
 
     def __init__(
             self,
             similarity_metric: str = "fingerprint",
-            store_results_in_protein_object: bool = True,
             **kwargs
     ):
         super().__init__(**kwargs)
@@ -46,11 +43,10 @@ class MostSimilarPDBLigandFeaturizer(ParallelBaseFeaturizer):
                 f"You provided {similarity_metric}."
             )
         self.similarity_metric = similarity_metric
-        self.store_results_in_protein_object = store_results_in_protein_object
 
-    def _featurize_one(self, system: ProteinLigandComplex) -> Tuple[str, str, str]:
+    def _featurize_one(self, system: ProteinLigandComplex) -> ProteinLigandComplex:
 
-        logger.debug("Getting ligand entities ...")
+        logger.debug("Getting available ligand entities from PDB...")
         pdb_ligand_entities = self._get_pdb_ligand_entities(system.protein.uniprot_id)
         logger.debug(pdb_ligand_entities)
 
@@ -60,18 +56,52 @@ class MostSimilarPDBLigandFeaturizer(ParallelBaseFeaturizer):
             system.ligand.smiles
         )
 
-        if self.store_results_in_protein_object:
-            logger.debug("Adding results to protein object ...")
-            system.protein.pdb_id = pdb_id
-            system.protein.chain_id = chain_id
-            system.protein.expo_id = expo_id
+        logger.debug("Adding results to protein object ...")
+        system.protein.pdb_id = pdb_id
+        system.protein.chain_id = chain_id
+        system.protein.expo_id = expo_id
 
-        return pdb_id, chain_id, expo_id
+        return system
+
+    def _post_featurize(
+        self,
+        systems: Iterable[ProteinLigandComplex],
+        features: Iterable[ProteinLigandComplex],
+        keep: bool = True,
+    ) -> Iterable[ProteinLigandComplex]:
+        """
+        Run after featurizing all systems. Original systems will be replaced with systems
+        returned by featurizer.
+
+        Parameters
+        ----------
+        systems : list of ProteinLigandComplex
+            The systems being featurized.
+        features : list of ProteinLigandComplex
+            The features returned by ``self._featurize``, i.e. new systems.
+        keep : bool, optional=True
+            Whether to store the current featurizer in the ``system.featurizations``
+            dictionary with its own key (``self.name``), in addition to ``last``.
+
+        Returns
+        -------
+        systems
+            The new systems with ``.featurizations`` extended with the calculated features in two
+            entries: the featurizer name and ``last``.
+        """
+        systems = features
+        for system in systems:
+            feature = (system.protein.pdb_id, system.protein.chain_id, system.protein.expo_id)
+            system.featurizations["last"] = feature
+            if keep:
+                system.featurizations[self.name] = feature
+        return systems
 
     def _get_pdb_ligand_entities(self, uniprot_id: str) -> pd.DataFrame:
         from biotite.database import rcsb
         import pandas as pd
 
+        logger.debug("Querying PDB by UniProt ID for ligand entities ...")
         query_by_uniprot = rcsb.FieldQuery(
             "rcsb_polymer_entity_container_identifiers."
             "reference_sequence_identifiers.database_name",
@@ -86,8 +116,6 @@ class MostSimilarPDBLigandFeaturizer(ParallelBaseFeaturizer):
             "exptl.method",
             exact_match="X-RAY DIFFRACTION"  # allows later sorting for resolution
         )
-
-        logger.debug("Querying PDB for ligand entities ...")
         results = rcsb.search(
             rcsb.CompositeQuery(
                 [
@@ -97,55 +125,99 @@ class MostSimilarPDBLigandFeaturizer(ParallelBaseFeaturizer):
                 ],
                 operator="and"
             ),
-            return_type="non_polymer_entity"  # "polymer_instance"
+            return_type="non_polymer_entity"
         )
-
-        logger.debug("Filtering ligand entities ...")
         pdb_ligand_entities = []
-        for result in results:
-            pdb_id, non_polymer_id = result.split("_")
-            logger.debug(
-                f"Getting ligand info for PDB {pdb_id} ligand entity {non_polymer_id} ..."
-            )
-            expo_id, chain_id = self._get_ligand_entity_info(pdb_id, non_polymer_id)
-            logger.debug(f"Getting resolution for PDB {pdb_id} ...")
-            resolution = self._get_pdb_resolution(pdb_id)
+        for pdb_ligand_entity in results:
+            pdb_id, non_polymer_id = pdb_ligand_entity.split("_")
             pdb_ligand_entities.append({
+                "ligand_entity": pdb_ligand_entity,
                 "pdb_id": pdb_id,
-                "expo_id": expo_id,
-                "chain_id": chain_id,
-                "resolution": resolution,
+                "non_polymer_id": non_polymer_id
             })
-
-        logger.debug("Converting ligand entities to dataframe ...")
         pdb_ligand_entities = pd.DataFrame(pdb_ligand_entities)
+
+        logger.debug("Adding chain and expo IDs for each ligand entity ...")
+        pdb_ligand_entities = self._add_ligand_entity_info(pdb_ligand_entities)
+
+        logger.debug("Adding resolution to each ligand entity ...")
+        pdb_ligand_entities = self._add_pdb_resolution(pdb_ligand_entities)
+
+        logger.debug("Picking highest quality entity per ligand ...")
         pdb_ligand_entities.sort_values(by="resolution", inplace=True)
         pdb_ligand_entities = pdb_ligand_entities.groupby("expo_id").head(1)
 
         return pdb_ligand_entities
 
     @staticmethod
-    def _get_ligand_entity_info(pdb_id, non_polymer_id):
+    def _add_ligand_entity_info(pdb_ligand_entities: pd.DataFrame):
         import json
+        import math
         import requests
+        import urllib
 
-        url = f"https://data.rcsb.org/rest/v1/core/nonpolymer_entity/{pdb_id}/{non_polymer_id}"
-        response = json.loads(requests.get(url).text)
-        expo_id = response["rcsb_nonpolymer_entity_container_identifiers"]["nonpolymer_comp_id"]
-        chain_id = response["rcsb_nonpolymer_entity_container_identifiers"]["auth_asym_ids"][0]
+        base_url = "https://data.rcsb.org/graphql?query="
+        ligand_entity_ids = pdb_ligand_entities["ligand_entity"].to_list()
+        chain_ids_dict = {}
+        expo_ids_dict = {}
+        n_batches = math.ceil(len(ligand_entity_ids) / 50)  # request maximal 50 entries at a time
+        for i in range(n_batches):
+            ligand_entity_ids_batch = ligand_entity_ids[i * 50: (i * 50) + 50]
+            logger.debug(f"Batch {i}\n{ligand_entity_ids_batch}")
+            query = '{nonpolymer_entities(entity_ids:[' + \
+                    ','.join([
+                        '"' + ligand_entity_id + '"'
+                        for ligand_entity_id in set(ligand_entity_ids_batch)
+                    ]) + \
+                    ']){rcsb_nonpolymer_entity_container_identifiers' \
+                    '{auth_asym_ids,nonpolymer_comp_id,rcsb_id}}}'
+            response = requests.get(base_url + urllib.parse.quote(query))
+            for ligand_identity_info in json.loads(response.text)["data"]["nonpolymer_entities"]:
+                identifiers = ligand_identity_info["rcsb_nonpolymer_entity_container_identifiers"]
+                expo_ids_dict[identifiers["rcsb_id"]] = identifiers["nonpolymer_comp_id"]
+                chain_ids_dict[identifiers["rcsb_id"]] = identifiers["auth_asym_ids"][0]
 
-        return expo_id, chain_id
+        pdb_ligand_entities["chain_id"] = pdb_ligand_entities["ligand_entity"].map(chain_ids_dict)
+        pdb_ligand_entities["expo_id"] = pdb_ligand_entities["ligand_entity"].map(expo_ids_dict)
+
+        pdb_ligand_entities = pdb_ligand_entities[
+            (pdb_ligand_entities["chain_id"].notnull()) &
+            (pdb_ligand_entities["expo_id"].notnull())
+        ]
+
+        return pdb_ligand_entities
 
     @staticmethod
-    def _get_pdb_resolution(pdb_id):
+    def _add_pdb_resolution(pdb_ligand_entities: pd.DataFrame):
         import json
+        import math
         import requests
+        import urllib
 
-        url = f"https://data.rcsb.org/rest/v1/core/entry/{pdb_id}"
-        response = json.loads(requests.get(url).text)
-        resolution = float(response["pdbx_vrpt_summary"]["pdbresolution"])
+        base_url = "https://data.rcsb.org/graphql?query="
+        pdb_ids = list(pdb_ligand_entities["pdb_id"].unique())
+        resolution_dict = {}
+        n_batches = math.ceil(len(pdb_ids) / 50)  # request maximal 50 entries at a time
+        for i in range(n_batches):
+            pdb_ids_batch = pdb_ids[i * 50: (i * 50) + 50]
+            logger.debug(f"Batch {i}\n{pdb_ids_batch}")
+            query = '{entries(entry_ids:[' + ','.join(
+                ['"' + pdb_id + '"' for pdb_id in pdb_ids_batch]
+            ) + ']){rcsb_id,pdbx_vrpt_summary{PDB_resolution}}}'
+            response = requests.get(base_url + urllib.parse.quote(query))
+            for entry_info in json.loads(response.text)["data"]["entries"]:
+                try:
+                    resolution_dict[entry_info["rcsb_id"]] = float(
+                        entry_info["pdbx_vrpt_summary"]["PDB_resolution"]
+                    )
+                except ValueError:
+                    # add high dummy resolution
+                    resolution_dict[entry_info["rcsb_id"]] = 99.9
 
-        return resolution
+        pdb_ligand_entities["resolution"] = pdb_ligand_entities["pdb_id"].map(resolution_dict)
+        pdb_ligand_entities = pdb_ligand_entities[pdb_ligand_entities["resolution"].notnull()]
+
+        return pdb_ligand_entities
 
     def _get_most_similar_pdb_ligand_entity(self, pdb_ligand_entities, smiles):
         from ..databases.pdb import smiles_from_pdb
@@ -171,32 +243,33 @@ class MostSimilarPDBLigandFeaturizer(ParallelBaseFeaturizer):
         from rdkit import Chem, RDLogger
         from rdkit.Chem import AllChem, DataStructs
 
-        RDLogger.DisableLog("rdApp.*")  # disable RDKit logging
+        if logger.level != logging.DEBUG:
+            RDLogger.DisableLog("rdApp.*")  # disable RDKit logging
 
+        logger.debug("Generating fingerprint for reference molecule ...")
         reference = Chem.MolFromSmiles(smiles)
         reference_fingerprint = AllChem.GetMorganFingerprint(reference, 2, useFeatures=True)
 
+        logger.debug("Generating fingerprints for PDB ligand entities ...")
         pdb_ligands = [Chem.MolFromSmiles(smiles) for smiles in pdb_ligand_entities["smiles"]]
-
         pdb_ligand_entities["rdkit_molecules"] = pdb_ligands
-
         pdb_ligand_entities = pdb_ligand_entities[
             pdb_ligand_entities["rdkit_molecules"].notnull()
         ]
-
         pd.options.mode.chained_assignment = None  # otherwise next line would raise a warning
         pdb_ligand_entities["rdkit_fingerprint"] = [
             AllChem.GetMorganFingerprint(rdkit_molecule, 2, useFeatures=True)
             for rdkit_molecule in pdb_ligand_entities["rdkit_molecules"]
         ]
 
+        logger.debug("Calculating fingerprint similarity ...")
         pdb_ligand_entities["fingerprint_similarity"] = [
             DataStructs.DiceSimilarity(reference_fingerprint, fingerprint)
             for fingerprint in pdb_ligand_entities["rdkit_fingerprint"]
         ]
 
         pdb_ligand_entities.sort_values(
-            by="fingerprint_similarities",
+            by="fingerprint_similarity",
             inplace=True,
             ascending=False
         )
