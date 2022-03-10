@@ -50,14 +50,18 @@ class MostSimilarPDBLigandFeaturizer(ParallelBaseFeaturizer):
 
     def _featurize_one(self, system: ProteinLigandComplex) -> Tuple[str, str, str]:
 
+        logger.debug("Getting ligand entities ...")
         pdb_ligand_entities = self._get_pdb_ligand_entities(system.protein.uniprot_id)
+        logger.debug(pdb_ligand_entities)
 
+        logger.debug("Getting most similar PDB ligand entity ...")
         pdb_id, chain_id, expo_id = self._get_most_similar_pdb_ligand_entity(
             pdb_ligand_entities,
             system.ligand.smiles
         )
 
         if self.store_results_in_protein_object:
+            logger.debug("Adding results to protein object ...")
             system.protein.pdb_id = pdb_id
             system.protein.chain_id = chain_id
             system.protein.expo_id = expo_id
@@ -83,6 +87,7 @@ class MostSimilarPDBLigandFeaturizer(ParallelBaseFeaturizer):
             exact_match="X-RAY DIFFRACTION"  # allows later sorting for resolution
         )
 
+        logger.debug("Querying PDB for ligand entities ...")
         results = rcsb.search(
             rcsb.CompositeQuery(
                 [
@@ -94,12 +99,17 @@ class MostSimilarPDBLigandFeaturizer(ParallelBaseFeaturizer):
             ),
             return_type="non_polymer_entity"  # "polymer_instance"
         )
+
+        logger.debug("Filtering ligand entities ...")
         pdb_ligand_entities = []
         for result in results:
             pdb_id, non_polymer_id = result.split("_")
+            logger.debug(
+                f"Getting ligand info for PDB {pdb_id} ligand entity {non_polymer_id} ..."
+            )
             expo_id, chain_id = self._get_ligand_entity_info(pdb_id, non_polymer_id)
+            logger.debug(f"Getting resolution for PDB {pdb_id} ...")
             resolution = self._get_pdb_resolution(pdb_id)
-
             pdb_ligand_entities.append({
                 "pdb_id": pdb_id,
                 "expo_id": expo_id,
@@ -107,6 +117,7 @@ class MostSimilarPDBLigandFeaturizer(ParallelBaseFeaturizer):
                 "resolution": resolution,
             })
 
+        logger.debug("Converting ligand entities to dataframe ...")
         pdb_ligand_entities = pd.DataFrame(pdb_ligand_entities)
         pdb_ligand_entities.sort_values(by="resolution", inplace=True)
         pdb_ligand_entities = pdb_ligand_entities.groupby("expo_id").head(1)
@@ -139,10 +150,12 @@ class MostSimilarPDBLigandFeaturizer(ParallelBaseFeaturizer):
     def _get_most_similar_pdb_ligand_entity(self, pdb_ligand_entities, smiles):
         from ..databases.pdb import smiles_from_pdb
 
+        logger.debug(f"Retrieving SMILES for {pdb_ligand_entities['expo_id']}")
         smiles_dict = smiles_from_pdb(pdb_ligand_entities["expo_id"])
         pdb_ligand_entities["smiles"] = pdb_ligand_entities["expo_id"].map(smiles_dict)
 
         if self.similarity_metric == "fingerprint":
+            logger.debug("Retrieving most similar ligand entity by fingerprint ...")
             pdb_id, chain_id, expo_id = self._get_most_similar_pdb_ligand_entity_by_fingerprint(
                 pdb_ligand_entities, smiles
             )
@@ -187,6 +200,7 @@ class MostSimilarPDBLigandFeaturizer(ParallelBaseFeaturizer):
             inplace=True,
             ascending=False
         )
+        logger.debug(f"Fingerprint similarites:\n{pdb_ligand_entities}")
 
         picked_ligand_entity = pdb_ligand_entities.iloc[0]
 
