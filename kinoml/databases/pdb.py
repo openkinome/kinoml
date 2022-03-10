@@ -1,6 +1,10 @@
+import logging
 from typing import Iterable
 
 from appdirs import user_cache_dir
+
+
+logger = logging.getLogger(__name__)
 
 
 def smiles_from_pdb(ligand_ids: Iterable[str]) -> dict:
@@ -22,14 +26,15 @@ def smiles_from_pdb(ligand_ids: Iterable[str]) -> dict:
     import requests
     import urllib
 
-    ligand_ids = set(ligand_ids)
+    ligand_ids = list(set(ligand_ids))
     ligands = {}
     base_url = "https://data.rcsb.org/graphql?query="
     n_batches = math.ceil(len(ligand_ids) / 50)  # request maximal 50 smiles at a time
     for i in range(n_batches):
-        ligand_ids_batch = ligand_ids[ligand_ids[i * 50: (i * 50) + 50]]
+        ligand_ids_batch = ligand_ids[i * 50: (i * 50) + 50]
+        logger.debug(f"Batch {i}\n{ligand_ids_batch}")
         query = '{chem_comps(comp_ids:[' + \
-                ','.join(['"' + ligand_id + '"' for ligand_id in set(ligand_ids_batch)]) + \
+                ','.join(['"' + ligand_id + '"' for ligand_id in ligand_ids_batch]) + \
                 ']){chem_comp{id}rcsb_chem_comp_descriptor{SMILES_stereo}}}'
         response = requests.get(base_url + urllib.parse.quote(query))
         for ligand in json.loads(response.text)["data"]["chem_comps"]:
