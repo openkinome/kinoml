@@ -25,7 +25,7 @@ class MostSimilarPDBLigandFeaturizer(ParallelBaseFeaturizer):
     UniProt ID.
 
     The protein component of each system must have `uniprot_id` attribute specifying the protein
-    sequence of interest when quering the PDB for available entries.
+    sequence of interest when querying the PDB for available entries.
 
     The ligand component of each system must have a `smiles` attribute specifying the molecular
     structure that should be used to query for the most similar co-crystallized ligand.
