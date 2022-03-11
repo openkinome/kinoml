@@ -1,5 +1,6 @@
 import logging
-from typing import Iterable
+from pathlib import Path
+from typing import Iterable, Union
 
 from appdirs import user_cache_dir
 
@@ -49,7 +50,9 @@ def smiles_from_pdb(ligand_ids: Iterable[str]) -> dict:
     return ligands
 
 
-def download_pdb_structure(pdb_id, directory=user_cache_dir()):
+def download_pdb_structure(
+        pdb_id: str, directory: Union[str, Path] = user_cache_dir()
+) -> Union[Path, bool]:
     """
     Download a PDB structure. If the structure is not available in PDB format, it will be download
     in CIF format.
@@ -87,5 +90,104 @@ def download_pdb_structure(pdb_id, directory=user_cache_dir()):
             return cif_path
     else:
         return cif_path
-
+    logger.debug(f"Could not download PDB entry {pdb_id}.")
     return False
+
+
+def download_pdb_ligand(
+        pdb_id: str,
+        chain_id: str,
+        expo_id: str,
+        smiles: str = "",
+        directory: Union[str, Path] = user_cache_dir(),
+) -> Union[Path, bool]:
+    """
+    Download a ligand co-crystallized to a PDB structure and save in SDF format. If a SMILES is
+    provided, the connectivity and protonation will be adjusted accordingly.
+
+    Parameters
+    ----------
+    pdb_id: str
+        The PDB ID of interest.
+    chain_id: str
+        The chain ID of the ligand.
+    expo_id: str
+        The residue name of the ligand.
+    smiles: str, default=""
+        The smiles of the small molecule describing the connectivity and protonation of the
+        ligand.
+    directory: str or Path, default=user_cache_dir
+        The directory for saving the downloaded structure.
+
+    Returns
+    -------
+    : Path or False
+        The path to the the processed ligand file in SDF format if successful, else False.
+    """
+    from rdkit import Chem
+    from rdkit.Chem import AllChem
+    from ..utils import LocalFileStorage
+
+    directory = Path(directory)
+    sdf_path = LocalFileStorage.rcsb_ligand_sdf(
+        pdb_id=pdb_id,
+        chain_id=chain_id,
+        expo_id=expo_id,
+        altloc=None,
+        directory=directory,
+    )
+    if sdf_path.is_file():
+        logger.debug(
+            f"Found cached ligand file for PDB entry{pdb_id}, chain {chain_id}, ligand {expo_id}."
+        )
+        return sdf_path
+
+    pdb_path = download_pdb_structure(pdb_id=pdb_id, directory=directory)
+    if not pdb_path:
+        return False
+
+    suffix = str(pdb_path).split(".")[-1]
+    if suffix == "cif":
+        cif_path = str(pdb_path)
+        pdb_path = LocalFileStorage.rcsb_structure_pdb(
+            pdb_id=f"{pdb_id}_chain{chain_id}", directory=directory
+        )
+        if not pdb_path.is_file():
+            from Bio.PDB import MMCIFParser, PDBIO
+
+            logger.debug("Converting CIF to PDB format ...")
+            parser = MMCIFParser()
+            try:
+                structure = parser.get_structure("", cif_path)[0][chain_id]
+            except KeyError:
+                logger.debug(f"Could not find chain {chain_id} in CIF file!")
+                return False
+            io = PDBIO()
+            io.set_structure(structure)
+            io.save(str(pdb_path))
+
+    logger.debug("Extracting ligand with RDKit ...")
+    try:
+        pdb_mol = Chem.MolFromPDBFile(str(pdb_path))
+        pdb_mol_chains = Chem.SplitMolByPDBChainId(pdb_mol)
+        chain = pdb_mol_chains[chain_id]
+        chain_residues = Chem.SplitMolByPDBResidues(chain)
+        ligand = chain_residues[expo_id]
+    except KeyError:
+        logger.debug(
+            f"Could not find ligand {expo_id} for chain {chain_id} in PDB entry {pdb_id}."
+        )
+        return False
+
+    if smiles:
+        logger.debug("Adjusting connectivity and protonation according to given SMILES ...")
+        ligand = Chem.RemoveHs(ligand)
+        reference_mol = Chem.MolFromSmiles(smiles)
+        ligand = AllChem.AssignBondOrdersFromTemplate(reference_mol, ligand)
+        ligand = Chem.AddHs(ligand, addCoords=True)
+
+    logger.debug("Writing extracted ligand to SDF file ...")
+    writer = Chem.SDWriter(str(sdf_path))
+    writer.write(ligand)
+
+    return sdf_path

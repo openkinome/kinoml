@@ -46,8 +46,8 @@ class LocalFileStorage:
         return file_path
 
     @staticmethod
-    def rcsb_ligand_sdf(pdb_id, chemical_id, chain, altloc, directory=DIRECTORY):
-        file_path = directory / f"rcsb_{pdb_id}_{chemical_id}_{chain}_{altloc}.sdf"
+    def rcsb_ligand_sdf(pdb_id, chain_id, expo_id, altloc, directory=DIRECTORY):
+        file_path = directory / f"rcsb_{pdb_id}_{chain_id}_{expo_id}_{altloc}.sdf"
         return file_path
 
     @staticmethod
