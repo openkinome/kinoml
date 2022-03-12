@@ -168,7 +168,7 @@ def download_pdb_ligand(
 
     logger.debug("Extracting ligand with RDKit ...")
     try:
-        pdb_mol = Chem.MolFromPDBFile(str(pdb_path))
+        pdb_mol = Chem.MolFromPDBFile(str(pdb_path), sanitize=False)
         pdb_mol_chains = Chem.SplitMolByPDBChainId(pdb_mol)
         chain = pdb_mol_chains[chain_id]
         chain_residues = Chem.SplitMolByPDBResidues(chain)
