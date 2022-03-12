@@ -33,7 +33,11 @@ class MostSimilarPDBLigandFeaturizer(ParallelBaseFeaturizer):
     Parameters
     ----------
     similarity_metric: str, default="fingerprint"
-        The similarity metric to use to detect the structure with the most similar ligand.
+        The similarity metric to use to detect the structure with the most similar ligand
+        ["fingerprint", "schrodinger_shape"].
+    cache_dir: str, Path or None, default=None
+        Path to directory used for saving intermediate files. If None, default location
+        provided by `appdirs.user_cache_dir()` will be used.
     """
     import pandas as pd
 
@@ -42,15 +46,35 @@ class MostSimilarPDBLigandFeaturizer(ParallelBaseFeaturizer):
     def __init__(
             self,
             similarity_metric: str = "fingerprint",
+            cache_dir: Union[str, Path, None] = None,
             **kwargs
     ):
+        from appdirs import user_cache_dir
+
         super().__init__(**kwargs)
-        if similarity_metric not in ["fingerprint"]:
+        if similarity_metric not in ["fingerprint", "schrodinger_shape"]:
             raise ValueError(
                 "Only 'fingerprint' is allowed as similarity metric! " +
                 f"You provided {similarity_metric}."
             )
         self.similarity_metric = similarity_metric
+        self.cache_dir = Path(user_cache_dir())
+        if cache_dir:
+            self.cache_dir = Path(cache_dir).expanduser().resolve()
+        self.cache_dir.mkdir(parents=True, exist_ok=True)
+
+    def _pre_featurize(self, systems: Iterable[ProteinLigandComplex]) -> None:
+        """
+        Check that SCHRODINGER variable exists.
+        """
+        import os
+
+        if self.similarity_metric == "schrodinger_shape":
+            try:
+                self.schrodinger = os.environ["SCHRODINGER"]
+            except KeyError:
+                raise KeyError("Cannot find the SCHRODINGER variable!")
+        return
 
     def _featurize_one(self, system: ProteinLigandComplex) -> Union[ProteinLigandComplex, None]:
         """
@@ -321,16 +345,16 @@ class MostSimilarPDBLigandFeaturizer(ParallelBaseFeaturizer):
 
         if self.similarity_metric == "fingerprint":
             logger.debug("Retrieving most similar ligand entity by fingerprint ...")
-            pdb_id, chain_id, expo_id = self._get_most_similar_pdb_ligand_entity_by_fingerprint(
-                pdb_ligand_entities, smiles
-            )
+            pdb_id, chain_id, expo_id = self._by_fingerprint(pdb_ligand_entities, smiles)
+        elif self.similarity_metric == "schrodinger_shape":
+            pdb_id, chain_id, expo_id = self._by_schrodinger_shape(pdb_ligand_entities, smiles)
         else:
             raise ValueError(f"Similarity metric '{self.similarity_metric}' unknown!")
 
         return pdb_id, chain_id, expo_id
 
     @staticmethod
-    def _get_most_similar_pdb_ligand_entity_by_fingerprint(
+    def _by_fingerprint(
             pdb_ligand_entities: pd.DataFrame, smiles: str
     ) -> Tuple[str, str, str]:
         """
@@ -386,6 +410,85 @@ class MostSimilarPDBLigandFeaturizer(ParallelBaseFeaturizer):
         logger.debug(f"Fingerprint similarites:\n{pdb_ligand_entities}")
 
         picked_ligand_entity = pdb_ligand_entities.iloc[0]
+
+        return (
+            picked_ligand_entity["pdb_id"],
+            picked_ligand_entity["chain_id"],
+            picked_ligand_entity["expo_id"]
+        )
+
+    def _by_schrodinger_shape(
+            self, pdb_ligand_entities: pd.DataFrame, smiles: str
+    ) -> Tuple[str, str, str]:
+        """
+        Get the PDB ligand that is most similar to the given SMILES according to SCHRODINGER
+        shape_screen.
+
+        Parameters
+        ----------
+        pdb_ligand_entities: pd.DataFrame
+            The PDB ligand entities dataframe with columns named `pdb_id`, `chain_id`, `expo_id`
+            and `smiles`.
+        smiles: str
+            The SMILES representation of the molecule to search for similar PDB ligands.
+
+        Returns
+        -------
+        : tuple of str
+            The PDB, chain and expo ID of the most similar ligand.
+        """
+        from tempfile import NamedTemporaryFile
+
+        from rdkit import Chem
+        from rdkit.Chem import AllChem
+
+        from ..databases.pdb import download_pdb_ligand
+        from ..modeling.SCHRODINGERModeling import shape_screen
+
+        logger.debug("Downloading PDB ligands ...")
+        queries = []
+        for _, pdb_ligand_entity in pdb_ligand_entities.iterrows():
+            query_path = download_pdb_ligand(
+                pdb_id=pdb_ligand_entity["pdb_id"],
+                chain_id=pdb_ligand_entity["chain_id"],
+                expo_id=pdb_ligand_entity["expo_id"],
+                directory=self.cache_dir
+            )
+            if query_path:
+                pdb_ligand_entity["path"] = query_path
+                queries.append(pdb_ligand_entity)
+
+        with NamedTemporaryFile(mode="w", suffix=".sdf") as query_sdf_path, \
+                NamedTemporaryFile(mode="w", suffix=".sdf") as ligand_sdf_path, \
+                NamedTemporaryFile(mode="w", suffix=".sdf") as result_sdf_path:
+            logger.debug("Merging PDB ligands to query SDF file ...")
+            with Chem.SDWriter(query_sdf_path.name) as writer:
+                for query in queries:
+                    mol = next(Chem.SDMolSupplier(str(query["path"]), removeHs=False))
+                    writer.write(mol)
+
+            logger.debug("Creating SDF file for given smiles ...")
+            mol = Chem.MolFromSmiles(smiles)
+            mol = Chem.AddHs(mol)
+            AllChem.EmbedMolecule(mol)
+            with Chem.SDWriter(ligand_sdf_path.name) as writer:
+                writer.write(mol)
+
+            logger.debug("Running shape_screen ...")
+            shape_screen(
+                schrodinger_directory=self.schrodinger,
+                query_path=query_sdf_path.name,
+                library_path=ligand_sdf_path.name,
+                output_sdf_path=result_sdf_path.name,
+                flexible=True,
+                thorough_sampling=True,
+                keep_best_match_only=True,
+            )
+
+            logger.debug("Getting best query ...")
+            mol = next(Chem.SDMolSupplier(str(result_sdf_path.name), removeHs=False))
+            best_query_index = int(mol.GetProp("i_phase_Shape_Query")) - 1
+            picked_ligand_entity = queries[best_query_index]
 
         return (
             picked_ligand_entity["pdb_id"],

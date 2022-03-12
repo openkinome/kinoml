@@ -78,7 +78,7 @@ def run_prepwizard(
             [executable] + standard_arguments + optional_arguments
         )
 
-    if logger.getEffectiveLevel() != 10:  # remove prepwizard log
+    if logger.getEffectiveLevel() != logging.DEBUG:  # remove prepwizard log
         paths = Path(".").glob(f"*{Path(input_file).stem}*")
         for path in paths:
             try:
@@ -113,4 +113,55 @@ def mae_to_pdb(
         "-imae", str(mae_file_path), "-opdb", str(pdb_file_path),  # file paths
     ]
     subprocess.run(arguments)
+    return
+
+
+def shape_screen(
+    schrodinger_directory: Union[Path, str],
+    query_path: Union[str, Path],
+    library_path: Union[str, Path],
+    output_sdf_path: Union[str, Path],
+    flexible: bool = True,
+    thorough_sampling: bool = True,
+    keep_best_match_only: bool = True,
+):
+    import gzip
+    import shutil
+
+    schrodinger_directory = Path(schrodinger_directory)
+    executable = str(schrodinger_directory / "shape_screen")
+    standard_arguments = [
+        "-shape", str(query_path), "-screen", str(library_path), "-osd", "-atomtypes", "qsar",
+        "-HOST", "localhost", "-WAIT",
+    ]
+    optional_arguments = []
+    if flexible:
+        optional_arguments.append("-flex")
+        if thorough_sampling:
+            optional_arguments += ["-sample", "thorough"]
+    if keep_best_match_only:
+        optional_arguments.append("-best")
+
+    subprocess.run(
+        [executable] + standard_arguments + optional_arguments
+    )
+    if logger.getEffectiveLevel() != logging.DEBUG:  # remove shape_screen log and okay
+        paths = [
+            Path(".") / f"{Path(query_path).stem}.log",
+            Path(".") / f"{Path(query_path).stem}.okay"
+        ]
+        for path in paths:
+            try:
+                path.unlink()
+            except FileNotFoundError:
+                # may happen in multiprocessing of the same query file
+                pass
+
+    logger.debug("Unzipping and renaming results ...")
+    output_sdfgz_path = Path(".") / f"{Path(query_path).stem}_align.sdfgz"
+    with gzip.open(output_sdfgz_path, "rb") as sdfgz:
+        with open(output_sdf_path, "wb") as sdf:
+            shutil.copyfileobj(sdfgz, sdf)
+    output_sdfgz_path.unlink()
+
     return
