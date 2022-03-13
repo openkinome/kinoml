@@ -147,8 +147,8 @@ def shape_screen(
     )
     if logger.getEffectiveLevel() != logging.DEBUG:  # remove shape_screen log and okay
         paths = [
-            Path(".") / f"{Path(query_path).stem}.log",
-            Path(".") / f"{Path(query_path).stem}.okay"
+            Path(".") / f"{Path(query_path).stem}_shape.log",
+            Path(".") / f"{Path(query_path).stem}_shape.okay"
         ]
         for path in paths:
             try:
