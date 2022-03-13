@@ -138,7 +138,7 @@ def download_pdb_ligand(
     )
     if sdf_path.is_file():
         logger.debug(
-            f"Found cached ligand file for PDB entry{pdb_id}, chain {chain_id}, ligand {expo_id}."
+            f"Found cached ligand file for PDB entry {pdb_id}, chain {chain_id}, ligand {expo_id}."
         )
         return sdf_path
 
