@@ -145,6 +145,7 @@ def run_glide(
         logger.debug("Writing input file for docking ...")
         docking_input_file.write(f"GRIDFILE '{str(grid_file_path)}'\n")
         docking_input_file.write(f"LIGANDFILE '{mols_file_sdf.name}'\n")
+        docking_input_file.write(f"LIGPREP True\n")
         docking_input_file.write("POSE_OUTTYPE ligandlib_sd\n")
         docking_input_file.write(f"COMPRESS_POSES False\n")
         docking_input_file.write(f"POSES_PER_LIG {n_poses}\n")
