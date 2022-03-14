@@ -57,8 +57,6 @@ def run_glide(
     from rdkit import Chem
     from rdkit.Chem import AllChem
 
-    from ..modeling.MDAnalysisModeling import read_molecule
-    from ..modeling.SCHRODINGERModeling import mae_to_pdb
     from ..utils import sha256_objects
 
     if precision not in ["HTVS", "SP", "XP"]:
@@ -69,7 +67,7 @@ def run_glide(
     schrodinger_directory = Path(schrodinger_directory).resolve()
     input_file_mae = Path(input_file_mae).resolve()
     with NamedTemporaryFile(mode="w", suffix=".mae") as protein_file_mae, \
-            NamedTemporaryFile(mode="w", suffix=".pdb") as ligand_file_pdb, \
+            NamedTemporaryFile(mode="w", suffix=".mae") as ligand_file_mae, \
             NamedTemporaryFile(mode="w", suffix=".sdf") as mols_file_sdf, \
             NamedTemporaryFile(mode="w", suffix=".in") as grid_input_file, \
             NamedTemporaryFile(mode="w", suffix=".in") as docking_input_file:
@@ -84,20 +82,15 @@ def run_glide(
             "not protein"
         ])
 
-        logger.debug("Converting MAE to PDB ...")
-        input_file_pdb = input_file_mae.parent / (input_file_mae.stem + ".pdb")
-        mae_to_pdb(schrodinger_directory, input_file_mae, input_file_pdb)
-
-        logger.debug("Selecting and writing co-crystallized ligand ...")
-        structure = read_molecule(input_file_pdb)
-        ligands = structure.select_atoms(f"resname {ligand_resname}").residues
-        if len(ligands) == 0:
-            logger.debug(
-                f"Could not find ligand {ligand_resname} in structure {input_file_pdb}, "
-                f"cannot proceed to docking!"
-            )
-            return
-        ligands[0].atoms.write(ligand_file_pdb.name)  # write first residue (in case of multiple chains)
+        logger.debug("Selecting and writing ligand from MAE input file ...")
+        subprocess.run([
+            str(schrodinger_directory / "run"),
+            "delete_atoms.py",
+            str(input_file_mae),
+            ligand_file_mae.name,
+            "-asl",
+            f"not res. {ligand_resname}"
+        ])
 
         logger.debug("Writing molecules to SDF ...")
         if not mols_names or len(mols_names) != len(mols_smiles):
@@ -116,7 +109,7 @@ def run_glide(
 
         logger.debug("Writing input file for grid generation ...")
         grid_input_file.write(f"RECEP_FILE '{protein_file_mae.name}'\n")
-        grid_input_file.write(f"REF_LIGAND_FILE '{ligand_file_pdb.name}'\n")
+        grid_input_file.write(f"REF_LIGAND_FILE '{ligand_file_mae.name}'\n")
         grid_input_file.write("LIGAND_INDEX 1\n")
         grid_input_file.flush()
 
@@ -152,7 +145,8 @@ def run_glide(
         docking_input_file.write(f"PRECISION {precision}\n")
         if shape_restrain:
             docking_input_file.write(f"SHAPE_RESTRAIN True\n")
-            docking_input_file.write(f"SHAPE_REF_LIGAND_FILE '{ligand_file_pdb.name}'\n")
+            docking_input_file.write(f"SHAPE_REF_LIGAND_FILE '{ligand_file_mae.name}'\n")
+            docking_input_file.write("SHAPE_TYPING PHASE_QSAR\n")
         if macrocyles:
             docking_input_file.write(f"MACROCYCLE True\n")
         docking_input_file.flush()
