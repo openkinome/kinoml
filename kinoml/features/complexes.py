@@ -95,7 +95,7 @@ class MostSimilarPDBLigandFeaturizer(ParallelBaseFeaturizer):
 
         logger.debug("Getting available ligand entities from PDB...")
         pdb_ligand_entities = self._get_pdb_ligand_entities(system.protein.uniprot_id)
-        if not pdb_ligand_entities or len(pdb_ligand_entities) == 0:
+        if pdb_ligand_entities is None or len(pdb_ligand_entities) == 0:
             return None
 
         logger.debug("Getting most similar PDB ligand entity ...")
