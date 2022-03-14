@@ -119,7 +119,8 @@ class MostSimilarPDBLigandFeaturizer(ParallelBaseFeaturizer):
     ) -> Iterable[ProteinLigandComplex]:
         """
         Run after featurizing all systems. Original systems will be replaced with systems
-        returned by the featurizer.
+        returned by the featurizer. Systems that were not successfully featurized will be
+        removed.
 
         Parameters
         ----------
@@ -137,7 +138,7 @@ class MostSimilarPDBLigandFeaturizer(ParallelBaseFeaturizer):
             The new systems with ``.featurizations`` extended with the calculated features in two
             entries: the featurizer name and ``last``.
         """
-        systems = features
+        systems = [feature for feature in features if feature]
         for system in systems:
             feature = (system.protein.pdb_id, system.protein.chain_id, system.protein.expo_id)
             system.featurizations["last"] = feature
