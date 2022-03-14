@@ -125,6 +125,28 @@ def shape_screen(
     thorough_sampling: bool = True,
     keep_best_match_only: bool = True,
 ):
+    """
+    Run the shape_screen tool to align a library of small molecules to the given shape query.
+
+    Parameters
+    ----------
+    schrodinger_directory: Path or str
+        The path to the directory of the Schrodinger installation.
+    query_path: Path or str
+        The path to a valid shape query, e.g. an SDF file with one or more small molecules.
+    library_path: Path or str
+        The path to a valid ligand library for shape screening, e.g. and SDF file with one more
+        small molecules.
+    output_sdf_path: Path or str
+        The path to the output SDF file of the shape screening.
+    flexible: bool, default=True
+        If conformers shell be generated for the small molecule library to screen.
+    thorough_sampling: bool, default=True
+        If conformations shell thoroughly sampled.
+    keep_best_match_only: bool, default=True
+        In case multiple shape queries, if only the results for best matching shape query shell
+        be returned.
+    """
     import gzip
     import shutil
 
