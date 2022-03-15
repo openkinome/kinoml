@@ -208,7 +208,7 @@ class Protein(BaseProtein, AminoAcidSequence):
             molecule=molecule,
             name=name,
             toolkit=toolkit,
-            metadata={"file_path": file_path},
+            metadata={"file_path": file_path}
         )
 
     @classmethod
@@ -238,7 +238,13 @@ class Protein(BaseProtein, AminoAcidSequence):
             molecule = read_molecule(file_path)
         if not name:
             name = pdb_id
-        return cls(molecule=molecule, name=name, toolkit=toolkit, metadata={"pdb_id": pdb_id})
+        return cls(
+            molecule=molecule,
+            name=name,
+            pdb_id=pdb_id,
+            toolkit=toolkit,
+            metadata={"pdb_id": pdb_id},
+        )
 
 
 class KLIFSKinase(Protein):
