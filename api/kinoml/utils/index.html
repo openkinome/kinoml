@@ -333,6 +333,8 @@
         </li>
         <li class="md-nav__item"><a href="#kinoml.utils.LocalFileStorage.rcsb_structure_pdb" class="md-nav__link">rcsb_structure_pdb</a>
         </li>
+        <li class="md-nav__item"><a href="#kinoml.utils.LocalFileStorage.rcsb_structure_cif" class="md-nav__link">rcsb_structure_cif</a>
+        </li>
         <li class="md-nav__item"><a href="#kinoml.utils.LocalFileStorage.rcsb_ligand_sdf" class="md-nav__link">rcsb_ligand_sdf</a>
         </li>
         <li class="md-nav__item"><a href="#kinoml.utils.LocalFileStorage.rcsb_electron_density_mtz" class="md-nav__link">rcsb_electron_density_mtz</a>
@@ -354,6 +356,8 @@
         <li class="md-nav__item"><a href="#kinoml.utils.FileDownloader.DIRECTORY" class="md-nav__link">DIRECTORY</a>
         </li>
         <li class="md-nav__item"><a href="#kinoml.utils.FileDownloader.rcsb_structure_pdb" class="md-nav__link">rcsb_structure_pdb</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.utils.FileDownloader.rcsb_structure_cif" class="md-nav__link">rcsb_structure_cif</a>
         </li>
         <li class="md-nav__item"><a href="#kinoml.utils.FileDownloader.rcsb_electron_density_mtz" class="md-nav__link">rcsb_electron_density_mtz</a>
         </li></ul>
@@ -432,6 +436,10 @@
 <em class="property">static </em><code class="sig-name descname">rcsb_structure_pdb</code><span class="sig-paren">(</span><em class="sig-param">pdb_id</em>, <em class="sig-param">directory=DIRECTORY</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.utils.LocalFileStorage.rcsb_structure_pdb" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 <dl class="method">
+<dt id="kinoml.utils.LocalFileStorage.rcsb_structure_cif">
+<em class="property">static </em><code class="sig-name descname">rcsb_structure_cif</code><span class="sig-paren">(</span><em class="sig-param">pdb_id</em>, <em class="sig-param">directory=DIRECTORY</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.utils.LocalFileStorage.rcsb_structure_cif" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="method">
 <dt id="kinoml.utils.LocalFileStorage.rcsb_ligand_sdf">
 <em class="property">static </em><code class="sig-name descname">rcsb_ligand_sdf</code><span class="sig-paren">(</span><em class="sig-param">pdb_id</em>, <em class="sig-param">chemical_id</em>, <em class="sig-param">chain</em>, <em class="sig-param">altloc</em>, <em class="sig-param">directory=DIRECTORY</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.utils.LocalFileStorage.rcsb_ligand_sdf" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -471,6 +479,10 @@
 <dl class="method">
 <dt id="kinoml.utils.FileDownloader.rcsb_structure_pdb">
 <em class="property">static </em><code class="sig-name descname">rcsb_structure_pdb</code><span class="sig-paren">(</span><em class="sig-param">pdb_id</em>, <em class="sig-param">directory=DIRECTORY</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.utils.FileDownloader.rcsb_structure_pdb" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="method">
+<dt id="kinoml.utils.FileDownloader.rcsb_structure_cif">
+<em class="property">static </em><code class="sig-name descname">rcsb_structure_cif</code><span class="sig-paren">(</span><em class="sig-param">pdb_id</em>, <em class="sig-param">directory=DIRECTORY</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.utils.FileDownloader.rcsb_structure_cif" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 <dl class="method">
 <dt id="kinoml.utils.FileDownloader.rcsb_electron_density_mtz">
@@ -529,13 +541,17 @@ filling it with fillvalue if needed.</p>
 <dl class="function">
 <dt id="kinoml.utils.download_file">
 <code class="sig-prename descclassname">kinoml.utils.</code><code class="sig-name descname">download_file</code><span class="sig-paren">(</span><em class="sig-param">url: str</em>, <em class="sig-param">path: str</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.utils.download_file" title="Permalink to this definition">¶</a></dt>
-<dd><p>Download a file and save it locally.</p>
+<dd><p>Download a file and save it locally.
+:param url: URL for downloading data.
+:type url: str
+:param path: Path to save downloaded data.
+:type path: str</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>url</strong> (<em>str</em>) – URL for downloading data.</p></li>
-<li><p><strong>path</strong> (<em>str</em>) – Path to save downloaded data.</p></li>
-</ul>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>True if successful, else False.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>bool</p>
 </dd>
 </dl>
 </dd></dl>

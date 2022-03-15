@@ -321,39 +321,29 @@
               <ul class="md-nav__list">
         <li class="md-nav__item"><a href="#kinoml.core.proteins.logger" class="md-nav__link">logger</a>
         </li>
-        <li class="md-nav__item"><a href="#kinoml.core.proteins.AminoAcidSequence" class="md-nav__link">AminoAcidSequence</a><nav class="md-nav">
+        <li class="md-nav__item"><a href="#kinoml.core.proteins.Protein" class="md-nav__link">Protein</a><nav class="md-nav">
               <ul class="md-nav__list">
-        <li class="md-nav__item"><a href="#kinoml.core.proteins.AminoAcidSequence.ALPHABET" class="md-nav__link">ALPHABET</a>
+        <li class="md-nav__item"><a href="#kinoml.core.proteins.Protein.pdb_id" class="md-nav__link">pdb_id</a>
         </li>
-        <li class="md-nav__item"><a href="#kinoml.core.proteins.AminoAcidSequence._ACCESSION_URL" class="md-nav__link">_ACCESSION_URL</a>
+        <li class="md-nav__item"><a href="#kinoml.core.proteins.Protein.molecule" class="md-nav__link">molecule</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.core.proteins.Protein.from_file" class="md-nav__link">from_file</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.core.proteins.Protein.from_pdb" class="md-nav__link">from_pdb</a>
         </li></ul>
             </nav>
         </li>
-        <li class="md-nav__item"><a href="#kinoml.core.proteins.UniprotProtein" class="md-nav__link">UniprotProtein</a>
-        </li>
-        <li class="md-nav__item"><a href="#kinoml.core.proteins.ProteinStructure" class="md-nav__link">ProteinStructure</a><nav class="md-nav">
+        <li class="md-nav__item"><a href="#kinoml.core.proteins.KLIFSKinase" class="md-nav__link">KLIFSKinase</a><nav class="md-nav">
               <ul class="md-nav__list">
-        <li class="md-nav__item"><a href="#kinoml.core.proteins.ProteinStructure.from_file" class="md-nav__link">from_file</a>
+        <li class="md-nav__item"><a href="#kinoml.core.proteins.KLIFSKinase._query_sequence_sources" class="md-nav__link">_query_sequence_sources</a>
         </li>
-        <li class="md-nav__item"><a href="#kinoml.core.proteins.ProteinStructure.from_sequence" class="md-nav__link">from_sequence</a>
+        <li class="md-nav__item"><a href="#kinoml.core.proteins.KLIFSKinase._query_klifs" class="md-nav__link">_query_klifs</a>
         </li>
-        <li class="md-nav__item"><a href="#kinoml.core.proteins.ProteinStructure.from_uniprot" class="md-nav__link">from_uniprot</a>
+        <li class="md-nav__item"><a href="#kinoml.core.proteins.KLIFSKinase.kinase_klifs_sequence" class="md-nav__link">kinase_klifs_sequence</a>
         </li>
-        <li class="md-nav__item"><a href="#kinoml.core.proteins.ProteinStructure.from_hgnc" class="md-nav__link">from_hgnc</a>
+        <li class="md-nav__item"><a href="#kinoml.core.proteins.KLIFSKinase.structure_klifs_sequence" class="md-nav__link">structure_klifs_sequence</a>
         </li>
-        <li class="md-nav__item"><a href="#kinoml.core.proteins.ProteinStructure.from_name" class="md-nav__link">from_name</a>
-        </li>
-        <li class="md-nav__item"><a href="#kinoml.core.proteins.ProteinStructure.sequence" class="md-nav__link">sequence</a>
-        </li></ul>
-            </nav>
-        </li>
-        <li class="md-nav__item"><a href="#kinoml.core.proteins.Kinase" class="md-nav__link">Kinase</a><nav class="md-nav">
-              <ul class="md-nav__list">
-        <li class="md-nav__item"><a href="#kinoml.core.proteins.Kinase.from_klifs" class="md-nav__link">from_klifs</a>
-        </li>
-        <li class="md-nav__item"><a href="#kinoml.core.proteins.Kinase.from_kinmap" class="md-nav__link">from_kinmap</a>
-        </li>
-        <li class="md-nav__item"><a href="#kinoml.core.proteins.Kinase.from_manning" class="md-nav__link">from_manning</a>
+        <li class="md-nav__item"><a href="#kinoml.core.proteins.KLIFSKinase.structure_klifs_residues" class="md-nav__link">structure_klifs_residues</a>
         </li></ul>
             </nav>
         </li></ul>
@@ -384,94 +374,216 @@
 <code class="sig-prename descclassname">kinoml.core.proteins.</code><code class="sig-name descname">logger</code><a class="headerlink" href="#kinoml.core.proteins.logger" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 <dl class="class">
-<dt id="kinoml.core.proteins.AminoAcidSequence">
-<em class="property">class </em><code class="sig-prename descclassname">kinoml.core.proteins.</code><code class="sig-name descname">AminoAcidSequence</code><span class="sig-paren">(</span><em class="sig-param">sequence</em>, <em class="sig-param">name=''</em>, <em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.proteins.AminoAcidSequence" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="../components/index.html#kinoml.core.components.BaseProtein" title="kinoml.core.components.BaseProtein"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.core.components.BaseProtein</span></code></a>, <a class="reference internal" href="../sequences/index.html#kinoml.core.sequences.Biosequence" title="kinoml.core.sequences.Biosequence"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.core.sequences.Biosequence</span></code></a></p>
-<p>Biosequence that only allows proteinic aminoacids</p>
+<dt id="kinoml.core.proteins.Protein">
+<em class="property">class </em><code class="sig-prename descclassname">kinoml.core.proteins.</code><code class="sig-name descname">Protein</code><span class="sig-paren">(</span><em class="sig-param">pdb_id: str = ''</em>, <em class="sig-param">molecule: Union[oechem.OEMol</em>, <em class="sig-param">oechem.OEGraphMol</em>, <em class="sig-param">Universe</em>, <em class="sig-param">None] = None</em>, <em class="sig-param">toolkit: str = 'OpenEye'</em>, <em class="sig-param">name: str = ''</em>, <em class="sig-param">sequence: str = ''</em>, <em class="sig-param">uniprot_id: str = ''</em>, <em class="sig-param">ncbi_id: str = ''</em>, <em class="sig-param">metadata: Union[dict</em>, <em class="sig-param">None] = None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.proteins.Protein" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../components/index.html#kinoml.core.components.BaseProtein" title="kinoml.core.components.BaseProtein"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.core.components.BaseProtein</span></code></a>, <a class="reference internal" href="../sequences/index.html#kinoml.core.sequences.AminoAcidSequence" title="kinoml.core.sequences.AminoAcidSequence"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.core.sequences.AminoAcidSequence</span></code></a></p>
+<p>Create a new Protein object. A molecular representation is accessible via the molecule attribute.</p>
+<div class="admonition-examples admonition">
+<p class="admonition-title">Examples</p>
+<p>Create a protein from file with OpenEye toolkit molecular representation:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">protein</span> <span class="o">=</span> <span class="n">Protein</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="s2">"data/proteins/4f8o.pdb"</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"4f8o"</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Create a protein from file with MDAnalysis toolkit molecular representation:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">protein</span> <span class="o">=</span> <span class="n">Protein</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="s2">"data/proteins/4f8o.pdb"</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"4f8o"</span><span class="p">,</span> <span class="n">toolkit</span><span class="o">=</span><span class="s2">"MDAnalysis"</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Create a protein from an OpenEye molecule:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">kinoml.modeling.OEModeling</span> <span class="kn">import</span> <span class="n">read_molecules</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">molecule</span> <span class="o">=</span> <span class="n">read_molecules</span><span class="p">(</span><span class="s2">"data/proteins/4f8o.pdb"</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">protein</span> <span class="o">=</span> <span class="n">Protein</span><span class="p">(</span><span class="n">molecule</span><span class="o">=</span><span class="n">molecule</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"4f8o"</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Create a protein from PDB ID:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">protein</span> <span class="o">=</span> <span class="n">Protein</span><span class="o">.</span><span class="n">from_pdb</span><span class="p">(</span><span class="s2">"4f8o"</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Create a protein from PDB ID with lazy instantiation:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">protein</span> <span class="o">=</span> <span class="n">Protein</span><span class="p">(</span><span class="n">pdb_id</span><span class="o">=</span><span class="s2">"4f8o"</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Create a protein from PDB ID with lazy instantiation and get access to the complete wildtype
+amino acid sequence via providing a UniProt ID:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">protein</span> <span class="o">=</span> <span class="n">Protein</span><span class="p">(</span><span class="n">pdb_id</span><span class="o">=</span><span class="s2">"4f8o"</span><span class="p">,</span> <span class="n">uniprot_id</span><span class="o">=</span><span class="s2">"P31522"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">protein</span><span class="o">.</span><span class="n">sequence</span>
+</pre></div>
+</div>
+</div>
+<dl class="method">
+<dt id="kinoml.core.proteins.Protein.pdb_id">
+<em class="property">property </em><code class="sig-name descname">pdb_id</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.proteins.Protein.pdb_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decorate pdb_id to modify setter.</p>
+</dd></dl>
+<dl class="method">
+<dt id="kinoml.core.proteins.Protein.molecule">
+<em class="property">property </em><code class="sig-name descname">molecule</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.proteins.Protein.molecule" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decorate molecule to modify setter and getter.</p>
+</dd></dl>
+<dl class="method">
+<dt>
+<code class="sig-name descname">molecule</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span></dt>
+<dd><p>Get the _molecule attribute. If the pdb_id attribute is given and _molecule is None, a
+new molecule representation will be created from the given pdb_id, e.g. in case of lazy
+instantiation. The toolkit being used depends on the toolkit attribute.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The molecular representation of the protein.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>Universe or AtomGroup or oechem.OEMol or oechem.OEGraphMol or None</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="method">
+<dt id="kinoml.core.proteins.Protein.from_file">
+<em class="property">classmethod </em><code class="sig-name descname">from_file</code><span class="sig-paren">(</span><em class="sig-param">cls, file_path: Union[Path, str], name: str = '', toolkit: str = 'OpenEye'</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.proteins.Protein.from_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a Protein from file.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>sequence</strong> (<em>str</em>) – The FASTA sequence for this protein (one-letter symbols)</p></li>
-<li><p><strong>name</strong> (<em>str</em><em>, </em><em>optional</em>) – Free-text identifier for the sequence</p></li>
+<li><p><strong>file_path</strong> (<em>pathlib.Path</em><em> or </em><em>str</em>) – The path to the molecular file. Supported formats depend on the toolkit being used.</p></li>
+<li><p><strong>name</strong> (<em>str</em><em>, </em><em>default=""</em>) – The name of the protein.</p></li>
+<li><p><strong>toolkit</strong> (<em>str</em><em>, </em><em>default="OpenEye"</em>) – The toolkit to use for molecular representation.</p></li>
 </ul>
 </dd>
 </dl>
-<dl class="attribute">
-<dt id="kinoml.core.proteins.AminoAcidSequence.ALPHABET">
-<code class="sig-name descname">ALPHABET</code><em class="property"> = ACDEFGHIKLMNPQRSTVWY</em><a class="headerlink" href="#kinoml.core.proteins.AminoAcidSequence.ALPHABET" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-<dl class="attribute">
-<dt id="kinoml.core.proteins.AminoAcidSequence._ACCESSION_URL">
-<code class="sig-name descname">_ACCESSION_URL</code><em class="property"> = https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=protein&amp;id={}&amp;rettype=fasta&amp;retmode=text</em><a class="headerlink" href="#kinoml.core.proteins.AminoAcidSequence._ACCESSION_URL" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
 </dd></dl>
-<dl class="class">
-<dt id="kinoml.core.proteins.UniprotProtein">
-<em class="property">class </em><code class="sig-prename descclassname">kinoml.core.proteins.</code><code class="sig-name descname">UniprotProtein</code><span class="sig-paren">(</span><em class="sig-param">uniprot_id</em>, <em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.proteins.UniprotProtein" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="../components/index.html#kinoml.core.components.BaseProtein" title="kinoml.core.components.BaseProtein"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.core.components.BaseProtein</span></code></a></p>
-<p>A protein represented by its UniProt ID, uniquely.</p>
+<dl class="method">
+<dt id="kinoml.core.proteins.Protein.from_pdb">
+<em class="property">classmethod </em><code class="sig-name descname">from_pdb</code><span class="sig-paren">(</span><em class="sig-param">cls</em>, <em class="sig-param">pdb_id: str</em>, <em class="sig-param">name: str = ''</em>, <em class="sig-param">toolkit: str = 'OpenEye'</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.proteins.Protein.from_pdb" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a Protein from file.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>uniprot_id</strong> (<em>str</em>) – Uniprot ID for this protein</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pdb_id</strong> (<em>str</em>) – The PDB ID of the protein structure of interest.</p></li>
+<li><p><strong>name</strong> (<em>str</em><em>, </em><em>default=""</em>) – The name of the protein.</p></li>
+<li><p><strong>toolkit</strong> (<em>str</em><em>, </em><em>default="OpenEye"</em>) – The toolkit to use for molecular representation.</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
-<dl class="class">
-<dt id="kinoml.core.proteins.ProteinStructure">
-<em class="property">class </em><code class="sig-prename descclassname">kinoml.core.proteins.</code><code class="sig-name descname">ProteinStructure</code><span class="sig-paren">(</span><em class="sig-param">name=''</em>, <em class="sig-param">metadata=None</em>, <em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.proteins.ProteinStructure" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="../components/index.html#kinoml.core.components.BaseProtein" title="kinoml.core.components.BaseProtein"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.core.components.BaseProtein</span></code></a>, <a class="reference internal" href="../components/index.html#kinoml.core.components.BaseStructure" title="kinoml.core.components.BaseStructure"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.core.components.BaseStructure</span></code></a></p>
-<p>Structural representation of a protein</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>This is probably going to be redone, so do not invest too much</p>
-</div>
-<dl class="method">
-<dt id="kinoml.core.proteins.ProteinStructure.from_file">
-<em class="property">classmethod </em><code class="sig-name descname">from_file</code><span class="sig-paren">(</span><em class="sig-param">cls</em>, <em class="sig-param">path</em>, <em class="sig-param">ext=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.proteins.ProteinStructure.from_file" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-<dl class="method">
-<dt id="kinoml.core.proteins.ProteinStructure.from_sequence">
-<em class="property">abstract classmethod </em><code class="sig-name descname">from_sequence</code><span class="sig-paren">(</span><em class="sig-param">cls</em>, <em class="sig-param">sequence</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.proteins.ProteinStructure.from_sequence" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-<dl class="method">
-<dt id="kinoml.core.proteins.ProteinStructure.from_uniprot">
-<em class="property">abstract classmethod </em><code class="sig-name descname">from_uniprot</code><span class="sig-paren">(</span><em class="sig-param">cls</em>, <em class="sig-param">identifier</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.proteins.ProteinStructure.from_uniprot" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-<dl class="method">
-<dt id="kinoml.core.proteins.ProteinStructure.from_hgnc">
-<em class="property">abstract classmethod </em><code class="sig-name descname">from_hgnc</code><span class="sig-paren">(</span><em class="sig-param">cls</em>, <em class="sig-param">identifier</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.proteins.ProteinStructure.from_hgnc" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-<dl class="method">
-<dt id="kinoml.core.proteins.ProteinStructure.from_name">
-<em class="property">classmethod </em><code class="sig-name descname">from_name</code><span class="sig-paren">(</span><em class="sig-param">cls</em>, <em class="sig-param">identifier</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.proteins.ProteinStructure.from_name" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-<dl class="method">
-<dt id="kinoml.core.proteins.ProteinStructure.sequence">
-<em class="property">property </em><code class="sig-name descname">sequence</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.proteins.ProteinStructure.sequence" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
 </dd></dl>
 <dl class="class">
-<dt id="kinoml.core.proteins.Kinase">
-<em class="property">class </em><code class="sig-prename descclassname">kinoml.core.proteins.</code><code class="sig-name descname">Kinase</code><span class="sig-paren">(</span><em class="sig-param">name=''</em>, <em class="sig-param">metadata=None</em>, <em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.proteins.Kinase" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#kinoml.core.proteins.ProteinStructure" title="kinoml.core.proteins.ProteinStructure"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.core.proteins.ProteinStructure</span></code></a></p>
-<p>Extends <code class="docutils literal notranslate"><span class="pre">Protein</span></code> to provide kinase-specific methods of
-instantiation.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>TODO: Define role vs those objects under <code class="docutils literal notranslate"><span class="pre">kinoml.core.kinase</span></code></p>
+<dt id="kinoml.core.proteins.KLIFSKinase">
+<em class="property">class </em><code class="sig-prename descclassname">kinoml.core.proteins.</code><code class="sig-name descname">KLIFSKinase</code><span class="sig-paren">(</span><em class="sig-param">pdb_id: str = ''</em>, <em class="sig-param">molecule: Union[oechem.OEMol</em>, <em class="sig-param">oechem.OEGraphMol</em>, <em class="sig-param">Universe</em>, <em class="sig-param">None] = None</em>, <em class="sig-param">toolkit: str = 'OpenEye'</em>, <em class="sig-param">name: str = ''</em>, <em class="sig-param">sequence: str = ''</em>, <em class="sig-param">uniprot_id: str = ''</em>, <em class="sig-param">ncbi_id: str = ''</em>, <em class="sig-param">structure_klifs_id: Union[int</em>, <em class="sig-param">None] = None</em>, <em class="sig-param">kinase_klifs_id: Union[int</em>, <em class="sig-param">None] = None</em>, <em class="sig-param">kinase_klifs_sequence: str = ''</em>, <em class="sig-param">structure_klifs_sequence: str = ''</em>, <em class="sig-param">structure_klifs_residues: Union[pd.DataFrame</em>, <em class="sig-param">None] = None</em>, <em class="sig-param">metadata: Union[dict</em>, <em class="sig-param">None] = None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.proteins.KLIFSKinase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#kinoml.core.proteins.Protein" title="kinoml.core.proteins.Protein"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.core.proteins.Protein</span></code></a></p>
+<p>Create a new KLIFSKinase object. A molecular representation is accessible via the molecule
+attribute. Allows access to the sequence and residues of the KLIFS binding pocket.</p>
+<div class="admonition-examples admonition">
+<p class="admonition-title">Examples</p>
+<p>Create a KLIFS kinase from PDB ID with lazy instantiation:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">kinase</span> <span class="o">=</span> <span class="n">KLIFSKinase</span><span class="p">(</span><span class="n">pdb_id</span><span class="o">=</span><span class="s2">"4yne"</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Create a KLIFS kinase from PDB ID with lazy instantiation and gain access to the wildtype
+KLIFS pocket sequence via providing a UniProt ID:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">kinase</span> <span class="o">=</span> <span class="n">KLIFSKinase</span><span class="p">(</span><span class="n">pdb_id</span><span class="o">=</span><span class="s2">"4yne"</span><span class="p">,</span> <span class="n">uniprot_id</span><span class="o">=</span><span class="s2">"P04629"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">kinase</span><span class="o">.</span><span class="n">kinase_klifs_sequence</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Create a KLIFS kinase from PDB ID with lazy instantiation and gain access to the wildtype
+KLIFS pocket sequence via providing a KLIFS specifc kinase ID:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">kinase</span> <span class="o">=</span> <span class="n">KLIFSKinase</span><span class="p">(</span><span class="n">pdb_id</span><span class="o">=</span><span class="s2">"4yne"</span><span class="p">,</span> <span class="n">kinase_klifs_id</span><span class="o">=</span><span class="mi">480</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">kinase</span><span class="o">.</span><span class="n">kinase_klifs_sequence</span><span class="p">()</span>  <span class="c1"># wildtype, does not need to match the given PDB structure</span>
+</pre></div>
+</div>
+<p>Create a KLIFS kinase from PDB ID with lazy instantiation and gain access to the KLIFS pocket
+sequence and residues of the structure via providing a KLIFS specifc structure ID:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">kinase</span> <span class="o">=</span> <span class="n">KLIFSKinase</span><span class="p">(</span><span class="n">pdb_id</span><span class="o">=</span><span class="s2">"4yne"</span><span class="p">,</span> <span class="n">structure_klifs_id</span><span class="o">=</span><span class="mi">3620</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">kinase</span><span class="o">.</span><span class="n">kinase_klifs_sequence</span><span class="p">()</span>  <span class="c1"># wildtype, does not need to match the given PDB structure</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">kinase</span><span class="o">.</span><span class="n">structure_klifs_sequence</span><span class="p">()</span>  <span class="c1"># specific to the structure</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">kinase</span><span class="o">.</span><span class="n">structure_klifs_residues</span><span class="p">()</span>  <span class="c1"># specific to the structure</span>
+</pre></div>
+</div>
 </div>
 <dl class="method">
-<dt id="kinoml.core.proteins.Kinase.from_klifs">
-<em class="property">abstract classmethod </em><code class="sig-name descname">from_klifs</code><span class="sig-paren">(</span><em class="sig-param">cls</em>, <em class="sig-param">identifier</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.proteins.Kinase.from_klifs" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dt id="kinoml.core.proteins.KLIFSKinase._query_sequence_sources">
+<code class="sig-name descname">_query_sequence_sources</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.proteins.KLIFSKinase._query_sequence_sources" title="Permalink to this definition">¶</a></dt>
+<dd><p>Query available sources for sequence details. Add additional methods below to allow
+fetching from other sources.</p>
+</dd></dl>
 <dl class="method">
-<dt id="kinoml.core.proteins.Kinase.from_kinmap">
-<em class="property">abstract classmethod </em><code class="sig-name descname">from_kinmap</code><span class="sig-paren">(</span><em class="sig-param">cls</em>, <em class="sig-param">identifier</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.proteins.Kinase.from_kinmap" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dt id="kinoml.core.proteins.KLIFSKinase._query_klifs">
+<code class="sig-name descname">_query_klifs</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.proteins.KLIFSKinase._query_klifs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Query KLIFS for the Uniprot ID, which allows fetching of the sequence.</p>
+</dd></dl>
 <dl class="method">
-<dt id="kinoml.core.proteins.Kinase.from_manning">
-<em class="property">abstract classmethod </em><code class="sig-name descname">from_manning</code><span class="sig-paren">(</span><em class="sig-param">cls</em>, <em class="sig-param">identifier</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.proteins.Kinase.from_manning" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dt id="kinoml.core.proteins.KLIFSKinase.kinase_klifs_sequence">
+<em class="property">property </em><code class="sig-name descname">kinase_klifs_sequence</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.proteins.KLIFSKinase.kinase_klifs_sequence" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decorate kinase_klifs_sequence to modify setter and getter.</p>
+</dd></dl>
+<dl class="method">
+<dt>
+<code class="sig-name descname">kinase_klifs_sequence</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span></dt>
+<dd><p>Get the _kinase_klifs_sequence attribute. Query KLIFS for the respective sequence if
+_kinase_klifs_sequence is an empty string.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The kinase KLIFS binding pocket sequence.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>str</p>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><strong>ValueError</strong> – To allow access to the kinase KLIFS sequence, the <cite>KLIFSKinase</cite> object needs to be
+initialized with one of the following attributes:
+kinase_klifs_sequence
+kinase_klifs_id
+structure_klifs_id
+uniprot_id</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="method">
+<dt id="kinoml.core.proteins.KLIFSKinase.structure_klifs_sequence">
+<em class="property">property </em><code class="sig-name descname">structure_klifs_sequence</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.proteins.KLIFSKinase.structure_klifs_sequence" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decorate structure_klifs_sequence to modify setter and getter.</p>
+</dd></dl>
+<dl class="method">
+<dt>
+<code class="sig-name descname">structure_klifs_sequence</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span></dt>
+<dd><p>Get the _structure_klifs_sequence attribute. Query KLIFS for the respective sequence if
+_structure_klifs_sequence is an empty string.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The structure-specific KLIFS binding pocket sequence.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>str</p>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><strong>ValueError</strong> – To allow access to the structure KLIFS sequence, the <cite>KLIFSKinase</cite> object needs to be
+initialized with one of the following attributes:
+structure_klifs_sequence
+structure_klifs_id</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="method">
+<dt id="kinoml.core.proteins.KLIFSKinase.structure_klifs_residues">
+<em class="property">property </em><code class="sig-name descname">structure_klifs_residues</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.proteins.KLIFSKinase.structure_klifs_residues" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decorate structure_klifs_residues to modify setter and getter.</p>
+</dd></dl>
+<dl class="method">
+<dt>
+<code class="sig-name descname">structure_klifs_residues</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span></dt>
+<dd><p>Get the _structure_klifs_residues attribute. Query KLIFS for the respective residues if
+_structure_klifs_residues is None.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The structure-specific KLIFS residues formatted like by opencadd.databases.klifs.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>pd.DataFrame or None</p>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><strong>ValueError</strong> – To allow access to structure KLIFS residues, the <cite>KLIFSKinase</cite> object needs to be
+initialized with one of the following attributes:
+structure_klifs_residues
+structure_klifs_id</p>
+</dd>
+</dl>
+</dd></dl>
 </dd></dl>
 </section>
 </section>

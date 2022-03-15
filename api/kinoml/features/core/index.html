@@ -319,6 +319,8 @@
               <ul class="md-nav__list">
         <li class="md-nav__item"><a href="#module-contents" class="md-nav__link">Module Contents</a><nav class="md-nav">
               <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#kinoml.features.core.logger" class="md-nav__link">logger</a>
+        </li>
         <li class="md-nav__item"><a href="#kinoml.features.core.BaseFeaturizer" class="md-nav__link">BaseFeaturizer</a><nav class="md-nav">
               <ul class="md-nav__list">
         <li class="md-nav__item"><a href="#kinoml.features.core.BaseFeaturizer._SUPPORTED_TYPES" class="md-nav__link">_SUPPORTED_TYPES</a>
@@ -456,6 +458,10 @@
 new representations of the molecular entities and their associated measurements.</p>
 <section id="module-contents">
 <h2 id="module-contents">Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
+<dl class="data">
+<dt id="kinoml.features.core.logger">
+<code class="sig-prename descclassname">kinoml.features.core.</code><code class="sig-name descname">logger</code><a class="headerlink" href="#kinoml.features.core.logger" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 <dl class="class">
 <dt id="kinoml.features.core.BaseFeaturizer">
 <em class="property">class </em><code class="sig-prename descclassname">kinoml.features.core.</code><code class="sig-name descname">BaseFeaturizer</code><a class="headerlink" href="#kinoml.features.core.BaseFeaturizer" title="Permalink to this definition">¶</a></dt>
@@ -544,20 +550,22 @@ or an array-like object.</p>
 </dd></dl>
 <dl class="method">
 <dt id="kinoml.features.core.BaseFeaturizer._post_featurize">
-<code class="sig-name descname">_post_featurize</code><span class="sig-paren">(</span><em class="sig-param">self, systems: Iterable[System], features: Iterable[System | np.array], keep: bool = True</em><span class="sig-paren">)</span> → Iterable[System]<a class="headerlink" href="#kinoml.features.core.BaseFeaturizer._post_featurize" title="Permalink to this definition">¶</a></dt>
-<dd><p>Run after featurizing all systems. You shouldn’t need to redefine this method</p>
+<code class="sig-name descname">_post_featurize</code><span class="sig-paren">(</span><em class="sig-param">self, systems: Iterable[System], features: Iterable, keep: bool = True</em><span class="sig-paren">)</span> → Iterable[System]<a class="headerlink" href="#kinoml.features.core.BaseFeaturizer._post_featurize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run after featurizing all systems. Systems with a feature of None will be removed.
+You shouldn’t need to redefine this method</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>systems</strong> (<em>list of System</em>) – The systems being featurized</p></li>
-<li><p><strong>features</strong> (<em>list of System</em><em> or </em><em>array</em>) – The features returned by <code class="docutils literal notranslate"><span class="pre">self._featurize</span></code></p></li>
+<li><p><strong>features</strong> (<em>iterable</em>) – The features returned by <code class="docutils literal notranslate"><span class="pre">self._featurize</span></code></p></li>
 <li><p><strong>keep</strong> (<em>bool</em><em>, </em><em>optional=True</em>) – Whether to store the current featurizer in the <code class="docutils literal notranslate"><span class="pre">system.featurizations</span></code>
 dictionary with its own key (<code class="docutils literal notranslate"><span class="pre">self.name</span></code>), in addition to <code class="docutils literal notranslate"><span class="pre">last</span></code>.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The same systems as passed, but with <code class="docutils literal notranslate"><span class="pre">.featurizations</span></code> extended with
-the calculated features in two entries: the featurizer name and <code class="docutils literal notranslate"><span class="pre">last</span></code>.</p>
+<dd class="field-even"><p><strong>filtered_systems</strong> – The same systems as passed, but with <code class="docutils literal notranslate"><span class="pre">.featurizations</span></code> extended with
+the calculated features in two entries: the featurizer name and <code class="docutils literal notranslate"><span class="pre">last</span></code>.
+Systems with a feature of None will be removed.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>systems</p>
@@ -825,39 +833,24 @@ it will be (N_systems, M_returned_objects).</p>
 <dt id="kinoml.features.core.BaseOneHotEncodingFeaturizer">
 <em class="property">class </em><code class="sig-prename descclassname">kinoml.features.core.</code><code class="sig-name descname">BaseOneHotEncodingFeaturizer</code><span class="sig-paren">(</span><em class="sig-param">dictionary: dict = None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.core.BaseOneHotEncodingFeaturizer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#kinoml.features.core.ParallelBaseFeaturizer" title="kinoml.features.core.ParallelBaseFeaturizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.features.core.ParallelBaseFeaturizer</span></code></a></p>
-<p>Abstract Featurizer class with support for multiprocessing.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>use_multiprocessing</strong> (<em>bool</em><em>, </em><em>default=True</em>) – If multiprocessing to use.</p></li>
-<li><p><strong>n_processes</strong> (<em>int</em><em> or </em><em>None</em><em>, </em><em>default=None</em>) – How many processes to use in case of multiprocessing.
-Defaults to number of available CPUs.</p></li>
-<li><p><strong>chunksize</strong> (<em>int</em><em>, </em><em>optional=None</em>) – See <a class="reference external" href="https://stackoverflow.com/a/54032744/3407590">https://stackoverflow.com/a/54032744/3407590</a>.</p></li>
-<li><p><strong>dask_client</strong> (<em>dask.distributed.Client</em><em> or </em><em>None</em><em>, </em><em>default=None</em>) – A dask client to manage multiprocessing. Will ignore <cite>use_multiprocessing</cite>
-<cite>chunksize</cite> and <cite>n_processes</cite> attributes.</p></li>
-</ul>
-</dd>
-</dl>
+<p>Base class for Featurizers concerning one hot encoding.</p>
 <dl class="attribute">
 <dt id="kinoml.features.core.BaseOneHotEncodingFeaturizer.ALPHABET">
 <code class="sig-name descname">ALPHABET</code><a class="headerlink" href="#kinoml.features.core.BaseOneHotEncodingFeaturizer.ALPHABET" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 <dl class="method">
 <dt id="kinoml.features.core.BaseOneHotEncodingFeaturizer._featurize_one">
-<code class="sig-name descname">_featurize_one</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">system: System</em><span class="sig-paren">)</span> → np.ndarray<a class="headerlink" href="#kinoml.features.core.BaseOneHotEncodingFeaturizer._featurize_one" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">_featurize_one</code><span class="sig-paren">(</span><em class="sig-param">self, system: Union[LigandSystem, ProteinLigandComplex]</em><span class="sig-paren">)</span> → Union[np.ndarray, None]<a class="headerlink" href="#kinoml.features.core.BaseOneHotEncodingFeaturizer._featurize_one" title="Permalink to this definition">¶</a></dt>
 <dd><p>One hot encode one system.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>system</strong> (<a class="reference internal" href="../../core/systems/index.html#kinoml.core.systems.System" title="kinoml.core.systems.System"><em>System</em></a>) – The System to be featurized.</p></li>
-<li><p><strong>options</strong> (<em>dict</em>) – Unused</p></li>
-</ul>
+<dd class="field-odd"><p><strong>system</strong> (<a class="reference internal" href="../../core/systems/index.html#kinoml.core.systems.LigandSystem" title="kinoml.core.systems.LigandSystem"><em>LigandSystem</em></a><em> or </em><a class="reference internal" href="../../core/systems/index.html#kinoml.core.systems.ProteinLigandComplex" title="kinoml.core.systems.ProteinLigandComplex"><em>ProteinLigandComplex</em></a>) – The System to be featurized.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p></p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>array</p>
+<dd class="field-odd"><p>array or None</p>
 </dd>
 </dl>
 </dd></dl>

@@ -321,8 +321,6 @@
               <ul class="md-nav__list">
         <li class="md-nav__item"><a href="#kinoml.datasets.core.logger" class="md-nav__link">logger</a>
         </li>
-        <li class="md-nav__item"><a href="#kinoml.datasets.core.FeaturizationError" class="md-nav__link">FeaturizationError</a>
-        </li>
         <li class="md-nav__item"><a href="#kinoml.datasets.core.BaseDatasetProvider" class="md-nav__link">BaseDatasetProvider</a><nav class="md-nav">
               <ul class="md-nav__list">
         <li class="md-nav__item"><a href="#kinoml.datasets.core.BaseDatasetProvider.from_source" class="md-nav__link">from_source</a>
@@ -367,6 +365,8 @@
         </li>
         <li class="md-nav__item"><a href="#kinoml.datasets.core.DatasetProvider.featurize" class="md-nav__link">featurize</a>
         </li>
+        <li class="md-nav__item"><a href="#kinoml.datasets.core.DatasetProvider._post_featurize" class="md-nav__link">_post_featurize</a>
+        </li>
         <li class="md-nav__item"><a href="#kinoml.datasets.core.DatasetProvider.featurized_systems" class="md-nav__link">featurized_systems</a>
         </li>
         <li class="md-nav__item"><a href="#kinoml.datasets.core.DatasetProvider._to_dataset" class="md-nav__link">_to_dataset</a>
@@ -405,6 +405,8 @@
         </li>
         <li class="md-nav__item"><a href="#kinoml.datasets.core.MultiDatasetProvider" class="md-nav__link">MultiDatasetProvider</a><nav class="md-nav">
               <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#kinoml.datasets.core.MultiDatasetProvider._post_featurize" class="md-nav__link">_post_featurize</a>
+        </li>
         <li class="md-nav__item"><a href="#kinoml.datasets.core.MultiDatasetProvider.observation_models" class="md-nav__link">observation_models</a>
         </li>
         <li class="md-nav__item"><a href="#kinoml.datasets.core.MultiDatasetProvider.loss_adapters" class="md-nav__link">loss_adapters</a>
@@ -432,8 +434,6 @@
         <li class="md-nav__item"><a href="#kinoml.datasets.core.MultiDatasetProvider.__repr__" class="md-nav__link">__repr__</a>
         </li></ul>
             </nav>
-        </li>
-        <li class="md-nav__item"><a href="#kinoml.datasets.core.ProteinLigandDatasetProvider" class="md-nav__link">ProteinLigandDatasetProvider</a>
         </li></ul>
             </nav>
         </li></ul>
@@ -461,16 +461,11 @@
 <dt id="kinoml.datasets.core.logger">
 <code class="sig-prename descclassname">kinoml.datasets.core.</code><code class="sig-name descname">logger</code><a class="headerlink" href="#kinoml.datasets.core.logger" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-<dl class="exception">
-<dt id="kinoml.datasets.core.FeaturizationError">
-<em class="property">exception </em><code class="sig-prename descclassname">kinoml.datasets.core.</code><code class="sig-name descname">FeaturizationError</code><a class="headerlink" href="#kinoml.datasets.core.FeaturizationError" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
-<p>Error raised if a featurization process could not finish successfully</p>
-</dd></dl>
 <dl class="class">
 <dt id="kinoml.datasets.core.BaseDatasetProvider">
 <em class="property">class </em><code class="sig-prename descclassname">kinoml.datasets.core.</code><code class="sig-name descname">BaseDatasetProvider</code><a class="headerlink" href="#kinoml.datasets.core.BaseDatasetProvider" title="Permalink to this definition">¶</a></dt>
-<dd><p>API specification for dataset providers</p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>API specification for dataset providers</p>
 <dl class="method">
 <dt id="kinoml.datasets.core.BaseDatasetProvider.from_source">
 <em class="property">abstract classmethod </em><code class="sig-name descname">from_source</code><span class="sig-paren">(</span><em class="sig-param">cls</em>, <em class="sig-param">path_or_url=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.core.BaseDatasetProvider.from_source" title="Permalink to this definition">¶</a></dt>
@@ -535,7 +530,7 @@
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>measurements</strong> (<em>list of BaseMeasurement</em>) – A DatasetProvider holds a list of <code class="docutils literal notranslate"><span class="pre">kinoml.core.measurements.BaseMeasurement</span></code>
 objects (or any of its subclasses). They must be of the same type!</p></li>
-<li><p><strong>metadata</strong> (<em>dict</em>) – Extra information for provenance</p></li>
+<li><p><strong>metadata</strong> (<em>dict</em>) – Extra information for provenance.</p></li>
 </ul>
 </dd>
 </dl>
@@ -582,14 +577,23 @@ in a stacked way.</p>
 </dl>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>TODO:</p>
-<blockquote>
-<div><ul class="simple">
-<li><p>This function can be easily parallelized, and is often the bottleneck!</p></li>
-<li><p>Shall we modify the system in place (default now), return the modified copy or store it?</p></li>
+<dl class="simple">
+<dt>TODO:</dt><dd><ul class="simple">
+<li><p>Will the systems be properly featurized with Dask?</p></li>
 </ul>
-</div></blockquote>
+</dd>
+</dl>
 </div>
+</dd></dl>
+<dl class="method">
+<dt id="kinoml.datasets.core.DatasetProvider._post_featurize">
+<code class="sig-name descname">_post_featurize</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">featurizer: BaseFeaturizer</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.core.DatasetProvider._post_featurize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove measurements with systems, that were not successfully featurized.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>featurizer</strong> (<a class="reference internal" href="../../features/core/index.html#kinoml.features.core.BaseFeaturizer" title="kinoml.features.core.BaseFeaturizer"><em>BaseFeaturizer</em></a>) – The used featurizer.</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="method">
 <dt id="kinoml.datasets.core.DatasetProvider.featurized_systems">
@@ -833,6 +837,16 @@ will be grouped together in different sub-datasets.</p>
 </dd>
 </dl>
 <dl class="method">
+<dt id="kinoml.datasets.core.MultiDatasetProvider._post_featurize">
+<code class="sig-name descname">_post_featurize</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">featurizer: BaseFeaturizer</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.core.MultiDatasetProvider._post_featurize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove measurements with systems, that were not successfully featurized.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>featurizer</strong> (<a class="reference internal" href="../../features/core/index.html#kinoml.features.core.BaseFeaturizer" title="kinoml.features.core.BaseFeaturizer"><em>BaseFeaturizer</em></a>) – The used featurizer.</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="method">
 <dt id="kinoml.datasets.core.MultiDatasetProvider.observation_models">
 <code class="sig-name descname">observation_models</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.core.MultiDatasetProvider.observation_models" title="Permalink to this definition">¶</a></dt>
 <dd><p>List of observation models present in this dataset,
@@ -919,26 +933,6 @@ be concatenated along axis=0 (one provider after another)</p>
 <code class="sig-name descname">__repr__</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span> → str<a class="headerlink" href="#kinoml.datasets.core.MultiDatasetProvider.__repr__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return repr(self).</p>
 </dd></dl>
-</dd></dl>
-<dl class="class">
-<dt id="kinoml.datasets.core.ProteinLigandDatasetProvider">
-<em class="property">class </em><code class="sig-prename descclassname">kinoml.datasets.core.</code><code class="sig-name descname">ProteinLigandDatasetProvider</code><span class="sig-paren">(</span><em class="sig-param">measurements: Iterable[BaseMeasurement], metadata: dict = None</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.core.ProteinLigandDatasetProvider" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#kinoml.datasets.core.DatasetProvider" title="kinoml.datasets.core.DatasetProvider"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.datasets.core.DatasetProvider</span></code></a></p>
-<p>Base object for all DatasetProvider classes.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>measurements</strong> (<em>list of BaseMeasurement</em>) – A DatasetProvider holds a list of <code class="docutils literal notranslate"><span class="pre">kinoml.core.measurements.BaseMeasurement</span></code>
-objects (or any of its subclasses). They must be of the same type!</p></li>
-<li><p><strong>metadata</strong> (<em>dict</em>) – Extra information for provenance</p></li>
-</ul>
-</dd>
-</dl>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>All measurements must be of the same type! If they are not, consider
-using <code class="docutils literal notranslate"><span class="pre">MultiDatasetProvider</span></code> instead.</p>
-</div>
 </dd></dl>
 </section>
 </section>

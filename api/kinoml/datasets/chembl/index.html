@@ -73,7 +73,7 @@
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
     <link rel="next" title="kinoml.datasets.core" href="../core/index.html" />
-    <link rel="prev" title="kinoml.datasets.kinomescan.utils" href="../kinomescan/utils/index.html" />
+    <link rel="prev" title="kinoml.datasets" href="../index.html" />
   
     <link rel="apple-touch-icon" href="../../../../_static/images/custom_favicon.png"/>
   
@@ -352,11 +352,11 @@
 <em class="property">class </em><code class="sig-prename descclassname">kinoml.datasets.chembl.</code><code class="sig-name descname">ChEMBLDatasetProvider</code><span class="sig-paren">(</span><em class="sig-param">measurements: Iterable[BaseMeasurement], metadata: dict = None</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.chembl.ChEMBLDatasetProvider" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="../core/index.html#kinoml.datasets.core.MultiDatasetProvider" title="kinoml.datasets.core.MultiDatasetProvider"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.datasets.core.MultiDatasetProvider</span></code></a></p>
 <p>This provider relies heavily on <code class="docutils literal notranslate"><span class="pre">openkinome/kinodata</span></code> data ingestion
-pipelines. It will load ChEMBL activities from its Releases page.</p>
+pipelines. It will load ChEMBL activities from its releases page.</p>
 <dl class="method">
 <dt id="kinoml.datasets.chembl.ChEMBLDatasetProvider.from_source">
-<em class="property">classmethod </em><code class="sig-name descname">from_source</code><span class="sig-paren">(</span><em class="sig-param">cls</em>, <em class="sig-param">path_or_url='https://github.com/openkinome/datascripts/releases/download/v0.2/activities-chembl28_v0.2.zip'</em>, <em class="sig-param">measurement_types=('pIC50'</em>, <em class="sig-param">'pKi'</em>, <em class="sig-param">'pKd')</em>, <em class="sig-param">sample=None</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.chembl.ChEMBLDatasetProvider.from_source" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create a MultiDatasetProvider out of the raw data contained in the zip file</p>
+<em class="property">classmethod </em><code class="sig-name descname">from_source</code><span class="sig-paren">(</span><em class="sig-param">cls</em>, <em class="sig-param">path_or_url='https://github.com/openkinome/datascripts/releases/download/v0.2/activities-chembl28_v0.2.zip'</em>, <em class="sig-param">measurement_types=('pIC50'</em>, <em class="sig-param">'pKi'</em>, <em class="sig-param">'pKd')</em>, <em class="sig-param">uniprot_ids=None</em>, <em class="sig-param">sample=None</em>, <em class="sig-param">protein_type: BaseProtein = KLIFSKinase</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.chembl.ChEMBLDatasetProvider.from_source" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a MultiDatasetProvider out of the raw data contained in the zip file.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -365,7 +365,9 @@ using schema detailed below.</p></li>
 <li><p><strong>measurement_types</strong> (<em>tuple of str</em><em>, </em><em>optional</em>) – Which measurement types must be imported from the CSV. By default, all
 three (pIC50, pKi, pKd) will be loaded, but you can choose a subset (
 e.g. <code class="docutils literal notranslate"><span class="pre">("pIC50",)</span></code>).</p></li>
+<li><p><strong>uniprot_ids</strong> (<em>None</em><em> or </em><em>list of str</em><em>, </em><em>default=None</em>) – Restrict measurements to the given UniProt IDs.</p></li>
 <li><p><strong>sample</strong> (<em>int</em><em>, </em><em>optional=None</em>) – If set to larger than zero, load only N data points from the dataset.</p></li>
+<li><p><strong>protein_type</strong> (<a class="reference internal" href="../../core/components/index.html#kinoml.core.components.BaseProtein" title="kinoml.core.components.BaseProtein"><em>BaseProtein</em></a>) – The protein object type to use.</p></li>
 </ul>
 </dd>
 </dl>
@@ -389,7 +391,7 @@ to be different across experiments.</p>
     <div class="md-footer-nav">
       <nav class="md-footer-nav__inner md-grid">
           
-            <a href="../kinomescan/utils/index.html" title="kinoml.datasets.kinomescan.utils"
+            <a href="../index.html" title="kinoml.datasets"
                class="md-flex md-footer-nav__link md-footer-nav__link--prev"
                rel="prev">
               <div class="md-flex__cell md-flex__cell--shrink">
@@ -398,7 +400,7 @@ to be different across experiments.</p>
               <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
                 <span class="md-flex__ellipsis">
                   <span
-                      class="md-footer-nav__direction"> Previous </span> <code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.datasets.kinomescan.utils</span></code> </span>
+                      class="md-footer-nav__direction"> Previous </span> <code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.datasets</span></code> </span>
               </div>
             </a>
           

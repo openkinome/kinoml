@@ -319,6 +319,16 @@
               <ul class="md-nav__list">
         <li class="md-nav__item"><a href="#module-contents" class="md-nav__link">Module Contents</a><nav class="md-nav">
               <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#kinoml.features.protein.logger" class="md-nav__link">logger</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.features.protein.SingleProteinFeaturizer" class="md-nav__link">SingleProteinFeaturizer</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#kinoml.features.protein.SingleProteinFeaturizer._COMPATIBLE_LIGAND_TYPES" class="md-nav__link">_COMPATIBLE_LIGAND_TYPES</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.features.protein.SingleProteinFeaturizer._supports" class="md-nav__link">_supports</a>
+        </li></ul>
+            </nav>
+        </li>
         <li class="md-nav__item"><a href="#kinoml.features.protein.AminoAcidCompositionFeaturizer" class="md-nav__link">AminoAcidCompositionFeaturizer</a><nav class="md-nav">
               <ul class="md-nav__list">
         <li class="md-nav__item"><a href="#kinoml.features.protein.AminoAcidCompositionFeaturizer._counter" class="md-nav__link">_counter</a>
@@ -357,46 +367,63 @@
 <p>Featurizers that mostly concern protein-based models</p>
 <section id="module-contents">
 <h2 id="module-contents">Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
+<dl class="data">
+<dt id="kinoml.features.protein.logger">
+<code class="sig-prename descclassname">kinoml.features.protein.</code><code class="sig-name descname">logger</code><a class="headerlink" href="#kinoml.features.protein.logger" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="class">
+<dt id="kinoml.features.protein.SingleProteinFeaturizer">
+<em class="property">class </em><code class="sig-prename descclassname">kinoml.features.protein.</code><code class="sig-name descname">SingleProteinFeaturizer</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.protein.SingleProteinFeaturizer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../core/index.html#kinoml.features.core.ParallelBaseFeaturizer" title="kinoml.features.core.ParallelBaseFeaturizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.features.core.ParallelBaseFeaturizer</span></code></a></p>
+<p>Provides a minimally useful <code class="docutils literal notranslate"><span class="pre">._supports()</span></code> method for all Protein-like featurizers.</p>
+<dl class="attribute">
+<dt id="kinoml.features.protein.SingleProteinFeaturizer._COMPATIBLE_LIGAND_TYPES">
+<code class="sig-name descname">_COMPATIBLE_LIGAND_TYPES</code><a class="headerlink" href="#kinoml.features.protein.SingleProteinFeaturizer._COMPATIBLE_LIGAND_TYPES" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="method">
+<dt id="kinoml.features.protein.SingleProteinFeaturizer._supports">
+<code class="sig-name descname">_supports</code><span class="sig-paren">(</span><em class="sig-param">self, system: Union[ProteinSystem, ProteinLigandComplex]</em><span class="sig-paren">)</span> → bool<a class="headerlink" href="#kinoml.features.protein.SingleProteinFeaturizer._supports" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check that exactly one protein is present in the System</p>
+</dd></dl>
+</dd></dl>
 <dl class="class">
 <dt id="kinoml.features.protein.AminoAcidCompositionFeaturizer">
 <em class="property">class </em><code class="sig-prename descclassname">kinoml.features.protein.</code><code class="sig-name descname">AminoAcidCompositionFeaturizer</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.protein.AminoAcidCompositionFeaturizer" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="../core/index.html#kinoml.features.core.ParallelBaseFeaturizer" title="kinoml.features.core.ParallelBaseFeaturizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.features.core.ParallelBaseFeaturizer</span></code></a></p>
-<p>Featurizes the protein using the composition of the residues
-in the binding site.</p>
+<dd><p>Bases: <a class="reference internal" href="#kinoml.features.protein.SingleProteinFeaturizer" title="kinoml.features.protein.SingleProteinFeaturizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.features.protein.SingleProteinFeaturizer</span></code></a></p>
+<p>Featurizes the protein using the composition of the residues in the binding site.</p>
 <dl class="attribute">
 <dt id="kinoml.features.protein.AminoAcidCompositionFeaturizer._counter">
 <code class="sig-name descname">_counter</code><a class="headerlink" href="#kinoml.features.protein.AminoAcidCompositionFeaturizer._counter" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 <dl class="method">
 <dt id="kinoml.features.protein.AminoAcidCompositionFeaturizer._featurize_one">
-<code class="sig-name descname">_featurize_one</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">system: System</em><span class="sig-paren">)</span> → np.array<a class="headerlink" href="#kinoml.features.protein.AminoAcidCompositionFeaturizer._featurize_one" title="Permalink to this definition">¶</a></dt>
-<dd><p>Featurizes a protein using the residue count in the sequence</p>
+<code class="sig-name descname">_featurize_one</code><span class="sig-paren">(</span><em class="sig-param">self, system: Union[ProteinSystem, ProteinLigandComplex]</em><span class="sig-paren">)</span> → Union[np.array, None]<a class="headerlink" href="#kinoml.features.protein.AminoAcidCompositionFeaturizer._featurize_one" title="Permalink to this definition">¶</a></dt>
+<dd><p>Featurizes a protein using the residue count in the sequence.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>system</strong> (<a class="reference internal" href="../../core/systems/index.html#kinoml.core.systems.System" title="kinoml.core.systems.System"><em>System</em></a>) – The System to be featurized. Sometimes it will</p>
+<dd class="field-odd"><p><strong>system</strong> (<a class="reference internal" href="../../core/systems/index.html#kinoml.core.systems.ProteinSystem" title="kinoml.core.systems.ProteinSystem"><em>ProteinSystem</em></a><em> or </em><a class="reference internal" href="../../core/systems/index.html#kinoml.core.systems.ProteinLigandComplex" title="kinoml.core.systems.ProteinLigandComplex"><em>ProteinLigandComplex</em></a>) – The System to be featurized.</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The count of amino acid in the binding site.</p>
+<dd class="field-even"><p>The count of amino acids in the binding site.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>list of array</p>
+<dd class="field-odd"><p>np.array or None</p>
 </dd>
 </dl>
 </dd></dl>
 </dd></dl>
 <dl class="class">
 <dt id="kinoml.features.protein.OneHotEncodedSequenceFeaturizer">
-<em class="property">class </em><code class="sig-prename descclassname">kinoml.features.protein.</code><code class="sig-name descname">OneHotEncodedSequenceFeaturizer</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.protein.OneHotEncodedSequenceFeaturizer" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="../core/index.html#kinoml.features.core.BaseOneHotEncodingFeaturizer" title="kinoml.features.core.BaseOneHotEncodingFeaturizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.features.core.BaseOneHotEncodingFeaturizer</span></code></a></p>
-<p>Featurize the sequence of the protein to a one hot encoding
-using the symbols in <code class="docutils literal notranslate"><span class="pre">ALL_AMINOACIDS</span></code>.</p>
+<em class="property">class </em><code class="sig-prename descclassname">kinoml.features.protein.</code><code class="sig-name descname">OneHotEncodedSequenceFeaturizer</code><span class="sig-paren">(</span><em class="sig-param">sequence_type: str = 'full'</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.protein.OneHotEncodedSequenceFeaturizer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../core/index.html#kinoml.features.core.BaseOneHotEncodingFeaturizer" title="kinoml.features.core.BaseOneHotEncodingFeaturizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.features.core.BaseOneHotEncodingFeaturizer</span></code></a>, <a class="reference internal" href="#kinoml.features.protein.SingleProteinFeaturizer" title="kinoml.features.protein.SingleProteinFeaturizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.features.protein.SingleProteinFeaturizer</span></code></a></p>
+<p>Featurizes the sequence of the protein to a one hot encoding.</p>
 <dl class="attribute">
 <dt id="kinoml.features.protein.OneHotEncodedSequenceFeaturizer.ALPHABET">
 <code class="sig-name descname">ALPHABET</code><a class="headerlink" href="#kinoml.features.protein.OneHotEncodedSequenceFeaturizer.ALPHABET" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 <dl class="method">
 <dt id="kinoml.features.protein.OneHotEncodedSequenceFeaturizer._retrieve_sequence">
-<code class="sig-name descname">_retrieve_sequence</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">system: System</em><span class="sig-paren">)</span> → str<a class="headerlink" href="#kinoml.features.protein.OneHotEncodedSequenceFeaturizer._retrieve_sequence" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">_retrieve_sequence</code><span class="sig-paren">(</span><em class="sig-param">self, system: Union[ProteinSystem, ProteinLigandComplex]</em><span class="sig-paren">)</span> → str<a class="headerlink" href="#kinoml.features.protein.OneHotEncodedSequenceFeaturizer._retrieve_sequence" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 </dd></dl>
 </section>
