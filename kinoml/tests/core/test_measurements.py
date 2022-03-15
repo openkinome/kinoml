@@ -4,7 +4,10 @@ Test kinoml.core.measurements
 
 
 def test_measurements():
-    from kinoml.core.measurements import BaseMeasurement, PercentageDisplacementMeasurement
+    from kinoml.core.measurements import (
+        BaseMeasurement,
+        PercentageDisplacementMeasurement,
+    )
     from kinoml.core.conditions import AssayConditions
     from kinoml.core.components import MolecularComponent
     from kinoml.core.systems import System

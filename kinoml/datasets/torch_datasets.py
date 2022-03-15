@@ -3,11 +3,8 @@ Helper classes to convert between DatasetProvider objects and
 Dataset-like objects native to the PyTorch ecosystem
 """
 from collections import defaultdict
-from functools import lru_cache
-from os import close
 from typing import List
 from pathlib import Path
-from functools import lru_cache
 
 import numpy as np
 import awkward as ak
@@ -43,7 +40,10 @@ class PrefeaturizedTorchDataset(_NativeTorchDataset):
     """
 
     def __init__(
-        self, systems, measurements, observation_model: callable = _null_observation_model
+        self,
+        systems,
+        measurements,
+        observation_model: callable = _null_observation_model,
     ):
         assert len(systems) == len(measurements), "Systems and Measurements must match in size!"
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -124,7 +124,10 @@ class TorchDataset(PrefeaturizedTorchDataset):
             requires_grad=True,
         )
         y = torch.tensor(
-            self.measurements[index], device=self.device, requires_grad=True, dtype=torch.float
+            self.measurements[index],
+            device=self.device,
+            requires_grad=True,
+            dtype=torch.float,
         )
         return X, y
 
@@ -293,7 +296,7 @@ class MultiXTorchDataset(_NativeTorchDataset):
           an initial waiting time.
         - B) use ``close_filehandle=True``. This will incur a penalty upon each access,
           because the NPZ file needs to be reloaded each time.
-        
+
         """
         data = np.load(path)
         if not lazy:

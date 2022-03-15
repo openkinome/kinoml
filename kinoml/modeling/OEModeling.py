@@ -5,10 +5,6 @@ from typing import List, Set, Union, Iterable, Tuple, Dict
 from openeye import oechem, oegrid, oeomega
 from scipy.spatial import cKDTree
 
-# TODO: Add space before Parameters and Returns in docstring, check with numpy standard
-# TODO: think more about exceptions
-# TODO: Think about using openff-toolkit as much as possible and converting only if needed
-
 
 def read_smiles(smiles: str, add_hydrogens: bool = True) -> oechem.OEGraphMol:
     """
@@ -117,7 +113,9 @@ def read_electron_density(path: Union[str, Path]) -> oegrid.OESkewGrid:
         electron_density = None
 
     if electron_density is None:
-        raise ValueError("Not a valid electron density file or wrong format. Only MTZ is currently supported.")
+        raise ValueError(
+            "Not a valid electron density file or wrong format. Only MTZ is currently supported."
+        )
 
     return electron_density
 
@@ -231,9 +229,9 @@ def select_altloc(
 
 
 def remove_non_protein(
-        molecule: oechem.OEMolBase,
-        exceptions: Union[None, List[str]] = None,
-        remove_water: bool = False,
+    molecule: oechem.OEMolBase,
+    exceptions: Union[None, List[str]] = None,
+    remove_water: bool = False,
 ) -> oechem.OEMolBase:
     """
     Remove non-protein atoms from an OpenEye molecule. Water will be kept by default.
@@ -546,7 +544,7 @@ def prepare_structure(
 
         if _update_ligand(design_unit, resname, chain_id):  # e.g. ANP of 3sls
             return True
-        
+
         return False
 
     # delete expression tags

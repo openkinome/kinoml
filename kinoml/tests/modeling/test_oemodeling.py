@@ -423,7 +423,7 @@ def test_assign_caps(package, resource, real_termini, caps):
 
     with resources.path(package, resource) as path:
         molecule = read_molecules(str(path))[0]
-        molecule = select_altloc(molecule, 'A')
+        molecule = select_altloc(molecule, "A")
         molecule = assign_caps(molecule, real_termini)
         hier_view = oechem.OEHierView(molecule)
         found_caps = set(

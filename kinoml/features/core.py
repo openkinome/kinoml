@@ -14,8 +14,10 @@ from typing import Callable, Hashable, Iterable, Sequence, Union, Tuple, List
 import numpy as np
 from tqdm.auto import tqdm
 
-from ..core.sequences import AminoAcidSequence
-from ..core.systems import System, ProteinSystem, ProteinLigandComplex
+from ..core.systems import System, LigandSystem, ProteinLigandComplex
+
+
+logger = logging.getLogger(__name__)
 
 
 class BaseFeaturizer:
@@ -113,33 +115,42 @@ class BaseFeaturizer:
         raise NotImplementedError("Implement in your subclass")
 
     def _post_featurize(
-        self, systems: List[System], features: List[System | np.array], keep: bool = True
+        self,
+        systems: List[System],
+        features: List,
+        keep: bool = True,
     ) -> List[System]:
         """
-        Run after featurizing all systems. You shouldn't need to redefine this method
+        Run after featurizing all systems. Systems with a feature of None will be removed.
+        You shouldn't need to redefine this method
 
         Parameters
         ----------
-        systems : list of System
+        systems: list of System
             The systems being featurized
-        features : list of System or array
+        features: list
             The features returned by ``self._featurize``
-        keep : bool, optional=True
+        keep: bool, optional=True
             Whether to store the current featurizer in the ``system.featurizations``
             dictionary with its own key (``self.name``), in addition to ``last``.
 
         Returns
         -------
-        systems
+        filtered_systems: systems
             The same systems as passed, but with ``.featurizations`` extended with
             the calculated features in two entries: the featurizer name and ``last``.
+            Systems with a feature of None will be removed.
         """
-        # TODO: Define self.id() to provide a unique key per class name and chosen init args
+        filtered_systems = []
         for system, feature in zip(systems, features):
+            if feature is None:
+                logger.debug(f"{self.__class__.__name__} failed for {system}")
+                continue
             system.featurizations["last"] = feature
             if keep:
                 system.featurizations[self.name] = feature
-        return systems
+            filtered_systems.append(system)
+        return filtered_systems
 
     def supports(self, *systems: System, raise_errors: bool = True) -> bool:
         """
@@ -219,12 +230,12 @@ class ParallelBaseFeaturizer(BaseFeaturizer):
     # TODO: environment variables for multiprocessing
 
     def __init__(
-            self,
-            use_multiprocessing: bool = True,
-            n_processes: Union[int, None] = None,
-            chunksize: Union[int, None] = None,
-            dask_client=None,
-            **kwargs
+        self,
+        use_multiprocessing: bool = True,
+        n_processes: Union[int, None] = None,
+        chunksize: Union[int, None] = None,
+        dask_client=None,
+        **kwargs,
     ):
         super().__init__(**kwargs)
         self.use_multiprocessing = use_multiprocessing
@@ -237,6 +248,7 @@ class ParallelBaseFeaturizer(BaseFeaturizer):
 
         def is_serializable(value):
             import pickle
+
             try:
                 pickle.dumps(value)
                 return True
@@ -268,6 +280,7 @@ class ParallelBaseFeaturizer(BaseFeaturizer):
             # check if dask_client is a Client from dask.distributed
             if not hasattr(self.dask_client, "map"):
                 from dask.distributed import Client
+
                 if not isinstance(self.dask_client, Client):
                     raise ValueError(
                         "The dask_client attribute appears not to be a Client from dask.distributed."
@@ -285,10 +298,7 @@ class ParallelBaseFeaturizer(BaseFeaturizer):
                 self.n_processes = 1
             if self.n_processes == 1:
                 # featurize in a serial fashion
-                features = [
-                    self._featurize_one(s)
-                    for s in tqdm(systems, desc=self.name)
-                ]
+                features = [self._featurize_one(s) for s in tqdm(systems, desc=self.name)]
             else:
                 # featurize in a parallel fashion
                 func = partial(self._featurize_one)
@@ -535,6 +545,10 @@ class TupleOfArrays(Pipeline):
 
 
 class BaseOneHotEncodingFeaturizer(ParallelBaseFeaturizer):
+    """
+    Base class for Featurizers concerning one hot encoding.
+    """
+
     ALPHABET = None
 
     def __init__(self, dictionary: dict = None, **kwargs):
@@ -545,22 +559,24 @@ class BaseOneHotEncodingFeaturizer(ParallelBaseFeaturizer):
         if not self.dictionary:
             raise ValueError("This featurizer requires a populated dictionary!")
 
-    def _featurize_one(self, system: System) -> np.ndarray:
+    def _featurize_one(
+        self, system: Union[LigandSystem, ProteinLigandComplex]
+    ) -> Union[np.ndarray, None]:
         """
         One hot encode one system.
 
         Parameters
         ----------
-        system : System
+        system: LigandSystem or ProteinLigandComplex
             The System to be featurized.
-        options : dict
-            Unused
 
         Returns
         -------
-        array
+        : array or None
         """
         sequence = self._retrieve_sequence(system)
+        if sequence == "":
+            return None
         return self.one_hot_encode(sequence, self.dictionary)
 
     def _retrieve_sequence(self, system: System):
@@ -580,7 +596,7 @@ class BaseOneHotEncodingFeaturizer(ParallelBaseFeaturizer):
         dictionary : dict or sequuence-like
             Mapping of each character to their position in the alphabet. If
             a sequence-like is given, it will be enumerated into a dict.
-        
+
         Returns
         -------
         array-like
@@ -614,7 +630,13 @@ class PadFeaturizer(ParallelBaseFeaturizer):
         value to fill the array-like features with
     """
 
-    def __init__(self, shape: Iterable[int] = "auto", key: Hashable = "last", pad_with: int = 0, **kwargs):
+    def __init__(
+        self,
+        shape: Iterable[int] = "auto",
+        key: Hashable = "last",
+        pad_with: int = 0,
+        **kwargs,
+    ):
         super().__init__(**kwargs)
         self.shape = shape
         self.key = key
@@ -681,7 +703,7 @@ class HashFeaturizer(BaseFeaturizer):
         super().__init__(**kwargs)
         self.getter = getter or self._getter
         self.normalize = normalize
-        self.denominator = 2 ** 256 if normalize else 1
+        self.denominator = 2**256 if normalize else 1
 
     @staticmethod
     def _getter(system):
@@ -708,7 +730,6 @@ class HashFeaturizer(BaseFeaturizer):
 
 
 class NullFeaturizer(ParallelBaseFeaturizer):
-
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
@@ -789,7 +810,10 @@ class ClearFeaturizations(BaseFeaturizer):
         return system
 
     def _post_featurize(
-        self, systems: Iterable[System], features: Iterable[System | np.array], keep: bool = True
+        self,
+        systems: Iterable[System],
+        features: Iterable[System | np.array],
+        keep: bool = True,
     ) -> Iterable[System]:
         """
         Bypass the automated population of the ``.featurizations`` dict

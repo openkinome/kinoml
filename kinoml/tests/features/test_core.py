@@ -4,8 +4,8 @@ Test core objects of ``kinoml.features``
 import pytest
 import numpy as np
 
-from kinoml.core.systems import System, LigandSystem
-from kinoml.core.ligands import RDKitLigand, SmilesLigand
+from kinoml.core.systems import LigandSystem
+from kinoml.core.ligands import Ligand
 from kinoml.features.core import (
     BaseFeaturizer,
     Pipeline,
@@ -21,8 +21,12 @@ from kinoml.features.core import (
 
 
 def test_BaseFeaturizer():
-    ligand = SmilesLigand.from_smiles("CCCC")
-    systems = System(components=[ligand]), System(components=[ligand]), System(components=[ligand])
+    ligand = Ligand(smiles="CCCC")
+    systems = [
+        LigandSystem(components=[ligand]),
+        LigandSystem(components=[ligand]),
+        LigandSystem(components=[ligand]),
+    ]
     featurizer = BaseFeaturizer()
     with pytest.raises(NotImplementedError):
         featurizer(systems)
@@ -32,11 +36,11 @@ def test_BaseFeaturizer():
 
 
 def test_Pipeline():
-    ligand = SmilesLigand.from_smiles("CCCC")
+    ligand = Ligand("CCCC")
     systems = [
-        System(components=[ligand]),
-        System(components=[ligand]),
-        System(components=[ligand]),
+        LigandSystem(components=[ligand]),
+        LigandSystem(components=[ligand]),
+        LigandSystem(components=[ligand]),
     ]
     featurizers = (NullFeaturizer(), NullFeaturizer())
     pipeline = Pipeline(featurizers)
@@ -47,8 +51,8 @@ def test_Pipeline():
 def test_Concatenated():
     from kinoml.features.ligand import MorganFingerprintFeaturizer
 
-    ligand = RDKitLigand.from_smiles("CCCC")
-    system = System([ligand])
+    ligand = Ligand(smiles="CCCC")
+    system = LigandSystem([ligand])
     featurizer1 = MorganFingerprintFeaturizer(radius=2, nbits=512)
     featurizer2 = MorganFingerprintFeaturizer(radius=2, nbits=512)
     concatenated = Concatenated([featurizer1, featurizer2], axis=1)
@@ -59,8 +63,8 @@ def test_Concatenated():
 def test_TupleOfArrays():
     from kinoml.features.ligand import MorganFingerprintFeaturizer
 
-    ligand = RDKitLigand.from_smiles("CCCC")
-    system = System([ligand])
+    ligand = Ligand(smiles="CCCC")
+    system = LigandSystem([ligand])
     featurizer1 = MorganFingerprintFeaturizer(radius=2, nbits=512)
     featurizer2 = MorganFingerprintFeaturizer(radius=2, nbits=1024)
     aggregated = TupleOfArrays([featurizer1, featurizer2])
@@ -88,9 +92,9 @@ def test_PadFeaturizer():
     from kinoml.features.ligand import OneHotSMILESFeaturizer
 
     systems = (
-        System([RDKitLigand.from_smiles("C")]),
-        System([RDKitLigand.from_smiles("CC")]),
-        System([RDKitLigand.from_smiles("CCC")]),
+        LigandSystem([Ligand(smiles="C")]),
+        LigandSystem([Ligand(smiles="CC")]),
+        LigandSystem([Ligand(smiles="CCC")]),
     )
     OneHotSMILESFeaturizer().featurize(systems)
     PadFeaturizer().featurize(systems)
@@ -102,13 +106,15 @@ def test_PadFeaturizer():
 
 
 def test_HashFeaturizer():
-    system = LigandSystem([SmilesLigand.from_smiles("CCC")])
-    HashFeaturizer(getter=lambda s: s.ligand.to_smiles(), normalize=True).featurize([system])
-    assert system.featurizations["last"] == pytest.approx(0.54818723)
+    system = LigandSystem([Ligand(smiles="CCC")])
+    HashFeaturizer(getter=lambda s: s.ligand.molecule.to_smiles(), normalize=True).featurize(
+        [system]
+    )
+    assert system.featurizations["last"] == pytest.approx(0.62342903)
 
 
 def test_NullFeaturizer():
-    system = LigandSystem([SmilesLigand.from_smiles("CCC")])
+    system = LigandSystem([Ligand(smiles="CCC")])
     NullFeaturizer().featurize([system])
 
     assert system == system.featurizations["last"]
@@ -118,11 +124,13 @@ def test_CallableFeaturizer():
     from sklearn.preprocessing import scale
 
     systems = (
-        LigandSystem([RDKitLigand.from_smiles("C")]),
-        LigandSystem([RDKitLigand.from_smiles("CC")]),
-        LigandSystem([RDKitLigand.from_smiles("CCC")]),
+        LigandSystem([Ligand(smiles="C")]),
+        LigandSystem([Ligand(smiles="CC")]),
+        LigandSystem([Ligand(smiles="CCC")]),
     )
-    HashFeaturizer(getter=lambda s: s.ligand.to_smiles(), normalize=False).featurize(systems)
+    HashFeaturizer(getter=lambda s: s.ligand.molecule.to_smiles(), normalize=False).featurize(
+        systems
+    )
     CallableFeaturizer(lambda s: scale(s.featurizations["last"].reshape((1,)))).featurize(systems)
 
     for s in systems:
@@ -133,9 +141,9 @@ def test_ClearFeaturizations_keeplast():
     from kinoml.features.ligand import OneHotSMILESFeaturizer
 
     systems = (
-        System([RDKitLigand.from_smiles("C")]),
-        System([RDKitLigand.from_smiles("CC")]),
-        System([RDKitLigand.from_smiles("CCC")]),
+        LigandSystem([Ligand(smiles="C")]),
+        LigandSystem([Ligand(smiles="CC")]),
+        LigandSystem([Ligand(smiles="CCC")]),
     )
     OneHotSMILESFeaturizer().featurize(systems)
     PadFeaturizer().featurize(systems)
@@ -150,9 +158,9 @@ def test_ClearFeaturizations_removeall():
     from kinoml.features.ligand import OneHotSMILESFeaturizer
 
     systems = (
-        System([RDKitLigand.from_smiles("C")]),
-        System([RDKitLigand.from_smiles("CC")]),
-        System([RDKitLigand.from_smiles("CCC")]),
+        LigandSystem([Ligand(smiles="C")]),
+        LigandSystem([Ligand(smiles="CC")]),
+        LigandSystem([Ligand(smiles="CCC")]),
     )
     OneHotSMILESFeaturizer().featurize(systems)
     PadFeaturizer().featurize(systems)

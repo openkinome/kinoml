@@ -78,7 +78,7 @@ CDK20, cyclin-dependent kinase 20 [ Homo sapiens (human) ],CMGC,Human,NP_0010348
 CDK3,cyclin-dependent kinase 3,CMGC,Human,NP_001249.1,Wild Type,Full Length,"scanMAX, scanEDGE",M1/H305
 CDK4,cyclin-dependent kinase 4,CMGC,Human,NP_000066.1,Wild Type,Full Length,scanMAX,M1/E303
 CDK4-cyclinD1,cyclin-dependent kinase 4,CMGC,Human,NP_000066.1,Wild Type,Full Length,scanMAX,M1/E303
-CDK4-cyclinD1(F93L),cyclin-dependent kinase 4,CMGC,Human,NP_000066.1,Mutation(F93L),Full Length,KdMAX,M1/E303
+CDK4-cyclinD1(F93L),cyclin-dependent kinase 4,CMGC,Human,NP_000066.1,Mutation (F93L),Full Length,KdMAX,M1/E303
 CDK4-cyclinD3,cyclin-dependent kinase 4,CMGC,Human,NP_000066.1,Wild Type,Full Length,scanMAX,M1/E303
 CDK5,cyclin-dependent kinase 5,CMGC,Human,NP_004926.1,Wild Type,Full Length,scanMAX,M1/P292
 CDK6,cyclin-dependent kinase 6 [ Homo sapiens (human) ],CMGC,Human,NP_001250.1,Wild Type,Full Length,KdMAX,M1/A326
@@ -117,7 +117,7 @@ DCAMKL2,doublecortin-like kinase 2,CAMK,Human,NP_001035351.3,Wild Type,Partial L
 DCAMKL3,doublecortin-like kinase 3,CAMK,Human,NP_208382.1,Wild Type,Partial Length,scanMAX,E140/V628
 DDR1,discoidin domain receptor tyrosine kinase 1,TK,Human,NP_001945.3,Wild Type,Partial Length,scanMAX,R565/V876
 DDR2,discoidin domain receptor tyrosine kinase 2,TK,Human,Q16832.2,Wild Type,Partial Length,scanMAX,V555/E855
-DDR2(T654M),discoidin domain receptor tyrosine kinase 2,TK,Human,Q16832.2,Mutation(T654M),Partial Length,KdMAX,V555/E855
+DDR2(T654M),discoidin domain receptor tyrosine kinase 2,TK,Human,Q16832.2,Mutation (T654M),Partial Length,KdMAX,V555/E855
 DLK,mitogen-activated protein kinase kinase kinase 12,TKL,Human,NP_006292.2,Wild Type,Full Length,scanMAX,M1/P859
 DMPK,dystrophia myotonica-protein kinase,AGC,Human,NP_004400.4,Wild Type,Partial Length,scanMAX,V47/V415
 DMPK2,CDC42 binding protein kinase gamma (DMPK-like),AGC,Human,NP_059995.2,Wild Type,Partial Length,scanMAX,S46/S408
@@ -156,7 +156,7 @@ ERBB2,"v-erb-b2 erythroblastic leukemia viral oncogene homolog 2, neuro/glioblas
 ERBB3,v-erb-b2 erythroblastic leukemia viral oncogene homolog 3 (avian),TK,Human,NP_001973.2,Wild Type,Partial Length,scanMAX,G684/A987
 ERBB4,v-erb-a erythroblastic leukemia viral oncogene homolog 4 (avian),TK,Human,NP_001036064.1,Wild Type,Partial Length,"scanMAX, scanEDGE",L690/K994
 ERK1,mitogen-activated protein kinase 3,CMGC,Human,NP_002737.2,Wild Type,Full Length,"scanMAX, scanEDGE",M1/P379
-ERK1(Q122L),mitogen-activated protein kinase 3,CMGC,Human,NP_002737.2,Mutation(Q122L),Full Length,KdMAX,M1/P379
+ERK1(Q122L),mitogen-activated protein kinase 3,CMGC,Human,NP_002737.2,Mutation (Q122L),Full Length,KdMAX,M1/P379
 ERK2,mitogen-activated protein kinase 1,CMGC,Human,NP_620407.1,Wild Type,Full Length,scanMAX,M1/S360
 ERK3,mitogen-activated protein kinase 6,CMGC,Human,NP_002739.1,Wild Type,Partial Length,scanMAX,M1/P413
 ERK4,mitogen-activated protein kinase 4,CMGC,Human,NP_002738.2,Wild Type,Partial Length,scanMAX,M1/L365
@@ -168,21 +168,21 @@ FER,fer (fps/fes related) tyrosine kinase,TK,Human,NP_005237.2,Wild Type,Partial
 FES,feline sarcoma oncogene,TK,Human,NP_001996.1,Wild Type,Partial Length,scanMAX,I527/R822
 FGFR1,fibroblast growth factor receptor 1,TK,Human,NP_075593.1,Wild Type,Partial Length,scanMAX,P357/V669
 FGFR2,fibroblast growth factor receptor 2,TK,Human,NP_075259.4,Wild Type,Partial Length,"scanMAX, scanEDGE",D457/E769
-FGFR2(N550K),fibroblast growth factor receptor 2,TK,Human,NP_075259.4,Mutation(N550K),Partial Length,KdMAX,D457/E769
+FGFR2(N550K),fibroblast growth factor receptor 2,TK,Human,NP_075259.4,Mutation (N550K),Partial Length,KdMAX,D457/E769
 FGFR3,fibroblast growth factor receptor 3,TK,Human,NP_000133.1,Wild Type,Partial Length,"scanMAX, scanEDGE",R442/S771
 FGFR3(G697C),fibroblast growth factor receptor 3,TK,Human,NP_000133.1,Mutation (G697C),Partial Length,scanMAX,R442/S771
-FGFR3(K650E),fibroblast growth factor receptor 3,TK,Human,NP_000133.1,Mutation(K650E),Partial Length,KdMAX,R442/S771
-FGFR3(V555M),fibroblast growth factor receptor 3,TK,Human,NP_000133.1,Mutation(V555M),Partial Length,KdMAX,R442/S771
+FGFR3(K650E),fibroblast growth factor receptor 3,TK,Human,NP_000133.1,Mutation (K650E),Partial Length,KdMAX,R442/S771
+FGFR3(V555M),fibroblast growth factor receptor 3,TK,Human,NP_000133.1,Mutation (V555M),Partial Length,KdMAX,R442/S771
 FGFR4,fibroblast growth factor receptor 4,TK,Human,NP_075252.2,Wild Type,Partial Length,scanMAX,G402/E713
 FGR,Gardner-Rasheed feline sarcoma viral (v-fgr) oncogene homolog,TK,Human,NP_005239.1,Wild Type,Partial Length,scanMAX,L233/T529
 FLT1,fms-related tyrosine kinase 1 (vascular endothelial growth factor/vascular permeability factor receptor),TK,Human,NP_002010.2,Wild Type,Partial Length,scanMAX,R781/F1239
 FLT3,fms-related tyrosine kinase 3,TK,Human,NP_004110.2,Wild Type,Partial Length,"scanMAX, scanEDGE",V592/Y969
 FLT3(D835H),fms-related tyrosine kinase 3,TK,Human,NP_004110.2,Mutation (D835H),Partial Length,scanMAX,V592/Y969
-FLT3(D835V),fms-related tyrosine kinase 3,TK,Human,NP_004110.2,Mutation(D835V),Partial Length,scanMAX,V592/Y969
+FLT3(D835V),fms-related tyrosine kinase 3,TK,Human,NP_004110.2,Mutation (D835V),Partial Length,scanMAX,V592/Y969
 FLT3(D835Y),fms-related tyrosine kinase 3,TK,Human,NP_004110.2,Mutation (D835Y),Partial Length,scanMAX,Q580/Y969
 FLT3(ITD),fms-related tyrosine kinase 3,TK,Human,NP_004110.2,Mutation (ITD),Partial Length,scanMAX,Null
-"FLT3(ITD,D835V)",fms-related tyrosine kinase 3,TK,Human,NP_004110.2,"Mutation(ITD,D835V)",Partial Length,scanMAX,Null
-"FLT3(ITD,F691L)",fms-related tyrosine kinase 3,TK,Human,NP_004110.2,"Mutation(ITD,F691L)",Partial Length,scanMAX,Null
+"FLT3(ITD,D835V)",fms-related tyrosine kinase 3,TK,Human,NP_004110.2,"Mutation (ITD,D835V)",Partial Length,scanMAX,Null
+"FLT3(ITD,F691L)",fms-related tyrosine kinase 3,TK,Human,NP_004110.2,"Mutation (ITD,F691L)",Partial Length,scanMAX,Null
 FLT3(K663Q),fms-related tyrosine kinase 3,TK,Human,NP_004110.2,Mutation (K663Q),Partial Length,scanMAX,V592/Y969
 FLT3(N841I),fms-related tyrosine kinase 3,TK,Human,NP_004110.2,Mutation (N841I),Partial Length,scanMAX,V592/Y969
 FLT3(R834Q),fms-related tyrosine kinase 3,TK,Human,NP_004110.2,Mutation (R834Q),Partial Length,scanMAX,V592/Y969
@@ -363,7 +363,7 @@ PIP5K1C,"phosphatidylinositol-4-phosphate 5-kinase, type I, gamma",Lipid,Human,N
 PIP5K2B,"phosphatidylinositol-5-phosphate 4-kinase, type II, beta",Lipid,Human,NP_003550.1,Wild Type,Full Length,scanMAX,M1/T416
 PIP5K2C,"phosphatidylinositol-5-phosphate 4-kinase, type II, gamma",Lipid,Human,NP_079055.2,Wild Type,Partial Length,scanMAX,M1/A421
 PKAC-alpha,"protein kinase, cAMP-dependent, catalytic, alpha",AGC,Human,NP_002721.1,Wild Type,Partial Length,"scanMAX, scanEDGE",G10/F351
-PKAC-alpha(L206R),cAMP-dependent protein kinase catalytic subunit alpha isoform Calpha1 [Homo sapiens],AGC,Human,NP_002721.1,Mutation(L206R),Partial Length,KdMAX,G10/F351
+PKAC-alpha(L206R),cAMP-dependent protein kinase catalytic subunit alpha isoform Calpha1 [Homo sapiens],AGC,Human,NP_002721.1,Mutation (L206R),Partial Length,KdMAX,G10/F351
 PKAC-beta,"protein kinase, cAMP-dependent, catalytic, beta",AGC,Human,NP_002722.1,Wild Type,Full Length,scanMAX,M1/F351
 PKMYT1,"protein kinase, membrane associated tyrosine/threonine 1",Other,Human,NP_872629.1,Wild Type,Partial Length,scanMAX,A88/G366
 PKN1,protein kinase N1,AGC,Human,NP_998725.1,Wild Type,Partial Length,scanMAX,E598/C948
@@ -390,9 +390,9 @@ PYK2,PTK2B protein tyrosine kinase 2 beta,TK,Human,NP_775267.1,Wild Type,Full Le
 QSK,SIK family kinase 3,CAMK,Human,BAA76843.2,Wild Type,Partial Length,scanMAX,A90/L395
 RAF1,v-raf-1 murine leukemia viral oncogene homolog 1,TKL,Human,NP_002871.1,Wild Type,Partial Length,"scanMAX, scanEDGE",I330/T640
 RET,ret proto-oncogene,TK,Human,NP_065681.1,Wild Type,Partial Length,"scanMAX, scanEDGE",E713/D1014
-RET(A883F),ret proto-oncogene,TK,Human,NP_065681.1,Mutation(A883F),Partial Length,KdMAX,E713/D1014
+RET(A883F),ret proto-oncogene,TK,Human,NP_065681.1,Mutation (A883F),Partial Length,KdMAX,E713/D1014
 RET(M918T),ret proto-oncogene,TK,Human,NP_065681.1,Mutation (M918T),Partial Length,scanMAX,E713/D1014
-RET(V804E),ret proto-oncogene,TK,Human,NP_065681.1,Mutation(V804E),Partial Length,KdMAX,E713/D1014
+RET(V804E),ret proto-oncogene,TK,Human,NP_065681.1,Mutation (V804E),Partial Length,KdMAX,E713/D1014
 RET(V804L),ret proto-oncogene,TK,Human,NP_065681.1,Mutation (V804L),Partial Length,scanMAX,E713/D1014
 RET(V804M),ret proto-oncogene,TK,Human,NP_065681.1,Mutation (V804M),Partial Length,scanMAX,E713/D1014
 RIOK1,RIO kinase 1 (yeast),Atypical,Human,NP_113668.2,Wild Type,Full Length,scanMAX,M1/K568

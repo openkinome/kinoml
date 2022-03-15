@@ -5,7 +5,6 @@ Base classes for ``DatasetProvider``-like objects
 import logging
 from typing import Iterable
 from collections import defaultdict
-import multiprocessing
 from urllib.request import urlopen
 import shutil
 from pathlib import Path
@@ -13,7 +12,6 @@ import os
 
 import numpy as np
 import pandas as pd
-from tqdm.auto import tqdm
 import awkward as ak
 
 from ..core.measurements import BaseMeasurement
@@ -23,11 +21,7 @@ from ..utils import APPDIR
 logger = logging.getLogger(__name__)
 
 
-class FeaturizationError(Exception):
-    """Error raised if a featurization process could not finish successfully"""
-
-
-class BaseDatasetProvider:
+class BaseDatasetProvider(object):
     """
     API specification for dataset providers
     """
@@ -89,8 +83,8 @@ class DatasetProvider(BaseDatasetProvider):
     measurements: list of BaseMeasurement
         A DatasetProvider holds a list of ``kinoml.core.measurements.BaseMeasurement``
         objects (or any of its subclasses). They must be of the same type!
-    metadata : dict
-        Extra information for provenance
+    metadata: dict
+        Extra information for provenance.
 
     Note
     ----
@@ -154,29 +148,34 @@ class DatasetProvider(BaseDatasetProvider):
         Note
         ----
         TODO:
-
-            * This function can be easily parallelized, and is often the bottleneck!
-            * Shall we modify the system in place (default now), return the modified copy or store it?
+            * Will the systems be properly featurized with Dask?
         """
         systems = self.systems
         featurizer.supports(next(iter(systems)), raise_errors=True)
         featurizer.featurize(tuple(systems))
-        for system in systems:
-            system.featurizations["last"] = system.featurizations[featurizer.name]
+        n_invalid = len(
+            [system for system in systems if featurizer.name not in system.featurizations.keys()]
+        )
+        if n_invalid > 0:
+            logger.warning(f"There were {n_invalid} systems that could not be featurized!")
+        self._post_featurize(featurizer)
 
-        invalid = sum(1 for system in systems if "failed" in system.featurizations)
-        if invalid == len(systems):
-            raise FeaturizationError(
-                "No system could be correctly featurized. "
-                "Check `system.featurizations['failed']` for more info"
-            )
-        elif invalid:
-            logger.warning(
-                "There were %d systems that could not be featurized! "
-                "Check `system.featurizations['failed']` for more info.",
-                invalid,
-            )
         return systems
+
+    def _post_featurize(self, featurizer: BaseFeaturizer):
+        """
+        Remove measurements with systems, that were not successfully featurized.
+
+        Parameters
+        ----------
+        featurizer: BaseFeaturizer
+            The used featurizer.
+        """
+        self.measurements = [
+            measurement
+            for measurement in self.measurements
+            if featurizer.name in measurement.system.featurizations.keys()
+        ]
 
     def featurized_systems(self, key="last", clear_after=False):
         """
@@ -541,6 +540,22 @@ class MultiDatasetProvider(DatasetProvider):
         self.providers = providers
         self.metadata = metadata or {}
 
+    def _post_featurize(self, featurizer: BaseFeaturizer):
+        """
+        Remove measurements with systems, that were not successfully featurized.
+
+        Parameters
+        ----------
+        featurizer: BaseFeaturizer
+            The used featurizer.
+        """
+        for provider in self.providers:
+            provider.measurements = [
+                measurement
+                for measurement in provider.measurements
+                if featurizer.name in measurement.system.featurizations.keys()
+            ]
+
     def observation_models(self, **kwargs):
         """
         List of observation models present in this dataset,
@@ -681,7 +696,3 @@ class MultiDatasetProvider(DatasetProvider):
             f"{len(self)} measurements ({', '.join(measurements)}), "
             f"and {len(self.systems)} systems ({components_str})>"
         )
-
-
-class ProteinLigandDatasetProvider(DatasetProvider):
-    pass

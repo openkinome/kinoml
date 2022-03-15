@@ -166,7 +166,9 @@ class MultiDataModule(pl.LightningDataModule):
     def dataset_indices_by_size(self, reverse=False):
         """WIP"""
         return sorted(
-            range(len(self.datasets)), key=lambda i: len(self.datasets[i]), reverse=reverse
+            range(len(self.datasets)),
+            key=lambda i: len(self.datasets[i]),
+            reverse=reverse,
         )
 
     @property
@@ -203,7 +205,8 @@ class MultiDataModule(pl.LightningDataModule):
     def train_dataloader(self, dataset_index=None):
         """WIP"""
         return self._build_dataloader(
-            dataset_index=dataset_index, indices=self.datasets[dataset_index].indices["train"]
+            dataset_index=dataset_index,
+            indices=self.datasets[dataset_index].indices["train"],
         )
 
     def val_dataloader(self, dataset_index=None):
@@ -213,7 +216,8 @@ class MultiDataModule(pl.LightningDataModule):
         #     for i in range(len(self.datasets))
         # ]
         return self._build_dataloader(
-            dataset_index=dataset_index, indices=self.datasets[dataset_index].indices["val"]
+            dataset_index=dataset_index,
+            indices=self.datasets[dataset_index].indices["val"],
         )
 
     def test_dataloader(self, dataset_index=None):
@@ -223,7 +227,8 @@ class MultiDataModule(pl.LightningDataModule):
         #     for i in range(len(self.datasets))
         # ]
         return self._build_dataloader(
-            dataset_index=dataset_index, indices=self.datasets[dataset_index].indices["test"]
+            dataset_index=dataset_index,
+            indices=self.datasets[dataset_index].indices["test"],
         )
 
     def get_kfold(self, nfolds=5, with_validation=True, shuffle=False, **kwargs):
@@ -234,7 +239,11 @@ class MultiDataModule(pl.LightningDataModule):
         for dataset_index in self.dataset_indices_by_size(reverse=True):
             dataset = self.datasets[dataset_index]
             all_indices = np.concatenate(
-                [dataset.indices["train"], dataset.indices["val"], dataset.indices["test"]]
+                [
+                    dataset.indices["train"],
+                    dataset.indices["val"],
+                    dataset.indices["test"],
+                ]
             )
             # Check splitting indices is the same as splitting on the dataset
             for fold_index, (train_index, val_index, test_index) in enumerate(
@@ -345,7 +354,10 @@ class CrossValidateTrainer:
         best_score = np.inf
         for i, subtrainer in enumerate(self._trainers):
             if subtrainer.checkpoint_callback.best_model_score < best_score:
-                best_index, best_score = i, subtrainer.checkpoint_callback.best_model_score
+                best_index, best_score = (
+                    i,
+                    subtrainer.checkpoint_callback.best_model_score,
+                )
         return self._trainers[best_index]
 
     def clear(self):
