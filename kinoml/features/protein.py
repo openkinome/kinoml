@@ -22,7 +22,7 @@ class SingleProteinFeaturizer(ParallelBaseFeaturizer):
     Provides a minimally useful ``._supports()`` method for all Protein-like featurizers.
     """
 
-    _COMPATIBLE_LIGAND_TYPES = (Protein, KLIFSKinase)
+    _COMPATIBLE_PROTEIN_TYPES = (Protein, KLIFSKinase)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -32,7 +32,7 @@ class SingleProteinFeaturizer(ParallelBaseFeaturizer):
         Check that exactly one protein is present in the System
         """
         super_checks = super()._supports(system)
-        proteins = [c for c in system.components if isinstance(c, self._COMPATIBLE_LIGAND_TYPES)]
+        proteins = [c for c in system.components if isinstance(c, self._COMPATIBLE_PROTEIN_TYPES)]
         return all([super_checks, len(proteins) == 1])
 
 
@@ -112,7 +112,7 @@ class OneHotEncodedSequenceFeaturizer(BaseOneHotEncodingFeaturizer, SingleProtei
         return sequence
 
 
-class OEProteinStructureFeaturizer(OEBaseModelingFeaturizer):
+class OEProteinStructureFeaturizer(OEBaseModelingFeaturizer, SingleProteinFeaturizer):
     """
     Given systems with exactly one protein, prepare the protein structure by:
 
@@ -160,8 +160,6 @@ class OEProteinStructureFeaturizer(OEBaseModelingFeaturizer):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-
-    _SUPPORTED_TYPES = (ProteinSystem,)
 
     def _featurize_one(self, system: ProteinSystem) -> Union[Universe, None]:
         """

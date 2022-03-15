@@ -5,11 +5,35 @@ subclasses thereof
 import logging
 from typing import Union
 
-from .core import OEBaseModelingFeaturizer
+from .core import OEBaseModelingFeaturizer, ParallelBaseFeaturizer
+from ..core.ligands import Ligand
+from ..core.proteins import Protein, KLIFSKinase
 from ..core.systems import ProteinLigandComplex
 
 
-class OEComplexFeaturizer(OEBaseModelingFeaturizer):
+class SingleLigandProteinComplexFeaturizer(ParallelBaseFeaturizer):
+    """
+    Provides a minimally useful ``._supports()`` method for all ProteinLigandComplex-like
+    featurizers.
+    """
+
+    _COMPATIBLE_PROTEIN_TYPES = (Protein, KLIFSKinase)
+    _COMPATIBLE_LIGAND_TYPES = (Ligand,)
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    def _supports(self, system: Union[ProteinLigandComplex]) -> bool:
+        """
+        Check that exactly one protein and one ligand is present in the System
+        """
+        super_checks = super()._supports(system)
+        proteins = [c for c in system.components if isinstance(c, self._COMPATIBLE_PROTEIN_TYPES)]
+        ligands = [c for c in system.components if isinstance(c, self._COMPATIBLE_LIGAND_TYPES)]
+        return all([super_checks, len(proteins) == 1]) and all([super_checks, len(ligands) == 1])
+
+
+class OEComplexFeaturizer(OEBaseModelingFeaturizer, SingleLigandProteinComplexFeaturizer):
     """
     Given systems with exactly one protein and one ligand, prepare the complex structure by:
 
@@ -152,7 +176,7 @@ class OEComplexFeaturizer(OEBaseModelingFeaturizer):
         return structure
 
 
-class OEHybridDockingFeaturizer(OEBaseModelingFeaturizer):
+class OEHybridDockingFeaturizer(OEBaseModelingFeaturizer, SingleLigandProteinComplexFeaturizer):
     """
     Given systems with exactly one protein and one ligand, dock the ligand into the prepared
     protein structure with OpenEye's Hybrid method:
@@ -323,7 +347,7 @@ class OEHybridDockingFeaturizer(OEBaseModelingFeaturizer):
         return structure
 
 
-class OEFredDockingFeaturizer(OEBaseModelingFeaturizer):
+class OEFredDockingFeaturizer(OEBaseModelingFeaturizer, SingleLigandProteinComplexFeaturizer):
     """
     Given systems with exactly one protein and one ligand, dock the ligand into the prepared
     protein structure with OpenEye's Fred method:
@@ -505,7 +529,7 @@ class OEFredDockingFeaturizer(OEBaseModelingFeaturizer):
         return structure
 
 
-class OEPositDockingFeaturizer(OEBaseModelingFeaturizer):
+class OEPositDockingFeaturizer(OEBaseModelingFeaturizer, SingleLigandProteinComplexFeaturizer):
     """
     Given systems with exactly one protein and one ligand, dock the ligand into the prepared
     protein structure with OpenEye's POSIT method:
