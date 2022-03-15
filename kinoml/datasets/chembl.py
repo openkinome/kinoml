@@ -3,14 +3,14 @@ Creates DatasetProvider objects from ChEMBL activity data
 """
 import random
 
-
 import pandas as pd
 from tqdm.auto import tqdm
 
 from .core import MultiDatasetProvider
+from ..core.components import BaseProtein
 from ..core.conditions import AssayConditions
-from ..core.proteins import AminoAcidSequence
-from ..core.ligands import SmilesLigand
+from ..core.proteins import KLIFSKinase
+from ..core.ligands import Ligand
 from ..core.systems import ProteinLigandComplex
 from ..core.measurements import pIC50Measurement, pKiMeasurement, pKdMeasurement
 
@@ -19,7 +19,7 @@ class ChEMBLDatasetProvider(MultiDatasetProvider):
 
     """
     This provider relies heavily on ``openkinome/kinodata`` data ingestion
-    pipelines. It will load ChEMBL activities from its Releases page.
+    pipelines. It will load ChEMBL activities from its releases page.
     """
 
     @classmethod
@@ -27,22 +27,28 @@ class ChEMBLDatasetProvider(MultiDatasetProvider):
         cls,
         path_or_url="https://github.com/openkinome/datascripts/releases/download/v0.2/activities-chembl28_v0.2.zip",
         measurement_types=("pIC50", "pKi", "pKd"),
+        uniprot_ids=None,
         sample=None,
+        protein_type: BaseProtein = KLIFSKinase,
     ):
         """
-        Create a MultiDatasetProvider out of the raw data contained in the zip file
+        Create a MultiDatasetProvider out of the raw data contained in the zip file.
 
         Parameters
         ----------
-        path_or_url : str, optional
+        path_or_url: str, optional
             path or URL to a (zipped) CSV file containing activities from ChEMBL,
             using schema detailed below.
-        measurement_types : tuple of str, optional
+        measurement_types: tuple of str, optional
             Which measurement types must be imported from the CSV. By default, all
             three (pIC50, pKi, pKd) will be loaded, but you can choose a subset (
             e.g. ``("pIC50",)``).
-        sample : int, optional=None
+        uniprot_ids: None or list of str, default=None
+            Restrict measurements to the given UniProt IDs.
+        sample: int, optional=None
             If set to larger than zero, load only N data points from the dataset.
+        protein_type: BaseProtein
+            The protein object type to use.
 
         Note
         ----
@@ -66,8 +72,10 @@ class ChEMBLDatasetProvider(MultiDatasetProvider):
         }
         measurements = []
         systems = {}
-        kinases = {}
+        proteins = {}
         ligands = {}
+        if uniprot_ids:
+            df = df[df["UniprotID"].isin(uniprot_ids)]
         chosen_types_labels = df["activities.standard_type"].isin(set(measurement_types))
         filtered_records = df[chosen_types_labels].to_dict("records")
         if sample is not None:
@@ -75,24 +83,26 @@ class ChEMBLDatasetProvider(MultiDatasetProvider):
         for row in tqdm(filtered_records):
             try:
                 measurement_type_key = row["activities.standard_type"]
-                kinase_key = row["component_sequences.sequence"]
+                protein_key = row["component_sequences.sequence"]
                 ligand_key = row["compound_structures.canonical_smiles"]
-                system_key = (kinase_key, ligand_key)
-                if kinase_key not in kinases:
+                system_key = (protein_key, ligand_key)
+                if protein_key not in proteins:
                     metadata = {
-                        "uniprot": row["UniprotID"],
-                        "chembl_target": row["target_dictionary.chembl_id"],
+                        "uniprot_id": row["UniprotID"],
+                        "chembl_target_id": row["target_dictionary.chembl_id"],
                     }
-                    kinase = AminoAcidSequence(
-                        kinase_key, name=row["UniprotID"], metadata=metadata
+                    protein = protein_type(
+                        sequence=protein_key,
+                        name=row["UniprotID"],
+                        uniprot_id=row["UniprotID"],
+                        metadata=metadata,
                     )
-                    kinases[kinase_key] = kinase
+                    proteins[protein_key] = protein
                 if ligand_key not in ligands:
-                    metadata = {"chembl_compound": None}  # TODO
-                    ligands[ligand_key] = SmilesLigand(ligand_key, name=ligand_key)
+                    ligands[ligand_key] = Ligand(smiles=ligand_key, name=ligand_key)
                 if system_key not in systems:
                     systems[system_key] = ProteinLigandComplex(
-                        [kinases[kinase_key], ligands[ligand_key]]
+                        [proteins[protein_key], ligands[ligand_key]]
                     )
 
                 MeasurementType = measurement_type_classes[measurement_type_key]

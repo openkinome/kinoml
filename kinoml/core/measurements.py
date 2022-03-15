@@ -296,12 +296,12 @@ class PercentageDisplacementMeasurement(ObservationModelMeasurement):
         summation = inhibitor_conc + temp
         difference = 100 * inhibitor_conc / summation - labels
 
-        grad_loss = constant * difference * temp / (summation ** 2)
+        grad_loss = constant * difference * temp / (summation**2)
 
-        first_term = constant * temp / (summation ** 2)
-        numerator = temp * summation - 2 * (temp ** 2)
+        first_term = constant * temp / (summation**2)
+        numerator = temp * summation - 2 * (temp**2)
 
-        hess_loss = first_term ** 2 + difference * constant * numerator / (summation ** 3)
+        hess_loss = first_term**2 + difference * constant * numerator / (summation**3)
 
         # XGBoost works only with f32
         return grad_loss.astype("float32"), hess_loss.astype("float32")

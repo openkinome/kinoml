@@ -3,9 +3,10 @@
 """
 
 import logging
+from pathlib import Path
+from typing import Union
 
-import rdkit
-from openff.toolkit.topology import Molecule as _OpenForceFieldMolecule
+from openff.toolkit.topology import Molecule
 
 from .components import BaseLigand
 
@@ -13,246 +14,150 @@ from .components import BaseLigand
 logger = logging.getLogger(__name__)
 
 
-class OpenForceFieldLigand(BaseLigand, _OpenForceFieldMolecule):
-
+class Ligand(BaseLigand):
     """
-    Small molecule object based on the OpenForceField toolkit.
-
-    Instantiation usually happens through a ``.from_xxxx()``
-    class method.
-
-    Parameters
-    ----------
-    metadata : dict
-        Metadata for this molecule, like provenance information
-        or the original SMILES string used to instantiate the object.
+    Create a new Ligand object. An openff representation is accessible via the molecule attribute.
 
     Examples
     --------
-    >>> ligand = OpenForceFieldLigand.from_smiles("CCCC")
+
+    Create a ligand from file:
+
+    >>> ligand = Ligand.from_file("data/molecules/chloroform.sdf", name="chloroform")
+
+    Create a ligand from an openff molecule:
+
+    >>> from openff.toolkit.topology import Molecule
+    >>> molecule = Molecule.from_file("data/molecules/chloroform.sdf")
+    >>> ligand = Ligand(molecule=molecule, name="chloroform")
+
+    Create a ligand from SMILES:
+
+    >>> ligand = Ligand.from_smiles("C(Cl)(Cl)Cl", name="chloroform")
+
+    Create a ligand from SMILES with lazy instantiation:
+
+    >>> ligand = Ligand(smiles="C(Cl)(Cl)Cl", name="chloroform")
+
     """
 
-    def __init__(self, metadata=None, name="", *args, **kwargs):
-        _OpenForceFieldMolecule.__init__(self, *args, **kwargs)
-        BaseLigand.__init__(self, name=name, metadata=metadata)
-
-    @classmethod
-    def from_smiles(
-        cls, smiles, name=None, allow_undefined_stereo=True, **kwargs
-    ):  # pylint: disable=arguments-differ
+    def __init__(
+        self,
+        molecule: Union[Molecule, None] = None,
+        smiles: str = "",
+        name: str = "",
+        metadata: Union[dict, None] = None,
+        **kwargs
+    ):
         """
-        Same as `openff.toolkit.topology.Molecule`, but adding
-        information about the original SMILES to ``.metadata`` dict.
+        Create a new Ligand object. Lazy instantiation is possible via the smiles parameter.
 
         Parameters
         ----------
-        smiles : str
-            SMILES representation of the ligand. This string will
-            be stored in the ``metadata`` attribute under the
-            ``smiles`` key.
-        name : str, optional
-            An easily identifiable name for the molecule. If not given,
-            ``smiles`` is used.
+        molecule: openff.toolkit.topology.Molecule or None, default=None
+            An openff representation of the ligand.
+        smiles: str, default=""
+            The SMILES representation of the ligand. Can be used for lazy instantiation, i.e. will
+            interpreted when calling the molecule attribute the first time.
+        name: str, default=""
+            The name of the ligand.
+        metadata: dict or None, default=None
+            Additional metadata of the needed for e.g. featurizers or provenance.
         """
-        self = super().from_smiles(smiles, allow_undefined_stereo=allow_undefined_stereo, **kwargs)
-        if name is None:
-            name = smiles
-        super().__init__(self, name=name, metadata={"smiles": smiles})
-        return self
-
-    def to_dict(self):
-        """
-        Dict representation of the Molecule, including the ``metadata``
-        dictionary.
-        """
-        d = super().to_dict()
-        d["metadata"] = self.metadata.copy()
-        return d
-
-    def _initialize_from_dict(self, molecule_dict):
-        """
-        Same as Molecule's method, but including the ``metadata`` dict.
-        """
-        super()._initialize_from_dict(molecule_dict)
-        self.metadata = molecule_dict["metadata"].copy()
-
-
-# Alias OpenForceFieldLigand to Ligand
-Ligand = OpenForceFieldLigand
-
-
-class OpenForceFieldLikeLigand(BaseLigand):
-    """
-    Ligand-like object that implements the bits of the
-    OpenForceField API we use more commonly.
-
-    The attributes of the wrapped object are forwarded
-    to ``self._molecule`` via ``__getattr__`` to provide
-    most of the native behaviour.
-
-    This is only the base class; use concrete subclasses
-    for full functionality.
-
-    Parameters
-    ----------
-    molecule : object, depends on subclass
-        The molecular object to be wrapped, under ``._molecule``.
-    metadata : dict, optional
-        Metadata dictionary
-    name : str, optional
-        Easily identifiable name for this ligand
-    """
-
-    def __init__(self, molecule, metadata=None, name="", *args, **kwargs):
-        super().__init__(name=name, metadata=metadata)
+        BaseLigand.__init__(self, name=name, metadata=metadata, **kwargs)
         self._molecule = molecule
+        self._smiles = smiles
 
-    def __getattr__(self, attr):
-        """
-        Forward attribute access to the wrapped ``._molecule`` object
-        """
-        if attr in {"__getstate__", "__setstate__"}:
-            return super().__getattr__(self, attr)
-        return getattr(self._molecule, attr)
-
-    @classmethod
-    def from_smiles(cls, smiles, name=None, **kwargs):
-        """
-        Create object from SMILES
-        """
-        raise NotImplementedError("Use ``OpenForceFieldLigand`` or implement API in a subclass")
-
-    def to_rdkit(self) -> rdkit.Chem.Mol:
-        """
-        Export Molecule to RDKit ``Mol``
-
-        Returns
-        -------
-        rdkit.Chem.Mol
-        """
-        raise NotImplementedError("Use ``OpenForceFieldLigand`` or implement API in a subclass")
-
-    def to_smiles(self) -> str:
-        """
-        Export Molecule to (canonical) SMILES string.
-
-        Returns
-        -------
-        str
-        """
-        raise NotImplementedError("Use ``OpenForceFieldLigand`` or implement API in a subclass")
-
-
-class RDKitLigand(OpenForceFieldLikeLigand):
-
-    """
-    Wrapper for RDKit molecules using some parts of the OpenForceField API
-
-    Note
-    ----
-    TODO: Implement other parts of the OFF Molecule API
-    """
-
-    @classmethod
-    def from_smiles(
-        cls, smiles: str, name: str = None, **kwargs
-    ):  # pylint: disable=arguments-differ
-        """
-        Create an RDKitLigand instance from a SMILES string
-
-        Parameters
-        ----------
-        smiles : str
-            SMILES sequence encoding the required molecule
-        name : str, optional
-            Identifier for the molecule. If not given, ``smiles``
-            will be used.
-
-        Note
-        ----
-        The ``metadata`` dictionary will be populated with a
-        ``smiles`` entry containing the input ``smiles`` string.
-        """
-        from rdkit.Chem import MolFromSmiles
-
-        molecule = MolFromSmiles(smiles)
-        if name is None:
-            name = smiles
-        return cls(molecule, name=name, metadata={"smiles": smiles})
-
-    def to_rdkit(self) -> rdkit.Chem.Mol:
-        """
-        Return the underlying RDKit ``Mol`` object, with no further
-        modifications.
-
-        Returns
-        -------
-        rdkit.Chem.Mol
-        """
+    @property
+    def molecule(self):
+        """Decorate molecule to modify setter and getter."""
         return self._molecule
 
-    def to_smiles(self) -> str:
+    @molecule.setter
+    def molecule(self, new_value: Union[Molecule, None]):
         """
-        Return canonicalized SMILES, as provided by RDKit.
-
-        Note
-        ----
-        More info: https://www.rdkit.org/docs/GettingStartedInPython.html#writing-molecules
-        """
-        from rdkit.Chem import MolToSmiles
-
-        return MolToSmiles(self._molecule)
-
-
-class SmilesLigand(OpenForceFieldLikeLigand):
-    """
-    Wrap a SMILES string in an OpenForceField-like API.
-
-    The underlying ``._molecule`` is just the SMILES string,
-    with no preprocessing.
-    """
-
-    @classmethod
-    def from_smiles(
-        cls, smiles: str, name: str = None, **kwargs
-    ):  # pylint: disable=arguments-differ
-        """
-        Initialize a SmilesLigand object using ``smiles`` as input.
+        Store a new value for molecule in the _molecule attribute.
 
         Parameters
         ----------
-        smiles : str
-            The SMILES string to wrap
-        name : str, optional
-            Identifier for this molecule. If not given, ``smiles``
-            will be used
-
-        Note
-        ----
-        The ``metadata`` dictionary will also contain a ``smiles``
-        key containing the input SMILES, for API compatibility reasons.
+        new_value: openff.toolkit.topology.Molecule or None
+            The new openff molecule.
         """
-        return cls(smiles, name=name or smiles, metadata={"smiles": smiles})
+        self._molecule = new_value
 
-    def to_rdkit(self) -> rdkit.Chem.Mol:
+    @molecule.getter
+    def molecule(self):
         """
-        Export this SMILES string as an RDKit ``Mol``.
+        Get the _molecule attribute. If the _smiles attribute is given and _molecule is None, a
+        new openff molecule will be created from smiles, e.g. in case of lazy instantiation.
 
         Returns
-        -------
-        rdkit.Chem.Mol
+        ------
+        : openff.toolkit.topology.Molecule or None
+            The openff molecular representation of the ligand.
         """
-        return RDKitLigand.from_smiles(self._molecule).to_rdkit()
+        if not self._molecule and self._smiles:
+            self._molecule = Molecule.from_smiles(smiles=self._smiles, allow_undefined_stereo=True)
+            if not self.name:
+                self.name = self._smiles
+            if self.metadata is None:
+                self.metadata = {"smiles": self._smiles}
+            else:
+                self.metadata.update({"smiles": self._smiles})
+        return self._molecule
 
-    def to_smiles(self) -> str:
+    @classmethod
+    def from_smiles(
+        cls, smiles: str, name: str = "", allow_undefined_stereo: bool = True, **kwargs
+    ):
         """
-        Create an RDKit ``Mol`` and export it as canonical SMILES
-        representation. If you want the RAW smiles, use
-        ``.metadata["smiles"]``.
+        Create a Ligand from a SMILES representation.
 
-        Returns
-        -------
-        str
-            Canonical SMILES
+        Parameters
+        ----------
+        smiles: str
+            smiles: str
+            The SMILES representation of the ligand.
+        name: str, default=""
+            The name of the ligand.
+        allow_undefined_stereo: bool, default=True
+            If undefined stereo centers should be allowed.
+        kwargs:
+            Any keyword arguments allowed for the from_smiles method of the openff molecule class.
         """
-        return RDKitLigand.from_smiles(self._molecule).to_smiles()
+        molecule = Molecule.from_smiles(
+            smiles=smiles, allow_undefined_stereo=allow_undefined_stereo, **kwargs
+        )
+        if not name:
+            name = smiles
+        return cls(molecule=molecule, name=name, metadata={"smiles": smiles})
+
+    @classmethod
+    def from_file(
+        cls,
+        file_path: Union[Path, str],
+        name: str = "",
+        allow_undefined_stereo: bool = True,
+        **kwargs
+    ):
+        """
+        Create a Ligand from file.
+
+        Parameters
+        ----------
+        file_path: pathlib.Path or str
+            The path to the molecular file. For supported formats see the openff molecule
+            documentation.
+        name: str, default=""
+            The name of the ligand.
+        allow_undefined_stereo: bool, default=True
+            If undefined stereo centers should be allowed.
+        kwargs:
+            Any keyword arguments allowed for the from_file method of the openff molecule class.
+        """
+        molecule = Molecule.from_file(
+            file_path=file_path, allow_undefined_stereo=allow_undefined_stereo, **kwargs
+        )
+        if not name:
+            name = molecule.to_smiles(explicit_hydrogens=False)
+        return cls(molecule=molecule, name=name, metadata={"file_path": file_path})
