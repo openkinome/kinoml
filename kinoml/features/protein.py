@@ -141,7 +141,7 @@ class OEProteinStructureFeaturizer(OEBaseModelingFeaturizer, SingleProteinFeatur
      - `uniprot_id`: A string specifying the UniProt ID that will be used to fetch the amino acid
        sequence from UniProt, which will be used for modeling the protein. This will supersede the
        sequence information given in the PDB header.
-     - `sequence`: An `AminoAcidSequence` object specifying the amino acid sequence that should be
+     - `sequence`: A  string specifying the amino acid sequence in one-letter-codes that should be
        used during modeling the protein. This will supersede a given `uniprot_id` and the sequence
        information given in the PDB header.
 
@@ -175,34 +175,53 @@ class OEProteinStructureFeaturizer(OEBaseModelingFeaturizer, SingleProteinFeatur
         : Universe or None
             An MDAnalysis universe of the featurized system. None if no design unit was found.
         """
+        from pathlib import Path
+
         import MDAnalysis as mda
 
-        from ..modeling.OEModeling import read_molecules
-
-        logging.debug("Interpreting system ...")
-        system_dict = self._interpret_system(system)
-
         logging.debug("Reading structure ...")
-        structure = read_molecules(system_dict["protein_path"])[0]
+        if system.protein.toolkit != "OpenEye":
+            raise ValueError(
+                f"{self.__class__.__name__} requires protein components initialized with "
+                f"toolkit='OpenEye', {system.protein.toolkit} was used instead!"
+            )
+        structure = system.protein.molecule
+        if structure is None:
+            logger.warning(
+                f"Could not read protein structure for {system.protein}, returning None!"
+            )
+            return None
 
         logging.debug("Preparing protein structure ...")
         design_unit = self._get_design_unit(
             structure=structure,
-            chain_id=system_dict["protein_chain_id"],
-            alternate_location=system_dict["protein_alternate_location"],
-            has_ligand=True if system_dict["protein_expo_id"] else False,
-            ligand_name=system_dict["protein_expo_id"],
-            model_loops_and_caps=False if system_dict["protein_sequence"] else True,
+            chain_id=system.protein.chain_id if hasattr(system.protein, "chain_id") else None,
+            alternate_location=system.protein.alternate_location if hasattr(
+                system.protein, "alternate_location"
+            ) else None,
+            has_ligand=hasattr(system.protein, "expo_id"),
+            ligand_name=system.protein.expo_id if hasattr(system.protein, "expo_id") else None,
+            model_loops_and_caps=False if system.protein.sequence else True,
         )  # if sequence is given model loops and caps separately later
         if not design_unit:
             logging.debug("No design unit found, returning None!")
             return None
 
         logging.debug("Extracting design unit components ...")
-        protein, solvent = self._get_components(design_unit, system_dict["protein_chain_id"])[:-1]
+        protein, solvent = self._get_components(
+            design_unit=design_unit,
+            chain_id=system.protein.chain_id if hasattr(system.protein, "chain_id") else None
+        )[:-1]
 
-        if system_dict["protein_sequence"]:
-            protein = self._process_protein(protein, system_dict["protein_sequence"])
+        if system.protein.sequence:
+            first_id = 1
+            if "construct_range" in system.protein.metadata.keys():
+                first_id = int(system.protein.metadata["construct_range"].split("-")[0])
+            protein = self._process_protein(
+                protein_structure=protein,
+                amino_acid_sequence=system.protein.sequence,
+                first_id=first_id,
+            )
 
         logging.debug("Assembling components ...")
         solvated_protein = self._assemble_components(protein, solvent)
@@ -216,13 +235,15 @@ class OEProteinStructureFeaturizer(OEBaseModelingFeaturizer, SingleProteinFeatur
         logging.debug("Writing results ...")
         file_path = self._write_results(
             solvated_protein,
-            "_".join([
-                system_dict["protein_name"],
-                system_dict["protein_pdb_id"] if system_dict["protein_pdb_id"]
-                else system_dict["protein_path"].stem,
-                f"chain{system_dict['protein_chain_id']}",
-                f"altloc{system_dict['protein_alternate_location']}"
-            ])
+            "_".join([info for info in [
+                system.protein.name,
+                system.protein.pdb_id if system.protein.pdb_id
+                else Path(system.protein.metadata["file_path"]).stem,
+                f"chain{system.protein.chain_id}" if hasattr(system.protein, "chain_id")
+                else None,
+                f"altloc{system.protein.alternate_location}"
+                if hasattr(system.protein, "alternate_location") else None,
+            ] if info])
         )
 
         logging.debug("Generating new MDAnalysis universe ...")

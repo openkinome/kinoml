@@ -861,118 +861,6 @@ class OEBaseModelingFeaturizer(ParallelBaseFeaturizer):
             self.output_dir = Path(output_dir).expanduser().resolve()
             self.output_dir.mkdir(parents=True, exist_ok=True)
 
-    def _interpret_system(self, system: Union[ProteinSystem, ProteinLigandComplex]) -> dict:
-        """
-        Interpret the attributes of the given system components and store them in a dictionary.
-
-        Parameters
-        ----------
-        system: ProteinSystem or ProteinLigandComplex
-            The system to interpret.
-
-        Returns
-        -------
-        : dict
-            A dictionary containing the content of the system components.
-        """
-        from ..databases.pdb import download_pdb_structure
-
-        system_dict = {
-            "protein_name": None,
-            "protein_pdb_id": None,
-            "protein_path": None,
-            "protein_sequence": None,
-            "protein_uniprot_id": None,
-            "protein_chain_id": None,
-            "protein_alternate_location": None,
-            "protein_expo_id": None,
-            "ligand_name": None,
-            "docking_template_pdb_id": None,
-            "docking_template_path": None,
-            "docking_template_expo_id": None,
-            "docking_template_chain_id": None,
-            "docking_template_alternate_location": None,
-        }
-
-        logging.debug("Interpreting protein component ...")
-        if hasattr(system.protein, "name"):
-            system_dict["protein_name"] = system.protein.name
-
-        if hasattr(system.protein, "pdb_id"):
-            system_dict["protein_path"] = download_pdb_structure(
-                system.protein.pdb_id, self.cache_dir
-            )
-            if not system_dict["protein_path"]:
-                raise ValueError(
-                    f"Could not download structure for PDB entry {system.protein.pdb_id}."
-                )
-        elif hasattr(system.protein, "path"):
-            system_dict["protein_path"] = Path(system.protein.path).expanduser().resolve()
-        else:
-            raise AttributeError(
-                f"The {self.__class__.__name__} requires systems with protein components having a"
-                f" `pdb_id` or `path` attribute."
-            )
-
-        if not hasattr(system.protein, "sequence"):
-            if hasattr(system.protein, "uniprot_id"):
-                logging.debug(
-                    f"Retrieving amino acid sequence details for UniProt entry "
-                    f"{system.protein.uniprot_id} ..."
-                )
-                system_dict["protein_sequence"] = AminoAcidSequence.from_uniprot(
-                    system.protein.uniprot_id
-                )
-                system_dict["protein_uniprot_id"] = system.protein.uniprot_id
-        else:
-            if not isinstance(system.protein.sequence, AminoAcidSequence):
-                raise AttributeError(
-                    f"The {self.__class__.__name__} only accepts systems with protein components whose"
-                    f" `sequence` attribute is an instance of `core.sequences.AminoAcidSequence`."
-                )
-            else:
-                system_dict["protein_sequence"] = system.protein.sequence
-
-        if hasattr(system.protein, "chain_id"):
-            system_dict["protein_chain_id"] = system.protein.chain_id
-
-        if hasattr(system.protein, "alternate_location"):
-            system_dict["protein_alternate_location"] = system.protein.alternate_location
-
-        if hasattr(system.protein, "expo_id"):
-            system_dict["protein_expo_id"] = system.protein.expo_id
-
-        if hasattr(system, "ligand"):
-            logging.debug("Interpreting ligand component ...")
-            if hasattr(system.ligand, "name"):
-                system_dict["ligand_name"] = system.ligand.name
-
-            if hasattr(system.ligand, "docking_template_pdb_id"):
-                system_dict["docking_template_pdb_id"] = system.ligand.docking_template_pdb_id
-                system_dict["docking_template_path"] = download_pdb_structure(
-                    system.ligand.docking_template_pdb_id, self.cache_dir
-                )
-                if not system_dict["docking_template_path"]:
-                    raise ValueError(
-                        f"Could not download structure for PDB entry "
-                        f"{system.ligand.docking_template_pdb_id}."
-                    )
-
-            elif hasattr(system.ligand, "docking_template_path"):
-                system_dict["docking_template_path"] = system.ligand.docking_template_path
-
-            if hasattr(system.ligand, "docking_template_expo_id"):
-                system_dict["docking_template_expo_id"] = system.ligand.docking_template_expo_id
-
-            if hasattr(system.ligand, "docking_template_chain_id"):
-                system_dict["docking_template_chain_id"] = system.ligand.docking_template_chain_id
-
-            if hasattr(system.ligand, "docking_template_alternate_location"):
-                system_dict["docking_template_alternate_location"] = \
-                    system.ligand.docking_template_alternate_location
-
-        return system_dict
-
     def _get_design_unit(
             self,
             structure: oechem.OEMolBase,
@@ -1126,7 +1014,8 @@ class OEBaseModelingFeaturizer(ParallelBaseFeaturizer):
     def _process_protein(
             self,
             protein_structure: oechem.OEMolBase,
-            amino_acid_sequence: AminoAcidSequence,
+            amino_acid_sequence: str,
+            first_id: int = 1,
             ligand: Union[oechem.OEMolBase, None] = None,
     ) -> oechem.OEMolBase:
         """
@@ -1136,8 +1025,11 @@ class OEBaseModelingFeaturizer(ParallelBaseFeaturizer):
         ----------
         protein_structure: oechem.OEMolBase
             An OpenEye molecule holding the protein structure to process.
-        amino_acid_sequence: core.sequences.AminoAcidSequence
+        amino_acid_sequence: str
             The amino acid sequence with associated metadata.
+        first_id: int, default=1
+            The ID of the first amino acid in the given sequence, e.g. if only a part of a
+            protein was expressed and used in experiment.
         ligand: oechem.OEMolBase or None, default=None
             An OpenEye molecule that should be checked for heavy atom clashes with built insertions.
 
@@ -1205,15 +1097,7 @@ class OEBaseModelingFeaturizer(ParallelBaseFeaturizer):
             )
 
         logging.debug("Checking protein structure sequence termini ...")
-        real_termini = []
-        if amino_acid_sequence.metadata["true_N_terminus"]:
-            if amino_acid_sequence.metadata["begin"] == residue_numbers[0]:
-                real_termini.append(residue_numbers[0])
-        if amino_acid_sequence.metadata["true_C_terminus"]:
-            if amino_acid_sequence.metadata["end"] == residue_numbers[-1]:
-                real_termini.append(residue_numbers[-1])
-        if len(real_termini) == 0:
-            real_termini = None
+        real_termini = [first_id, first_id + len(amino_acid_sequence) - 1]
 
         logging.debug(f"Assigning caps except for real termini {real_termini} ...")
         protein_structure = assign_caps(protein_structure, real_termini)
@@ -1226,7 +1110,8 @@ class OEBaseModelingFeaturizer(ParallelBaseFeaturizer):
     @staticmethod
     def _get_protein_residue_numbers(
             protein_structure: oechem.OEMolBase,
-            amino_acid_sequence: AminoAcidSequence
+            amino_acid_sequence: str,
+            first_id: int = 1,
     ) -> List[int]:
         """
         Get the residue numbers of a protein structure according to given amino acid sequence.
@@ -1236,7 +1121,10 @@ class OEBaseModelingFeaturizer(ParallelBaseFeaturizer):
         protein_structure: oechem.OEMolBase
             The kinase domain structure.
         amino_acid_sequence: core.sequences.AminoAcidSequence
-            The canonical kinase domain sequence.
+            The template amino acid sequence.
+        first_id: int, default=1
+            The ID of the first amino acid in the given sequence, e.g. if only a part of a
+            protein was expressed and used in experiment.
 
         Returns
         -------
@@ -1254,7 +1142,7 @@ class OEBaseModelingFeaturizer(ParallelBaseFeaturizer):
 
         logging.debug("Generating residue numbers ...")
         residue_numbers = []
-        residue_number = amino_acid_sequence.metadata["begin"]
+        residue_number = first_id
         for template_sequence_residue, target_sequence_residue in zip(
                 template_sequence, target_sequence
         ):
@@ -1265,8 +1153,8 @@ class OEBaseModelingFeaturizer(ParallelBaseFeaturizer):
             else:
                 # I doubt this this will ever happen in the current implementation
                 text = (
-                    "Cannot generate residue IDs. The given protein structure contain residues "
-                    "that are not part of the canoical sequence from UniProt."
+                    "Cannot generate residue IDs. The given protein structure contains residues "
+                    "that are not part of the given sequence."
                 )
                 logging.debug("Exception: " + text)
                 raise ValueError(text)
