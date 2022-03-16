@@ -14,6 +14,7 @@ from typing import Callable, Hashable, Iterable, Sequence, Union, Tuple, List
 import numpy as np
 from tqdm.auto import tqdm
 
+from ..core.proteins import Protein, KLIFSKinase
 from ..core.systems import System, LigandSystem, ProteinLigandComplex
 
 
@@ -860,6 +861,36 @@ class OEBaseModelingFeaturizer(ParallelBaseFeaturizer):
         if output_dir:
             self.output_dir = Path(output_dir).expanduser().resolve()
             self.output_dir.mkdir(parents=True, exist_ok=True)
+
+    def _read_protein_structure(
+            self, protein: Union[Protein, KLIFSKinase]
+    ) -> Union[oechem.OEGraphMol, None]:
+        """
+        Returns the protein structure of the given protein object as OpenEye molecule.
+
+        Parameters
+        ----------
+        protein: Protein or KLIFSKinase
+            The protein object.
+
+        Returns
+        -------
+        : oechem.OEGraphMol or None
+            The protein structure as OpenEye molecule or None.
+
+        Raises
+        ------
+        ValueError
+            If wrong toolkit was used during initialization of the protein object.
+        """
+        logger.debug("Reading structure ...")
+        if protein.toolkit != "OpenEye":
+            raise ValueError(
+                f"{self.__class__.__name__} requires protein components initialized with "
+                f"toolkit='OpenEye', {protein.toolkit} was used instead!"
+            )
+        structure = protein.molecule
+        return structure
 
     def _get_design_unit(
             self,

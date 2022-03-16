@@ -11,6 +11,9 @@ from ..core.proteins import Protein, KLIFSKinase
 from ..core.systems import ProteinLigandComplex
 
 
+logger = logging.getLogger(__name__)
+
+
 class SingleLigandProteinComplexFeaturizer(ParallelBaseFeaturizer):
     """
     Provides a minimally useful ``._supports()`` method for all ProteinLigandComplex-like
@@ -112,65 +115,79 @@ class OEComplexFeaturizer(OEBaseModelingFeaturizer, SingleLigandProteinComplexFe
         : Universe or None
             An MDAnalysis universe of the featurized system. None if no design unit was found.
         """
+        from pathlib import Path
+
         import MDAnalysis as mda
 
-        from ..modeling.OEModeling import read_molecules
-
-        logging.debug("Interpreting system ...")
-        system_dict = self._interpret_system(system)
-
-        logging.debug("Reading structure ...")
-        structure = read_molecules(system_dict["protein_path"])[0]
-
-        logging.debug("Preparing protein ligand complex ...")
-        design_unit = self._get_design_unit(
-            structure=structure,
-            chain_id=system_dict["protein_chain_id"],
-            alternate_location=system_dict["protein_alternate_location"],
-            has_ligand=True,
-            ligand_name=system_dict["protein_expo_id"],
-            model_loops_and_caps=False if system_dict["protein_sequence"] else True,
-        )  # if sequence is given model loops and caps separately later
-        if not design_unit:
-            logging.debug("No design unit found, returning None!")
+        structure = self._read_protein_structure(system.protein)
+        if structure is None:
+            logger.warning(
+                f"Could not read protein structure for {system.protein}, returning None!"
+            )
             return None
 
-        logging.debug("Extracting design unit components ...")
+        logger.debug("Preparing protein ligand complex ...")
+        design_unit = self._get_design_unit(
+            structure=structure,
+            chain_id=system.protein.chain_id if hasattr(system.protein, "chain_id") else None,
+            alternate_location=system.protein.alternate_location if hasattr(
+                system.protein, "alternate_location"
+            ) else None,
+            has_ligand=True,
+            ligand_name=system.protein.expo_id if hasattr(system.protein, "expo_id") else None,
+            model_loops_and_caps=False if system.protein.sequence else True,
+        )  # if sequence is given model loops and caps separately later
+        if not design_unit:
+            logger.debug("No design unit found, returning None!")
+            return None
+
+        logger.debug("Extracting design unit components ...")
         protein, solvent, ligand = self._get_components(
-            design_unit, system_dict["protein_chain_id"]
+            design_unit=design_unit,
+            chain_id=system.protein.chain_id if hasattr(system.protein, "chain_id") else None
         )
 
-        if system_dict["protein_sequence"]:
-            protein = self._process_protein(protein, system_dict["protein_sequence"], ligand)
+        if system.protein.sequence:
+            first_id = 1
+            if "construct_range" in system.protein.metadata.keys():
+                first_id = int(system.protein.metadata["construct_range"].split("-")[0])
+            protein = self._process_protein(
+                protein_structure=protein,
+                amino_acid_sequence=system.protein.sequence,
+                first_id=first_id,
+                ligand=ligand,
+            )
 
-        logging.debug("Assembling components ...")
+        logger.debug("Assembling components ...")
         protein_ligand_complex = self._assemble_components(protein, solvent, ligand)
 
-        logging.debug("Updating pdb header ...")
+        logger.debug("Updating pdb header ...")
         protein_ligand_complex = self._update_pdb_header(
             protein_ligand_complex,
             protein_name=system.protein.name,
             ligand_name=system.ligand.name,
         )
 
-        logging.debug("Writing results ...")
+        logger.debug("Writing results ...")
         file_path = self._write_results(
             protein_ligand_complex,
-            "_".join([
-                system_dict["protein_name"],
-                system_dict["protein_pdb_id"] if system_dict["protein_pdb_id"]
-                else system_dict["protein_path"].stem,
-                f"chain{system_dict['protein_chain_id']}",
-                f"altloc{system_dict['protein_alternate_location']}"
-            ]),
-            system_dict["ligand_name"],
+            "_".join([info for info in [
+                system.protein.name,
+                system.protein.pdb_id if system.protein.pdb_id
+                else Path(system.protein.metadata["file_path"]).stem,
+                f"chain{system.protein.chain_id}" if hasattr(system.protein, "chain_id")
+                else None,
+                f"altloc{system.protein.alternate_location}"
+                if hasattr(system.protein, "alternate_location") else None,
+            ] if info]),
+            system.ligand.name,
         )
 
-        logging.debug("Generating new MDAnalysis universe ...")
+        logger.debug("Generating new MDAnalysis universe ...")
         structure = mda.Universe(file_path, in_memory=True)
 
         if not self.output_dir:
-            logging.debug("Removing structure file ...")
+            logger.debug("Removing structure file ...")
             file_path.unlink()
 
         return structure
@@ -262,86 +279,101 @@ class OEHybridDockingFeaturizer(OEBaseModelingFeaturizer, SingleLigandProteinCom
             An MDAnalysis universe of the featurized system. None if no design unit or docking
             pose was found.
         """
+        from pathlib import Path
+
         import MDAnalysis as mda
         from openeye import oechem, oedocking
 
         from ..docking.OEDocking import hybrid_docking
-        from ..modeling.OEModeling import read_smiles, read_molecules
 
-        logging.debug("Interpreting system ...")
-        system_dict = self._interpret_system(system)
-
-        logging.debug("Reading structure ...")
-        structure = read_molecules(system_dict["protein_path"])[0]
-
-        logging.debug("Preparing protein ligand complex ...")
-        design_unit = self._get_design_unit(
-            structure=structure,
-            chain_id=system_dict["protein_chain_id"],
-            alternate_location=system_dict["protein_alternate_location"],
-            has_ligand=True,
-            ligand_name=system_dict["protein_expo_id"],
-            model_loops_and_caps=False if system_dict["protein_sequence"] else True,
-        )  # if sequence is given model loops and caps separately later
-        if not design_unit:
-            logging.debug("No design unit found, returning None!")
+        structure = self._read_protein_structure(system.protein)
+        if structure is None:
+            logger.warning(
+                f"Could not read protein structure for {system.protein}, returning None!"
+            )
             return None
 
-        logging.debug("Extracting design unit components ...")
+        logger.debug("Preparing protein ligand complex ...")
+        design_unit = self._get_design_unit(
+            structure=structure,
+            chain_id=system.protein.chain_id if hasattr(system.protein, "chain_id") else None,
+            alternate_location=system.protein.alternate_location if hasattr(
+                system.protein, "alternate_location"
+            ) else None,
+            has_ligand=True,
+            ligand_name=system.protein.expo_id if hasattr(system.protein, "expo_id") else None,
+            model_loops_and_caps=False if system.protein.sequence else True,
+        )  # if sequence is given model loops and caps separately later
+        if not design_unit:
+            logger.debug("No design unit found, returning None!")
+            return None
+
+        logger.debug("Extracting design unit components ...")
         protein, solvent, ligand = self._get_components(
-            design_unit, system_dict["protein_chain_id"]
+            design_unit=design_unit,
+            chain_id=system.protein.chain_id if hasattr(system.protein, "chain_id") else None
         )
 
-        if system_dict["protein_sequence"]:
-            protein = self._process_protein(protein, system_dict["protein_sequence"])
+        if system.protein.sequence:
+            first_id = 1
+            if "construct_range" in system.protein.metadata.keys():
+                first_id = int(system.protein.metadata["construct_range"].split("-")[0])
+            protein = self._process_protein(
+                protein_structure=protein,
+                amino_acid_sequence=system.protein.sequence,
+                first_id=first_id,
+                ligand=ligand,
+            )
             oechem.OEUpdateDesignUnit(design_unit, protein, oechem.OEDesignUnitComponents_Protein)
 
         if not design_unit.HasReceptor():
-            logging.debug("Preparing receptor for docking ...")
+            logger.debug("Preparing receptor for docking ...")
             oedocking.OEMakeReceptor(design_unit)
 
-        logging.debug("Performing docking ...")
+        logger.debug("Performing docking ...")
         docking_poses = hybrid_docking(
             design_unit,
-            [read_smiles(system.ligand.to_smiles())],
+            [system.ligand.molecule.to_openeye()],
             pKa_norm=self.pKa_norm
         )
         if not docking_poses:
-            logging.debug("No docking pose found, returning None!")
+            logger.debug("No docking pose found, returning None!")
             return None
         else:
             docking_pose = docking_poses[0]
         # generate residue information
         oechem.OEPerceiveResidues(docking_pose, oechem.OEPreserveResInfo_None)
 
-        logging.debug("Assembling components ...")
+        logger.debug("Assembling components ...")
         protein_ligand_complex = self._assemble_components(protein, solvent, docking_pose)
 
-        logging.debug("Updating pdb header ...")
+        logger.debug("Updating pdb header ...")
         protein_ligand_complex = self._update_pdb_header(
             protein_ligand_complex,
             protein_name=system.protein.name,
             ligand_name=system.ligand.name,
         )
 
-        logging.debug("Writing results ...")
+        logger.debug("Writing results ...")
         file_path = self._write_results(
             protein_ligand_complex,
-            "_".join([
-                system_dict["protein_name"],
-                system_dict["protein_pdb_id"] if system_dict["protein_pdb_id"]
-                else system_dict["protein_path"].stem,
-                f"chain{system_dict['protein_chain_id']}",
-                f"altloc{system_dict['protein_alternate_location']}"
-            ]),
+            "_".join([info for info in [
+                system.protein.name,
+                system.protein.pdb_id if system.protein.pdb_id
+                else Path(system.protein.metadata["file_path"]).stem,
+                f"chain{system.protein.chain_id}" if hasattr(system.protein, "chain_id")
+                else None,
+                f"altloc{system.protein.alternate_location}"
+                if hasattr(system.protein, "alternate_location") else None,
+            ] if info]),
             system.ligand.name,
         )
 
-        logging.debug("Generating new MDAnalysis universe ...")
+        logger.debug("Generating new MDAnalysis universe ...")
         structure = mda.Universe(file_path, in_memory=True)
 
         if not self.output_dir:
-            logging.debug("Removing structure file ...")
+            logger.debug("Removing structure file ...")
             file_path.unlink()
 
         return structure
@@ -430,41 +462,53 @@ class OEFredDockingFeaturizer(OEBaseModelingFeaturizer, SingleLigandProteinCompl
             An MDAnalysis universe of the featurized system. None if no design unit or docking
             pose was found.
         """
+        from pathlib import Path
+
         import MDAnalysis as mda
         from openeye import oechem, oedocking
 
         from ..docking.OEDocking import fred_docking, resids_to_box_molecule
-        from ..modeling.OEModeling import read_smiles, read_molecules
 
-        logging.debug("Interpreting system ...")
-        system_dict = self._interpret_system(system)
-
-        logging.debug("Reading structure ...")
-        structure = read_molecules(system_dict["protein_path"])[0]
-
-        logging.debug("Preparing protein ligand complex ...")
-        design_unit = self._get_design_unit(
-            structure=structure,
-            chain_id=system_dict["protein_chain_id"],
-            alternate_location=system_dict["protein_alternate_location"],
-            has_ligand=True if system_dict["protein_expo_id"] else False,
-            ligand_name=system_dict["protein_expo_id"],
-            model_loops_and_caps=False if system_dict["protein_sequence"] else True,
-        )  # if sequence is given model loops and caps separately later
-
-        logging.debug("Extracting design unit components ...")
-        protein, solvent, ligand = self._get_components(
-            design_unit, system_dict["protein_chain_id"]
-        )
-        if not design_unit:
-            logging.debug("No design unit found, returning None!")
+        structure = self._read_protein_structure(system.protein)
+        if structure is None:
+            logger.warning(
+                f"Could not read protein structure for {system.protein}, returning None!"
+            )
             return None
 
-        logging.debug("Defining binding site ...")
+        logger.debug("Preparing protein ligand complex ...")
+        design_unit = self._get_design_unit(
+            structure=structure,
+            chain_id=system.protein.chain_id if hasattr(system.protein, "chain_id") else None,
+            alternate_location=system.protein.alternate_location if hasattr(
+                system.protein, "alternate_location"
+            ) else None,
+            has_ligand=hasattr(system.protein, "expo_id"),
+            ligand_name=system.protein.expo_id if hasattr(system.protein, "expo_id") else None,
+            model_loops_and_caps=False if system.protein.sequence else True,
+        )  # if sequence is given model loops and caps separately later
+        if not design_unit:
+            logger.debug("No design unit found, returning None!")
+            return None
+
+        logger.debug("Extracting design unit components ...")
+        protein, solvent = self._get_components(
+            design_unit=design_unit,
+            chain_id=system.protein.chain_id if hasattr(system.protein, "chain_id") else None
+        )[:-1]
+
+        logger.debug("Defining binding site ...")
         box_molecule = resids_to_box_molecule(protein, system.protein.pocket_resids)
 
-        if system_dict["protein_sequence"]:
-            protein = self._process_protein(protein, system_dict["protein_sequence"])
+        if system.protein.sequence:
+            first_id = 1
+            if "construct_range" in system.protein.metadata.keys():
+                first_id = int(system.protein.metadata["construct_range"].split("-")[0])
+            protein = self._process_protein(
+                protein_structure=protein,
+                amino_acid_sequence=system.protein.sequence,
+                first_id=first_id
+            )
             if not oechem.OEUpdateDesignUnit(  # does not work if no ligand was present
                     design_unit, protein, oechem.OEDesignUnitComponents_Protein
             ):
@@ -477,53 +521,55 @@ class OEFredDockingFeaturizer(OEBaseModelingFeaturizer, SingleLigandProteinCompl
                     solvent
                 )
 
-        logging.debug("Preparing receptor for docking ...")
+        logger.debug("Preparing receptor for docking ...")
         receptor_options = oedocking.OEMakeReceptorOptions()
         receptor_options.SetBoxMol(box_molecule)
         oedocking.OEMakeReceptor(design_unit, receptor_options)
 
-        logging.debug("Performing docking ...")
+        logger.debug("Performing docking ...")
         docking_poses = fred_docking(
             design_unit,
-            [read_smiles(system.ligand.to_smiles())],
+            [system.ligand.molecule.to_openeye()],
             pKa_norm=self.pKa_norm
         )
         if not docking_poses:
-            logging.debug("No docking pose found, returning None!")
+            logger.debug("No docking pose found, returning None!")
             return None
         else:
             docking_pose = docking_poses[0]
         # generate residue information
         oechem.OEPerceiveResidues(docking_pose, oechem.OEPreserveResInfo_None)
 
-        logging.debug("Assembling components ...")
+        logger.debug("Assembling components ...")
         protein_ligand_complex = self._assemble_components(protein, solvent, docking_pose)
 
-        logging.debug("Updating pdb header ...")
+        logger.debug("Updating pdb header ...")
         protein_ligand_complex = self._update_pdb_header(
             protein_ligand_complex,
             protein_name=system.protein.name,
             ligand_name=system.ligand.name,
         )
 
-        logging.debug("Writing results ...")
+        logger.debug("Writing results ...")
         file_path = self._write_results(
             protein_ligand_complex,
-            "_".join([
-                system_dict["protein_name"],
-                system_dict["protein_pdb_id"] if system_dict["protein_pdb_id"]
-                else system_dict["protein_path"].stem,
-                f"chain{system_dict['protein_chain_id']}",
-                f"altloc{system_dict['protein_alternate_location']}"
-            ]),
+            "_".join([info for info in [
+                system.protein.name,
+                system.protein.pdb_id if system.protein.pdb_id
+                else Path(system.protein.metadata["file_path"]).stem,
+                f"chain{system.protein.chain_id}" if hasattr(system.protein, "chain_id")
+                else None,
+                f"altloc{system.protein.alternate_location}"
+                if hasattr(system.protein, "alternate_location") else None,
+            ] if info]),
             system.ligand.name,
         )
 
-        logging.debug("Generating new MDAnalysis universe ...")
+        logger.debug("Generating new MDAnalysis universe ...")
         structure = mda.Universe(file_path, in_memory=True)
 
         if not self.output_dir:
-            logging.debug("Removing structure file ...")
+            logger.debug("Removing structure file ...")
             file_path.unlink()
 
         return structure
@@ -633,144 +679,107 @@ class OEPositDockingFeaturizer(OEBaseModelingFeaturizer, SingleLigandProteinComp
             An MDAnalysis universe of the featurized system. None if no design unit, docking
             template ligand or docking pose was found.
         """
+        from pathlib import Path
+
         import MDAnalysis as mda
         from openeye import oechem, oedocking
 
         from ..docking.OEDocking import pose_molecules
         from ..modeling.OEModeling import (
             read_smiles,
-            read_molecules,
             select_chain,
             superpose_proteins
         )
 
-        logging.debug("Interpreting system ...")
-        system_dict = self._interpret_system(system)
-
-        logging.debug("Reading structure ...")
-        structure = read_molecules(system_dict["protein_path"])[0]
-
-        logging.debug("Preparing protein ligand complex ...")
-        design_unit = self._get_design_unit(
-            structure=structure,
-            chain_id=system_dict["protein_chain_id"],
-            alternate_location=system_dict["protein_alternate_location"],
-            has_ligand=True,
-            ligand_name=system_dict["protein_expo_id"],
-            model_loops_and_caps=False if system_dict["protein_sequence"] else True,
-        )  # if sequence is given model loops and caps separately later
-        if not design_unit:
-            logging.debug("No design unit found, returning None!")
+        structure = self._read_protein_structure(system.protein)
+        if structure is None:
+            logger.warning(
+                f"Could not read protein structure for {system.protein}, returning None!"
+            )
             return None
 
-        logging.debug("Extracting design unit components ...")
+        logger.debug("Preparing protein ligand complex ...")
+        design_unit = self._get_design_unit(
+            structure=structure,
+            chain_id=system.protein.chain_id if hasattr(system.protein, "chain_id") else None,
+            alternate_location=system.protein.alternate_location if hasattr(
+                system.protein, "alternate_location"
+            ) else None,
+            has_ligand=True,
+            ligand_name=system.protein.expo_id if hasattr(system.protein, "expo_id") else None,
+            model_loops_and_caps=False if system.protein.sequence else True,
+        )  # if sequence is given model loops and caps separately later
+        if not design_unit:
+            logger.debug("No design unit found, returning None!")
+            return None
+
+        logger.debug("Extracting design unit components ...")
         protein, solvent, ligand = self._get_components(
-            design_unit, system_dict["protein_chain_id"]
+            design_unit=design_unit,
+            chain_id=system.protein.chain_id if hasattr(system.protein, "chain_id") else None
         )
 
-        if system_dict["protein_sequence"]:
-            protein = self._process_protein(protein, system_dict["protein_sequence"])
+        if system.protein.sequence:
+            first_id = 1
+            if "construct_range" in system.protein.metadata.keys():
+                first_id = int(system.protein.metadata["construct_range"].split("-")[0])
+            protein = self._process_protein(
+                protein_structure=protein,
+                amino_acid_sequence=system.protein.sequence,
+                first_id=first_id,
+                ligand=ligand,
+            )
             oechem.OEUpdateDesignUnit(design_unit, protein, oechem.OEDesignUnitComponents_Protein)
 
-        if system_dict["docking_template_path"]:
-            logging.debug("Preparing docking template ...")
-            docking_template = read_molecules(system_dict["docking_template_path"])[0]
-            docking_template_du = self._get_design_unit(
-                structure=docking_template,
-                chain_id=system_dict["docking_template_chain_id"],
-                alternate_location=system_dict["docking_template_alternate_location"],
-                has_ligand=True,
-                ligand_name=system_dict["docking_template_expo_id"],
-                model_loops_and_caps=False,
-            )
-            if not docking_template_du:
-                logging.debug("No design unit found for docking template, returning None!")
-                return None
-
-            logging.debug("Retrieving docking template components ...")
-            docking_template_du.GetComponents(
-                docking_template,
-                oechem.OEDesignUnitComponents_Protein | oechem.OEDesignUnitComponents_Ligand
-            )
-
-            if system_dict["docking_template_chain_id"]:
-                logging.debug("Selecting chain of docking template ...")
-                docking_template = select_chain(
-                    docking_template, system_dict["docking_template_chain_id"]
-                )
-
-            logging.debug("Superposing docking template to protein structure ...")
-            docking_template = superpose_proteins(protein, docking_template)
-
-            logging.debug("Extracting docking template ligand ...")
-            split_options = oechem.OESplitMolComplexOptions()
-            split_options.SetSplitCovalent(True)
-            try:
-                docking_template_ligand = list(oechem.OEGetMolComplexComponents(
-                    docking_template, split_options, split_options.GetLigandFilter())
-                )[0]
-            except IndexError:
-                logging.debug("No docking template ligand could be extracted, returning None!")
-                return None
-
-            logging.debug("Transferring docking template ligand to protein structure ...")
-            oechem.OEUpdateDesignUnit(
-                design_unit, docking_template_ligand, oechem.OEDesignUnitComponents_Ligand
-            )
-
         if not design_unit.HasReceptor():
-            logging.debug("Preparing receptor for docking ...")
+            logger.debug("Preparing receptor for docking ...")
             oedocking.OEMakeReceptor(design_unit)
 
-        logging.debug("Performing docking ...")
+        logger.debug("Performing docking ...")
         docking_poses = pose_molecules(
             design_unit,
-            [read_smiles(system.ligand.to_smiles())],
+            [system.ligand.molecule.to_openeye()],
             pKa_norm=self.pKa_norm,
             score_pose=True,
         )
         if not docking_poses:
-            logging.debug("No docking pose found, returning None!")
+            logger.debug("No docking pose found, returning None!")
             return None
         else:
             docking_pose = docking_poses[0]
         # generate residue information
         oechem.OEPerceiveResidues(docking_pose, oechem.OEPreserveResInfo_None)
 
-        logging.debug("Assembling components ...")
+        logger.debug("Assembling components ...")
         protein_ligand_complex = self._assemble_components(protein, solvent, docking_pose)
 
-        logging.debug("Updating pdb header ...")
+        logger.debug("Updating pdb header ...")
         protein_ligand_complex = self._update_pdb_header(
             protein_ligand_complex,
             protein_name=system.protein.name,
             ligand_name=system.ligand.name,
         )
 
-        logging.debug("Writing results ...")
-        docking_template_name = None
-        if system_dict["docking_template_pdb_id"]:
-            docking_template_name = system_dict["docking_template_pdb_id"]
-        elif system_dict["docking_template_path"]:
-            docking_template_name = system_dict["docking_template_path"].stem
+        logger.debug("Writing results ...")
         file_path = self._write_results(
             protein_ligand_complex,
-            "_".join([
-                system_dict["protein_name"],
-                system_dict["protein_pdb_id"] if system_dict["protein_pdb_id"]
-                else system_dict["protein_path"].stem,
-                f"chain{system_dict['protein_chain_id']}",
-                f"altloc{system_dict['protein_alternate_location']}",
-                f"docking-template{docking_template_name}"
-            ]),
+            "_".join([info for info in [
+                system.protein.name,
+                system.protein.pdb_id if system.protein.pdb_id
+                else Path(system.protein.metadata["file_path"]).stem,
+                f"chain{system.protein.chain_id}" if hasattr(system.protein, "chain_id")
+                else None,
+                f"altloc{system.protein.alternate_location}"
+                if hasattr(system.protein, "alternate_location") else None,
+            ] if info]),
             system.ligand.name,
         )
 
-        logging.debug("Generating new MDAnalysis universe ...")
+        logger.debug("Generating new MDAnalysis universe ...")
         structure = mda.Universe(file_path, in_memory=True)
 
         if not self.output_dir:
-            logging.debug("Removing structure file ...")
+            logger.debug("Removing structure file ...")
             file_path.unlink()
 
         return structure

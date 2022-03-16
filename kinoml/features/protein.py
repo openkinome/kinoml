@@ -179,13 +179,7 @@ class OEProteinStructureFeaturizer(OEBaseModelingFeaturizer, SingleProteinFeatur
 
         import MDAnalysis as mda
 
-        logging.debug("Reading structure ...")
-        if system.protein.toolkit != "OpenEye":
-            raise ValueError(
-                f"{self.__class__.__name__} requires protein components initialized with "
-                f"toolkit='OpenEye', {system.protein.toolkit} was used instead!"
-            )
-        structure = system.protein.molecule
+        structure = self._read_protein_structure(system.protein)
         if structure is None:
             logger.warning(
                 f"Could not read protein structure for {system.protein}, returning None!"
