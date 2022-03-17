@@ -1085,7 +1085,9 @@ class OEBaseModelingFeaturizer(ParallelBaseFeaturizer):
 
         processed_protein_path = LocalFileStorage.featurizer_result(
             self.__class__.__name__,
-            sha256_objects([self.loop_db, protein_structure, amino_acid_sequence]),
+            sha256_objects(
+                [self.loop_db, protein_structure, amino_acid_sequence, first_id, ligand]
+            ),
             "oeb",
             self.cache_dir,
         )
