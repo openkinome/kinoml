@@ -92,6 +92,7 @@ class OEComplexFeaturizer(OEBaseModelingFeaturizer, SingleLigandProteinComplexFe
     If the ligand of interest is covalently bonded to the protein, the covalent bond will be
     broken. This may lead to the transformation of the ligand into a radical.
     """
+
     from MDAnalysis.core.universe import Universe
 
     def __init__(self, **kwargs):
@@ -128,9 +129,9 @@ class OEComplexFeaturizer(OEBaseModelingFeaturizer, SingleLigandProteinComplexFe
         design_unit = self._get_design_unit(
             structure=structure,
             chain_id=system.protein.chain_id if hasattr(system.protein, "chain_id") else None,
-            alternate_location=system.protein.alternate_location if hasattr(
-                system.protein, "alternate_location"
-            ) else None,
+            alternate_location=system.protein.alternate_location
+            if hasattr(system.protein, "alternate_location")
+            else None,
             has_ligand=True,
             ligand_name=system.protein.expo_id if hasattr(system.protein, "expo_id") else None,
             model_loops_and_caps=False if system.protein.sequence else True,
@@ -142,7 +143,7 @@ class OEComplexFeaturizer(OEBaseModelingFeaturizer, SingleLigandProteinComplexFe
         logger.debug("Extracting design unit components ...")
         protein, solvent, ligand = self._get_components(
             design_unit=design_unit,
-            chain_id=system.protein.chain_id if hasattr(system.protein, "chain_id") else None
+            chain_id=system.protein.chain_id if hasattr(system.protein, "chain_id") else None,
         )
 
         if system.protein.sequence:
@@ -169,15 +170,24 @@ class OEComplexFeaturizer(OEBaseModelingFeaturizer, SingleLigandProteinComplexFe
         logger.debug("Writing results ...")
         file_path = self._write_results(
             protein_ligand_complex,
-            "_".join([info for info in [
-                system.protein.name,
-                system.protein.pdb_id if system.protein.pdb_id
-                else Path(system.protein.metadata["file_path"]).stem,
-                f"chain{system.protein.chain_id}" if hasattr(system.protein, "chain_id")
-                else None,
-                f"altloc{system.protein.alternate_location}"
-                if hasattr(system.protein, "alternate_location") else None,
-            ] if info]),
+            "_".join(
+                [
+                    info
+                    for info in [
+                        system.protein.name,
+                        system.protein.pdb_id
+                        if system.protein.pdb_id
+                        else Path(system.protein.metadata["file_path"]).stem,
+                        f"chain{system.protein.chain_id}"
+                        if hasattr(system.protein, "chain_id")
+                        else None,
+                        f"altloc{system.protein.alternate_location}"
+                        if hasattr(system.protein, "alternate_location")
+                        else None,
+                    ]
+                    if info
+                ]
+            ),
             system.ligand.name,
         )
 
@@ -252,6 +262,7 @@ class OEDockingFeaturizer(OEBaseModelingFeaturizer, SingleLigandProteinComplexFe
         Assign the predominant ionization state of the molecules to dock at pH ~7.4. If False,
         the ionization state of the input molecules will be conserved.
     """
+
     from MDAnalysis.core.universe import Universe
 
     def __init__(self, method: str = "Posit", pKa_norm: bool = True, **kwargs):
@@ -290,7 +301,7 @@ class OEDockingFeaturizer(OEBaseModelingFeaturizer, SingleLigandProteinComplexFe
             fred_docking,
             hybrid_docking,
             pose_molecules,
-            resids_to_box_molecule
+            resids_to_box_molecule,
         )
 
         structure = self._read_protein_structure(system.protein)
@@ -304,9 +315,9 @@ class OEDockingFeaturizer(OEBaseModelingFeaturizer, SingleLigandProteinComplexFe
         design_unit = self._get_design_unit(
             structure=structure,
             chain_id=system.protein.chain_id if hasattr(system.protein, "chain_id") else None,
-            alternate_location=system.protein.alternate_location if hasattr(
-                system.protein, "alternate_location"
-            ) else None,
+            alternate_location=system.protein.alternate_location
+            if hasattr(system.protein, "alternate_location")
+            else None,
             has_ligand=hasattr(system.protein, "expo_id") or self.method in ["Hybrid", "Posit"],
             ligand_name=system.protein.expo_id if hasattr(system.protein, "expo_id") else None,
             model_loops_and_caps=False if system.protein.sequence else True,
@@ -318,7 +329,7 @@ class OEDockingFeaturizer(OEBaseModelingFeaturizer, SingleLigandProteinComplexFe
         logger.debug("Extracting design unit components ...")
         protein, solvent, ligand = self._get_components(
             design_unit=design_unit,
-            chain_id=system.protein.chain_id if hasattr(system.protein, "chain_id") else None
+            chain_id=system.protein.chain_id if hasattr(system.protein, "chain_id") else None,
         )
 
         if system.protein.sequence:
@@ -332,7 +343,7 @@ class OEDockingFeaturizer(OEBaseModelingFeaturizer, SingleLigandProteinComplexFe
                 ligand=ligand if ligand.NumAtoms() > 0 else None,
             )
             if not oechem.OEUpdateDesignUnit(
-                    design_unit, protein, oechem.OEDesignUnitComponents_Protein
+                design_unit, protein, oechem.OEDesignUnitComponents_Protein
             ):  # does not work if no ligand was present, e.g. Fred docking in apo structure
                 # create new design unit with dummy site residue
                 hierview = oechem.OEHierView(protein)
@@ -343,7 +354,7 @@ class OEDockingFeaturizer(OEBaseModelingFeaturizer, SingleLigandProteinComplexFe
                         f"{first_residue.GetResidueName()}:{first_residue.GetResidueNumber()}: :"
                         f"{first_residue.GetOEResidue().GetChainID()}"
                     ],
-                    solvent
+                    solvent,
                 )
 
         if self.method == "Fred":
@@ -362,15 +373,11 @@ class OEDockingFeaturizer(OEBaseModelingFeaturizer, SingleLigandProteinComplexFe
         logger.debug("Performing docking ...")
         if self.method == "Fred":
             docking_poses = fred_docking(
-                design_unit,
-                [system.ligand.molecule.to_openeye()],
-                pKa_norm=self.pKa_norm
+                design_unit, [system.ligand.molecule.to_openeye()], pKa_norm=self.pKa_norm
             )
         elif self.method == "Hybrid":
             docking_poses = hybrid_docking(
-                design_unit,
-                [system.ligand.molecule.to_openeye()],
-                pKa_norm=self.pKa_norm
+                design_unit, [system.ligand.molecule.to_openeye()], pKa_norm=self.pKa_norm
             )
         else:
             docking_poses = pose_molecules(
@@ -400,15 +407,24 @@ class OEDockingFeaturizer(OEBaseModelingFeaturizer, SingleLigandProteinComplexFe
         logger.debug("Writing results ...")
         file_path = self._write_results(
             protein_ligand_complex,
-            "_".join([info for info in [
-                system.protein.name,
-                system.protein.pdb_id if system.protein.pdb_id
-                else Path(system.protein.metadata["file_path"]).stem,
-                f"chain{system.protein.chain_id}" if hasattr(system.protein, "chain_id")
-                else None,
-                f"altloc{system.protein.alternate_location}"
-                if hasattr(system.protein, "alternate_location") else None,
-            ] if info]),
+            "_".join(
+                [
+                    info
+                    for info in [
+                        system.protein.name,
+                        system.protein.pdb_id
+                        if system.protein.pdb_id
+                        else Path(system.protein.metadata["file_path"]).stem,
+                        f"chain{system.protein.chain_id}"
+                        if hasattr(system.protein, "chain_id")
+                        else None,
+                        f"altloc{system.protein.alternate_location}"
+                        if hasattr(system.protein, "alternate_location")
+                        else None,
+                    ]
+                    if info
+                ]
+            ),
             system.ligand.name,
         )
 

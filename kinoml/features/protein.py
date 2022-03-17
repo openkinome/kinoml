@@ -157,6 +157,7 @@ class OEProteinStructureFeaturizer(OEBaseModelingFeaturizer, SingleProteinFeatur
         How many processes to use in case of multiprocessing. Defaults to number of available
         CPUs.
     """
+
     from MDAnalysis.core.universe import Universe
 
     def __init__(self, **kwargs):
@@ -191,9 +192,9 @@ class OEProteinStructureFeaturizer(OEBaseModelingFeaturizer, SingleProteinFeatur
         design_unit = self._get_design_unit(
             structure=structure,
             chain_id=system.protein.chain_id if hasattr(system.protein, "chain_id") else None,
-            alternate_location=system.protein.alternate_location if hasattr(
-                system.protein, "alternate_location"
-            ) else None,
+            alternate_location=system.protein.alternate_location
+            if hasattr(system.protein, "alternate_location")
+            else None,
             has_ligand=hasattr(system.protein, "expo_id"),
             ligand_name=system.protein.expo_id if hasattr(system.protein, "expo_id") else None,
             model_loops_and_caps=False if system.protein.sequence else True,
@@ -205,7 +206,7 @@ class OEProteinStructureFeaturizer(OEBaseModelingFeaturizer, SingleProteinFeatur
         logging.debug("Extracting design unit components ...")
         protein, solvent = self._get_components(
             design_unit=design_unit,
-            chain_id=system.protein.chain_id if hasattr(system.protein, "chain_id") else None
+            chain_id=system.protein.chain_id if hasattr(system.protein, "chain_id") else None,
         )[:-1]
 
         if system.protein.sequence:
@@ -223,22 +224,30 @@ class OEProteinStructureFeaturizer(OEBaseModelingFeaturizer, SingleProteinFeatur
 
         logging.debug("Updating pdb header ...")
         solvated_protein = self._update_pdb_header(
-            solvated_protein,
-            protein_name=system.protein.name
+            solvated_protein, protein_name=system.protein.name
         )
 
         logging.debug("Writing results ...")
         file_path = self._write_results(
             solvated_protein,
-            "_".join([info for info in [
-                system.protein.name,
-                system.protein.pdb_id if system.protein.pdb_id
-                else Path(system.protein.metadata["file_path"]).stem,
-                f"chain{system.protein.chain_id}" if hasattr(system.protein, "chain_id")
-                else None,
-                f"altloc{system.protein.alternate_location}"
-                if hasattr(system.protein, "alternate_location") else None,
-            ] if info])
+            "_".join(
+                [
+                    info
+                    for info in [
+                        system.protein.name,
+                        system.protein.pdb_id
+                        if system.protein.pdb_id
+                        else Path(system.protein.metadata["file_path"]).stem,
+                        f"chain{system.protein.chain_id}"
+                        if hasattr(system.protein, "chain_id")
+                        else None,
+                        f"altloc{system.protein.alternate_location}"
+                        if hasattr(system.protein, "alternate_location")
+                        else None,
+                    ]
+                    if info
+                ]
+            ),
         )
 
         logging.debug("Generating new MDAnalysis universe ...")

@@ -73,12 +73,7 @@ def does_not_raise():
             does_not_raise(),
             5,
         ),
-        (
-            "1",
-            False,
-            pytest.raises(ValueError),
-            0
-        ),
+        ("1", False, pytest.raises(ValueError), 0),
     ],
 )
 def test_read_smiles(smiles, add_hydrogens, expectation, n_atoms):
@@ -124,7 +119,7 @@ def test_read_smiles(smiles, add_hydrogens, expectation, n_atoms):
             "4f8o.pdb",
             True,
             does_not_raise(),
-            [2497],# TODO: doesnt match number in file
+            [2497],  # TODO: doesnt match number in file
         ),
         (
             "kinoml.data.proteins",
@@ -180,26 +175,10 @@ def test_read_electron_density(package, resource, expectation, n_grid_points):
 @pytest.mark.parametrize(
     "molecules, suffix, n_atoms_list",
     [
-        (
-            [read_smiles("CCC")],
-            ".sdf",
-            [11]
-        ),
-        (
-            [read_smiles("CCC")],
-            ".pdb",
-            [11]
-        ),
-        (
-            [read_smiles("COCC"), read_smiles("cccccc")],
-            ".sdf",
-            [12, 14]
-        ),
-        (
-            [read_smiles("CCC"), read_smiles("cccccc")],
-            ".pdb",
-            [11, 14]
-        ),
+        ([read_smiles("CCC")], ".sdf", [11]),
+        ([read_smiles("CCC")], ".pdb", [11]),
+        ([read_smiles("COCC"), read_smiles("cccccc")], ".sdf", [12, 14]),
+        ([read_smiles("CCC"), read_smiles("cccccc")], ".pdb", [11, 14]),
     ],
 )
 def test_write_molecules(molecules, suffix, n_atoms_list):
@@ -222,8 +201,13 @@ def test_write_molecules(molecules, suffix, n_atoms_list):
                 return int(molecule_text.split("\n")[3].split()[0])
             elif path.split(".")[-1] == "pdb":
                 molecule_text = rf.read().split("\nEND\n")[index]
-                return len([line for line in molecule_text.split("\n")
-                            if line.startswith(("ATOM", "HETATM"))])
+                return len(
+                    [
+                        line
+                        for line in molecule_text.split("\n")
+                        if line.startswith(("ATOM", "HETATM"))
+                    ]
+                )
             else:
                 raise NotImplementedError
 
@@ -237,27 +221,9 @@ def test_write_molecules(molecules, suffix, n_atoms_list):
 @pytest.mark.parametrize(
     "package, resource, chain_id, expectation, n_atoms",
     [
-        (
-            "kinoml.data.proteins",
-            "4f8o.pdb",
-            "A",
-            does_not_raise(),
-            2430
-        ),
-        (
-            "kinoml.data.proteins",
-            "4f8o.pdb",
-            "B",
-            does_not_raise(),
-            45
-        ),
-        (
-            "kinoml.data.proteins",
-            "4f8o.pdb",
-            "1",
-            pytest.raises(ValueError),
-            0
-        ),
+        ("kinoml.data.proteins", "4f8o.pdb", "A", does_not_raise(), 2430),
+        ("kinoml.data.proteins", "4f8o.pdb", "B", does_not_raise(), 45),
+        ("kinoml.data.proteins", "4f8o.pdb", "1", pytest.raises(ValueError), 0),
     ],
 )
 def test_select_chain(package, resource, chain_id, expectation, n_atoms):
@@ -272,27 +238,9 @@ def test_select_chain(package, resource, chain_id, expectation, n_atoms):
 @pytest.mark.parametrize(
     "package, resource, alternate_location, expectation, n_atoms",
     [
-        (
-            "kinoml.data.proteins",
-            "4f8o.pdb",
-            "A",
-            does_not_raise(),
-            2458
-        ),
-        (
-            "kinoml.data.proteins",
-            "4f8o.pdb",
-            "B",
-            does_not_raise(),
-            2458
-        ),
-        (
-            "kinoml.data.proteins",
-            "4f8o.pdb",
-            "C",
-            pytest.raises(ValueError),
-            2458
-        ),
+        ("kinoml.data.proteins", "4f8o.pdb", "A", does_not_raise(), 2458),
+        ("kinoml.data.proteins", "4f8o.pdb", "B", does_not_raise(), 2458),
+        ("kinoml.data.proteins", "4f8o.pdb", "C", pytest.raises(ValueError), 2458),
     ],
 )
 def test_select_altloc(package, resource, alternate_location, expectation, n_atoms):
@@ -307,27 +255,9 @@ def test_select_altloc(package, resource, alternate_location, expectation, n_ato
 @pytest.mark.parametrize(
     "package, resource, exceptions, remove_water, n_atoms",
     [
-        (
-            "kinoml.data.proteins",
-            "4f8o.pdb",
-            [],
-            True,
-            2104
-        ),
-        (
-            "kinoml.data.proteins",
-            "4f8o.pdb",
-            [],
-            False,
-            2393
-        ),
-        (
-            "kinoml.data.proteins",
-            "4f8o.pdb",
-            ["AES"],
-            True,
-            2122
-        ),
+        ("kinoml.data.proteins", "4f8o.pdb", [], True, 2104),
+        ("kinoml.data.proteins", "4f8o.pdb", [], False, 2393),
+        ("kinoml.data.proteins", "4f8o.pdb", ["AES"], True, 2122),
     ],
 )
 def test_remove_non_protein(package, resource, exceptions, remove_water, n_atoms):
@@ -341,27 +271,13 @@ def test_remove_non_protein(package, resource, exceptions, remove_water, n_atoms
 @pytest.mark.parametrize(
     "package, resource, chain_id, residue_name, residue_id, expectation, n_atoms",
     [
-        (
-            "kinoml.data.proteins",
-            "4f8o.pdb",
-            "A",
-            "GLY",
-            22,
-            does_not_raise(),
-            2468
-        ),
-        (
-            "kinoml.data.proteins",
-            "4f8o.pdb",
-            "A",
-            "ASP",
-            22,
-            pytest.raises(ValueError),
-            2468
-        ),
+        ("kinoml.data.proteins", "4f8o.pdb", "A", "GLY", 22, does_not_raise(), 2468),
+        ("kinoml.data.proteins", "4f8o.pdb", "A", "ASP", 22, pytest.raises(ValueError), 2468),
     ],
 )
-def test_delete_residue(package, resource, chain_id, residue_name, residue_id, expectation, n_atoms):
+def test_delete_residue(
+    package, resource, chain_id, residue_name, residue_id, expectation, n_atoms
+):
     """Compare results to number of expected atoms."""
     with resources.path(package, resource) as path:
         with expectation:
@@ -373,11 +289,7 @@ def test_delete_residue(package, resource, chain_id, residue_name, residue_id, e
 @pytest.mark.parametrize(
     "package, resource, n_expression_tags",
     [
-        (
-            "kinoml.data.proteins",
-            "4f8o.pdb",
-            9
-        ),
+        ("kinoml.data.proteins", "4f8o.pdb", 9),
     ],
 )
 def test_get_expression_tags(package, resource, n_expression_tags):
@@ -391,30 +303,10 @@ def test_get_expression_tags(package, resource, n_expression_tags):
 @pytest.mark.parametrize(
     "package, resource, real_termini, caps",
     [
-        (
-            "kinoml.data.proteins",
-            "4f8o.pdb",
-            [],
-            {"ACE", "NME"}
-        ),
-        (
-            "kinoml.data.proteins",
-            "4f8o.pdb",
-            [1, 138],
-            set()
-        ),
-        (
-            "kinoml.data.proteins",
-            "4f8o.pdb",
-            [1],
-            {"NME"}
-        ),
-        (
-            "kinoml.data.proteins",
-            "4f8o.pdb",
-            [138],
-            {"ACE"}
-        ),
+        ("kinoml.data.proteins", "4f8o.pdb", [], {"ACE", "NME"}),
+        ("kinoml.data.proteins", "4f8o.pdb", [1, 138], set()),
+        ("kinoml.data.proteins", "4f8o.pdb", [1], {"NME"}),
+        ("kinoml.data.proteins", "4f8o.pdb", [138], {"ACE"}),
     ],
 )
 def test_assign_caps(package, resource, real_termini, caps):
@@ -428,7 +320,8 @@ def test_assign_caps(package, resource, real_termini, caps):
         hier_view = oechem.OEHierView(molecule)
         found_caps = set(
             [
-                residue.GetResidueName() for residue in hier_view.GetResidues()
+                residue.GetResidueName()
+                for residue in hier_view.GetResidues()
                 if residue.GetResidueName() in ["ACE", "NME"]
             ]
         )
@@ -446,18 +339,9 @@ def test_assign_caps(package, resource, real_termini, caps):
             "A",
             "AES",
             does_not_raise(),
-            ["(A)", "AES"]
+            ["(A)", "AES"],
         ),
-        (
-            "kinoml.data.proteins",
-            "4f8o.pdb",
-            False,
-            "A",
-            "A",
-            None,
-            does_not_raise(),
-            ["(A)"]
-        ),
+        ("kinoml.data.proteins", "4f8o.pdb", False, "A", "A", None, does_not_raise(), ["(A)"]),
         (
             "kinoml.data.proteins",
             "4f8o.pdb",
@@ -466,7 +350,7 @@ def test_assign_caps(package, resource, real_termini, caps):
             "C",
             "AES",
             pytest.raises(ValueError),
-            ["(A)", "AES"]
+            ["(A)", "AES"],
         ),
         (
             "kinoml.data.proteins",
@@ -476,11 +360,13 @@ def test_assign_caps(package, resource, real_termini, caps):
             "A",
             "AES",
             pytest.raises(ValueError),
-            ["(C)", "AES"]
+            ["(C)", "AES"],
         ),
     ],
 )
-def test_prepare_structure(package, resource, has_ligand, chain_id, altloc, ligand_name, expectation, title_contains):
+def test_prepare_structure(
+    package, resource, has_ligand, chain_id, altloc, ligand_name, expectation, title_contains
+):
     """Check if returned design unit title contains expected strings."""
     with resources.path(package, resource) as path:
         structure = read_molecules(str(path))[0]
@@ -490,7 +376,7 @@ def test_prepare_structure(package, resource, has_ligand, chain_id, altloc, liga
                 has_ligand=has_ligand,
                 chain_id=chain_id,
                 alternate_location=altloc,
-                ligand_name=ligand_name
+                ligand_name=ligand_name,
             )
             assert all(x in design_unit.GetTitle() for x in title_contains)
 
@@ -498,22 +384,10 @@ def test_prepare_structure(package, resource, has_ligand, chain_id, altloc, liga
 @pytest.mark.parametrize(
     "smiles, n_tautomers",
     [
-        (
-            "COC",
-            1
-        ),
-        (
-            "CCC(O)C(C)=O",
-            2
-        ),
-        (
-            r"C\N=C\NCC(O)C(C)=O",
-            4
-        ),
-        (
-            r"C\N=C/NCCC(=O)C(O)CC(CN\C=N\C)C(O)C(=O)CCN\C=N\C",
-            16
-        ),
+        ("COC", 1),
+        ("CCC(O)C(C)=O", 2),
+        (r"C\N=C\NCC(O)C(C)=O", 4),
+        (r"C\N=C/NCCC(=O)C(O)CC(CN\C=N\C)C(O)C(=O)CCN\C=N\C", 16),
     ],
 )
 def test_generate_tautomers(smiles, n_tautomers):
@@ -526,22 +400,10 @@ def test_generate_tautomers(smiles, n_tautomers):
 @pytest.mark.parametrize(
     "smiles, n_enantiomers",
     [
-        (
-            "CC(C)(C)C",
-            1
-        ),
-        (
-            "C(C)(F)Cl",
-            2
-        ),
-        (
-            "CC(Cl)CCC(O)F",
-            4
-        ),
-        (
-            "CC(Cl)CC(C)C(O)F",
-            8
-        ),
+        ("CC(C)(C)C", 1),
+        ("C(C)(F)Cl", 2),
+        ("CC(Cl)CCC(O)F", 4),
+        ("CC(Cl)CC(C)C(O)F", 8),
     ],
 )
 def test_generate_enantiomers(smiles, n_enantiomers):
@@ -554,14 +416,8 @@ def test_generate_enantiomers(smiles, n_enantiomers):
 @pytest.mark.parametrize(
     "smiles, n_conformations",
     [
-        (
-            "CCC(C)C(C)=O",
-            1
-        ),
-        (
-            "C1CCN(C1)CCOC2=C3COCC=CCOCC4=CC(=CC=C4)C5=NC(=NC=C5)NC(=C3)C=C2",
-            5
-        ),
+        ("CCC(C)C(C)=O", 1),
+        ("C1CCN(C1)CCOC2=C3COCC=CCOCC4=CC(=CC=C4)C5=NC(=NC=C5)NC(=C3)C=C2", 5),
     ],
 )
 def test_generate_conformations(smiles, n_conformations):
@@ -578,14 +434,8 @@ def test_generate_conformations(smiles, n_conformations):
 @pytest.mark.parametrize(
     "smiles, n_conformations_list",
     [
-        (
-            "FC(Cl)Br",
-            [1, 1]
-        ),
-        (
-            "CC(Cl)CCC(O)F",
-            [5, 5, 5, 5]
-        ),
+        ("FC(Cl)Br", [1, 1]),
+        ("CC(Cl)CCC(O)F", [5, 5, 5, 5]),
     ],
 )
 def test_generate_reasonable_conformations(smiles, n_conformations_list):
@@ -604,16 +454,8 @@ def test_generate_reasonable_conformations(smiles, n_conformations_list):
 @pytest.mark.parametrize(
     "reference_smiles, fit_smiles, comparator",
     [
-        (
-            "C1=CC=C(C=C1)C1=CC=CC=C1",
-            "S1C=NC=C1C1=CC=CC=C1",
-            ">"
-        ),
-        (
-            "C1=CC=CC=C1",
-            "COC",
-            "<"
-        ),
+        ("C1=CC=C(C=C1)C1=CC=CC=C1", "S1C=NC=C1C1=CC=CC=C1", ">"),
+        ("C1=CC=CC=C1", "COC", "<"),
     ],
 )
 def test_overlay_molecules(reference_smiles, fit_smiles, comparator):
@@ -639,22 +481,10 @@ def test_overlay_molecules(reference_smiles, fit_smiles, comparator):
 @pytest.mark.parametrize(
     "smiles, n_smiles",
     [
-        (
-            "CC(=O)C(C)O",
-            2
-        ),
-        (
-            "CCC(=O)C(C)O",
-            4
-        ),
-        (
-            "C[C@H](F)Cl",
-            1
-        ),
-        (
-            "CC(F)Cl",
-            2
-        ),
+        ("CC(=O)C(C)O", 2),
+        ("CCC(=O)C(C)O", 4),
+        ("C[C@H](F)Cl", 1),
+        ("CC(F)Cl", 2),
     ],
 )
 def test_enumerate_isomeric_smiles(smiles, n_smiles):
@@ -667,26 +497,10 @@ def test_enumerate_isomeric_smiles(smiles, n_smiles):
 @pytest.mark.parametrize(
     "smiles1, smiles2, identical_molecules",
     [
-        (
-            "CC(=O)C(C)O",
-            "C[C@@H](O)C(C)=O",
-            True
-        ),
-        (
-            "CCC(=O)C(C)O",
-            "CC[C@@H](O)C(C)=O",
-            True
-        ),
-        (
-            "C[C@H](F)Cl",
-            "CC(F)Cl",
-            True
-        ),
-        (
-            "C[C@H](F)Cl",
-            "C[C@@H](F)Cl",
-            False
-        ),
+        ("CC(=O)C(C)O", "C[C@@H](O)C(C)=O", True),
+        ("CCC(=O)C(C)O", "CC[C@@H](O)C(C)=O", True),
+        ("C[C@H](F)Cl", "CC(F)Cl", True),
+        ("C[C@H](F)Cl", "C[C@@H](F)Cl", False),
     ],
 )
 def test_are_identical_molecules(smiles1, smiles2, identical_molecules):
@@ -727,8 +541,8 @@ def test_get_sequence(package, resource, sequence):
             "MNTFHVDFAPNTGEIFAGKQPGDVTMFTLTMGDTAPHGGWRLIPTGDSKGGYMISADGDYVGLFSYMMSWVGIDNNWYINDDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVKQGV",
             [
                 "MNTFHVDFAPNTGEIFAGKQPGDVTMFTLTMGDTAPHGGWRLIPTGDSKGGYMISADGDYVGLYSYMMSWVGIDNNWYINDDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVKQGL",
-                "MNTFHVDFAPNTGEIFAGKQPGDVTMFTLTMGDTAPHGGWRLIPTGDSKGGYMISADGDYVGLFSYMMSWVGIDNNWYINDDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVKQGV"
-            ]
+                "MNTFHVDFAPNTGEIFAGKQPGDVTMFTLTMGDTAPHGGWRLIPTGDSKGGYMISADGDYVGLFSYMMSWVGIDNNWYINDDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVKQGV",
+            ],
         ),
         (  # insertions (missing D82 could be placed at two positions, only "D-" is correct)
             "kinoml.data.proteins",
@@ -736,8 +550,8 @@ def test_get_sequence(package, resource, sequence):
             "MNTFHVDFAPNTGEIFAGKQPGDVTMFTLTMGDTAPHGGWRLIPTGDSKGVVVGYMISADGDYVGLYSYMMSWVGIDNNWYINDDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVKQGLEHHHHHH",
             [
                 "MNTFHVDFAPNTGEIFAGKQPGDVTMFTLTMGDTAPHGGWRLIPTGDSKG---GYMISADGDYVGLYSYMMSWVGIDNNWYIND-SPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTV-QGL-------",
-                "MNTFHVDFAPNTGEIFAGKQPGDVTMFTLTMGDTAPHGGWRLIPTGDSKGVVVGYMISADGDYVGLYSYMMSWVGIDNNWYINDDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVKQGLEHHHHHH"
-            ]
+                "MNTFHVDFAPNTGEIFAGKQPGDVTMFTLTMGDTAPHGGWRLIPTGDSKGVVVGYMISADGDYVGLYSYMMSWVGIDNNWYINDDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVKQGLEHHHHHH",
+            ],
         ),
         (  # deletions (start and middle)
             "kinoml.data.proteins",
@@ -745,8 +559,8 @@ def test_get_sequence(package, resource, sequence):
             "FHVDFAPNTGEIFAGKQPGDVTMFTLTMGDTAPHGGWRLIPTGDSKGGYMISADGDLYSYMMSWVGIDNNWYINDDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVKQGL",
             [
                 "MNTFHVDFAPNTGEIFAGKQPGDVTMFTLTMGDTAPHGGWRLIPTGDSKGGYMISADGDYVGLYSYMMSWVGIDNNWYINDDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVKQGL",
-                "---FHVDFAPNTGEIFAGKQPGDVTMFTLTMGDTAPHGGWRLIPTGDSKGGYMISADGD---LYSYMMSWVGIDNNWYINDDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVKQGL"
-            ]
+                "---FHVDFAPNTGEIFAGKQPGDVTMFTLTMGDTAPHGGWRLIPTGDSKGGYMISADGD---LYSYMMSWVGIDNNWYINDDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVKQGL",
+            ],
         ),
         (  # all together
             "kinoml.data.proteins",
@@ -754,9 +568,9 @@ def test_get_sequence(package, resource, sequence):
             "FHVDFAPNTGEIFAGKQPGDVTMFTLTMGDTAPHGGWRLIPTGDSKGVVVGYMISADGDLFSYMMSWVGIDNNWYINDDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVKQGVEHHHHHH",
             [
                 "MNTFHVDFAPNTGEIFAGKQPGDVTMFTLTMGDTAPHGGWRLIPTGDSKG---GYMISADGDYVGLYSYMMSWVGIDNNWYIND-SPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTV-QGL-------",
-                "---FHVDFAPNTGEIFAGKQPGDVTMFTLTMGDTAPHGGWRLIPTGDSKGVVVGYMISADGD---LFSYMMSWVGIDNNWYINDDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVKQGVEHHHHHH"
-            ]
-        )
+                "---FHVDFAPNTGEIFAGKQPGDVTMFTLTMGDTAPHGGWRLIPTGDSKGVVVGYMISADGD---LFSYMMSWVGIDNNWYINDDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVKQGVEHHHHHH",
+            ],
+        ),
     ],
 )
 def test_get_structure_sequence_alignment(package, resource, sequence, expected_alignment):
@@ -811,10 +625,12 @@ def test_get_structure_sequence_alignment(package, resource, sequence, expected_
             -1,
             pytest.raises(ValueError),
             "MNTHVDFAPNTGEIFAGKQPGDVTMFTLTMGDTAPHGGWRLIPTGDSKGGYMISADGDYVGLYSYMMSWVGIDNNWYINDDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVKQGL",
-        )
+        ),
     ],
 )
-def test_apply_deletions(package, resource, sequence, delete_n_anchors, expectation, expected_sequence):
+def test_apply_deletions(
+    package, resource, sequence, delete_n_anchors, expectation, expected_sequence
+):
     """Compare results to expected sequence."""
     with resources.path(package, resource) as path:
         structure = read_molecules(str(path))[0]
@@ -855,7 +671,7 @@ def test_apply_insertions(package_list, resource_list, sequence):
             "MNTFHVDFAPNTGEIFAGKQPGDVTMFTLTMGDTAPHGGWRLIPTGDSKGGYMISADGDYVGLFSYMMSWVGIDNNWYINDDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVKQGL",
             True,
             does_not_raise(),
-            "MNTFHVDFAPNTGEIFAGKQPGDVTMFTLTMGDTAPHGGWRLIPTGDSKGGYMISADGDYVGLFSYMMSWVGIDNNWYINDDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVKQGL"
+            "MNTFHVDFAPNTGEIFAGKQPGDVTMFTLTMGDTAPHGGWRLIPTGDSKGGYMISADGDYVGLFSYMMSWVGIDNNWYINDDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVKQGL",
         ),
         (  # mutation fails with delete_fallback (middle TMGDT -> TMWDT)
             "kinoml.data.proteins",
@@ -875,7 +691,9 @@ def test_apply_insertions(package_list, resource_list, sequence):
         ),
     ],
 )
-def test_apply_mutations(package, resource, sequence, delete_fallback, expectation, expected_sequence):
+def test_apply_mutations(
+    package, resource, sequence, delete_fallback, expectation, expected_sequence
+):
     """Compare results to expected sequence."""
     with resources.path(package, resource) as pdb_path:
         structure = read_molecules(str(pdb_path))[0]
@@ -905,7 +723,9 @@ def test_delete_partial_residues(package, resource, delete_backbone_C, sequence)
         structure = read_molecules(str(path))[0]
         if delete_backbone_C:
             hier_view = oechem.OEHierView(structure)
-            hier_residue = hier_view.GetResidue("A", delete_backbone_C[:3], int(delete_backbone_C[3:]))
+            hier_residue = hier_view.GetResidue(
+                "A", delete_backbone_C[:3], int(delete_backbone_C[3:])
+            )
             for atom in hier_residue.GetAtoms():
                 atom_name = atom.GetName().strip()
                 if atom_name == "C":
@@ -989,8 +809,8 @@ def test_get_atom_coordinates(package, resource):
         coordinates = get_atom_coordinates(structure)
         all_floats = all(
             [
-                isinstance(coordinate, float) for coordinate
-                in itertools.chain.from_iterable(coordinates)
+                isinstance(coordinate, float)
+                for coordinate in itertools.chain.from_iterable(coordinates)
             ]
         )
         assert structure.NumAtoms() == len(coordinates)
@@ -1001,12 +821,7 @@ def test_get_atom_coordinates(package, resource):
 @pytest.mark.parametrize(
     "package, resource, residue_ids, expectation",
     [
-        (
-            "kinoml.data.proteins",
-            "4f8o.pdb",
-            list(range(245)),
-            does_not_raise()
-        ),
+        ("kinoml.data.proteins", "4f8o.pdb", list(range(245)), does_not_raise()),
         (
             "kinoml.data.molecules",
             "chloroform.sdf",
@@ -1046,17 +861,23 @@ def test_renumber_structure(package, resource, residue_ids, expectation):
 @pytest.mark.parametrize(
     "package_list, resource_list, residues, chain_id",
     [
+        (["kinoml.data.proteins", "kinoml.data.proteins"], ["4f8o.pdb", "4f8o_edit.pdb"], [], "A"),
         (
             ["kinoml.data.proteins", "kinoml.data.proteins"],
             ["4f8o.pdb", "4f8o_edit.pdb"],
-            [],
-            "A"
-        ),
-        (
-            ["kinoml.data.proteins", "kinoml.data.proteins"],
-            ["4f8o.pdb", "4f8o_edit.pdb"],
-            ["GLY13", "GLU14", "ILE15", "PHE16", "ALA17", "GLY18", "LYS19", "GLN20", "PRO21", "GLY22"],
-            "A"
+            [
+                "GLY13",
+                "GLU14",
+                "ILE15",
+                "PHE16",
+                "ALA17",
+                "GLY18",
+                "LYS19",
+                "GLN20",
+                "PRO21",
+                "GLY22",
+            ],
+            "A",
         ),
     ],
 )
@@ -1072,10 +893,7 @@ def test_superpose_protein(package_list, resource_list, residues, chain_id):
         with resources.path(package_list[1], resource_list[1]) as fit_path:
             fit_structure = read_molecules(str(fit_path))[0]
             superposed_structure = superpose_proteins(
-                reference_structure,
-                fit_structure,
-                residues,
-                chain_id
+                reference_structure, fit_structure, residues, chain_id
             )
             superposed_protein = remove_non_protein(superposed_structure, remove_water=True)
             reference_protein = remove_non_protein(reference_structure, remove_water=True)
@@ -1135,13 +953,13 @@ def test_superpose_protein(package_list, resource_list, residues, chain_id):
     ],
 )
 def test_update_residue_identifiers(
-        package,
-        resource,
-        keep_protein_residue_ids,
-        keep_chain_id,
-        chain_ids,
-        first_residue_id,
-        last_residue_id,
+    package,
+    resource,
+    keep_protein_residue_ids,
+    keep_chain_id,
+    chain_ids,
+    first_residue_id,
+    last_residue_id,
 ):
     """
     Compare results to contain expected chains, to start with atom serial 1 and for correct residue ID handling.
@@ -1153,7 +971,7 @@ def test_update_residue_identifiers(
         structure = update_residue_identifiers(
             structure,
             keep_protein_residue_ids=keep_protein_residue_ids,
-            keep_chain_ids=keep_chain_id
+            keep_chain_ids=keep_chain_id,
         )
         hierview = oechem.OEHierView(structure)
         # check chain IDs
@@ -1228,12 +1046,7 @@ def test_split_molecule_components(package, resource, n_components):
     ],
 )
 def test_residue_ids_to_residue_names(
-        package,
-        resource,
-        residue_ids,
-        chain_id,
-        expectation,
-        residue_names
+    package, resource, residue_ids, chain_id, expectation, residue_names
 ):
     """
     Compare results to have the expected residue names.

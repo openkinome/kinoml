@@ -36,9 +36,9 @@ def resids_to_box_molecule(protein: oechem.OEMolBase, resids: List[int]) -> oech
             y_coordinates.append(coordinates[(i * 3) + 1])
             z_coordinates.append(coordinates[(i * 3) + 2])
 
-    if any([
-        len(coordinates) == 0 for coordinates in [x_coordinates, y_coordinates, z_coordinates]
-    ]):
+    if any(
+        [len(coordinates) == 0 for coordinates in [x_coordinates, y_coordinates, z_coordinates]]
+    ):
         raise ValueError("Given residue IDs do not match any residue in the given protein.")
 
     # calculate box dimensions
@@ -63,10 +63,10 @@ def resids_to_box_molecule(protein: oechem.OEMolBase, resids: List[int]) -> oech
 
 
 def pose_molecules(
-        design_unit: oechem.OEDesignUnit,
-        molecules: List[oechem.OEMolBase],
-        pKa_norm: bool = True,
-        score_pose: bool = False,
+    design_unit: oechem.OEDesignUnit,
+    molecules: List[oechem.OEMolBase],
+    pKa_norm: bool = True,
+    score_pose: bool = False,
 ) -> Union[List[oechem.OEGraphMol], None]:
     """
     Generate a binding pose of molecules in a prepared receptor with OpenEye's Posit method.
@@ -109,9 +109,7 @@ def pose_molecules(
     for molecule in molecules:
         # tautomers, enantiomers, conformations
         conformations_ensemble = generate_reasonable_conformations(
-            molecule,
-            oeomega.OEOmegaOptions(oeomega.OEOmegaSampling_Pose),
-            pKa_norm=pKa_norm
+            molecule, oeomega.OEOmegaOptions(oeomega.OEOmegaSampling_Pose), pKa_norm=pKa_norm
         )
 
         posed_conformations = list()
@@ -155,11 +153,11 @@ def pose_molecules(
 
 
 def run_docking(
-        design_unit: oechem.OEDesignUnit,
-        molecules: List[oechem.OEMolBase],
-        dock_method: int,
-        num_poses: int = 1,
-        pKa_norm: bool = True,
+    design_unit: oechem.OEDesignUnit,
+    molecules: List[oechem.OEMolBase],
+    dock_method: int,
+    num_poses: int = 1,
+    pKa_norm: bool = True,
 ) -> Union[List[oechem.OEGraphMol], None]:
     """
     Dock molecules into a prepared design unit containing a receptor object.
@@ -203,7 +201,7 @@ def run_docking(
         conformations_ensemble = generate_reasonable_conformations(
             molecule,
             options=oeomega.OEOmegaOptions(oeomega.OEOmegaSampling_Pose),
-            pKa_norm=pKa_norm
+            pKa_norm=pKa_norm,
         )
 
         docked_conformations = list()
@@ -241,10 +239,10 @@ def run_docking(
 
 
 def hybrid_docking(
-        design_unit: oechem.OEDesignUnit,
-        molecules: List[oechem.OEMolBase],
-        num_poses: int = 1,
-        pKa_norm: bool = True,
+    design_unit: oechem.OEDesignUnit,
+    molecules: List[oechem.OEMolBase],
+    num_poses: int = 1,
+    pKa_norm: bool = True,
 ) -> Union[List[oechem.OEGraphMol], None]:
     """
     Dock molecules into a prepared design unit containing a hybrid receptor object.
@@ -274,10 +272,10 @@ def hybrid_docking(
 
 
 def fred_docking(
-        design_unit: oechem.OEDesignUnit,
-        molecules: List[oechem.OEMolBase],
-        num_poses: int = 1,
-        pKa_norm: bool = True,
+    design_unit: oechem.OEDesignUnit,
+    molecules: List[oechem.OEMolBase],
+    num_poses: int = 1,
+    pKa_norm: bool = True,
 ) -> Union[List[oechem.OEGraphMol], None]:
     """
     Dock molecules into a prepared design unit containing a receptor object.
