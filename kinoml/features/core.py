@@ -947,7 +947,7 @@ class OEBaseModelingFeaturizer(ParallelBaseFeaturizer):
             self.cache_dir,
         )
         if not design_unit_path.is_file():
-            logging.debug("Generating design unit ...")
+            logger.debug("Generating design unit ...")
             try:
                 design_unit = prepare_structure(
                     structure,
@@ -960,11 +960,11 @@ class OEBaseModelingFeaturizer(ParallelBaseFeaturizer):
                 )
             except ValueError:
                 return None
-            logging.debug("Writing design unit ...")
+            logger.debug("Writing design unit ...")
             oechem.OEWriteDesignUnit(str(design_unit_path), design_unit)
         # re-reading design unit helps proper capping of e.g. 2itz
         # TODO: revisit, report bug
-        logging.debug("Reading design unit from file ...")
+        logger.debug("Reading design unit from file ...")
         design_unit = oechem.OEDesignUnit()
         oechem.OEReadDesignUnit(str(design_unit_path), design_unit)
 
@@ -996,27 +996,27 @@ class OEBaseModelingFeaturizer(ParallelBaseFeaturizer):
 
         protein, solvent, ligand = oechem.OEGraphMol(), oechem.OEGraphMol(), oechem.OEGraphMol()
 
-        logging.debug("Extracting molecular components ...")
+        logger.debug("Extracting molecular components ...")
         design_unit.GetProtein(protein)
         design_unit.GetSolvent(solvent)
         design_unit.GetLigand(ligand)
 
         if chain_id:  # some design units can contain multiple chains
-            logging.debug("Selecting chain ...")
+            logger.debug("Selecting chain ...")
             protein = select_chain(protein, chain_id)
             try:
                 solvent = select_chain(solvent, chain_id)
             except ValueError:
-                logging.debug("No solvent atoms found in given chain.")
+                logger.debug("No solvent atoms found in given chain.")
             try:
                 ligand = select_chain(ligand, chain_id)
             except ValueError:
-                logging.debug("No ligand atoms found in given chain.")
+                logger.debug("No ligand atoms found in given chain.")
 
         # delete protein atoms with no name (found in prepared protein of 4ll0)
         for atom in protein.GetAtoms():
             if not atom.GetName().strip():
-                logging.debug("Deleting unknown atom ...")
+                logger.debug("Deleting unknown atom ...")
                 protein.DeleteAtom(atom)
 
         # perceive residues to remove artifacts of other design units in the sequence of the protein
@@ -1034,7 +1034,7 @@ class OEBaseModelingFeaturizer(ParallelBaseFeaturizer):
         oechem.OEPerceiveResidues(solvent, preserved_info)
         oechem.OEPerceiveResidues(ligand)
 
-        logging.debug(
+        logger.debug(
             "Number of component atoms: " +
             f"Protein - {protein.NumAtoms()}, " +
             f"Solvent - {solvent.NumAtoms()}, " +
@@ -1092,36 +1092,36 @@ class OEBaseModelingFeaturizer(ParallelBaseFeaturizer):
             self.cache_dir,
         )
         if processed_protein_path.is_file():
-            logging.debug("Reading processed protein from file ...")
+            logger.debug("Reading processed protein from file ...")
             return read_molecules(processed_protein_path)[0]
 
-        logging.debug(f"Deleting residues with clashing side chains ...")  # e.g. 2j5f, 4wd5
+        logger.debug(f"Deleting residues with clashing side chains ...")  # e.g. 2j5f, 4wd5
         protein_structure = delete_clashing_sidechains(protein_structure)
 
-        logging.debug("Deleting residues with missing atoms ...")
+        logger.debug("Deleting residues with missing atoms ...")
         protein_structure = delete_partial_residues(protein_structure)
 
-        logging.debug("Deleting loose protein segments ...")
+        logger.debug("Deleting loose protein segments ...")
         protein_structure = delete_short_protein_segments(protein_structure)
 
-        logging.debug("Applying deletions to protein structure ...")
+        logger.debug("Applying deletions to protein structure ...")
         protein_structure = apply_deletions(protein_structure, amino_acid_sequence)
 
-        logging.debug("Deleting loose protein segments after applying deletions ...")
+        logger.debug("Deleting loose protein segments after applying deletions ...")
         protein_structure = delete_short_protein_segments(protein_structure)
 
-        logging.debug("Applying mutations to protein structure ...")
+        logger.debug("Applying mutations to protein structure ...")
         protein_structure = apply_mutations(protein_structure, amino_acid_sequence)
 
-        logging.debug("Deleting loose protein segments after applying mutations ...")
+        logger.debug("Deleting loose protein segments after applying mutations ...")
         protein_structure = delete_short_protein_segments(protein_structure)
 
-        logging.debug("Renumbering protein residues ...")
+        logger.debug("Renumbering protein residues ...")
         residue_numbers = self._get_protein_residue_numbers(protein_structure, amino_acid_sequence)
         protein_structure = renumber_structure(protein_structure, residue_numbers)
 
         if self.loop_db:
-            logging.debug("Applying insertions to protein structure ...")
+            logger.debug("Applying insertions to protein structure ...")
             protein_structure = apply_insertions(
                 protein_structure,
                 amino_acid_sequence,
@@ -1129,13 +1129,13 @@ class OEBaseModelingFeaturizer(ParallelBaseFeaturizer):
                 ligand,
             )
 
-        logging.debug("Checking protein structure sequence termini ...")
+        logger.debug("Checking protein structure sequence termini ...")
         real_termini = [first_id, first_id + len(amino_acid_sequence) - 1]
 
-        logging.debug(f"Assigning caps except for real termini {real_termini} ...")
+        logger.debug(f"Assigning caps except for real termini {real_termini} ...")
         protein_structure = assign_caps(protein_structure, real_termini)
 
-        logging.debug("Writing processed protein structure ...")
+        logger.debug("Writing processed protein structure ...")
         write_molecules([protein_structure], processed_protein_path)
 
         return protein_structure
@@ -1167,13 +1167,13 @@ class OEBaseModelingFeaturizer(ParallelBaseFeaturizer):
         """
         from ..modeling.OEModeling import get_structure_sequence_alignment
 
-        logging.debug("Aligning sequences ...")
+        logger.debug("Aligning sequences ...")
         target_sequence, template_sequence = get_structure_sequence_alignment(
             protein_structure, amino_acid_sequence)
-        logging.debug(f"Template sequence:\n{template_sequence}")
-        logging.debug(f"Target sequence:\n{target_sequence}")
+        logger.debug(f"Template sequence:\n{template_sequence}")
+        logger.debug(f"Target sequence:\n{target_sequence}")
 
-        logging.debug("Generating residue numbers ...")
+        logger.debug("Generating residue numbers ...")
         residue_numbers = []
         residue_number = first_id
         for template_sequence_residue, target_sequence_residue in zip(
@@ -1189,7 +1189,7 @@ class OEBaseModelingFeaturizer(ParallelBaseFeaturizer):
                     "Cannot generate residue IDs. The given protein structure contains residues "
                     "that are not part of the given sequence."
                 )
-                logging.debug("Exception: " + text)
+                logger.debug("Exception: " + text)
                 raise ValueError(text)
 
         return residue_numbers
@@ -1223,24 +1223,24 @@ class OEBaseModelingFeaturizer(ParallelBaseFeaturizer):
 
         assembled_components = oechem.OEGraphMol()
 
-        logging.debug("Adding protein ...")
+        logger.debug("Adding protein ...")
         oechem.OEAddMols(assembled_components, protein)
 
         if ligand:
-            logging.debug("Renaming ligand ...")
+            logger.debug("Renaming ligand ...")
             for atom in ligand.GetAtoms():
                 oeresidue = oechem.OEAtomGetResidue(atom)
                 oeresidue.SetName("LIG")
                 oechem.OEAtomSetResidue(atom, oeresidue)
 
-            logging.debug("Adding ligand ...")
+            logger.debug("Adding ligand ...")
             oechem.OEAddMols(assembled_components, ligand)
 
-        logging.debug("Adding water molecules ...")
+        logger.debug("Adding water molecules ...")
         filtered_solvent = self._remove_clashing_water(solvent, ligand, protein)
         oechem.OEAddMols(assembled_components, filtered_solvent)
 
-        logging.debug("Updating hydrogen positions of assembled components ...")
+        logger.debug("Updating hydrogen positions of assembled components ...")
         options = oechem.OEPlaceHydrogensOptions()  # keep protonation state from docking
         predicate = oechem.OEAtomMatchResidue(["LIG:.*:.*:.*:.*"])
         options.SetBypassPredicate(predicate)
@@ -1256,7 +1256,7 @@ class OEBaseModelingFeaturizer(ParallelBaseFeaturizer):
                 atom.SetImplicitHCount(1)
         oechem.OEAddExplicitHydrogens(assembled_components)
 
-        logging.debug("Updating residue identifiers ...")
+        logger.debug("Updating residue identifiers ...")
         assembled_components = update_residue_identifiers(assembled_components)
 
         return assembled_components
@@ -1322,26 +1322,26 @@ class OEBaseModelingFeaturizer(ParallelBaseFeaturizer):
                 water_oxygen_atom = water.GetAtoms(oechem.OEIsOxygen()).next()
             except StopIteration:
                 # experienced lonely water hydrogens for 2v7a after mutating PTR393 to TYR
-                logging.debug("Removing water molecule without oxygen!")
+                logger.debug("Removing water molecule without oxygen!")
                 continue
             # experienced problems when preparing 4pmp
             # making design units generated clashing waters that were not protonatable
             # TODO: revisit this behavior
             if oechem.OEAtomGetResidue(water_oxygen_atom).GetInsertCode() != " ":
-                logging.debug("Removing ambiguous water molecule!")
+                logger.debug("Removing ambiguous water molecule!")
                 continue
             water_oxygen_coordinates = water.GetCoords()[water_oxygen_atom.GetIdx()]
             # check for clashes with newly placed ligand
             if ligand is not None:
                 clashes = ligand_heavy_atoms_tree.query_ball_point(water_oxygen_coordinates, 1.5)
                 if len(clashes) > 0:
-                    logging.debug("Removing water molecule clashing with ligand atoms!")
+                    logger.debug("Removing water molecule clashing with ligand atoms!")
                     continue
             # check for clashes with newly modeled protein residues
             if modeled_heavy_atoms_tree:
                 clashes = modeled_heavy_atoms_tree.query_ball_point(water_oxygen_coordinates, 1.5)
                 if len(clashes) > 0:
-                    logging.debug("Removing water molecule clashing with modeled atoms!")
+                    logger.debug("Removing water molecule clashing with modeled atoms!")
                     continue
             # water molecule is not clashy, add to filtered solvent
             oechem.OEAddMols(filtered_solvent, water)
@@ -1420,7 +1420,7 @@ class OEBaseModelingFeaturizer(ParallelBaseFeaturizer):
 
         if self.output_dir:
             if ligand_name:
-                logging.debug("Writing protein ligand complex ...")
+                logger.debug("Writing protein ligand complex ...")
                 complex_path = LocalFileStorage.featurizer_result(
                     self.__class__.__name__,
                     f"{protein_name}_{ligand_name}_complex",
@@ -1437,14 +1437,14 @@ class OEBaseModelingFeaturizer(ParallelBaseFeaturizer):
                 )
                 write_molecules([structure], complex_path)
 
-                logging.debug("Splitting components")
+                logger.debug("Splitting components")
                 solvated_protein = remove_non_protein(structure, remove_water=False)
                 split_options = oechem.OESplitMolComplexOptions()
                 ligand = list(oechem.OEGetMolComplexComponents(
                     structure, split_options, split_options.GetLigandFilter())
                 )[0]
 
-                logging.debug("Writing protein ...")
+                logger.debug("Writing protein ...")
                 protein_path = LocalFileStorage.featurizer_result(
                     self.__class__.__name__,
                     f"{protein_name}_{ligand_name}_protein",
@@ -1461,7 +1461,7 @@ class OEBaseModelingFeaturizer(ParallelBaseFeaturizer):
                 )
                 write_molecules([solvated_protein], protein_path)
 
-                logging.debug("Writing ligand ...")
+                logger.debug("Writing ligand ...")
                 ligand_path = LocalFileStorage.featurizer_result(
                     self.__class__.__name__,
                     f"{protein_name}_{ligand_name}_ligand",
@@ -1472,7 +1472,7 @@ class OEBaseModelingFeaturizer(ParallelBaseFeaturizer):
 
                 return complex_path
             else:
-                logging.debug("Writing protein ...")
+                logger.debug("Writing protein ...")
                 protein_path = LocalFileStorage.featurizer_result(
                     self.__class__.__name__,
                     f"{protein_name}_protein",

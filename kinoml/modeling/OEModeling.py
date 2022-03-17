@@ -6,6 +6,9 @@ from openeye import oechem, oegrid, oeomega
 from scipy.spatial import cKDTree
 
 
+logger = logging.getLogger(__name__)
+
+
 def read_smiles(smiles: str, add_hydrogens: bool = True) -> oechem.OEGraphMol:
     """
     Read molecule from a smiles string. Explicit hydrogens will be added by default.
@@ -617,7 +620,7 @@ def prepare_structure(
 
     # filter design units for ligand of interest
     if ligand_name is not None:
-        logging.debug(
+        logger.debug(
             f"Filtering design units for ligand with name {ligand_name} and chain ID {chain_id}..."
         )
         design_units = [
@@ -628,7 +631,7 @@ def prepare_structure(
 
     # filter design units for chain of interest
     if chain_id is not None:
-        logging.debug(f"Filtering design units for chain with ID {chain_id} ...")
+        logger.debug(f"Filtering design units for chain with ID {chain_id} ...")
         design_units = [
             design_unit
             for design_unit in design_units
@@ -1130,14 +1133,14 @@ def get_structure_sequence_alignment(
                 else:
                     # i.e. ABEDEFG     ABEDEFG
                     #      AB**EFG --> AB--EFG
-                    logging.debug(
+                    logger.debug(
                         f"Alignment contains insertion with sequence {gap_sequence}" +
                         f" between bonded residues {start_residue.GetResidueNumber()}" +
                         f" and {end_residue.GetResidueNumber()}, " +
                         "keeping original alignment ..."
                     )
                     continue
-            logging.debug("Corrected sequence gap ...")
+            logger.debug("Corrected sequence gap ...")
 
     return structure_sequence_aligned, sequence_aligned
 
@@ -1185,8 +1188,8 @@ def apply_deletions(
     target_sequence_aligned, template_sequence_aligned = get_structure_sequence_alignment(
         structure_with_deletions, template_sequence
     )
-    logging.debug(f"Template sequence:\n{template_sequence_aligned}")
-    logging.debug(f"Target sequence:\n{target_sequence_aligned}")
+    logger.debug(f"Template sequence:\n{template_sequence_aligned}")
+    logger.debug(f"Target sequence:\n{target_sequence_aligned}")
     hierview = oechem.OEHierView(structure_with_deletions)
     structure_residues = list(hierview.GetResidues())
     insertions = re.finditer(
@@ -1197,7 +1200,7 @@ def apply_deletions(
         insertion_start = insertion.start() - target_sequence_aligned[:insertion.start()].count("-")
         insertion_end = insertion.end() - target_sequence_aligned[:insertion.end()].count("-")
         insertion_residues = structure_residues[insertion_start:insertion_end]
-        logging.debug(f"Found insertion! Deleting residues "
+        logger.debug(f"Found insertion! Deleting residues "
                       f"{insertion_residues[0].GetResidueNumber()}-"
                       f"{insertion_residues[-1].GetResidueNumber()} ...")
         # delete atoms
@@ -1249,7 +1252,7 @@ def apply_insertions(
                     for bonded_atom in bonded_atoms:
                         bonded_residue = oechem.OEAtomGetResidue(bonded_atom)
                         if bonded_residue.GetResidueNumber() == residue2.GetResidueNumber():
-                            logging.debug(
+                            logger.debug(
                                 "Breaking bond between residues " +
                                 f"{residue1.GetResidueNumber()} and " +
                                 f"{residue2.GetResidueNumber()}"
@@ -1275,8 +1278,8 @@ def apply_insertions(
         # align template and target sequences
         target_sequence_aligned, template_sequence_aligned = get_structure_sequence_alignment(
             structure_with_insertions, template_sequence)
-        logging.debug(f"Template sequence:\n{template_sequence_aligned}")
-        logging.debug(f"Target sequence:\n{target_sequence_aligned}")
+        logger.debug(f"Template sequence:\n{template_sequence_aligned}")
+        logger.debug(f"Target sequence:\n{target_sequence_aligned}")
         hierview = oechem.OEHierView(structure_with_insertions)
         structure_residues = list(hierview.GetResidues())
         gaps = list(re.finditer("[^-][-]+[^-]", target_sequence_aligned))
@@ -1287,7 +1290,7 @@ def apply_insertions(
             end_residue = structure_residues[gap_start + 1]
             gap_sequence = template_sequence_aligned[gap.start() + 1:gap.end() - 1]
             loop_conformations = oechem.OEMol()
-            logging.debug(f"Trying to build loop {gap_sequence} " +
+            logger.debug(f"Trying to build loop {gap_sequence} " +
                           f"between residues {start_residue.GetResidueNumber()}" +
                           f" and {end_residue.GetResidueNumber()} ...")
             # build loop and reinitialize if successful
@@ -1300,7 +1303,7 @@ def apply_insertions(
                     sidechain_options,
                     loop_options
             ):
-                logging.debug("Successfully built loop conformations!")
+                logger.debug("Successfully built loop conformations!")
                 for i, loop_conformation in enumerate(loop_conformations.GetConfs()):
                     # loop modeling from OESpruce can lead to ring penetration, e.g. 3bel
                     # the next step tries to fix those issues
@@ -1322,14 +1325,14 @@ def apply_insertions(
                         structure_with_insertions = loop_conformation
                         reinitialize = True
                         break
-                    logging.debug(
+                    logger.debug(
                         f"Generated loop conformation {i} contains not fixable severe clashes, trying next!"
                     )
             if reinitialize:
                 # break and reinitialize
                 break
             else:
-                logging.debug("Failed building loop without clashes, skipping insertion!")
+                logger.debug("Failed building loop without clashes, skipping insertion!")
                 # break bond between residues next to insertion
                 # important if an isoform specific insertion failed
                 structure_with_insertions = _disconnect_residues(
@@ -1394,8 +1397,8 @@ def apply_mutations(
         # align template and target sequences
         target_sequence_aligned, template_sequence_aligned = get_structure_sequence_alignment(
             structure_with_mutations, template_sequence)
-        logging.debug(f"Template sequence:\n{template_sequence_aligned}")
-        logging.debug(f"Target sequence:\n{target_sequence_aligned}")
+        logger.debug(f"Template sequence:\n{template_sequence_aligned}")
+        logger.debug(f"Target sequence:\n{target_sequence_aligned}")
         hierview = oechem.OEHierView(structure_with_mutations)
         structure_residues = hierview.GetResidues()
         # adjust target structure to match template sequence
@@ -1412,19 +1415,19 @@ def apply_mutations(
                         three_letter_code = oechem.OEGetResidueName(
                             oechem.OEGetResidueIndexFromCode(template_sequence_residue)
                         )
-                        logging.debug("Trying to perform mutation " +
+                        logger.debug("Trying to perform mutation " +
                                       f"{oeresidue.GetName()}{oeresidue.GetResidueNumber()}" +
                                       f"{three_letter_code} ...")
                         if oespruce.OEMutateResidue(
                                 structure_with_mutations, oeresidue, three_letter_code
                         ):
-                            logging.debug("Successfully mutated residue!")
+                            logger.debug("Successfully mutated residue!")
                             # break loop and reinitialize
                             altered = True
                             break
                         else:
                             if fallback_delete:
-                                logging.debug("Mutation failed! Deleting residue ...")
+                                logger.debug("Mutation failed! Deleting residue ...")
                                 atom_functor = oechem.OEOrAtom(
                                     # if residue was not mutated
                                     oechem.OEAtomMatchResidue([
@@ -1493,7 +1496,7 @@ def delete_partial_residues(
 
     # delete atoms
     for incomplete_residue in incomplete_residues:
-        logging.debug(
+        logger.debug(
             "Deleting protein residue with incomplete sidechain "
             f"{incomplete_residue.GetName()}"
             f"{incomplete_residue.GetResidueNumber()}"
@@ -1515,7 +1518,7 @@ def delete_partial_residues(
     for hier_residue in hier_view.GetResidues():
         atom_names = set([atom.GetName().strip() for atom in hier_residue.GetAtoms()])
         if len(backbone_atom_names.difference(atom_names)) > 0:
-            logging.debug(
+            logger.debug(
                 "Deleting protein residue with incomplete backbone "
                 f"{hier_residue.GetResidueName()}"
                 f"{hier_residue.GetResidueNumber()} ..."
@@ -1548,7 +1551,7 @@ def delete_short_protein_segments(structure: oechem.OEMolBase) -> oechem.OEMolBa
     for component in components:
         residues = set([oechem.OEAtomGetResidue(atom) for atom in component.GetAtoms()])
         if len(residues) <= 3:
-            logging.debug(
+            logger.debug(
                 "Deleting loose protein segment with resids "
                 f"{[residue.GetResidueNumber() for residue in residues]} ..."
             )
@@ -1644,7 +1647,7 @@ def delete_clashing_sidechains(
             residue_name = residue.GetName()
             residue_id = residue.GetResidueNumber()
             chain_id = residue.GetChainID()
-            logging.debug(
+            logger.debug(
                 f"Deleting clashing sidechain of {residue_name}" +
                 f"{residue_id} {chain_id} ..."
             )
