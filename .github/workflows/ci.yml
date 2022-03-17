@@ -99,13 +99,12 @@ jobs:
       - name: Run tests
         shell: bash -l {0}
         run: |
-          pytest -v --cov=kinoml --cov-report=xml --color=yes kinoml/tests/ -k "not read_electron_density"
+          pytest -v -n auto --dist loadfile --cov=kinoml --cov-report=xml --color=yes kinoml/tests/ -k "not read_electron_density"
 
       - name: Run notebook tests
         shell: bash -l {0}
         run: |
-          PYTEST_ARGS="--nbval-lax --nbval-cell-timeout 6000 --current-env --dist loadscope --numprocesses 2"
-          pytest $PYTEST_ARGS examples/*.ipynb
+          pytest -v -n auto --dist loadfile --nbval-lax --nbval-cell-timeout 6000 --current-env examples/*.ipynb
 
       - name: CodeCov
         uses: codecov/codecov-action@v1
