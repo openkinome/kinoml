@@ -47,14 +47,10 @@ class OEComplexFeaturizer(OEBaseModelingFeaturizer, SingleLigandProteinComplexFe
      - removing everything but protein, water and ligand of interest
      - protonation at pH 7.4
 
-    The protein component of each system must have a `pdb_id` or a `path` attribute specifying
-    the complex structure to prepare.
-
-     - `pdb_id`: A string specifying the PDB entry of interest, required if `path` not given.
-     - `path`: The path to the structure file, required if `pdb_id` not given.
-
-    Additionally, the protein component can have the following optional attributes to customize
-    the protein modeling:
+    The protein component of each system must be a `core.proteins.Protein` or a subclass thereof
+    , must be initialized with toolkit='OpenEye' and give access to the molecular structure, e.g.
+    via a pdb_id. Additionally, the protein component can have the following optional attributes
+    to customize the protein modeling:
 
      - `name`: A string specifying the name of the protein, will be used for generating the
        output file name.
@@ -69,8 +65,8 @@ class OEComplexFeaturizer(OEBaseModelingFeaturizer, SingleLigandProteinComplexFe
        used during modeling the protein. This will supersede a given `uniprot_id` and the sequence
        information given in the PDB header.
 
-    The ligand component can be a BaseLigand without any further attributes. Additionally, the
-    ligand component can have the following optional attributes:
+    The ligand component of each system must be a `core.components.BaseLigand` or a subclass
+    thereof. The ligand component can have the following optional attributes:
 
      - `name`: A string specifying the name of the ligand, will be used for generating the
        output file name.
@@ -85,9 +81,11 @@ class OEComplexFeaturizer(OEBaseModelingFeaturizer, SingleLigandProteinComplexFe
     output_dir: str, Path or None, default=None
         Path to directory used for saving output files. If None, output structures will not be
         saved.
-    raise_errors: bool, default=False
-        If False, will try to catch errors and return None, else featurization will stop when Error is raised.
-
+    use_multiprocessing : bool, default=True
+        If multiprocessing to use.
+    n_processes : int or None, default=None
+        How many processes to use in case of multiprocessing. Defaults to number of available
+        CPUs.
 
     Note
     ----
@@ -195,8 +193,8 @@ class OEComplexFeaturizer(OEBaseModelingFeaturizer, SingleLigandProteinComplexFe
 
 class OEDockingFeaturizer(OEBaseModelingFeaturizer, SingleLigandProteinComplexFeaturizer):
     """
-    Given systems with exactly one protein and one ligand, dock the ligand into the prepared
-    protein structure with OpenEye's Fred method:
+    Given systems with exactly one protein and one ligand, prepare the structure and dock the
+    ligand into the prepared protein structure with one of OpenEye's docking algorithms:
 
      - modeling missing loops
      - building missing side chains
@@ -204,18 +202,12 @@ class OEDockingFeaturizer(OEBaseModelingFeaturizer, SingleLigandProteinComplexFe
        (see below)
      - removing everything but protein, water and ligand of interest
      - protonation at pH 7.4
-     - perform Fred docking
+     - perform docking
 
-    The protein component of each system must have a `pdb_id` or a `path` as well as a
-    `pocket_resids` attribute specifying the structure to prepare and the binding pocket to dock
-    to.
-
-     - `pdb_id`: A string specifying the PDB entry of interest, required if `path` not given.
-     - `path`: The path to the structure file, required if `pdb_id` not given.
-     - `pocket_resids`: List of integers specifying the residues in the binding pocket of interest.
-
-    Additionally, the protein component can have the following optional attributes to customize
-    the protein modeling:
+    The protein component of each system must be a `core.proteins.Protein` or a subclass thereof
+    , must be initialized with toolkit='OpenEye' and give access to the molecular structure, e.g.
+    via a pdb_id. Additionally, the protein component can have the following optional attributes
+    to customize the protein modeling:
 
      - `name`: A string specifying the name of the protein, will be used for generating the
        output file name.
@@ -229,12 +221,12 @@ class OEDockingFeaturizer(OEBaseModelingFeaturizer, SingleLigandProteinComplexFe
      - `sequence`: An `AminoAcidSequence` object specifying the amino acid sequence that should be
        used during modeling the protein. This will supersede a given `uniprot_id` and the sequence
        information given in the PDB header.
+     - `pocket_resids`: List of integers specifying the residues in the binding pocket of interest.
+       This is attribute is required if docking with Fred into an apo structure.
 
-    The ligand component of each system must have a `to_smiles` method allowing access to the
-    molecular structure to dock, e.g. a Ligand object from `core.ligands` initiated as
-    Ligand.from_smiles("CCOCCC").
-
-    Additionally, the ligand component can have the following optional attributes:
+    The ligand component of each system must be a `core.ligands.Ligand` or a subclass thereof and
+    give access to the molecular structure, e.g. via a SMILES. Additionally, the ligand component
+    can have the following optional attributes:
 
      - `name`: A string specifying the name of the ligand, will be used for generating the
        output file name.
@@ -251,6 +243,11 @@ class OEDockingFeaturizer(OEBaseModelingFeaturizer, SingleLigandProteinComplexFe
     output_dir: str, Path or None, default=None
         Path to directory used for saving output files. If None, output structures will not be
         saved.
+    use_multiprocessing : bool, default=True
+        If multiprocessing to use.
+    n_processes : int or None, default=None
+        How many processes to use in case of multiprocessing. Defaults to number of available
+        CPUs.
     pKa_norm: bool, default=True
         Assign the predominant ionization state of the molecules to dock at pH ~7.4. If False,
         the ionization state of the input molecules will be conserved.
