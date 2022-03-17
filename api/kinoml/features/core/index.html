@@ -434,6 +434,28 @@
         <li class="md-nav__item"><a href="#kinoml.features.core.ClearFeaturizations._post_featurize" class="md-nav__link">_post_featurize</a>
         </li></ul>
             </nav>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.features.core.OEBaseModelingFeaturizer" class="md-nav__link">OEBaseModelingFeaturizer</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#kinoml.features.core.OEBaseModelingFeaturizer._read_protein_structure" class="md-nav__link">_read_protein_structure</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.features.core.OEBaseModelingFeaturizer._get_design_unit" class="md-nav__link">_get_design_unit</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.features.core.OEBaseModelingFeaturizer._get_components" class="md-nav__link">_get_components</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.features.core.OEBaseModelingFeaturizer._process_protein" class="md-nav__link">_process_protein</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.features.core.OEBaseModelingFeaturizer._get_protein_residue_numbers" class="md-nav__link">_get_protein_residue_numbers</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.features.core.OEBaseModelingFeaturizer._assemble_components" class="md-nav__link">_assemble_components</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.features.core.OEBaseModelingFeaturizer._remove_clashing_water" class="md-nav__link">_remove_clashing_water</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.features.core.OEBaseModelingFeaturizer._update_pdb_header" class="md-nav__link">_update_pdb_header</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.features.core.OEBaseModelingFeaturizer._write_results" class="md-nav__link">_write_results</a>
+        </li></ul>
+            </nav>
         </li></ul>
             </nav>
         </li></ul>
@@ -472,7 +494,7 @@ new representations of the molecular entities and their associated measurements.
 <dd></dd></dl>
 <dl class="method">
 <dt id="kinoml.features.core.BaseFeaturizer.featurize">
-<code class="sig-name descname">featurize</code><span class="sig-paren">(</span><em class="sig-param">self, systems: Iterable[System], keep=True</em><span class="sig-paren">)</span> → Iterable[System]<a class="headerlink" href="#kinoml.features.core.BaseFeaturizer.featurize" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">featurize</code><span class="sig-paren">(</span><em class="sig-param">self, systems: List[System], keep=True</em><span class="sig-paren">)</span> → List[System]<a class="headerlink" href="#kinoml.features.core.BaseFeaturizer.featurize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Given some systems (compatible with <code class="docutils literal notranslate"><span class="pre">_SUPPORTED_TYPES</span></code>), apply
 the featurization scheme implemented in this class.</p>
 <p>First, <code class="docutils literal notranslate"><span class="pre">self.supports()</span></code> will check whether the systems are compatible
@@ -506,7 +528,7 @@ or an array-like object) under a key named after <code class="docutils literal n
 </dd></dl>
 <dl class="method">
 <dt id="kinoml.features.core.BaseFeaturizer._pre_featurize">
-<code class="sig-name descname">_pre_featurize</code><span class="sig-paren">(</span><em class="sig-param">self, systems: Iterable[System]</em><span class="sig-paren">)</span> → None<a class="headerlink" href="#kinoml.features.core.BaseFeaturizer._pre_featurize" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">_pre_featurize</code><span class="sig-paren">(</span><em class="sig-param">self, systems: List[System]</em><span class="sig-paren">)</span> → None<a class="headerlink" href="#kinoml.features.core.BaseFeaturizer._pre_featurize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run before featurizing all systems. Redefine this method if needed.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -516,7 +538,7 @@ or an array-like object) under a key named after <code class="docutils literal n
 </dd></dl>
 <dl class="method">
 <dt id="kinoml.features.core.BaseFeaturizer._featurize">
-<code class="sig-name descname">_featurize</code><span class="sig-paren">(</span><em class="sig-param">self, systems: Iterable[System]</em><span class="sig-paren">)</span> → Iterable[object]<a class="headerlink" href="#kinoml.features.core.BaseFeaturizer._featurize" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">_featurize</code><span class="sig-paren">(</span><em class="sig-param">self, systems: List[System]</em><span class="sig-paren">)</span> → List[object]<a class="headerlink" href="#kinoml.features.core.BaseFeaturizer._featurize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Featurize all system objects in a serial fashion as defined in <code class="docutils literal notranslate"><span class="pre">._featurize_one()</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -550,14 +572,14 @@ or an array-like object.</p>
 </dd></dl>
 <dl class="method">
 <dt id="kinoml.features.core.BaseFeaturizer._post_featurize">
-<code class="sig-name descname">_post_featurize</code><span class="sig-paren">(</span><em class="sig-param">self, systems: Iterable[System], features: Iterable, keep: bool = True</em><span class="sig-paren">)</span> → Iterable[System]<a class="headerlink" href="#kinoml.features.core.BaseFeaturizer._post_featurize" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">_post_featurize</code><span class="sig-paren">(</span><em class="sig-param">self, systems: List[System], features: List, keep: bool = True</em><span class="sig-paren">)</span> → List[System]<a class="headerlink" href="#kinoml.features.core.BaseFeaturizer._post_featurize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run after featurizing all systems. Systems with a feature of None will be removed.
 You shouldn’t need to redefine this method</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>systems</strong> (<em>list of System</em>) – The systems being featurized</p></li>
-<li><p><strong>features</strong> (<em>iterable</em>) – The features returned by <code class="docutils literal notranslate"><span class="pre">self._featurize</span></code></p></li>
+<li><p><strong>features</strong> (<em>list</em>) – The features returned by <code class="docutils literal notranslate"><span class="pre">self._featurize</span></code></p></li>
 <li><p><strong>keep</strong> (<em>bool</em><em>, </em><em>optional=True</em>) – Whether to store the current featurizer in the <code class="docutils literal notranslate"><span class="pre">system.featurizations</span></code>
 dictionary with its own key (<code class="docutils literal notranslate"><span class="pre">self.name</span></code>), in addition to <code class="docutils literal notranslate"><span class="pre">last</span></code>.</p></li>
 </ul>
@@ -656,7 +678,7 @@ Defaults to number of available CPUs.</p></li>
 </dd></dl>
 <dl class="method">
 <dt id="kinoml.features.core.ParallelBaseFeaturizer._featurize">
-<code class="sig-name descname">_featurize</code><span class="sig-paren">(</span><em class="sig-param">self, systems: Iterable[System]</em><span class="sig-paren">)</span> → Iterable[object]<a class="headerlink" href="#kinoml.features.core.ParallelBaseFeaturizer._featurize" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">_featurize</code><span class="sig-paren">(</span><em class="sig-param">self, systems: List[System]</em><span class="sig-paren">)</span> → List[object]<a class="headerlink" href="#kinoml.features.core.ParallelBaseFeaturizer._featurize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Featurize all system objects in a parallel fashion as defined in <code class="docutils literal notranslate"><span class="pre">._featurize_one()</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -673,7 +695,7 @@ Defaults to number of available CPUs.</p></li>
 </dd></dl>
 <dl class="class">
 <dt id="kinoml.features.core.Pipeline">
-<em class="property">class </em><code class="sig-prename descclassname">kinoml.features.core.</code><code class="sig-name descname">Pipeline</code><span class="sig-paren">(</span><em class="sig-param">featurizers: Iterable[BaseFeaturizer], shortname=None, **kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.core.Pipeline" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">kinoml.features.core.</code><code class="sig-name descname">Pipeline</code><span class="sig-paren">(</span><em class="sig-param">featurizers: List[BaseFeaturizer], shortname=None, **kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.core.Pipeline" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#kinoml.features.core.BaseFeaturizer" title="kinoml.features.core.BaseFeaturizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.features.core.BaseFeaturizer</span></code></a></p>
 <p>Given a list of featurizers, apply them sequentially
 on the systems (e.g. featurizer A returns X, and X is
@@ -694,7 +716,7 @@ wrapper around individual <code class="docutils literal notranslate"><span class
 </div>
 <dl class="method">
 <dt id="kinoml.features.core.Pipeline._featurize">
-<code class="sig-name descname">_featurize</code><span class="sig-paren">(</span><em class="sig-param">self, systems: Iterable[System], keep: bool = True</em><span class="sig-paren">)</span> → Iterable[object]<a class="headerlink" href="#kinoml.features.core.Pipeline._featurize" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">_featurize</code><span class="sig-paren">(</span><em class="sig-param">self, systems: List[System], keep: bool = True</em><span class="sig-paren">)</span> → List[object]<a class="headerlink" href="#kinoml.features.core.Pipeline._featurize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Given a list of featurizers, apply them sequentially
 on the systems (e.g. featurizer A returns X, and X is
 taken by featurizer B, which returns Y) and store the
@@ -748,7 +770,7 @@ dictionary with its own key (<code class="docutils literal notranslate"><span cl
 </dd></dl>
 <dl class="class">
 <dt id="kinoml.features.core.Concatenated">
-<em class="property">class </em><code class="sig-prename descclassname">kinoml.features.core.</code><code class="sig-name descname">Concatenated</code><span class="sig-paren">(</span><em class="sig-param">featurizers: Iterable[BaseFeaturizer], axis: int = 1, **kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.core.Concatenated" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">kinoml.features.core.</code><code class="sig-name descname">Concatenated</code><span class="sig-paren">(</span><em class="sig-param">featurizers: List[BaseFeaturizer], axis: int = 1, **kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.core.Concatenated" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#kinoml.features.core.Pipeline" title="kinoml.features.core.Pipeline"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.features.core.Pipeline</span></code></a></p>
 <p>Given a list of featurizers, apply them serially and concatenate
 the result (e.g. featurizer A returns X, and featurizer B returns Y;
@@ -774,7 +796,7 @@ by <cite>TupleOfArrays</cite>.</p>
 </div>
 <dl class="method">
 <dt id="kinoml.features.core.Concatenated._featurize">
-<code class="sig-name descname">_featurize</code><span class="sig-paren">(</span><em class="sig-param">self, systems: Iterable[System], keep=True</em><span class="sig-paren">)</span> → np.ndarray<a class="headerlink" href="#kinoml.features.core.Concatenated._featurize" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">_featurize</code><span class="sig-paren">(</span><em class="sig-param">self, systems: List[System], keep=True</em><span class="sig-paren">)</span> → np.ndarray<a class="headerlink" href="#kinoml.features.core.Concatenated._featurize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Given a list of featurizers, apply them serially and concatenate
 the result (e.g. featurizer A returns X, and featurizer B returns Y;
 the output is XY).</p>
@@ -806,7 +828,7 @@ and featurizer B returns Y, Z; the output is a tuple of X, Y, Z).</p>
 <p>The final result will be tuple of tuples.</p>
 <dl class="method">
 <dt id="kinoml.features.core.TupleOfArrays._featurize">
-<code class="sig-name descname">_featurize</code><span class="sig-paren">(</span><em class="sig-param">self, systems: Iterable[System], keep: bool = True</em><span class="sig-paren">)</span> → np.ndarray<a class="headerlink" href="#kinoml.features.core.TupleOfArrays._featurize" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">_featurize</code><span class="sig-paren">(</span><em class="sig-param">self, systems: List[System], keep: bool = True</em><span class="sig-paren">)</span> → List<a class="headerlink" href="#kinoml.features.core.TupleOfArrays._featurize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Given a list of featurizers, apply them serially and build a
 flat tuple out of the results.</p>
 <dl class="field-list simple">
@@ -1077,6 +1099,218 @@ or an array-like object.</p>
 <code class="sig-name descname">_post_featurize</code><span class="sig-paren">(</span><em class="sig-param">self, systems: Iterable[System], features: Iterable[System | np.array], keep: bool = True</em><span class="sig-paren">)</span> → Iterable[System]<a class="headerlink" href="#kinoml.features.core.ClearFeaturizations._post_featurize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bypass the automated population of the <code class="docutils literal notranslate"><span class="pre">.featurizations</span></code> dict
 in each System</p>
+</dd></dl>
+</dd></dl>
+<dl class="class">
+<dt id="kinoml.features.core.OEBaseModelingFeaturizer">
+<em class="property">class </em><code class="sig-prename descclassname">kinoml.features.core.</code><code class="sig-name descname">OEBaseModelingFeaturizer</code><span class="sig-paren">(</span><em class="sig-param">loop_db: Union[str</em>, <em class="sig-param">None] = None</em>, <em class="sig-param">cache_dir: Union[str</em>, <em class="sig-param">Path</em>, <em class="sig-param">None] = None</em>, <em class="sig-param">output_dir: Union[str</em>, <em class="sig-param">Path</em>, <em class="sig-param">None] = None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.core.OEBaseModelingFeaturizer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#kinoml.features.core.ParallelBaseFeaturizer" title="kinoml.features.core.ParallelBaseFeaturizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.features.core.ParallelBaseFeaturizer</span></code></a></p>
+<p>This abstract class defines several methods that use functionality from the OpenEye toolkit
+for molecular modeling. Featurizers that subclass <cite>OEBaseModelingFeaturizer</cite> need to implement
+at least the <cite>_featurize_one</cite> method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>loop_db</strong> (<em>str</em>) – The path to the loop database used by OESpruce to model missing loops.</p></li>
+<li><p><strong>cache_dir</strong> (<em>str</em><em>, </em><em>Path</em><em> or </em><em>None</em><em>, </em><em>default=None</em>) – Path to directory used for saving intermediate files. If None, default location
+provided by <cite>appdirs.user_cache_dir()</cite> will be used.</p></li>
+<li><p><strong>output_dir</strong> (<em>str</em><em>, </em><em>Path</em><em> or </em><em>None</em><em>, </em><em>default=None</em>) – Path to directory used for saving output files. If None, output structures will not be
+saved.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="kinoml.features.core.OEBaseModelingFeaturizer._read_protein_structure">
+<code class="sig-name descname">_read_protein_structure</code><span class="sig-paren">(</span><em class="sig-param">self, protein: Union[Protein, KLIFSKinase]</em><span class="sig-paren">)</span> → Union[oechem.OEGraphMol, None]<a class="headerlink" href="#kinoml.features.core.OEBaseModelingFeaturizer._read_protein_structure" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the protein structure of the given protein object as OpenEye molecule.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>protein</strong> (<a class="reference internal" href="../../core/proteins/index.html#kinoml.core.proteins.Protein" title="kinoml.core.proteins.Protein"><em>Protein</em></a><em> or </em><a class="reference internal" href="../../core/proteins/index.html#kinoml.core.proteins.KLIFSKinase" title="kinoml.core.proteins.KLIFSKinase"><em>KLIFSKinase</em></a>) – The protein object.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The protein structure as OpenEye molecule or None.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>oechem.OEGraphMol or None</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If wrong toolkit was used during initialization of the protein object.</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="method">
+<dt id="kinoml.features.core.OEBaseModelingFeaturizer._get_design_unit">
+<code class="sig-name descname">_get_design_unit</code><span class="sig-paren">(</span><em class="sig-param">self, structure: oechem.OEMolBase, chain_id: Union[str, None], alternate_location: Union[str, None], has_ligand: bool, ligand_name: Union[str, None], model_loops_and_caps: bool</em><span class="sig-paren">)</span> → Union[oechem.OEDesignUnit, None]<a class="headerlink" href="#kinoml.features.core.OEBaseModelingFeaturizer._get_design_unit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get an OpenEye design unit based on the given input.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>structure</strong> (<em>oechem.OEMolBase</em>) – An OpenEye molecule holding the protein structure to prepare.</p></li>
+<li><p><strong>chain_id</strong> (<em>str</em><em> or </em><em>None</em>) – The chain ID of interest.</p></li>
+<li><p><strong>alternate_location</strong> (<em>str</em><em> or </em><em>None</em>) – The alternate location of interest.</p></li>
+<li><p><strong>has_ligand</strong> (<em>bool</em>) – If design unit generation should consider ligands. If True, design units will be only
+generated for protein ligand complexes. If False, design units will not consider
+co-crystallized ligands.</p></li>
+<li><p><strong>ligand_name</strong> (<em>str</em><em> or </em><em>None</em>) – The ligand expo ID bound to the protein of interest. Design units will be filtered to
+contain the respective ligand.</p></li>
+<li><p><strong>model_loops_and_caps</strong> (<em>bool</em>) – If loops and caps should be modeled.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>design_unit</strong> – The design unit or None if no design unit was found.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>oechem.OEDesignUnit or None</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="method">
+<dt id="kinoml.features.core.OEBaseModelingFeaturizer._get_components">
+<em class="property">static </em><code class="sig-name descname">_get_components</code><span class="sig-paren">(</span><em class="sig-param">design_unit: oechem.OEDesignUnit, chain_id: Union[str, None]</em><span class="sig-paren">)</span> → Tuple[oechem.OEGraphMol(), oechem.OEGraphMol(), oechem.OEGraphMol()]<a class="headerlink" href="#kinoml.features.core.OEBaseModelingFeaturizer._get_components" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get protein, solvent and ligand components from an OpenEye design unit.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>design_unit</strong> (<em>oechem.OEDesignUnit</em>) – The OpenEye design unit to extract components from.</p></li>
+<li><p><strong>chain_id</strong> (<em>str</em><em> or </em><em>None</em>) – The chain ID of interest.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>components</strong> – OpenEye molecules holding protein, solvent and ligand.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>tuple of oechem.OEGraphMol, oechem.OEGraphMol and oechem.OEGraphMol</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="method">
+<dt id="kinoml.features.core.OEBaseModelingFeaturizer._process_protein">
+<code class="sig-name descname">_process_protein</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">protein_structure: oechem.OEMolBase</em>, <em class="sig-param">amino_acid_sequence: str</em>, <em class="sig-param">first_id: int = 1</em>, <em class="sig-param">ligand: Union[oechem.OEMolBase</em>, <em class="sig-param">None] = None</em><span class="sig-paren">)</span> → oechem.OEMolBase<a class="headerlink" href="#kinoml.features.core.OEBaseModelingFeaturizer._process_protein" title="Permalink to this definition">¶</a></dt>
+<dd><p>Process a protein structure according to the given amino acid sequence.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>protein_structure</strong> (<em>oechem.OEMolBase</em>) – An OpenEye molecule holding the protein structure to process.</p></li>
+<li><p><strong>amino_acid_sequence</strong> (<em>str</em>) – The amino acid sequence with associated metadata.</p></li>
+<li><p><strong>first_id</strong> (<em>int</em><em>, </em><em>default=1</em>) – The ID of the first amino acid in the given sequence, e.g. if only a part of a
+protein was expressed and used in experiment.</p></li>
+<li><p><strong>ligand</strong> (<em>oechem.OEMolBase</em><em> or </em><em>None</em><em>, </em><em>default=None</em>) – An OpenEye molecule that should be checked for heavy atom clashes with built insertions.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An OpenEye molecule holding the processed protein structure.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>oechem.OEMolBase</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="method">
+<dt id="kinoml.features.core.OEBaseModelingFeaturizer._get_protein_residue_numbers">
+<em class="property">static </em><code class="sig-name descname">_get_protein_residue_numbers</code><span class="sig-paren">(</span><em class="sig-param">protein_structure: oechem.OEMolBase</em>, <em class="sig-param">amino_acid_sequence: str</em>, <em class="sig-param">first_id: int = 1</em><span class="sig-paren">)</span> → List[int]<a class="headerlink" href="#kinoml.features.core.OEBaseModelingFeaturizer._get_protein_residue_numbers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the residue numbers of a protein structure according to given amino acid sequence.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>protein_structure</strong> (<em>oechem.OEMolBase</em>) – The kinase domain structure.</p></li>
+<li><p><strong>amino_acid_sequence</strong> (<a class="reference internal" href="../../core/sequences/index.html#kinoml.core.sequences.AminoAcidSequence" title="kinoml.core.sequences.AminoAcidSequence"><em>core.sequences.AminoAcidSequence</em></a>) – The template amino acid sequence.</p></li>
+<li><p><strong>first_id</strong> (<em>int</em><em>, </em><em>default=1</em>) – The ID of the first amino acid in the given sequence, e.g. if only a part of a
+protein was expressed and used in experiment.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>residue_number</strong> – A list of residue numbers according to the given amino acid sequence in the same order
+as the residues in the given protein structure.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list of int</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="method">
+<dt id="kinoml.features.core.OEBaseModelingFeaturizer._assemble_components">
+<code class="sig-name descname">_assemble_components</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">protein: oechem.OEMolBase</em>, <em class="sig-param">solvent: oechem.OEMolBase</em>, <em class="sig-param">ligand: Union[oechem.OEMolBase</em>, <em class="sig-param">None] = None</em><span class="sig-paren">)</span> → oechem.OEMolBase<a class="headerlink" href="#kinoml.features.core.OEBaseModelingFeaturizer._assemble_components" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assemble components of a solvated protein-ligand complex into a single OpenEye molecule.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>protein</strong> (<em>oechem.OEMolBase</em>) – An OpenEye molecule holding the protein of interest.</p></li>
+<li><p><strong>solvent</strong> (<em>oechem.OEMolBase</em>) – An OpenEye molecule holding the solvent of interest.</p></li>
+<li><p><strong>ligand</strong> (<em>oechem.OEMolBase</em><em> or </em><em>None</em><em>, </em><em>default=None</em>) – An OpenEye molecule holding the ligand of interest if given.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>assembled_components</strong> – An OpenEye molecule holding protein, solvent and ligand if given.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>oechem.OEMolBase</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="method">
+<dt id="kinoml.features.core.OEBaseModelingFeaturizer._remove_clashing_water">
+<em class="property">static </em><code class="sig-name descname">_remove_clashing_water</code><span class="sig-paren">(</span><em class="sig-param">solvent: oechem.OEMolBase, ligand: Union[oechem.OEMolBase, None], protein: oechem.OEMolBase</em><span class="sig-paren">)</span> → oechem.OEGraphMol<a class="headerlink" href="#kinoml.features.core.OEBaseModelingFeaturizer._remove_clashing_water" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove water molecules clashing with a ligand or newly modeled protein residues.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>solvent</strong> (<em>oechem.OEGraphMol</em>) – An OpenEye molecule holding the water molecules.</p></li>
+<li><p><strong>ligand</strong> (<em>oechem.OEGraphMol</em><em> or </em><em>None</em>) – An OpenEye molecule holding the ligand or None.</p></li>
+<li><p><strong>protein</strong> (<em>oechem.OEGraphMol</em>) – An OpenEye molecule holding the protein.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An OpenEye molecule holding water molecules not clashing with the ligand or newly
+modeled protein residues.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>oechem.OEGraphMol</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="method">
+<dt id="kinoml.features.core.OEBaseModelingFeaturizer._update_pdb_header">
+<code class="sig-name descname">_update_pdb_header</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">structure: oechem.OEMolBase</em>, <em class="sig-param">protein_name: str</em>, <em class="sig-param">ligand_name: [str</em>, <em class="sig-param">None] = None</em>, <em class="sig-param">other_pdb_header_info: Union[None</em>, <em class="sig-param">Iterable[Tuple[str</em>, <em class="sig-param">str]]] = None</em><span class="sig-paren">)</span> → oechem.OEMolBase<a class="headerlink" href="#kinoml.features.core.OEBaseModelingFeaturizer._update_pdb_header" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stores information about Featurizer, protein and ligand in the PDB header COMPND section in the
+given OpenEye molecule.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>structure</strong> (<em>oechem.OEMolBase</em>) – An OpenEye molecule.</p></li>
+<li><p><strong>protein_name</strong> (<em>str</em>) – The name of the protein.</p></li>
+<li><p><strong>ligand_name</strong> (<em>str</em><em> or </em><em>None</em><em>, </em><em>default=None</em>) – The name of the ligand if present.</p></li>
+<li><p><strong>other_pdb_header_info</strong> (<em>None</em><em> or </em><em>iterable of tuple of str</em>) – Tuples with information that should be saved in the PDB header. Each tuple consists of two strings,
+i.e., the PDB header section (e.g. COMPND) and the respective information.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The OpenEye molecule containing the updated PDB header.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>oechem.OEMolBase</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="method">
+<dt id="kinoml.features.core.OEBaseModelingFeaturizer._write_results">
+<code class="sig-name descname">_write_results</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">structure: oechem.OEMolBase</em>, <em class="sig-param">protein_name: str</em>, <em class="sig-param">ligand_name: Union[str</em>, <em class="sig-param">None] = None</em><span class="sig-paren">)</span> → Path<a class="headerlink" href="#kinoml.features.core.OEBaseModelingFeaturizer._write_results" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write the results from the Featurizer and retrieve the paths to protein or complex if a
+ligand is present.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>structure</strong> (<em>oechem.OEMolBase</em>) – The OpenEye molecule holding the featurized system.</p></li>
+<li><p><strong>protein_name</strong> (<em>str</em>) – The name of the protein.</p></li>
+<li><p><strong>ligand_name</strong> (<em>str</em><em> or </em><em>None</em><em>, </em><em>default=None</em>) – The name of the ligand if present.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Path to prepared protein or complex if ligand is present.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Path</p>
+</dd>
+</dl>
 </dd></dl>
 </dd></dl>
 </section>

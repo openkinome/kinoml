@@ -384,6 +384,8 @@
         <li class="md-nav__item"><a href="#kinoml.utils.fill_until_next_multiple" class="md-nav__link">fill_until_next_multiple</a>
         </li>
         <li class="md-nav__item"><a href="#kinoml.utils.import_object" class="md-nav__link">import_object</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.utils.sha256_objects" class="md-nav__link">sha256_objects</a>
         </li></ul>
             </nav>
         </li></ul>
@@ -541,17 +543,19 @@ filling it with fillvalue if needed.</p>
 <dl class="function">
 <dt id="kinoml.utils.download_file">
 <code class="sig-prename descclassname">kinoml.utils.</code><code class="sig-name descname">download_file</code><span class="sig-paren">(</span><em class="sig-param">url: str</em>, <em class="sig-param">path: str</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.utils.download_file" title="Permalink to this definition">¶</a></dt>
-<dd><p>Download a file and save it locally.
-:param url: URL for downloading data.
-:type url: str
-:param path: Path to save downloaded data.
-:type path: str</p>
+<dd><p>Download a file and save it locally.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>True if successful, else False.</p>
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>url</strong> (<em>str</em>) – URL for downloading data.</p></li>
+<li><p><strong>path</strong> (<em>str</em>) – Path to save downloaded data.</p></li>
+</ul>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>bool</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>True if successful, else False.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>bool</p>
 </dd>
 </dl>
 </dd></dl>
@@ -637,6 +641,22 @@ used to extend <code class="docutils literal notranslate"><span class="pre">cont
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>object</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="function">
+<dt id="kinoml.utils.sha256_objects">
+<code class="sig-prename descclassname">kinoml.utils.</code><code class="sig-name descname">sha256_objects</code><span class="sig-paren">(</span><em class="sig-param">objects_to_hash: Iterable[object]</em><span class="sig-paren">)</span> → str<a class="headerlink" href="#kinoml.utils.sha256_objects" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a SHA256 hash of pickable objects.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>objects_to_hash</strong> (<em>Iterable of object</em>) – Objects that should be hashed.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The SHA256 of given objects.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>str</p>
 </dd>
 </dl>
 </dd></dl>

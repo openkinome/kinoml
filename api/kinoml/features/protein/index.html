@@ -323,7 +323,7 @@
         </li>
         <li class="md-nav__item"><a href="#kinoml.features.protein.SingleProteinFeaturizer" class="md-nav__link">SingleProteinFeaturizer</a><nav class="md-nav">
               <ul class="md-nav__list">
-        <li class="md-nav__item"><a href="#kinoml.features.protein.SingleProteinFeaturizer._COMPATIBLE_LIGAND_TYPES" class="md-nav__link">_COMPATIBLE_LIGAND_TYPES</a>
+        <li class="md-nav__item"><a href="#kinoml.features.protein.SingleProteinFeaturizer._COMPATIBLE_PROTEIN_TYPES" class="md-nav__link">_COMPATIBLE_PROTEIN_TYPES</a>
         </li>
         <li class="md-nav__item"><a href="#kinoml.features.protein.SingleProteinFeaturizer._supports" class="md-nav__link">_supports</a>
         </li></ul>
@@ -342,6 +342,12 @@
         <li class="md-nav__item"><a href="#kinoml.features.protein.OneHotEncodedSequenceFeaturizer.ALPHABET" class="md-nav__link">ALPHABET</a>
         </li>
         <li class="md-nav__item"><a href="#kinoml.features.protein.OneHotEncodedSequenceFeaturizer._retrieve_sequence" class="md-nav__link">_retrieve_sequence</a>
+        </li></ul>
+            </nav>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.features.protein.OEProteinStructureFeaturizer" class="md-nav__link">OEProteinStructureFeaturizer</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#kinoml.features.protein.OEProteinStructureFeaturizer._featurize_one" class="md-nav__link">_featurize_one</a>
         </li></ul>
             </nav>
         </li></ul>
@@ -377,8 +383,8 @@
 <dd><p>Bases: <a class="reference internal" href="../core/index.html#kinoml.features.core.ParallelBaseFeaturizer" title="kinoml.features.core.ParallelBaseFeaturizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.features.core.ParallelBaseFeaturizer</span></code></a></p>
 <p>Provides a minimally useful <code class="docutils literal notranslate"><span class="pre">._supports()</span></code> method for all Protein-like featurizers.</p>
 <dl class="attribute">
-<dt id="kinoml.features.protein.SingleProteinFeaturizer._COMPATIBLE_LIGAND_TYPES">
-<code class="sig-name descname">_COMPATIBLE_LIGAND_TYPES</code><a class="headerlink" href="#kinoml.features.protein.SingleProteinFeaturizer._COMPATIBLE_LIGAND_TYPES" title="Permalink to this definition">¶</a></dt>
+<dt id="kinoml.features.protein.SingleProteinFeaturizer._COMPATIBLE_PROTEIN_TYPES">
+<code class="sig-name descname">_COMPATIBLE_PROTEIN_TYPES</code><a class="headerlink" href="#kinoml.features.protein.SingleProteinFeaturizer._COMPATIBLE_PROTEIN_TYPES" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 <dl class="method">
 <dt id="kinoml.features.protein.SingleProteinFeaturizer._supports">
@@ -425,6 +431,83 @@
 <dt id="kinoml.features.protein.OneHotEncodedSequenceFeaturizer._retrieve_sequence">
 <code class="sig-name descname">_retrieve_sequence</code><span class="sig-paren">(</span><em class="sig-param">self, system: Union[ProteinSystem, ProteinLigandComplex]</em><span class="sig-paren">)</span> → str<a class="headerlink" href="#kinoml.features.protein.OneHotEncodedSequenceFeaturizer._retrieve_sequence" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+</dd></dl>
+<dl class="class">
+<dt id="kinoml.features.protein.OEProteinStructureFeaturizer">
+<em class="property">class </em><code class="sig-prename descclassname">kinoml.features.protein.</code><code class="sig-name descname">OEProteinStructureFeaturizer</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.protein.OEProteinStructureFeaturizer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../core/index.html#kinoml.features.core.OEBaseModelingFeaturizer" title="kinoml.features.core.OEBaseModelingFeaturizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.features.core.OEBaseModelingFeaturizer</span></code></a>, <a class="reference internal" href="#kinoml.features.protein.SingleProteinFeaturizer" title="kinoml.features.protein.SingleProteinFeaturizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.features.protein.SingleProteinFeaturizer</span></code></a></p>
+<p>Given systems with exactly one protein, prepare the protein structure by:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>modeling missing loops</p></li>
+<li><p>building missing side chains</p></li>
+<li><p>mutations, if <cite>uniprot_id</cite> or <cite>sequence</cite> attribute is provided for
+the protein component (see below)</p></li>
+<li><p>removing everything but protein and water</p></li>
+<li><p>protonation at pH 7.4</p></li>
+</ul>
+</div></blockquote>
+<p>The protein component of each system must be a <cite>core.proteins.Protein</cite>
+or a subclass thereof, must be initialized with toolkit=’OpenEye’ and
+give access to a molecular structure, e.g. via a pdb_id. Additionally,
+the protein component can have the following optional attributes to
+customize the protein modeling:</p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="simple">
+<dt><cite>name</cite>: A string specifying the name of the protein, will be used for</dt><dd><p>generating the output file name.</p>
+</dd>
+</dl>
+</li>
+<li><p><cite>chain_id</cite>: A string specifying which chain should be used.</p></li>
+<li><dl class="simple">
+<dt><cite>alternate_location</cite>: A string specifying which alternate location</dt><dd><p>should be used.</p>
+</dd>
+</dl>
+</li>
+<li><p><cite>expo_id</cite>: A string specifying a ligand bound to the protein of
+interest. This is especially useful if multiple proteins are found in
+one PDB structure.</p></li>
+<li><p><cite>uniprot_id</cite>: A string specifying the UniProt ID that will be used to
+fetch the amino acid sequence from UniProt, which will be used for
+modeling the protein. This will supersede the sequence information
+given in the PDB header.</p></li>
+<li><p><cite>sequence</cite>: A  string specifying the amino acid sequence in
+one-letter-codes that should be used during modeling the protein. This
+will supersede a given <cite>uniprot_id</cite> and the sequence information given
+in the PDB header.</p></li>
+</ul>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>loop_db</strong> (<em>str</em>) – The path to the loop database used by OESpruce to model missing loops.</p></li>
+<li><p><strong>cache_dir</strong> (<em>str</em><em>, </em><em>Path</em><em> or </em><em>None</em><em>, </em><em>default=None</em>) – Path to directory used for saving intermediate files. If None, default
+location provided by <cite>appdirs.user_cache_dir()</cite> will be used.</p></li>
+<li><p><strong>output_dir</strong> (<em>str</em><em>, </em><em>Path</em><em> or </em><em>None</em><em>, </em><em>default=None</em>) – Path to directory used for saving output files. If None, output
+structures will not be saved.</p></li>
+<li><p><strong>use_multiprocessing</strong> (<em>bool</em><em>, </em><em>default=True</em>) – If multiprocessing to use.</p></li>
+<li><p><strong>n_processes</strong> (<em>int</em><em> or </em><em>None</em><em>, </em><em>default=None</em>) – How many processes to use in case of multiprocessing. Defaults to
+number of available CPUs.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="kinoml.features.protein.OEProteinStructureFeaturizer._featurize_one">
+<code class="sig-name descname">_featurize_one</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">system: ProteinSystem</em><span class="sig-paren">)</span> → Union[Universe, None]<a class="headerlink" href="#kinoml.features.protein.OEProteinStructureFeaturizer._featurize_one" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prepare a protein structure.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>system</strong> (<a class="reference internal" href="../../core/systems/index.html#kinoml.core.systems.ProteinSystem" title="kinoml.core.systems.ProteinSystem"><em>ProteinSystem</em></a>) – A system object holding a protein component.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An MDAnalysis universe of the featurized system. None if no design unit was found.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Universe or None</p>
+</dd>
+</dl>
+</dd></dl>
 </dd></dl>
 </section>
 </section>

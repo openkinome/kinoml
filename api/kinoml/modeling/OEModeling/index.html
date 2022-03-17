@@ -319,6 +319,8 @@
               <ul class="md-nav__list">
         <li class="md-nav__item"><a href="#module-contents" class="md-nav__link">Module Contents</a><nav class="md-nav">
               <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#kinoml.modeling.OEModeling.logger" class="md-nav__link">logger</a>
+        </li>
         <li class="md-nav__item"><a href="#kinoml.modeling.OEModeling.read_smiles" class="md-nav__link">read_smiles</a>
         </li>
         <li class="md-nav__item"><a href="#kinoml.modeling.OEModeling.read_molecules" class="md-nav__link">read_molecules</a>
@@ -408,6 +410,10 @@
 <span id="kinoml-modeling-oemodeling"></span><h1 id="api-kinoml-modeling-oemodeling-index--page-root"><a class="reference internal" href="#api-kinoml-modeling-oemodeling-index--page-root" title="kinoml.modeling.OEModeling"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.modeling.OEModeling</span></code></a><a class="headerlink" href="#api-kinoml-modeling-oemodeling-index--page-root" title="Permalink to this headline">¶</a></h1>
 <section id="module-contents">
 <h2 id="module-contents">Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
+<dl class="data">
+<dt id="kinoml.modeling.OEModeling.logger">
+<code class="sig-prename descclassname">kinoml.modeling.OEModeling.</code><code class="sig-name descname">logger</code><a class="headerlink" href="#kinoml.modeling.OEModeling.logger" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 <dl class="function">
 <dt id="kinoml.modeling.OEModeling.read_smiles">
 <code class="sig-prename descclassname">kinoml.modeling.OEModeling.</code><code class="sig-name descname">read_smiles</code><span class="sig-paren">(</span><em class="sig-param">smiles: str</em>, <em class="sig-param">add_hydrogens: bool = True</em><span class="sig-paren">)</span> → oechem.OEGraphMol<a class="headerlink" href="#kinoml.modeling.OEModeling.read_smiles" title="Permalink to this definition">¶</a></dt>
@@ -597,13 +603,13 @@ PDB header section “SEQADV”.</p>
 <dl class="function">
 <dt id="kinoml.modeling.OEModeling.assign_caps">
 <code class="sig-prename descclassname">kinoml.modeling.OEModeling.</code><code class="sig-name descname">assign_caps</code><span class="sig-paren">(</span><em class="sig-param">structure: oechem.OEMolBase</em>, <em class="sig-param">real_termini: Union[Iterable[int] or None] = None</em><span class="sig-paren">)</span> → oechem.OEMolBase<a class="headerlink" href="#kinoml.modeling.OEModeling.assign_caps" title="Permalink to this definition">¶</a></dt>
-<dd><p>Cap N and C termini of the given input structure. Real termini can be protected from capping by providing the
-corresponding residue ids via the ‘real_termini’ argument.</p>
+<dd><p>Cap N and C termini of the given input structure. Real termini can be protected from capping
+by providing the corresponding residue ids via the ‘real_termini’ argument.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>structure</strong> (<em>oechem.OEMolBase</em>) – The OpenEye molecule holding the protein structure to cap.</p></li>
-<li><p><strong>real_termini</strong> (<em>iterable of int</em><em> or </em><em>None</em>) – The biologically relevant real termini that shpuld be prevented from capping.</p></li>
+<li><p><strong>real_termini</strong> (<em>iterable of int</em><em> or </em><em>None</em>) – The biologically relevant real termini that should be prevented from capping.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -749,14 +755,15 @@ units.</p>
 </dd></dl>
 <dl class="function">
 <dt id="kinoml.modeling.OEModeling.generate_conformations">
-<code class="sig-prename descclassname">kinoml.modeling.OEModeling.</code><code class="sig-name descname">generate_conformations</code><span class="sig-paren">(</span><em class="sig-param">molecule: oechem.OEMolBase</em>, <em class="sig-param">max_conformations: int = 1000</em>, <em class="sig-param">dense: bool = False</em><span class="sig-paren">)</span> → oechem.OEMCMolBase<a class="headerlink" href="#kinoml.modeling.OEModeling.generate_conformations" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">kinoml.modeling.OEModeling.</code><code class="sig-name descname">generate_conformations</code><span class="sig-paren">(</span><em class="sig-param">molecule: oechem.OEMolBase</em>, <em class="sig-param">options: oeomega.OEOmegaOptions = oeomega.OEOmegaOptions(oeomega.OEOmegaSampling_Classic)</em><span class="sig-paren">)</span> → oechem.OEMCMolBase<a class="headerlink" href="#kinoml.modeling.OEModeling.generate_conformations" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate conformations of a given molecule.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>molecule</strong> (<em>oechem.OEMolBase</em>) – An OpenEye molecule.</p></li>
-<li><p><strong>max_conformations</strong> (<em>int</em>) – Maximal number of conformations to generate.</p></li>
-<li><p><strong>dense</strong> (<em>bool</em>) – If densely sampled conformers should be generated. Will overwrite max_conformations settings.</p></li>
+<li><p><strong>options</strong> (<em>oeomega.OEOmegaOptions</em><em>, </em><em>default=oeomega.OEOmegaOptions</em><em>(</em><em>oeomega.OEOmegaSampling_Classic</em><em>)</em>) – Options for generating conformations. If the given molecule is a macrocycle only the
+maximal number of conformations will be changed from the defaults defined in
+<cite>oeomega.OEMacrocycleOmegaOptions()</cite>.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -769,14 +776,15 @@ units.</p>
 </dd></dl>
 <dl class="function">
 <dt id="kinoml.modeling.OEModeling.generate_reasonable_conformations">
-<code class="sig-prename descclassname">kinoml.modeling.OEModeling.</code><code class="sig-name descname">generate_reasonable_conformations</code><span class="sig-paren">(</span><em class="sig-param">molecule: oechem.OEMolBase</em>, <em class="sig-param">max_conformations: int = 1000</em>, <em class="sig-param">dense: bool = False</em>, <em class="sig-param">pKa_norm: bool = True</em><span class="sig-paren">)</span> → List[oechem.OEMCMolBase]<a class="headerlink" href="#kinoml.modeling.OEModeling.generate_reasonable_conformations" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">kinoml.modeling.OEModeling.</code><code class="sig-name descname">generate_reasonable_conformations</code><span class="sig-paren">(</span><em class="sig-param">molecule: oechem.OEMolBase</em>, <em class="sig-param">options: oeomega.OEOmegaOptions = oeomega.OEOmegaOptions(oeomega.OEOmegaSampling_Classic)</em>, <em class="sig-param">pKa_norm: bool = True</em><span class="sig-paren">)</span> → List[oechem.OEMCMolBase]<a class="headerlink" href="#kinoml.modeling.OEModeling.generate_reasonable_conformations" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate conformations of reasonable enantiomers and tautomers of a given molecule.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>molecule</strong> (<em>oechem.OEMolBase</em>) – An OpenEye molecule.</p></li>
-<li><p><strong>max_conformations</strong> (<em>int</em>) – Maximal number of conformations to generate per isomer. Will overwrite max_conformations settings.</p></li>
-<li><p><strong>dense</strong> (<em>bool</em>) – If densely sampled conformers should be generated.</p></li>
+<li><p><strong>options</strong> (<em>oeomega.OEOmegaOptions</em><em>, </em><em>default=oeomega.OEOmegaOptions</em><em>(</em><em>oeomega.OEOmegaSampling_Classic</em><em>)</em>) – Options for generating conformations. If the given molecule is a macrocycle only the
+maximal number of conformations will be changed from the defaults defined in
+<cite>oeomega.OEMacrocycleOmegaOptions()</cite>.</p></li>
 <li><p><strong>pKa_norm</strong> (<em>bool</em>) – Assign the predominant ionization state at pH ~7.4.</p></li>
 </ul>
 </dd>
@@ -910,7 +918,7 @@ of a sequence, not at the end or the beginning.</p></li>
 </dd></dl>
 <dl class="function">
 <dt id="kinoml.modeling.OEModeling.apply_insertions">
-<code class="sig-prename descclassname">kinoml.modeling.OEModeling.</code><code class="sig-name descname">apply_insertions</code><span class="sig-paren">(</span><em class="sig-param">target_structure: oechem.OEMolBase, template_sequence: str, loop_db: Union[str, Path]</em><span class="sig-paren">)</span> → oechem.OEMolBase<a class="headerlink" href="#kinoml.modeling.OEModeling.apply_insertions" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">kinoml.modeling.OEModeling.</code><code class="sig-name descname">apply_insertions</code><span class="sig-paren">(</span><em class="sig-param">target_structure: oechem.OEMolBase, template_sequence: str, loop_db: Union[str, Path], ligand: Union[oechem.OEMolBase, None] = None</em><span class="sig-paren">)</span> → oechem.OEMolBase<a class="headerlink" href="#kinoml.modeling.OEModeling.apply_insertions" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply insertions to a protein structure according to an amino acid sequence. The provided protein structure should
 only contain protein residues to prevent unexpected behavior.</p>
 <dl class="field-list simple">
@@ -920,6 +928,7 @@ only contain protein residues to prevent unexpected behavior.</p>
 <li><p><strong>template_sequence</strong> (<em>str</em>) – A template one letter amino acid sequence, which holds potential insertions when compared to the target
 structure sequence.</p></li>
 <li><p><strong>loop_db</strong> (<em>str</em><em> or </em><em>Path</em>) – The path to the loop database used by OESpruce to model missing loops.</p></li>
+<li><p><strong>ligand</strong> (<em>oechem.OEMolBase</em><em> or </em><em>None</em><em>, </em><em>default=None</em>) – An OpenEye molecule that should be checked for heavy atom clashes with built insertions.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
