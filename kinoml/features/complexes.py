@@ -99,6 +99,7 @@ class OEComplexFeaturizer(OEBaseModelingFeaturizer, SingleLigandProteinComplexFe
     covalent bond will be broken. This may lead to the transformation of the
     ligand into a radical.
     """
+
     from MDAnalysis.core.universe import Universe
 
     def __init__(self, **kwargs):
@@ -277,6 +278,7 @@ class OEDockingFeaturizer(OEBaseModelingFeaturizer, SingleLigandProteinComplexFe
         ~7.4. If False, the ionization state of the input molecules will be
         conserved.
     """
+
     from MDAnalysis.core.universe import Universe
 
     def __init__(self, method: str = "Posit", pKa_norm: bool = True, **kwargs):

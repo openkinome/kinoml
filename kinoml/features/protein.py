@@ -162,6 +162,7 @@ class OEProteinStructureFeaturizer(OEBaseModelingFeaturizer, SingleProteinFeatur
         How many processes to use in case of multiprocessing. Defaults to
         number of available CPUs.
     """
+
     from MDAnalysis.core.universe import Universe
 
     def __init__(self, **kwargs):
