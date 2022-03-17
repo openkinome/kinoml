@@ -6,10 +6,12 @@ from appdirs import user_cache_dir
 def smiles_from_pdb(ligand_ids: Iterable[str]) -> dict:
     """
     Retrieve SMILES of molecules defined by their PDB chemical identifier.
+
     Parameters
     ----------
     ligand_ids: iterable of str
         PDB chemical identifier.
+
     Returns
     -------
     ligands: dict
@@ -43,12 +45,14 @@ def download_pdb_structure(pdb_id, directory=user_cache_dir()):
     """
     Download a PDB structure. If the structure is not available in PDB format, it will be download
     in CIF format.
+
     Parameters
     ----------
     pdb_id: str
         The PDB ID of interest.
     directory: str or Path, default=user_cache_dir
         The directory for saving the downloaded structure.
+
     Returns
     -------
     : Path or False

@@ -8,11 +8,13 @@ from functools import partial
 import hashlib
 import logging
 from multiprocessing import Pool, cpu_count
-from typing import Callable, Hashable, Iterable, Sequence, Union
+from pathlib import Path
+from typing import Callable, Hashable, Iterable, Sequence, Union, Tuple, List
 
 import numpy as np
 from tqdm.auto import tqdm
 
+from ..core.proteins import Protein, KLIFSKinase
 from ..core.systems import System, LigandSystem, ProteinLigandComplex
 
 
@@ -28,9 +30,9 @@ class BaseFeaturizer:
 
     def featurize(
         self,
-        systems: Iterable[System],
+        systems: List[System],
         keep=True,
-    ) -> Iterable[System]:
+    ) -> List[System]:
         """
         Given some systems (compatible with ``_SUPPORTED_TYPES``), apply
         the featurization scheme implemented in this class.
@@ -69,7 +71,7 @@ class BaseFeaturizer:
         """
         return self.featurize(*args, **kwargs)
 
-    def _pre_featurize(self, systems: Iterable[System]) -> None:
+    def _pre_featurize(self, systems: List[System]) -> None:
         """
         Run before featurizing all systems. Redefine this method if needed.
 
@@ -80,7 +82,7 @@ class BaseFeaturizer:
         """
         return
 
-    def _featurize(self, systems: Iterable[System]) -> Iterable[object]:
+    def _featurize(self, systems: List[System]) -> List[object]:
         """
         Featurize all system objects in a serial fashion as defined in ``._featurize_one()``.
 
@@ -115,10 +117,10 @@ class BaseFeaturizer:
 
     def _post_featurize(
         self,
-        systems: Iterable[System],
-        features: Iterable,
+        systems: List[System],
+        features: List,
         keep: bool = True,
-    ) -> Iterable[System]:
+    ) -> List[System]:
         """
         Run after featurizing all systems. Systems with a feature of None will be removed.
         You shouldn't need to redefine this method
@@ -127,7 +129,7 @@ class BaseFeaturizer:
         ----------
         systems: list of System
             The systems being featurized
-        features: iterable
+        features: list
             The features returned by ``self._featurize``
         keep: bool, optional=True
             Whether to store the current featurizer in the ``system.featurizations``
@@ -261,7 +263,7 @@ class ParallelBaseFeaturizer(BaseFeaturizer):
         for name, value in state.items():
             setattr(self, name, value)
 
-    def _featurize(self, systems: Iterable[System]) -> Iterable[object]:
+    def _featurize(self, systems: List[System]) -> List[object]:
         """
         Featurize all system objects in a parallel fashion as defined in ``._featurize_one()``.
 
@@ -329,12 +331,12 @@ class Pipeline(BaseFeaturizer):
     wrapper around individual ``Featurizer`` objects.
     """
 
-    def __init__(self, featurizers: Iterable[BaseFeaturizer], shortname=None, **kwargs):
+    def __init__(self, featurizers: List[BaseFeaturizer], shortname=None, **kwargs):
         super().__init__(**kwargs)
         self.featurizers = featurizers
         self._shortname = shortname
 
-    def _featurize(self, systems: Iterable[System], keep: bool = True) -> Iterable[object]:
+    def _featurize(self, systems: List[System], keep: bool = True) -> List[object]:
         """
         Given a list of featurizers, apply them sequentially
         on the systems (e.g. featurizer A returns X, and X is
@@ -423,11 +425,11 @@ class Concatenated(Pipeline):
     by `TupleOfArrays`.
     """
 
-    def __init__(self, featurizers: Iterable[BaseFeaturizer], axis: int = 1, **kwargs):
+    def __init__(self, featurizers: List[BaseFeaturizer], axis: int = 1, **kwargs):
         super().__init__(featurizers, **kwargs)
         self.axis = axis
 
-    def _featurize(self, systems: Iterable[System], keep=True) -> np.ndarray:
+    def _featurize(self, systems: List[System], keep=True) -> np.ndarray:
         """
         Given a list of featurizers, apply them serially and concatenate
         the result (e.g. featurizer A returns X, and featurizer B returns Y;
@@ -472,7 +474,7 @@ class TupleOfArrays(Pipeline):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    def _featurize(self, systems: Iterable[System], keep: bool = True) -> np.ndarray:
+    def _featurize(self, systems: List[System], keep: bool = True) -> List:
         """
         Given a list of featurizers, apply them serially and build a
         flat tuple out of the results.
@@ -571,7 +573,7 @@ class BaseOneHotEncodingFeaturizer(ParallelBaseFeaturizer):
 
         Returns
         -------
-            : array or None
+        : array or None
         """
         sequence = self._retrieve_sequence(system)
         if sequence == "":
@@ -819,3 +821,687 @@ class ClearFeaturizations(BaseFeaturizer):
         in each System
         """
         return systems
+
+
+class OEBaseModelingFeaturizer(ParallelBaseFeaturizer):
+    """
+    This abstract class defines several methods that use functionality from the OpenEye toolkit
+    for molecular modeling. Featurizers that subclass `OEBaseModelingFeaturizer` need to implement
+    at least the `_featurize_one` method.
+
+    Parameters
+    ----------
+    loop_db: str
+        The path to the loop database used by OESpruce to model missing loops.
+    cache_dir: str, Path or None, default=None
+        Path to directory used for saving intermediate files. If None, default location
+        provided by `appdirs.user_cache_dir()` will be used.
+    output_dir: str, Path or None, default=None
+        Path to directory used for saving output files. If None, output structures will not be
+        saved.
+    """
+
+    from openeye import oechem
+
+    def __init__(
+        self,
+        loop_db: Union[str, None] = None,
+        cache_dir: Union[str, Path, None] = None,
+        output_dir: Union[str, Path, None] = None,
+        **kwargs,
+    ):
+        from appdirs import user_cache_dir
+
+        super().__init__(**kwargs)
+        self.loop_db = loop_db
+        self.cache_dir = Path(user_cache_dir())
+        self.output_dir = None
+        if cache_dir:
+            self.cache_dir = Path(cache_dir).expanduser().resolve()
+        self.cache_dir.mkdir(parents=True, exist_ok=True)
+        if output_dir:
+            self.output_dir = Path(output_dir).expanduser().resolve()
+            self.output_dir.mkdir(parents=True, exist_ok=True)
+
+    def _read_protein_structure(
+        self, protein: Union[Protein, KLIFSKinase]
+    ) -> Union[oechem.OEGraphMol, None]:
+        """
+        Returns the protein structure of the given protein object as OpenEye molecule.
+
+        Parameters
+        ----------
+        protein: Protein or KLIFSKinase
+            The protein object.
+
+        Returns
+        -------
+        : oechem.OEGraphMol or None
+            The protein structure as OpenEye molecule or None.
+
+        Raises
+        ------
+        ValueError
+            If wrong toolkit was used during initialization of the protein object.
+        """
+        logger.debug("Reading structure ...")
+        if protein.toolkit != "OpenEye":
+            raise ValueError(
+                f"{self.__class__.__name__} requires protein components initialized with "
+                f"toolkit='OpenEye', {protein.toolkit} was used instead!"
+            )
+        structure = protein.molecule
+        return structure
+
+    def _get_design_unit(
+        self,
+        structure: oechem.OEMolBase,
+        chain_id: Union[str, None],
+        alternate_location: Union[str, None],
+        has_ligand: bool,
+        ligand_name: Union[str, None],
+        model_loops_and_caps: bool,
+    ) -> Union[oechem.OEDesignUnit, None]:
+        """
+        Get an OpenEye design unit based on the given input.
+
+        Parameters
+        ----------
+        structure: oechem.OEMolBase
+            An OpenEye molecule holding the protein structure to prepare.
+        chain_id: str or None
+            The chain ID of interest.
+        alternate_location: str or None
+            The alternate location of interest.
+        has_ligand: bool
+            If design unit generation should consider ligands. If True, design units will be only
+            generated for protein ligand complexes. If False, design units will not consider
+            co-crystallized ligands.
+        ligand_name: str or None
+            The ligand expo ID bound to the protein of interest. Design units will be filtered to
+            contain the respective ligand.
+        model_loops_and_caps: bool
+            If loops and caps should be modeled.
+
+        Returns
+        -------
+        design_unit: oechem.OEDesignUnit or None
+            The design unit or None if no design unit was found.
+        """
+        from openeye import oechem
+
+        from ..modeling.OEModeling import prepare_structure
+        from ..utils import LocalFileStorage, sha256_objects
+
+        design_unit_path = LocalFileStorage.featurizer_result(
+            self.__class__.__name__,
+            sha256_objects(
+                [
+                    self.loop_db,
+                    structure,
+                    chain_id,
+                    alternate_location,
+                    has_ligand,
+                    ligand_name,
+                    model_loops_and_caps,
+                ]
+            ),
+            "oedu",
+            self.cache_dir,
+        )
+        if not design_unit_path.is_file():
+            logger.debug("Generating design unit ...")
+            try:
+                design_unit = prepare_structure(
+                    structure,
+                    loop_db=self.loop_db if model_loops_and_caps else None,
+                    has_ligand=has_ligand,
+                    ligand_name=ligand_name,
+                    chain_id=chain_id,
+                    alternate_location=alternate_location,
+                    cap_termini=True if model_loops_and_caps else False,
+                )
+            except ValueError:
+                return None
+            logger.debug("Writing design unit ...")
+            oechem.OEWriteDesignUnit(str(design_unit_path), design_unit)
+        # re-reading design unit helps proper capping of e.g. 2itz
+        # TODO: revisit, report bug
+        logger.debug("Reading design unit from file ...")
+        design_unit = oechem.OEDesignUnit()
+        oechem.OEReadDesignUnit(str(design_unit_path), design_unit)
+
+        return design_unit
+
+    @staticmethod
+    def _get_components(
+        design_unit: oechem.OEDesignUnit,
+        chain_id: Union[str, None],
+    ) -> Tuple[oechem.OEGraphMol(), oechem.OEGraphMol(), oechem.OEGraphMol()]:
+        """
+        Get protein, solvent and ligand components from an OpenEye design unit.
+
+        Parameters
+        ----------
+        design_unit: oechem.OEDesignUnit
+            The OpenEye design unit to extract components from.
+        chain_id: str or None
+            The chain ID of interest.
+
+        Returns
+        -------
+        components: tuple of oechem.OEGraphMol, oechem.OEGraphMol and oechem.OEGraphMol
+            OpenEye molecules holding protein, solvent and ligand.
+        """
+        from openeye import oechem
+
+        from ..modeling.OEModeling import select_chain
+
+        protein, solvent, ligand = oechem.OEGraphMol(), oechem.OEGraphMol(), oechem.OEGraphMol()
+
+        logger.debug("Extracting molecular components ...")
+        design_unit.GetProtein(protein)
+        design_unit.GetSolvent(solvent)
+        design_unit.GetLigand(ligand)
+
+        if chain_id:  # some design units can contain multiple chains
+            logger.debug("Selecting chain ...")
+            protein = select_chain(protein, chain_id)
+            try:
+                solvent = select_chain(solvent, chain_id)
+            except ValueError:
+                logger.debug("No solvent atoms found in given chain.")
+            try:
+                ligand = select_chain(ligand, chain_id)
+            except ValueError:
+                logger.debug("No ligand atoms found in given chain.")
+
+        # delete protein atoms with no name (found in prepared protein of 4ll0)
+        for atom in protein.GetAtoms():
+            if not atom.GetName().strip():
+                logger.debug("Deleting unknown atom ...")
+                protein.DeleteAtom(atom)
+
+        # perceive residues to remove artifacts of other design units in the sequence of the protein
+        # preserve certain properties to assure correct behavior of the pipeline
+        preserved_info = (
+            oechem.OEPreserveResInfo_ResidueNumber
+            | oechem.OEPreserveResInfo_ResidueName
+            | oechem.OEPreserveResInfo_AtomName
+            | oechem.OEPreserveResInfo_ChainID
+            | oechem.OEPreserveResInfo_HetAtom
+            | oechem.OEPreserveResInfo_InsertCode
+            | oechem.OEPreserveResInfo_AlternateLocation
+        )
+        oechem.OEPerceiveResidues(protein, preserved_info)
+        oechem.OEPerceiveResidues(solvent, preserved_info)
+        oechem.OEPerceiveResidues(ligand)
+
+        logger.debug(
+            "Number of component atoms: "
+            + f"Protein - {protein.NumAtoms()}, "
+            + f"Solvent - {solvent.NumAtoms()}, "
+            + f"Ligand - {ligand.NumAtoms()}."
+        )
+        return protein, solvent, ligand
+
+    def _process_protein(
+        self,
+        protein_structure: oechem.OEMolBase,
+        amino_acid_sequence: str,
+        first_id: int = 1,
+        ligand: Union[oechem.OEMolBase, None] = None,
+    ) -> oechem.OEMolBase:
+        """
+        Process a protein structure according to the given amino acid sequence.
+
+        Parameters
+        ----------
+        protein_structure: oechem.OEMolBase
+            An OpenEye molecule holding the protein structure to process.
+        amino_acid_sequence: str
+            The amino acid sequence with associated metadata.
+        first_id: int, default=1
+            The ID of the first amino acid in the given sequence, e.g. if only a part of a
+            protein was expressed and used in experiment.
+        ligand: oechem.OEMolBase or None, default=None
+            An OpenEye molecule that should be checked for heavy atom clashes with built insertions.
+
+        Returns
+        -------
+        :oechem.OEMolBase
+            An OpenEye molecule holding the processed protein structure.
+        """
+        from ..modeling.OEModeling import (
+            read_molecules,
+            assign_caps,
+            apply_deletions,
+            apply_insertions,
+            apply_mutations,
+            delete_clashing_sidechains,
+            delete_partial_residues,
+            delete_short_protein_segments,
+            renumber_structure,
+            write_molecules,
+        )
+        from ..utils import LocalFileStorage, sha256_objects
+
+        processed_protein_path = LocalFileStorage.featurizer_result(
+            self.__class__.__name__,
+            sha256_objects(
+                [self.loop_db, protein_structure, amino_acid_sequence, first_id, ligand]
+            ),
+            "oeb",
+            self.cache_dir,
+        )
+        if processed_protein_path.is_file():
+            logger.debug("Reading processed protein from file ...")
+            return read_molecules(processed_protein_path)[0]
+
+        logger.debug(f"Deleting residues with clashing side chains ...")  # e.g. 2j5f, 4wd5
+        protein_structure = delete_clashing_sidechains(protein_structure)
+
+        logger.debug("Deleting residues with missing atoms ...")
+        protein_structure = delete_partial_residues(protein_structure)
+
+        logger.debug("Deleting loose protein segments ...")
+        protein_structure = delete_short_protein_segments(protein_structure)
+
+        logger.debug("Applying deletions to protein structure ...")
+        protein_structure = apply_deletions(protein_structure, amino_acid_sequence)
+
+        logger.debug("Deleting loose protein segments after applying deletions ...")
+        protein_structure = delete_short_protein_segments(protein_structure)
+
+        logger.debug("Applying mutations to protein structure ...")
+        protein_structure = apply_mutations(protein_structure, amino_acid_sequence)
+
+        logger.debug("Deleting loose protein segments after applying mutations ...")
+        protein_structure = delete_short_protein_segments(protein_structure)
+
+        logger.debug("Renumbering protein residues ...")
+        residue_numbers = self._get_protein_residue_numbers(protein_structure, amino_acid_sequence)
+        protein_structure = renumber_structure(protein_structure, residue_numbers)
+
+        if self.loop_db:
+            logger.debug("Applying insertions to protein structure ...")
+            protein_structure = apply_insertions(
+                protein_structure,
+                amino_acid_sequence,
+                self.loop_db,
+                ligand,
+            )
+
+        logger.debug("Checking protein structure sequence termini ...")
+        real_termini = [first_id, first_id + len(amino_acid_sequence) - 1]
+
+        logger.debug(f"Assigning caps except for real termini {real_termini} ...")
+        protein_structure = assign_caps(protein_structure, real_termini)
+
+        logger.debug("Writing processed protein structure ...")
+        write_molecules([protein_structure], processed_protein_path)
+
+        return protein_structure
+
+    @staticmethod
+    def _get_protein_residue_numbers(
+        protein_structure: oechem.OEMolBase,
+        amino_acid_sequence: str,
+        first_id: int = 1,
+    ) -> List[int]:
+        """
+        Get the residue numbers of a protein structure according to given amino acid sequence.
+
+        Parameters
+        ----------
+        protein_structure: oechem.OEMolBase
+            The kinase domain structure.
+        amino_acid_sequence: core.sequences.AminoAcidSequence
+            The template amino acid sequence.
+        first_id: int, default=1
+            The ID of the first amino acid in the given sequence, e.g. if only a part of a
+            protein was expressed and used in experiment.
+
+        Returns
+        -------
+        residue_number: list of int
+            A list of residue numbers according to the given amino acid sequence in the same order
+            as the residues in the given protein structure.
+        """
+        from ..modeling.OEModeling import get_structure_sequence_alignment
+
+        logger.debug("Aligning sequences ...")
+        target_sequence, template_sequence = get_structure_sequence_alignment(
+            protein_structure, amino_acid_sequence
+        )
+        logger.debug(f"Template sequence:\n{template_sequence}")
+        logger.debug(f"Target sequence:\n{target_sequence}")
+
+        logger.debug("Generating residue numbers ...")
+        residue_numbers = []
+        residue_number = first_id
+        for template_sequence_residue, target_sequence_residue in zip(
+            template_sequence, target_sequence
+        ):
+            if template_sequence_residue != "-":
+                if target_sequence_residue != "-":
+                    residue_numbers.append(residue_number)
+                residue_number += 1
+            else:
+                # I doubt this this will ever happen in the current implementation
+                text = (
+                    "Cannot generate residue IDs. The given protein structure contains residues "
+                    "that are not part of the given sequence."
+                )
+                logger.debug("Exception: " + text)
+                raise ValueError(text)
+
+        return residue_numbers
+
+    def _assemble_components(
+        self,
+        protein: oechem.OEMolBase,
+        solvent: oechem.OEMolBase,
+        ligand: Union[oechem.OEMolBase, None] = None,
+    ) -> oechem.OEMolBase:
+        """
+        Assemble components of a solvated protein-ligand complex into a single OpenEye molecule.
+
+        Parameters
+        ----------
+        protein: oechem.OEMolBase
+            An OpenEye molecule holding the protein of interest.
+        solvent: oechem.OEMolBase
+            An OpenEye molecule holding the solvent of interest.
+        ligand: oechem.OEMolBase or None, default=None
+            An OpenEye molecule holding the ligand of interest if given.
+
+        Returns
+        -------
+        assembled_components: oechem.OEMolBase
+            An OpenEye molecule holding protein, solvent and ligand if given.
+        """
+        from openeye import oechem
+
+        from ..modeling.OEModeling import update_residue_identifiers
+
+        assembled_components = oechem.OEGraphMol()
+
+        logger.debug("Adding protein ...")
+        oechem.OEAddMols(assembled_components, protein)
+
+        if ligand:
+            logger.debug("Renaming ligand ...")
+            for atom in ligand.GetAtoms():
+                oeresidue = oechem.OEAtomGetResidue(atom)
+                oeresidue.SetName("LIG")
+                oechem.OEAtomSetResidue(atom, oeresidue)
+
+            logger.debug("Adding ligand ...")
+            oechem.OEAddMols(assembled_components, ligand)
+
+        logger.debug("Adding water molecules ...")
+        filtered_solvent = self._remove_clashing_water(solvent, ligand, protein)
+        oechem.OEAddMols(assembled_components, filtered_solvent)
+
+        logger.debug("Updating hydrogen positions of assembled components ...")
+        options = oechem.OEPlaceHydrogensOptions()  # keep protonation state from docking
+        predicate = oechem.OEAtomMatchResidue(["LIG:.*:.*:.*:.*"])
+        options.SetBypassPredicate(predicate)
+        oechem.OEPlaceHydrogens(assembled_components, options)
+        # keep tyrosine protonated, e.g. 6tg1 chain B
+        predicate = oechem.OEAndAtom(
+            oechem.OEAtomMatchResidue(["TYR:.*:.*:.*:.*"]), oechem.OEHasFormalCharge(-1)
+        )
+        for atom in assembled_components.GetAtoms(predicate):
+            if atom.GetName().strip() == "OH":
+                atom.SetFormalCharge(0)
+                atom.SetImplicitHCount(1)
+        oechem.OEAddExplicitHydrogens(assembled_components)
+
+        logger.debug("Updating residue identifiers ...")
+        assembled_components = update_residue_identifiers(assembled_components)
+
+        return assembled_components
+
+    @staticmethod
+    def _remove_clashing_water(
+        solvent: oechem.OEMolBase, ligand: Union[oechem.OEMolBase, None], protein: oechem.OEMolBase
+    ) -> oechem.OEGraphMol:
+        """
+        Remove water molecules clashing with a ligand or newly modeled protein residues.
+
+        Parameters
+        ----------
+        solvent: oechem.OEGraphMol
+            An OpenEye molecule holding the water molecules.
+        ligand: oechem.OEGraphMol or None
+            An OpenEye molecule holding the ligand or None.
+        protein: oechem.OEGraphMol
+            An OpenEye molecule holding the protein.
+
+        Returns
+        -------
+        :oechem.OEGraphMol
+            An OpenEye molecule holding water molecules not clashing with the ligand or newly
+            modeled protein residues.
+        """
+        from openeye import oechem, oespruce
+        from scipy.spatial import cKDTree
+
+        from ..modeling.OEModeling import get_atom_coordinates, split_molecule_components
+
+        if ligand is not None:
+            ligand_heavy_atoms = oechem.OEGraphMol()
+            oechem.OESubsetMol(ligand_heavy_atoms, ligand, oechem.OEIsHeavy())
+            ligand_heavy_atom_coordinates = get_atom_coordinates(ligand_heavy_atoms)
+            ligand_heavy_atoms_tree = cKDTree(ligand_heavy_atom_coordinates)
+
+        modeled_heavy_atoms = oechem.OEGraphMol()
+        oechem.OESubsetMol(
+            modeled_heavy_atoms,
+            protein,
+            oechem.OEAndAtom(oespruce.OEIsModeledAtom(), oechem.OEIsHeavy()),
+        )
+        modeled_heavy_atoms_tree = None
+        if modeled_heavy_atoms.NumAtoms() > 0:
+            modeled_heavy_atom_coordinates = get_atom_coordinates(modeled_heavy_atoms)
+            modeled_heavy_atoms_tree = cKDTree(modeled_heavy_atom_coordinates)
+
+        filtered_solvent = oechem.OEGraphMol()
+        waters = split_molecule_components(solvent)
+        # iterate over water molecules and check for clashes and ambiguous water molecules
+        for water in waters:
+            try:
+                water_oxygen_atom = water.GetAtoms(oechem.OEIsOxygen()).next()
+            except StopIteration:
+                # experienced lonely water hydrogens for 2v7a after mutating PTR393 to TYR
+                logger.debug("Removing water molecule without oxygen!")
+                continue
+            # experienced problems when preparing 4pmp
+            # making design units generated clashing waters that were not protonatable
+            # TODO: revisit this behavior
+            if oechem.OEAtomGetResidue(water_oxygen_atom).GetInsertCode() != " ":
+                logger.debug("Removing ambiguous water molecule!")
+                continue
+            water_oxygen_coordinates = water.GetCoords()[water_oxygen_atom.GetIdx()]
+            # check for clashes with newly placed ligand
+            if ligand is not None:
+                clashes = ligand_heavy_atoms_tree.query_ball_point(water_oxygen_coordinates, 1.5)
+                if len(clashes) > 0:
+                    logger.debug("Removing water molecule clashing with ligand atoms!")
+                    continue
+            # check for clashes with newly modeled protein residues
+            if modeled_heavy_atoms_tree:
+                clashes = modeled_heavy_atoms_tree.query_ball_point(water_oxygen_coordinates, 1.5)
+                if len(clashes) > 0:
+                    logger.debug("Removing water molecule clashing with modeled atoms!")
+                    continue
+            # water molecule is not clashy, add to filtered solvent
+            oechem.OEAddMols(filtered_solvent, water)
+
+        return filtered_solvent
+
+    def _update_pdb_header(
+        self,
+        structure: oechem.OEMolBase,
+        protein_name: str,
+        ligand_name: [str, None] = None,
+        other_pdb_header_info: Union[None, Iterable[Tuple[str, str]]] = None,
+    ) -> oechem.OEMolBase:
+        """
+        Stores information about Featurizer, protein and ligand in the PDB header COMPND section in the
+        given OpenEye molecule.
+
+        Parameters
+        ----------
+        structure: oechem.OEMolBase
+            An OpenEye molecule.
+        protein_name: str
+            The name of the protein.
+        ligand_name: str or None, default=None
+            The name of the ligand if present.
+        other_pdb_header_info: None or iterable of tuple of str
+            Tuples with information that should be saved in the PDB header. Each tuple consists of two strings,
+            i.e., the PDB header section (e.g. COMPND) and the respective information.
+
+        Returns
+        -------
+        :oechem.OEMolBase
+            The OpenEye molecule containing the updated PDB header.
+        """
+        from openeye import oechem
+
+        oechem.OEClearPDBData(structure)
+        oechem.OESetPDBData(structure, "COMPND", f"\tFeaturizer: {self.__class__.__name__}")
+        oechem.OEAddPDBData(structure, "COMPND", f"\tProtein: {protein_name}")
+        if ligand_name:
+            oechem.OEAddPDBData(structure, "COMPND", f"\tLigand: {ligand_name}")
+        if other_pdb_header_info is not None:
+            for section, information in other_pdb_header_info:
+                oechem.OEAddPDBData(structure, section, information)
+
+        return structure
+
+    def _write_results(
+        self,
+        structure: oechem.OEMolBase,
+        protein_name: str,
+        ligand_name: Union[str, None] = None,
+    ) -> Path:
+        """
+        Write the results from the Featurizer and retrieve the paths to protein or complex if a
+        ligand is present.
+
+        Parameters
+        ----------
+        structure: oechem.OEMolBase
+            The OpenEye molecule holding the featurized system.
+        protein_name: str
+            The name of the protein.
+        ligand_name: str or None, default=None
+            The name of the ligand if present.
+
+        Returns
+        -------
+        :Path
+            Path to prepared protein or complex if ligand is present.
+        """
+        from openeye import oechem
+
+        from ..modeling.OEModeling import write_molecules, remove_non_protein
+        from ..utils import LocalFileStorage
+
+        if self.output_dir:
+            if ligand_name:
+                logger.debug("Writing protein ligand complex ...")
+                complex_path = LocalFileStorage.featurizer_result(
+                    self.__class__.__name__,
+                    f"{protein_name}_{ligand_name}_complex",
+                    "oeb",
+                    self.output_dir,
+                )
+                write_molecules([structure], complex_path)
+
+                complex_path = LocalFileStorage.featurizer_result(
+                    self.__class__.__name__,
+                    f"{protein_name}_{ligand_name}_complex",
+                    "pdb",
+                    self.output_dir,
+                )
+                write_molecules([structure], complex_path)
+
+                logger.debug("Splitting components")
+                solvated_protein = remove_non_protein(structure, remove_water=False)
+                split_options = oechem.OESplitMolComplexOptions()
+                ligand = list(
+                    oechem.OEGetMolComplexComponents(
+                        structure, split_options, split_options.GetLigandFilter()
+                    )
+                )[0]
+
+                logger.debug("Writing protein ...")
+                protein_path = LocalFileStorage.featurizer_result(
+                    self.__class__.__name__,
+                    f"{protein_name}_{ligand_name}_protein",
+                    "oeb",
+                    self.output_dir,
+                )
+                write_molecules([solvated_protein], protein_path)
+
+                protein_path = LocalFileStorage.featurizer_result(
+                    self.__class__.__name__,
+                    f"{protein_name}_{ligand_name}_protein",
+                    "pdb",
+                    self.output_dir,
+                )
+                write_molecules([solvated_protein], protein_path)
+
+                logger.debug("Writing ligand ...")
+                ligand_path = LocalFileStorage.featurizer_result(
+                    self.__class__.__name__,
+                    f"{protein_name}_{ligand_name}_ligand",
+                    "sdf",
+                    self.output_dir,
+                )
+                write_molecules([ligand], ligand_path)
+
+                return complex_path
+            else:
+                logger.debug("Writing protein ...")
+                protein_path = LocalFileStorage.featurizer_result(
+                    self.__class__.__name__,
+                    f"{protein_name}_protein",
+                    "oeb",
+                    self.output_dir,
+                )
+                write_molecules([structure], protein_path)
+
+                protein_path = LocalFileStorage.featurizer_result(
+                    self.__class__.__name__,
+                    f"{protein_name}_protein",
+                    "pdb",
+                    self.output_dir,
+                )
+                write_molecules([structure], protein_path)
+
+                return protein_path
+        else:
+            if ligand_name:
+                complex_path = LocalFileStorage.featurizer_result(
+                    self.__class__.__name__,
+                    f"{protein_name}_{ligand_name}_complex",
+                    "pdb",
+                )
+                write_molecules([structure], complex_path)
+
+                return complex_path
+            else:
+                protein_path = LocalFileStorage.featurizer_result(
+                    self.__class__.__name__,
+                    f"{protein_name}_protein",
+                    "pdb",
+                )
+                write_molecules([structure], protein_path)
+
+                return protein_path

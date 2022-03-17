@@ -1,5 +1,5 @@
 """
-Test protein featurizers of `kinoml.features`
+Test ligand featurizers of `kinoml.protein`
 """
 
 

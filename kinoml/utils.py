@@ -169,12 +169,14 @@ class defaultdictwithargs(defaultdict):
 def download_file(url: str, path: str):
     """
     Download a file and save it locally.
+
     Parameters
     ----------
     url: str
         URL for downloading data.
     path: str
         Path to save downloaded data.
+
     Returns
     -------
     : bool
@@ -364,3 +366,23 @@ def import_object(import_path: str):
         module = import_module(module_str)
         return getattr(module, obj_str)
     return import_module(import_path)
+
+
+def sha256_objects(objects_to_hash: Iterable[object]) -> str:
+    """
+    Generate a SHA256 hash of pickable objects.
+
+    Parameters
+    ----------
+    objects_to_hash: Iterable of object
+        Objects that should be hashed.
+
+    Returns
+    -------
+    : str
+        The SHA256 of given objects.
+    """
+    import hashlib
+    import pickle
+
+    return hashlib.sha256(pickle.dumps(objects_to_hash)).hexdigest()

@@ -1,74 +1,12 @@
-from typing import List, Tuple, Union
+import logging
+from typing import List, Union
 
 from openeye import oechem
 
 
-def create_hybrid_receptor(
-    protein: oechem.OEMolBase, ligand: oechem.OEMolBase
-) -> oechem.OEGraphMol:
+def resids_to_box_molecule(protein: oechem.OEMolBase, resids: List[int]) -> oechem.OEGraphMol:
     """
-    Create a receptor for hybrid docking.
-
-    Parameters
-    ----------
-    protein: oechem.OEMolBase
-        An OpenEye molecule holding a prepared protein structure.
-    ligand: oechem.OEMolBase
-        An OpenEye molecule holding a prepared ligand structure.
-
-    Returns
-    -------
-    receptor: oechem.OEGraphMol
-        An OpenEye molecule holding a receptor with protein and ligand.
-    """
-    from openeye import oedocking
-
-    # create receptor
-    receptor = oechem.OEGraphMol()
-    oedocking.OEMakeReceptor(receptor, protein, ligand)
-
-    return receptor
-
-
-def create_hint_receptor(
-    protein: oechem.OEMolBase,
-    hintx: Union[float, int],
-    hinty: Union[float, int],
-    hintz: Union[float, int],
-) -> oechem.OEGraphMol:
-    """
-    Create a hint receptor for docking.
-
-    Parameters
-    ----------
-    protein: oechem.OEMolBase
-        An OpenEye molecule holding a prepared protein structure.
-    hintx: float or int
-        A number defining the hint x coordinate.
-    hinty: float or int
-        A number defining the hint y coordinate.
-    hintz: float or int
-        A number defining the hint z coordinate.
-
-    Returns
-    -------
-    receptor: oechem.OEGraphMol
-        An OpenEye molecule holding a receptor with defined binding site via hint coordinates.
-    """
-    from openeye import oedocking
-
-    # create receptor
-    receptor = oechem.OEGraphMol()
-    oedocking.OEMakeReceptor(receptor, protein, hintx, hinty, hintz)
-
-    return receptor
-
-
-def resids_to_box(
-    protein: oechem.OEMolBase, resids: List[int]
-) -> Tuple[float, float, float, float, float, float]:
-    """
-    Retrieve box dimensions of a list if residues.
+    Retrieve a box molecule spanning the given protein residue IDs.
 
     Parameters
     ----------
@@ -79,13 +17,16 @@ def resids_to_box(
 
     Returns
     -------
-    box_dimensions: tuple of float
-        The box dimensions in the order of xmax, ymax, zmax, xmin, ymin, zmin.
+    box_molecule: oechem.OEGraphMol
+        Rectangular box molecule spanning the region of the given protein defined by the given
+        residue IDs.
     """
+    from openeye import oedocking
 
     coordinates = oechem.OEFloatArray(protein.NumAtoms() * 3)
     oechem.OEGetPackedCoords(protein, coordinates)
 
+    # collect coordinates
     x_coordinates = []
     y_coordinates = []
     z_coordinates = []
@@ -95,6 +36,12 @@ def resids_to_box(
             y_coordinates.append(coordinates[(i * 3) + 1])
             z_coordinates.append(coordinates[(i * 3) + 2])
 
+    if any(
+        [len(coordinates) == 0 for coordinates in [x_coordinates, y_coordinates, z_coordinates]]
+    ):
+        raise ValueError("Given residue IDs do not match any residue in the given protein.")
+
+    # calculate box dimensions
     box_dimensions = (
         max(x_coordinates),
         max(y_coordinates),
@@ -104,61 +51,43 @@ def resids_to_box(
         min(z_coordinates),
     )
 
-    return box_dimensions
+    # create box
+    box = oechem.OEBox()
+    box.Setup(*box_dimensions)
 
+    # make box molecule
+    box_molecule = oechem.OEGraphMol()
+    oedocking.OEMakeBoxMolecule(box_molecule, box)
 
-def create_box_receptor(
-    protein: oechem.OEMolBase,
-    box_dimensions: Tuple[float, float, float, float, float, float],
-) -> oechem.OEGraphMol:
-    """
-    Create a box receptor for docking.
-
-    Parameters
-    ----------
-    protein: oechem.OEMolBase
-        An OpenEye molecule holding a prepared protein structure.
-    box_dimensions: tuple of float
-        The box dimensions in the order of xmax, ymax, zmax, xmin, ymin, zmin.
-
-    Returns
-    -------
-    receptor: oechem.OEGraphMol
-        An OpenEye molecule holding a receptor with defined binding site via box dimensions.
-    """
-    from openeye import oedocking
-
-    # create receptor
-    box = oedocking.OEBox(*box_dimensions)
-    receptor = oechem.OEGraphMol()
-    oedocking.OEMakeReceptor(receptor, protein, box)
-
-    return receptor
+    return box_molecule
 
 
 def pose_molecules(
-    receptor: oechem.OEMolBase,
+    design_unit: oechem.OEDesignUnit,
     molecules: List[oechem.OEMolBase],
     pKa_norm: bool = True,
+    score_pose: bool = False,
 ) -> Union[List[oechem.OEGraphMol], None]:
     """
     Generate a binding pose of molecules in a prepared receptor with OpenEye's Posit method.
 
     Parameters
     ----------
-    receptor: oechem.OEMolBase
-        An OpenEye molecule holding the prepared receptor.
+    design_unit: oechem. OEDesignUnit
+        A design unit with a receptor object.
     molecules: list of oechem.OEMolBase
         A list of OpenEye molecules holding prepared molecules for docking.
     pKa_norm: bool, default=True
         Assign the predominant ionization state at pH ~7.4.
+    score_pose: bool, default=False
+        Score the best docking pose per ligand and add the proper SD tag.
 
     Returns
     -------
     posed_molecules: list of oechem.OEGraphMol or None
         A list of OpenEye molecules holding the docked molecules.
     """
-    from openeye import oedocking
+    from openeye import oedocking, oeomega
     from ..modeling.OEModeling import generate_reasonable_conformations
 
     def probability(molecule: oechem.OEGraphMol):
@@ -169,16 +98,18 @@ def pose_molecules(
     # initialize receptor
     options = oedocking.OEPositOptions()
     options.SetIgnoreNitrogenStereo(True)  # nitrogen stereo centers can be problematic
-    options.SetPoseRelaxMode(oedocking.OEPoseRelaxMode_ALL)
-    poser = oedocking.OEPosit()
-    poser.Initialize(receptor)
+    options.SetPoseRelaxMode(
+        oedocking.OEPoseRelaxMode_NONE
+    )  # relaxation is slow and would also affect the protein, which is currently not returned
+    poser = oedocking.OEPosit(options)
+    poser.AddReceptor(design_unit)
 
     posed_molecules = list()
     # pose molecules
     for molecule in molecules:
         # tautomers, enantiomers, conformations
         conformations_ensemble = generate_reasonable_conformations(
-            molecule, dense=True, pKa_norm=pKa_norm
+            molecule, oeomega.OEOmegaOptions(oeomega.OEOmegaSampling_Pose), pKa_norm=pKa_norm
         )
 
         posed_conformations = list()
@@ -186,25 +117,33 @@ def pose_molecules(
             result = oedocking.OESinglePoseResult()
             return_code = poser.Dock(result, conformations)
             if return_code != oedocking.OEDockingReturnCode_Success:
-                # TODO: Maybe something for logging
-                print(
-                    f"POsing failed for molecule with title {conformations.GetTitle()} with error code "
+                logging.debug(
+                    f"Posing failed for molecule with title {conformations.GetTitle()} with error code "
                     f"{oedocking.OEDockingReturnCodeGetName(return_code)}."
                 )
                 continue
             else:
                 posed_conformation = result.GetPose()
 
-            # store probability and store pose
-            oechem.OESetSDData(
-                posed_conformation, "POSIT::Probability", str(result.GetProbability())
-            )
-            posed_conformations.append(oechem.OEGraphMol(posed_conformation))
+                # store probability and pose
+                oechem.OESetSDData(
+                    posed_conformation, "POSIT::Probability", str(result.GetProbability())
+                )
+                posed_conformations.append(oechem.OEGraphMol(posed_conformation))
 
-        # sort all conformations of all tautomers and enantiomers by score
+        # sort poses of all tautomers and enantiomers by score
         posed_conformations.sort(key=probability, reverse=True)
 
-        posed_molecules.append(posed_conformations[0])
+        # keep conformation with highest probability
+        if len(posed_conformations) > 0:
+            best_pose = posed_conformations[0]
+            if score_pose:
+                # calculate and store ChemGauss4 docking score
+                pose_scorer = oedocking.OEScore(oedocking.OEScoreType_Chemgauss4)
+                pose_scorer.Initialize(design_unit)
+                pose_scorer.ScoreLigand(best_pose)
+                oedocking.OESetSDScore(best_pose, pose_scorer, pose_scorer.GetName())
+            posed_molecules.append(best_pose)
 
     if len(posed_molecules) == 0:
         # TODO: returning None when something goes wrong
@@ -214,20 +153,20 @@ def pose_molecules(
 
 
 def run_docking(
-    receptor: oechem.OEMolBase,
+    design_unit: oechem.OEDesignUnit,
     molecules: List[oechem.OEMolBase],
     dock_method: int,
     num_poses: int = 1,
     pKa_norm: bool = True,
 ) -> Union[List[oechem.OEGraphMol], None]:
     """
-    Dock molecules into a prepared receptor.
+    Dock molecules into a prepared design unit containing a receptor object.
 
     Parameters
     ----------
-    receptor: oechem.OEGraphMol
-        An OpenEye molecule holding the prepared receptor.
-    molecules: list of oechem.OEGraphMol
+    design_unit: oechem.OEDesignUnit
+        A design unit with a receptor object.
+    molecules: list of oechem.OEMolBase
         A list of OpenEye molecules holding prepared molecules for docking.
     dock_method: int
         Constant defining the docking method.
@@ -241,13 +180,13 @@ def run_docking(
     docked_molecules: list of oechem.OEGraphMol or None
         A list of OpenEye molecules holding the docked molecules.
     """
-    from openeye import oedocking
+    from openeye import oedocking, oeomega
     from ..modeling.OEModeling import generate_reasonable_conformations
 
     # initialize receptor
     dock_resolution = oedocking.OESearchResolution_High
     dock = oedocking.OEDock(dock_method, dock_resolution)
-    dock.Initialize(receptor)
+    dock.Initialize(design_unit)
 
     def score(molecule: oechem.OEGraphMol, dock: oedocking.OEDock = dock):
         """Return the docking score."""
@@ -260,7 +199,9 @@ def run_docking(
     for molecule in molecules:
         # tautomers, enantiomers, conformations
         conformations_ensemble = generate_reasonable_conformations(
-            molecule, dense=True, pKa_norm=pKa_norm
+            molecule,
+            options=oeomega.OEOmegaOptions(oeomega.OEOmegaSampling_Pose),
+            pKa_norm=pKa_norm,
         )
 
         docked_conformations = list()
@@ -271,8 +212,7 @@ def run_docking(
             # dock molecule
             return_code = dock.DockMultiConformerMolecule(docked_mol, conformations, num_poses)
             if return_code != oedocking.OEDockingReturnCode_Success:
-                # TODO: Maybe something for logging
-                print(
+                logging.debug(
                     f"Docking failed for molecule with title {conformations.GetTitle()} with error code "
                     f"{oedocking.OEDockingReturnCodeGetName(return_code)}."
                 )
@@ -299,18 +239,18 @@ def run_docking(
 
 
 def hybrid_docking(
-    hybrid_receptor: oechem.OEMolBase,
+    design_unit: oechem.OEDesignUnit,
     molecules: List[oechem.OEMolBase],
     num_poses: int = 1,
     pKa_norm: bool = True,
 ) -> Union[List[oechem.OEGraphMol], None]:
     """
-    Dock molecules into a prepared receptor holding protein and ligand structure.
+    Dock molecules into a prepared design unit containing a hybrid receptor object.
 
     Parameters
     ----------
-    hybrid_receptor: oechem.OEMolBase
-        An OpenEye molecule holding the prepared receptor.
+    design_unit: oechem.OEDesignUnit
+        A design unit with a hybrid receptor object.
     molecules: list of oechem.OEMolBase
         A list of OpenEye molecules holding prepared molecules for docking.
     num_poses: int
@@ -326,24 +266,24 @@ def hybrid_docking(
     from openeye import oedocking
 
     dock_method = oedocking.OEDockMethod_Hybrid2
-    docked_molecules = run_docking(hybrid_receptor, molecules, dock_method, num_poses, pKa_norm)
+    docked_molecules = run_docking(design_unit, molecules, dock_method, num_poses, pKa_norm)
 
     return docked_molecules
 
 
-def chemgauss_docking(
-    receptor: oechem.OEMolBase,
+def fred_docking(
+    design_unit: oechem.OEDesignUnit,
     molecules: List[oechem.OEMolBase],
     num_poses: int = 1,
     pKa_norm: bool = True,
 ) -> Union[List[oechem.OEGraphMol], None]:
     """
-    Dock molecules into a prepared receptor holding a protein structure.
+    Dock molecules into a prepared design unit containing a receptor object.
 
     Parameters
     ----------
-    receptor: oechem.OEMolBase
-        An OpenEye molecule holding the prepared hint or box receptor.
+    design_unit: oechem.OEDesignUnit
+        A design unit with a receptor object.
     molecules: list of oechem.OEMolBase
         A list of OpenEye molecules holding prepared molecules for docking.
     num_poses: int
@@ -359,6 +299,6 @@ def chemgauss_docking(
     from openeye import oedocking
 
     dock_method = oedocking.OEDockMethod_Chemgauss4
-    docked_molecules = run_docking(receptor, molecules, dock_method, num_poses, pKa_norm)
+    docked_molecules = run_docking(design_unit, molecules, dock_method, num_poses, pKa_norm)
 
     return docked_molecules
