@@ -49,7 +49,7 @@ class OEComplexFeaturizer(OEBaseModelingFeaturizer, SingleLigandProteinComplexFe
      - protonation at pH 7.4
 
     The protein component of each system must be a `core.proteins.Protein` or
-    a subclass thereof , must be initialized with toolkit='OpenEye' and give
+    a subclass thereof, must be initialized with toolkit='OpenEye' and give
     access to the molecular structure, e.g. via a pdb_id. Additionally, the
     protein component can have the following optional attributes to customize
     the protein modeling:
