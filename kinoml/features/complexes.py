@@ -16,8 +16,8 @@ logger = logging.getLogger(__name__)
 
 class SingleLigandProteinComplexFeaturizer(ParallelBaseFeaturizer):
     """
-    Provides a minimally useful ``._supports()`` method for all ProteinLigandComplex-like
-    featurizers.
+    Provides a minimally useful ``._supports()`` method for all
+    ProteinLigandComplex-like featurizers.
     """
 
     _COMPATIBLE_PROTEIN_TYPES = (Protein, KLIFSKinase)
@@ -38,61 +38,67 @@ class SingleLigandProteinComplexFeaturizer(ParallelBaseFeaturizer):
 
 class OEComplexFeaturizer(OEBaseModelingFeaturizer, SingleLigandProteinComplexFeaturizer):
     """
-    Given systems with exactly one protein and one ligand, prepare the complex structure by:
+    Given systems with exactly one protein and one ligand, prepare the complex
+    structure by:
 
      - modeling missing loops
      - building missing side chains
-     - mutations, if `uniprot_id` or `sequence` attribute is provided for the protein component
-       (see below)
+     - mutations, if `uniprot_id` or `sequence` attribute is provided for the
+       protein component (see below)
      - removing everything but protein, water and ligand of interest
      - protonation at pH 7.4
 
-    The protein component of each system must be a `core.proteins.Protein` or a subclass thereof
-    , must be initialized with toolkit='OpenEye' and give access to the molecular structure, e.g.
-    via a pdb_id. Additionally, the protein component can have the following optional attributes
-    to customize the protein modeling:
+    The protein component of each system must be a `core.proteins.Protein` or
+    a subclass thereof , must be initialized with toolkit='OpenEye' and give
+    access to the molecular structure, e.g. via a pdb_id. Additionally, the
+    protein component can have the following optional attributes to customize
+    the protein modeling:
 
-     - `name`: A string specifying the name of the protein, will be used for generating the
-       output file name.
+     - `name`: A string specifying the name of the protein, will be used for
+       generating the output file name.
      - `chain_id`: A string specifying which chain should be used.
-     - `alternate_location`: A string specifying which alternate location should be used.
-     - `expo_id`: A string specifying the ligand of interest. This is especially useful if
-       multiple ligands are present in a PDB structure.
-     - `uniprot_id`: A string specifying the UniProt ID that will be used to fetch the amino acid
-       sequence from UniProt, which will be used for modeling the protein. This will supersede the
-       sequence information given in the PDB header.
-     - `sequence`: An `AminoAcidSequence` object specifying the amino acid sequence that should be
-       used during modeling the protein. This will supersede a given `uniprot_id` and the sequence
-       information given in the PDB header.
+     - `alternate_location`: A string specifying which alternate location
+       should be used.
+     - `expo_id`: A string specifying the ligand of interest. This is
+       especially useful if multiple ligands are present in a PDB structure.
+     - `uniprot_id`: A string specifying the UniProt ID that will be used to
+       fetch the amino acid sequence from UniProt, which will be used for
+       modeling the protein. This will supersede the sequence information
+       given in the PDB header.
+     - `sequence`: A  string specifying the amino acid sequence in
+       one-letter-codes that should be used during modeling the protein. This
+       will supersede a given `uniprot_id` and the sequence information given
+       in the PDB header.
 
-    The ligand component of each system must be a `core.components.BaseLigand` or a subclass
-    thereof. The ligand component can have the following optional attributes:
+    The ligand component of each system must be a `core.components.BaseLigand`
+    or a subclass thereof. The ligand component can have the following
+    optional attributes:
 
-     - `name`: A string specifying the name of the ligand, will be used for generating the
-       output file name.
+     - `name`: A string specifying the name of the ligand, will be used for
+       generating the output file name.
 
     Parameters
     ----------
     loop_db: str
         The path to the loop database used by OESpruce to model missing loops.
     cache_dir: str, Path or None, default=None
-        Path to directory used for saving intermediate files. If None, default location
-        provided by `appdirs.user_cache_dir()` will be used.
+        Path to directory used for saving intermediate files. If None, default
+        location provided by `appdirs.user_cache_dir()` will be used.
     output_dir: str, Path or None, default=None
-        Path to directory used for saving output files. If None, output structures will not be
-        saved.
+        Path to directory used for saving output files. If None, output
+        structures will not be saved.
     use_multiprocessing : bool, default=True
         If multiprocessing to use.
     n_processes : int or None, default=None
-        How many processes to use in case of multiprocessing. Defaults to number of available
-        CPUs.
+        How many processes to use in case of multiprocessing. Defaults to
+        number of available CPUs.
 
     Note
     ----
-    If the ligand of interest is covalently bonded to the protein, the covalent bond will be
-    broken. This may lead to the transformation of the ligand into a radical.
+    If the ligand of interest is covalently bonded to the protein, the
+    covalent bond will be broken. This may lead to the transformation of the
+    ligand into a radical.
     """
-
     from MDAnalysis.core.universe import Universe
 
     def __init__(self, **kwargs):
@@ -203,43 +209,51 @@ class OEComplexFeaturizer(OEBaseModelingFeaturizer, SingleLigandProteinComplexFe
 
 class OEDockingFeaturizer(OEBaseModelingFeaturizer, SingleLigandProteinComplexFeaturizer):
     """
-    Given systems with exactly one protein and one ligand, prepare the structure and dock the
-    ligand into the prepared protein structure with one of OpenEye's docking algorithms:
+    Given systems with exactly one protein and one ligand, prepare the
+    structure and dock the ligand into the prepared protein structure with
+    one of OpenEye's docking algorithms:
 
      - modeling missing loops
      - building missing side chains
-     - mutations, if `uniprot_id` or `sequence` attribute is provided for the protein component
-       (see below)
+     - mutations, if `uniprot_id` or `sequence` attribute is provided for the
+       protein component (see below)
      - removing everything but protein, water and ligand of interest
      - protonation at pH 7.4
      - perform docking
 
-    The protein component of each system must be a `core.proteins.Protein` or a subclass thereof
-    , must be initialized with toolkit='OpenEye' and give access to the molecular structure, e.g.
-    via a pdb_id. Additionally, the protein component can have the following optional attributes
-    to customize the protein modeling:
+    The protein component of each system must be a `core.proteins.Protein` or
+    a subclass thereof, must be initialized with toolkit='OpenEye' and give
+    access to the molecular structure, e.g. via a pdb_id. Additionally, the
+    protein component can have the following optional attributes to customize
+    the protein modeling:
 
-     - `name`: A string specifying the name of the protein, will be used for generating the
-       output file name.
+     - `name`: A string specifying the name of the protein, will be used for
+       generating the output file name.
      - `chain_id`: A string specifying which chain should be used.
-     - `alternate_location`: A string specifying which alternate location should be used.
-     - `expo_id`: A string specifying a ligand bound to the protein of interest. This is especially
-       useful if multiple proteins are found in one PDB structure.
-     - `uniprot_id`: A string specifying the UniProt ID that will be used to fetch the amino acid
-       sequence from UniProt, which will be used for modeling the protein. This will supersede the
-       sequence information given in the PDB header.
-     - `sequence`: An `AminoAcidSequence` object specifying the amino acid sequence that should be
-       used during modeling the protein. This will supersede a given `uniprot_id` and the sequence
-       information given in the PDB header.
-     - `pocket_resids`: List of integers specifying the residues in the binding pocket of interest.
-       This is attribute is required if docking with Fred into an apo structure.
+     - `alternate_location`: A string specifying which alternate location
+       should be used.
+     - `expo_id`: A string specifying a ligand bound to the protein of
+       interest. This is especially useful if multiple proteins are found in
+       one PDB structure.
+     - `uniprot_id`: A string specifying the UniProt ID that will be used to
+       fetch the amino acid sequence from UniProt, which will be used for
+       modeling the protein. This will supersede the sequence information
+       given in the PDB header.
+     - `sequence`: A  string specifying the amino acid sequence in
+       one-letter-codes that should be used during modeling the protein. This
+       will supersede a given `uniprot_id` and the sequence information given
+       in the PDB header.
+     - `pocket_resids`: List of integers specifying the residues in the
+       binding pocket of interest. This attribute is required if docking with
+       Fred into an apo structure.
 
-    The ligand component of each system must be a `core.ligands.Ligand` or a subclass thereof and
-    give access to the molecular structure, e.g. via a SMILES. Additionally, the ligand component
-    can have the following optional attributes:
+    The ligand component of each system must be a `core.ligands.Ligand` or a
+    subclass thereof and give access to the molecular structure, e.g. via a
+    SMILES. Additionally, the ligand component can have the following optional
+    attributes:
 
-     - `name`: A string specifying the name of the ligand, will be used for generating the
-       output file name.
+     - `name`: A string specifying the name of the ligand, will be used for
+       generating the output file name.
 
     Parameters
     ----------
@@ -248,21 +262,21 @@ class OEDockingFeaturizer(OEBaseModelingFeaturizer, SingleLigandProteinComplexFe
     loop_db: str
         The path to the loop database used by OESpruce to model missing loops.
     cache_dir: str, Path or None, default=None
-        Path to directory used for saving intermediate files. If None, default location
-        provided by `appdirs.user_cache_dir()` will be used.
+        Path to directory used for saving intermediate files. If None, default
+        location provided by `appdirs.user_cache_dir()` will be used.
     output_dir: str, Path or None, default=None
-        Path to directory used for saving output files. If None, output structures will not be
-        saved.
+        Path to directory used for saving output files. If None, output
+        structures will not be saved.
     use_multiprocessing : bool, default=True
         If multiprocessing to use.
     n_processes : int or None, default=None
-        How many processes to use in case of multiprocessing. Defaults to number of available
-        CPUs.
+        How many processes to use in case of multiprocessing. Defaults to
+        number of available CPUs.
     pKa_norm: bool, default=True
-        Assign the predominant ionization state of the molecules to dock at pH ~7.4. If False,
-        the ionization state of the input molecules will be conserved.
+        Assign the predominant ionization state of the molecules to dock at pH
+        ~7.4. If False, the ionization state of the input molecules will be
+        conserved.
     """
-
     from MDAnalysis.core.universe import Universe
 
     def __init__(self, method: str = "Posit", pKa_norm: bool = True, **kwargs):
