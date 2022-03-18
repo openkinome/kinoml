@@ -20,7 +20,7 @@ dependencies:
   - bravado
   - biopandas
   - awkward
-  - pyarrow
+  - pyarrow >=6.0.1
   - mdanalysis >=2.0.0
   - opencadd
   - matplotlib-base
@@ -46,7 +46,9 @@ dependencies:
   # testing
   - pytest
   - pytest-cov
+  - pytest-xdist
   - codecov
+  - nbval
 
   - pip:
       # PyTorch trees

@@ -4,56 +4,26 @@ Test ligand featurizers of `kinoml.features`
 import pytest
 import numpy as np
 
-from kinoml.core.systems import System
-from kinoml.core.ligands import OpenForceFieldLigand, RDKitLigand, SmilesLigand
+from kinoml.core.systems import LigandSystem
+from kinoml.core.ligands import Ligand
 from kinoml.features.ligand import (
     SingleLigandFeaturizer,
     MorganFingerprintFeaturizer,
     OneHotSMILESFeaturizer,
     GraphLigandFeaturizer,
-    SmilesToLigandFeaturizer,
 )
 
 
-@pytest.mark.parametrize("LigandClass", [OpenForceFieldLigand, RDKitLigand])
-def test_single_ligand_featurizer(LigandClass):
-    ligand1 = LigandClass.from_smiles("CCCC")
-    single_ligand_system = System(components=[ligand1])
+def test_single_ligand_featurizer():
+    ligand1 = Ligand(smiles="CCCC")
+    single_ligand_system = LigandSystem(components=[ligand1])
     featurizer = SingleLigandFeaturizer()
     featurizer.supports(single_ligand_system)
 
-    ligand2 = LigandClass.from_smiles("COCC")
-    double_ligand_system = System(components=[ligand1, ligand2])
+    ligand2 = Ligand(smiles="COCC")
+    double_ligand_system = LigandSystem(components=[ligand1, ligand2])
     with pytest.raises(ValueError):
         featurizer.featurize([double_ligand_system])
-
-
-def test_SmilesToLigandFeaturizer_rdkit():
-    ligand = SmilesLigand.from_smiles("CCCCC")
-    system = System([ligand])
-    featurizer = SmilesToLigandFeaturizer(ligand_type="rdkit")
-    featurizer.featurize([system])
-    molecule = system.featurizations[featurizer.name]
-    assert type(molecule) == RDKitLigand
-
-
-def test_SmilesToLigandFeaturizer_rdkit():
-    ligand = SmilesLigand.from_smiles("CCCCC")
-    system = System([ligand])
-    featurizer = SmilesToLigandFeaturizer(ligand_type="openforcefield")
-    featurizer.featurize([system])
-    molecule = system.featurizations[featurizer.name]
-    assert type(molecule) == OpenForceFieldLigand
-
-
-def test_SmilesToLigandFeaturizer_fails():
-    ligand = RDKitLigand.from_smiles("CCCCC")
-    system = System([ligand])
-    featurizer = SmilesToLigandFeaturizer(ligand_type="openforcefield")
-    with pytest.raises(ValueError):
-        featurizer.featurize([system])
-        molecule = system.featurizations[featurizer.name]
-        assert type(molecule) == OpenForceFieldLigand
 
 
 @pytest.mark.parametrize(
@@ -69,13 +39,9 @@ def test_SmilesToLigandFeaturizer_fails():
         ),
     ],
 )
-def test_ligand_MorganFingerprintFeaturizer_RDKit(smiles, solution):
-    """
-    OFFTK _will_ add hydrogens to all ingested SMILES, and export a canonicalized output,
-    so the representation you get might not be the one you expect if you compute it directly.
-    """
-    ligand = RDKitLigand.from_smiles(smiles)
-    system = System([ligand])
+def test_ligand_MorganFingerprintFeaturizer(smiles, solution):
+    ligand = Ligand(smiles=smiles)
+    system = LigandSystem([ligand])
     featurizer = MorganFingerprintFeaturizer(radius=2, nbits=512)
     featurizer.featurize([system])
     fingerprint = system.featurizations[featurizer.name]
@@ -91,14 +57,9 @@ def test_ligand_MorganFingerprintFeaturizer_RDKit(smiles, solution):
         ("CC", np.array([[0, 1] + [0] * 51, [0, 1] + [0] * 51])),
     ],
 )
-def test_ligand_OneHotSMILESFeaturizer_RDKit(smiles, solution):
-    """
-    OFFTK _will_ add hydrogens to all ingested SMILES, and export a canonicalized output,
-    so the representation you get might not be the one you expect if you compute it directly.
-    That's why we use RDKitLigand here.
-    """
-    ligand = RDKitLigand.from_smiles(smiles)
-    system = System([ligand])
+def test_ligand_OneHotSMILESFeaturizer(smiles, solution):
+    ligand = Ligand(smiles=smiles)
+    system = LigandSystem([ligand])
     featurizer = OneHotSMILESFeaturizer()
     featurizer.featurize([system])
     matrix = system.featurizations[featurizer.name]
@@ -342,13 +303,8 @@ def test_ligand_OneHotSMILESFeaturizer_RDKit(smiles, solution):
     ],
 )
 def test_ligand_GraphLigandFeaturizer_RDKit(smiles, solution):
-    """
-    OFFTK _will_ add hydrogens to all ingested SMILES, and export a canonicalized output,
-    so the representation you get might not be the one you expect if you compute it directly.
-    That's why we use RDKitLigand here.
-    """
-    ligand = RDKitLigand.from_smiles(smiles)
-    system = System([ligand])
+    ligand = Ligand(smiles=smiles)
+    system = LigandSystem([ligand])
     GraphLigandFeaturizer().featurize([system])
     connectivity, features = system.featurizations["last"]
     assert (connectivity == solution[0]).all()

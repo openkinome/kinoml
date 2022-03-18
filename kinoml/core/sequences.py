@@ -1,432 +1,330 @@
 """
 Sequence-like objects to build MolecularComponents and others.
 """
-from string import ascii_letters
-from collections import Counter
 import logging
 import re
-from typing import Union, Iterable
+from string import ascii_letters
 
-import requests
 
 logger = logging.getLogger(__name__)
 
 
-class Biosequence(str):
+class Biosequence(object):
     """
     Base class for string representations of biological polymers
-    (nucleic acids, peptides, proteins...)
+    (nucleic acids, peptides, proteins...).
 
-    Note
-    ----
-    How to handle several mutations at the same time, while
-    keeping indices relevant (after a deletion, a replacement
-    or insertion position might be wrong).
+    Parameters
+    ----------
+    sequence: str, default=""
+        The sequence in one-letter codes.
+    name: str, default=""
+        The sequence name.
+    metadata: dict or None, default=None
+        Additional data as a dictionary.
     """
 
     ALPHABET = set(ascii_letters)
-    _ACCESSION_URL = None
-    ACCESSION_MAX_RETRIEVAL = 50
 
-    def __new__(cls, value, name="", metadata=None, *args, **kwargs):
-        """
-        We are subclassing ``str`` to:
-
-        - provide a ``.metadata`` dict
-        - validate input is part of the allowed alphabet
-        """
-        diff = set(value).difference(cls.ALPHABET)
+    def __init__(self, sequence="", name="", metadata=None, **kwargs):
+        diff = set(sequence).difference(self.ALPHABET)
         if diff:
             raise ValueError(
-                f"Biosequence can only contain characters in {cls.ALPHABET}, "
+                f"Biosequence can only contain characters in {self.ALPHABET}, "
                 f"but found these extra ones: {diff}."
             )
-        s = super().__new__(cls, value, *args, **kwargs)
-        s.name = name
-        s.sequence = value
-        s.metadata = {}
-        # TODO: We might override some metadata data with this blind update
+        self._sequence = sequence
+        self.name = name
+        self.metadata = {"sequence_source": "user"}
         if metadata is not None:
-            s.metadata.update(metadata)
-        return s
+            self.metadata.update(metadata)
 
-    @classmethod
-    def from_ncbi(
-        cls,
-        *accessions: str,
-    ) -> Union["Biosequence", Iterable["Biosequence"]]:
+    @property
+    def sequence(self):
+        return self._sequence
+
+    @sequence.setter
+    def sequence(self, new_value):
+        self._sequence = new_value
+
+    @sequence.getter
+    def sequence(self):
+        if len(self._sequence) == 0:
+            self._query_sequence_sources()
+        return self._sequence
+
+    def _query_sequence_sources(self):
         """
-        Get FASTA sequence from an online NCBI identifier
+        Query available sources for sequence details. Overwrite method in subclasses to fetch
+        data.
+        """
+        pass
+
+    def substitute(self, substitution):
+        """
+        Given ``XYYYZ``, substitute element ``X`` at position ``YYY`` with ``Z``, e.g. C1156Y.
 
         Parameters
         ----------
-        accessions : str
-            NCBI identifier. Multiple can be provided!
-
-        Returns
-        -------
-        Retrieved biosequence(s)
+        substitution: str
+            Substitution to apply. It must be formatted as
+            ``[existing element][1-indexed position][new element]``.
 
         Examples
         --------
-        >>> sequence = AminoAcidSequence.from_ncbi("AAC05299.1")
-        >>> print(sequence[:10])
-        MSVNSEKSSS
-        >>> print(sequence.name)
-        AAC05299.1 serine kinase SRPK2 [Homo sapiens]
+        >>> s = Biosequence(sequence="ABCD")
+        >>> s.sequence
+        "ABCD"
+        >>> s.substitute("B2F")
+        >>> s.sequence
+        "AFCD"
         """
-        if cls._ACCESSION_URL is None:
-            raise NotImplementedError
-        if len(accessions) > cls.ACCESSION_MAX_RETRIEVAL:
-            raise ValueError(
-                f"You can only provide {cls.ACCESSION_MAX_RETRIEVAL} accessions at the same time."
-            )
-        r = requests.get(cls._ACCESSION_URL.format(",".join(accessions)))
-        r.raise_for_status()
-        sequences = []
-        for line in r.text.splitlines():
-            line = line.strip()
-            if not line:
-                continue
-            if line.startswith(">"):
-                sequences.append({"name": line[1:], "sequence": []})
-            else:
-                sequences[-1]["sequence"].append(line)
-        if not sequences:
-            return
-        objects = []
-        for sequence, accession in zip(sequences, accessions):
-            obj = cls(
-                "".join(sequence["sequence"]),
-                name=sequence["name"],
-                metadata={"accession": accession},
-            )
-            objects.append(obj)
-        if not objects:
-            return None
-        if len(objects) == 1:
-            return objects[0]
-        return objects
-
-    def cut(self, start: str, stop: str, check: bool = True) -> "Biosequence":
-        """
-        Slice a sequence using biological notation
-
-        Parameters
-        ----------
-        start : str
-            Starting element and 1-indexed position; e.g. C123
-        stop : str
-            Ending element and 1-indexed position; e.g. T234
-            This will be included in the resulting sequence
-        check : bool, optional=True
-            Whether to test if the existing elements correspond
-            to those specified in the bounds
-
-        Returns
-        -------
-        Biosequence
-            Substring corresponding to [start, end]. Right bound is included!
-
-        Examples
-        --------
-        >>> s = Biosequence("ATCGTHCTCH")
-        >>> s.cut("T2", "T8")
-        "TCGTHCT"
-        """
-        start_res, start_pos = start[0], int(start[1:])
-        stop_res, stop_pos = stop[0], int(stop[1:])
-        if check:
-            assert (
-                start_res == self[start_pos - 1]
-            ), f"Element at position {start_pos} is not {start_res}"
-            assert (
-                stop_res == self[stop_pos - 1]
-            ), f"Element at position {stop_pos} is not {stop_res}"
-        return self.__class__(
-            self[start_pos - 1 : stop_pos],
-            name=f"{self.name}{ ' | ' if self.name else '' }Cut: {start}/{stop}",
-            metadata={"cut": (start, stop)},
-        )
-
-    def mutate(self, *mutations: str, raise_errors: bool = True) -> "Biosequence":
-        """
-        Apply a mutation on the sequence using biological notation.
-
-        Parameters
-        ----------
-        mutations : str
-            Mutations to be applied. Indices are always 1-indexed. It can be one of:
-            (1) substitution, like ``C234T`` (C at position 234 will be replaced by T);
-            (2) deletion, like ``L746-A750del`` (delete everything between L at position 746
-            A at position 750, bounds not included);
-            (3) insertion, like ``1151Tins`` (insert a T after position 1151)
-        raise_errors : bool, optional=True
-            Raise ``ValueError`` if one of the mutations is not supported.
-
-        Returns
-        -------
-        Biosequence
-            The edited sequence
-
-        Examples
-        --------
-        >>> s = Biosequence("ATCGTHCTCH")
-        >>> s.mutate("C3P")
-        "ATPGTHCTCH"
-        >>> s.mutate("T2-T5del")
-        "ATTHCTCH"
-        >>> s.mutate("5Tins")
-        "ATCGTTHCTCH"
-        """
-        # We can only handle one insertion or deletion at once now
-        mutation_types = {m: self._type_mutation(m, raise_errors) for m in mutations}
-        mutation_count = Counter(mutation_types.values())
-        if mutation_count["insertion"] + mutation_count["deletion"] > 1:
-            msg = f"Only one simultaneous insertion or deletion is currently supported. You provided `{','.join(mutations)}`"
-            if raise_errors:
-                raise ValueError(msg)
-            logger.warning("Warning: %s", msg)
-            return None
-
-        # Reverse alphabetical order (substitutions will come first)
-        mutated = self
-        for mutation in sorted(mutations, key=lambda m: mutation_count[m], reverse=True):
-            if None in (mutation, mutation_types[mutation]):
-                continue
-            operation = getattr(mutated, f"_mutate_with_{mutation_types[mutation]}")
-            mutated = operation(mutation)
-        mutated.name += f" (mutations: {', '.join(mutations)})"
-        mutated.metadata.update({"mutations": mutations})
-        return mutated
-
-    @staticmethod
-    def _type_mutation(mutation, raise_errors=True):
-        """
-        Guess which kind of operation ``mutation`` is asking for.
-        """
-        if "ins" in mutation:
-            return "insertion"
-        if "del" in mutation:
-            return "deletion"
-        if re.search(r"([A-Z])(\d+)([A-Z])", mutation) is not None:
-            return "substitution"
-        if raise_errors:
-            raise ValueError(f"Mutation `{mutation}` is not recognized")
-
-    def _mutate_with_substitution(self, mutation: str) -> "Biosequence":
-        """
-        Given ``XYYYZ``, replace element ``X`` at position ``YYY`` with ``Z``.
-
-        Parameters
-        ----------
-        mutation : str
-            Replacement to apply. It must be formatted as
-            ``[existing element][1-indexed position][new element]``
-
-        Returns
-        -------
-        Biosequence
-            Replaced sequence
-        """
-        # replacement: e.g. C1156Y
-        search = re.search(r"([A-Z])(\d+)([A-Z])", mutation)
+        search = re.search(r"([A-Z])(\d+)([A-Z])", substitution)
         if search is None:
-            raise ValueError(f"Mutation `{mutation}` is not a valid substitution.")
+            raise ValueError(f"Mutation `{substitution}` is not a valid substitution.")
         old, position, new = search.groups()
+        position = int(position)
         assert (
             new in self.ALPHABET
         ), f"{new} is not a valid {self.__class__.__name__} character ({self.ALPHABET})"
-        index = int(position) - 1
-        return self.__class__(f"{self[:index]}{new}{self[index+1:]}")
+        if position < 1 or position > len(self.sequence):
+            raise ValueError(
+                f"Cannot find position {position} in the sequence "
+                f"for substitution `{substitution}`."
+            )
+        if self.sequence[position - 1] != old:
+            raise ValueError(
+                f"Cannot find {old} at position {position} for substitution `{substitution}`,"
+                f" found {self.sequence[position - 1]} instead."
+            )
+        self.sequence = f"{self.sequence[: position - 1]}{new}{self.sequence[position:]}"
+        if "mutations" in self.metadata.keys():
+            self.metadata["mutations"] += f" sub{substitution}"
+        else:
+            self.metadata["mutations"] = f"sub{substitution}"
 
-    def _mutate_with_deletion(self, mutation: str) -> "Biosequence":
+    def delete(self, first, last, insert=""):
         """
-        Given ``AXXX-BYYYdel``, delete everything between elements ``A`` and ``B`` at positions
-        ``XXX`` and ``YYY``, respectively. ``A`` and ``B`` will still be part of the resulting sequence.
+        Delete all elements between first and last positions including bounds. Optionally, provide
+        an additional insert that shell be placed at the position of the deletion.
 
         Parameters
         ----------
-        mutation : str
-            Replacement to apply. It must be formatted as
-            ``[starting element][1-indexed starting position]-[ending element][1-indexed ending position]del``
+        first: int
+            First residue to delete (1-indexed).
+        last: int
+            Last residue to delete (1-indexed).
+        insert: str, default=""
+            Sequence that should be placed at the position of the deletion.
 
-        Returns
-        -------
-        Biosequence
-            Edited sequence
+        Examples
+        --------
+        >>> s = Biosequence(sequence="ABCD")
+        >>> s.sequence
+        "ABCD"
+        >>> s.delete(3,3, insert="GH")
+        >>> s.sequence
+        "ABGHD"
         """
-        # deletion: e.g. L746-A750del
-        search = re.search(r"[A-Z](\d+)-[A-Z](\d+)del", mutation)
-        if search is None:
-            raise ValueError(f"Mutation `{mutation}` is not a valid deletion.")
-        start = int(search.group(1))
-        end = int(search.group(2)) - 1
-        return self.__class__(f"{self[:start]}{self[end:]}")
+        assert all(new in self.ALPHABET for new in insert)
+        if first < 1 or last > len(self.sequence):
+            raise ValueError(f"Deletion {first}-{last} out of bounds for given sequence.")
+        self.sequence = f"{self.sequence[: first - 1]}{insert}{self.sequence[last:]}"
+        if "mutations" in self.metadata.keys():
+            self.metadata["mutations"] += f" del{first}-{last}{insert}"
+        else:
+            self.metadata["mutations"] = f"del{first}-{last}{insert}"
 
-    def _mutate_with_insertion(self, mutation: str) -> "Biosequence":
+    def insert(self, position, insert):
         """
-        Given ``XXXAdel``, insert element ``A`` at position ``XXX``.
+        Insert a sequence at the given position.
 
         Parameters
-        -----------
-        mutation : str
-            Insertion to apply. It must be formatted as
-            ``[1-indexed insert position][element to be inserted]ins``
+        ----------
+        position: int
+            Position (1-indexed) to place the insertion.
+        insert: str
+            The sequence of the insertion.
 
-        Returns
-        -------
-        Biosequence
-            Edited sequence
+        Examples
+        --------
+        >>> s = Biosequence(sequence="ABCD")
+        >>> s.sequence
+        "ABCD"
+        >>> s.insert(4, insert="EF")
+        >>> s.sequence
+        "ABCEFD"
         """
-        # insertion: e.g. 1151Tins
-        search = re.search(r"(\d+)([A-Z]+)ins", mutation)
-        if search is None:
-            raise ValueError(f"Mutation `{mutation}` is not a valid insertion.")
-        position = int(search.group(1))
-        residue = search.group(2)
-        assert all(r in self.ALPHABET for r in residue)
-        return self.__class__(f"{self[:position]}{residue}{self[position:]}")
-
-
-class DNASequence(Biosequence):
-    """Biosequence that only allows DNA bases"""
-
-    ALPHABET = "ATCG"
-    _ACCESSION_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=nuccore&id={}&rettype=fasta&retmode=text"
-
-
-class RNASequence(Biosequence):
-    """Biosequence that only allows RNA bases"""
-
-    ALPHABET = "AUCG"
-    _ACCESSION_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=nuccore&id={}&rettype=fasta&retmode=text"
+        assert all(new in self.ALPHABET for new in insert)
+        if position < 1 or position - 1 > len(self.sequence):
+            raise ValueError(f"Insertion position {position} out of bonds for given sequence.")
+        self.sequence = f"{self.sequence[: position - 1]}{insert}{self.sequence[position:]}"
+        if "mutations" in self.metadata.keys():
+            self.metadata["mutations"] += f" ins{position}{insert}"
+        else:
+            self.metadata["mutations"] = f"ins{position}{insert}"
 
 
 class AminoAcidSequence(Biosequence):
-    """Biosequence for amino acid sequences."""
+    """
+    Biosequence for amino acid sequences.
 
-    @classmethod
-    def from_uniprot(cls, uniprot_id: str) -> Biosequence:
-        """
-        Retrieve an amino acid sequence defined by a UniProt identifier.
-        Parameters
-        ----------
-        uniprot_id: str
-            The UniProt identifier.
-        Returns
-        -------
-        amino_acid_sequence: Biosequence
-            Retrieved amino acid sequence.
-        """
-        response = cls.query_uniprot(uniprot_id)
-        sequence_details = cls.get_sequence_details_from_uniprot_response(response)
+    Parameters
+    ----------
+    uniprot_id: str or None, default=None
+        The UniProt ID.
+    ncbi_id: str or None, default=None
+        The NCBI ID.
+    sequence: str, default=""
+        The amino acid sequence in one-letter codes.
+    name: str, default=""
+        The sequence name.
+    metadata: dict or None, default=None
+        Additional data as a dictionary.
 
-        amino_acid_sequence = Biosequence(
-            sequence_details["sequence"],
-            name=sequence_details["name"],
-            metadata={
-                "uniprot_id": uniprot_id,
-                "begin": sequence_details["begin"],
-                "end": sequence_details["end"],
-                "true_N_terminus": sequence_details["true_N_terminus"],
-                "true_C_terminus": sequence_details["true_C_terminus"],
-            },
-        )
-        return amino_acid_sequence
+    Examples
+    --------
+    Amino acid sequences can be created by providing the sequence manually or by fetching from
+    e.g. UniProt:
 
-    @staticmethod
-    def query_uniprot(uniprot_id: str) -> dict:
+    >>> alatripeptide = AminoAcidSequence(sequence="AAA", name="alatripeptide")
+    >>> alatripeptide.sequence
+    "AAA"
+    >>> abl1 = AminoAcidSequence(uniprot_id="P00519", name="ABL1")
+    >>> abl1.sequence[:5]
+    "MLEIC"
+
+    Fetched sequences can be altered by providing information via metadata["mutations"], i.e.:
+     - insertions - formatted like "ins123AGA"
+     - deletions - formatted like "del12-15P" (the P stands for a proline insert (optional))
+     - substitutions - formatted like "T315A"
+
+     >>> abl1 = AminoAcidSequence(
+     >>>     uniprot_id="P00519", name="ABL1", metadata={"mutations": "T315A"}
+     >>> )
+
+     Multiple mutations can be added sequentially in a single string:
+
+     >>> abl1 = AminoAcidSequence(
+     >>>     uniprot_id="P00519", name="ABL1", metadata={"mutations": "T315A del320-22P"}
+     >>> )
+
+     An artificial contruct only consisting of a part of the sequence can be specified via
+     metadata["construct_range"]:
+     >>> abl1 = AminoAcidSequence(
+     >>>     uniprot_id="P00519",
+     >>>     name="ABL1",
+     >>>     metadata={"mutations": "T315A", "construct_range": "229-512"}
+     >>> )
+
+    """
+
+    ALPHABET = "ACDEFGHIKLMNPQRSTVWY"
+
+    def __init__(self, uniprot_id="", ncbi_id="", sequence="", name="", metadata=None, **kwargs):
+        super().__init__(sequence=sequence, name=name, metadata=metadata, **kwargs)
+        self.uniprot_id = uniprot_id
+        self.ncbi_id = ncbi_id
+
+    def _query_sequence_sources(self):
         """
-        Query Uniprot by a UniProt identifier.
-        Parameters
-        ----------
-        uniprot_id: str
-            The UniProt identifier.
-        Returns
-        -------
-        response: dict
-            The sequence information stored in a dictionary.
+        Query available sources for sequence details. Add additional methods below to allow
+        fetching from other sources. Perform mutations etc if given via metadata.
         """
+        if self.uniprot_id:
+            self._query_uniprot()
+        elif self.ncbi_id:
+            self._query_ncbi()
+        if "mutations" in self.metadata.keys():
+            mutations = self.metadata["mutations"].split()
+            del self.metadata["mutations"]  # remove mutations, will be added subsequently
+            for mutation in mutations:
+                import re
+
+                if mutation.startswith("ins"):  # insertion
+                    logger.debug(f"Performing insertion {mutation} ...")
+                    match = re.search("ins(?P<position>[0-9]+)(?P<insertion>[A-Z]+)", mutation)
+                    self.insert(int(match.group("position")), match.group("insertion"))
+                elif mutation.startswith("del"):  # deletion
+                    logger.debug(f"Performing deletion {mutation} ...")
+                    match = re.search(
+                        "del(?P<first>[0-9]+)-(?P<last>[0-9]+)(?P<insertion>[A-Z]*)",
+                        mutation,
+                    )
+                    self.delete(
+                        int(match.group("first")),
+                        int(match.group("last")),
+                        match.group("insertion"),
+                    )
+                else:  # substitution
+                    logger.debug(f"Performing substitution {mutation} ...")
+                    self.substitute(mutation)
+        if "construct_range" in self.metadata.keys():
+            logger.debug(f"Cropping sequence to construct {self.metadata['construct_range']} ...")
+            first, last = [int(x) for x in self.metadata["construct_range"].split("-")]
+            self._sequence = self._sequence[first - 1 : last]  # 1-indexed
+
+    def _query_uniprot(self):
+        """Fetch the amino acid sequence from UniProt."""
         import requests
         import json
 
-        response = requests.get(f"https://www.ebi.ac.uk/proteins/api/proteins/{uniprot_id}")
+        response = requests.get(f"https://www.ebi.ac.uk/proteins/api/proteins/{self.uniprot_id}")
+        if response.status_code != 200:
+            raise ValueError(f"Failed to fetch sequence for UniProt ID {self.uniprot_id}")
+
         response = json.loads(response.text)
+        self._sequence = response["sequence"]["sequence"]
+        self.metadata["sequence_source"] = "UniProt"
 
-        return response
+    def _query_ncbi(self):
+        """Fetch the amino acid sequence from NCBI."""
+        import requests
 
-    @staticmethod
-    def get_sequence_details_from_uniprot_response(response):
-        """
-        Get sequence details from a UniProt query response.
-        Parameters
-        ----------
-        response: dict
-            The sequence information stored in a dictionary.
-        Returns
-        -------
-        sequence_details: dict
-            Sequence details filtered for key information
-            (sequence, name, begin, end, true_N_terminus, true_C_terminus).
-        """
-        sequence_details = {
-            "sequence": response["sequence"]["sequence"],
-            "name": response["id"],
-            "begin": 1,
-            "end": response["sequence"]["length"],
-            "true_N_terminus": True,
-            "true_C_terminus": True,
-        }
-        return sequence_details
+        response = requests.get(
+            f"https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?"
+            f"db=protein&id={self.ncbi_id}&rettype=fasta&retmode=text"
+        )
+        if response.status_code != 200:
+            raise ValueError(f"Failed to fetch sequence for NCBI ID {self.ncbi_id}")
 
-
-class KinaseDomainAminoAcidSequence(AminoAcidSequence):
-    """Biosequence for kinase domain amino acid sequences."""
+        self._sequence = "".join(response.text.split("\n")[1:])
+        self.metadata["sequence_source"] = "NCBI"
 
     @staticmethod
-    def get_sequence_details_from_uniprot_response(response):
+    def ncbi_to_uniprot(ncbi_id):
         """
-        Get kinase domain sequence details from a UniProt query response.
+        Convert an NCBI protein accession to the corresponding UniProt ID.
+
         Parameters
         ----------
-        response: dict
-            The sequence information stored in a dictionary.
+        ncbi_id: str
+            The NCBI protein accession.
+
         Returns
         -------
-        sequence_details: dict
-            Kinase doamin sequence details filtered for key information
-            (sequence, name, begin, end, true_N_terminus, true_C_terminus).
+        : str
+            The corresponding UniProt ID, empty string if not successful.
         """
-        kinase_domains = []
 
-        for feature in response["features"]:
-            if feature["type"] == "DOMAIN":
-                if feature["description"] == "Protein kinase":
-                    kinase_domains.append(feature)
+        import requests
 
-        if len(kinase_domains) > 1:
-            print("Found multiple kinase domains. Using first one.")
+        url = "https://www.uniprot.org/uploadlists/"
+        params = {"from": "P_REFSEQ_AC", "to": "SWISSPROT", "format": "tab", "query": ncbi_id}
+        response = requests.get(url, params=params)
+        response = response.text.split("\n")
+        if len(response) != 3:
+            return ""
+        return response[1].split("\t")[1]
 
-        kinase_domain = kinase_domains[0]
-        name = response["id"]
-        sequence = response["sequence"]["sequence"]
-        begin = int(kinase_domain["begin"])
-        true_N_terminus = False
-        if begin == 1:
-            true_N_terminus = True
-        end = int(kinase_domain["end"])
-        true_C_terminus = False
-        if end == len(sequence):
-            true_C_terminus = True
-        kinase_domain_sequence = sequence[begin - 1 : end]
 
-        sequence_details = {
-            "sequence": kinase_domain_sequence,
-            "name": name,
-            "begin": begin,
-            "end": end,
-            "true_N_terminus": true_N_terminus,
-            "true_C_terminus": true_C_terminus,
-        }
-        return sequence_details
+class DNASequence(Biosequence):
+    """Biosequence that only allows DNA bases."""
+
+    ALPHABET = "ATCG"
+
+
+class RNASequence(Biosequence):
+    """Biosequence that only allows RNA bases."""
+
+    ALPHABET = "AUCG"
