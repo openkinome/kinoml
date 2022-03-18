@@ -47,11 +47,7 @@ class MostSimilarPDBLigandFeaturizer(SingleLigandProteinComplexFeaturizer):
 
     The ligand component of each system must be a `core.ligands.Ligand` or a
     subclass thereof and give access to the molecular structure, e.g. via a
-    SMILES. Additionally, the ligand component can have the following optional
-    attributes:
-
-     - `name`: A string specifying the name of the ligand, will be used for
-       generating the output file name.
+    SMILES.
 
     Parameters
     ----------
