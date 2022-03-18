@@ -42,13 +42,16 @@ class MostSimilarPDBLigandFeaturizer(SingleLigandProteinComplexFeaturizer):
     Find the most similar co-crystallized ligand in the PDB according to a
     given SMILES and UniProt ID.
 
-    The protein component of each system must have `uniprot_id` attribute
-    specifying the protein sequence of interest when querying the PDB for
-    available entries.
+    The protein component of each system must be a `core.proteins.Protein` or
+    a subclass thereof, and must be initialized with a `uniprot_id` parameter.
 
-    The ligand component of each system must have a `smiles` attribute
-    specifying the molecular structure that should be used to query for the
-    most similar co-crystallized ligand.
+    The ligand component of each system must be a `core.ligands.Ligand` or a
+    subclass thereof and give access to the molecular structure, e.g. via a
+    SMILES. Additionally, the ligand component can have the following optional
+    attributes:
+
+     - `name`: A string specifying the name of the ligand, will be used for
+       generating the output file name.
 
     Parameters
     ----------
@@ -58,6 +61,17 @@ class MostSimilarPDBLigandFeaturizer(SingleLigandProteinComplexFeaturizer):
     cache_dir: str, Path or None, default=None
         Path to directory used for saving intermediate files. If None, default
         location provided by `appdirs.user_cache_dir()` will be used.
+    use_multiprocessing : bool, default=True
+        If multiprocessing to use.
+    n_processes : int or None, default=None
+        How many processes to use in case of multiprocessing. Defaults to
+        number of available CPUs.
+
+    Note
+    ----
+    The toolkit ['MDAnalysis' or 'OpenEye'] specified in the protein object
+    initialization should fit the required toolkit when subsequently applying
+    the OEDockingFeaturizer or SCHRODINGERDockingFeaturizer.
     """
 
     import pandas as pd
