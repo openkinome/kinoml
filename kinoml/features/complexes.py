@@ -3,7 +3,8 @@ Featurizers that can only get applied to ProteinLigandComplexes or
 subclasses thereof
 """
 import logging
-from typing import Union
+from pathlib import Path
+from typing import Union, List, Tuple
 
 from .core import OEBaseModelingFeaturizer, ParallelBaseFeaturizer
 from ..core.ligands import Ligand
@@ -36,26 +37,29 @@ class SingleLigandProteinComplexFeaturizer(ParallelBaseFeaturizer):
         return all([super_checks, len(proteins) == 1]) and all([super_checks, len(ligands) == 1])
 
 
-class MostSimilarPDBLigandFeaturizer(ParallelBaseFeaturizer):
+class MostSimilarPDBLigandFeaturizer(ParallelBaseFeaturizer, SingleLigandProteinComplexFeaturizer):
     """
-    Find the most similar co-crystallized ligand in the PDB according to a given SMILES and
-    UniProt ID.
+    Find the most similar co-crystallized ligand in the PDB according to a
+    given SMILES and UniProt ID.
 
-    The protein component of each system must have `uniprot_id` attribute specifying the protein
-    sequence of interest when querying the PDB for available entries.
+    The protein component of each system must have `uniprot_id` attribute
+    specifying the protein sequence of interest when querying the PDB for
+    available entries.
 
-    The ligand component of each system must have a `smiles` attribute specifying the molecular
-    structure that should be used to query for the most similar co-crystallized ligand.
+    The ligand component of each system must have a `smiles` attribute
+    specifying the molecular structure that should be used to query for the
+    most similar co-crystallized ligand.
 
     Parameters
     ----------
     similarity_metric: str, default="fingerprint"
-        The similarity metric to use to detect the structure with the most similar ligand
-        ["fingerprint", "schrodinger_shape"].
+        The similarity metric to use to detect the structure with the most
+        similar ligand ["fingerprint", "schrodinger_shape"].
     cache_dir: str, Path or None, default=None
-        Path to directory used for saving intermediate files. If None, default location
-        provided by `appdirs.user_cache_dir()` will be used.
+        Path to directory used for saving intermediate files. If None, default
+        location provided by `appdirs.user_cache_dir()` will be used.
     """
+
     import pandas as pd
 
     _SUPPORTED_TYPES = (ProteinLigandComplex,)
@@ -80,7 +84,7 @@ class MostSimilarPDBLigandFeaturizer(ParallelBaseFeaturizer):
             self.cache_dir = Path(cache_dir).expanduser().resolve()
         self.cache_dir.mkdir(parents=True, exist_ok=True)
 
-    def _pre_featurize(self, systems: Iterable[ProteinLigandComplex]) -> None:
+    def _pre_featurize(self, systems: List[ProteinLigandComplex]) -> None:
         """
         Check that SCHRODINGER variable exists.
         """
@@ -130,10 +134,10 @@ class MostSimilarPDBLigandFeaturizer(ParallelBaseFeaturizer):
 
     def _post_featurize(
         self,
-        systems: Iterable[ProteinLigandComplex],
-        features: Iterable[ProteinLigandComplex],
+        systems: List[ProteinLigandComplex],
+        features: List[ProteinLigandComplex],
         keep: bool = True,
-    ) -> Iterable[ProteinLigandComplex]:
+    ) -> List[ProteinLigandComplex]:
         """
         Run after featurizing all systems. Original systems will be replaced with systems
         returned by the featurizer. Systems that were not successfully featurized will be
@@ -933,51 +937,57 @@ class OEDockingFeaturizer(OEBaseModelingFeaturizer, SingleLigandProteinComplexFe
         return structure
 
 
-class SCHRODINGERComplexFeaturizer(ParallelBaseFeaturizer):
+class SCHRODINGERComplexFeaturizer(ParallelBaseFeaturizer, SingleLigandProteinComplexFeaturizer):
     """
-    Given systems with exactly one protein and one ligand, prepare the complex structure by:
+    Given systems with exactly one protein and one ligand, prepare the complex
+    structure by:
 
      - modeling missing loops
      - building missing side chains
-     - mutations, if `uniprot_id` or `sequence` attribute is provided for the protein component
+     - mutations, if `uniprot_id` or `sequence` attribute is provided for the
+       protein component
        (see below)
      - removing everything but protein, water and ligand of interest
      - protonation at pH 7.4
 
-    The protein component of each system must have a `pdb_id` or a `path` attribute specifying
-    the complex structure to prepare.
+    The protein component of each system must have a `pdb_id` or a `path`
+    attribute specifying the complex structure to prepare.
 
-     - `pdb_id`: A string specifying the PDB entry of interest, required if `path` not given.
+     - `pdb_id`: A string specifying the PDB entry of interest, required if
+       `path` not given.
      - `path`: The path to the structure file, required if `pdb_id` not given.
 
-    Additionally, the protein component can have the following optional attributes to customize
-    the protein modeling:
-     - `name`: A string specifying the name of the protein, will be used for generating the
-       output file name.
+    Additionally, the protein component can have the following optional
+    attributes to customize the protein modeling:
+     - `name`: A string specifying the name of the protein, will be used for
+       generating the output file name.
      - `chain_id`: A string specifying which chain should be used.
-     - `alternate_location`: A string specifying which alternate location should be used.
-     - `expo_id`: A string specifying the ligand of interest. This is especially useful if
-       multiple ligands are present in a PDB structure.
-     - `uniprot_id`: A string specifying the UniProt ID that will be used to fetch the amino acid
-       sequence from UniProt, which will be used for modeling the protein. This will supersede the
-       sequence information given in the PDB header.
-     - `sequence`: A string specifying the amino acid sequence in single letter codes to be used
-       during loop modeling and for mutations.
+     - `alternate_location`: A string specifying which alternate location
+       should be used.
+     - `expo_id`: A string specifying the ligand of interest. This is
+       especially useful if multiple ligands are present in a PDB structure.
+     - `uniprot_id`: A string specifying the UniProt ID that will be used to
+       fetch the amino acid sequence from UniProt, which will be used for
+       modeling the protein. This will supersede the sequence information
+       given in the PDB header.
+     - `sequence`: A string specifying the amino acid sequence in single
+       letter codes to be used during loop modeling and for mutations.
 
-    The ligand component can be a BaseLigand without any further attributes. Additionally, the
-    ligand component can have the following optional attributes:
+    The ligand component can be a BaseLigand without any further attributes.
+    Additionally, the ligand component can have the following optional
+    attributes:
 
-     - `name`: A string specifying the name of the ligand, will be used for generating the
-       output file name.
+     - `name`: A string specifying the name of the ligand, will be used for
+       generating the output file name.
 
     Parameters
     ----------
     cache_dir: str, Path or None, default=None
-        Path to directory used for saving intermediate files. If None, default location
-        provided by `appdirs.user_cache_dir()` will be used.
+        Path to directory used for saving intermediate files. If None, default
+        location provided by `appdirs.user_cache_dir()` will be used.
     output_dir: str, Path or None, default=None
-        Path to directory used for saving output files. If None, output structures will not be
-        saved.
+        Path to directory used for saving output files. If None, output
+        structures will not be saved.
     max_retry: int, default=3
         The maximal number of attempts to try running the prepwizard step.
     """
@@ -1008,7 +1018,7 @@ class SCHRODINGERComplexFeaturizer(ParallelBaseFeaturizer):
 
     _SUPPORTED_TYPES = (ProteinLigandComplex,)
 
-    def _pre_featurize(self, systems: Iterable[ProteinLigandComplex]) -> None:
+    def _pre_featurize(self, systems: List[ProteinLigandComplex]) -> None:
         """
         Check that SCHRODINGER variable exists.
         """
@@ -1395,61 +1405,68 @@ class SCHRODINGERComplexFeaturizer(ParallelBaseFeaturizer):
 
 class SCHRODINGERDockingFeaturizer(SCHRODINGERComplexFeaturizer):
     """
-    Given systems with exactly one protein and one ligand dock the ligand into the protein
-    structure. The protein structure needs to have a co-crystallized ligand to identify the
-    pocket for docking. The following steps will be performed.
+    Given systems with exactly one protein and one ligand dock the ligand into
+    the protein structure. The protein structure needs to have a
+    co-crystallized ligand to identify the pocket for docking. The following
+    steps will be performed.
 
      - modeling missing loops
      - building missing side chains
-     - mutations, if `uniprot_id` or `sequence` attribute is provided for the protein component
-       (see below)
+     - mutations, if `uniprot_id` or `sequence` attribute is provided for the
+       protein component (see below)
      - removing everything but protein, water and ligand of interest
      - protonation at pH 7.4
      - docking a ligand
 
-    The protein component of each system must have a `pdb_id` or a `path` attribute specifying
-    the complex structure to prepare.
+    The protein component of each system must have a `pdb_id` or a `path`
+    attribute specifying the complex structure to prepare.
 
-     - `pdb_id`: A string specifying the PDB entry of interest, required if `path` not given.
+     - `pdb_id`: A string specifying the PDB entry of interest, required if
+       `path` not given.
      - `path`: The path to the structure file, required if `pdb_id` not given.
 
-    Additionally, the protein component can have the following optional attributes to customize
-    the protein modeling:
-     - `name`: A string specifying the name of the protein, will be used for generating the
-       output file name.
+    Additionally, the protein component can have the following optional
+    attributes to customize the protein modeling:
+     - `name`: A string specifying the name of the protein, will be used for
+       generating the output file name.
      - `chain_id`: A string specifying which chain should be used.
-     - `alternate_location`: A string specifying which alternate location should be used.
-     - `expo_id`: A string specifying the ligand of interest. This is especially useful if
-       multiple ligands are present in a PDB structure.
-     - `uniprot_id`: A string specifying the UniProt ID that will be used to fetch the amino acid
-       sequence from UniProt, which will be used for modeling the protein. This will supersede the
-       sequence information given in the PDB header.
-     - `sequence`: A string specifying the amino acid sequence in single letter codes to be used
-       during loop modeling and for mutations.
+     - `alternate_location`: A string specifying which alternate location
+       should be used.
+     - `expo_id`: A string specifying the ligand of interest. This is
+       especially useful if multiple ligands are present in a PDB structure.
+     - `uniprot_id`: A string specifying the UniProt ID that will be used to
+       fetch the amino acid sequence from UniProt, which will be used for
+       modeling the protein. This will supersede the sequence information
+       given in the PDB header.
+     - `sequence`: A string specifying the amino acid sequence in single
+       letter codes to be used during loop modeling and for mutations.
 
     The ligand component must be a BaseLigand with smiles attribute:
      - `smiles`: A SMILES representation of the molecule to dock.
 
-    Additionally, the ligand component can have the following optional attributes to customize
-    the docking:
-     - `name`: A string specifying the name of the ligand, will be used for generating the
-       output file name and as molecule title in the docking pose SDF file.
-     - `macrocycle`: A bool specifying if the ligand shell be sampled as a macrocycle during
-       docking. Docking will fail, if SCHRDODINGER does not consider the ligand a macrocycle.
+    Additionally, the ligand component can have the following optional
+    attributes to customize the docking:
+     - `name`: A string specifying the name of the ligand, will be used for
+       generating the output file name and as molecule title in the docking
+       pose SDF file.
+     - `macrocycle`: A bool specifying if the ligand shell be sampled as a
+       macrocycle during docking. Docking will fail, if SCHRDODINGER does not
+       consider the ligand a macrocycle.
 
     Parameters
     ----------
     cache_dir: str, Path or None, default=None
-        Path to directory used for saving intermediate files. If None, default location
-        provided by `appdirs.user_cache_dir()` will be used.
+        Path to directory used for saving intermediate files. If None, default
+        location provided by `appdirs.user_cache_dir()` will be used.
     output_dir: str, Path or None, default=None
-        Path to directory used for saving output files. If None, output structures will not be
-        saved.
+        Path to directory used for saving output files. If None, output
+        structures will not be saved.
     shape_restrain: bool, default=True
-        If the docking shell be performed with shape restrain based on the co-crystallized
-        ligand.
+        If the docking shell be performed with shape restrain based on the
+        co-crystallized ligand.
     max_retry: int, default=3
-        The maximal number of attempts to try running the prepwizard and docking steps.
+        The maximal number of attempts to try running the prepwizard and
+        docking steps.
     """
     from MDAnalysis.core.universe import Universe
 
