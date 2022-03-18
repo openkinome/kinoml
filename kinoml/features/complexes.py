@@ -57,7 +57,8 @@ class MostSimilarPDBLigandFeaturizer(SingleLigandProteinComplexFeaturizer):
     ----------
     similarity_metric: str, default="fingerprint"
         The similarity metric to use to detect the structure with the most
-        similar ligand ["fingerprint", "schrodinger_shape", "openeye_shape"].
+        similar ligand ["fingerprint", "mcs", "openeye_shape",
+        "schrodinger_shape"].
     cache_dir: str, Path or None, default=None
         Path to directory used for saving intermediate files. If None, default
         location provided by `appdirs.user_cache_dir()` will be used.
@@ -77,6 +78,12 @@ class MostSimilarPDBLigandFeaturizer(SingleLigandProteinComplexFeaturizer):
     import pandas as pd
 
     _SUPPORTED_TYPES = (ProteinLigandComplex,)
+    _SUPPORTED_SIMILARITY_METRICS = (
+        "fingerprint",
+        "mcs",
+        "openeye_shape",
+        "schrodinger_shape"
+    )
 
     def __init__(
             self,
@@ -87,9 +94,9 @@ class MostSimilarPDBLigandFeaturizer(SingleLigandProteinComplexFeaturizer):
         from appdirs import user_cache_dir
 
         super().__init__(**kwargs)
-        if similarity_metric not in ["fingerprint", "schrodinger_shape", "openeye_shape"]:
+        if similarity_metric not in self._SUPPORTED_SIMILARITY_METRICS:
             raise ValueError(
-                "Only 'fingerprint', 'schrodinger_shape', and  'openeye_shape' are allowed as "
+                f"Only {self._SUPPORTED_SIMILARITY_METRICS} are allowed as "
                 f"similarity metric! You provided '{similarity_metric}'."
             )
         self.similarity_metric = similarity_metric
@@ -388,10 +395,17 @@ class MostSimilarPDBLigandFeaturizer(SingleLigandProteinComplexFeaturizer):
         if self.similarity_metric == "fingerprint":
             logger.debug("Retrieving most similar ligand entity by fingerprint ...")
             pdb_id, chain_id, expo_id = self._by_fingerprint(pdb_ligand_entities, smiles)
-        elif self.similarity_metric == "schrodinger_shape":
-            pdb_id, chain_id, expo_id = self._by_schrodinger_shape(pdb_ligand_entities, smiles)
+        elif self.similarity_metric == "mcs":
+            logger.debug(
+                "Retrieving most similar ligand entity by maximum common substructure ..."
+            )
+            pdb_id, chain_id, expo_id = self._by_mcs(pdb_ligand_entities, smiles)
         elif self.similarity_metric == "openeye_shape":
+            logger.debug("Retrieving most similar ligand entity by OpenEye shape ...")
             pdb_id, chain_id, expo_id = self._by_openeye_shape(pdb_ligand_entities, smiles)
+        elif self.similarity_metric == "schrodinger_shape":
+            logger.debug("Retrieving most similar ligand entity by SCHRODINGER shape ...")
+            pdb_id, chain_id, expo_id = self._by_schrodinger_shape(pdb_ligand_entities, smiles)
         else:
             raise ValueError(f"Similarity metric '{self.similarity_metric}' unknown!")
 
@@ -410,6 +424,8 @@ class MostSimilarPDBLigandFeaturizer(SingleLigandProteinComplexFeaturizer):
         pdb_ligand_entities: pd.DataFrame
             The PDB ligand entities dataframe with columns named `pdb_id`, `chain_id`, `expo_id`
             and `smiles`.
+        smiles: str
+            The SMILES representation of the molecule to search for similar PDB ligands.
 
         Returns
         -------
@@ -452,6 +468,66 @@ class MostSimilarPDBLigandFeaturizer(SingleLigandProteinComplexFeaturizer):
             ascending=False
         )
         logger.debug(f"Fingerprint similarites:\n{pdb_ligand_entities}")
+
+        picked_ligand_entity = pdb_ligand_entities.iloc[0]
+
+        return (
+            picked_ligand_entity["pdb_id"],
+            picked_ligand_entity["chain_id"],
+            picked_ligand_entity["expo_id"]
+        )
+
+    @staticmethod
+    def _by_mcs(
+            pdb_ligand_entities: pd.DataFrame, smiles: str
+    ) -> Tuple[str, str, str]:
+        """
+        Get the PDB ligand that is most similar to the given SMILES according to Morgan
+        Fingerprints.
+
+        Parameters
+        ----------
+        pdb_ligand_entities: pd.DataFrame
+            The PDB ligand entities dataframe with columns named `pdb_id`, `chain_id`, `expo_id`
+            and `smiles`.
+        smiles: str
+            The SMILES representation of the molecule to search for similar PDB ligands.
+
+        Returns
+        -------
+        : tuple of str
+            The PDB, chain and expo ID of the most similar ligand.
+        """
+        from rdkit import Chem, RDLogger
+        from rdkit.Chem import rdFMCS
+
+        if logger.level != logging.DEBUG:
+            RDLogger.DisableLog("rdApp.*")  # disable RDKit logging
+
+        logger.debug("Loading reference molecule ...")
+        reference_molecule = Chem.MolFromSmiles(smiles)
+
+        logger.debug("Loading PDB ligands ...")
+        pdb_ligands = [Chem.MolFromSmiles(smiles) for smiles in pdb_ligand_entities["smiles"]]
+        pdb_ligand_entities["rdkit_molecules"] = pdb_ligands
+        pdb_ligand_entities = pdb_ligand_entities[
+            pdb_ligand_entities["rdkit_molecules"].notnull()
+        ]
+
+        logger.debug("Finding maximum common structure and counting bonds ...")
+        mcs_bonds = [
+            rdFMCS.FindMCS(
+                [reference_molecule, pdb_ligand_molecule], ringMatchesRingOnly=True, timeout=60
+            ).numBonds for pdb_ligand_molecule in pdb_ligand_entities["rdkit_molecules"]
+        ]
+        pdb_ligand_entities["mcs_bonds"] = mcs_bonds
+
+        pdb_ligand_entities.sort_values(
+            by="mcs_bonds",
+            inplace=True,
+            ascending=False
+        )
+        logger.debug(f"MCS bonds:\n{pdb_ligand_entities}")
 
         picked_ligand_entity = pdb_ligand_entities.iloc[0]
 
