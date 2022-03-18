@@ -106,12 +106,12 @@ def test_remove_non_protein(package, resource, exceptions, remove_water, n_atoms
         (
             "kinoml.data.proteins",
             "4f8o.pdb",
-            "MNTFHNTGEIFAGKQMFTLTMGDTAPHGGWRLIPTGDSKGGYMISADGDYVGLYSYMMSWVGIDNNWYINDDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVKQGLXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+            "MNTFHNTGEIFAGKQMFTLTMGDTAPHGGWRLIPTGDSKGGYMISADGDYVGLYSYMMSWVGIDNNWYINDDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVKQGLXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
         ),
         (
             "kinoml.data.proteins",
             "4f8o_edit.pdb",
-            "MNTFHNTGEIFAGKQMFTLTMGDTAPHGGWRLIPTGDSKGGYMISADGDYVGLYSYMMSWVGIDNNWYINDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVQGL"
+            "MNTFHNTGEIFAGKQMFTLTMGDTAPHGGWRLIPTGDSKGGYMISADGDYVGLYSYMMSWVGIDNNWYINDSPKDIKDHLYVKAGTVLKPTTYKFTGRVEEYVFDNKQSTVINSKDVSGEVTVQGL",
         ),
     ],
 )
@@ -122,8 +122,7 @@ def test_delete_residues(package, resource, expected_sequence):
     with resources.path(package, resource) as path:
         molecule = read_molecule(str(path))
         molecule = delete_residues(
-            molecule,
-            list(molecule.residues[5:10]) + list(molecule.residues[20:25])
+            molecule, list(molecule.residues[5:10]) + list(molecule.residues[20:25])
         )
         sequence = get_sequence(molecule)
         assert sequence == expected_sequence
@@ -215,8 +214,9 @@ def test_get_structure_sequence_alignment(package, resource, sequence, expected_
     from kinoml.modeling.MDAnalysisModeling import (
         read_molecule,
         remove_non_protein,
-        get_structure_sequence_alignment
+        get_structure_sequence_alignment,
     )
+
     with resources.path(package, resource) as path:
         structure = read_molecule(str(path))
         structure = remove_non_protein(structure, remove_water=True)
@@ -279,16 +279,16 @@ def test_get_structure_sequence_alignment(package, resource, sequence, expected_
     ],
 )
 def test_delete_alterations(
-        package, resource, sequence, delete_n_anchors, short_protein_segments_cutoff,
-        expected_sequence
+    package, resource, sequence, delete_n_anchors, short_protein_segments_cutoff, expected_sequence
 ):
     """Compare results to expected sequence."""
     from kinoml.modeling.MDAnalysisModeling import (
         read_molecule,
         remove_non_protein,
         delete_alterations,
-        get_sequence
+        get_sequence,
     )
+
     with resources.path(package, resource) as path:
         structure = read_molecule(str(path))
         structure = remove_non_protein(structure, remove_water=True)
@@ -312,8 +312,11 @@ def test_delete_alterations(
 def test_delete_short_protein_segments(package, resource, sequence):
     """Compare results to expected sequence."""
     from kinoml.modeling.MDAnalysisModeling import (
-        read_molecule, delete_short_protein_segments, get_sequence
+        read_molecule,
+        delete_short_protein_segments,
+        get_sequence,
     )
+
     with resources.path(package, resource) as path:
         structure = read_molecule(str(path))
         structure = delete_short_protein_segments(structure)
@@ -346,8 +349,11 @@ def test_delete_short_protein_segments(package, resource, sequence):
 def test_renumber_protein_residues(package, resource, sequence, expected_residue_ids):
     """Compare results to expected residue IDs."""
     from kinoml.modeling.MDAnalysisModeling import (
-        read_molecule, remove_non_protein, renumber_protein_residues
+        read_molecule,
+        remove_non_protein,
+        renumber_protein_residues,
     )
+
     with resources.path(package, resource) as path:
         structure = read_molecule(str(path))
         protein = remove_non_protein(structure, remove_water=True)
@@ -366,7 +372,7 @@ def test_renumber_protein_residues(package, resource, sequence, expected_residue
             True,
             list(range(1, 246)),
             list(range(1, 2477)),
-            ["A", "B"]
+            ["A", "B"],
         ),
         (
             "kinoml.data.proteins",
@@ -375,7 +381,7 @@ def test_renumber_protein_residues(package, resource, sequence, expected_residue
             False,
             list(range(1, 246)),
             list(range(1, 2477)),
-            ["A"]
+            ["A"],
         ),
         (
             "kinoml.data.proteins",
@@ -384,7 +390,7 @@ def test_renumber_protein_residues(package, resource, sequence, expected_residue
             True,
             list(range(1, 137)),
             list(range(1, 2046)),
-            ["A"]
+            ["A"],
         ),
         (
             "kinoml.data.proteins",
@@ -393,26 +399,33 @@ def test_renumber_protein_residues(package, resource, sequence, expected_residue
             False,
             [x for x in range(1, 139) if x not in [82, 135]],
             list(range(1, 2046)),
-            ["A"]
+            ["A"],
         ),
     ],
 )
 def test_update_residue_identifiers(
-        package, resource, keep_protein_residue_ids, keep_chain_ids, expected_residue_ids,
-        expected_atom_ids, expected_chain_ids
+    package,
+    resource,
+    keep_protein_residue_ids,
+    keep_chain_ids,
+    expected_residue_ids,
+    expected_atom_ids,
+    expected_chain_ids,
 ):
     """Compare results to expected identifiers."""
     from kinoml.modeling.MDAnalysisModeling import read_molecule, update_residue_identifiers
+
     with resources.path(package, resource) as path:
         structure = read_molecule(str(path))
         structure = update_residue_identifiers(structure, keep_protein_residue_ids, keep_chain_ids)
-        assert all([
-            True for x, y in zip(expected_residue_ids, structure.residues.resids) if x == y
-        ])
-        assert all([
-            True for x, y in zip(expected_chain_ids, sorted(set(structure.segments.segids)))
-            if x == y
-        ])
-        assert all([
-            True for x, y in zip(expected_atom_ids, structure.atoms.indices) if x == y
-        ])
+        assert all(
+            [True for x, y in zip(expected_residue_ids, structure.residues.resids) if x == y]
+        )
+        assert all(
+            [
+                True
+                for x, y in zip(expected_chain_ids, sorted(set(structure.segments.segids)))
+                if x == y
+            ]
+        )
+        assert all([True for x, y in zip(expected_atom_ids, structure.atoms.indices) if x == y])

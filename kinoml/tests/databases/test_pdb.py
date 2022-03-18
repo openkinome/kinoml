@@ -100,7 +100,4 @@ def test_download_pdb_structure(pdb_id, chain_id, expo_id, smiles, return_type):
     from kinoml.databases.pdb import download_pdb_ligand
 
     with TemporaryDirectory() as temporary_directory:
-        assert isinstance(
-            download_pdb_ligand(pdb_id, chain_id, expo_id, smiles),
-            return_type
-        )
+        assert isinstance(download_pdb_ligand(pdb_id, chain_id, expo_id, smiles), return_type)

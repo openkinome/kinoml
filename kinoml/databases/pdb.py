@@ -32,17 +32,19 @@ def smiles_from_pdb(ligand_ids: Iterable[str]) -> dict:
     base_url = "https://data.rcsb.org/graphql?query="
     n_batches = math.ceil(len(ligand_ids) / 50)  # request maximal 50 smiles at a time
     for i in range(n_batches):
-        ligand_ids_batch = ligand_ids[i * 50: (i * 50) + 50]
+        ligand_ids_batch = ligand_ids[i * 50 : (i * 50) + 50]
         logger.debug(f"Batch {i}\n{ligand_ids_batch}")
-        query = '{chem_comps(comp_ids:[' + \
-                ','.join(['"' + ligand_id + '"' for ligand_id in ligand_ids_batch]) + \
-                ']){chem_comp{id}rcsb_chem_comp_descriptor{SMILES_stereo}}}'
+        query = (
+            "{chem_comps(comp_ids:["
+            + ",".join(['"' + ligand_id + '"' for ligand_id in ligand_ids_batch])
+            + "]){chem_comp{id}rcsb_chem_comp_descriptor{SMILES_stereo}}}"
+        )
         response = requests.get(base_url + urllib.parse.quote(query))
         for ligand in json.loads(response.text)["data"]["chem_comps"]:
             try:
-                ligands[ligand["chem_comp"]["id"]] = ligand[
-                    "rcsb_chem_comp_descriptor"
-                ]["SMILES_stereo"]
+                ligands[ligand["chem_comp"]["id"]] = ligand["rcsb_chem_comp_descriptor"][
+                    "SMILES_stereo"
+                ]
             except TypeError:
                 # missing smiles entry
                 pass
@@ -51,7 +53,7 @@ def smiles_from_pdb(ligand_ids: Iterable[str]) -> dict:
 
 
 def download_pdb_structure(
-        pdb_id: str, directory: Union[str, Path] = user_cache_dir()
+    pdb_id: str, directory: Union[str, Path] = user_cache_dir()
 ) -> Union[Path, bool]:
     """
     Download a PDB structure. If the structure is not available in PDB format, it will be download
@@ -95,11 +97,11 @@ def download_pdb_structure(
 
 
 def download_pdb_ligand(
-        pdb_id: str,
-        chain_id: str,
-        expo_id: str,
-        smiles: str = "",
-        directory: Union[str, Path] = user_cache_dir(),
+    pdb_id: str,
+    chain_id: str,
+    expo_id: str,
+    smiles: str = "",
+    directory: Union[str, Path] = user_cache_dir(),
 ) -> Union[Path, bool]:
     """
     Download a ligand co-crystallized to a PDB structure and save in SDF format. If a SMILES is

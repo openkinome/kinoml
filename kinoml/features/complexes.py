@@ -74,18 +74,13 @@ class MostSimilarPDBLigandFeaturizer(SingleLigandProteinComplexFeaturizer):
     import pandas as pd
 
     _SUPPORTED_TYPES = (ProteinLigandComplex,)
-    _SUPPORTED_SIMILARITY_METRICS = (
-        "fingerprint",
-        "mcs",
-        "openeye_shape",
-        "schrodinger_shape"
-    )
+    _SUPPORTED_SIMILARITY_METRICS = ("fingerprint", "mcs", "openeye_shape", "schrodinger_shape")
 
     def __init__(
-            self,
-            similarity_metric: str = "fingerprint",
-            cache_dir: Union[str, Path, None] = None,
-            **kwargs
+        self,
+        similarity_metric: str = "fingerprint",
+        cache_dir: Union[str, Path, None] = None,
+        **kwargs,
     ):
         from appdirs import user_cache_dir
 
@@ -138,8 +133,7 @@ class MostSimilarPDBLigandFeaturizer(SingleLigandProteinComplexFeaturizer):
 
         logger.debug("Getting most similar PDB ligand entity ...")
         pdb_id, chain_id, expo_id = self._get_most_similar_pdb_ligand_entity(
-            pdb_ligand_entities,
-            system.ligand.molecule.to_smiles(explicit_hydrogens=False)
+            pdb_ligand_entities, system.ligand.molecule.to_smiles(explicit_hydrogens=False)
         )
 
         logger.debug("Adding results to new protein object ...")
@@ -147,7 +141,7 @@ class MostSimilarPDBLigandFeaturizer(SingleLigandProteinComplexFeaturizer):
             pdb_id=pdb_id,
             uniprot_id=system.protein.uniprot_id,
             name=system.protein.name,
-            toolkit=system.protein.toolkit
+            toolkit=system.protein.toolkit,
         )
         new_protein.chain_id = chain_id
         new_protein.expo_id = expo_id
@@ -214,16 +208,15 @@ class MostSimilarPDBLigandFeaturizer(SingleLigandProteinComplexFeaturizer):
         query_by_uniprot = rcsb.FieldQuery(
             "rcsb_polymer_entity_container_identifiers."
             "reference_sequence_identifiers.database_name",
-            exact_match="UniProt"
+            exact_match="UniProt",
         )
         query_by_uniprot_id = rcsb.FieldQuery(
             "rcsb_polymer_entity_container_identifiers."
             "reference_sequence_identifiers.database_accession",
-            exact_match=uniprot_id
+            exact_match=uniprot_id,
         )
         query_by_experimental_method = rcsb.FieldQuery(
-            "exptl.method",
-            exact_match="X-RAY DIFFRACTION"  # allows later sorting for resolution
+            "exptl.method", exact_match="X-RAY DIFFRACTION"  # allows later sorting for resolution
         )
         results = rcsb.search(
             rcsb.CompositeQuery(
@@ -232,18 +225,20 @@ class MostSimilarPDBLigandFeaturizer(SingleLigandProteinComplexFeaturizer):
                     query_by_uniprot_id,
                     query_by_experimental_method,
                 ],
-                operator="and"
+                operator="and",
             ),
-            return_type="non_polymer_entity"
+            return_type="non_polymer_entity",
         )
         pdb_ligand_entities = []
         for pdb_ligand_entity in results:
             pdb_id, non_polymer_id = pdb_ligand_entity.split("_")
-            pdb_ligand_entities.append({
-                "ligand_entity": pdb_ligand_entity,
-                "pdb_id": pdb_id,
-                "non_polymer_id": non_polymer_id
-            })
+            pdb_ligand_entities.append(
+                {
+                    "ligand_entity": pdb_ligand_entity,
+                    "pdb_id": pdb_id,
+                    "non_polymer_id": non_polymer_id,
+                }
+            )
         if len(pdb_ligand_entities) == 0:
             logger.debug(f"No ligand entities found for UniProt ID {uniprot_id}, returning None!")
             return None
@@ -290,15 +285,19 @@ class MostSimilarPDBLigandFeaturizer(SingleLigandProteinComplexFeaturizer):
         expo_ids_dict = {}
         n_batches = math.ceil(len(ligand_entity_ids) / 50)  # request maximal 50 entries at a time
         for i in range(n_batches):
-            ligand_entity_ids_batch = ligand_entity_ids[i * 50: (i * 50) + 50]
+            ligand_entity_ids_batch = ligand_entity_ids[i * 50 : (i * 50) + 50]
             logger.debug(f"Batch {i}\n{ligand_entity_ids_batch}")
-            query = '{nonpolymer_entities(entity_ids:[' + \
-                    ','.join([
+            query = (
+                "{nonpolymer_entities(entity_ids:["
+                + ",".join(
+                    [
                         '"' + ligand_entity_id + '"'
                         for ligand_entity_id in set(ligand_entity_ids_batch)
-                    ]) + \
-                    ']){rcsb_nonpolymer_entity_container_identifiers' \
-                    '{auth_asym_ids,nonpolymer_comp_id,rcsb_id}}}'
+                    ]
+                )
+                + "]){rcsb_nonpolymer_entity_container_identifiers"
+                "{auth_asym_ids,nonpolymer_comp_id,rcsb_id}}}"
+            )
             response = requests.get(base_url + urllib.parse.quote(query))
             for ligand_identity_info in json.loads(response.text)["data"]["nonpolymer_entities"]:
                 identifiers = ligand_identity_info["rcsb_nonpolymer_entity_container_identifiers"]
@@ -309,8 +308,8 @@ class MostSimilarPDBLigandFeaturizer(SingleLigandProteinComplexFeaturizer):
         pdb_ligand_entities["expo_id"] = pdb_ligand_entities["ligand_entity"].map(expo_ids_dict)
 
         pdb_ligand_entities = pdb_ligand_entities[
-            (pdb_ligand_entities["chain_id"].notnull()) &
-            (pdb_ligand_entities["expo_id"].notnull())
+            (pdb_ligand_entities["chain_id"].notnull())
+            & (pdb_ligand_entities["expo_id"].notnull())
         ]
 
         return pdb_ligand_entities
@@ -343,11 +342,13 @@ class MostSimilarPDBLigandFeaturizer(SingleLigandProteinComplexFeaturizer):
         resolution_dict = {}
         n_batches = math.ceil(len(pdb_ids) / 50)  # request maximal 50 entries at a time
         for i in range(n_batches):
-            pdb_ids_batch = pdb_ids[i * 50: (i * 50) + 50]
+            pdb_ids_batch = pdb_ids[i * 50 : (i * 50) + 50]
             logger.debug(f"Batch {i}\n{pdb_ids_batch}")
-            query = '{entries(entry_ids:[' + ','.join(
-                ['"' + pdb_id + '"' for pdb_id in pdb_ids_batch]
-            ) + ']){rcsb_id,pdbx_vrpt_summary{PDB_resolution}}}'
+            query = (
+                "{entries(entry_ids:["
+                + ",".join(['"' + pdb_id + '"' for pdb_id in pdb_ids_batch])
+                + "]){rcsb_id,pdbx_vrpt_summary{PDB_resolution}}}"
+            )
             response = requests.get(base_url + urllib.parse.quote(query))
             for entry_info in json.loads(response.text)["data"]["entries"]:
                 try:
@@ -364,9 +365,7 @@ class MostSimilarPDBLigandFeaturizer(SingleLigandProteinComplexFeaturizer):
         return pdb_ligand_entities
 
     def _get_most_similar_pdb_ligand_entity(
-            self,
-            pdb_ligand_entities: pd.DataFrame,
-            smiles: str
+        self, pdb_ligand_entities: pd.DataFrame, smiles: str
     ) -> Tuple[str, str, str]:
         """
         Get the PDB ligand that is most similar to the given SMILES.
@@ -408,9 +407,7 @@ class MostSimilarPDBLigandFeaturizer(SingleLigandProteinComplexFeaturizer):
         return pdb_id, chain_id, expo_id
 
     @staticmethod
-    def _by_fingerprint(
-            pdb_ligand_entities: pd.DataFrame, smiles: str
-    ) -> Tuple[str, str, str]:
+    def _by_fingerprint(pdb_ligand_entities: pd.DataFrame, smiles: str) -> Tuple[str, str, str]:
         """
         Get the PDB ligand that is most similar to the given SMILES according to Morgan
         Fingerprints.
@@ -443,9 +440,7 @@ class MostSimilarPDBLigandFeaturizer(SingleLigandProteinComplexFeaturizer):
         logger.debug("Generating fingerprints for PDB ligand entities ...")
         pdb_ligands = [Chem.MolFromSmiles(smiles) for smiles in pdb_ligand_entities["smiles"]]
         pdb_ligand_entities["rdkit_molecules"] = pdb_ligands
-        pdb_ligand_entities = pdb_ligand_entities[
-            pdb_ligand_entities["rdkit_molecules"].notnull()
-        ]
+        pdb_ligand_entities = pdb_ligand_entities[pdb_ligand_entities["rdkit_molecules"].notnull()]
         pd.options.mode.chained_assignment = None  # otherwise next line would raise a warning
         pdb_ligand_entities["rdkit_fingerprint"] = [
             AllChem.GetMorganFingerprint(rdkit_molecule, 2, useFeatures=True)
@@ -458,11 +453,7 @@ class MostSimilarPDBLigandFeaturizer(SingleLigandProteinComplexFeaturizer):
             for fingerprint in pdb_ligand_entities["rdkit_fingerprint"]
         ]
 
-        pdb_ligand_entities.sort_values(
-            by="fingerprint_similarity",
-            inplace=True,
-            ascending=False
-        )
+        pdb_ligand_entities.sort_values(by="fingerprint_similarity", inplace=True, ascending=False)
         logger.debug(f"Fingerprint similarites:\n{pdb_ligand_entities}")
 
         picked_ligand_entity = pdb_ligand_entities.iloc[0]
@@ -470,13 +461,11 @@ class MostSimilarPDBLigandFeaturizer(SingleLigandProteinComplexFeaturizer):
         return (
             picked_ligand_entity["pdb_id"],
             picked_ligand_entity["chain_id"],
-            picked_ligand_entity["expo_id"]
+            picked_ligand_entity["expo_id"],
         )
 
     @staticmethod
-    def _by_mcs(
-            pdb_ligand_entities: pd.DataFrame, smiles: str
-    ) -> Tuple[str, str, str]:
+    def _by_mcs(pdb_ligand_entities: pd.DataFrame, smiles: str) -> Tuple[str, str, str]:
         """
         Get the PDB ligand that is most similar to the given SMILES according to Morgan
         Fingerprints.
@@ -506,23 +495,18 @@ class MostSimilarPDBLigandFeaturizer(SingleLigandProteinComplexFeaturizer):
         logger.debug("Loading PDB ligands ...")
         pdb_ligands = [Chem.MolFromSmiles(smiles) for smiles in pdb_ligand_entities["smiles"]]
         pdb_ligand_entities["rdkit_molecules"] = pdb_ligands
-        pdb_ligand_entities = pdb_ligand_entities[
-            pdb_ligand_entities["rdkit_molecules"].notnull()
-        ]
+        pdb_ligand_entities = pdb_ligand_entities[pdb_ligand_entities["rdkit_molecules"].notnull()]
 
         logger.debug("Finding maximum common structure and counting bonds ...")
         mcs_bonds = [
             rdFMCS.FindMCS(
                 [reference_molecule, pdb_ligand_molecule], ringMatchesRingOnly=True, timeout=60
-            ).numBonds for pdb_ligand_molecule in pdb_ligand_entities["rdkit_molecules"]
+            ).numBonds
+            for pdb_ligand_molecule in pdb_ligand_entities["rdkit_molecules"]
         ]
         pdb_ligand_entities["mcs_bonds"] = mcs_bonds
 
-        pdb_ligand_entities.sort_values(
-            by="mcs_bonds",
-            inplace=True,
-            ascending=False
-        )
+        pdb_ligand_entities.sort_values(by="mcs_bonds", inplace=True, ascending=False)
         logger.debug(f"MCS bonds:\n{pdb_ligand_entities}")
 
         picked_ligand_entity = pdb_ligand_entities.iloc[0]
@@ -530,11 +514,11 @@ class MostSimilarPDBLigandFeaturizer(SingleLigandProteinComplexFeaturizer):
         return (
             picked_ligand_entity["pdb_id"],
             picked_ligand_entity["chain_id"],
-            picked_ligand_entity["expo_id"]
+            picked_ligand_entity["expo_id"],
         )
 
     def _by_schrodinger_shape(
-            self, pdb_ligand_entities: pd.DataFrame, smiles: str
+        self, pdb_ligand_entities: pd.DataFrame, smiles: str
     ) -> Tuple[str, str, str]:
         """
         Get the PDB ligand that is most similar to the given SMILES according to SCHRODINGER
@@ -568,15 +552,15 @@ class MostSimilarPDBLigandFeaturizer(SingleLigandProteinComplexFeaturizer):
                 pdb_id=pdb_ligand_entity["pdb_id"],
                 chain_id=pdb_ligand_entity["chain_id"],
                 expo_id=pdb_ligand_entity["expo_id"],
-                directory=self.cache_dir
+                directory=self.cache_dir,
             )
             if query_path:
                 pdb_ligand_entity["path"] = query_path
                 queries.append(pdb_ligand_entity)
 
-        with NamedTemporaryFile(mode="w", suffix=".sdf") as query_sdf_path, \
-                NamedTemporaryFile(mode="w", suffix=".sdf") as ligand_sdf_path, \
-                NamedTemporaryFile(mode="w", suffix=".sdf") as result_sdf_path:
+        with NamedTemporaryFile(mode="w", suffix=".sdf") as query_sdf_path, NamedTemporaryFile(
+            mode="w", suffix=".sdf"
+        ) as ligand_sdf_path, NamedTemporaryFile(mode="w", suffix=".sdf") as result_sdf_path:
             logger.debug("Merging PDB ligands to query SDF file ...")
             with Chem.SDWriter(query_sdf_path.name) as writer:
                 for query in queries:
@@ -609,11 +593,11 @@ class MostSimilarPDBLigandFeaturizer(SingleLigandProteinComplexFeaturizer):
         return (
             picked_ligand_entity["pdb_id"],
             picked_ligand_entity["chain_id"],
-            picked_ligand_entity["expo_id"]
+            picked_ligand_entity["expo_id"],
         )
 
     def _by_openeye_shape(
-            self, pdb_ligand_entities: pd.DataFrame, smiles: str
+        self, pdb_ligand_entities: pd.DataFrame, smiles: str
     ) -> Tuple[str, str, str]:
         """
         Get the PDB ligand that is most similar to the given SMILES according to OpenEye's
@@ -647,16 +631,14 @@ class MostSimilarPDBLigandFeaturizer(SingleLigandProteinComplexFeaturizer):
                 pdb_id=pdb_ligand_entity["pdb_id"],
                 chain_id=pdb_ligand_entity["chain_id"],
                 expo_id=pdb_ligand_entity["expo_id"],
-                directory=self.cache_dir
+                directory=self.cache_dir,
             )
             if query_path:
                 pdb_ligand_entity["path"] = query_path
                 queries.append(pdb_ligand_entity)
 
         logger.debug("Reading downloaded PDB ligands ...")
-        pdb_ligand_molecules = [
-            read_molecules(query["path"])[0] for query in queries
-        ]
+        pdb_ligand_molecules = [read_molecules(query["path"])[0] for query in queries]
 
         logger.debug("Generating reasonable conformations of ligand of interest ...")
         conformations_ensemble = generate_reasonable_conformations(read_smiles(smiles))
@@ -675,7 +657,7 @@ class MostSimilarPDBLigandFeaturizer(SingleLigandProteinComplexFeaturizer):
         return (
             picked_ligand_entity["pdb_id"],
             picked_ligand_entity["chain_id"],
-            picked_ligand_entity["expo_id"]
+            picked_ligand_entity["expo_id"],
         )
 
 
@@ -1151,14 +1133,15 @@ class SCHRODINGERComplexFeaturizer(SingleLigandProteinComplexFeaturizer):
     max_retry: int, default=3
         The maximal number of attempts to try running the prepwizard step.
     """
+
     from MDAnalysis.core.universe import Universe
 
     def __init__(
-            self,
-            cache_dir: Union[str, Path, None] = None,
-            output_dir: Union[str, Path, None] = None,
-            max_retry: int = 3,
-            **kwargs,
+        self,
+        cache_dir: Union[str, Path, None] = None,
+        output_dir: Union[str, Path, None] = None,
+        max_retry: int = 3,
+        **kwargs,
     ):
         from appdirs import user_cache_dir
 
@@ -1328,12 +1311,12 @@ class SCHRODINGERComplexFeaturizer(SingleLigandProteinComplexFeaturizer):
         return system_dict
 
     def _preprocess_structure(
-            self,
-            pdb_path: Union[str, Path],
-            chain_id: Union[str, None],
-            alternate_location: Union[str, None],
-            expo_id: Union[str, None],
-            sequence: str,
+        self,
+        pdb_path: Union[str, Path],
+        chain_id: Union[str, None],
+        alternate_location: Union[str, None],
+        expo_id: Union[str, None],
+        sequence: str,
     ) -> Path:
         """
         Pre-process a structure for SCHRODINGER's prepwizard with the following steps:
@@ -1379,9 +1362,7 @@ class SCHRODINGERComplexFeaturizer(SingleLigandProteinComplexFeaturizer):
 
         clean_structure_path = LocalFileStorage.featurizer_result(
             self.__class__.__name__,
-            sha256_objects(
-                [pdb_path, chain_id, alternate_location, expo_id, sequence]
-            ),
+            sha256_objects([pdb_path, chain_id, alternate_location, expo_id, sequence]),
             "pdb",
             self.cache_dir,
         )
@@ -1440,7 +1421,7 @@ class SCHRODINGERComplexFeaturizer(SingleLigandProteinComplexFeaturizer):
         return clean_structure_path
 
     def _prepare_structure(
-            self, input_file: Path, sequence: Union[str, None]
+        self, input_file: Path, sequence: Union[str, None]
     ) -> Union[Path, None]:
         """
         Prepare the structure with SCHRODINGER's prepwizard.
@@ -1473,8 +1454,9 @@ class SCHRODINGERComplexFeaturizer(SingleLigandProteinComplexFeaturizer):
 
             for i in range(self.max_retry):
                 logger.debug(f"Running prepwizard trial {i + 1}...")
-                mae_file_path = prepared_structure_path.parent / \
-                                f"{prepared_structure_path.stem}.mae"
+                mae_file_path = (
+                    prepared_structure_path.parent / f"{prepared_structure_path.stem}.mae"
+                )
                 run_prepwizard(
                     schrodinger_directory=self.schrodinger,
                     input_file=input_file,
@@ -1501,11 +1483,11 @@ class SCHRODINGERComplexFeaturizer(SingleLigandProteinComplexFeaturizer):
 
     @staticmethod
     def _postprocess_structure(
-            prepared_structure: Universe,
-            chain_id: [str, None],
-            alternate_location: [str, None],
-            expo_id: [str, None],
-            sequence: [str, None],
+        prepared_structure: Universe,
+        chain_id: [str, None],
+        alternate_location: [str, None],
+        expo_id: [str, None],
+        sequence: [str, None],
     ):
         """
         Post-process a structure prepared with SCHRODINGER's prepwizard with the following steps:
@@ -1537,7 +1519,7 @@ class SCHRODINGERComplexFeaturizer(SingleLigandProteinComplexFeaturizer):
             select_chain,
             select_altloc,
             remove_non_protein,
-            update_residue_identifiers
+            update_residue_identifiers,
         )
 
         if not sequence:
@@ -1628,19 +1610,18 @@ class SCHRODINGERDockingFeaturizer(SCHRODINGERComplexFeaturizer):
         The maximal number of attempts to try running the prepwizard and
         docking steps.
     """
+
     from MDAnalysis.core.universe import Universe
 
     def __init__(
-            self,
-            cache_dir: Union[str, Path, None] = None,
-            output_dir: Union[str, Path, None] = None,
-            max_retry: int = 3,
-            shape_restrain: bool = True,
-            **kwargs,
+        self,
+        cache_dir: Union[str, Path, None] = None,
+        output_dir: Union[str, Path, None] = None,
+        max_retry: int = 3,
+        shape_restrain: bool = True,
+        **kwargs,
     ):
-        super().__init__(
-            cache_dir=cache_dir, output_dir=output_dir, max_retry=max_retry, **kwargs
-        )
+        super().__init__(cache_dir=cache_dir, output_dir=output_dir, max_retry=max_retry, **kwargs)
         self.shape_restrain = shape_restrain
 
     _SUPPORTED_TYPES = (ProteinLigandComplex,)
@@ -1666,9 +1647,7 @@ class SCHRODINGERDockingFeaturizer(SCHRODINGERComplexFeaturizer):
         system_dict = self._interpret_system(system)
 
         if not system_dict["protein_expo_id"]:
-            logger.debug(
-                "No expo_id given in Protein object needed for docking, returning None!"
-            )
+            logger.debug("No expo_id given in Protein object needed for docking, returning None!")
             return None
 
         if system_dict["protein_sequence"]:
@@ -1694,11 +1673,11 @@ class SCHRODINGERDockingFeaturizer(SCHRODINGERComplexFeaturizer):
         )
         mae_file_path = prepared_structure_path.parent / f"{prepared_structure_path.stem}.mae"
         if not self._dock_molecule(
-                mae_file=mae_file_path,
-                output_file_sdf=docking_pose_path,
-                ligand_resname=system_dict["protein_expo_id"],
-                smiles=system_dict["ligand_smiles"],
-                macrocycle=system_dict["ligand_macrocycle"],
+            mae_file=mae_file_path,
+            output_file_sdf=docking_pose_path,
+            ligand_resname=system_dict["protein_expo_id"],
+            smiles=system_dict["ligand_smiles"],
+            macrocycle=system_dict["ligand_macrocycle"],
         ):
             logger.debug("Failed to generate docking pose ...")
             return None
@@ -1706,7 +1685,7 @@ class SCHRODINGERDockingFeaturizer(SCHRODINGERComplexFeaturizer):
         prepared_structure = self._replace_ligand(
             pdb_path=prepared_structure_path,
             resname_replace=system_dict["protein_expo_id"],
-            docking_pose_sdf_path=docking_pose_path
+            docking_pose_sdf_path=docking_pose_path,
         )
 
         prepared_structure = self._postprocess_structure(
@@ -1730,12 +1709,12 @@ class SCHRODINGERDockingFeaturizer(SCHRODINGERComplexFeaturizer):
         return prepared_structure
 
     def _dock_molecule(
-            self,
-            mae_file: Path,
-            output_file_sdf: Path,
-            ligand_resname: str,
-            smiles: str,
-            macrocycle: bool
+        self,
+        mae_file: Path,
+        output_file_sdf: Path,
+        ligand_resname: str,
+        smiles: str,
+        macrocycle: bool,
     ) -> bool:
         """
         Dock the molecule into the protein with SCHRODINGER's Glide.
@@ -1782,9 +1761,7 @@ class SCHRODINGERDockingFeaturizer(SCHRODINGERComplexFeaturizer):
 
     @staticmethod
     def _replace_ligand(
-            pdb_path: Path,
-            resname_replace: str,
-            docking_pose_sdf_path: Path
+        pdb_path: Path, resname_replace: str, docking_pose_sdf_path: Path
     ) -> Universe:
         """
         Replace the ligand in a PDB file with a ligand in an SDF file.

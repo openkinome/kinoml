@@ -53,10 +53,27 @@ def run_prepwizard(
     schrodinger_directory = Path(schrodinger_directory)
     executable = str(schrodinger_directory / "utilities/prepwizard")
     standard_arguments = [
-        str(input_file), str(output_file), "-HOST", "localhost", "-WAIT", "-keepfarwat",
-        "-disulfides", "-glycosylation", "-palmitoylation", "-mse", "-fillsidechains",
-        "-samplewater", "-pH", protein_pH, "-propka_pH", str(propka_pH), "-minimize_adj_h",
-        "-epik_pH", str(epik_pH), "-f", force_field,
+        str(input_file),
+        str(output_file),
+        "-HOST",
+        "localhost",
+        "-WAIT",
+        "-keepfarwat",
+        "-disulfides",
+        "-glycosylation",
+        "-palmitoylation",
+        "-mse",
+        "-fillsidechains",
+        "-samplewater",
+        "-pH",
+        protein_pH,
+        "-propka_pH",
+        str(propka_pH),
+        "-minimize_adj_h",
+        "-epik_pH",
+        str(epik_pH),
+        "-f",
+        force_field,
     ]
     optional_arguments = []
     if cap_termini:
@@ -66,17 +83,18 @@ def run_prepwizard(
 
     if sequence:  # one letter characters, 60 per line, no header
         with NamedTemporaryFile(mode="w", suffix=".fasta") as fasta_file:
-            sequence = "\n".join([sequence[i:i + 60] for i in range(0, len(sequence), 60)])
+            sequence = "\n".join([sequence[i : i + 60] for i in range(0, len(sequence), 60)])
             fasta_file.write(f">entry:{chain_id}\n")
             fasta_file.write(sequence)
             fasta_file.flush()
             subprocess.run(
-                [executable] + standard_arguments + optional_arguments + ["-fasta_file", fasta_file.name]
+                [executable]
+                + standard_arguments
+                + optional_arguments
+                + ["-fasta_file", fasta_file.name]
             )
     else:
-        subprocess.run(
-            [executable] + standard_arguments + optional_arguments
-        )
+        subprocess.run([executable] + standard_arguments + optional_arguments)
 
     if logger.getEffectiveLevel() != logging.DEBUG:  # remove prepwizard log
         paths = Path(".").glob(f"*{Path(input_file).stem}*")
@@ -91,9 +109,9 @@ def run_prepwizard(
 
 
 def mae_to_pdb(
-        schrodinger_directory: Union[str, Path],
-        mae_file_path: Union[str, Path],
-        pdb_file_path: Union[str, Path]
+    schrodinger_directory: Union[str, Path],
+    mae_file_path: Union[str, Path],
+    pdb_file_path: Union[str, Path],
 ):
     """
     Convert a structure file from MAE to PDB format.
@@ -110,7 +128,10 @@ def mae_to_pdb(
     schrodinger_directory = Path(schrodinger_directory)
     arguments = [
         str(schrodinger_directory / "utilities/pdbconvert"),  # executable
-        "-imae", str(mae_file_path), "-opdb", str(pdb_file_path),  # file paths
+        "-imae",
+        str(mae_file_path),
+        "-opdb",
+        str(pdb_file_path),  # file paths
     ]
     subprocess.run(arguments)
     return
@@ -153,8 +174,16 @@ def shape_screen(
     schrodinger_directory = Path(schrodinger_directory)
     executable = str(schrodinger_directory / "shape_screen")
     standard_arguments = [
-        "-shape", str(query_path), "-screen", str(library_path), "-osd", "-atomtypes", "qsar",
-        "-HOST", "localhost", "-WAIT",
+        "-shape",
+        str(query_path),
+        "-screen",
+        str(library_path),
+        "-osd",
+        "-atomtypes",
+        "qsar",
+        "-HOST",
+        "localhost",
+        "-WAIT",
     ]
     optional_arguments = []
     if flexible:
@@ -164,13 +193,11 @@ def shape_screen(
     if keep_best_match_only:
         optional_arguments.append("-best")
 
-    subprocess.run(
-        [executable] + standard_arguments + optional_arguments
-    )
+    subprocess.run([executable] + standard_arguments + optional_arguments)
     if logger.getEffectiveLevel() != logging.DEBUG:  # remove shape_screen log and okay
         paths = [
             Path(".") / f"{Path(query_path).stem}_shape.log",
-            Path(".") / f"{Path(query_path).stem}_shape.okay"
+            Path(".") / f"{Path(query_path).stem}_shape.okay",
         ]
         for path in paths:
             try:

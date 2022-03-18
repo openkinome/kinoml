@@ -11,17 +11,17 @@ logger = logging.getLogger(__name__)
 
 
 def run_glide(
-        schrodinger_directory: Union[Path, str],
-        input_file_mae: Union[Path, str],
-        output_file_sdf: Union[Path, str],
-        ligand_resname: str,
-        mols_smiles: List[str],
-        n_poses: int = 1,
-        mols_names: Union[List[str], None] = None,
-        shape_restrain: bool = True,
-        macrocyles: bool = False,
-        precision: str = "XP",
-        cache_dir: Union[Path, str] = user_cache_dir(),
+    schrodinger_directory: Union[Path, str],
+    input_file_mae: Union[Path, str],
+    output_file_sdf: Union[Path, str],
+    ligand_resname: str,
+    mols_smiles: List[str],
+    n_poses: int = 1,
+    mols_names: Union[List[str], None] = None,
+    shape_restrain: bool = True,
+    macrocyles: bool = False,
+    precision: str = "XP",
+    cache_dir: Union[Path, str] = user_cache_dir(),
 ):
     """
     Run glide for protein ligand docking.
@@ -66,31 +66,39 @@ def run_glide(
 
     schrodinger_directory = Path(schrodinger_directory).resolve()
     input_file_mae = Path(input_file_mae).resolve()
-    with NamedTemporaryFile(mode="w", suffix=".mae") as protein_file_mae, \
-            NamedTemporaryFile(mode="w", suffix=".mae") as ligand_file_mae, \
-            NamedTemporaryFile(mode="w", suffix=".sdf") as mols_file_sdf, \
-            NamedTemporaryFile(mode="w", suffix=".in") as grid_input_file, \
-            NamedTemporaryFile(mode="w", suffix=".in") as docking_input_file:
+    with NamedTemporaryFile(mode="w", suffix=".mae") as protein_file_mae, NamedTemporaryFile(
+        mode="w", suffix=".mae"
+    ) as ligand_file_mae, NamedTemporaryFile(
+        mode="w", suffix=".sdf"
+    ) as mols_file_sdf, NamedTemporaryFile(
+        mode="w", suffix=".in"
+    ) as grid_input_file, NamedTemporaryFile(
+        mode="w", suffix=".in"
+    ) as docking_input_file:
 
         logger.debug("Selecting and writing protein from MAE input file ...")
-        subprocess.run([
-            str(schrodinger_directory / "run"),
-            "delete_atoms.py",
-            str(input_file_mae),
-            protein_file_mae.name,
-            "-asl",
-            "not protein"
-        ])
+        subprocess.run(
+            [
+                str(schrodinger_directory / "run"),
+                "delete_atoms.py",
+                str(input_file_mae),
+                protein_file_mae.name,
+                "-asl",
+                "not protein",
+            ]
+        )
 
         logger.debug("Selecting and writing ligand from MAE input file ...")
-        subprocess.run([
-            str(schrodinger_directory / "run"),
-            "delete_atoms.py",
-            str(input_file_mae),
-            ligand_file_mae.name,
-            "-asl",
-            f"not res. {ligand_resname}"
-        ])
+        subprocess.run(
+            [
+                str(schrodinger_directory / "run"),
+                "delete_atoms.py",
+                str(input_file_mae),
+                ligand_file_mae.name,
+                "-asl",
+                f"not res. {ligand_resname}",
+            ]
+        )
 
         logger.debug("Writing molecules to SDF ...")
         if not mols_names or len(mols_names) != len(mols_smiles):
@@ -114,20 +122,22 @@ def run_glide(
         grid_input_file.flush()
 
         grid_file_path = Path(cache_dir) / (
-                sha256_objects([input_file_mae, ligand_resname]) + ".zip"
+            sha256_objects([input_file_mae, ligand_resname]) + ".zip"
         )  # caching via hash based on input structure and chosen ligand
         if grid_file_path.is_file():
             logger.debug("Found cached grid file ..")
         else:
             logger.debug("Generating grid for docking ...")
-            subprocess.run([
-                str(schrodinger_directory / "glide"),
-                grid_input_file.name,
-                "-HOST",
-                "localhost",
-                "-WAIT",
-                "-OVERWRITE"
-            ])
+            subprocess.run(
+                [
+                    str(schrodinger_directory / "glide"),
+                    grid_input_file.name,
+                    "-HOST",
+                    "localhost",
+                    "-WAIT",
+                    "-OVERWRITE",
+                ]
+            )
             (Path(".") / (Path(grid_input_file.name).stem + ".zip")).rename(grid_file_path)
 
         if logger.getEffectiveLevel() != 10:  # remove grid logs etc.
@@ -152,14 +162,16 @@ def run_glide(
         docking_input_file.flush()
 
         logger.debug("Running docking ...")
-        subprocess.run([
-            str(schrodinger_directory / "glide"),
-            docking_input_file.name,
-            "-HOST",
-            "localhost",
-            "-WAIT",
-            "-OVERWRITE"
-        ])
+        subprocess.run(
+            [
+                str(schrodinger_directory / "glide"),
+                docking_input_file.name,
+                "-HOST",
+                "localhost",
+                "-WAIT",
+                "-OVERWRITE",
+            ]
+        )
 
         logger.debug("Filtering poses for appropriate number ...")
         docking_input_file_path = Path(docking_input_file.name)
