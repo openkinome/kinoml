@@ -57,7 +57,7 @@ class MostSimilarPDBLigandFeaturizer(SingleLigandProteinComplexFeaturizer):
     ----------
     similarity_metric: str, default="fingerprint"
         The similarity metric to use to detect the structure with the most
-        similar ligand ["fingerprint", "schrodinger_shape"].
+        similar ligand ["fingerprint", "schrodinger_shape", "openeye_shape"].
     cache_dir: str, Path or None, default=None
         Path to directory used for saving intermediate files. If None, default
         location provided by `appdirs.user_cache_dir()` will be used.
@@ -87,10 +87,10 @@ class MostSimilarPDBLigandFeaturizer(SingleLigandProteinComplexFeaturizer):
         from appdirs import user_cache_dir
 
         super().__init__(**kwargs)
-        if similarity_metric not in ["fingerprint", "schrodinger_shape"]:
+        if similarity_metric not in ["fingerprint", "schrodinger_shape", "openeye_shape"]:
             raise ValueError(
-                "Only 'fingerprint' is allowed as similarity metric! " +
-                f"You provided {similarity_metric}."
+                "Only 'fingerprint', 'schrodinger_shape', and  'openeye_shape' are allowed as "
+                f"similarity metric! You provided '{similarity_metric}'."
             )
         self.similarity_metric = similarity_metric
         self.cache_dir = Path(user_cache_dir())
@@ -390,6 +390,8 @@ class MostSimilarPDBLigandFeaturizer(SingleLigandProteinComplexFeaturizer):
             pdb_id, chain_id, expo_id = self._by_fingerprint(pdb_ligand_entities, smiles)
         elif self.similarity_metric == "schrodinger_shape":
             pdb_id, chain_id, expo_id = self._by_schrodinger_shape(pdb_ligand_entities, smiles)
+        elif self.similarity_metric == "openeye_shape":
+            pdb_id, chain_id, expo_id = self._by_openeye_shape(pdb_ligand_entities, smiles)
         else:
             raise ValueError(f"Similarity metric '{self.similarity_metric}' unknown!")
 
@@ -531,6 +533,72 @@ class MostSimilarPDBLigandFeaturizer(SingleLigandProteinComplexFeaturizer):
             mol = next(Chem.SDMolSupplier(str(result_sdf_path.name), removeHs=False))
             best_query_index = int(mol.GetProp("i_phase_Shape_Query")) - 1
             picked_ligand_entity = queries[best_query_index]
+
+        return (
+            picked_ligand_entity["pdb_id"],
+            picked_ligand_entity["chain_id"],
+            picked_ligand_entity["expo_id"]
+        )
+
+    def _by_openeye_shape(
+            self, pdb_ligand_entities: pd.DataFrame, smiles: str
+    ) -> Tuple[str, str, str]:
+        """
+        Get the PDB ligand that is most similar to the given SMILES according to OpenEye's
+        TanimotoCombo score.
+
+        Parameters
+        ----------
+        pdb_ligand_entities: pd.DataFrame
+            The PDB ligand entities dataframe with columns named `pdb_id`, `chain_id`, `expo_id`
+            and `smiles`.
+        smiles: str
+            The SMILES representation of the molecule to search for similar PDB ligands.
+
+        Returns
+        -------
+        : tuple of str
+            The PDB, chain and expo ID of the most similar ligand.
+        """
+        from ..databases.pdb import download_pdb_ligand
+        from ..modeling.OEModeling import (
+            read_molecules,
+            read_smiles,
+            generate_reasonable_conformations,
+            overlay_molecules,
+        )
+
+        logger.debug("Downloading PDB ligands ...")
+        queries = []
+        for _, pdb_ligand_entity in pdb_ligand_entities.iterrows():
+            query_path = download_pdb_ligand(
+                pdb_id=pdb_ligand_entity["pdb_id"],
+                chain_id=pdb_ligand_entity["chain_id"],
+                expo_id=pdb_ligand_entity["expo_id"],
+                directory=self.cache_dir
+            )
+            if query_path:
+                pdb_ligand_entity["path"] = query_path
+                queries.append(pdb_ligand_entity)
+
+        logger.debug("Reading downloaded PDB ligands ...")
+        pdb_ligand_molecules = [
+            read_molecules(query["path"])[0] for query in queries
+        ]
+
+        logger.debug("Generating reasonable conformations of ligand of interest ...")
+        conformations_ensemble = generate_reasonable_conformations(read_smiles(smiles))
+
+        logger.debug("Overlaying molecules ...")
+        overlay_scores = []
+        for conformations in conformations_ensemble:
+            overlay_scores += [
+                [i, overlay_molecules(pdb_ligand_molecule, conformations)[0]]
+                for i, pdb_ligand_molecule in enumerate(pdb_ligand_molecules)
+            ]
+
+        overlay_scores = sorted(overlay_scores, key=lambda x: x[1], reverse=True)
+        picked_ligand_entity = queries[overlay_scores[0][0]]
 
         return (
             picked_ligand_entity["pdb_id"],
