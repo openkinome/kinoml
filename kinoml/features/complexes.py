@@ -37,7 +37,7 @@ class SingleLigandProteinComplexFeaturizer(ParallelBaseFeaturizer):
         return all([super_checks, len(proteins) == 1]) and all([super_checks, len(ligands) == 1])
 
 
-class MostSimilarPDBLigandFeaturizer(ParallelBaseFeaturizer, SingleLigandProteinComplexFeaturizer):
+class MostSimilarPDBLigandFeaturizer(SingleLigandProteinComplexFeaturizer):
     """
     Find the most similar co-crystallized ligand in the PDB according to a
     given SMILES and UniProt ID.
@@ -122,13 +122,19 @@ class MostSimilarPDBLigandFeaturizer(ParallelBaseFeaturizer, SingleLigandProtein
         logger.debug("Getting most similar PDB ligand entity ...")
         pdb_id, chain_id, expo_id = self._get_most_similar_pdb_ligand_entity(
             pdb_ligand_entities,
-            system.ligand.smiles
+            system.ligand.molecule.to_smiles(explicit_hydrogens=False)
         )
 
-        logger.debug("Adding results to protein object ...")
-        system.protein.pdb_id = pdb_id
-        system.protein.chain_id = chain_id
-        system.protein.expo_id = expo_id
+        logger.debug("Adding results to new protein object ...")
+        new_protein = system.protein.__class__(
+            pdb_id=pdb_id,
+            uniprot_id=system.protein.uniprot_id,
+            name=system.protein.name,
+            toolkit=system.protein.toolkit
+        )
+        new_protein.chain_id = chain_id
+        new_protein.expo_id = expo_id
+        system.components = [new_protein, system.ligand]
 
         return system
 
@@ -937,7 +943,7 @@ class OEDockingFeaturizer(OEBaseModelingFeaturizer, SingleLigandProteinComplexFe
         return structure
 
 
-class SCHRODINGERComplexFeaturizer(ParallelBaseFeaturizer, SingleLigandProteinComplexFeaturizer):
+class SCHRODINGERComplexFeaturizer(SingleLigandProteinComplexFeaturizer):
     """
     Given systems with exactly one protein and one ligand, prepare the complex
     structure by:
