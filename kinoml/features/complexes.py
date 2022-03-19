@@ -1839,7 +1839,7 @@ class SCHRODINGERDockingFeaturizer(SCHRODINGERComplexFeaturizer):
         return
 
     def _write_complex_mae(
-            self, prepared_structure: Universe, docking_pose_path: Path, complex_path_mae: Path
+        self, prepared_structure: Universe, docking_pose_path: Path, complex_path_mae: Path
     ):
         """
         Write the new docked structure in MAE format.
@@ -1866,7 +1866,7 @@ class SCHRODINGERDockingFeaturizer(SCHRODINGERComplexFeaturizer):
                     str(schrodinger_directory / "utilities/structcat"),
                     pdb_file.name,
                     str(docking_pose_path),
-                    str(complex_path_mae)
+                    str(complex_path_mae),
                 ]
             )
         return
