@@ -1680,13 +1680,20 @@ class SCHRODINGERDockingFeaturizer(SCHRODINGERComplexFeaturizer):
 
         if self.output_dir:
             logging.debug("Saving results ...")
-            complex_path = LocalFileStorage.featurizer_result(
+            complex_path_pdb = LocalFileStorage.featurizer_result(
                 self.__class__.__name__,
                 f"{system_name}_complex",
                 "pdb",
                 self.output_dir,
             )
-            write_molecule(prepared_structure.atoms, complex_path)
+            write_molecule(prepared_structure.atoms, complex_path_pdb)
+            complex_path_mae = LocalFileStorage.featurizer_result(
+                self.__class__.__name__,
+                f"{system_name}_complex",
+                "pdb",
+                self.output_dir,
+            )
+            self._write_complex_mae(prepared_structure, docking_pose_path, complex_path_mae)
         else:
             docking_pose_path.unlink()
 
@@ -1825,4 +1832,37 @@ class SCHRODINGERDockingFeaturizer(SCHRODINGERComplexFeaturizer):
         docking_score = float(mol.GetProp("r_i_docking_score"))
         ligand.metadata["docking_score"] = docking_score
 
+        return
+
+    def _write_complex_mae(
+            self, prepared_structure: Universe, docking_pose_path: Path, complex_path_mae: Path
+    ):
+        """
+        Write the new docked structure in MAE format.
+
+        Parameters
+        ----------
+        prepared_structure: Universe
+            The prepared structure containing the docked ligand with resname LIG.
+        docking_pose_path: Path
+            The prepared docking pose including correct bonding information.
+        complex_path_mae: Path
+            The path for the output file in MAE format.
+        """
+        import subprocess
+        from tempfile import NamedTemporaryFile
+
+        from ..modeling.MDAnalysisModeling import write_molecule
+
+        with NamedTemporaryFile(mode="w", suffix=".pdb") as pdb_file:
+            write_molecule(prepared_structure.select_atoms("not resname LIG"), pdb_file.name)
+            schrodinger_directory = Path(self.schrodinger).resolve()
+            subprocess.run(
+                [
+                    str(schrodinger_directory / "utilities/structcat"),
+                    pdb_file.name,
+                    str(docking_pose_path),
+                    str(complex_path_mae)
+                ]
+            )
         return
