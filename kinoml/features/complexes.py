@@ -905,6 +905,7 @@ class OEDockingFeaturizer(OEBaseModelingFeaturizer, SingleLigandProteinComplexFe
     """
 
     from MDAnalysis.core.universe import Universe
+    from openeye import oechem
 
     def __init__(self, method: str = "Posit", pKa_norm: bool = True, **kwargs):
         super().__init__(**kwargs)
@@ -1035,6 +1036,9 @@ class OEDockingFeaturizer(OEBaseModelingFeaturizer, SingleLigandProteinComplexFe
         # generate residue information
         oechem.OEPerceiveResidues(docking_pose, oechem.OEPreserveResInfo_None)
 
+        logger.debug("Storing docking score in ligand metadata ...")
+        self._store_docking_score(ligand, system.ligand)
+
         logger.debug("Assembling components ...")
         protein_ligand_complex = self._assemble_components(protein, solvent, docking_pose)
 
@@ -1077,6 +1081,31 @@ class OEDockingFeaturizer(OEBaseModelingFeaturizer, SingleLigandProteinComplexFe
             file_path.unlink()
 
         return structure
+
+    @staticmethod
+    def _store_docking_score(docking_pose: oechem.OEGraphMol, ligand: Ligand):
+        """
+        Store the docking score from GLIDE in the ligand metadata.
+
+        Parameters
+        ----------
+        docking_pose: oechem.OEGraphMol
+            The docking pose.
+        ligand: Ligand
+            The ligand component.
+        """
+        from openeye import oechem
+
+        docking_score = float(oechem.OEGetSDData(docking_pose, "Chemgauss4"))
+        ligand.metadata["docking_score"] = docking_score
+        try:
+            posit_probability = float(oechem.OEGetSDData(docking_pose, "POSIT::Probability"))
+            ligand.metadata["posit_probability"] = posit_probability
+        except ValueError:
+            # no Posit probability, likely from Fred or Hybrid
+            pass
+
+        return
 
 
 class SCHRODINGERComplexFeaturizer(SingleLigandProteinComplexFeaturizer):
@@ -1646,6 +1675,9 @@ class SCHRODINGERDockingFeaturizer(SCHRODINGERComplexFeaturizer):
         logger.debug("Postprocessing structure ...")
         prepared_structure = self._postprocess_structure(prepared_structure, system.protein)
 
+        logger.debug("Storing docking score in ligand metadata ...")
+        self._store_docking_score(docking_pose_path, system.ligand)
+
         if self.output_dir:
             logging.debug("Saving results ...")
             complex_path = LocalFileStorage.featurizer_result(
@@ -1774,3 +1806,23 @@ class SCHRODINGERDockingFeaturizer(SCHRODINGERComplexFeaturizer):
                 prepared_structure = delete_residues(prepared_structure, clashing_water)
 
         return prepared_structure
+
+    @staticmethod
+    def _store_docking_score(docking_pose_path: Path, ligand: Ligand):
+        """
+        Store the docking score from GLIDE in the ligand metadata.
+
+        Parameters
+        ----------
+        docking_pose_path: Path
+            The path to the docking pose.
+        ligand: Ligand
+            The ligand component.
+        """
+        from rdkit import Chem
+
+        mol = next(Chem.SDMolSupplier(str(docking_pose_path)))
+        docking_score = float(mol.GetProp("r_i_docking_score"))
+        ligand.metadata["docking_score"] = docking_score
+
+        return
