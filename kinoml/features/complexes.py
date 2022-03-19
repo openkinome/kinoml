@@ -748,7 +748,7 @@ class OEComplexFeaturizer(OEBaseModelingFeaturizer, SingleLigandProteinComplexFe
         """
         from pathlib import Path
 
-        import MDAnalysis as mda
+        from ..modeling.MDAnalysisModeling import read_molecule
 
         structure = self._read_protein_structure(system.protein)
         if structure is None:
@@ -824,7 +824,7 @@ class OEComplexFeaturizer(OEBaseModelingFeaturizer, SingleLigandProteinComplexFe
         )
 
         logger.debug("Generating new MDAnalysis universe ...")
-        structure = mda.Universe(file_path, in_memory=True)
+        structure = read_molecule(file_path)
 
         if not self.output_dir:
             logger.debug("Removing structure file ...")
@@ -936,7 +936,6 @@ class OEDockingFeaturizer(OEBaseModelingFeaturizer, SingleLigandProteinComplexFe
         """
         from pathlib import Path
 
-        import MDAnalysis as mda
         from openeye import oechem, oedocking
 
         from ..docking.OEDocking import (
@@ -945,6 +944,7 @@ class OEDockingFeaturizer(OEBaseModelingFeaturizer, SingleLigandProteinComplexFe
             pose_molecules,
             resids_to_box_molecule,
         )
+        from ..modeling.MDAnalysisModeling import read_molecule
 
         structure = self._read_protein_structure(system.protein)
         if structure is None:
@@ -1036,9 +1036,6 @@ class OEDockingFeaturizer(OEBaseModelingFeaturizer, SingleLigandProteinComplexFe
         # generate residue information
         oechem.OEPerceiveResidues(docking_pose, oechem.OEPreserveResInfo_None)
 
-        logger.debug("Storing docking score in ligand metadata ...")
-        self._store_docking_score(ligand, system.ligand)
-
         logger.debug("Assembling components ...")
         protein_ligand_complex = self._assemble_components(protein, solvent, docking_pose)
 
@@ -1074,33 +1071,38 @@ class OEDockingFeaturizer(OEBaseModelingFeaturizer, SingleLigandProteinComplexFe
         )
 
         logger.debug("Generating new MDAnalysis universe ...")
-        structure = mda.Universe(file_path, in_memory=True)
+        structure = read_molecule(file_path)
 
         if not self.output_dir:
             logger.debug("Removing structure file ...")
             file_path.unlink()
 
+        logger.debug("Storing docking score in MDAnalysis universe._topology ...")
+        self._store_docking_score(structure, docking_pose)
+
         return structure
 
     @staticmethod
-    def _store_docking_score(docking_pose: oechem.OEGraphMol, ligand: Ligand):
+    def _store_docking_score(structure: Universe, docking_pose: oechem.OEGraphMol):
         """
-        Store the docking score from GLIDE in the ligand metadata.
+        Store the docking score from OpenEye docking in the MDAnalysis universe._topology. If the
+        Posit probability is available it will be stored as well. They cannot be stored in the
+        universe object directly, because they will be lost during multiprocessing/pickling.
 
         Parameters
         ----------
+        structure: Universe
+            The docked structure as MDAnalysis universe.
         docking_pose: oechem.OEGraphMol
             The docking pose.
-        ligand: Ligand
-            The ligand component.
         """
         from openeye import oechem
 
         docking_score = float(oechem.OEGetSDData(docking_pose, "Chemgauss4"))
-        ligand.metadata["docking_score"] = docking_score
+        structure._topology.docking_score = docking_score
         try:
             posit_probability = float(oechem.OEGetSDData(docking_pose, "POSIT::Probability"))
-            ligand.metadata["posit_probability"] = posit_probability
+            structure._topology.posit_probability = posit_probability
         except ValueError:
             # no Posit probability, likely from Fred or Hybrid
             pass
@@ -1675,8 +1677,8 @@ class SCHRODINGERDockingFeaturizer(SCHRODINGERComplexFeaturizer):
         logger.debug("Postprocessing structure ...")
         prepared_structure = self._postprocess_structure(prepared_structure, system.protein)
 
-        logger.debug("Storing docking score in ligand metadata ...")
-        self._store_docking_score(docking_pose_path, system.ligand)
+        logger.debug("Storing docking score in MDAnalysis universe._topology ...")
+        self._store_docking_score(prepared_structure, docking_pose_path)
 
         if self.output_dir:
             logging.debug("Saving results ...")
@@ -1815,22 +1817,24 @@ class SCHRODINGERDockingFeaturizer(SCHRODINGERComplexFeaturizer):
         return prepared_structure
 
     @staticmethod
-    def _store_docking_score(docking_pose_path: Path, ligand: Ligand):
+    def _store_docking_score(structure: Universe, docking_pose_path: Path):
         """
-        Store the docking score from GLIDE in the ligand metadata.
+        Store the docking score from OpenEye docking in the MDAnalysis universe._topology. They
+        cannot be stored in the universe object directly, because they will be lost during
+        multiprocessing/pickling.
 
         Parameters
         ----------
+        structure: Universe
+            The docked structure as MDAnalysis universe.
         docking_pose_path: Path
             The path to the docking pose.
-        ligand: Ligand
-            The ligand component.
         """
         from rdkit import Chem
 
         mol = next(Chem.SDMolSupplier(str(docking_pose_path)))
         docking_score = float(mol.GetProp("r_i_docking_score"))
-        ligand.metadata["docking_score"] = docking_score
+        structure._topology.docking_score = docking_score
 
         return
 
