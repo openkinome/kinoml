@@ -1231,19 +1231,23 @@ class SCHRODINGERComplexFeaturizer(SingleLigandProteinComplexFeaturizer):
             A descriptive name of the system
         """
         system_name = "_".join(
-            [info for info in [
-                system.protein.name,
-                system.protein.pdb_id
-                if system.protein.pdb_id
-                else Path(system.protein.metadata["file_path"]).stem,
-                f"chain{system.protein.chain_id}"
-                if hasattr(system.protein, "chain_id")
-                else None,
-                f"altloc{system.protein.alternate_location}"
-                if hasattr(system.protein, "alternate_location")
-                else None,
-                system.ligand.name if system.ligand.name else None,
-            ] if info]
+            [
+                info
+                for info in [
+                    system.protein.name,
+                    system.protein.pdb_id
+                    if system.protein.pdb_id
+                    else Path(system.protein.metadata["file_path"]).stem,
+                    f"chain{system.protein.chain_id}"
+                    if hasattr(system.protein, "chain_id")
+                    else None,
+                    f"altloc{system.protein.alternate_location}"
+                    if hasattr(system.protein, "alternate_location")
+                    else None,
+                    system.ligand.name if system.ligand.name else None,
+                ]
+                if info
+            ]
         )
         return system_name
 
@@ -1268,9 +1272,7 @@ class SCHRODINGERComplexFeaturizer(SingleLigandProteinComplexFeaturizer):
         logger.debug("Checking structure for readability ...")
         structure = self._read_protein_structure(protein)
         if structure is None:
-            logger.warning(
-                f"Could not read protein structure for {protein}, returning None!"
-            )
+            logger.warning(f"Could not read protein structure for {protein}, returning None!")
             return None
 
         if protein.sequence:
@@ -1278,7 +1280,8 @@ class SCHRODINGERComplexFeaturizer(SingleLigandProteinComplexFeaturizer):
                 pdb_path=protein.metadata["file_path"],
                 chain_id=protein.chain_id if hasattr(protein, "chain_id") else None,
                 alternate_location=protein.alternate_location
-                if hasattr(protein, "alternate_location") else None,
+                if hasattr(protein, "alternate_location")
+                else None,
                 expo_id=protein.expo_id if hasattr(protein, "expo_id") else None,
                 sequence=protein.sequence,
             )
@@ -1297,7 +1300,7 @@ class SCHRODINGERComplexFeaturizer(SingleLigandProteinComplexFeaturizer):
             for i in range(self.max_retry):
                 logger.debug(f"Running prepwizard trial {i + 1}...")
                 mae_file_path = (
-                        prepared_structure_path.parent / f"{prepared_structure_path.stem}.mae"
+                    prepared_structure_path.parent / f"{prepared_structure_path.stem}.mae"
                 )
                 run_prepwizard(
                     schrodinger_directory=self.schrodinger,
@@ -1509,8 +1512,7 @@ class SCHRODINGERComplexFeaturizer(SingleLigandProteinComplexFeaturizer):
             if hasattr(protein, "expo_id"):
                 logger.debug(f"Selecting ligand {protein.expo_id} ...")
                 prepared_structure = remove_non_protein(
-                    prepared_structure,
-                    exceptions=[protein.expo_id]
+                    prepared_structure, exceptions=[protein.expo_id]
                 )
 
         logger.debug("Updating residue identifiers ...")
@@ -1699,13 +1701,15 @@ class SCHRODINGERDockingFeaturizer(SCHRODINGERComplexFeaturizer):
                 input_file_mae=mae_file_path,
                 output_file_sdf=docking_pose_path,
                 ligand_resname=system.protein.expo_id
-                if hasattr(system.protein, "expo_id") else None,
+                if hasattr(system.protein, "expo_id")
+                else None,
                 mols_smiles=[system.ligand.molecule.to_smiles(explicit_hydrogens=False)],
                 mols_names=["LIG"],
                 n_poses=1,
                 shape_restrain=self.shape_restrain,
                 macrocyles=system.ligand.macrocycle
-                if hasattr(system.ligand, "macrocycle") else False,
+                if hasattr(system.ligand, "macrocycle")
+                else False,
                 precision="XP",
                 cache_dir=self.cache_dir,
             )
@@ -1715,9 +1719,7 @@ class SCHRODINGERDockingFeaturizer(SCHRODINGERComplexFeaturizer):
         return None
 
     @staticmethod
-    def _replace_ligand(
-        pdb_path: Path, docking_pose_sdf_path: Path
-    ) -> Universe:
+    def _replace_ligand(pdb_path: Path, docking_pose_sdf_path: Path) -> Universe:
         """
         Replace the ligand in a PDB file with a ligand in an SDF file.
 
@@ -1744,7 +1746,9 @@ class SCHRODINGERDockingFeaturizer(SCHRODINGERComplexFeaturizer):
         prepared_structure = read_molecule(pdb_path)
         ligand_residue = prepared_structure.select_atoms(
             "not protein and not resname HOH"
-        ).residues[0]  # most likely the ligand to replace
+        ).residues[
+            0
+        ]  # most likely the ligand to replace
         chain_id = ligand_residue.segid
         prepared_structure = delete_residues(prepared_structure, [ligand_residue])
 
