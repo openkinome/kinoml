@@ -255,7 +255,7 @@ def remove_non_protein(
     return Merge(selection)
 
 
-def delete_residues(molecule: Universe, residues: Iterable[Residue]):
+def delete_residues(molecule: [Universe, AtomGroup], residues: Iterable[Residue]):
     """
     Delete residues from an MDAnalysis molecule.
 
