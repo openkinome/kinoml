@@ -176,9 +176,9 @@ class Protein(BaseProtein, AminoAcidSequence):
             if not self.name:
                 self.name = self.pdb_id
             if self.metadata is None:
-                self.metadata = {"pdb_id": self.pdb_id}
+                self.metadata = {"pdb_id": self.pdb_id, "file_path": file_path}
             else:
-                self.metadata.update({"pdb_id": self.pdb_id})
+                self.metadata.update({"pdb_id": self.pdb_id, "file_path": file_path})
         return self._molecule
 
     @classmethod
