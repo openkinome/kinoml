@@ -690,7 +690,7 @@ class OEComplexFeaturizer(OEBaseModelingFeaturizer, SingleLigandProteinComplexFe
        fetch the amino acid sequence from UniProt, which will be used for
        modeling the protein. This will supersede the sequence information
        given in the PDB header.
-     - `sequence`: A  string specifying the amino acid sequence in
+     - `sequence`: A string specifying the amino acid sequence in
        one-letter-codes that should be used during modeling the protein. This
        will supersede a given `uniprot_id` and the sequence information given
        in the PDB header.
@@ -865,7 +865,7 @@ class OEDockingFeaturizer(OEBaseModelingFeaturizer, SingleLigandProteinComplexFe
        fetch the amino acid sequence from UniProt, which will be used for
        modeling the protein. This will supersede the sequence information
        given in the PDB header.
-     - `sequence`: A  string specifying the amino acid sequence in
+     - `sequence`: A string specifying the amino acid sequence in
        one-letter-codes that should be used during modeling the protein. This
        will supersede a given `uniprot_id` and the sequence information given
        in the PDB header.
@@ -1092,15 +1092,12 @@ class SCHRODINGERComplexFeaturizer(SingleLigandProteinComplexFeaturizer):
      - removing everything but protein, water and ligand of interest
      - protonation at pH 7.4
 
-    The protein component of each system must have a `pdb_id` or a `path`
-    attribute specifying the complex structure to prepare.
+    The protein component of each system must be a `core.proteins.Protein` or
+    a subclass thereof, must be initialized with toolkit='MDAnalysis' and give
+    access to the molecular structure, e.g. via a pdb_id. Additionally, the
+    protein component can have the following optional attributes to customize
+    the protein modeling:
 
-     - `pdb_id`: A string specifying the PDB entry of interest, required if
-       `path` not given.
-     - `path`: The path to the structure file, required if `pdb_id` not given.
-
-    Additionally, the protein component can have the following optional
-    attributes to customize the protein modeling:
      - `name`: A string specifying the name of the protein, will be used for
        generating the output file name.
      - `chain_id`: A string specifying which chain should be used.
@@ -1112,12 +1109,14 @@ class SCHRODINGERComplexFeaturizer(SingleLigandProteinComplexFeaturizer):
        fetch the amino acid sequence from UniProt, which will be used for
        modeling the protein. This will supersede the sequence information
        given in the PDB header.
-     - `sequence`: A string specifying the amino acid sequence in single
-       letter codes to be used during loop modeling and for mutations.
+     - `sequence`: A string specifying the amino acid sequence in
+       one-letter-codes that should be used during modeling the protein. This
+       will supersede a given `uniprot_id` and the sequence information given
+       in the PDB header.
 
-    The ligand component can be a BaseLigand without any further attributes.
-    Additionally, the ligand component can have the following optional
-    attributes:
+    The ligand component of each system must be a `core.components.BaseLigand`
+    or a subclass thereof. The ligand component can have the following
+    optional attributes:
 
      - `name`: A string specifying the name of the ligand, will be used for
        generating the output file name.
@@ -1130,6 +1129,11 @@ class SCHRODINGERComplexFeaturizer(SingleLigandProteinComplexFeaturizer):
     output_dir: str, Path or None, default=None
         Path to directory used for saving output files. If None, output
         structures will not be saved.
+    use_multiprocessing : bool, default=True
+        If multiprocessing to use.
+    n_processes : int or None, default=None
+        How many processes to use in case of multiprocessing. Defaults to
+        number of available CPUs.
     max_retry: int, default=3
         The maximal number of attempts to try running the prepwizard step.
     """
@@ -1150,13 +1154,10 @@ class SCHRODINGERComplexFeaturizer(SingleLigandProteinComplexFeaturizer):
         if cache_dir:
             self.cache_dir = Path(cache_dir).expanduser().resolve()
         self.cache_dir.mkdir(parents=True, exist_ok=True)
+        self.output_dir = None
         if output_dir:
             self.output_dir = Path(output_dir).expanduser().resolve()
             self.output_dir.mkdir(parents=True, exist_ok=True)
-            self.save_output = True
-        else:
-            self.output_dir = Path(user_cache_dir())
-            self.save_output = False
         self.max_retry = max_retry
 
     _SUPPORTED_TYPES = (ProteinLigandComplex,)
@@ -1190,38 +1191,23 @@ class SCHRODINGERComplexFeaturizer(SingleLigandProteinComplexFeaturizer):
         from ..modeling.MDAnalysisModeling import read_molecule, write_molecule
         from ..utils import LocalFileStorage
 
-        logger.debug("Interpreting system ...")
-        system_dict = self._interpret_system(system)
+        logger.debug("Generating system name ...")
+        system_name = self._system_to_name(system)
 
-        if system_dict["protein_sequence"]:
-            system_dict["protein_path"] = self._preprocess_structure(
-                pdb_path=system_dict["protein_path"],
-                chain_id=system_dict["protein_chain_id"],
-                alternate_location=system_dict["protein_alternate_location"],
-                expo_id=system_dict["protein_expo_id"],
-                sequence=system_dict["protein_sequence"],
-            )
-
-        prepared_structure_path = self._prepare_structure(
-            system_dict["protein_path"], system_dict["protein_sequence"]
-        )
+        logger.debug("Preparing structure ...")
+        prepared_structure_path = self._prepare_structure(system.protein)
         if not prepared_structure_path:
             return None
 
+        logger.debug("Postprocessing structure ...")
         prepared_structure = read_molecule(prepared_structure_path)
-        prepared_structure = self._postprocess_structure(
-            prepared_structure=prepared_structure,
-            chain_id=system_dict["protein_chain_id"],
-            alternate_location=system_dict["protein_alternate_location"],
-            expo_id=system_dict["protein_expo_id"],
-            sequence=system_dict["protein_sequence"],
-        )
+        prepared_structure = self._postprocess_structure(prepared_structure, system.protein)
 
-        if self.save_output:
+        if self.output_dir:
             logging.debug("Saving results ...")
             complex_path = LocalFileStorage.featurizer_result(
                 self.__class__.__name__,
-                f"{system_dict['protein_name']}_{system_dict['ligand_name']}_complex",
+                f"{system_name}_complex",
                 "pdb",
                 self.output_dir,
             )
@@ -1229,86 +1215,142 @@ class SCHRODINGERComplexFeaturizer(SingleLigandProteinComplexFeaturizer):
 
         return prepared_structure
 
-    def _interpret_system(self, system: ProteinLigandComplex) -> dict:
+    @staticmethod
+    def _system_to_name(system: ProteinLigandComplex) -> str:
         """
-        Interpret the attributes of the given system components and store them in a dictionary.
+        Get a name of the system based on attributes of the protein and ligand component.
 
         Parameters
         ----------
-        system: ProteinSystem or ProteinLigandComplex
-            The system to interpret.
+        system: ProteinLigandComplex
+            The system with protein and ligand component.
 
         Returns
         -------
-        : dict
-            A dictionary containing the content of the system components.
+        : str
+            A descriptive name of the system
         """
-        from ..databases.pdb import download_pdb_structure
-        from ..core.sequences import AminoAcidSequence
+        system_name = "_".join(
+            [info for info in [
+                system.protein.name,
+                system.protein.pdb_id
+                if system.protein.pdb_id
+                else Path(system.protein.metadata["file_path"]).stem,
+                f"chain{system.protein.chain_id}"
+                if hasattr(system.protein, "chain_id")
+                else None,
+                f"altloc{system.protein.alternate_location}"
+                if hasattr(system.protein, "alternate_location")
+                else None,
+                system.ligand.name if system.ligand.name else None,
+            ] if info]
+        )
+        return system_name
 
-        system_dict = {
-            "protein_name": None,
-            "protein_pdb_id": None,
-            "protein_path": None,
-            "protein_sequence": None,
-            "protein_uniprot_id": None,
-            "protein_chain_id": None,
-            "protein_alternate_location": None,
-            "protein_expo_id": None,
-            "ligand_name": None,
-            "ligand_smiles": None,
-            "ligand_macrocycle": False,
-        }
+    def _prepare_structure(self, protein: Union[Protein, KLIFSKinase]) -> Union[Path, None]:
+        """
+        Prepare the structure with SCHRODINGER's prepwizard.
 
-        logger.debug("Interpreting protein component ...")
-        if hasattr(system.protein, "name"):
-            system_dict["protein_name"] = system.protein.name
+        Parameters
+        ----------
+        protein: Path
+            The path to the input structure file in PDB format.
 
-        if hasattr(system.protein, "pdb_id"):
-            system_dict["protein_path"] = download_pdb_structure(
-                system.protein.pdb_id, self.cache_dir
+        Returns
+        -------
+        : Path or None
+            The path to the prepared structure if successful.
+        """
+
+        from ..modeling.SCHRODINGERModeling import run_prepwizard, mae_to_pdb
+        from ..utils import LocalFileStorage, sha256_objects
+
+        logger.debug("Checking structure for readability ...")
+        structure = self._read_protein_structure(protein)
+        if structure is None:
+            logger.warning(
+                f"Could not read protein structure for {protein}, returning None!"
             )
-            if not system_dict["protein_path"]:
-                raise ValueError(
-                    f"Could not download structure for PDB entry {system.protein.pdb_id}."
-                )
-        elif hasattr(system.protein, "path"):
-            system_dict["protein_path"] = Path(system.protein.path).expanduser().resolve()
+            return None
+
+        if protein.sequence:
+            structure_path = self._preprocess_structure(
+                pdb_path=protein.metadata["file_path"],
+                chain_id=protein.chain_id if hasattr(protein, "chain_id") else None,
+                alternate_location=protein.alternate_location
+                if hasattr(protein, "alternate_location") else None,
+                expo_id=protein.expo_id if hasattr(protein, "expo_id") else None,
+                sequence=protein.sequence,
+            )
         else:
-            raise AttributeError(
-                f"The {self.__class__.__name__} requires systems with protein components having a"
-                f" `pdb_id` or `path` attribute."
+            structure_path = protein.metadata["file_path"]
+
+        prepared_structure_path = LocalFileStorage.featurizer_result(
+            self.__class__.__name__,
+            sha256_objects([structure_path, protein.sequence]),
+            "pdb",
+            self.cache_dir,
+        )
+
+        if not prepared_structure_path.is_file():
+
+            for i in range(self.max_retry):
+                logger.debug(f"Running prepwizard trial {i + 1}...")
+                mae_file_path = (
+                        prepared_structure_path.parent / f"{prepared_structure_path.stem}.mae"
+                )
+                run_prepwizard(
+                    schrodinger_directory=self.schrodinger,
+                    input_file=structure_path,
+                    output_file=mae_file_path,
+                    cap_termini=True,
+                    build_loops=True,
+                    sequence=protein.sequence,
+                    protein_pH="neutral",
+                    propka_pH=7.4,
+                    epik_pH=7.4,
+                    force_field="3",
+                )
+                if mae_file_path.is_file():
+                    mae_to_pdb(self.schrodinger, mae_file_path, prepared_structure_path)
+                    break
+        else:
+            logger.debug("Found cached prepared structure ...")
+
+        if not prepared_structure_path.is_file():
+            logger.debug("Running prepwizard was not successful, returning None ...")
+            return None
+
+        return prepared_structure_path
+
+    def _read_protein_structure(
+        self, protein: Union[Protein, KLIFSKinase]
+    ) -> Union[Universe, None]:
+        """
+        Returns the protein structure of the given protein object as MDAnalysis universe.
+
+        Parameters
+        ----------
+        protein: Protein or KLIFSKinase
+            The protein object.
+
+        Returns
+        -------
+        : Universe or None
+            The protein structure as MDAnalysis universe or None.
+
+        Raises
+        ------
+        ValueError
+            If wrong toolkit was used during initialization of the protein object.
+        """
+        if protein.toolkit != "MDAnalysis":
+            raise ValueError(
+                f"{self.__class__.__name__} requires protein components initialized with "
+                f"toolkit='MDAnalysis', {protein.toolkit} was used instead!"
             )
-        if not hasattr(system.protein, "sequence"):
-            if hasattr(system.protein, "uniprot_id"):
-                logger.debug(
-                    f"Retrieving amino acid sequence details for UniProt entry "
-                    f"{system.protein.uniprot_id} ..."
-                )
-                system_dict["protein_sequence"] = AminoAcidSequence.from_uniprot(
-                    system.protein.uniprot_id
-                )
-
-        if hasattr(system.protein, "chain_id"):
-            system_dict["protein_chain_id"] = system.protein.chain_id
-
-        if hasattr(system.protein, "alternate_location"):
-            system_dict["protein_alternate_location"] = system.protein.alternate_location
-
-        if hasattr(system.protein, "expo_id"):
-            system_dict["protein_expo_id"] = system.protein.expo_id
-
-        logger.debug("Interpreting ligand component ...")
-        if hasattr(system.ligand, "name"):
-            system_dict["ligand_name"] = system.ligand.name
-
-        if hasattr(system.ligand, "smiles"):
-            system_dict["ligand_smiles"] = system.ligand.smiles
-
-        if hasattr(system.ligand, "macrocycle"):
-            system_dict["ligand_macrocycle"] = system.ligand.macrocycle
-
-        return system_dict
+        structure = protein.molecule
+        return structure
 
     def _preprocess_structure(
         self,
@@ -1420,75 +1462,11 @@ class SCHRODINGERComplexFeaturizer(SingleLigandProteinComplexFeaturizer):
 
         return clean_structure_path
 
-    def _prepare_structure(
-        self, input_file: Path, sequence: Union[str, None]
-    ) -> Union[Path, None]:
-        """
-        Prepare the structure with SCHRODINGER's prepwizard.
-
-        Parameters
-        ----------
-        input_file: Path
-            The path to the input structure file in PDB format.
-        sequence: str or None
-            The amino acid sequence of the protein. If not given, relevant information will be
-            used from the PDB header.
-
-        Returns
-        -------
-        : Path or None
-            The path to the prepared structure if successful.
-        """
-
-        from ..modeling.SCHRODINGERModeling import run_prepwizard, mae_to_pdb
-        from ..utils import LocalFileStorage, sha256_objects
-
-        prepared_structure_path = LocalFileStorage.featurizer_result(
-            self.__class__.__name__,
-            sha256_objects([input_file, sequence]),
-            "pdb",
-            self.cache_dir,
-        )
-
-        if not prepared_structure_path.is_file():
-
-            for i in range(self.max_retry):
-                logger.debug(f"Running prepwizard trial {i + 1}...")
-                mae_file_path = (
-                    prepared_structure_path.parent / f"{prepared_structure_path.stem}.mae"
-                )
-                run_prepwizard(
-                    schrodinger_directory=self.schrodinger,
-                    input_file=input_file,
-                    output_file=mae_file_path,
-                    cap_termini=True,
-                    build_loops=True,
-                    sequence=sequence,
-                    protein_pH="neutral",
-                    propka_pH=7.4,
-                    epik_pH=7.4,
-                    force_field="3",
-                )
-                if mae_file_path.is_file():
-                    mae_to_pdb(self.schrodinger, mae_file_path, prepared_structure_path)
-                    break
-        else:
-            logger.debug("Found cached prepared structure ...")
-
-        if not prepared_structure_path.is_file():
-            logger.debug("Running prepwizard was not successful, returning None ...")
-            return None
-
-        return prepared_structure_path
-
     @staticmethod
     def _postprocess_structure(
         prepared_structure: Universe,
-        chain_id: [str, None],
-        alternate_location: [str, None],
-        expo_id: [str, None],
-        sequence: [str, None],
-    ):
+        protein: [Protein, KLIFSKinase],
+    ) -> Universe:
         """
         Post-process a structure prepared with SCHRODINGER's prepwizard with the following steps:
          - select the chain of interest
@@ -1500,21 +1478,14 @@ class SCHRODINGERComplexFeaturizer(SingleLigandProteinComplexFeaturizer):
         ----------
         prepared_structure: Universe
            The structure prepared by SCHRODINGER's prepwizard.
-        chain_id: str or None
-            The chain ID of interest. Will only be used if `sequence` is None.
-        alternate_location: str or None
-            The alternate location of interest. Will only be used if `sequence` is None.
-        expo_id: str or None
-            The resname of the ligand of interest. Will only be used if `sequence` is None.
-        sequence: str or None
-            The amino acid sequence of the protein.
+        protein: Protein or KLIFSKinase
+            The protein component of the system.
 
         Returns
         -------
         : Universe
             The post-processed structure.
         """
-
         from ..modeling.MDAnalysisModeling import (
             select_chain,
             select_altloc,
@@ -1522,22 +1493,25 @@ class SCHRODINGERComplexFeaturizer(SingleLigandProteinComplexFeaturizer):
             update_residue_identifiers,
         )
 
-        if not sequence:
-            if chain_id:
-                logger.debug(f"Selecting chain {chain_id} ...")
-                prepared_structure = select_chain(prepared_structure, chain_id)
-            if alternate_location:
-                logger.debug(f"Selecting alternate location {alternate_location} ...")
-                prepared_structure = select_altloc(prepared_structure, alternate_location)
+        if not protein.sequence:
+            if hasattr(protein, "chain_id"):
+                logger.debug(f"Selecting chain {protein.chain_id} ...")
+                prepared_structure = select_chain(prepared_structure, protein.chain_id)
+            if hasattr(protein, "alternate_location"):
+                logger.debug(f"Selecting alternate location {protein.alternate_location} ...")
+                prepared_structure = select_altloc(prepared_structure, protein.alternate_location)
             else:
                 try:  # try to select altloc A, since the prepwizard will not handle altlocs
                     prepared_structure = select_altloc(prepared_structure, "A")
                     logger.debug(f"Selected default alternate location A.")
                 except ValueError:
                     pass
-            if expo_id:
-                logger.debug(f"Selecting ligand {expo_id} ...")
-                prepared_structure = remove_non_protein(prepared_structure, exceptions=[expo_id])
+            if hasattr(protein, "expo_id"):
+                logger.debug(f"Selecting ligand {protein.expo_id} ...")
+                prepared_structure = remove_non_protein(
+                    prepared_structure,
+                    exceptions=[protein.expo_id]
+                )
 
         logger.debug("Updating residue identifiers ...")
         prepared_structure = update_residue_identifiers(prepared_structure)
@@ -1547,10 +1521,9 @@ class SCHRODINGERComplexFeaturizer(SingleLigandProteinComplexFeaturizer):
 
 class SCHRODINGERDockingFeaturizer(SCHRODINGERComplexFeaturizer):
     """
-    Given systems with exactly one protein and one ligand dock the ligand into
-    the protein structure. The protein structure needs to have a
-    co-crystallized ligand to identify the pocket for docking. The following
-    steps will be performed.
+    Given systems with exactly one protein and one ligand, prepare the
+    structure dock the ligand into its binding site identified by a
+    co-crystallized ligand. The following steps will be performed:
 
      - modeling missing loops
      - building missing side chains
@@ -1560,34 +1533,34 @@ class SCHRODINGERDockingFeaturizer(SCHRODINGERComplexFeaturizer):
      - protonation at pH 7.4
      - docking a ligand
 
-    The protein component of each system must have a `pdb_id` or a `path`
-    attribute specifying the complex structure to prepare.
+    The protein component of each system must be a `core.proteins.Protein` or
+    a subclass thereof, must be initialized with toolkit='MDAnalysis' and give
+    access to the molecular structure, e.g. via a pdb_id. Additionally, the
+    protein component can have the following optional attributes to customize
+    the protein modeling:
 
-     - `pdb_id`: A string specifying the PDB entry of interest, required if
-       `path` not given.
-     - `path`: The path to the structure file, required if `pdb_id` not given.
-
-    Additionally, the protein component can have the following optional
-    attributes to customize the protein modeling:
      - `name`: A string specifying the name of the protein, will be used for
        generating the output file name.
      - `chain_id`: A string specifying which chain should be used.
      - `alternate_location`: A string specifying which alternate location
        should be used.
-     - `expo_id`: A string specifying the ligand of interest. This is
-       especially useful if multiple ligands are present in a PDB structure.
+     - `expo_id`: A string specifying a ligand bound to the protein of
+       interest. This is especially useful if multiple proteins are found in
+       one PDB structure.
      - `uniprot_id`: A string specifying the UniProt ID that will be used to
        fetch the amino acid sequence from UniProt, which will be used for
        modeling the protein. This will supersede the sequence information
        given in the PDB header.
-     - `sequence`: A string specifying the amino acid sequence in single
-       letter codes to be used during loop modeling and for mutations.
+     - `sequence`: A string specifying the amino acid sequence in
+       one-letter-codes that should be used during modeling the protein. This
+       will supersede a given `uniprot_id` and the sequence information given
+       in the PDB header.
 
-    The ligand component must be a BaseLigand with smiles attribute:
-     - `smiles`: A SMILES representation of the molecule to dock.
+    The ligand component of each system must be a `core.ligands.Ligand` or a
+    subclass thereof and give access to the molecular structure, e.g. via a
+    SMILES. Additionally, the ligand component can have the following optional
+    attributes:
 
-    Additionally, the ligand component can have the following optional
-    attributes to customize the docking:
      - `name`: A string specifying the name of the ligand, will be used for
        generating the output file name and as molecule title in the docking
        pose SDF file.
@@ -1603,6 +1576,11 @@ class SCHRODINGERDockingFeaturizer(SCHRODINGERComplexFeaturizer):
     output_dir: str, Path or None, default=None
         Path to directory used for saving output files. If None, output
         structures will not be saved.
+    use_multiprocessing : bool, default=True
+        If multiprocessing to use.
+    n_processes : int or None, default=None
+        How many processes to use in case of multiprocessing. Defaults to
+        number of available CPUs.
     shape_restrain: bool, default=True
         If the docking shell be performed with shape restrain based on the
         co-crystallized ligand.
@@ -1643,125 +1621,102 @@ class SCHRODINGERDockingFeaturizer(SCHRODINGERComplexFeaturizer):
         from ..modeling.MDAnalysisModeling import write_molecule
         from ..utils import LocalFileStorage
 
-        logger.debug("Interpreting system ...")
-        system_dict = self._interpret_system(system)
+        logger.debug("Generating system name ...")
+        system_name = self._system_to_name(system)
 
-        if not system_dict["protein_expo_id"]:
-            logger.debug("No expo_id given in Protein object needed for docking, returning None!")
+        logger.debug("Preparing structure ...")
+        prepared_structure_path = self._prepare_structure(system.protein)
+        if not prepared_structure_path:
             return None
 
-        if system_dict["protein_sequence"]:
-            system_dict["protein_path"] = self._preprocess_structure(
-                pdb_path=system_dict["protein_path"],
-                chain_id=system_dict["protein_chain_id"],
-                alternate_location=system_dict["protein_alternate_location"],
-                expo_id=system_dict["protein_expo_id"],
-                sequence=system_dict["protein_sequence"],
-            )
-
-        prepared_structure_path = self._prepare_structure(
-            system_dict["protein_path"], system_dict["protein_sequence"]
-        )
-        if not prepared_structure_path.is_file():
-            return None
-
-        docking_pose_path = LocalFileStorage.featurizer_result(
-            self.__class__.__name__,
-            f"{system_dict['protein_name']}_{system_dict['ligand_name']}_ligand",
-            "sdf",
-            self.output_dir,
-        )
-        mae_file_path = prepared_structure_path.parent / f"{prepared_structure_path.stem}.mae"
-        if not self._dock_molecule(
-            mae_file=mae_file_path,
-            output_file_sdf=docking_pose_path,
-            ligand_resname=system_dict["protein_expo_id"],
-            smiles=system_dict["ligand_smiles"],
-            macrocycle=system_dict["ligand_macrocycle"],
-        ):
+        logger.debug("Docking small molecule ...")
+        docking_pose_path = self._dock_molecule(prepared_structure_path, system, system_name)
+        if not docking_pose_path:
             logger.debug("Failed to generate docking pose ...")
             return None
 
+        logger.debug("Replacing co-crystallized ligand with docking pose ...")
         prepared_structure = self._replace_ligand(
             pdb_path=prepared_structure_path,
-            resname_replace=system_dict["protein_expo_id"],
             docking_pose_sdf_path=docking_pose_path,
         )
 
-        prepared_structure = self._postprocess_structure(
-            prepared_structure=prepared_structure,
-            chain_id=system_dict["protein_chain_id"],
-            alternate_location=system_dict["protein_alternate_location"],
-            expo_id="LIG",
-            sequence=system_dict["protein_sequence"],
-        )
+        logger.debug("Postprocessing structure ...")
+        prepared_structure = self._postprocess_structure(prepared_structure, system.protein)
 
-        if self.save_output:
+        if self.output_dir:
             logging.debug("Saving results ...")
             complex_path = LocalFileStorage.featurizer_result(
                 self.__class__.__name__,
-                f"{system_dict['protein_name']}_{system_dict['ligand_name']}_complex",
+                f"{system_name}_complex",
                 "pdb",
                 self.output_dir,
             )
             write_molecule(prepared_structure.atoms, complex_path)
+        else:
+            docking_pose_path.unlink()
 
         return prepared_structure
 
     def _dock_molecule(
         self,
-        mae_file: Path,
-        output_file_sdf: Path,
-        ligand_resname: str,
-        smiles: str,
-        macrocycle: bool,
-    ) -> bool:
+        prepared_structure_path: Path,
+        system: ProteinLigandComplex,
+        system_name: str,
+    ) -> Union[Path, None]:
         """
         Dock the molecule into the protein with SCHRODINGER's Glide.
 
         Parameters
         ----------
-        mae_file: Path
-            Path to the prepared structure for docking.
-        output_file_sdf: Path
-            Path to the output docking pose in SDF format.
-        ligand_resname: str
-            The resname of the ligand defining the binding pocket.
-        smiles: str
-            The molecule to dock as SMILES representation.
-        macrocycle: bool
-            If molecule to dock shell be treated as macrocycle during docking.
+        prepared_structure_path: Path
+            A prepared protein structure, ready for docking.
+        system: ProteinLigandComplex
+            The system that is being featurized.
+        system_name: str
+            A descriptive name of the system.
 
         Returns
         -------
-        : bool
-            True if successful, else False.
+        : Path or None
+            The path to the generated docking pose, None if not successful.
         """
         from ..docking.SCHRODINGERDocking import run_glide
+        from ..utils import LocalFileStorage
+
+        docking_pose_path = LocalFileStorage.featurizer_result(
+            self.__class__.__name__,
+            f"{system_name}_ligand",
+            "sdf",
+            self.output_dir if self.output_dir else self.cache_dir,
+        )
+        mae_file_path = prepared_structure_path.parent / f"{prepared_structure_path.stem}.mae"
 
         for i in range(self.max_retry):
             logger.debug(f"Running docking trial {i + 1}...")
             run_glide(
                 schrodinger_directory=self.schrodinger,
-                input_file_mae=mae_file,
-                output_file_sdf=output_file_sdf,
-                ligand_resname=ligand_resname,
-                mols_smiles=[smiles],
+                input_file_mae=mae_file_path,
+                output_file_sdf=docking_pose_path,
+                ligand_resname=system.protein.expo_id
+                if hasattr(system.protein, "expo_id") else None,
+                mols_smiles=[system.ligand.molecule.to_smiles(explicit_hydrogens=False)],
                 mols_names=["LIG"],
                 n_poses=1,
                 shape_restrain=self.shape_restrain,
-                macrocyles=macrocycle,
+                macrocyles=system.ligand.macrocycle
+                if hasattr(system.ligand, "macrocycle") else False,
                 precision="XP",
                 cache_dir=self.cache_dir,
             )
-            if output_file_sdf.is_file():
-                return True
+            if docking_pose_path.is_file():
+                return docking_pose_path
 
-        return False
+        return None
 
     @staticmethod
     def _replace_ligand(
-        pdb_path: Path, resname_replace: str, docking_pose_sdf_path: Path
+        pdb_path: Path, docking_pose_sdf_path: Path
     ) -> Universe:
         """
         Replace the ligand in a PDB file with a ligand in an SDF file.
@@ -1770,8 +1725,6 @@ class SCHRODINGERDockingFeaturizer(SCHRODINGERComplexFeaturizer):
         ----------
         pdb_path: Path
             Path to the PDB file of the protein ligand complex.
-        resname_replace: str
-            The resname of the ligand that shell be removed from the structure.
         docking_pose_sdf_path: Path
             Path to the molecule in SDF format that shell be added to the structure.
 
@@ -1789,8 +1742,11 @@ class SCHRODINGERDockingFeaturizer(SCHRODINGERComplexFeaturizer):
 
         logger.debug("Removing co-crystallized ligand ...")
         prepared_structure = read_molecule(pdb_path)
-        chain_id = prepared_structure.select_atoms(f"resname {resname_replace}").residues[0].segid
-        prepared_structure = prepared_structure.select_atoms(f"not resname {resname_replace}")
+        ligand_residue = prepared_structure.select_atoms(
+            "not protein and not resname HOH"
+        ).residues[0]  # most likely the ligand to replace
+        chain_id = ligand_residue.segid
+        prepared_structure = delete_residues(prepared_structure, [ligand_residue])
 
         with NamedTemporaryFile(mode="w", suffix=".pdb") as docking_pose_pdb_path:
             logger.debug("Converting docking pose SDF to PDB ...")
