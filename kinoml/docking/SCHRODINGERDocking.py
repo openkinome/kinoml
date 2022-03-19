@@ -14,8 +14,8 @@ def run_glide(
     schrodinger_directory: Union[Path, str],
     input_file_mae: Union[Path, str],
     output_file_sdf: Union[Path, str],
-    ligand_resname: str,
     mols_smiles: List[str],
+    ligand_resname: Union[str, None],
     n_poses: int = 1,
     mols_names: Union[List[str], None] = None,
     shape_restrain: bool = True,
@@ -35,10 +35,10 @@ def run_glide(
         co-crystallized ligand in the binding pocket of interest.
     output_file_sdf: Path or str
         The path to the output file of the generated in docking poses in SDF format.
-    ligand_resname: str
-        The resname of the co-crystallized ligand, which will be used for pocket definition.
     mols_smiles: list of str
         The molecules to dock as SMILES representation.
+    ligand_resname: str or None
+        The resname of the co-crystallized ligand, which will be used for pocket definition.
     mols_names: None or list of str, default=None
         The names of the molecules to dock. Will be used as molecule title in the SDF file. If
         None, names will be numbers (1,..,len(mols_smiles).
@@ -96,7 +96,7 @@ def run_glide(
                 str(input_file_mae),
                 ligand_file_mae.name,
                 "-asl",
-                f"not res. {ligand_resname}",
+                f"not res. {ligand_resname}" if ligand_resname else "not ligand",
             ]
         )
 
