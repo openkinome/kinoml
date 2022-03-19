@@ -1791,7 +1791,7 @@ class SCHRODINGERDockingFeaturizer(SCHRODINGERComplexFeaturizer):
 
             logger.debug("Readind docking pose and renaming residue ...")
             docking_pose = read_molecule(docking_pose_pdb_path.name)
-            for atom in docking_pose.atoms:
+            for atom in list(docking_pose.atoms):
                 atom.residue.resname = "LIG"
                 atom.segment.segid = chain_id
 
