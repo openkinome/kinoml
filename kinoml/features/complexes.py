@@ -1805,7 +1805,7 @@ class SCHRODINGERDockingFeaturizer(SCHRODINGERComplexFeaturizer):
                 atom.segment.segid = chain_id
 
             logger.debug("Adding docking pose to structure ...")
-            prepared_structure = Merge(prepared_structure, docking_pose.atoms)
+            prepared_structure = Merge(prepared_structure.atoms, docking_pose.atoms)
 
             logger.debug("Deleting water clashing with docking pose ...")
             clashing_water = prepared_structure.select_atoms(
