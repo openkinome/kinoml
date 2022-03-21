@@ -240,7 +240,7 @@ class Protein(BaseProtein, AminoAcidSequence):
             name=name,
             pdb_id=pdb_id,
             toolkit=toolkit,
-            metadata={"pdb_id": pdb_id},
+            metadata={"pdb_id": pdb_id, "file_path": file_path},
         )
 
 
