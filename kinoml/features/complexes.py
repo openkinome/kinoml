@@ -1167,6 +1167,8 @@ class SCHRODINGERComplexFeaturizer(SingleLigandProteinComplexFeaturizer):
         number of available CPUs.
     max_retry: int, default=3
         The maximal number of attempts to try running the prepwizard step.
+    build_loops: bool, default=True
+        If missing loops shell be built. Is also needed to model mutations.
     """
 
     from MDAnalysis.core.universe import Universe
@@ -1176,6 +1178,7 @@ class SCHRODINGERComplexFeaturizer(SingleLigandProteinComplexFeaturizer):
         cache_dir: Union[str, Path, None] = None,
         output_dir: Union[str, Path, None] = None,
         max_retry: int = 3,
+        build_loops: bool = True,
         **kwargs,
     ):
         from appdirs import user_cache_dir
@@ -1190,6 +1193,7 @@ class SCHRODINGERComplexFeaturizer(SingleLigandProteinComplexFeaturizer):
             self.output_dir = Path(output_dir).expanduser().resolve()
             self.output_dir.mkdir(parents=True, exist_ok=True)
         self.max_retry = max_retry
+        self.build_loops = build_loops
 
     _SUPPORTED_TYPES = (ProteinLigandComplex,)
 
@@ -1338,7 +1342,7 @@ class SCHRODINGERComplexFeaturizer(SingleLigandProteinComplexFeaturizer):
                     input_file=structure_path,
                     output_file=mae_file_path,
                     cap_termini=True,
-                    build_loops=True,
+                    build_loops=self.build_loops,
                     sequence=protein.sequence,
                     protein_pH="neutral",
                     propka_pH=7.4,
@@ -1614,12 +1618,14 @@ class SCHRODINGERDockingFeaturizer(SCHRODINGERComplexFeaturizer):
     n_processes : int or None, default=None
         How many processes to use in case of multiprocessing. Defaults to
         number of available CPUs.
-    shape_restrain: bool, default=True
-        If the docking shell be performed with shape restrain based on the
-        co-crystallized ligand.
     max_retry: int, default=3
         The maximal number of attempts to try running the prepwizard and
         docking steps.
+    build_loops: bool, default=True
+        If missing loops shell be built. Is also needed to model mutations.
+    shape_restrain: bool, default=True
+        If the docking shell be performed with shape restrain based on the
+        co-crystallized ligand.
     """
 
     from MDAnalysis.core.universe import Universe
@@ -1629,10 +1635,17 @@ class SCHRODINGERDockingFeaturizer(SCHRODINGERComplexFeaturizer):
         cache_dir: Union[str, Path, None] = None,
         output_dir: Union[str, Path, None] = None,
         max_retry: int = 3,
+        build_loops: bool = True,
         shape_restrain: bool = True,
         **kwargs,
     ):
-        super().__init__(cache_dir=cache_dir, output_dir=output_dir, max_retry=max_retry, **kwargs)
+        super().__init__(
+            cache_dir=cache_dir,
+            output_dir=output_dir,
+            max_retry=max_retry,
+            build_loops=build_loops,
+            **kwargs,
+        )
         self.shape_restrain = shape_restrain
 
     _SUPPORTED_TYPES = (ProteinLigandComplex,)
