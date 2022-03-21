@@ -1692,7 +1692,7 @@ class SCHRODINGERDockingFeaturizer(SCHRODINGERComplexFeaturizer):
             complex_path_mae = LocalFileStorage.featurizer_result(
                 self.__class__.__name__,
                 f"{system_name}_complex",
-                "pdb",
+                "mae",
                 self.output_dir,
             )
             self._write_complex_mae(prepared_structure, docking_pose_path, complex_path_mae)
@@ -1864,8 +1864,10 @@ class SCHRODINGERDockingFeaturizer(SCHRODINGERComplexFeaturizer):
             subprocess.run(
                 [
                     str(schrodinger_directory / "utilities/structcat"),
+                    "-i",
                     pdb_file.name,
                     str(docking_pose_path),
+                    "-o",
                     str(complex_path_mae),
                 ]
             )
