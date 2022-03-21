@@ -180,7 +180,7 @@ def shape_screen(
         str(library_path),
         "-osd",
         "-atomtypes",
-        "qsar",
+        "element",
         "-HOST",
         "localhost",
         "-WAIT",

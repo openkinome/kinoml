@@ -156,7 +156,6 @@ def run_glide(
         if shape_restrain:
             docking_input_file.write(f"SHAPE_RESTRAIN True\n")
             docking_input_file.write(f"SHAPE_REF_LIGAND_FILE '{ligand_file_mae.name}'\n")
-            docking_input_file.write("SHAPE_TYPING PHASE_QSAR\n")
         if macrocyles:
             docking_input_file.write(f"MACROCYCLE True\n")
         docking_input_file.flush()
