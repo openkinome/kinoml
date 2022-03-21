@@ -1786,7 +1786,7 @@ class SCHRODINGERDockingFeaturizer(SCHRODINGERComplexFeaturizer):
         logger.debug("Removing co-crystallized ligand ...")
         prepared_structure = read_molecule(pdb_path)
         ligand_residue = prepared_structure.select_atoms(
-            "not protein and not resname HOH"
+            "not protein and not (resname HOH or resname NMA or resname ACE)"
         ).residues[
             0
         ]  # most likely the ligand to replace
