@@ -1235,7 +1235,7 @@ class SCHRODINGERComplexFeaturizer(SingleLigandProteinComplexFeaturizer):
         prepared_structure = self._postprocess_structure(prepared_structure, system.protein)
 
         if self.output_dir:
-            logging.debug("Saving results ...")
+            logger.debug("Saving results ...")
             complex_path = LocalFileStorage.featurizer_result(
                 self.__class__.__name__,
                 f"{system_name}_complex",
@@ -1681,7 +1681,7 @@ class SCHRODINGERDockingFeaturizer(SCHRODINGERComplexFeaturizer):
         self._store_docking_score(prepared_structure, docking_pose_path)
 
         if self.output_dir:
-            logging.debug("Saving results ...")
+            logger.debug("Saving results ...")
             complex_path_pdb = LocalFileStorage.featurizer_result(
                 self.__class__.__name__,
                 f"{system_name}_complex",
