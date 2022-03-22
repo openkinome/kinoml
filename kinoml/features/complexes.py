@@ -1335,8 +1335,8 @@ class SCHRODINGERComplexFeaturizer(SingleLigandProteinComplexFeaturizer):
             for i in range(self.max_retry):
                 logger.debug(f"Running prepwizard trial {i + 1}...")
                 mae_file_path = (
-                    prepared_structure_path.parent / f"{prepared_structure_path.stem}.mae"
-                )
+                    Path(".") / f"{prepared_structure_path.stem}.mae"
+                )  # output file needs to be in CWD
                 run_prepwizard(
                     schrodinger_directory=self.schrodinger,
                     input_file=structure_path,
@@ -1351,6 +1351,9 @@ class SCHRODINGERComplexFeaturizer(SingleLigandProteinComplexFeaturizer):
                 )
                 if mae_file_path.is_file():
                     mae_to_pdb(self.schrodinger, mae_file_path, prepared_structure_path)
+                    mae_file_path.rename(
+                        prepared_structure_path.parent / f"{prepared_structure_path.stem}.mae"
+                    )  # move MAE file to actual cache, maybe needed for docking
                     break
         else:
             logger.debug("Found cached prepared structure ...")
