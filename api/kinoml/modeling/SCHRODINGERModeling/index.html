@@ -48,7 +48,7 @@
     <link rel="apple-touch-icon" href="../../../../_static/images/custom_favicon.png"/>
   
   
-    <title>kinoml.docking.OEDocking &#8212; KinoML 0.1 documentation</title>
+    <title>kinoml.modeling.SCHRODINGERModeling &#8212; KinoML 0.1 documentation</title>
     <link rel="stylesheet" href="../../../../_static/material.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/twemoji.css" />
@@ -72,8 +72,8 @@
     <link rel="shortcut icon" href="../../../../_static/custom_favicon.png"/>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
-    <link rel="next" title="kinoml.docking.SCHRODINGERDocking" href="../SCHRODINGERDocking/index.html" />
-    <link rel="prev" title="kinoml.docking" href="../index.html" />
+    <link rel="next" title="kinoml.modeling.alignment" href="../alignment/index.html" />
+    <link rel="prev" title="kinoml.modeling.OEModeling" href="../OEModeling/index.html" />
   
     <link rel="apple-touch-icon" href="../../../../_static/images/custom_favicon.png"/>
   
@@ -94,7 +94,7 @@
   <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer">
   <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search">
   <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
-  <a href="#api/kinoml/docking/OEDocking/index" tabindex="1" class="md-skip"> Skip to content </a>
+  <a href="#api/kinoml/modeling/SCHRODINGERModeling/index" tabindex="1" class="md-skip"> Skip to content </a>
   <header class="md-header" data-md-component="header">
   <nav class="md-header-nav md-grid">
     <div class="md-flex navheader">
@@ -112,7 +112,7 @@
       <div class="md-flex__cell md-flex__cell--stretch">
         <div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
           <span class="md-header-nav__topic">KinoML</span>
-          <span class="md-header-nav__topic"> kinoml.docking.OEDocking </span>
+          <span class="md-header-nav__topic"> kinoml.modeling.SCHRODINGERModeling </span>
         </div>
       </div>
       <div class="md-flex__cell md-flex__cell--shrink">
@@ -184,7 +184,7 @@
             
             <li class="md-tabs__item"><a href="https://openkinome.org" class="md-tabs__link">OpenKinome</a></li>
           <li class="md-tabs__item"><a href="../../index.html" class="md-tabs__link"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml</span></code></a></li>
-          <li class="md-tabs__item"><a href="../index.html" class="md-tabs__link"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.docking</span></code></a></li>
+          <li class="md-tabs__item"><a href="../index.html" class="md-tabs__link"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.modeling</span></code></a></li>
       </ul>
     </div>
   </nav>
@@ -315,19 +315,17 @@
 <nav class="md-nav md-nav--secondary">
     <label class="md-nav__title" for="__toc">Contents</label>
   <ul class="md-nav__list" data-md-scrollfix="">
-        <li class="md-nav__item"><a href="#api-kinoml-docking-oedocking-index--page-root" class="md-nav__link"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.docking.OEDocking</span></code></a><nav class="md-nav">
+        <li class="md-nav__item"><a href="#api-kinoml-modeling-schrodingermodeling-index--page-root" class="md-nav__link"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.modeling.SCHRODINGERModeling</span></code></a><nav class="md-nav">
               <ul class="md-nav__list">
         <li class="md-nav__item"><a href="#module-contents" class="md-nav__link">Module Contents</a><nav class="md-nav">
               <ul class="md-nav__list">
-        <li class="md-nav__item"><a href="#kinoml.docking.OEDocking.resids_to_box_molecule" class="md-nav__link">resids_to_box_molecule</a>
+        <li class="md-nav__item"><a href="#kinoml.modeling.SCHRODINGERModeling.logger" class="md-nav__link">logger</a>
         </li>
-        <li class="md-nav__item"><a href="#kinoml.docking.OEDocking.pose_molecules" class="md-nav__link">pose_molecules</a>
+        <li class="md-nav__item"><a href="#kinoml.modeling.SCHRODINGERModeling.run_prepwizard" class="md-nav__link">run_prepwizard</a>
         </li>
-        <li class="md-nav__item"><a href="#kinoml.docking.OEDocking.run_docking" class="md-nav__link">run_docking</a>
+        <li class="md-nav__item"><a href="#kinoml.modeling.SCHRODINGERModeling.mae_to_pdb" class="md-nav__link">mae_to_pdb</a>
         </li>
-        <li class="md-nav__item"><a href="#kinoml.docking.OEDocking.hybrid_docking" class="md-nav__link">hybrid_docking</a>
-        </li>
-        <li class="md-nav__item"><a href="#kinoml.docking.OEDocking.fred_docking" class="md-nav__link">fred_docking</a>
+        <li class="md-nav__item"><a href="#kinoml.modeling.SCHRODINGERModeling.shape_screen" class="md-nav__link">shape_screen</a>
         </li></ul>
             </nav>
         </li></ul>
@@ -346,112 +344,68 @@
         <div class="md-content">
           <article class="md-content__inner md-typeset" role="main">
             
-  <section id="module-kinoml.docking.OEDocking">
-<span id="kinoml-docking-oedocking"></span><h1 id="api-kinoml-docking-oedocking-index--page-root"><a class="reference internal" href="#api-kinoml-docking-oedocking-index--page-root" title="kinoml.docking.OEDocking"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.docking.OEDocking</span></code></a><a class="headerlink" href="#api-kinoml-docking-oedocking-index--page-root" title="Permalink to this headline">¶</a></h1>
+  <section id="module-kinoml.modeling.SCHRODINGERModeling">
+<span id="kinoml-modeling-schrodingermodeling"></span><h1 id="api-kinoml-modeling-schrodingermodeling-index--page-root"><a class="reference internal" href="#api-kinoml-modeling-schrodingermodeling-index--page-root" title="kinoml.modeling.SCHRODINGERModeling"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.modeling.SCHRODINGERModeling</span></code></a><a class="headerlink" href="#api-kinoml-modeling-schrodingermodeling-index--page-root" title="Permalink to this headline">¶</a></h1>
 <section id="module-contents">
 <h2 id="module-contents">Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
+<dl class="data">
+<dt id="kinoml.modeling.SCHRODINGERModeling.logger">
+<code class="sig-prename descclassname">kinoml.modeling.SCHRODINGERModeling.</code><code class="sig-name descname">logger</code><a class="headerlink" href="#kinoml.modeling.SCHRODINGERModeling.logger" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 <dl class="function">
-<dt id="kinoml.docking.OEDocking.resids_to_box_molecule">
-<code class="sig-prename descclassname">kinoml.docking.OEDocking.</code><code class="sig-name descname">resids_to_box_molecule</code><span class="sig-paren">(</span><em class="sig-param">protein: oechem.OEMolBase, resids: List[int]</em><span class="sig-paren">)</span> → oechem.OEGraphMol<a class="headerlink" href="#kinoml.docking.OEDocking.resids_to_box_molecule" title="Permalink to this definition">¶</a></dt>
-<dd><p>Retrieve a box molecule spanning the given protein residue IDs.</p>
+<dt id="kinoml.modeling.SCHRODINGERModeling.run_prepwizard">
+<code class="sig-prename descclassname">kinoml.modeling.SCHRODINGERModeling.</code><code class="sig-name descname">run_prepwizard</code><span class="sig-paren">(</span><em class="sig-param">schrodinger_directory: Union[Path, str], input_file: Union[Path, str], output_file: Union[Path, str], cap_termini: bool = True, build_loops: bool = True, sequence: Union[str, None] = None, chain_id: str = '', protein_pH: str = 'neutral', propka_pH: float = 7.4, epik_pH: float = 7.4, force_field: str = '3'</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.modeling.SCHRODINGERModeling.run_prepwizard" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run the prepwizard utility to prepare a protein structure.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>protein</strong> (<em>oechem.OEMolBase</em>) – An OpenEye molecule holding a protein structure.</p></li>
-<li><p><strong>resids</strong> (<em>list of int</em>) – A list of resids defining the residues of interest.</p></li>
+<li><p><strong>schrodinger_directory</strong> (<em>Path</em><em> or </em><em>str</em>) – The path to the directory of the Schrodinger installation.</p></li>
+<li><p><strong>input_file</strong> (<em>Path</em><em> or </em><em>str</em>) – The path to the input file.</p></li>
+<li><p><strong>output_file</strong> (<em>Path</em><em> or </em><em>str</em>) – The path to the output file.</p></li>
+<li><p><strong>cap_termini</strong> (<em>bool</em><em>, </em><em>default=True</em>) – If termini should be capped.</p></li>
+<li><p><strong>build_loops</strong> (<em>bool</em><em>, </em><em>default=True</em>) – If loops should be built.</p></li>
+<li><p><strong>sequence</strong> (<em>str</em><em> or </em><em>None</em>) – The amino acid sequence in single letter codes that should be used for loop building.
+Also needs the chain_id parameter to work correctly.</p></li>
+<li><p><strong>chain_id</strong> (<em>str</em><em>, </em><em>default=""</em>) – The chain ID of the protein that should be modeled based on the given sequence.</p></li>
+<li><p><strong>protein_pH</strong> (<em>str</em><em>, </em><em>default='neutral'</em>) – The pH used during protonation of the protein (‘very_low’, ‘low’, ‘neutral’, ‘high’).</p></li>
+<li><p><strong>propka_pH</strong> (<em>float</em><em>, </em><em>default=7.4</em>) – Run PROPKA at given pH.</p></li>
+<li><p><strong>epik_pH</strong> (<em>float</em><em>, </em><em>default=7.4</em>) – The pH used during protonation of the ligand.</p></li>
+<li><p><strong>force_field</strong> (<em>str</em><em>, </em><em>default='3'</em>) – Force field to use during minimization (2005, 3)</p></li>
 </ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><strong>box_molecule</strong> – Rectangular box molecule spanning the region of the given protein defined by the given
-residue IDs.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>oechem.OEGraphMol</p>
 </dd>
 </dl>
 </dd></dl>
 <dl class="function">
-<dt id="kinoml.docking.OEDocking.pose_molecules">
-<code class="sig-prename descclassname">kinoml.docking.OEDocking.</code><code class="sig-name descname">pose_molecules</code><span class="sig-paren">(</span><em class="sig-param">design_unit: oechem.OEDesignUnit, molecules: List[oechem.OEMolBase], pKa_norm: bool = True, score_pose: bool = False</em><span class="sig-paren">)</span> → Union[List[oechem.OEGraphMol], None]<a class="headerlink" href="#kinoml.docking.OEDocking.pose_molecules" title="Permalink to this definition">¶</a></dt>
-<dd><p>Generate a binding pose of molecules in a prepared receptor with OpenEye’s Posit method.</p>
+<dt id="kinoml.modeling.SCHRODINGERModeling.mae_to_pdb">
+<code class="sig-prename descclassname">kinoml.modeling.SCHRODINGERModeling.</code><code class="sig-name descname">mae_to_pdb</code><span class="sig-paren">(</span><em class="sig-param">schrodinger_directory: Union[str, Path], mae_file_path: Union[str, Path], pdb_file_path: Union[str, Path]</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.modeling.SCHRODINGERModeling.mae_to_pdb" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a structure file from MAE to PDB format.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>design_unit</strong> (<em>oechem. OEDesignUnit</em>) – A design unit with a receptor object.</p></li>
-<li><p><strong>molecules</strong> (<em>list of oechem.OEMolBase</em>) – A list of OpenEye molecules holding prepared molecules for docking.</p></li>
-<li><p><strong>pKa_norm</strong> (<em>bool</em><em>, </em><em>default=True</em>) – Assign the predominant ionization state at pH ~7.4.</p></li>
-<li><p><strong>score_pose</strong> (<em>bool</em><em>, </em><em>default=False</em>) – Score the best docking pose per ligand and add the proper SD tag.</p></li>
+<li><p><strong>schrodinger_directory</strong> (<em>str</em><em> or </em><em>pathlib.Path</em>) – The path to the directory of the Schrodinger installation.</p></li>
+<li><p><strong>mae_file_path</strong> (<em>str</em><em> or </em><em>pathlib.Path</em>) – The path to the input file in MAE format.</p></li>
+<li><p><strong>pdb_file_path</strong> (<em>str</em><em> or </em><em>pathlib.Path</em>) – The path to the output file in PDB format.</p></li>
 </ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><strong>posed_molecules</strong> – A list of OpenEye molecules holding the docked molecules.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>list of oechem.OEGraphMol or None</p>
 </dd>
 </dl>
 </dd></dl>
 <dl class="function">
-<dt id="kinoml.docking.OEDocking.run_docking">
-<code class="sig-prename descclassname">kinoml.docking.OEDocking.</code><code class="sig-name descname">run_docking</code><span class="sig-paren">(</span><em class="sig-param">design_unit: oechem.OEDesignUnit, molecules: List[oechem.OEMolBase], dock_method: int, num_poses: int = 1, pKa_norm: bool = True</em><span class="sig-paren">)</span> → Union[List[oechem.OEGraphMol], None]<a class="headerlink" href="#kinoml.docking.OEDocking.run_docking" title="Permalink to this definition">¶</a></dt>
-<dd><p>Dock molecules into a prepared design unit containing a receptor object.</p>
+<dt id="kinoml.modeling.SCHRODINGERModeling.shape_screen">
+<code class="sig-prename descclassname">kinoml.modeling.SCHRODINGERModeling.</code><code class="sig-name descname">shape_screen</code><span class="sig-paren">(</span><em class="sig-param">schrodinger_directory: Union[Path, str], query_path: Union[str, Path], library_path: Union[str, Path], output_sdf_path: Union[str, Path], flexible: bool = True, thorough_sampling: bool = True, keep_best_match_only: bool = True</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.modeling.SCHRODINGERModeling.shape_screen" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run the shape_screen tool to align a library of small molecules to the given shape query.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>design_unit</strong> (<em>oechem.OEDesignUnit</em>) – A design unit with a receptor object.</p></li>
-<li><p><strong>molecules</strong> (<em>list of oechem.OEMolBase</em>) – A list of OpenEye molecules holding prepared molecules for docking.</p></li>
-<li><p><strong>dock_method</strong> (<em>int</em>) – Constant defining the docking method.</p></li>
-<li><p><strong>num_poses</strong> (<em>int</em>) – Number of docking poses to generate per molecule.</p></li>
-<li><p><strong>pKa_norm</strong> (<em>bool</em><em>, </em><em>default=True</em>) – Assign the predominant ionization state at pH ~7.4.</p></li>
+<li><p><strong>schrodinger_directory</strong> (<em>Path</em><em> or </em><em>str</em>) – The path to the directory of the Schrodinger installation.</p></li>
+<li><p><strong>query_path</strong> (<em>Path</em><em> or </em><em>str</em>) – The path to a valid shape query, e.g. an SDF file with one or more small molecules.</p></li>
+<li><p><strong>library_path</strong> (<em>Path</em><em> or </em><em>str</em>) – The path to a valid ligand library for shape screening, e.g. and SDF file with one more
+small molecules.</p></li>
+<li><p><strong>output_sdf_path</strong> (<em>Path</em><em> or </em><em>str</em>) – The path to the output SDF file of the shape screening.</p></li>
+<li><p><strong>flexible</strong> (<em>bool</em><em>, </em><em>default=True</em>) – If conformers shell be generated for the small molecule library to screen.</p></li>
+<li><p><strong>thorough_sampling</strong> (<em>bool</em><em>, </em><em>default=True</em>) – If conformations shell thoroughly sampled.</p></li>
+<li><p><strong>keep_best_match_only</strong> (<em>bool</em><em>, </em><em>default=True</em>) – In case multiple shape queries, if only the results for best matching shape query shell
+be returned.</p></li>
 </ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><strong>docked_molecules</strong> – A list of OpenEye molecules holding the docked molecules.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>list of oechem.OEGraphMol or None</p>
-</dd>
-</dl>
-</dd></dl>
-<dl class="function">
-<dt id="kinoml.docking.OEDocking.hybrid_docking">
-<code class="sig-prename descclassname">kinoml.docking.OEDocking.</code><code class="sig-name descname">hybrid_docking</code><span class="sig-paren">(</span><em class="sig-param">design_unit: oechem.OEDesignUnit, molecules: List[oechem.OEMolBase], num_poses: int = 1, pKa_norm: bool = True</em><span class="sig-paren">)</span> → Union[List[oechem.OEGraphMol], None]<a class="headerlink" href="#kinoml.docking.OEDocking.hybrid_docking" title="Permalink to this definition">¶</a></dt>
-<dd><p>Dock molecules into a prepared design unit containing a hybrid receptor object.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>design_unit</strong> (<em>oechem.OEDesignUnit</em>) – A design unit with a hybrid receptor object.</p></li>
-<li><p><strong>molecules</strong> (<em>list of oechem.OEMolBase</em>) – A list of OpenEye molecules holding prepared molecules for docking.</p></li>
-<li><p><strong>num_poses</strong> (<em>int</em>) – Number of docking poses to generate per molecule.</p></li>
-<li><p><strong>pKa_norm</strong> (<em>bool</em><em>, </em><em>default=True</em>) – Assign the predominant ionization state at pH ~7.4.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><strong>docked_molecules</strong> – A list of OpenEye molecules holding the docked molecules.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>list of oechem.OEGraphMol or None</p>
-</dd>
-</dl>
-</dd></dl>
-<dl class="function">
-<dt id="kinoml.docking.OEDocking.fred_docking">
-<code class="sig-prename descclassname">kinoml.docking.OEDocking.</code><code class="sig-name descname">fred_docking</code><span class="sig-paren">(</span><em class="sig-param">design_unit: oechem.OEDesignUnit, molecules: List[oechem.OEMolBase], num_poses: int = 1, pKa_norm: bool = True</em><span class="sig-paren">)</span> → Union[List[oechem.OEGraphMol], None]<a class="headerlink" href="#kinoml.docking.OEDocking.fred_docking" title="Permalink to this definition">¶</a></dt>
-<dd><p>Dock molecules into a prepared design unit containing a receptor object.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>design_unit</strong> (<em>oechem.OEDesignUnit</em>) – A design unit with a receptor object.</p></li>
-<li><p><strong>molecules</strong> (<em>list of oechem.OEMolBase</em>) – A list of OpenEye molecules holding prepared molecules for docking.</p></li>
-<li><p><strong>num_poses</strong> (<em>int</em>) – Number of docking poses to generate per molecule.</p></li>
-<li><p><strong>pKa_norm</strong> (<em>bool</em><em>, </em><em>default=True</em>) – Assign the predominant ionization state at pH ~7.4.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><strong>docked_molecules</strong> – A list of OpenEye molecules holding the docked molecules.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>list of oechem.OEGraphMol or None</p>
 </dd>
 </dl>
 </dd></dl>
@@ -468,7 +422,7 @@ residue IDs.</p>
     <div class="md-footer-nav">
       <nav class="md-footer-nav__inner md-grid">
           
-            <a href="../index.html" title="kinoml.docking"
+            <a href="../OEModeling/index.html" title="kinoml.modeling.OEModeling"
                class="md-flex md-footer-nav__link md-footer-nav__link--prev"
                rel="prev">
               <div class="md-flex__cell md-flex__cell--shrink">
@@ -477,17 +431,17 @@ residue IDs.</p>
               <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
                 <span class="md-flex__ellipsis">
                   <span
-                      class="md-footer-nav__direction"> Previous </span> <code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.docking</span></code> </span>
+                      class="md-footer-nav__direction"> Previous </span> <code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.modeling.OEModeling</span></code> </span>
               </div>
             </a>
           
           
-            <a href="../SCHRODINGERDocking/index.html" title="kinoml.docking.SCHRODINGERDocking"
+            <a href="../alignment/index.html" title="kinoml.modeling.alignment"
                class="md-flex md-footer-nav__link md-footer-nav__link--next"
                rel="next">
             <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title"><span
                 class="md-flex__ellipsis"> <span
-                class="md-footer-nav__direction"> Next </span> <code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.docking.SCHRODINGERDocking</span></code> </span>
+                class="md-footer-nav__direction"> Next </span> <code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.modeling.alignment</span></code> </span>
             </div>
             <div class="md-flex__cell md-flex__cell--shrink"><i
                 class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>

@@ -322,6 +322,30 @@
         <li class="md-nav__item"><a href="#kinoml.modeling.MDAnalysisModeling.logger" class="md-nav__link">logger</a>
         </li>
         <li class="md-nav__item"><a href="#kinoml.modeling.MDAnalysisModeling.read_molecule" class="md-nav__link">read_molecule</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.modeling.MDAnalysisModeling.write_molecule" class="md-nav__link">write_molecule</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.modeling.MDAnalysisModeling.select_chain" class="md-nav__link">select_chain</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.modeling.MDAnalysisModeling.select_altloc" class="md-nav__link">select_altloc</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.modeling.MDAnalysisModeling.remove_non_protein" class="md-nav__link">remove_non_protein</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.modeling.MDAnalysisModeling.delete_residues" class="md-nav__link">delete_residues</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.modeling.MDAnalysisModeling.delete_expression_tags" class="md-nav__link">delete_expression_tags</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.modeling.MDAnalysisModeling.get_sequence" class="md-nav__link">get_sequence</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.modeling.MDAnalysisModeling.get_structure_sequence_alignment" class="md-nav__link">get_structure_sequence_alignment</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.modeling.MDAnalysisModeling.delete_alterations" class="md-nav__link">delete_alterations</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.modeling.MDAnalysisModeling.delete_short_protein_segments" class="md-nav__link">delete_short_protein_segments</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.modeling.MDAnalysisModeling.renumber_protein_residues" class="md-nav__link">renumber_protein_residues</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.modeling.MDAnalysisModeling.update_residue_identifiers" class="md-nav__link">update_residue_identifiers</a>
         </li></ul>
             </nav>
         </li></ul>
@@ -361,6 +385,255 @@
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p><strong>molecule</strong> – The MDAnalysis universe.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>MDAnalysis.core.universe.Universe</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="function">
+<dt id="kinoml.modeling.MDAnalysisModeling.write_molecule">
+<code class="sig-prename descclassname">kinoml.modeling.MDAnalysisModeling.</code><code class="sig-name descname">write_molecule</code><span class="sig-paren">(</span><em class="sig-param">molecule: Union[AtomGroup], file_path: Union[str, Path], delete_segid: bool = True</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.modeling.MDAnalysisModeling.write_molecule" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write an AtomGroup to a file. If written in PDB format and delete_segid is True the segid will
+be deleted from the PDB file.
+(<a class="reference external" href="https://docs.mdanalysis.org/1.0.0/documentation_pages/coordinates/PDB.html">https://docs.mdanalysis.org/1.0.0/documentation_pages/coordinates/PDB.html</a>)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>molecule</strong> (<em>MDAnalysis.core.groups.Atomgroup</em>) – An MDAnalysis molecule holding a molecular structure.</p></li>
+<li><p><strong>file_path</strong> (<em>str</em><em> or </em><em>pathlib.Path</em>) – The path to the output file.</p></li>
+<li><p><strong>delete_segid</strong> (<em>bool</em><em>, </em><em>default=True</em>) – If the segid shell be deleted in case of PDB format.
+(<a class="reference external" href="https://docs.mdanalysis.org/1.0.0/documentation_pages/coordinates/PDB.html">https://docs.mdanalysis.org/1.0.0/documentation_pages/coordinates/PDB.html</a>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+<dl class="function">
+<dt id="kinoml.modeling.MDAnalysisModeling.select_chain">
+<code class="sig-prename descclassname">kinoml.modeling.MDAnalysisModeling.</code><code class="sig-name descname">select_chain</code><span class="sig-paren">(</span><em class="sig-param">molecule: Union[Universe, AtomGroup], chain_id: str</em><span class="sig-paren">)</span> → Universe<a class="headerlink" href="#kinoml.modeling.MDAnalysisModeling.select_chain" title="Permalink to this definition">¶</a></dt>
+<dd><p>Select a chain from an MDAnalysis molecule.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>molecule</strong> (<em>MDAnalysis.core.universe.Universe</em><em> or </em><em>MDAnalysis.core.groups.Atomgroup</em>) – An MDAnalysis molecule holding a molecular structure.</p></li>
+<li><p><strong>chain_id</strong> (<em>str</em>) – Chain identifier.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An MDAnalysis universe holding the selected chain.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>MDAnalysis.core.universe.Universe</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="function">
+<dt id="kinoml.modeling.MDAnalysisModeling.select_altloc">
+<code class="sig-prename descclassname">kinoml.modeling.MDAnalysisModeling.</code><code class="sig-name descname">select_altloc</code><span class="sig-paren">(</span><em class="sig-param">molecule: Union[Universe, AtomGroup], altloc_id: str, altloc_fallback: bool = True</em><span class="sig-paren">)</span> → Universe<a class="headerlink" href="#kinoml.modeling.MDAnalysisModeling.select_altloc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Select an alternate location from an MDAnalysis molecule.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>molecule</strong> (<em>MDAnalysis.core.universe.Universe</em><em> or </em><em>MDAnalysis.core.groups.Atomgroup</em>) – An MDAnalysis molecule holding a molecular structure.</p></li>
+<li><p><strong>altloc_id</strong> (<em>str</em>) – Alternate location identifier.</p></li>
+<li><p><strong>altloc_fallback</strong> (<em>bool</em>) – If the alternate location “A” should be used for residues that do
+not contain the given alternate location identifier.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>selection</strong> – An MDAnalysis universe holding the selected alternate location.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>MDAnalysis.core.universe.Universe</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>ValueError</strong> – No atoms were found with given altloc id.</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="function">
+<dt id="kinoml.modeling.MDAnalysisModeling.remove_non_protein">
+<code class="sig-prename descclassname">kinoml.modeling.MDAnalysisModeling.</code><code class="sig-name descname">remove_non_protein</code><span class="sig-paren">(</span><em class="sig-param">molecule: Union[Universe, AtomGroup], exceptions: Union[None, Iterable[str]] = None, only_standard_amino_acids: bool = True, remove_water: bool = False</em><span class="sig-paren">)</span> → Universe<a class="headerlink" href="#kinoml.modeling.MDAnalysisModeling.remove_non_protein" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove non-protein atoms from an OpenEye molecule. Water will be kept by default.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>molecule</strong> (<em>MDAnalysis.core.universe.Universe</em><em> or </em><em>MDAnalysis.core.groups.Atomgroup</em>) – An MDAnalysis molecule holding a molecular structure.</p></li>
+<li><p><strong>exceptions</strong> (<em>None</em><em> or </em><em>iterable of str</em>) – Exceptions that should not be removed.</p></li>
+<li><p><strong>only_standard_amino_acids</strong> (<em>bool</em><em>, </em><em>default=True</em>) – If only standard amino acids shell be retained, .i.e. ALA, ARG, ASN, ASP, CYS, GLN, GLU,
+GLY, HIS, ILE, LEU, LYS, MET, PHE, PRO, SEC, SER, THR, TRP, TYR, VAL.</p></li>
+<li><p><strong>remove_water</strong> (<em>bool</em><em>, </em><em>default=False</em>) – If water should be removed.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An MDAnalysis universe holding the filtered structure.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>MDAnalysis.core.universe.Universe</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="function">
+<dt id="kinoml.modeling.MDAnalysisModeling.delete_residues">
+<code class="sig-prename descclassname">kinoml.modeling.MDAnalysisModeling.</code><code class="sig-name descname">delete_residues</code><span class="sig-paren">(</span><em class="sig-param">molecule: [Universe, AtomGroup], residues: Iterable[Residue]</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.modeling.MDAnalysisModeling.delete_residues" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete residues from an MDAnalysis molecule.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>molecule</strong> (<em>MDAnalysis.core.universe.Universe</em><em> or </em><em>MDAnalysis.core.groups.Atomgroup</em>) – An MDAnalysis molecule holding a molecular structure.</p></li>
+<li><p><strong>residues</strong> (<em>iterable of MDAnalysis.core.groups.Residue</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An MDAnalysis molecule holding a molecular structure without given residues.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>MDAnalysis.core.universe.Universe</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="function">
+<dt id="kinoml.modeling.MDAnalysisModeling.delete_expression_tags">
+<code class="sig-prename descclassname">kinoml.modeling.MDAnalysisModeling.</code><code class="sig-name descname">delete_expression_tags</code><span class="sig-paren">(</span><em class="sig-param">molecule: Union[Universe, AtomGroup], pdb_path: Union[str, Path]</em><span class="sig-paren">)</span> → Universe<a class="headerlink" href="#kinoml.modeling.MDAnalysisModeling.delete_expression_tags" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete expression tags listed in the PDB header section “SEQADV”.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>molecule</strong> (<em>MDAnalysis.core.universe.Universe</em><em> or </em><em>MDAnalysis.core.groups.Atomgroup</em>) – An MDAnalysis molecule.</p></li>
+<li><p><strong>pdb_path</strong> (<em>str</em><em> or </em><em>pathlib.Path</em>) – The path to the PDB file containing the information about expression tags.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The MDAnalysis universe without expression tags.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Universe</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="function">
+<dt id="kinoml.modeling.MDAnalysisModeling.get_sequence">
+<code class="sig-prename descclassname">kinoml.modeling.MDAnalysisModeling.</code><code class="sig-name descname">get_sequence</code><span class="sig-paren">(</span><em class="sig-param">molecule: Union[Universe, AtomGroup]</em><span class="sig-paren">)</span> → str<a class="headerlink" href="#kinoml.modeling.MDAnalysisModeling.get_sequence" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the amino acid sequence with one letter characters of an MDAnalysis molecule.
+All residues not named as standard amino acid will receive the character ‘X’.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>molecule</strong> (<em>MDAnalysis.core.universe.Universe</em><em> or </em><em>MDAnalysis.core.groups.Atomgroup</em>) – An MDAnalysis molecule.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>sequence</strong> – The amino acid sequence with one letter characters.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="function">
+<dt id="kinoml.modeling.MDAnalysisModeling.get_structure_sequence_alignment">
+<code class="sig-prename descclassname">kinoml.modeling.MDAnalysisModeling.</code><code class="sig-name descname">get_structure_sequence_alignment</code><span class="sig-paren">(</span><em class="sig-param">molecule: Union[Universe, AtomGroup], sequence: str</em><span class="sig-paren">)</span> → Tuple[str, str]<a class="headerlink" href="#kinoml.modeling.MDAnalysisModeling.get_structure_sequence_alignment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate an alignment between an MDAnalysis protein structure and an amino acid sequence. The
+provided protein structure should only contain protein residues to prevent unexpected behavior.
+Also, this alignment was optimized for highly similar sequences, i.e. only few mutations,
+deletions and insertions. Non protein residues will be marked with “X”. The provided MDAnalysis
+molecule needs bond information to properly work, hence use “guess_bonds=True” when loading
+the universe.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>molecule</strong> (<em>MDAnalysis.core.universe.Universe</em><em> or </em><em>MDAnalysis.core.groups.Atomgroup</em>) – An MDAnalysis molecule holding a protein structure.</p></li>
+<li><p><strong>sequence</strong> (<em>str</em>) – A one letter amino acid sequence.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>structure_sequence_aligned</strong> (<em>str</em>) – The aligned protein structure sequence with gaps denoted as “-“.</p></li>
+<li><p><strong>sequence_aligned</strong> (<em>str</em>) – The aligned amino acid sequence with gaps denoted as “-“.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="function">
+<dt id="kinoml.modeling.MDAnalysisModeling.delete_alterations">
+<code class="sig-prename descclassname">kinoml.modeling.MDAnalysisModeling.</code><code class="sig-name descname">delete_alterations</code><span class="sig-paren">(</span><em class="sig-param">molecule: Union[Universe, AtomGroup], sequence: str, delete_n_anchors: int = 2, short_protein_segments_cutoff: int = 3</em><span class="sig-paren">)</span> → Universe<a class="headerlink" href="#kinoml.modeling.MDAnalysisModeling.delete_alterations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete residues from an MDAnalysis molecule that are not covered by the given sequence, i.e.
+mutations and insertions. The provided protein structure should only contain protein residues
+to prevent unexpected behavior.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>molecule</strong> (<em>MDAnalysis.core.universe.Universe</em><em> or </em><em>MDAnalysis.core.groups.Atomgroup</em>) – An MDAnalysis molecule holding a protein structure.</p></li>
+<li><p><strong>sequence</strong> (<em>str</em>) – A one letter amino acid sequence.</p></li>
+<li><p><strong>delete_n_anchors</strong> (<em>int</em><em>, </em><em>default=2</em>) – The number of anchoring residues to delete when deleting insertions.</p></li>
+<li><p><strong>short_protein_segments_cutoff</strong> (<em>int</em><em>, </em><em>default=3</em>) – If deleting residues will lead to short protein segments, delete these segments with a
+length up to the specified cutoff.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An MDAnalysis molecule holding a protein structure without alterations deleted.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>MDAnalysis.core.universe.Universe</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="function">
+<dt id="kinoml.modeling.MDAnalysisModeling.delete_short_protein_segments">
+<code class="sig-prename descclassname">kinoml.modeling.MDAnalysisModeling.</code><code class="sig-name descname">delete_short_protein_segments</code><span class="sig-paren">(</span><em class="sig-param">molecule: Union[Universe, AtomGroup], cutoff: int = 3</em><span class="sig-paren">)</span> → Universe<a class="headerlink" href="#kinoml.modeling.MDAnalysisModeling.delete_short_protein_segments" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete protein segments consisting of 3 or less residues. Needs to have bonding information
+to work correctly.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>molecule</strong> (<em>MDAnalysis.core.universe.Universe</em><em> or </em><em>MDAnalysis.core.groups.Atomgroup</em>) – An MDAnalysis molecule holding a protein with possibly short segments.</p></li>
+<li><p><strong>cutoff</strong> (<em>int</em><em>, </em><em>default=3</em>) – The upper bound defining a short protein segment.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An MDAnalysis molecule holding the protein without short segments.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>MDAnalysis.core.universe.Universe</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="function">
+<dt id="kinoml.modeling.MDAnalysisModeling.renumber_protein_residues">
+<code class="sig-prename descclassname">kinoml.modeling.MDAnalysisModeling.</code><code class="sig-name descname">renumber_protein_residues</code><span class="sig-paren">(</span><em class="sig-param">molecule: Union[Universe, AtomGroup], template_sequence: str</em><span class="sig-paren">)</span> → Universe<a class="headerlink" href="#kinoml.modeling.MDAnalysisModeling.renumber_protein_residues" title="Permalink to this definition">¶</a></dt>
+<dd><p>Renumber a protein structure according to the provided sequence.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>molecule</strong> (<em>MDAnalysis.core.universe.Universe</em><em> or </em><em>MDAnalysis.core.groups.Atomgroup</em>) – An MDAnalysis molecule holding a protein structure.</p></li>
+<li><p><strong>template_sequence</strong> (<em>str</em>) – The amino acid sequence to use for renumbering.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An MDAnalysis molecule holding the renumbered protein structure.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>MDAnalysis.core.universe.Universe</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="function">
+<dt id="kinoml.modeling.MDAnalysisModeling.update_residue_identifiers">
+<code class="sig-prename descclassname">kinoml.modeling.MDAnalysisModeling.</code><code class="sig-name descname">update_residue_identifiers</code><span class="sig-paren">(</span><em class="sig-param">molecule: Union[Universe, AtomGroup], keep_protein_residue_ids: bool = True, keep_chain_ids: bool = False</em><span class="sig-paren">)</span> → Universe<a class="headerlink" href="#kinoml.modeling.MDAnalysisModeling.update_residue_identifiers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the atom, residue and chain IDs of the given molecular structure. All residues become
+part of chain A, unless ‘keep_chain_ids’ is set True. Atom IDs will start from 1. Residue IDs
+will start from 1, except ‘keep_protein_residue_ids’ is set True. This is especially useful, if
+molecules were merged, which can result in overlapping atom and residue IDs as well as
+separate chains.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>molecule</strong> (<em>MDAnalysis.core.universe.Universe</em><em> or </em><em>MDAnalysis.core.groups.Atomgroup</em>) – The MDAnalysis molecule structure for updating atom and residue ids.</p></li>
+<li><p><strong>keep_protein_residue_ids</strong> (<em>bool</em>) – If the protein residues should be kept.</p></li>
+<li><p><strong>keep_chain_ids</strong> (<em>bool</em>) – If the chain IDS should be kept.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The MDAnalysis molecule structure with updated atom and residue ids.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>MDAnalysis.core.universe.Universe</p>
