@@ -190,7 +190,7 @@ def run_glide(
             name = mol.GetProp("_Name")
             if name not in mol_counter_dict.keys():
                 mol_counter_dict[name] = 0
-            if mol_counter_dict[name] <= n_poses:
+            if mol_counter_dict[name] < n_poses:
                 sd_writer.write(mol)
                 mol_counter_dict[name] += 1
         sd_file_path.unlink()  # manually delete file
