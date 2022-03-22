@@ -188,6 +188,8 @@ def shape_screen(
     optional_arguments = []
     if flexible:
         optional_arguments.append("-flex")
+        optional_arguments.append("-max")
+        optional_arguments.append("800")
         if thorough_sampling:
             optional_arguments += ["-sample", "thorough"]
     if keep_best_match_only:
