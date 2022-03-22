@@ -1300,6 +1300,7 @@ class SCHRODINGERComplexFeaturizer(SingleLigandProteinComplexFeaturizer):
         : Path or None
             The path to the prepared structure if successful.
         """
+        import shutil
 
         from ..modeling.SCHRODINGERModeling import run_prepwizard, mae_to_pdb
         from ..utils import LocalFileStorage, sha256_objects
@@ -1351,8 +1352,9 @@ class SCHRODINGERComplexFeaturizer(SingleLigandProteinComplexFeaturizer):
                 )
                 if mae_file_path.is_file():
                     mae_to_pdb(self.schrodinger, mae_file_path, prepared_structure_path)
-                    mae_file_path.rename(
-                        prepared_structure_path.parent / f"{prepared_structure_path.stem}.mae"
+                    shutil.move(
+                        str(mae_file_path),
+                        str(prepared_structure_path.parent / f"{prepared_structure_path.stem}.mae")
                     )  # move MAE file to actual cache, maybe needed for docking
                     break
         else:

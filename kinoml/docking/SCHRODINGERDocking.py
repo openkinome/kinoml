@@ -54,6 +54,8 @@ def run_glide(
     cache_dir: Path or str, default=appdirs.user_cache_dir()
         Path to a directory for caching grids for docking.
     """
+    import shutil
+
     from rdkit import Chem
     from rdkit.Chem import AllChem
 
@@ -138,7 +140,10 @@ def run_glide(
                     "-OVERWRITE",
                 ]
             )
-            (Path(".") / (Path(grid_input_file.name).stem + ".zip")).rename(grid_file_path)
+            shutil.move(
+                str(Path(".") / (Path(grid_input_file.name).stem + ".zip")),
+                grid_file_path
+            )
 
         if logger.getEffectiveLevel() != 10:  # remove grid logs etc.
             paths = Path(".").glob(f"*{Path(grid_input_file.name).stem}*")
