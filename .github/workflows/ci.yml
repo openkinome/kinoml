@@ -104,7 +104,7 @@ jobs:
       - name: Run notebook tests
         shell: bash -l {0}
         run: |
-          pytest -v -n auto --dist loadfile --nbval-lax --nbval-cell-timeout 6000 --current-env examples/*.ipynb
+          pytest -v -n auto --dist loadfile --nbval-lax --nbval-cell-timeout 6000 --current-env examples/*.ipynb -k "not Schrodinger_structural_featurizer.ipynb"
 
       - name: CodeCov
         uses: codecov/codecov-action@v1

@@ -1231,11 +1231,13 @@ class OEBaseModelingFeaturizer(ParallelBaseFeaturizer):
         oechem.OEAddMols(assembled_components, protein)
 
         if ligand:
-            logger.debug("Renaming ligand ...")
+            logger.debug("Renaming ligand and filtering radicals ...")
             for atom in ligand.GetAtoms():
                 oeresidue = oechem.OEAtomGetResidue(atom)
                 oeresidue.SetName("LIG")
                 oechem.OEAtomSetResidue(atom, oeresidue)
+                if atom.GetAtomicNum() == 0:
+                    ligand.DeleteAtom(atom)
 
             logger.debug("Adding ligand ...")
             oechem.OEAddMols(assembled_components, ligand)

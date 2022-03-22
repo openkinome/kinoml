@@ -184,7 +184,7 @@ class OEProteinStructureFeaturizer(OEBaseModelingFeaturizer, SingleProteinFeatur
         """
         from pathlib import Path
 
-        import MDAnalysis as mda
+        from ..modeling.MDAnalysisModeling import read_molecule
 
         structure = self._read_protein_structure(system.protein)
         if structure is None:
@@ -256,7 +256,7 @@ class OEProteinStructureFeaturizer(OEBaseModelingFeaturizer, SingleProteinFeatur
         )
 
         logging.debug("Generating new MDAnalysis universe ...")
-        structure = mda.Universe(file_path, in_memory=True)
+        structure = read_molecule(file_path)
 
         if not self.output_dir:
             logging.debug("Removing structure file ...")
