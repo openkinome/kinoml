@@ -404,6 +404,8 @@ class MostSimilarPDBLigandFeaturizer(SingleLigandProteinComplexFeaturizer):
         else:
             raise ValueError(f"Similarity metric '{self.similarity_metric}' unknown!")
 
+        logger.debug(f"Selected most similar PDB ligand: {pdb_id} {chain_id} {expo_id}.")
+
         return pdb_id, chain_id, expo_id
 
     @staticmethod
