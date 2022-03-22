@@ -141,8 +141,7 @@ def run_glide(
                 ]
             )
             shutil.move(
-                str(Path(".") / (Path(grid_input_file.name).stem + ".zip")),
-                grid_file_path
+                str(Path(".") / (Path(grid_input_file.name).stem + ".zip")), grid_file_path
             )
 
         if logger.getEffectiveLevel() != 10:  # remove grid logs etc.

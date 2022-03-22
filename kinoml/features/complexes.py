@@ -1354,7 +1354,9 @@ class SCHRODINGERComplexFeaturizer(SingleLigandProteinComplexFeaturizer):
                     mae_to_pdb(self.schrodinger, mae_file_path, prepared_structure_path)
                     shutil.move(
                         str(mae_file_path),
-                        str(prepared_structure_path.parent / f"{prepared_structure_path.stem}.mae")
+                        str(
+                            prepared_structure_path.parent / f"{prepared_structure_path.stem}.mae"
+                        ),
                     )  # move MAE file to actual cache, maybe needed for docking
                     break
         else:
