@@ -37,22 +37,22 @@ class LocalFileStorage:
 
     @staticmethod
     def rcsb_structure_pdb(pdb_id, directory=DIRECTORY):
-        file_path = directory / f"rcsb_{pdb_id}.pdb"
+        file_path = directory / f"rcsb_{pdb_id.upper()}.pdb"
         return file_path
 
     @staticmethod
     def rcsb_structure_cif(pdb_id, directory=DIRECTORY):
-        file_path = directory / f"rcsb_{pdb_id}.cif"
+        file_path = directory / f"rcsb_{pdb_id.upper()}.cif"
         return file_path
 
     @staticmethod
     def rcsb_ligand_sdf(pdb_id, chain_id, expo_id, altloc, directory=DIRECTORY):
-        file_path = directory / f"rcsb_{pdb_id}_{chain_id}_{expo_id}_{altloc}.sdf"
+        file_path = directory / f"rcsb_{pdb_id.upper()}_{chain_id}_{expo_id}_{altloc}.sdf"
         return file_path
 
     @staticmethod
     def rcsb_electron_density_mtz(pdb_id, directory=DIRECTORY):
-        file_path = directory / f"rcsb_{pdb_id}.mtz"
+        file_path = directory / f"rcsb_{pdb_id.upper()}.mtz"
         return file_path
 
     @staticmethod
