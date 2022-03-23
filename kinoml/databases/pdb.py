@@ -80,6 +80,7 @@ def download_pdb_structure(
     # check for structure in PDB format
     pdb_path = LocalFileStorage.rcsb_structure_pdb(pdb_id, directory)
     if not pdb_path.is_file():
+        logger.debug("Downloading PDB entry in PDB format ...")
         if FileDownloader.rcsb_structure_pdb(pdb_id, directory):
             return pdb_path
     else:
@@ -88,6 +89,7 @@ def download_pdb_structure(
     # check for structure in CIF format
     cif_path = LocalFileStorage.rcsb_structure_cif(pdb_id, directory)
     if not cif_path.is_file():
+        logger.debug("Downloading PDB entry in CIF format ...")
         if FileDownloader.rcsb_structure_cif(pdb_id, directory):
             return cif_path
     else:
@@ -171,6 +173,11 @@ def download_pdb_ligand(
     logger.debug("Extracting ligand with RDKit ...")
     try:
         pdb_mol = Chem.MolFromPDBFile(str(pdb_path), sanitize=False)
+        if pdb_mol is None:
+            logger.debug(
+                f"Could not read {pdb_path} with RDKit."
+            )
+            return False
         pdb_mol_chains = Chem.SplitMolByPDBChainId(pdb_mol)
         chain = pdb_mol_chains[chain_id]
         chain_residues = Chem.SplitMolByPDBResidues(chain)
