@@ -339,6 +339,8 @@
         </li>
         <li class="md-nav__item"><a href="#kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._pre_featurize" class="md-nav__link">_pre_featurize</a>
         </li>
+        <li class="md-nav__item"><a href="#kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._check_schrodinger" class="md-nav__link">_check_schrodinger</a>
+        </li>
         <li class="md-nav__item"><a href="#kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._featurize_one" class="md-nav__link">_featurize_one</a>
         </li>
         <li class="md-nav__item"><a href="#kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._post_featurize" class="md-nav__link">_post_featurize</a>
@@ -358,6 +360,26 @@
         <li class="md-nav__item"><a href="#kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._by_schrodinger_shape" class="md-nav__link">_by_schrodinger_shape</a>
         </li>
         <li class="md-nav__item"><a href="#kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._by_openeye_shape" class="md-nav__link">_by_openeye_shape</a>
+        </li></ul>
+            </nav>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.features.complexes.KLIFSConformationTemplatesFeaturizer" class="md-nav__link">KLIFSConformationTemplatesFeaturizer</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#kinoml.features.complexes.KLIFSConformationTemplatesFeaturizer._COMPATIBLE_PROTEIN_TYPES" class="md-nav__link">_COMPATIBLE_PROTEIN_TYPES</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.features.complexes.KLIFSConformationTemplatesFeaturizer._pre_featurize" class="md-nav__link">_pre_featurize</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.features.complexes.KLIFSConformationTemplatesFeaturizer._create_klifs_structure_db" class="md-nav__link">_create_klifs_structure_db</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.features.complexes.KLIFSConformationTemplatesFeaturizer._featurize_one" class="md-nav__link">_featurize_one</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.features.complexes.KLIFSConformationTemplatesFeaturizer._filter_structures" class="md-nav__link">_filter_structures</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.features.complexes.KLIFSConformationTemplatesFeaturizer._get_most_similar_klifs_ligand_entity" class="md-nav__link">_get_most_similar_klifs_ligand_entity</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.features.complexes.KLIFSConformationTemplatesFeaturizer._by_klifs_sequence" class="md-nav__link">_by_klifs_sequence</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.features.complexes.KLIFSConformationTemplatesFeaturizer._post_featurize" class="md-nav__link">_post_featurize</a>
         </li></ul>
             </nav>
         </li>
@@ -507,6 +529,11 @@ the OEDockingFeaturizer or SCHRODINGERDockingFeaturizer.</p>
 <dd><p>Check that SCHRODINGER variable exists.</p>
 </dd></dl>
 <dl class="method">
+<dt id="kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._check_schrodinger">
+<code class="sig-name descname">_check_schrodinger</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._check_schrodinger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check that SCHRODINGER variable exists.</p>
+</dd></dl>
+<dl class="method">
 <dt id="kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._featurize_one">
 <code class="sig-name descname">_featurize_one</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">system: ProteinLigandComplex</em><span class="sig-paren">)</span> → Union[ProteinLigandComplex, None]<a class="headerlink" href="#kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._featurize_one" title="Permalink to this definition">¶</a></dt>
 <dd><p>Find a PDB entry with a protein of the given UniProt ID and with the most similar
@@ -624,8 +651,8 @@ resolution of 99.9.</p>
 </dd></dl>
 <dl class="method">
 <dt id="kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._by_fingerprint">
-<em class="property">static </em><code class="sig-name descname">_by_fingerprint</code><span class="sig-paren">(</span><em class="sig-param">pdb_ligand_entities: pd.DataFrame</em>, <em class="sig-param">smiles: str</em><span class="sig-paren">)</span> → Tuple[str, str, str]<a class="headerlink" href="#kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._by_fingerprint" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the PDB ligand that is most similar to the given SMILES according to Morgan
+<em class="property">static </em><code class="sig-name descname">_by_fingerprint</code><span class="sig-paren">(</span><em class="sig-param">pdb_ligand_entities: pd.DataFrame</em>, <em class="sig-param">smiles: str</em>, <em class="sig-param">max_similarity_cutoff: float = 0.0</em><span class="sig-paren">)</span> → pd.DataFrame<a class="headerlink" href="#kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._by_fingerprint" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the PDB ligands that are most similar to the given SMILES according to Morgan
 Fingerprints.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -633,41 +660,50 @@ Fingerprints.</p>
 <li><p><strong>pdb_ligand_entities</strong> (<em>pd.DataFrame</em>) – The PDB ligand entities dataframe with columns named <cite>pdb_id</cite>, <cite>chain_id</cite>, <cite>expo_id</cite>
 and <cite>smiles</cite>.</p></li>
 <li><p><strong>smiles</strong> (<em>str</em>) – The SMILES representation of the molecule to search for similar PDB ligands.</p></li>
+<li><p><strong>max_similarity_cutoff</strong> (<em>float</em><em>, </em><em>default=0.0</em>) – The cutoff to use for selecting similar ligands based on the highest detected
+similarity. If the highest detected similarity is 0.87 and the <cite>max_similarity_cutoff</cite>
+is set to 0.1, all ligands will be returned with a similarity of 0.77 or higher.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The PDB, chain and expo ID of the most similar ligand.</p>
+<dd class="field-even"><p>The most similar ligands.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>tuple of str</p>
+<dd class="field-odd"><p>pd.DataFrame</p>
 </dd>
 </dl>
 </dd></dl>
 <dl class="method">
 <dt id="kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._by_mcs">
-<em class="property">static </em><code class="sig-name descname">_by_mcs</code><span class="sig-paren">(</span><em class="sig-param">pdb_ligand_entities: pd.DataFrame</em>, <em class="sig-param">smiles: str</em><span class="sig-paren">)</span> → Tuple[str, str, str]<a class="headerlink" href="#kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._by_mcs" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the PDB ligand that is most similar to the given SMILES according to Morgan
-Fingerprints.</p>
+<em class="property">static </em><code class="sig-name descname">_by_mcs</code><span class="sig-paren">(</span><em class="sig-param">pdb_ligand_entities: pd.DataFrame</em>, <em class="sig-param">smiles: str</em>, <em class="sig-param">max_bonds_cutoff: float = 0.0</em><span class="sig-paren">)</span> → pd.DataFrame<a class="headerlink" href="#kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._by_mcs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the PDB ligands that are most similar to the given SMILES according to the number of
+bonds in the maximum common substructures.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>pdb_ligand_entities</strong> (<em>pd.DataFrame</em>) – The PDB ligand entities dataframe with columns named <cite>pdb_id</cite>, <cite>chain_id</cite>, <cite>expo_id</cite>
 and <cite>smiles</cite>.</p></li>
 <li><p><strong>smiles</strong> (<em>str</em>) – The SMILES representation of the molecule to search for similar PDB ligands.</p></li>
+<li><p><strong>max_bonds_cutoff</strong> (<em>float</em><em>, </em><em>default=0.0</em>) – The cutoff to use for selecting similar ligands based on the highest detected number
+of MCS bonds and the possible maximum of MCS bonds. The possible maximum number is
+calculated from the number of bonds in the given <cite>smiles</cite>. If the possible maximum
+number is 35, the highest number of detected mcs bonds is 20 and the <cite>max_bonds_cutoff</cite>
+is 0.1, all ligands will be returned with a number of MCS bonds of 16.5
+(20 - (35 * 0.1)) or higher.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The PDB, chain and expo ID of the most similar ligand.</p>
+<dd class="field-even"><p>The most similar ligands.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>tuple of str</p>
+<dd class="field-odd"><p>pd.DataFrame</p>
 </dd>
 </dl>
 </dd></dl>
 <dl class="method">
 <dt id="kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._by_schrodinger_shape">
-<code class="sig-name descname">_by_schrodinger_shape</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">pdb_ligand_entities: pd.DataFrame</em>, <em class="sig-param">smiles: str</em><span class="sig-paren">)</span> → Tuple[str, str, str]<a class="headerlink" href="#kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._by_schrodinger_shape" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the PDB ligand that is most similar to the given SMILES according to SCHRODINGER
+<code class="sig-name descname">_by_schrodinger_shape</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">pdb_ligand_entities: pd.DataFrame</em>, <em class="sig-param">smiles: str</em>, <em class="sig-param">max_similarity_cutoff: float = 0.0</em><span class="sig-paren">)</span> → pd.DataFrame<a class="headerlink" href="#kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._by_schrodinger_shape" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the PDB ligands that are most similar to the given SMILES according to SCHRODINGER
 shape_screen.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -675,20 +711,23 @@ shape_screen.</p>
 <li><p><strong>pdb_ligand_entities</strong> (<em>pd.DataFrame</em>) – The PDB ligand entities dataframe with columns named <cite>pdb_id</cite>, <cite>chain_id</cite>, <cite>expo_id</cite>
 and <cite>smiles</cite>.</p></li>
 <li><p><strong>smiles</strong> (<em>str</em>) – The SMILES representation of the molecule to search for similar PDB ligands.</p></li>
+<li><p><strong>max_similarity_cutoff</strong> (<em>float</em><em>, </em><em>default=0.0</em>) – The cutoff to use for selecting similar ligands based on the highest detected
+similarity. If the highest detected similarity is 0.87 and the <cite>max_similarity_cutoff</cite>
+is set to 0.1, all ligands will be returned with a similarity of 0.77 or higher.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The PDB, chain and expo ID of the most similar ligand.</p>
+<dd class="field-even"><p>The most similar ligands.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>tuple of str</p>
+<dd class="field-odd"><p>pd.DataFrame</p>
 </dd>
 </dl>
 </dd></dl>
 <dl class="method">
 <dt id="kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._by_openeye_shape">
-<code class="sig-name descname">_by_openeye_shape</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">pdb_ligand_entities: pd.DataFrame</em>, <em class="sig-param">smiles: str</em><span class="sig-paren">)</span> → Tuple[str, str, str]<a class="headerlink" href="#kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._by_openeye_shape" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the PDB ligand that is most similar to the given SMILES according to OpenEye’s
+<code class="sig-name descname">_by_openeye_shape</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">pdb_ligand_entities: pd.DataFrame</em>, <em class="sig-param">smiles: str</em>, <em class="sig-param">max_similarity_cutoff: float = 0.0</em><span class="sig-paren">)</span> → pd.DataFrame<a class="headerlink" href="#kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._by_openeye_shape" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the PDB ligands that are most similar to the given SMILES according to OpenEye’s
 TanimotoCombo score.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -696,13 +735,159 @@ TanimotoCombo score.</p>
 <li><p><strong>pdb_ligand_entities</strong> (<em>pd.DataFrame</em>) – The PDB ligand entities dataframe with columns named <cite>pdb_id</cite>, <cite>chain_id</cite>, <cite>expo_id</cite>
 and <cite>smiles</cite>.</p></li>
 <li><p><strong>smiles</strong> (<em>str</em>) – The SMILES representation of the molecule to search for similar PDB ligands.</p></li>
+<li><p><strong>max_similarity_cutoff</strong> (<em>float</em><em>, </em><em>default=0.0</em>) – The cutoff to use for selecting similar ligands based on the highest detected
+similarity. If the highest detected similarity is 1.31 and the <cite>max_similarity_cutoff</cite>
+is set to 0.2, all ligands will be returned with a similarity of 1.11 or higher.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The PDB, chain and expo ID of the most similar ligand.</p>
+<dd class="field-even"><p>The most similar ligands.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>pd.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+</dd></dl>
+<dl class="class">
+<dt id="kinoml.features.complexes.KLIFSConformationTemplatesFeaturizer">
+<em class="property">class </em><code class="sig-prename descclassname">kinoml.features.complexes.</code><code class="sig-name descname">KLIFSConformationTemplatesFeaturizer</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.complexes.KLIFSConformationTemplatesFeaturizer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#kinoml.features.complexes.MostSimilarPDBLigandFeaturizer" title="kinoml.features.complexes.MostSimilarPDBLigandFeaturizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.features.complexes.MostSimilarPDBLigandFeaturizer</span></code></a></p>
+<p>Find suitable kinase templates for modeling a kinase:inhibitor complex in
+different KLIFS conformations.</p>
+<p>The protein component of each system must be a <cite>core.proteins.KLIFSKinase</cite>,
+and must be initialized with a <cite>uniprot_id</cite> or <cite>kinase_klifs_id</cite> parameter.</p>
+<p>The ligand component of each system must be a <cite>core.ligands.Ligand</cite> or a
+subclass thereof and give access to the molecular structure, e.g. via a
+SMILES.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>similarity_metric</strong> (<em>str</em><em>, </em><em>default="fingerprint"</em>) – The similarity metric to use to detect the structures with similar
+ligands [“fingerprint”, “mcs”, “openeye_shape”, “schrodinger_shape”].</p></li>
+<li><p><strong>cache_dir</strong> (<em>str</em><em>, </em><em>Path</em><em> or </em><em>None</em><em>, </em><em>default=None</em>) – Path to directory used for saving intermediate files. If None, default
+location provided by <cite>appdirs.user_cache_dir()</cite> will be used.</p></li>
+<li><p><strong>use_multiprocessing</strong> (<em>bool</em><em>, </em><em>default=True</em>) – If multiprocessing to use.</p></li>
+<li><p><strong>n_processes</strong> (<em>int</em><em> or </em><em>None</em><em>, </em><em>default=None</em>) – How many processes to use in case of multiprocessing. Defaults to
+number of available CPUs.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="attribute">
+<dt id="kinoml.features.complexes.KLIFSConformationTemplatesFeaturizer._COMPATIBLE_PROTEIN_TYPES">
+<code class="sig-name descname">_COMPATIBLE_PROTEIN_TYPES</code><a class="headerlink" href="#kinoml.features.complexes.KLIFSConformationTemplatesFeaturizer._COMPATIBLE_PROTEIN_TYPES" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="method">
+<dt id="kinoml.features.complexes.KLIFSConformationTemplatesFeaturizer._pre_featurize">
+<code class="sig-name descname">_pre_featurize</code><span class="sig-paren">(</span><em class="sig-param">self, systems: List[ProteinLigandComplex]</em><span class="sig-paren">)</span> → None<a class="headerlink" href="#kinoml.features.complexes.KLIFSConformationTemplatesFeaturizer._pre_featurize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check SCHRODINGER variable and fetch KLIFS data.</p>
+</dd></dl>
+<dl class="method">
+<dt id="kinoml.features.complexes.KLIFSConformationTemplatesFeaturizer._create_klifs_structure_db">
+<code class="sig-name descname">_create_klifs_structure_db</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.complexes.KLIFSConformationTemplatesFeaturizer._create_klifs_structure_db" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetch structure data from KLIFS.</p>
+</dd></dl>
+<dl class="method">
+<dt id="kinoml.features.complexes.KLIFSConformationTemplatesFeaturizer._featurize_one">
+<code class="sig-name descname">_featurize_one</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">system: ProteinLigandComplex</em><span class="sig-paren">)</span> → pd.DataFrame<a class="headerlink" href="#kinoml.features.complexes.KLIFSConformationTemplatesFeaturizer._featurize_one" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find PDB entries for different KLIFS conformations with a similar co-crystallized ligand
+and a similar pocket sequence.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>system</strong> (<a class="reference internal" href="../../core/systems/index.html#kinoml.core.systems.ProteinLigandComplex" title="kinoml.core.systems.ProteinLigandComplex"><em>ProteinLigandComplex</em></a>) – A system object holding a protein and a ligand component.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A dataframe with columns for <cite>dfg</cite>, <cite>ac_helix</cite>, <cite>pdb_id</cite>, <cite>chain_id</cite>, <cite>expo_id</cite>,
+<cite>ligand_similarity</cite> and <cite>sequence_similarity</cite>.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="method">
+<dt id="kinoml.features.complexes.KLIFSConformationTemplatesFeaturizer._filter_structures">
+<em class="property">static </em><code class="sig-name descname">_filter_structures</code><span class="sig-paren">(</span><em class="sig-param">structures: pd.DataFrame</em><span class="sig-paren">)</span> → pd.DataFrame<a class="headerlink" href="#kinoml.features.complexes.KLIFSConformationTemplatesFeaturizer._filter_structures" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filter KLIFS entries for the presence of exactly one orthosteric ligand and determined
+KLIFS conformation, and remove duplicates.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>structures</strong> (<em>DataFrame</em>) – The KLIFS entries to filter, need to contain the columns <cite>ligand.expo_id</cite>,
+<cite>structure.pdb_id</cite>, <cite>structure.dfg</cite>, <cite>structure.ac_helix</cite>, <cite>structure.qualityscore</cite>,
+<cite>structure.resolution</cite>, <cite>structure.chain</cite> and <cite>structure.alternate_model</cite>.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The filtered KLIFS entries.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="method">
+<dt id="kinoml.features.complexes.KLIFSConformationTemplatesFeaturizer._get_most_similar_klifs_ligand_entity">
+<code class="sig-name descname">_get_most_similar_klifs_ligand_entity</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">structures: pd.DataFrame</em>, <em class="sig-param">smiles: str</em>, <em class="sig-param">klifs_sequence: str</em><span class="sig-paren">)</span> → Tuple[str, str, str, str, str]<a class="headerlink" href="#kinoml.features.complexes.KLIFSConformationTemplatesFeaturizer._get_most_similar_klifs_ligand_entity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the KLIFS entry that is most similar to the given SMILES and KLIFS pocket sequence.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>structures</strong> (<em>pd.DataFrame</em>) – The KLIFS entries dataframe with columns named <cite>structure.pdb_id</cite>, <cite>structure.chain</cite>,
+<cite>structure.expo_id</cite>, <cite>smiles</cite> and <cite>structure.pocket</cite>.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The PDB ID, chain ID, expo ID, ligand similarity and pocket similarity of the KLIFS
+entry with the most similar ligand and KLIFS pocket sequence.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>tuple of str</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="method">
+<dt id="kinoml.features.complexes.KLIFSConformationTemplatesFeaturizer._by_klifs_sequence">
+<em class="property">static </em><code class="sig-name descname">_by_klifs_sequence</code><span class="sig-paren">(</span><em class="sig-param">klifs_structures: pd.DataFrame</em>, <em class="sig-param">reference_klifs_sequence: str</em>, <em class="sig-param">max_similarity_cutoff: float = 0.0</em><span class="sig-paren">)</span> → pd.DataFrame<a class="headerlink" href="#kinoml.features.complexes.KLIFSConformationTemplatesFeaturizer._by_klifs_sequence" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the KLIFS entries that are most similar to the given pocket sequence.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>reference_klifs_sequence</strong> (<em>str</em>) – The PDB ligand entities dataframe with a column named <cite>structure.pocket</cite>.</p></li>
+<li><p><strong>reference_klifs_sequence</strong> – The sequence for calculating the similarity.</p></li>
+<li><p><strong>max_similarity_cutoff</strong> (<em>float</em><em>, </em><em>default=0.0</em>) – The cutoff to use for selecting similar sequences based on the highest detected
+sequence similarity and the possible maximum of sequence similarity. The possible
+maximum sequence similarity is aligning the reference sequence to itself. If the
+possible maximum sequence similarity is 450, the highest detected sequence similarity
+is 320 and the <cite>max_similarity_cutoff</cite> is 0.1, all entries will be returned with a
+sequence similarity of 275 (320 - (450 * 0.1)) or higher.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The KLIFS entries with the most similar pocket sequences.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>pd.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="method">
+<dt id="kinoml.features.complexes.KLIFSConformationTemplatesFeaturizer._post_featurize">
+<code class="sig-name descname">_post_featurize</code><span class="sig-paren">(</span><em class="sig-param">self, systems: List[ProteinLigandComplex], features: List, keep: bool = True</em><span class="sig-paren">)</span> → List[ProteinLigandComplex]<a class="headerlink" href="#kinoml.features.complexes.KLIFSConformationTemplatesFeaturizer._post_featurize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run after featurizing all systems. Systems with a feature of None will be removed.
+You shouldn’t need to redefine this method</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>systems</strong> (<em>list of System</em>) – The systems being featurized</p></li>
+<li><p><strong>features</strong> (<em>list</em>) – The features returned by <code class="docutils literal notranslate"><span class="pre">self._featurize</span></code></p></li>
+<li><p><strong>keep</strong> (<em>bool</em><em>, </em><em>optional=True</em>) – Whether to store the current featurizer in the <code class="docutils literal notranslate"><span class="pre">system.featurizations</span></code>
+dictionary with its own key (<code class="docutils literal notranslate"><span class="pre">self.name</span></code>), in addition to <code class="docutils literal notranslate"><span class="pre">last</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>filtered_systems</strong> – The same systems as passed, but with <code class="docutils literal notranslate"><span class="pre">.featurizations</span></code> extended with
+the calculated features in two entries: the featurizer name and <code class="docutils literal notranslate"><span class="pre">last</span></code>.
+Systems with a feature of None will be removed.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>systems</p>
 </dd>
 </dl>
 </dd></dl>

@@ -444,11 +444,15 @@
 </li>
       <li><a href="api/kinoml/features/complexes/index.html#kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._by_fingerprint">_by_fingerprint() (kinoml.features.complexes.MostSimilarPDBLigandFeaturizer static method)</a>
 </li>
+      <li><a href="api/kinoml/features/complexes/index.html#kinoml.features.complexes.KLIFSConformationTemplatesFeaturizer._by_klifs_sequence">_by_klifs_sequence() (kinoml.features.complexes.KLIFSConformationTemplatesFeaturizer static method)</a>
+</li>
       <li><a href="api/kinoml/features/complexes/index.html#kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._by_mcs">_by_mcs() (kinoml.features.complexes.MostSimilarPDBLigandFeaturizer static method)</a>
 </li>
       <li><a href="api/kinoml/features/complexes/index.html#kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._by_openeye_shape">_by_openeye_shape() (kinoml.features.complexes.MostSimilarPDBLigandFeaturizer method)</a>
 </li>
       <li><a href="api/kinoml/features/complexes/index.html#kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._by_schrodinger_shape">_by_schrodinger_shape() (kinoml.features.complexes.MostSimilarPDBLigandFeaturizer method)</a>
+</li>
+      <li><a href="api/kinoml/features/complexes/index.html#kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._check_schrodinger">_check_schrodinger() (kinoml.features.complexes.MostSimilarPDBLigandFeaturizer method)</a>
 </li>
       <li><a href="api/kinoml/ml/lightning_modules/index.html#kinoml.ml.lightning_modules.ObservationModelModule._common_validation_test_epoch_end">_common_validation_test_epoch_end() (kinoml.ml.lightning_modules.ObservationModelModule method)</a>
 </li>
@@ -460,9 +464,11 @@
         <li><a href="api/kinoml/features/ligand/index.html#kinoml.features.ligand.SingleLigandFeaturizer._COMPATIBLE_LIGAND_TYPES">(kinoml.features.ligand.SingleLigandFeaturizer attribute)</a>
 </li>
       </ul></li>
-      <li><a href="api/kinoml/features/complexes/index.html#kinoml.features.complexes.SingleLigandProteinComplexFeaturizer._COMPATIBLE_PROTEIN_TYPES">_COMPATIBLE_PROTEIN_TYPES (kinoml.features.complexes.SingleLigandProteinComplexFeaturizer attribute)</a>
+      <li><a href="api/kinoml/features/complexes/index.html#kinoml.features.complexes.KLIFSConformationTemplatesFeaturizer._COMPATIBLE_PROTEIN_TYPES">_COMPATIBLE_PROTEIN_TYPES (kinoml.features.complexes.KLIFSConformationTemplatesFeaturizer attribute)</a>
 
       <ul>
+        <li><a href="api/kinoml/features/complexes/index.html#kinoml.features.complexes.SingleLigandProteinComplexFeaturizer._COMPATIBLE_PROTEIN_TYPES">(kinoml.features.complexes.SingleLigandProteinComplexFeaturizer attribute)</a>
+</li>
         <li><a href="api/kinoml/features/protein/index.html#kinoml.features.protein.SingleProteinFeaturizer._COMPATIBLE_PROTEIN_TYPES">(kinoml.features.protein.SingleProteinFeaturizer attribute)</a>
 </li>
       </ul></li>
@@ -471,6 +477,8 @@
       <li><a href="api/kinoml/features/ligand/index.html#kinoml.features.ligand.GraphLigandFeaturizer._connectivity_COO_format">_connectivity_COO_format() (kinoml.features.ligand.GraphLigandFeaturizer static method)</a>
 </li>
       <li><a href="api/kinoml/features/protein/index.html#kinoml.features.protein.AminoAcidCompositionFeaturizer._counter">_counter (kinoml.features.protein.AminoAcidCompositionFeaturizer attribute)</a>
+</li>
+      <li><a href="api/kinoml/features/complexes/index.html#kinoml.features.complexes.KLIFSConformationTemplatesFeaturizer._create_klifs_structure_db">_create_klifs_structure_db() (kinoml.features.complexes.KLIFSConformationTemplatesFeaturizer method)</a>
 </li>
       <li><a href="api/kinoml/features/core/index.html#kinoml.features.core.CallableFeaturizer._default_func">_default_func() (kinoml.features.core.CallableFeaturizer static method)</a>
 </li>
@@ -496,9 +504,11 @@
         <li><a href="api/kinoml/features/core/index.html#kinoml.features.core.TupleOfArrays._featurize">(kinoml.features.core.TupleOfArrays method)</a>
 </li>
       </ul></li>
-      <li><a href="api/kinoml/features/complexes/index.html#kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._featurize_one">_featurize_one() (kinoml.features.complexes.MostSimilarPDBLigandFeaturizer method)</a>
+      <li><a href="api/kinoml/features/complexes/index.html#kinoml.features.complexes.KLIFSConformationTemplatesFeaturizer._featurize_one">_featurize_one() (kinoml.features.complexes.KLIFSConformationTemplatesFeaturizer method)</a>
 
       <ul>
+        <li><a href="api/kinoml/features/complexes/index.html#kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._featurize_one">(kinoml.features.complexes.MostSimilarPDBLigandFeaturizer method)</a>
+</li>
         <li><a href="api/kinoml/features/complexes/index.html#kinoml.features.complexes.OEComplexFeaturizer._featurize_one">(kinoml.features.complexes.OEComplexFeaturizer method)</a>
 </li>
         <li><a href="api/kinoml/features/complexes/index.html#kinoml.features.complexes.OEDockingFeaturizer._featurize_one">(kinoml.features.complexes.OEDockingFeaturizer method)</a>
@@ -528,15 +538,19 @@
         <li><a href="api/kinoml/features/protein/index.html#kinoml.features.protein.OEProteinStructureFeaturizer._featurize_one">(kinoml.features.protein.OEProteinStructureFeaturizer method)</a>
 </li>
       </ul></li>
+      <li><a href="api/kinoml/features/complexes/index.html#kinoml.features.complexes.KLIFSConformationTemplatesFeaturizer._filter_structures">_filter_structures() (kinoml.features.complexes.KLIFSConformationTemplatesFeaturizer static method)</a>
+</li>
       <li><a href="api/kinoml/utils/index.html#kinoml.utils.FromDistpatcherMixin._from_dispatcher">_from_dispatcher() (kinoml.utils.FromDistpatcherMixin class method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/kinoml/features/core/index.html#kinoml.features.core.PadFeaturizer._get_array">_get_array() (kinoml.features.core.PadFeaturizer method)</a>
 </li>
       <li><a href="api/kinoml/features/core/index.html#kinoml.features.core.OEBaseModelingFeaturizer._get_components">_get_components() (kinoml.features.core.OEBaseModelingFeaturizer static method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/kinoml/features/core/index.html#kinoml.features.core.OEBaseModelingFeaturizer._get_design_unit">_get_design_unit() (kinoml.features.core.OEBaseModelingFeaturizer method)</a>
+</li>
+      <li><a href="api/kinoml/features/complexes/index.html#kinoml.features.complexes.KLIFSConformationTemplatesFeaturizer._get_most_similar_klifs_ligand_entity">_get_most_similar_klifs_ligand_entity() (kinoml.features.complexes.KLIFSConformationTemplatesFeaturizer method)</a>
 </li>
       <li><a href="api/kinoml/features/complexes/index.html#kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._get_most_similar_pdb_ligand_entity">_get_most_similar_pdb_ligand_entity() (kinoml.features.complexes.MostSimilarPDBLigandFeaturizer method)</a>
 </li>
@@ -617,6 +631,8 @@
       <ul>
         <li><a href="api/kinoml/datasets/core/index.html#kinoml.datasets.core.MultiDatasetProvider._post_featurize">(kinoml.datasets.core.MultiDatasetProvider method)</a>
 </li>
+        <li><a href="api/kinoml/features/complexes/index.html#kinoml.features.complexes.KLIFSConformationTemplatesFeaturizer._post_featurize">(kinoml.features.complexes.KLIFSConformationTemplatesFeaturizer method)</a>
+</li>
         <li><a href="api/kinoml/features/complexes/index.html#kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._post_featurize">(kinoml.features.complexes.MostSimilarPDBLigandFeaturizer method)</a>
 </li>
         <li><a href="api/kinoml/features/core/index.html#kinoml.features.core.BaseFeaturizer._post_featurize">(kinoml.features.core.BaseFeaturizer method)</a>
@@ -638,9 +654,11 @@
       </ul></li>
       <li><a href="api/kinoml/features/complexes/index.html#kinoml.features.complexes.SCHRODINGERComplexFeaturizer._postprocess_structure">_postprocess_structure() (kinoml.features.complexes.SCHRODINGERComplexFeaturizer static method)</a>
 </li>
-      <li><a href="api/kinoml/features/complexes/index.html#kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._pre_featurize">_pre_featurize() (kinoml.features.complexes.MostSimilarPDBLigandFeaturizer method)</a>
+      <li><a href="api/kinoml/features/complexes/index.html#kinoml.features.complexes.KLIFSConformationTemplatesFeaturizer._pre_featurize">_pre_featurize() (kinoml.features.complexes.KLIFSConformationTemplatesFeaturizer method)</a>
 
       <ul>
+        <li><a href="api/kinoml/features/complexes/index.html#kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._pre_featurize">(kinoml.features.complexes.MostSimilarPDBLigandFeaturizer method)</a>
+</li>
         <li><a href="api/kinoml/features/complexes/index.html#kinoml.features.complexes.SCHRODINGERComplexFeaturizer._pre_featurize">(kinoml.features.complexes.SCHRODINGERComplexFeaturizer method)</a>
 </li>
         <li><a href="api/kinoml/features/core/index.html#kinoml.features.core.BaseFeaturizer._pre_featurize">(kinoml.features.core.BaseFeaturizer method)</a>
@@ -1220,10 +1238,10 @@
 </li>
       <li><a href="api/kinoml/datasets/torch_geometric_datasets/index.html#module-kinoml.datasets.torch_geometric_datasets">kinoml.datasets.torch_geometric_datasets (module)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/kinoml/docking/index.html#module-kinoml.docking">kinoml.docking (module)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/kinoml/docking/OEDocking/index.html#module-kinoml.docking.OEDocking">kinoml.docking.OEDocking (module)</a>
 </li>
       <li><a href="api/kinoml/docking/SCHRODINGERDocking/index.html#module-kinoml.docking.SCHRODINGERDocking">kinoml.docking.SCHRODINGERDocking (module)</a>
@@ -1275,6 +1293,8 @@
       <li><a href="api/kinoml/utils/index.html#kinoml.utils.LocalFileStorage.klifs_ligand_mol2">klifs_ligand_mol2() (kinoml.utils.LocalFileStorage static method)</a>
 </li>
       <li><a href="api/kinoml/utils/index.html#kinoml.utils.LocalFileStorage.klifs_structure_db">klifs_structure_db() (kinoml.utils.LocalFileStorage static method)</a>
+</li>
+      <li><a href="api/kinoml/features/complexes/index.html#kinoml.features.complexes.KLIFSConformationTemplatesFeaturizer">KLIFSConformationTemplatesFeaturizer (class in kinoml.features.complexes)</a>
 </li>
       <li><a href="api/kinoml/core/proteins/index.html#kinoml.core.proteins.KLIFSKinase">KLIFSKinase (class in kinoml.core.proteins)</a>
 </li>
