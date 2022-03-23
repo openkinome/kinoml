@@ -174,9 +174,7 @@ def download_pdb_ligand(
     try:
         pdb_mol = Chem.MolFromPDBFile(str(pdb_path), sanitize=False)
         if pdb_mol is None:
-            logger.debug(
-                f"Could not read {pdb_path} with RDKit."
-            )
+            logger.debug(f"Could not read {pdb_path} with RDKit.")
             return False
         pdb_mol_chains = Chem.SplitMolByPDBChainId(pdb_mol)
         chain = pdb_mol_chains[chain_id]

@@ -540,8 +540,9 @@ class MostSimilarPDBLigandFeaturizer(SingleLigandProteinComplexFeaturizer):
         logger.debug("Selecting most similar ligands ...")
         max_mcs_bonds = pdb_ligand_entities.iloc[0]["ligand_similarity"]
         pdb_ligand_entities = pdb_ligand_entities[
-            pdb_ligand_entities["ligand_similarity"] >= max_mcs_bonds - (reference_molecule.GetNumBonds() * max_bonds_cutoff)
-            ]
+            pdb_ligand_entities["ligand_similarity"]
+            >= max_mcs_bonds - (reference_molecule.GetNumBonds() * max_bonds_cutoff)
+        ]
 
         return pdb_ligand_entities
 
@@ -635,7 +636,7 @@ class MostSimilarPDBLigandFeaturizer(SingleLigandProteinComplexFeaturizer):
         max_similarity = pdb_ligand_entities.iloc[0]["ligand_similarity"]
         pdb_ligand_entities = pdb_ligand_entities[
             pdb_ligand_entities["ligand_similarity"] >= max_similarity - max_similarity_cutoff
-            ]
+        ]
 
         return pdb_ligand_entities
 
@@ -720,7 +721,7 @@ class MostSimilarPDBLigandFeaturizer(SingleLigandProteinComplexFeaturizer):
         max_similarity = pdb_ligand_entities.iloc[0]["ligand_similarity"]
         pdb_ligand_entities = pdb_ligand_entities[
             pdb_ligand_entities["ligand_similarity"] >= max_similarity - max_similarity_cutoff
-            ]
+        ]
 
         return pdb_ligand_entities
 
@@ -751,6 +752,7 @@ class KLIFSConformationTemplatesFeaturizer(MostSimilarPDBLigandFeaturizer):
         How many processes to use in case of multiprocessing. Defaults to
         number of available CPUs.
     """
+
     import pandas as pd
 
     _COMPATIBLE_PROTEIN_TYPES = (KLIFSKinase,)
@@ -811,9 +813,9 @@ class KLIFSConformationTemplatesFeaturizer(MostSimilarPDBLigandFeaturizer):
         klifs_structure_db = self._filter_structures(klifs_structure_db)
 
         logger.debug("Searching similar ligand and kinase for KLIFS conformations ...")
-        conformations = klifs_structure_db.groupby(
-            ["structure.dfg", "structure.ac_helix"]
-        ).head(1)[["structure.dfg", "structure.ac_helix"]]
+        conformations = klifs_structure_db.groupby(["structure.dfg", "structure.ac_helix"]).head(
+            1
+        )[["structure.dfg", "structure.ac_helix"]]
         conformation_templates = []
         for i, conformation in conformations.iterrows():
             logger.debug(
@@ -821,24 +823,31 @@ class KLIFSConformationTemplatesFeaturizer(MostSimilarPDBLigandFeaturizer):
                 f"aC helix {conformation['structure.ac_helix']}"
             )
             possible_templates = klifs_structure_db[
-                (klifs_structure_db["structure.dfg"] == conformation["structure.dfg"]) &
-                (klifs_structure_db["structure.ac_helix"] == conformation["structure.ac_helix"])
-                ]
-            pdb_id, chain_id, expo_id, ligand_similarity, pocket_similarity = \
-                self._get_most_similar_klifs_ligand_entity(
-                    possible_templates,
-                    system.ligand.molecule.to_smiles(explicit_hydrogens=False),
-                    system.protein.kinase_klifs_sequence
-                )
-            conformation_templates.append([
-                conformation["structure.dfg"],
-                conformation["structure.ac_helix"],
+                (klifs_structure_db["structure.dfg"] == conformation["structure.dfg"])
+                & (klifs_structure_db["structure.ac_helix"] == conformation["structure.ac_helix"])
+            ]
+            (
                 pdb_id,
                 chain_id,
                 expo_id,
                 ligand_similarity,
                 pocket_similarity,
-            ])
+            ) = self._get_most_similar_klifs_ligand_entity(
+                possible_templates,
+                system.ligand.molecule.to_smiles(explicit_hydrogens=False),
+                system.protein.kinase_klifs_sequence,
+            )
+            conformation_templates.append(
+                [
+                    conformation["structure.dfg"],
+                    conformation["structure.ac_helix"],
+                    pdb_id,
+                    chain_id,
+                    expo_id,
+                    ligand_similarity,
+                    pocket_similarity,
+                ]
+            )
 
         logger.debug("Merging results into dataframe ...")
         conformation_templates = pd.DataFrame(
@@ -850,8 +859,8 @@ class KLIFSConformationTemplatesFeaturizer(MostSimilarPDBLigandFeaturizer):
                 "chain_id",
                 "expo_id",
                 "ligand_similarity",
-                "pocket_similarity"
-            ]
+                "pocket_similarity",
+            ],
         )
 
         return conformation_templates
@@ -875,16 +884,13 @@ class KLIFSConformationTemplatesFeaturizer(MostSimilarPDBLigandFeaturizer):
             The filtered KLIFS entries.
         """
         logger.debug("Filtering KLIFS entries for ligands and conformations ...")
-        structures = structures[
-            structures["ligand.expo_id"] != "-"
-            ]  # orthosteric ligand
+        structures = structures[structures["ligand.expo_id"] != "-"]  # orthosteric ligand
         structures = structures.groupby("structure.pdb_id").filter(
             lambda x: len(set(x["ligand.expo_id"])) == 1
         )  # single orthosteric ligand
         structures = structures[
-            (structures["structure.dfg"] != "na") &
-            (structures["structure.ac_helix"] != "na")
-            ]  # no missing kinase conformations
+            (structures["structure.dfg"] != "na") & (structures["structure.ac_helix"] != "na")
+        ]  # no missing kinase conformations
 
         logger.debug("Sorting and selecting highest quality representatives ...")
         structures = structures.sort_values(
@@ -901,7 +907,10 @@ class KLIFSConformationTemplatesFeaturizer(MostSimilarPDBLigandFeaturizer):
         return structures
 
     def _get_most_similar_klifs_ligand_entity(
-        self, structures: pd.DataFrame, smiles: str, klifs_sequence: str,
+        self,
+        structures: pd.DataFrame,
+        smiles: str,
+        klifs_sequence: str,
     ) -> Tuple[str, str, str, str, str]:
         """
         Get the KLIFS entry that is most similar to the given SMILES and KLIFS pocket sequence.
@@ -919,11 +928,13 @@ class KLIFSConformationTemplatesFeaturizer(MostSimilarPDBLigandFeaturizer):
             entry with the most similar ligand and KLIFS pocket sequence.
         """
         logger.debug("Reformatting dataframe ...")
-        structures = structures.rename(columns={
-            "structure.pdb_id": "pdb_id",
-            "structure.chain": "chain_id",
-            "ligand.expo_id": "expo_id",
-        })
+        structures = structures.rename(
+            columns={
+                "structure.pdb_id": "pdb_id",
+                "structure.chain": "chain_id",
+                "ligand.expo_id": "expo_id",
+            }
+        )
         structures = structures[structures["smiles"].notna()]
 
         if self.similarity_metric == "fingerprint":
@@ -949,7 +960,7 @@ class KLIFSConformationTemplatesFeaturizer(MostSimilarPDBLigandFeaturizer):
         filtered_structures.sort_values(
             by=["structure.qualityscore", "structure.resolution"],
             inplace=True,
-            ascending=[False, True]
+            ascending=[False, True],
         )
 
         klifs_structure = filtered_structures.iloc[0]
@@ -964,9 +975,9 @@ class KLIFSConformationTemplatesFeaturizer(MostSimilarPDBLigandFeaturizer):
 
     @staticmethod
     def _by_klifs_sequence(
-            klifs_structures: pd.DataFrame,
-            reference_klifs_sequence: str,
-            max_similarity_cutoff: float = 0.0,
+        klifs_structures: pd.DataFrame,
+        reference_klifs_sequence: str,
+        max_similarity_cutoff: float = 0.0,
     ) -> pd.DataFrame:
         """
         Get the KLIFS entries that are most similar to the given pocket sequence.
@@ -1008,16 +1019,17 @@ class KLIFSConformationTemplatesFeaturizer(MostSimilarPDBLigandFeaturizer):
             reference_klifs_sequence, reference_klifs_sequence
         )
         klifs_structures = klifs_structures[
-            klifs_structures["pocket_similarity"] >= max_similarity - (optimal_similarity * max_similarity_cutoff)
-            ]
+            klifs_structures["pocket_similarity"]
+            >= max_similarity - (optimal_similarity * max_similarity_cutoff)
+        ]
 
         return klifs_structures
 
     def _post_featurize(
-            self,
-            systems: List[ProteinLigandComplex],
-            features: List,
-            keep: bool = True,
+        self,
+        systems: List[ProteinLigandComplex],
+        features: List,
+        keep: bool = True,
     ) -> List[ProteinLigandComplex]:
         """
         Run after featurizing all systems. Systems with a feature of None will be removed.
