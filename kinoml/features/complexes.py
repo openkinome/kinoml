@@ -97,9 +97,12 @@ class MostSimilarPDBLigandFeaturizer(SingleLigandProteinComplexFeaturizer):
         self.cache_dir.mkdir(parents=True, exist_ok=True)
 
     def _pre_featurize(self, systems: List[ProteinLigandComplex]) -> None:
-        """
-        Check that SCHRODINGER variable exists.
-        """
+        """Check that SCHRODINGER variable exists."""
+        self._check_schrodinger()
+        return
+
+    def _check_schrodinger(self):
+        """Check that SCHRODINGER variable exists."""
         import os
 
         if self.similarity_metric == "schrodinger_shape":
@@ -389,29 +392,37 @@ class MostSimilarPDBLigandFeaturizer(SingleLigandProteinComplexFeaturizer):
 
         if self.similarity_metric == "fingerprint":
             logger.debug("Retrieving most similar ligand entity by fingerprint ...")
-            pdb_id, chain_id, expo_id = self._by_fingerprint(pdb_ligand_entities, smiles)
+            pdb_ligand_entities = self._by_fingerprint(pdb_ligand_entities, smiles)
         elif self.similarity_metric == "mcs":
             logger.debug(
                 "Retrieving most similar ligand entity by maximum common substructure ..."
             )
-            pdb_id, chain_id, expo_id = self._by_mcs(pdb_ligand_entities, smiles)
+            pdb_ligand_entities = self._by_mcs(pdb_ligand_entities, smiles)
         elif self.similarity_metric == "openeye_shape":
             logger.debug("Retrieving most similar ligand entity by OpenEye shape ...")
-            pdb_id, chain_id, expo_id = self._by_openeye_shape(pdb_ligand_entities, smiles)
+            pdb_ligand_entities = self._by_openeye_shape(pdb_ligand_entities, smiles)
         elif self.similarity_metric == "schrodinger_shape":
             logger.debug("Retrieving most similar ligand entity by SCHRODINGER shape ...")
-            pdb_id, chain_id, expo_id = self._by_schrodinger_shape(pdb_ligand_entities, smiles)
+            pdb_ligand_entities = self._by_schrodinger_shape(pdb_ligand_entities, smiles)
         else:
             raise ValueError(f"Similarity metric '{self.similarity_metric}' unknown!")
 
+        pdb_ligand_entity = pdb_ligand_entities.iloc[0]
+        pdb_id = pdb_ligand_entity["pdb_id"]
+        chain_id = pdb_ligand_entity["chain_id"]
+        expo_id = pdb_ligand_entity["expo_id"]
         logger.debug(f"Selected most similar PDB ligand: {pdb_id} {chain_id} {expo_id}.")
 
         return pdb_id, chain_id, expo_id
 
     @staticmethod
-    def _by_fingerprint(pdb_ligand_entities: pd.DataFrame, smiles: str) -> Tuple[str, str, str]:
+    def _by_fingerprint(
+        pdb_ligand_entities: pd.DataFrame,
+        smiles: str,
+        max_similarity_cutoff: float = 0.0,
+    ) -> pd.DataFrame:
         """
-        Get the PDB ligand that is most similar to the given SMILES according to Morgan
+        Get the PDB ligands that are most similar to the given SMILES according to Morgan
         Fingerprints.
 
         Parameters
@@ -421,11 +432,15 @@ class MostSimilarPDBLigandFeaturizer(SingleLigandProteinComplexFeaturizer):
             and `smiles`.
         smiles: str
             The SMILES representation of the molecule to search for similar PDB ligands.
+        max_similarity_cutoff: float, default=0.0
+            The cutoff to use for selecting similar ligands based on the highest detected
+            similarity. If the highest detected similarity is 0.87 and the `max_similarity_cutoff`
+            is set to 0.1, all ligands will be returned with a similarity of 0.77 or higher.
 
         Returns
         -------
-        : tuple of str
-            The PDB, chain and expo ID of the most similar ligand.
+        : pd.DataFrame
+            The most similar ligands.
         """
         import pandas as pd
 
@@ -450,27 +465,31 @@ class MostSimilarPDBLigandFeaturizer(SingleLigandProteinComplexFeaturizer):
         ]
 
         logger.debug("Calculating fingerprint similarity ...")
-        pdb_ligand_entities["fingerprint_similarity"] = [
+        pdb_ligand_entities["ligand_similarity"] = [
             DataStructs.DiceSimilarity(reference_fingerprint, fingerprint)
             for fingerprint in pdb_ligand_entities["rdkit_fingerprint"]
         ]
 
-        pdb_ligand_entities.sort_values(by="fingerprint_similarity", inplace=True, ascending=False)
-        logger.debug(f"Fingerprint similarites:\n{pdb_ligand_entities}")
+        pdb_ligand_entities.sort_values(by="ligand_similarity", inplace=True, ascending=False)
+        logger.debug(f"Fingerprint similarities:\n{pdb_ligand_entities}")
 
-        picked_ligand_entity = pdb_ligand_entities.iloc[0]
+        logger.debug("Selecting most similar ligands ...")
+        max_similarity = pdb_ligand_entities.iloc[0]["ligand_similarity"]
+        pdb_ligand_entities = pdb_ligand_entities[
+            pdb_ligand_entities["ligand_similarity"] >= max_similarity - max_similarity_cutoff
+        ]
 
-        return (
-            picked_ligand_entity["pdb_id"],
-            picked_ligand_entity["chain_id"],
-            picked_ligand_entity["expo_id"],
-        )
+        return pdb_ligand_entities
 
     @staticmethod
-    def _by_mcs(pdb_ligand_entities: pd.DataFrame, smiles: str) -> Tuple[str, str, str]:
+    def _by_mcs(
+        pdb_ligand_entities: pd.DataFrame,
+        smiles: str,
+        max_bonds_cutoff: float = 0.0,
+    ) -> pd.DataFrame:
         """
-        Get the PDB ligand that is most similar to the given SMILES according to Morgan
-        Fingerprints.
+        Get the PDB ligands that are most similar to the given SMILES according to the number of
+        bonds in the maximum common substructures.
 
         Parameters
         ----------
@@ -479,11 +498,18 @@ class MostSimilarPDBLigandFeaturizer(SingleLigandProteinComplexFeaturizer):
             and `smiles`.
         smiles: str
             The SMILES representation of the molecule to search for similar PDB ligands.
+        max_bonds_cutoff: float, default=0.0
+            The cutoff to use for selecting similar ligands based on the highest detected number
+            of MCS bonds and the possible maximum of MCS bonds. The possible maximum number is
+            calculated from the number of bonds in the given `smiles`. If the possible maximum
+            number is 35, the highest number of detected mcs bonds is 20 and the `max_bonds_cutoff`
+            is 0.1, all ligands will be returned with a number of MCS bonds of 16.5
+            (20 - (35 * 0.1)) or higher.
 
         Returns
         -------
-        : tuple of str
-            The PDB, chain and expo ID of the most similar ligand.
+        : pd.DataFrame
+            The most similar ligands.
         """
         from rdkit import Chem, RDLogger
         from rdkit.Chem import rdFMCS
@@ -506,24 +532,27 @@ class MostSimilarPDBLigandFeaturizer(SingleLigandProteinComplexFeaturizer):
             ).numBonds
             for pdb_ligand_molecule in pdb_ligand_entities["rdkit_molecules"]
         ]
-        pdb_ligand_entities["mcs_bonds"] = mcs_bonds
+        pdb_ligand_entities["ligand_similarity"] = mcs_bonds
 
-        pdb_ligand_entities.sort_values(by="mcs_bonds", inplace=True, ascending=False)
+        pdb_ligand_entities.sort_values(by="ligand_similarity", inplace=True, ascending=False)
         logger.debug(f"MCS bonds:\n{pdb_ligand_entities}")
 
-        picked_ligand_entity = pdb_ligand_entities.iloc[0]
+        logger.debug("Selecting most similar ligands ...")
+        max_mcs_bonds = pdb_ligand_entities.iloc[0]["ligand_similarity"]
+        pdb_ligand_entities = pdb_ligand_entities[
+            pdb_ligand_entities["ligand_similarity"] >= max_mcs_bonds - (reference_molecule.GetNumBonds() * max_bonds_cutoff)
+            ]
 
-        return (
-            picked_ligand_entity["pdb_id"],
-            picked_ligand_entity["chain_id"],
-            picked_ligand_entity["expo_id"],
-        )
+        return pdb_ligand_entities
 
     def _by_schrodinger_shape(
-        self, pdb_ligand_entities: pd.DataFrame, smiles: str
-    ) -> Tuple[str, str, str]:
+        self,
+        pdb_ligand_entities: pd.DataFrame,
+        smiles: str,
+        max_similarity_cutoff: float = 0.0,
+    ) -> pd.DataFrame:
         """
-        Get the PDB ligand that is most similar to the given SMILES according to SCHRODINGER
+        Get the PDB ligands that are most similar to the given SMILES according to SCHRODINGER
         shape_screen.
 
         Parameters
@@ -533,14 +562,19 @@ class MostSimilarPDBLigandFeaturizer(SingleLigandProteinComplexFeaturizer):
             and `smiles`.
         smiles: str
             The SMILES representation of the molecule to search for similar PDB ligands.
+        max_similarity_cutoff: float, default=0.0
+            The cutoff to use for selecting similar ligands based on the highest detected
+            similarity. If the highest detected similarity is 0.87 and the `max_similarity_cutoff`
+            is set to 0.1, all ligands will be returned with a similarity of 0.77 or higher.
 
         Returns
         -------
-        : tuple of str
-            The PDB, chain and expo ID of the most similar ligand.
+        : pd.DataFrame
+            The most similar ligands.
         """
         from tempfile import NamedTemporaryFile
 
+        import pandas as pd
         from rdkit import Chem
         from rdkit.Chem import AllChem
 
@@ -584,25 +618,35 @@ class MostSimilarPDBLigandFeaturizer(SingleLigandProteinComplexFeaturizer):
                 output_sdf_path=result_sdf_path.name,
                 flexible=True,
                 thorough_sampling=True,
-                keep_best_match_only=True,
+                keep_best_match_only=False,
             )
 
-            logger.debug("Getting best query ...")
-            mol = next(Chem.SDMolSupplier(str(result_sdf_path.name), removeHs=False))
-            best_query_index = int(mol.GetProp("i_phase_Shape_Query")) - 1
-            picked_ligand_entity = queries[best_query_index]
+            logger.debug("Getting similarity scores ...")
+            for mol in Chem.SDMolSupplier(str(result_sdf_path.name), removeHs=False):
+                shape_similarity = float(mol.GetProp("r_phase_Shape_Sim"))
+                query_index = int(mol.GetProp("i_phase_Shape_Query")) - 1
+                queries[query_index]["ligand_similarity"] = shape_similarity
 
-        return (
-            picked_ligand_entity["pdb_id"],
-            picked_ligand_entity["chain_id"],
-            picked_ligand_entity["expo_id"],
-        )
+        pdb_ligand_entities = pd.concat(queries, axis=1).T
+        pdb_ligand_entities.sort_values(by="ligand_similarity", inplace=True, ascending=False)
+        logger.debug(f"Shape similarities:\n{pdb_ligand_entities}")
+
+        logger.debug("Selecting most similar ligands ...")
+        max_similarity = pdb_ligand_entities.iloc[0]["ligand_similarity"]
+        pdb_ligand_entities = pdb_ligand_entities[
+            pdb_ligand_entities["ligand_similarity"] >= max_similarity - max_similarity_cutoff
+            ]
+
+        return pdb_ligand_entities
 
     def _by_openeye_shape(
-        self, pdb_ligand_entities: pd.DataFrame, smiles: str
-    ) -> Tuple[str, str, str]:
+        self,
+        pdb_ligand_entities: pd.DataFrame,
+        smiles: str,
+        max_similarity_cutoff: float = 0.0,
+    ) -> pd.DataFrame:
         """
-        Get the PDB ligand that is most similar to the given SMILES according to OpenEye's
+        Get the PDB ligands that are most similar to the given SMILES according to OpenEye's
         TanimotoCombo score.
 
         Parameters
@@ -612,12 +656,18 @@ class MostSimilarPDBLigandFeaturizer(SingleLigandProteinComplexFeaturizer):
             and `smiles`.
         smiles: str
             The SMILES representation of the molecule to search for similar PDB ligands.
+        max_similarity_cutoff: float, default=0.0
+            The cutoff to use for selecting similar ligands based on the highest detected
+            similarity. If the highest detected similarity is 1.31 and the `max_similarity_cutoff`
+            is set to 0.2, all ligands will be returned with a similarity of 1.11 or higher.
 
         Returns
         -------
-        : tuple of str
-            The PDB, chain and expo ID of the most similar ligand.
+        : pd.DataFrame
+            The most similar ligands.
         """
+        import pandas as pd
+
         from ..databases.pdb import download_pdb_ligand
         from ..modeling.OEModeling import (
             read_molecules,
@@ -643,7 +693,9 @@ class MostSimilarPDBLigandFeaturizer(SingleLigandProteinComplexFeaturizer):
         pdb_ligand_molecules = [read_molecules(query["path"])[0] for query in queries]
 
         logger.debug("Generating reasonable conformations of ligand of interest ...")
-        conformations_ensemble = generate_reasonable_conformations(read_smiles(smiles))
+        conformations_ensemble = generate_reasonable_conformations(
+            read_smiles(smiles), pKa_norm=False
+        )
 
         logger.debug("Overlaying molecules ...")
         overlay_scores = []
@@ -653,14 +705,351 @@ class MostSimilarPDBLigandFeaturizer(SingleLigandProteinComplexFeaturizer):
                 for i, pdb_ligand_molecule in enumerate(pdb_ligand_molecules)
             ]
 
-        overlay_scores = sorted(overlay_scores, key=lambda x: x[1], reverse=True)
-        picked_ligand_entity = queries[overlay_scores[0][0]]
+        logger.debug("Storing scores ...")
+        for i, query in enumerate(queries):
+            shape_similarity = max(
+                [shape_similarity for j, shape_similarity in overlay_scores if i == j]
+            )
+            query["ligand_similarity"] = shape_similarity
 
-        return (
-            picked_ligand_entity["pdb_id"],
-            picked_ligand_entity["chain_id"],
-            picked_ligand_entity["expo_id"],
+        pdb_ligand_entities = pd.concat(queries, axis=1).T
+        pdb_ligand_entities.sort_values(by="ligand_similarity", inplace=True, ascending=False)
+        logger.debug(f"Shape similarities:\n{pdb_ligand_entities}")
+
+        logger.debug("Selecting most similar ligands ...")
+        max_similarity = pdb_ligand_entities.iloc[0]["ligand_similarity"]
+        pdb_ligand_entities = pdb_ligand_entities[
+            pdb_ligand_entities["ligand_similarity"] >= max_similarity - max_similarity_cutoff
+            ]
+
+        return pdb_ligand_entities
+
+
+class KLIFSConformationTemplatesFeaturizer(MostSimilarPDBLigandFeaturizer):
+    """
+    Find suitable kinase templates for modeling a kinase:inhibitor complex in
+    different KLIFS conformations.
+
+    The protein component of each system must be a `core.proteins.KLIFSKinase`,
+    and must be initialized with a `uniprot_id` or `kinase_klifs_id` parameter.
+
+    The ligand component of each system must be a `core.ligands.Ligand` or a
+    subclass thereof and give access to the molecular structure, e.g. via a
+    SMILES.
+
+    Parameters
+    ----------
+    similarity_metric: str, default="fingerprint"
+        The similarity metric to use to detect the structures with similar
+        ligands ["fingerprint", "mcs", "openeye_shape", "schrodinger_shape"].
+    cache_dir: str, Path or None, default=None
+        Path to directory used for saving intermediate files. If None, default
+        location provided by `appdirs.user_cache_dir()` will be used.
+    use_multiprocessing : bool, default=True
+        If multiprocessing to use.
+    n_processes : int or None, default=None
+        How many processes to use in case of multiprocessing. Defaults to
+        number of available CPUs.
+    """
+    import pandas as pd
+
+    _COMPATIBLE_PROTEIN_TYPES = (KLIFSKinase,)
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    def _pre_featurize(self, systems: List[ProteinLigandComplex]) -> None:
+        """Check SCHRODINGER variable and fetch KLIFS data."""
+        self._check_schrodinger()
+        self._create_klifs_structure_db()
+        return
+
+    def _create_klifs_structure_db(self):
+        """Fetch structure data from KLIFS."""
+        from ..databases.pdb import smiles_from_pdb
+        from ..utils import LocalFileStorage
+
+        from opencadd.databases.klifs import setup_remote
+
+        logger.debug("Fetching all structures from KLIFS ...")
+        remote = setup_remote()
+        structures = remote.structures.all_structures()
+
+        logger.debug("Getting SMILES of co-crystallized ligands ...")
+        smiles_dict = smiles_from_pdb(structures["ligand.expo_id"])
+        structures["smiles"] = structures["ligand.expo_id"].map(smiles_dict)
+
+        logger.debug("Saving KLIFS data locally ...")
+        klifs_structure_db_path = LocalFileStorage.klifs_structure_db(self.cache_dir)
+        structures.to_csv(klifs_structure_db_path, index=False)
+
+        return
+
+    def _featurize_one(self, system: ProteinLigandComplex) -> pd.DataFrame:
+        """
+        Find PDB entries for different KLIFS conformations with a similar co-crystallized ligand
+        and a similar pocket sequence.
+
+        Parameters
+        ----------
+        system: ProteinLigandComplex
+            A system object holding a protein and a ligand component.
+
+        Returns
+        -------
+        : DataFrame
+            A dataframe with columns for `dfg`, `ac_helix`, `pdb_id`, `chain_id`, `expo_id`,
+            `ligand_similarity` and `sequence_similarity`.
+        """
+        import pandas as pd
+
+        from ..utils import LocalFileStorage
+
+        logger.debug("Getting and filtering available KLIFS structures ...")
+        klifs_structure_db_path = LocalFileStorage.klifs_structure_db(self.cache_dir)
+        klifs_structure_db = pd.read_csv(klifs_structure_db_path)
+        klifs_structure_db = self._filter_structures(klifs_structure_db)
+
+        logger.debug("Searching similar ligand and kinase for KLIFS conformations ...")
+        conformations = klifs_structure_db.groupby(
+            ["structure.dfg", "structure.ac_helix"]
+        ).head(1)[["structure.dfg", "structure.ac_helix"]]
+        conformation_templates = []
+        for i, conformation in conformations.iterrows():
+            logger.debug(
+                f"Conformation: DFG {conformation['structure.dfg']}/"
+                f"aC helix {conformation['structure.ac_helix']}"
+            )
+            possible_templates = klifs_structure_db[
+                (klifs_structure_db["structure.dfg"] == conformation["structure.dfg"]) &
+                (klifs_structure_db["structure.ac_helix"] == conformation["structure.ac_helix"])
+                ]
+            pdb_id, chain_id, expo_id, ligand_similarity, pocket_similarity = \
+                self._get_most_similar_klifs_ligand_entity(
+                    possible_templates,
+                    system.ligand.molecule.to_smiles(explicit_hydrogens=False),
+                    system.protein.kinase_klifs_sequence
+                )
+            conformation_templates.append([
+                conformation["structure.dfg"],
+                conformation["structure.ac_helix"],
+                pdb_id,
+                chain_id,
+                expo_id,
+                ligand_similarity,
+                pocket_similarity,
+            ])
+
+        logger.debug("Merging results into dataframe ...")
+        conformation_templates = pd.DataFrame(
+            conformation_templates,
+            columns=[
+                "dfg",
+                "ac_helix",
+                "pdb_id",
+                "chain_id",
+                "expo_id",
+                "ligand_similarity",
+                "pocket_similarity"
+            ]
         )
+
+        return conformation_templates
+
+    @staticmethod
+    def _filter_structures(structures: pd.DataFrame) -> pd.DataFrame:
+        """
+        Filter KLIFS entries for the presence of exactly one orthosteric ligand and determined
+        KLIFS conformation, and remove duplicates.
+
+        Parameters
+        ----------
+        structures: DataFrame
+            The KLIFS entries to filter, need to contain the columns `ligand.expo_id`,
+            `structure.pdb_id`, `structure.dfg`, `structure.ac_helix`, `structure.qualityscore`,
+            `structure.resolution`, `structure.chain` and `structure.alternate_model`.
+
+        Returns
+        -------
+        : DataFrame
+            The filtered KLIFS entries.
+        """
+        logger.debug("Filtering KLIFS entries for ligands and conformations ...")
+        structures = structures[
+            structures["ligand.expo_id"] != "-"
+            ]  # orthosteric ligand
+        structures = structures.groupby("structure.pdb_id").filter(
+            lambda x: len(set(x["ligand.expo_id"])) == 1
+        )  # single orthosteric ligand
+        structures = structures[
+            (structures["structure.dfg"] != "na") &
+            (structures["structure.ac_helix"] != "na")
+            ]  # no missing kinase conformations
+
+        logger.debug("Sorting and selecting highest quality representatives ...")
+        structures = structures.sort_values(
+            by=[
+                "structure.qualityscore",  # better quality score
+                "structure.resolution",  # better resolution
+                "structure.chain",  # chain A preferred over chain B
+                "structure.alternate_model",  # altloc A preferred over altloc B
+            ],
+            ascending=[False, True, True, True],
+        )
+        structures = structures.groupby("structure.pdb_id").head(1)
+
+        return structures
+
+    def _get_most_similar_klifs_ligand_entity(
+        self, structures: pd.DataFrame, smiles: str, klifs_sequence: str,
+    ) -> Tuple[str, str, str, str, str]:
+        """
+        Get the KLIFS entry that is most similar to the given SMILES and KLIFS pocket sequence.
+
+        Parameters
+        ----------
+        structures: pd.DataFrame
+            The KLIFS entries dataframe with columns named `structure.pdb_id`, `structure.chain`,
+            `structure.expo_id`, `smiles` and `structure.pocket`.
+
+        Returns
+        -------
+        : tuple of str
+            The PDB ID, chain ID, expo ID, ligand similarity and pocket similarity of the KLIFS
+            entry with the most similar ligand and KLIFS pocket sequence.
+        """
+        logger.debug("Reformatting dataframe ...")
+        structures = structures.rename(columns={
+            "structure.pdb_id": "pdb_id",
+            "structure.chain": "chain_id",
+            "ligand.expo_id": "expo_id",
+        })
+        structures = structures[structures["smiles"].notna()]
+
+        if self.similarity_metric == "fingerprint":
+            logger.debug("Retrieving most similar ligand entity by fingerprint ...")
+            filtered_structures = self._by_fingerprint(structures, smiles, 0.1)
+        elif self.similarity_metric == "mcs":
+            logger.debug(
+                "Retrieving most similar ligand entity by maximum common substructure ..."
+            )
+            filtered_structures = self._by_mcs(structures, smiles, 0.1)
+        elif self.similarity_metric == "openeye_shape":
+            logger.debug("Retrieving most similar ligand entity by OpenEye shape ...")
+            filtered_structures = self._by_openeye_shape(structures, smiles, 0.1)
+        elif self.similarity_metric == "schrodinger_shape":
+            logger.debug("Retrieving most similar ligand entity by SCHRODINGER shape ...")
+            filtered_structures = self._by_schrodinger_shape(structures, smiles)
+        else:
+            raise ValueError(f"Similarity metric '{self.similarity_metric}' unknown!")
+
+        filtered_structures = self._by_klifs_sequence(filtered_structures, klifs_sequence, 0.1)
+
+        logger.debug("Sorting by KLIFS quality ...")
+        filtered_structures.sort_values(
+            by=["structure.qualityscore", "structure.resolution"],
+            inplace=True,
+            ascending=[False, True]
+        )
+
+        klifs_structure = filtered_structures.iloc[0]
+        pdb_id = klifs_structure["pdb_id"]
+        chain_id = klifs_structure["chain_id"]
+        expo_id = klifs_structure["expo_id"]
+        ligand_similarity = klifs_structure["ligand_similarity"]
+        pocket_similarity = klifs_structure["pocket_similarity"]
+        logger.debug(f"Selected most similar KLIFS entry: {pdb_id} {chain_id} {expo_id}.")
+
+        return pdb_id, chain_id, expo_id, ligand_similarity, pocket_similarity
+
+    @staticmethod
+    def _by_klifs_sequence(
+            klifs_structures: pd.DataFrame,
+            reference_klifs_sequence: str,
+            max_similarity_cutoff: float = 0.0,
+    ) -> pd.DataFrame:
+        """
+        Get the KLIFS entries that are most similar to the given pocket sequence.
+
+        Parameters
+        ----------
+        reference_klifs_sequence: pd.DataFrame
+            The PDB ligand entities dataframe with a column named `structure.pocket`.
+        reference_klifs_sequence: str
+            The sequence for calculating the similarity.
+        max_similarity_cutoff: float, default=0.0
+            The cutoff to use for selecting similar sequences based on the highest detected
+            sequence similarity and the possible maximum of sequence similarity. The possible
+            maximum sequence similarity is aligning the reference sequence to itself. If the
+            possible maximum sequence similarity is 450, the highest detected sequence similarity
+            is 320 and the `max_similarity_cutoff` is 0.1, all entries will be returned with a
+            sequence similarity of 275 (320 - (450 * 0.1)) or higher.
+
+        Returns
+        -------
+        : pd.DataFrame
+            The KLIFS entries with the most similar pocket sequences.
+        """
+        from ..modeling.alignment import sequence_similarity
+
+        logger.debug("Calculating KLIFS pocket sequence similarities ...")
+        pocket_similarities = [
+            sequence_similarity(klifs_sequence.replace("_", ""), reference_klifs_sequence)
+            for klifs_sequence in klifs_structures["structure.pocket"]
+        ]
+        klifs_structures["pocket_similarity"] = pocket_similarities
+
+        klifs_structures.sort_values(by="pocket_similarity", inplace=True, ascending=False)
+        logger.debug(f"KLIFS pocket similarities:\n{klifs_structures}")
+
+        logger.debug("Selecting most similar KLIFS pockets ...")
+        max_similarity = klifs_structures.iloc[0]["pocket_similarity"]
+        optimal_similarity = sequence_similarity(
+            reference_klifs_sequence, reference_klifs_sequence
+        )
+        klifs_structures = klifs_structures[
+            klifs_structures["pocket_similarity"] >= max_similarity - (optimal_similarity * max_similarity_cutoff)
+            ]
+
+        return klifs_structures
+
+    def _post_featurize(
+            self,
+            systems: List[ProteinLigandComplex],
+            features: List,
+            keep: bool = True,
+    ) -> List[ProteinLigandComplex]:
+        """
+        Run after featurizing all systems. Systems with a feature of None will be removed.
+        You shouldn't need to redefine this method
+
+        Parameters
+        ----------
+        systems: list of System
+            The systems being featurized
+        features: list
+            The features returned by ``self._featurize``
+        keep: bool, optional=True
+            Whether to store the current featurizer in the ``system.featurizations``
+            dictionary with its own key (``self.name``), in addition to ``last``.
+
+        Returns
+        -------
+        filtered_systems: systems
+            The same systems as passed, but with ``.featurizations`` extended with
+            the calculated features in two entries: the featurizer name and ``last``.
+            Systems with a feature of None will be removed.
+        """
+        filtered_systems = []
+        for system, feature in zip(systems, features):
+            if feature is None:
+                logger.debug(f"{self.__class__.__name__} failed for {system}")
+                continue
+            system.featurizations["last"] = feature
+            if keep:
+                system.featurizations[self.name] = feature
+            filtered_systems.append(system)
+        return filtered_systems
 
 
 class OEComplexFeaturizer(OEBaseModelingFeaturizer, SingleLigandProteinComplexFeaturizer):
