@@ -8,7 +8,8 @@ dependencies:
 
   - pip:
       # core
-      - sphinx
+      - sphinx~=2.4.0
+      - jinja2<=3.0.3
       - nbsphinx
       - sphinx-notfound-page
       - sphinx-version-warning
