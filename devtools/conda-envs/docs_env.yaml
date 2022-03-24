@@ -8,7 +8,7 @@ dependencies:
 
   - pip:
       # core
-      - sphinx~=2.4.0
+      - sphinx
       - nbsphinx
       - sphinx-notfound-page
       - sphinx-version-warning
