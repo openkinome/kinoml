@@ -22,22 +22,19 @@ Please be aware that this code is work in progress and is not guaranteed to prov
 KinoML and its dependencies can be installed via conda/mamba.
 
 ```
-git clone https://github.com/openkinome/kinoml.git
-cd kinoml
-mamba env create -n kinoml -f devtools/conda-envs/test_env.yaml
+mamba create -n kinoml --no-default-packages
+mamba env update -n kinoml -f https://raw.githubusercontent.com/openkinome/kinoml/master/devtools/conda-envs/test_env.yaml
 conda activate kinoml
-pip install .
+pip install https://github.com/openkinome/kinoml/archive/master.tar.gz
 ```
 
 ### Usage
 
-Several notebooks providing usage examples can be found in [examples](https://github.com/openkinome/kinoml/tree/master/examples).  
-Also, this framework used by several repositories, which may give additional insights:
- - [experiments-binding-affinity](https://github.com/openkinome/experiments-binding-affinity)
- - [kinase-conformational-modeling](https://github.com/openkinome/kinase-conformational-modeling)
- - [study-abl-resistance](https://github.com/openkinome/study-abl-resistance)
- - [study-ntrk-resistance](https://github.com/openkinome/study-ntrk-resistance)
-
+Several notebooks providing usage examples can be found in [examples](https://github.com/openkinome/kinoml/tree/master/examples)
+including a [getting started notebook](https://github.com/openkinome/kinoml/blob/master/examples/getting_started.ipynb).  
+This framework is tightly bound to other repositories:
+ - [experiments-binding-affinity](https://github.com/openkinome/experiments-binding-affinity) - for advanced and reproducable ML experiments using KinoML
+ - [kinodata](https://github.com/openkinome/kinodata) - ready-to-use kinase-focused datasets from ChEMBL 
 ### Copyright
 
 Copyright (c) 2019, OpenKinome
