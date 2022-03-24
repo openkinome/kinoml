@@ -389,6 +389,7 @@ class MostSimilarPDBLigandFeaturizer(SingleLigandProteinComplexFeaturizer):
         logger.debug(f"Retrieving SMILES for {pdb_ligand_entities['expo_id']}")
         smiles_dict = smiles_from_pdb(pdb_ligand_entities["expo_id"])
         pdb_ligand_entities["smiles"] = pdb_ligand_entities["expo_id"].map(smiles_dict)
+        pdb_ligand_entities = pdb_ligand_entities[pdb_ligand_entities["smiles"].notna()]
 
         if self.similarity_metric == "fingerprint":
             logger.debug("Retrieving most similar ligand entity by fingerprint ...")
