@@ -169,6 +169,10 @@ def select_altloc(
                     if found_altloc != "A":
                         altloc_exclusion.append(atom_details + (found_altloc,))
 
+    if len(altloc_exclusion) == 0:
+        logger.debug("No other altlocs found, returning universe as is!")
+        return Merge(molecule.atoms)
+
     selection_command = (
         "not ("
         + " or ".join(
