@@ -252,25 +252,25 @@ class MostSimilarPDBLigandFeaturizer(SingleLigandProteinComplexFeaturizer):
 
         logger.debug("Adding chain and expo IDs for each ligand entity ...")
         pdb_ligand_entities = pd.DataFrame(pdb_ligand_entities)
-        for i in range(3):
+        for i in range(10):
             try:
                 logger.debug(f"Fetching ligand identity info trial {i} ...")
                 pdb_ligand_entities = self._add_ligand_entity_info(pdb_ligand_entities)
                 break
             except JSONDecodeError as e:
-                if i < 3:
+                if i < 9:
                     time.sleep(random.randint(1, self.n_processes))
                 else:
                     raise e
 
         logger.debug("Adding resolution to each ligand entity ...")
-        for i in range(3):
+        for i in range(10):
             try:
                 logger.debug(f"Fetching resolution for PDB ligand entities trail {i} ...")
                 pdb_ligand_entities = self._add_pdb_resolution(pdb_ligand_entities)
                 break
             except JSONDecodeError as e:
-                if i < 3:
+                if i < 9:
                     time.sleep(random.randint(1, self.n_processes))
                 else:
                     raise e
@@ -413,13 +413,13 @@ class MostSimilarPDBLigandFeaturizer(SingleLigandProteinComplexFeaturizer):
         from ..databases.pdb import smiles_from_pdb
 
         logger.debug(f"Retrieving SMILES for {pdb_ligand_entities['expo_id']}")
-        for i in range(3):
+        for i in range(10):
             try:
                 logger.debug(f"Fetching smiles from PDB trail {i} ...")
                 smiles_dict = smiles_from_pdb(pdb_ligand_entities["expo_id"])
                 break
             except JSONDecodeError as e:
-                if i < 3:
+                if i < 9:
                     time.sleep(random.randint(1, self.n_processes))
                 else:
                     raise e
