@@ -205,6 +205,7 @@ class MostSimilarPDBLigandFeaturizer(SingleLigandProteinComplexFeaturizer):
             `expo_id` and `resolution`. None if no suitable ligand entities were found.
         """
         from json.decoder import JSONDecodeError
+        import random
         import time
 
         from biotite.database import rcsb
@@ -256,8 +257,11 @@ class MostSimilarPDBLigandFeaturizer(SingleLigandProteinComplexFeaturizer):
                 logger.debug(f"Fetching ligand identity info trial {i} ...")
                 pdb_ligand_entities = self._add_ligand_entity_info(pdb_ligand_entities)
                 break
-            except JSONDecodeError:
-                time.sleep(5)
+            except JSONDecodeError as e:
+                if i < 3:
+                    time.sleep(random.randint(1, self.n_processes))
+                else:
+                    raise e
 
         logger.debug("Adding resolution to each ligand entity ...")
         pdb_ligand_entities = self._add_pdb_resolution(pdb_ligand_entities)
@@ -393,10 +397,23 @@ class MostSimilarPDBLigandFeaturizer(SingleLigandProteinComplexFeaturizer):
         : tuple of str
             The PDB, chain and expo ID of the most similar ligand.
         """
+        from json.decoder import JSONDecodeError
+        import random
+        import time
+
         from ..databases.pdb import smiles_from_pdb
 
         logger.debug(f"Retrieving SMILES for {pdb_ligand_entities['expo_id']}")
-        smiles_dict = smiles_from_pdb(pdb_ligand_entities["expo_id"])
+        for i in range(3):
+            try:
+                logger.debug(f"Fetching smiles from PDB trail {i} ...")
+                smiles_dict = smiles_from_pdb(pdb_ligand_entities["expo_id"])
+                break
+            except JSONDecodeError as e:
+                if i < 3:
+                    time.sleep(random.randint(1, self.n_processes))
+                else:
+                    raise e
         pdb_ligand_entities["smiles"] = pdb_ligand_entities["expo_id"].map(smiles_dict)
         pdb_ligand_entities = pdb_ligand_entities[pdb_ligand_entities["smiles"].notna()]
 
