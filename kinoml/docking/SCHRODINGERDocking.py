@@ -179,7 +179,7 @@ def run_glide(
         logger.debug("Filtering poses for appropriate number ...")
         docking_input_file_path = Path(docking_input_file.name)
         sd_file_path = Path(".") / (docking_input_file_path.stem + "_lib.sdf")
-        if not sd_file_path:
+        if not sd_file_path.is_file():
             logger.debug("No docking poses were generated during docking ...")
             return
         supplier = Chem.SDMolSupplier(str(sd_file_path), removeHs=False)
