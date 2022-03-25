@@ -264,7 +264,16 @@ class MostSimilarPDBLigandFeaturizer(SingleLigandProteinComplexFeaturizer):
                     raise e
 
         logger.debug("Adding resolution to each ligand entity ...")
-        pdb_ligand_entities = self._add_pdb_resolution(pdb_ligand_entities)
+        for i in range(3):
+            try:
+                logger.debug(f"Fetching resolution for PDB ligand entities trail {i} ...")
+                pdb_ligand_entities = self._add_pdb_resolution(pdb_ligand_entities)
+                break
+            except JSONDecodeError as e:
+                if i < 3:
+                    time.sleep(random.randint(1, self.n_processes))
+                else:
+                    raise e
 
         logger.debug("Picking highest quality entity per ligand ...")
         pdb_ligand_entities.sort_values(by="resolution", inplace=True)
