@@ -204,6 +204,9 @@ class MostSimilarPDBLigandFeaturizer(SingleLigandProteinComplexFeaturizer):
             A DataFrame with columns `ligand_entity`, `pdb_id`, `non_polymer_id`, `chain_id`,
             `expo_id` and `resolution`. None if no suitable ligand entities were found.
         """
+        from json.decoder import JSONDecodeError
+        import time
+
         from biotite.database import rcsb
         import pandas as pd
 
@@ -248,7 +251,13 @@ class MostSimilarPDBLigandFeaturizer(SingleLigandProteinComplexFeaturizer):
 
         logger.debug("Adding chain and expo IDs for each ligand entity ...")
         pdb_ligand_entities = pd.DataFrame(pdb_ligand_entities)
-        pdb_ligand_entities = self._add_ligand_entity_info(pdb_ligand_entities)
+        for i in range(3):
+            try:
+                logger.debug(f"Fetching ligand identity info trial {i} ...")
+                pdb_ligand_entities = self._add_ligand_entity_info(pdb_ligand_entities)
+                break
+            except JSONDecodeError:
+                time.sleep(5)
 
         logger.debug("Adding resolution to each ligand entity ...")
         pdb_ligand_entities = self._add_pdb_resolution(pdb_ligand_entities)
