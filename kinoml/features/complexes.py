@@ -1879,6 +1879,7 @@ class SCHRODINGERComplexFeaturizer(SingleLigandProteinComplexFeaturizer):
             select_altloc,
             remove_non_protein,
             delete_expression_tags,
+            delete_incomplete_backbone_residues,
             delete_short_protein_segments,
             delete_alterations,
             renumber_protein_residues,
@@ -1923,6 +1924,9 @@ class SCHRODINGERComplexFeaturizer(SingleLigandProteinComplexFeaturizer):
             logger.debug("Splitting protein and non-protein ...")
             protein = structure.select_atoms("protein")
             not_protein = structure.select_atoms("not protein")
+
+            logger.debug("Deleting residues with incomplete backbone ...")
+            protein = delete_incomplete_backbone_residues(protein)
 
             logger.debug("Deleting short protein segments ...")
             protein = delete_short_protein_segments(protein)

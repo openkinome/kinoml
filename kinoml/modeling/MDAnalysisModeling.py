@@ -259,7 +259,7 @@ def remove_non_protein(
     return Merge(selection)
 
 
-def delete_residues(molecule: [Universe, AtomGroup], residues: Iterable[Residue]):
+def delete_residues(molecule: Union[Universe, AtomGroup], residues: Iterable[Residue]):
     """
     Delete residues from an MDAnalysis molecule.
 
@@ -287,6 +287,38 @@ def delete_residues(molecule: [Universe, AtomGroup], residues: Iterable[Residue]
     selection = molecule.select_atoms(selection_command)
 
     return Merge(selection)
+
+
+def delete_incomplete_backbone_residues(molecule: Union[Universe, AtomGroup]) -> Universe:
+    """
+    Delete protein residues with incomplete backbone, i.e. less than 4 backbone heavy atoms.
+
+    Parameters
+    ----------
+    molecule: MDAnalysis.core.universe.Universe or MDAnalysis.core.groups.Atomgroup
+        An MDAnalysis molecule holding a molecular structure.
+
+    Returns
+    -------
+    : MDAnalysis.core.universe.Universe
+        An MDAnalysis molecule holding a molecular structure without protein residues with
+        incomplete backbone.
+    """
+    protein = molecule.select_atoms("protein")
+    not_protein = molecule.select_atoms("not protein")
+
+    incomplete_backbone_residues = []
+    for residue in protein.residues:
+        if len(residue.atoms.select_atoms("backbone and not element hydrogen")) < 4:
+            incomplete_backbone_residues.append(residue)
+
+    if len(incomplete_backbone_residues) > 0:
+        protein = delete_residues(protein, incomplete_backbone_residues)
+
+    if len(not_protein) > 0:
+        return Merge(protein.atoms, not_protein.atoms)
+    else:
+        return Merge(protein.atoms)
 
 
 def delete_expression_tags(
