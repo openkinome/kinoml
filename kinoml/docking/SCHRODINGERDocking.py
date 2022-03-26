@@ -71,6 +71,8 @@ def run_glide(
     with NamedTemporaryFile(mode="w", suffix=".mae") as protein_file_mae, NamedTemporaryFile(
         mode="w", suffix=".mae"
     ) as ligand_file_mae, NamedTemporaryFile(
+        mode="w", suffix=".mae"
+    ) as protein_ligand_file_mae, NamedTemporaryFile(
         mode="w", suffix=".sdf"
     ) as mols_file_sdf, NamedTemporaryFile(
         mode="w", suffix=".in"
@@ -102,6 +104,18 @@ def run_glide(
             ]
         )
 
+        logger.debug("Merging protein and ligand in the right order ...")
+        subprocess.run(
+            [
+                str(schrodinger_directory / "utilities/structcat"),
+                "-i",
+                protein_file_mae.name,
+                ligand_file_mae.name,
+                "-o",
+                protein_ligand_file_mae.name,
+            ]
+        )
+
         logger.debug("Writing molecules to SDF ...")
         if not mols_names or len(mols_names) != len(mols_smiles):
             logger.debug("Creating molecule names ...")
@@ -118,9 +132,8 @@ def run_glide(
             sd_writer.write(mol)
 
         logger.debug("Writing input file for grid generation ...")
-        grid_input_file.write(f"RECEP_FILE '{protein_file_mae.name}'\n")
-        grid_input_file.write(f"REF_LIGAND_FILE '{ligand_file_mae.name}'\n")
-        grid_input_file.write("LIGAND_INDEX 1\n")
+        grid_input_file.write(f"RECEP_FILE '{protein_ligand_file_mae.name}'\n")
+        grid_input_file.write("LIGAND_INDEX 2\n")
         grid_input_file.flush()
 
         grid_file_path = Path(cache_dir) / (
