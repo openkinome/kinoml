@@ -92,17 +92,28 @@ def run_glide(
             ]
         )
 
-        logger.debug("Selecting and writing ligand from MAE input file ...")
-        subprocess.run(
-            [
-                str(schrodinger_directory / "run"),
-                "delete_atoms.py",
-                str(input_file_mae),
-                ligand_file_mae.name,
-                "-asl",
-                f"not res. {ligand_resname}" if ligand_resname else "not ligand",
-            ]
-        )
+        with NamedTemporaryFile(mode="w", suffix=".mae") as ligand_file_raw_mae:
+            logger.debug("Selecting and writing ligand from MAE input file ...")
+            subprocess.run(  # first everything that could be ligand
+                [
+                    str(schrodinger_directory / "run"),
+                    "delete_atoms.py",
+                    str(input_file_mae),
+                    ligand_file_raw_mae.name,
+                    "-asl",
+                    f"not res. {ligand_resname}" if ligand_resname else "not ligand",
+                ]
+            )
+            subprocess.run(  # then only first molecule from potential ligands
+                [
+                    str(schrodinger_directory / "run"),
+                    "delete_atoms.py",
+                    ligand_file_raw_mae.name,
+                    ligand_file_mae.name,
+                    "-asl",
+                    "mol. >1",
+                ]
+            )
 
         logger.debug("Merging protein and ligand in the right order ...")
         subprocess.run(
