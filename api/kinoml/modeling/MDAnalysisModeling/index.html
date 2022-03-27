@@ -333,6 +333,8 @@
         </li>
         <li class="md-nav__item"><a href="#kinoml.modeling.MDAnalysisModeling.delete_residues" class="md-nav__link">delete_residues</a>
         </li>
+        <li class="md-nav__item"><a href="#kinoml.modeling.MDAnalysisModeling.delete_incomplete_backbone_residues" class="md-nav__link">delete_incomplete_backbone_residues</a>
+        </li>
         <li class="md-nav__item"><a href="#kinoml.modeling.MDAnalysisModeling.delete_expression_tags" class="md-nav__link">delete_expression_tags</a>
         </li>
         <li class="md-nav__item"><a href="#kinoml.modeling.MDAnalysisModeling.get_sequence" class="md-nav__link">get_sequence</a>
@@ -475,7 +477,7 @@ GLY, HIS, ILE, LEU, LYS, MET, PHE, PRO, SEC, SER, THR, TRP, TYR, VAL.</p></li>
 </dd></dl>
 <dl class="function">
 <dt id="kinoml.modeling.MDAnalysisModeling.delete_residues">
-<code class="sig-prename descclassname">kinoml.modeling.MDAnalysisModeling.</code><code class="sig-name descname">delete_residues</code><span class="sig-paren">(</span><em class="sig-param">molecule: [Universe, AtomGroup], residues: Iterable[Residue]</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.modeling.MDAnalysisModeling.delete_residues" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">kinoml.modeling.MDAnalysisModeling.</code><code class="sig-name descname">delete_residues</code><span class="sig-paren">(</span><em class="sig-param">molecule: Union[Universe, AtomGroup], residues: Iterable[Residue]</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.modeling.MDAnalysisModeling.delete_residues" title="Permalink to this definition">¶</a></dt>
 <dd><p>Delete residues from an MDAnalysis molecule.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -486,6 +488,23 @@ GLY, HIS, ILE, LEU, LYS, MET, PHE, PRO, SEC, SER, THR, TRP, TYR, VAL.</p></li>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>An MDAnalysis molecule holding a molecular structure without given residues.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>MDAnalysis.core.universe.Universe</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="function">
+<dt id="kinoml.modeling.MDAnalysisModeling.delete_incomplete_backbone_residues">
+<code class="sig-prename descclassname">kinoml.modeling.MDAnalysisModeling.</code><code class="sig-name descname">delete_incomplete_backbone_residues</code><span class="sig-paren">(</span><em class="sig-param">molecule: Union[Universe, AtomGroup]</em><span class="sig-paren">)</span> → Universe<a class="headerlink" href="#kinoml.modeling.MDAnalysisModeling.delete_incomplete_backbone_residues" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete protein residues with incomplete backbone, i.e. less than 4 backbone heavy atoms.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>molecule</strong> (<em>MDAnalysis.core.universe.Universe</em><em> or </em><em>MDAnalysis.core.groups.Atomgroup</em>) – An MDAnalysis molecule holding a molecular structure.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An MDAnalysis molecule holding a molecular structure without protein residues with
+incomplete backbone.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>MDAnalysis.core.universe.Universe</p>
