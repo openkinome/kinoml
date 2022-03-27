@@ -71,6 +71,8 @@ def run_glide(
     with NamedTemporaryFile(mode="w", suffix=".mae") as protein_file_mae, NamedTemporaryFile(
         mode="w", suffix=".mae"
     ) as ligand_file_mae, NamedTemporaryFile(
+        mode="w", suffix=".mae"
+    ) as protein_ligand_file_mae, NamedTemporaryFile(
         mode="w", suffix=".sdf"
     ) as mols_file_sdf, NamedTemporaryFile(
         mode="w", suffix=".in"
@@ -90,15 +92,38 @@ def run_glide(
             ]
         )
 
-        logger.debug("Selecting and writing ligand from MAE input file ...")
+        with NamedTemporaryFile(mode="w", suffix=".mae") as ligand_file_raw_mae:
+            logger.debug("Selecting and writing ligand from MAE input file ...")
+            subprocess.run(  # first everything that could be ligand
+                [
+                    str(schrodinger_directory / "run"),
+                    "delete_atoms.py",
+                    str(input_file_mae),
+                    ligand_file_raw_mae.name,
+                    "-asl",
+                    f"not res. {ligand_resname}" if ligand_resname else "not ligand",
+                ]
+            )
+            subprocess.run(  # then only first molecule from potential ligands
+                [
+                    str(schrodinger_directory / "run"),
+                    "delete_atoms.py",
+                    ligand_file_raw_mae.name,
+                    ligand_file_mae.name,
+                    "-asl",
+                    "mol. >1",
+                ]
+            )
+
+        logger.debug("Merging protein and ligand in the right order ...")
         subprocess.run(
             [
-                str(schrodinger_directory / "run"),
-                "delete_atoms.py",
-                str(input_file_mae),
+                str(schrodinger_directory / "utilities/structcat"),
+                "-i",
+                protein_file_mae.name,
                 ligand_file_mae.name,
-                "-asl",
-                f"not res. {ligand_resname}" if ligand_resname else "not ligand",
+                "-o",
+                protein_ligand_file_mae.name,
             ]
         )
 
@@ -118,9 +143,8 @@ def run_glide(
             sd_writer.write(mol)
 
         logger.debug("Writing input file for grid generation ...")
-        grid_input_file.write(f"RECEP_FILE '{protein_file_mae.name}'\n")
-        grid_input_file.write(f"REF_LIGAND_FILE '{ligand_file_mae.name}'\n")
-        grid_input_file.write("LIGAND_INDEX 1\n")
+        grid_input_file.write(f"RECEP_FILE '{protein_ligand_file_mae.name}'\n")
+        grid_input_file.write("LIGAND_INDEX 2\n")
         grid_input_file.flush()
 
         grid_file_path = Path(cache_dir) / (
@@ -179,7 +203,7 @@ def run_glide(
         logger.debug("Filtering poses for appropriate number ...")
         docking_input_file_path = Path(docking_input_file.name)
         sd_file_path = Path(".") / (docking_input_file_path.stem + "_lib.sdf")
-        if not sd_file_path:
+        if not sd_file_path.is_file():
             logger.debug("No docking poses were generated during docking ...")
             return
         supplier = Chem.SDMolSupplier(str(sd_file_path), removeHs=False)
