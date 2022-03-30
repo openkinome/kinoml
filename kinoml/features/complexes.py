@@ -190,6 +190,8 @@ class MostSimilarPDBLigandFeaturizer(SingleLigandProteinComplexFeaturizer):
                     failure_log.write(f"System: {system}\n")
                     for i, component in enumerate(system.components):
                         failure_log.write(f"\tComponent {i}: {component.__dict__}\n")
+            else:
+                new_systems.append(feature)
 
         for system in new_systems:
             feature = (system.protein.pdb_id, system.protein.chain_id, system.protein.expo_id)
