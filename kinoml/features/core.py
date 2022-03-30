@@ -143,9 +143,15 @@ class BaseFeaturizer:
             Systems with a feature of None will be removed.
         """
         filtered_systems = []
+        failure_log_path = Path(f"{self.__class__.__name__}_failures.log")
+        if failure_log_path.is_file():  # remove old log
+            failure_log_path.unlink()
         for system, feature in zip(systems, features):
             if feature is None:
-                logger.debug(f"{self.__class__.__name__} failed for {system}")
+                with open(failure_log_path, "a") as failure_log:
+                    failure_log.write(f"System: {system}\n")
+                    for i, component in enumerate(system.components):
+                        failure_log.write(f"\tComponent {i}: {component.__dict__}\n")
                 continue
             system.featurizations["last"] = feature
             if keep:
