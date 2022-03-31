@@ -161,7 +161,7 @@ class MostSimilarPDBLigandFeaturizer(SingleLigandProteinComplexFeaturizer):
         """
         Run after featurizing all systems. Original systems will be replaced with systems
         returned by the featurizer. Systems that were not successfully featurized will be
-        removed.
+        removed and listed in a log file in the current working directory.
 
         Parameters
         ----------
@@ -1081,8 +1081,9 @@ class KLIFSConformationTemplatesFeaturizer(MostSimilarPDBLigandFeaturizer):
         keep: bool = True,
     ) -> List[ProteinLigandComplex]:
         """
-        Run after featurizing all systems. Systems with a feature of None will be removed.
-        You shouldn't need to redefine this method
+        Run after featurizing all systems. Systems with a feature of None will be removed and
+        listed in a log file in the current working directory. You shouldn't need to redefine
+        this method.
 
         Parameters
         ----------
