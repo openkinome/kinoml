@@ -161,7 +161,7 @@ class MostSimilarPDBLigandFeaturizer(SingleLigandProteinComplexFeaturizer):
         """
         Run after featurizing all systems. Original systems will be replaced with systems
         returned by the featurizer. Systems that were not successfully featurized will be
-        removed.
+        removed and listed in a log file in the current working directory.
 
         Parameters
         ----------
@@ -179,13 +179,26 @@ class MostSimilarPDBLigandFeaturizer(SingleLigandProteinComplexFeaturizer):
             The new systems with ``.featurizations`` extended with the calculated features in two
             entries: the featurizer name and ``last``.
         """
-        systems = [feature for feature in features if feature]
-        for system in systems:
+        failure_log_path = Path(f"{self.__class__.__name__}_failures.log")
+        if failure_log_path.is_file():  # remove old log
+            failure_log_path.unlink()
+
+        new_systems = []
+        for system, feature in zip(systems, features):
+            if feature is None:
+                with open(failure_log_path, "a") as failure_log:
+                    failure_log.write(f"System: {system}\n")
+                    for i, component in enumerate(system.components):
+                        failure_log.write(f"\tComponent {i}: {component.__dict__}\n")
+            else:
+                new_systems.append(feature)
+
+        for system in new_systems:
             feature = (system.protein.pdb_id, system.protein.chain_id, system.protein.expo_id)
             system.featurizations["last"] = feature
             if keep:
                 system.featurizations[self.name] = feature
-        return systems
+        return new_systems
 
     def _get_pdb_ligand_entities(self, uniprot_id: str) -> Union[pd.DataFrame, None]:
         """
@@ -1068,8 +1081,9 @@ class KLIFSConformationTemplatesFeaturizer(MostSimilarPDBLigandFeaturizer):
         keep: bool = True,
     ) -> List[ProteinLigandComplex]:
         """
-        Run after featurizing all systems. Systems with a feature of None will be removed.
-        You shouldn't need to redefine this method
+        Run after featurizing all systems. Systems with a feature of None will be removed and
+        listed in a log file in the current working directory. You shouldn't need to redefine
+        this method.
 
         Parameters
         ----------
@@ -1089,9 +1103,15 @@ class KLIFSConformationTemplatesFeaturizer(MostSimilarPDBLigandFeaturizer):
             Systems with a feature of None will be removed.
         """
         filtered_systems = []
+        failure_log_path = Path(f"{self.__class__.__name__}_failures.log")
+        if failure_log_path.is_file():  # remove old log
+            failure_log_path.unlink()
         for system, feature in zip(systems, features):
             if feature is None:
-                logger.debug(f"{self.__class__.__name__} failed for {system}")
+                with open(failure_log_path, "a") as failure_log:
+                    failure_log.write(f"System: {system}\n")
+                    for i, component in enumerate(system.components):
+                        failure_log.write(f"\tComponent {i}: {component.__dict__}\n")
                 continue
             system.featurizations["last"] = feature
             if keep:
