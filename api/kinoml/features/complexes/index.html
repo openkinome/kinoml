@@ -556,7 +556,7 @@ expo_id. None if no suitable PDB entry was found.</p>
 <code class="sig-name descname">_post_featurize</code><span class="sig-paren">(</span><em class="sig-param">self, systems: List[ProteinLigandComplex], features: List[ProteinLigandComplex], keep: bool = True</em><span class="sig-paren">)</span> → List[ProteinLigandComplex]<a class="headerlink" href="#kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._post_featurize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run after featurizing all systems. Original systems will be replaced with systems
 returned by the featurizer. Systems that were not successfully featurized will be
-removed.</p>
+removed and listed in a log file in the current working directory.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -870,8 +870,9 @@ sequence similarity of 275 (320 - (450 * 0.1)) or higher.</p></li>
 <dl class="method">
 <dt id="kinoml.features.complexes.KLIFSConformationTemplatesFeaturizer._post_featurize">
 <code class="sig-name descname">_post_featurize</code><span class="sig-paren">(</span><em class="sig-param">self, systems: List[ProteinLigandComplex], features: List, keep: bool = True</em><span class="sig-paren">)</span> → List[ProteinLigandComplex]<a class="headerlink" href="#kinoml.features.complexes.KLIFSConformationTemplatesFeaturizer._post_featurize" title="Permalink to this definition">¶</a></dt>
-<dd><p>Run after featurizing all systems. Systems with a feature of None will be removed.
-You shouldn’t need to redefine this method</p>
+<dd><p>Run after featurizing all systems. Systems with a feature of None will be removed and
+listed in a log file in the current working directory. You shouldn’t need to redefine
+this method.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">

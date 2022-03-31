@@ -573,8 +573,9 @@ or an array-like object.</p>
 <dl class="method">
 <dt id="kinoml.features.core.BaseFeaturizer._post_featurize">
 <code class="sig-name descname">_post_featurize</code><span class="sig-paren">(</span><em class="sig-param">self, systems: List[System], features: List, keep: bool = True</em><span class="sig-paren">)</span> → List[System]<a class="headerlink" href="#kinoml.features.core.BaseFeaturizer._post_featurize" title="Permalink to this definition">¶</a></dt>
-<dd><p>Run after featurizing all systems. Systems with a feature of None will be removed.
-You shouldn’t need to redefine this method</p>
+<dd><p>Run after featurizing all systems. Systems with a feature of None will be removed and
+listed in a log file in the current working directory. You shouldn’t need to redefine
+this method.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
