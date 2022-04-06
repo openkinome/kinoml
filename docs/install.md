@@ -1,9 +1,12 @@
 # Installation
 
-Assuming you have a local copy of the KinoML repository, `cd` into the repo and use `conda` to create an environment:
+KinoML and its dependencies can be installed via conda/mamba.:
 
-1. `conda env create -n kinoml -f devtools/conda-envs/test_env.yaml`
-2. `conda activate kinoml`
-3. `pip install .`
+```
+mamba create -n kinoml --no-default-packages
+mamba env update -n kinoml -f https://raw.githubusercontent.com/openkinome/kinoml/master/devtools/conda-envs/test_env.yaml
+conda activate kinoml
+pip install https://github.com/openkinome/kinoml/archive/master.tar.gz
+```
 
 Note this has only been tested in Linux and MacOS. In the future, a `conda` package `kinoml` will be provided, but right now we are in a very early stage of development.
