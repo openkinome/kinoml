@@ -99,7 +99,7 @@ jobs:
       - name: Run tests
         shell: bash -l {0}
         run: |
-          pytest -v -n auto --dist loadfile --cov=kinoml --cov-report=xml --color=yes --nbval-lax -k "not read_electron_density and not Schrodinger_structural_featurizer.ipynb" kinoml/tests/ examples/*.ipynb
+          pytest -v -n auto --dist loadfile --cov=kinoml --cov-report=xml --color=yes --nbval-lax -k "not read_electron_density and not Schrodinger_structural_featurizer.ipynb" examples/*.ipynb kinoml/tests/
 
       - name: CodeCov
         uses: codecov/codecov-action@v1
