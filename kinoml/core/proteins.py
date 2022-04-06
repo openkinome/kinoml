@@ -112,6 +112,7 @@ class Protein(BaseProtein, AminoAcidSequence):
             )
         if toolkit == "OpenEye":
             from openeye import oechem
+
             if not oechem.OEChemIsLicensed():
                 raise ValueError(
                     "Could not find valid OpenEye license, consider using the MDAnalysis toolkit "
@@ -119,6 +120,7 @@ class Protein(BaseProtein, AminoAcidSequence):
                 )
         if molecule:
             from openeye import oechem
+
             if isinstance(molecule, (oechem.OEMol, oechem.OEGraphMol)):
                 toolkit = "OpenEye"
             elif isinstance(molecule, (Universe, AtomGroup)):

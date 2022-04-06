@@ -211,7 +211,7 @@ class AminoAcidSequence(Biosequence):
 
      An artificial contruct only consisting of a part of the sequence can be specified via
      metadata["construct_range"]:
-     
+
      >>> abl1 = AminoAcidSequence(
      >>>     uniprot_id="P00519",
      >>>     name="ABL1",
