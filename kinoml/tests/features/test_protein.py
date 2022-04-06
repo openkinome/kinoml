@@ -15,7 +15,7 @@ def test_aminoacidcompositionfeaturizer():
         ProteinSystem([Protein(uniprot_id="P00519")]),
         ProteinSystem([Protein(uniprot_id="xxxxx")]),
     ]
-    featurizer = AminoAcidCompositionFeaturizer()
+    featurizer = AminoAcidCompositionFeaturizer(use_multiprocessing=False)
     featurized_systems = featurizer.featurize(systems)
 
     assert len(featurized_systems) == 3  # filter protein with wrong UniProt ID
@@ -99,7 +99,7 @@ def test_onehotencodedsequencefeaturizer_full():
         ProteinSystem([Protein(uniprot_id="P00519")]),
         ProteinSystem([Protein(uniprot_id="xxxxx")]),
     ]
-    featurizer = OneHotEncodedSequenceFeaturizer()
+    featurizer = OneHotEncodedSequenceFeaturizer(use_multiprocessing=False)
     featurized_systems = featurizer.featurize(systems)
 
     assert len(featurized_systems) == 2  # filter protein with wrong UniProt ID and empty string
@@ -122,7 +122,9 @@ def test_onehotencodedsequencefeaturizer_klifs_kinase():
         ProteinSystem([KLIFSKinase(kinase_klifs_id=480)]),
         ProteinSystem([KLIFSKinase(structure_klifs_id=3620)]),
     ]
-    featurizer = OneHotEncodedSequenceFeaturizer(sequence_type="klifs_kinase")
+    featurizer = OneHotEncodedSequenceFeaturizer(
+        sequence_type="klifs_kinase", use_multiprocessing=False
+    )
     featurized_systems = featurizer.featurize(systems)
 
     assert len(featurized_systems) == 5  # filter protein with wrong UniProt ID and empty string
@@ -146,7 +148,9 @@ def test_onehotencodedsequencefeaturizer_klifs_structure():
         ProteinSystem([KLIFSKinase(kinase_klifs_id=480)]),
         ProteinSystem([KLIFSKinase(structure_klifs_id=3620)]),
     ]
-    featurizer = OneHotEncodedSequenceFeaturizer(sequence_type="klifs_structure")
+    featurizer = OneHotEncodedSequenceFeaturizer(
+        sequence_type="klifs_structure", use_multiprocessing=False
+    )
     featurized_systems = featurizer.featurize(systems)
 
     assert len(featurized_systems) == 2  # needs structure_klifs_sequence or structure_klifs_id

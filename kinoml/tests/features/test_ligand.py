@@ -42,7 +42,7 @@ def test_single_ligand_featurizer():
 def test_ligand_MorganFingerprintFeaturizer(smiles, solution):
     ligand = Ligand(smiles=smiles)
     system = LigandSystem([ligand])
-    featurizer = MorganFingerprintFeaturizer(radius=2, nbits=512)
+    featurizer = MorganFingerprintFeaturizer(radius=2, nbits=512, use_multiprocessing=False)
     featurizer.featurize([system])
     fingerprint = system.featurizations[featurizer.name]
     solution_array = np.array(list(map(int, solution)), dtype="uint8")
@@ -60,7 +60,7 @@ def test_ligand_MorganFingerprintFeaturizer(smiles, solution):
 def test_ligand_OneHotSMILESFeaturizer(smiles, solution):
     ligand = Ligand(smiles=smiles)
     system = LigandSystem([ligand])
-    featurizer = OneHotSMILESFeaturizer()
+    featurizer = OneHotSMILESFeaturizer(use_multiprocessing=False)
     featurizer.featurize([system])
     matrix = system.featurizations[featurizer.name]
     assert matrix.shape == solution.T.shape
@@ -305,7 +305,7 @@ def test_ligand_OneHotSMILESFeaturizer(smiles, solution):
 def test_ligand_GraphLigandFeaturizer_RDKit(smiles, solution):
     ligand = Ligand(smiles=smiles)
     system = LigandSystem([ligand])
-    GraphLigandFeaturizer().featurize([system])
+    GraphLigandFeaturizer(use_multiprocessing=False).featurize([system])
     connectivity, features = system.featurizations["last"]
     assert (connectivity == solution[0]).all()
     assert features == pytest.approx(solution[1])
