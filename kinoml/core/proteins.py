@@ -86,6 +86,14 @@ class Protein(BaseProtein, AminoAcidSequence):
             The NCBI ID of the protein.
         metadata: dict or None, default=None
             Additional metadata of the needed for e.g. featurizers or provenance.
+
+        Raises
+        ------
+        AttributeError
+            Only 'MDAnalysis' and 'OpenEye' are supported, you provided <toolkit>.
+        ValueError
+            Could not find valid OpenEye license, consider using the MDAnalysis toolkit
+            instead!
         """
         BaseProtein.__init__(self)
         AminoAcidSequence.__init__(
@@ -102,7 +110,15 @@ class Protein(BaseProtein, AminoAcidSequence):
             raise AttributeError(
                 f"Only 'MDAnalysis' and 'OpenEye' are supported, you provided '{toolkit}'."
             )
+        if toolkit == "OpenEye":
+            from openeye import oechem
+            if not oechem.OEChemIsLicensed():
+                raise ValueError(
+                    "Could not find valid OpenEye license, consider using the MDAnalysis toolkit "
+                    "instead!"
+                )
         if molecule:
+            from openeye import oechem
             if isinstance(molecule, (oechem.OEMol, oechem.OEGraphMol)):
                 toolkit = "OpenEye"
             elif isinstance(molecule, (Universe, AtomGroup)):
