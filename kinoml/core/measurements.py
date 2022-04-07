@@ -229,7 +229,7 @@ class PercentageDisplacementMeasurement(ObservationModelMeasurement):
 
     .. math :: \mathbf{F}_{KinomeScan}(\Delta g, [I]) = 100 * \frac{1}{1 + \frac{exp[\Delta g] * C[M]}{[I]}}
 
-    where `C` is the standard concentration of 1 [M].
+    where :math:`C` is the standard concentration of 1 [M].
 
     Note
     ----
@@ -391,11 +391,11 @@ class pIC50Measurement(ObservationModelMeasurement):
 class pKiMeasurement(ObservationModelMeasurement):
 
     r"""
-    Measurement where the value(s) come from $K_i$ experiments
+    Measurement where the value(s) come from :math:`K_i` experiments
 
-    We make the assumption that $K_i \approx K_d$ and therefore
+    We make the assumption that :math:`K_i \approx K_d` and therefore
 
-    $\mathbf{F}_{pK_i} = \mathbf{F}_{pK_d}$.
+    .. math :: \mathbf{F}_{pK_i} = \mathbf{F}_{pK_d}
 
     Note
     ----
