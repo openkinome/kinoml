@@ -105,6 +105,7 @@ exclude_patterns = [
     ".ipynb_checkpoints/*",
     "__pycache__",
     "kinoml/data",
+    "developers",
 ]
 
 
