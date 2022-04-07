@@ -23,8 +23,8 @@ Do you want to know more about OpenKinome ecosystem? Check its [website](https:/
 :maxdepth: 1
 :hidden:
 
-getting_started
-install
+notebooks/getting_started.nblink
+notebooks/kinoml_object_model.nblink
 ```
 
 ```{toctree}
@@ -32,7 +32,8 @@ install
 :maxdepth: 1
 :hidden:
 
-tutorials/example
+notebooks/OpenEye_structural_featurizer.nblink
+notebooks/Schrodinger_structural_featurizer.nblink
 ```
 
 ```{toctree}
@@ -40,7 +41,5 @@ tutorials/example
 :maxdepth: 1
 :hidden:
 
-developers/api_concepts
-developers/api_docs
 API Reference <api/kinoml/index>
 ```

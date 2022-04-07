@@ -42,8 +42,10 @@ extensions = [
     # "sphinxcontrib.httpdomain",
     "autoapi.extension",
     "nbsphinx",
+    "nbsphinx_link",
     "sphinx_last_updated_by_git",
     "sphinx_panels",
+    "IPython.sphinxext.ipython_console_highlighting",
 ]
 
 autosectionlabel_prefix_document = True
@@ -102,6 +104,7 @@ exclude_patterns = [
     "sphinx-notfound-page",
     ".ipynb_checkpoints/*",
     "__pycache__",
+    "kinoml/data",
 ]
 
 
@@ -195,7 +198,7 @@ myst_enable_extensions = [
 ]
 
 myst_update_mathjax = False
-mathjax_config = {
+mathjax3_config = {
     "tex2jax": {
         "inlineMath": [["\\(", "\\)"]],
         "displayMath": [["\\[", "\\]"]],
