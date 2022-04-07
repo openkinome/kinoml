@@ -143,7 +143,6 @@ html_theme_options = {
     "master_doc": False,
     "nav_links": [
         {"href": "index", "internal": True, "title": "User guide"},
-        {"href": "developers/api_concepts", "internal": True, "title": "Developers"},
         {"href": "api/kinoml/index", "internal": True, "title": "API Reference"},
         {
             "href": "https://openkinome.org",
