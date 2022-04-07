@@ -1,9 +1,10 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
@@ -49,26 +50,23 @@
   
   
     <title>kinoml.core.conditions &#8212; KinoML 0.1 documentation</title>
-    <link rel="stylesheet" href="../../../../_static/material.css" type="text/css" />
-    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/material.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/twemoji.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css" />
-    <link rel="stylesheet" type="text/css" href="../../../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
-    <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
     <script src="../../../../_static/jquery.js"></script>
     <script src="../../../../_static/underscore.js"></script>
     <script src="../../../../_static/doctools.js"></script>
-    <script src="../../../../_static/language_data.js"></script>
     <script src="https://twemoji.maxcdn.com/v/latest/twemoji.min.js"></script>
     <script src="../../../../_static/twemoji.js"></script>
     <script src="../../../../_static/clipboard.min.js"></script>
     <script src="../../../../_static/copybutton.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "tex2jax_ignore|mathjax_ignore|document", "processClass": "tex2jax_process|mathjax_process|math|output_area", "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
     <link rel="shortcut icon" href="../../../../_static/custom_favicon.png"/>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
@@ -178,8 +176,6 @@
             
             <li class="md-tabs__item"><a href="../../../../index.html" class="md-tabs__link">User guide</a></li>
             
-            <li class="md-tabs__item"><a href="../../../../developers/api_concepts.html" class="md-tabs__link">Developers</a></li>
-            
             <li class="md-tabs__item"><a href="../../index.html" class="md-tabs__link">API Reference</a></li>
             
             <li class="md-tabs__item"><a href="https://openkinome.org" class="md-tabs__link">OpenKinome</a></li>
@@ -231,14 +227,14 @@
     <li class="md-nav__item">
     
     
-      <a href="../../../../getting_started.html" class="md-nav__link">Getting started</a>
+      <a href="../../../../notebooks/getting_started.html" class="md-nav__link">Getting Started</a>
       
     
     </li>
     <li class="md-nav__item">
     
     
-      <a href="../../../../install.html" class="md-nav__link">Installation</a>
+      <a href="../../../../notebooks/kinoml_object_model.html" class="md-nav__link">KinoML object model</a>
       
     
     </li>
@@ -250,27 +246,20 @@
     <li class="md-nav__item">
     
     
-      <a href="../../../../tutorials/example.html" class="md-nav__link">Tutorial 1</a>
+      <a href="../../../../notebooks/OpenEye_structural_featurizer.html" class="md-nav__link">OpenEye Structural Featurizer</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="../../../../notebooks/Schrodinger_structural_featurizer.html" class="md-nav__link">Schrodinger Structural Featurizer</a>
       
     
     </li>
     <li class="md-nav__item">
     
       <span class="md-nav__link caption"><span class="caption-text">Developers</span></span>
-    
-    </li>
-    <li class="md-nav__item">
-    
-    
-      <a href="../../../../developers/api_concepts.html" class="md-nav__link">Base concepts in our API</a>
-      
-    
-    </li>
-    <li class="md-nav__item">
-    
-    
-      <a href="../../../../developers/api_docs.html" class="md-nav__link">How to write docs with Sphinx, MyST and Material Theme</a>
-      
     
     </li>
     <li class="md-nav__item">
@@ -368,9 +357,9 @@ here defined.</p>
 involved in the experiment, like pH.</p>
 <section id="module-contents">
 <h2 id="module-contents">Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="kinoml.core.conditions.BaseConditions">
-<em class="property">class </em><code class="sig-prename descclassname">kinoml.core.conditions.</code><code class="sig-name descname">BaseConditions</code><span class="sig-paren">(</span><em class="sig-param">strict: bool = True</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.conditions.BaseConditions" title="Permalink to this definition">¶</a></dt>
+<dl class="py class">
+<dt class="sig sig-object py" id="kinoml.core.conditions.BaseConditions">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">kinoml.core.conditions.</span></span><span class="sig-name descname"><span class="pre">BaseConditions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">strict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.conditions.BaseConditions" title="Permalink to this definition">¶</a></dt>
 <dd><p>Contains information about the experimental conditions.
 We ensure objects are immutable by using read-only properties
 for all attributes. Do NOT modify private attributes or
@@ -380,48 +369,45 @@ hashing will break.</p>
 <dd class="field-odd"><p><strong>strict</strong> (<em>bool</em><em>, </em><em>optional=True</em>) – Whether to perform safety checks at initialization.</p>
 </dd>
 </dl>
-<dl class="method">
-<dt id="kinoml.core.conditions.BaseConditions.check">
-<code class="sig-name descname">check</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.conditions.BaseConditions.check" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.core.conditions.BaseConditions.check">
+<span class="sig-name descname"><span class="pre">check</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.conditions.BaseConditions.check" title="Permalink to this definition">¶</a></dt>
 <dd><p>Perform some checks for valid values</p>
 </dd></dl>
-<dl class="method">
-<dt id="kinoml.core.conditions.BaseConditions._properties">
-<code class="sig-name descname">_properties</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">classname: bool = True</em><span class="sig-paren">)</span> → dict<a class="headerlink" href="#kinoml.core.conditions.BaseConditions._properties" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.core.conditions.BaseConditions._properties">
+<span class="sig-name descname"><span class="pre">_properties</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">classname</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#kinoml.core.conditions.BaseConditions._properties" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a dictionary with the classname and all defined properties.
 Used for equality comparisons in subclasses.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>classname</strong> (<em>bool</em><em>, </em><em>optional=True</em>) – Whether to include the name of the instance class</p>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p></p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>dict</p>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>dict</p>
 </dd>
 </dl>
 </dd></dl>
-<dl class="method">
-<dt id="kinoml.core.conditions.BaseConditions.__hash__">
-<code class="sig-name descname">__hash__</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.conditions.BaseConditions.__hash__" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.core.conditions.BaseConditions.__hash__">
+<span class="sig-name descname"><span class="pre">__hash__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.conditions.BaseConditions.__hash__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return hash(self).</p>
 </dd></dl>
-<dl class="method">
-<dt id="kinoml.core.conditions.BaseConditions.__eq__">
-<code class="sig-name descname">__eq__</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">other</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.conditions.BaseConditions.__eq__" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.core.conditions.BaseConditions.__eq__">
+<span class="sig-name descname"><span class="pre">__eq__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.conditions.BaseConditions.__eq__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return self==value.</p>
 </dd></dl>
-<dl class="method">
-<dt id="kinoml.core.conditions.BaseConditions.__repr__">
-<code class="sig-name descname">__repr__</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span> → str<a class="headerlink" href="#kinoml.core.conditions.BaseConditions.__repr__" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.core.conditions.BaseConditions.__repr__">
+<span class="sig-name descname"><span class="pre">__repr__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#kinoml.core.conditions.BaseConditions.__repr__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return repr(self).</p>
 </dd></dl>
 </dd></dl>
-<dl class="class">
-<dt id="kinoml.core.conditions.AssayConditions">
-<em class="property">class </em><code class="sig-prename descclassname">kinoml.core.conditions.</code><code class="sig-name descname">AssayConditions</code><span class="sig-paren">(</span><em class="sig-param">pH: Union[int</em>, <em class="sig-param">float] = 7.0</em>, <em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.conditions.AssayConditions" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#kinoml.core.conditions.BaseConditions" title="kinoml.core.conditions.BaseConditions"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.core.conditions.BaseConditions</span></code></a></p>
+<dl class="py class">
+<dt class="sig sig-object py" id="kinoml.core.conditions.AssayConditions">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">kinoml.core.conditions.</span></span><span class="sig-name descname"><span class="pre">AssayConditions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pH</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">7.0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.conditions.AssayConditions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#kinoml.core.conditions.BaseConditions" title="kinoml.core.conditions.BaseConditions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BaseConditions</span></code></a></p>
 <p>Contains information about the experimental conditions
 of a given assay.</p>
 <dl class="field-list simple">
@@ -429,13 +415,13 @@ of a given assay.</p>
 <dd class="field-odd"><p><strong>pH</strong> (<em>int</em><em> or </em><em>float</em><em>, </em><em>optional=7.0</em>) – Acidity conditions</p>
 </dd>
 </dl>
-<dl class="method">
-<dt id="kinoml.core.conditions.AssayConditions.pH">
-<em class="property">property </em><code class="sig-name descname">pH</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.conditions.AssayConditions.pH" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.core.conditions.AssayConditions.pH">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pH</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.conditions.AssayConditions.pH" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-<dl class="method">
-<dt id="kinoml.core.conditions.AssayConditions.check">
-<code class="sig-name descname">check</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.conditions.AssayConditions.check" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.core.conditions.AssayConditions.check">
+<span class="sig-name descname"><span class="pre">check</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.conditions.AssayConditions.check" title="Permalink to this definition">¶</a></dt>
 <dd><p>Perform some checks for valid values</p>
 </dd></dl>
 </dd></dl>
@@ -489,7 +475,7 @@ of a given assay.</p>
               
           </div>
             Created using
-            <a href="http://www.sphinx-doc.org/">Sphinx</a> 2.4.5.
+            <a href="http://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
              and
             <a href="https://github.com/bashtage/sphinx-material/">Material for
               Sphinx</a>

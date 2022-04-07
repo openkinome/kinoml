@@ -1,9 +1,10 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
@@ -49,26 +50,23 @@
   
   
     <title>kinoml.optimize &#8212; KinoML 0.1 documentation</title>
-    <link rel="stylesheet" href="../../../_static/material.css" type="text/css" />
-    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/material.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/twemoji.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
-    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
     <script src="../../../_static/underscore.js"></script>
     <script src="../../../_static/doctools.js"></script>
-    <script src="../../../_static/language_data.js"></script>
     <script src="https://twemoji.maxcdn.com/v/latest/twemoji.min.js"></script>
     <script src="../../../_static/twemoji.js"></script>
     <script src="../../../_static/clipboard.min.js"></script>
     <script src="../../../_static/copybutton.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "tex2jax_ignore|mathjax_ignore|document", "processClass": "tex2jax_process|mathjax_process|math|output_area", "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
     <link rel="shortcut icon" href="../../../_static/custom_favicon.png"/>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
@@ -178,8 +176,6 @@
             
             <li class="md-tabs__item"><a href="../../../index.html" class="md-tabs__link">User guide</a></li>
             
-            <li class="md-tabs__item"><a href="../../../developers/api_concepts.html" class="md-tabs__link">Developers</a></li>
-            
             <li class="md-tabs__item"><a href="../index.html" class="md-tabs__link">API Reference</a></li>
             
             <li class="md-tabs__item"><a href="https://openkinome.org" class="md-tabs__link">OpenKinome</a></li>
@@ -230,14 +226,14 @@
     <li class="md-nav__item">
     
     
-      <a href="../../../getting_started.html" class="md-nav__link">Getting started</a>
+      <a href="../../../notebooks/getting_started.html" class="md-nav__link">Getting Started</a>
       
     
     </li>
     <li class="md-nav__item">
     
     
-      <a href="../../../install.html" class="md-nav__link">Installation</a>
+      <a href="../../../notebooks/kinoml_object_model.html" class="md-nav__link">KinoML object model</a>
       
     
     </li>
@@ -249,27 +245,20 @@
     <li class="md-nav__item">
     
     
-      <a href="../../../tutorials/example.html" class="md-nav__link">Tutorial 1</a>
+      <a href="../../../notebooks/OpenEye_structural_featurizer.html" class="md-nav__link">OpenEye Structural Featurizer</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="../../../notebooks/Schrodinger_structural_featurizer.html" class="md-nav__link">Schrodinger Structural Featurizer</a>
       
     
     </li>
     <li class="md-nav__item">
     
       <span class="md-nav__link caption"><span class="caption-text">Developers</span></span>
-    
-    </li>
-    <li class="md-nav__item">
-    
-    
-      <a href="../../../developers/api_concepts.html" class="md-nav__link">Base concepts in our API</a>
-      
-    
-    </li>
-    <li class="md-nav__item">
-    
-    
-      <a href="../../../developers/api_docs.html" class="md-nav__link">How to write docs with Sphinx, MyST and Material Theme</a>
-      
     
     </li>
     <li class="md-nav__item">
@@ -377,7 +366,7 @@
               
           </div>
             Created using
-            <a href="http://www.sphinx-doc.org/">Sphinx</a> 2.4.5.
+            <a href="http://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
              and
             <a href="https://github.com/bashtage/sphinx-material/">Material for
               Sphinx</a>

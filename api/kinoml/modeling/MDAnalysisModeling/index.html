@@ -1,9 +1,10 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
@@ -49,26 +50,23 @@
   
   
     <title>kinoml.modeling.MDAnalysisModeling &#8212; KinoML 0.1 documentation</title>
-    <link rel="stylesheet" href="../../../../_static/material.css" type="text/css" />
-    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/material.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/twemoji.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css" />
-    <link rel="stylesheet" type="text/css" href="../../../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
-    <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
     <script src="../../../../_static/jquery.js"></script>
     <script src="../../../../_static/underscore.js"></script>
     <script src="../../../../_static/doctools.js"></script>
-    <script src="../../../../_static/language_data.js"></script>
     <script src="https://twemoji.maxcdn.com/v/latest/twemoji.min.js"></script>
     <script src="../../../../_static/twemoji.js"></script>
     <script src="../../../../_static/clipboard.min.js"></script>
     <script src="../../../../_static/copybutton.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "tex2jax_ignore|mathjax_ignore|document", "processClass": "tex2jax_process|mathjax_process|math|output_area", "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
     <link rel="shortcut icon" href="../../../../_static/custom_favicon.png"/>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
@@ -178,8 +176,6 @@
             
             <li class="md-tabs__item"><a href="../../../../index.html" class="md-tabs__link">User guide</a></li>
             
-            <li class="md-tabs__item"><a href="../../../../developers/api_concepts.html" class="md-tabs__link">Developers</a></li>
-            
             <li class="md-tabs__item"><a href="../../index.html" class="md-tabs__link">API Reference</a></li>
             
             <li class="md-tabs__item"><a href="https://openkinome.org" class="md-tabs__link">OpenKinome</a></li>
@@ -231,14 +227,14 @@
     <li class="md-nav__item">
     
     
-      <a href="../../../../getting_started.html" class="md-nav__link">Getting started</a>
+      <a href="../../../../notebooks/getting_started.html" class="md-nav__link">Getting Started</a>
       
     
     </li>
     <li class="md-nav__item">
     
     
-      <a href="../../../../install.html" class="md-nav__link">Installation</a>
+      <a href="../../../../notebooks/kinoml_object_model.html" class="md-nav__link">KinoML object model</a>
       
     
     </li>
@@ -250,27 +246,20 @@
     <li class="md-nav__item">
     
     
-      <a href="../../../../tutorials/example.html" class="md-nav__link">Tutorial 1</a>
+      <a href="../../../../notebooks/OpenEye_structural_featurizer.html" class="md-nav__link">OpenEye Structural Featurizer</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="../../../../notebooks/Schrodinger_structural_featurizer.html" class="md-nav__link">Schrodinger Structural Featurizer</a>
       
     
     </li>
     <li class="md-nav__item">
     
       <span class="md-nav__link caption"><span class="caption-text">Developers</span></span>
-    
-    </li>
-    <li class="md-nav__item">
-    
-    
-      <a href="../../../../developers/api_concepts.html" class="md-nav__link">Base concepts in our API</a>
-      
-    
-    </li>
-    <li class="md-nav__item">
-    
-    
-      <a href="../../../../developers/api_docs.html" class="md-nav__link">How to write docs with Sphinx, MyST and Material Theme</a>
-      
     
     </li>
     <li class="md-nav__item">
@@ -370,13 +359,13 @@
 <span id="kinoml-modeling-mdanalysismodeling"></span><h1 id="api-kinoml-modeling-mdanalysismodeling-index--page-root"><a class="reference internal" href="#api-kinoml-modeling-mdanalysismodeling-index--page-root" title="kinoml.modeling.MDAnalysisModeling"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.modeling.MDAnalysisModeling</span></code></a><a class="headerlink" href="#api-kinoml-modeling-mdanalysismodeling-index--page-root" title="Permalink to this headline">¶</a></h1>
 <section id="module-contents">
 <h2 id="module-contents">Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
-<dl class="data">
-<dt id="kinoml.modeling.MDAnalysisModeling.logger">
-<code class="sig-prename descclassname">kinoml.modeling.MDAnalysisModeling.</code><code class="sig-name descname">logger</code><a class="headerlink" href="#kinoml.modeling.MDAnalysisModeling.logger" title="Permalink to this definition">¶</a></dt>
+<dl class="py data">
+<dt class="sig sig-object py" id="kinoml.modeling.MDAnalysisModeling.logger">
+<span class="sig-prename descclassname"><span class="pre">kinoml.modeling.MDAnalysisModeling.</span></span><span class="sig-name descname"><span class="pre">logger</span></span><a class="headerlink" href="#kinoml.modeling.MDAnalysisModeling.logger" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-<dl class="function">
-<dt id="kinoml.modeling.MDAnalysisModeling.read_molecule">
-<code class="sig-prename descclassname">kinoml.modeling.MDAnalysisModeling.</code><code class="sig-name descname">read_molecule</code><span class="sig-paren">(</span><em class="sig-param">path: Union[str, Path], guess_bonds: bool = True</em><span class="sig-paren">)</span> → Universe<a class="headerlink" href="#kinoml.modeling.MDAnalysisModeling.read_molecule" title="Permalink to this definition">¶</a></dt>
+<dl class="py function">
+<dt class="sig sig-object py" id="kinoml.modeling.MDAnalysisModeling.read_molecule">
+<span class="sig-prename descclassname"><span class="pre">kinoml.modeling.MDAnalysisModeling.</span></span><span class="sig-name descname"><span class="pre">read_molecule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">pathlib.Path</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">guess_bonds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">MDAnalysis.core.universe.Universe</span></span></span><a class="headerlink" href="#kinoml.modeling.MDAnalysisModeling.read_molecule" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read a molecule from a file. Uses Biopython to support reading of the CIF format.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -393,9 +382,9 @@
 </dd>
 </dl>
 </dd></dl>
-<dl class="function">
-<dt id="kinoml.modeling.MDAnalysisModeling.write_molecule">
-<code class="sig-prename descclassname">kinoml.modeling.MDAnalysisModeling.</code><code class="sig-name descname">write_molecule</code><span class="sig-paren">(</span><em class="sig-param">molecule: Union[AtomGroup], file_path: Union[str, Path], delete_segid: bool = True</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.modeling.MDAnalysisModeling.write_molecule" title="Permalink to this definition">¶</a></dt>
+<dl class="py function">
+<dt class="sig sig-object py" id="kinoml.modeling.MDAnalysisModeling.write_molecule">
+<span class="sig-prename descclassname"><span class="pre">kinoml.modeling.MDAnalysisModeling.</span></span><span class="sig-name descname"><span class="pre">write_molecule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">molecule</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">MDAnalysis.core.groups.AtomGroup</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">pathlib.Path</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delete_segid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.modeling.MDAnalysisModeling.write_molecule" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write an AtomGroup to a file. If written in PDB format and delete_segid is True the segid will
 be deleted from the PDB file.
 (<a class="reference external" href="https://docs.mdanalysis.org/1.0.0/documentation_pages/coordinates/PDB.html">https://docs.mdanalysis.org/1.0.0/documentation_pages/coordinates/PDB.html</a>)</p>
@@ -410,9 +399,9 @@ be deleted from the PDB file.
 </dd>
 </dl>
 </dd></dl>
-<dl class="function">
-<dt id="kinoml.modeling.MDAnalysisModeling.select_chain">
-<code class="sig-prename descclassname">kinoml.modeling.MDAnalysisModeling.</code><code class="sig-name descname">select_chain</code><span class="sig-paren">(</span><em class="sig-param">molecule: Union[Universe, AtomGroup], chain_id: str</em><span class="sig-paren">)</span> → Universe<a class="headerlink" href="#kinoml.modeling.MDAnalysisModeling.select_chain" title="Permalink to this definition">¶</a></dt>
+<dl class="py function">
+<dt class="sig sig-object py" id="kinoml.modeling.MDAnalysisModeling.select_chain">
+<span class="sig-prename descclassname"><span class="pre">kinoml.modeling.MDAnalysisModeling.</span></span><span class="sig-name descname"><span class="pre">select_chain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">molecule</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">MDAnalysis.core.universe.Universe</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">MDAnalysis.core.groups.AtomGroup</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chain_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">MDAnalysis.core.universe.Universe</span></span></span><a class="headerlink" href="#kinoml.modeling.MDAnalysisModeling.select_chain" title="Permalink to this definition">¶</a></dt>
 <dd><p>Select a chain from an MDAnalysis molecule.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -429,9 +418,9 @@ be deleted from the PDB file.
 </dd>
 </dl>
 </dd></dl>
-<dl class="function">
-<dt id="kinoml.modeling.MDAnalysisModeling.select_altloc">
-<code class="sig-prename descclassname">kinoml.modeling.MDAnalysisModeling.</code><code class="sig-name descname">select_altloc</code><span class="sig-paren">(</span><em class="sig-param">molecule: Union[Universe, AtomGroup], altloc_id: str, altloc_fallback: bool = True</em><span class="sig-paren">)</span> → Universe<a class="headerlink" href="#kinoml.modeling.MDAnalysisModeling.select_altloc" title="Permalink to this definition">¶</a></dt>
+<dl class="py function">
+<dt class="sig sig-object py" id="kinoml.modeling.MDAnalysisModeling.select_altloc">
+<span class="sig-prename descclassname"><span class="pre">kinoml.modeling.MDAnalysisModeling.</span></span><span class="sig-name descname"><span class="pre">select_altloc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">molecule</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">MDAnalysis.core.universe.Universe</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">MDAnalysis.core.groups.AtomGroup</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">altloc_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">altloc_fallback</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">MDAnalysis.core.universe.Universe</span></span></span><a class="headerlink" href="#kinoml.modeling.MDAnalysisModeling.select_altloc" title="Permalink to this definition">¶</a></dt>
 <dd><p>Select an alternate location from an MDAnalysis molecule.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -453,9 +442,9 @@ not contain the given alternate location identifier.</p></li>
 </dd>
 </dl>
 </dd></dl>
-<dl class="function">
-<dt id="kinoml.modeling.MDAnalysisModeling.remove_non_protein">
-<code class="sig-prename descclassname">kinoml.modeling.MDAnalysisModeling.</code><code class="sig-name descname">remove_non_protein</code><span class="sig-paren">(</span><em class="sig-param">molecule: Union[Universe, AtomGroup], exceptions: Union[None, Iterable[str]] = None, only_standard_amino_acids: bool = True, remove_water: bool = False</em><span class="sig-paren">)</span> → Universe<a class="headerlink" href="#kinoml.modeling.MDAnalysisModeling.remove_non_protein" title="Permalink to this definition">¶</a></dt>
+<dl class="py function">
+<dt class="sig sig-object py" id="kinoml.modeling.MDAnalysisModeling.remove_non_protein">
+<span class="sig-prename descclassname"><span class="pre">kinoml.modeling.MDAnalysisModeling.</span></span><span class="sig-name descname"><span class="pre">remove_non_protein</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">molecule</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">MDAnalysis.core.universe.Universe</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">MDAnalysis.core.groups.AtomGroup</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exceptions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">None</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">only_standard_amino_acids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remove_water</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">MDAnalysis.core.universe.Universe</span></span></span><a class="headerlink" href="#kinoml.modeling.MDAnalysisModeling.remove_non_protein" title="Permalink to this definition">¶</a></dt>
 <dd><p>Remove non-protein atoms from an OpenEye molecule. Water will be kept by default.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -475,9 +464,9 @@ GLY, HIS, ILE, LEU, LYS, MET, PHE, PRO, SEC, SER, THR, TRP, TYR, VAL.</p></li>
 </dd>
 </dl>
 </dd></dl>
-<dl class="function">
-<dt id="kinoml.modeling.MDAnalysisModeling.delete_residues">
-<code class="sig-prename descclassname">kinoml.modeling.MDAnalysisModeling.</code><code class="sig-name descname">delete_residues</code><span class="sig-paren">(</span><em class="sig-param">molecule: Union[Universe, AtomGroup], residues: Iterable[Residue]</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.modeling.MDAnalysisModeling.delete_residues" title="Permalink to this definition">¶</a></dt>
+<dl class="py function">
+<dt class="sig sig-object py" id="kinoml.modeling.MDAnalysisModeling.delete_residues">
+<span class="sig-prename descclassname"><span class="pre">kinoml.modeling.MDAnalysisModeling.</span></span><span class="sig-name descname"><span class="pre">delete_residues</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">molecule</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">MDAnalysis.core.universe.Universe</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">MDAnalysis.core.groups.AtomGroup</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">residues</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">MDAnalysis.core.groups.Residue</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.modeling.MDAnalysisModeling.delete_residues" title="Permalink to this definition">¶</a></dt>
 <dd><p>Delete residues from an MDAnalysis molecule.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -494,9 +483,9 @@ GLY, HIS, ILE, LEU, LYS, MET, PHE, PRO, SEC, SER, THR, TRP, TYR, VAL.</p></li>
 </dd>
 </dl>
 </dd></dl>
-<dl class="function">
-<dt id="kinoml.modeling.MDAnalysisModeling.delete_incomplete_backbone_residues">
-<code class="sig-prename descclassname">kinoml.modeling.MDAnalysisModeling.</code><code class="sig-name descname">delete_incomplete_backbone_residues</code><span class="sig-paren">(</span><em class="sig-param">molecule: Union[Universe, AtomGroup]</em><span class="sig-paren">)</span> → Universe<a class="headerlink" href="#kinoml.modeling.MDAnalysisModeling.delete_incomplete_backbone_residues" title="Permalink to this definition">¶</a></dt>
+<dl class="py function">
+<dt class="sig sig-object py" id="kinoml.modeling.MDAnalysisModeling.delete_incomplete_backbone_residues">
+<span class="sig-prename descclassname"><span class="pre">kinoml.modeling.MDAnalysisModeling.</span></span><span class="sig-name descname"><span class="pre">delete_incomplete_backbone_residues</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">molecule</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">MDAnalysis.core.universe.Universe</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">MDAnalysis.core.groups.AtomGroup</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">MDAnalysis.core.universe.Universe</span></span></span><a class="headerlink" href="#kinoml.modeling.MDAnalysisModeling.delete_incomplete_backbone_residues" title="Permalink to this definition">¶</a></dt>
 <dd><p>Delete protein residues with incomplete backbone, i.e. less than 4 backbone heavy atoms.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -511,9 +500,9 @@ incomplete backbone.</p>
 </dd>
 </dl>
 </dd></dl>
-<dl class="function">
-<dt id="kinoml.modeling.MDAnalysisModeling.delete_expression_tags">
-<code class="sig-prename descclassname">kinoml.modeling.MDAnalysisModeling.</code><code class="sig-name descname">delete_expression_tags</code><span class="sig-paren">(</span><em class="sig-param">molecule: Union[Universe, AtomGroup], pdb_path: Union[str, Path]</em><span class="sig-paren">)</span> → Universe<a class="headerlink" href="#kinoml.modeling.MDAnalysisModeling.delete_expression_tags" title="Permalink to this definition">¶</a></dt>
+<dl class="py function">
+<dt class="sig sig-object py" id="kinoml.modeling.MDAnalysisModeling.delete_expression_tags">
+<span class="sig-prename descclassname"><span class="pre">kinoml.modeling.MDAnalysisModeling.</span></span><span class="sig-name descname"><span class="pre">delete_expression_tags</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">molecule</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">MDAnalysis.core.universe.Universe</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">MDAnalysis.core.groups.AtomGroup</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pdb_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">pathlib.Path</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">MDAnalysis.core.universe.Universe</span></span></span><a class="headerlink" href="#kinoml.modeling.MDAnalysisModeling.delete_expression_tags" title="Permalink to this definition">¶</a></dt>
 <dd><p>Delete expression tags listed in the PDB header section “SEQADV”.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -530,9 +519,9 @@ incomplete backbone.</p>
 </dd>
 </dl>
 </dd></dl>
-<dl class="function">
-<dt id="kinoml.modeling.MDAnalysisModeling.get_sequence">
-<code class="sig-prename descclassname">kinoml.modeling.MDAnalysisModeling.</code><code class="sig-name descname">get_sequence</code><span class="sig-paren">(</span><em class="sig-param">molecule: Union[Universe, AtomGroup]</em><span class="sig-paren">)</span> → str<a class="headerlink" href="#kinoml.modeling.MDAnalysisModeling.get_sequence" title="Permalink to this definition">¶</a></dt>
+<dl class="py function">
+<dt class="sig sig-object py" id="kinoml.modeling.MDAnalysisModeling.get_sequence">
+<span class="sig-prename descclassname"><span class="pre">kinoml.modeling.MDAnalysisModeling.</span></span><span class="sig-name descname"><span class="pre">get_sequence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">molecule</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">MDAnalysis.core.universe.Universe</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">MDAnalysis.core.groups.AtomGroup</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#kinoml.modeling.MDAnalysisModeling.get_sequence" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the amino acid sequence with one letter characters of an MDAnalysis molecule.
 All residues not named as standard amino acid will receive the character ‘X’.</p>
 <dl class="field-list simple">
@@ -547,9 +536,9 @@ All residues not named as standard amino acid will receive the character ‘X’
 </dd>
 </dl>
 </dd></dl>
-<dl class="function">
-<dt id="kinoml.modeling.MDAnalysisModeling.get_structure_sequence_alignment">
-<code class="sig-prename descclassname">kinoml.modeling.MDAnalysisModeling.</code><code class="sig-name descname">get_structure_sequence_alignment</code><span class="sig-paren">(</span><em class="sig-param">molecule: Union[Universe, AtomGroup], sequence: str</em><span class="sig-paren">)</span> → Tuple[str, str]<a class="headerlink" href="#kinoml.modeling.MDAnalysisModeling.get_structure_sequence_alignment" title="Permalink to this definition">¶</a></dt>
+<dl class="py function">
+<dt class="sig sig-object py" id="kinoml.modeling.MDAnalysisModeling.get_structure_sequence_alignment">
+<span class="sig-prename descclassname"><span class="pre">kinoml.modeling.MDAnalysisModeling.</span></span><span class="sig-name descname"><span class="pre">get_structure_sequence_alignment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">molecule</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">MDAnalysis.core.universe.Universe</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">MDAnalysis.core.groups.AtomGroup</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sequence</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#kinoml.modeling.MDAnalysisModeling.get_structure_sequence_alignment" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate an alignment between an MDAnalysis protein structure and an amino acid sequence. The
 provided protein structure should only contain protein residues to prevent unexpected behavior.
 Also, this alignment was optimized for highly similar sequences, i.e. only few mutations,
@@ -572,9 +561,9 @@ the universe.</p>
 </dd>
 </dl>
 </dd></dl>
-<dl class="function">
-<dt id="kinoml.modeling.MDAnalysisModeling.delete_alterations">
-<code class="sig-prename descclassname">kinoml.modeling.MDAnalysisModeling.</code><code class="sig-name descname">delete_alterations</code><span class="sig-paren">(</span><em class="sig-param">molecule: Union[Universe, AtomGroup], sequence: str, delete_n_anchors: int = 2, short_protein_segments_cutoff: int = 3</em><span class="sig-paren">)</span> → Universe<a class="headerlink" href="#kinoml.modeling.MDAnalysisModeling.delete_alterations" title="Permalink to this definition">¶</a></dt>
+<dl class="py function">
+<dt class="sig sig-object py" id="kinoml.modeling.MDAnalysisModeling.delete_alterations">
+<span class="sig-prename descclassname"><span class="pre">kinoml.modeling.MDAnalysisModeling.</span></span><span class="sig-name descname"><span class="pre">delete_alterations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">molecule</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">MDAnalysis.core.universe.Universe</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">MDAnalysis.core.groups.AtomGroup</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sequence</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delete_n_anchors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">short_protein_segments_cutoff</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">MDAnalysis.core.universe.Universe</span></span></span><a class="headerlink" href="#kinoml.modeling.MDAnalysisModeling.delete_alterations" title="Permalink to this definition">¶</a></dt>
 <dd><p>Delete residues from an MDAnalysis molecule that are not covered by the given sequence, i.e.
 mutations and insertions. The provided protein structure should only contain protein residues
 to prevent unexpected behavior.</p>
@@ -596,9 +585,9 @@ length up to the specified cutoff.</p></li>
 </dd>
 </dl>
 </dd></dl>
-<dl class="function">
-<dt id="kinoml.modeling.MDAnalysisModeling.delete_short_protein_segments">
-<code class="sig-prename descclassname">kinoml.modeling.MDAnalysisModeling.</code><code class="sig-name descname">delete_short_protein_segments</code><span class="sig-paren">(</span><em class="sig-param">molecule: Union[Universe, AtomGroup], cutoff: int = 3</em><span class="sig-paren">)</span> → Universe<a class="headerlink" href="#kinoml.modeling.MDAnalysisModeling.delete_short_protein_segments" title="Permalink to this definition">¶</a></dt>
+<dl class="py function">
+<dt class="sig sig-object py" id="kinoml.modeling.MDAnalysisModeling.delete_short_protein_segments">
+<span class="sig-prename descclassname"><span class="pre">kinoml.modeling.MDAnalysisModeling.</span></span><span class="sig-name descname"><span class="pre">delete_short_protein_segments</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">molecule</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">MDAnalysis.core.universe.Universe</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">MDAnalysis.core.groups.AtomGroup</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cutoff</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">MDAnalysis.core.universe.Universe</span></span></span><a class="headerlink" href="#kinoml.modeling.MDAnalysisModeling.delete_short_protein_segments" title="Permalink to this definition">¶</a></dt>
 <dd><p>Delete protein segments consisting of 3 or less residues. Needs to have bonding information
 to work correctly.</p>
 <dl class="field-list simple">
@@ -616,9 +605,9 @@ to work correctly.</p>
 </dd>
 </dl>
 </dd></dl>
-<dl class="function">
-<dt id="kinoml.modeling.MDAnalysisModeling.renumber_protein_residues">
-<code class="sig-prename descclassname">kinoml.modeling.MDAnalysisModeling.</code><code class="sig-name descname">renumber_protein_residues</code><span class="sig-paren">(</span><em class="sig-param">molecule: Union[Universe, AtomGroup], template_sequence: str</em><span class="sig-paren">)</span> → Universe<a class="headerlink" href="#kinoml.modeling.MDAnalysisModeling.renumber_protein_residues" title="Permalink to this definition">¶</a></dt>
+<dl class="py function">
+<dt class="sig sig-object py" id="kinoml.modeling.MDAnalysisModeling.renumber_protein_residues">
+<span class="sig-prename descclassname"><span class="pre">kinoml.modeling.MDAnalysisModeling.</span></span><span class="sig-name descname"><span class="pre">renumber_protein_residues</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">molecule</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">MDAnalysis.core.universe.Universe</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">MDAnalysis.core.groups.AtomGroup</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">template_sequence</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">MDAnalysis.core.universe.Universe</span></span></span><a class="headerlink" href="#kinoml.modeling.MDAnalysisModeling.renumber_protein_residues" title="Permalink to this definition">¶</a></dt>
 <dd><p>Renumber a protein structure according to the provided sequence.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -635,9 +624,9 @@ to work correctly.</p>
 </dd>
 </dl>
 </dd></dl>
-<dl class="function">
-<dt id="kinoml.modeling.MDAnalysisModeling.update_residue_identifiers">
-<code class="sig-prename descclassname">kinoml.modeling.MDAnalysisModeling.</code><code class="sig-name descname">update_residue_identifiers</code><span class="sig-paren">(</span><em class="sig-param">molecule: Union[Universe, AtomGroup], keep_protein_residue_ids: bool = True, keep_chain_ids: bool = False</em><span class="sig-paren">)</span> → Universe<a class="headerlink" href="#kinoml.modeling.MDAnalysisModeling.update_residue_identifiers" title="Permalink to this definition">¶</a></dt>
+<dl class="py function">
+<dt class="sig sig-object py" id="kinoml.modeling.MDAnalysisModeling.update_residue_identifiers">
+<span class="sig-prename descclassname"><span class="pre">kinoml.modeling.MDAnalysisModeling.</span></span><span class="sig-name descname"><span class="pre">update_residue_identifiers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">molecule</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">MDAnalysis.core.universe.Universe</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">MDAnalysis.core.groups.AtomGroup</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_protein_residue_ids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_chain_ids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">MDAnalysis.core.universe.Universe</span></span></span><a class="headerlink" href="#kinoml.modeling.MDAnalysisModeling.update_residue_identifiers" title="Permalink to this definition">¶</a></dt>
 <dd><p>Update the atom, residue and chain IDs of the given molecular structure. All residues become
 part of chain A, unless ‘keep_chain_ids’ is set True. Atom IDs will start from 1. Residue IDs
 will start from 1, except ‘keep_protein_residue_ids’ is set True. This is especially useful, if
@@ -709,7 +698,7 @@ separate chains.</p>
               
           </div>
             Created using
-            <a href="http://www.sphinx-doc.org/">Sphinx</a> 2.4.5.
+            <a href="http://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
              and
             <a href="https://github.com/bashtage/sphinx-material/">Material for
               Sphinx</a>

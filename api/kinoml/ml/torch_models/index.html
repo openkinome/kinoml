@@ -1,9 +1,10 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
@@ -49,26 +50,23 @@
   
   
     <title>kinoml.ml.torch_models &#8212; KinoML 0.1 documentation</title>
-    <link rel="stylesheet" href="../../../../_static/material.css" type="text/css" />
-    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/material.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/twemoji.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css" />
-    <link rel="stylesheet" type="text/css" href="../../../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
-    <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
     <script src="../../../../_static/jquery.js"></script>
     <script src="../../../../_static/underscore.js"></script>
     <script src="../../../../_static/doctools.js"></script>
-    <script src="../../../../_static/language_data.js"></script>
     <script src="https://twemoji.maxcdn.com/v/latest/twemoji.min.js"></script>
     <script src="../../../../_static/twemoji.js"></script>
     <script src="../../../../_static/clipboard.min.js"></script>
     <script src="../../../../_static/copybutton.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "tex2jax_ignore|mathjax_ignore|document", "processClass": "tex2jax_process|mathjax_process|math|output_area", "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
     <link rel="shortcut icon" href="../../../../_static/custom_favicon.png"/>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
@@ -178,8 +176,6 @@
             
             <li class="md-tabs__item"><a href="../../../../index.html" class="md-tabs__link">User guide</a></li>
             
-            <li class="md-tabs__item"><a href="../../../../developers/api_concepts.html" class="md-tabs__link">Developers</a></li>
-            
             <li class="md-tabs__item"><a href="../../index.html" class="md-tabs__link">API Reference</a></li>
             
             <li class="md-tabs__item"><a href="https://openkinome.org" class="md-tabs__link">OpenKinome</a></li>
@@ -231,14 +227,14 @@
     <li class="md-nav__item">
     
     
-      <a href="../../../../getting_started.html" class="md-nav__link">Getting started</a>
+      <a href="../../../../notebooks/getting_started.html" class="md-nav__link">Getting Started</a>
       
     
     </li>
     <li class="md-nav__item">
     
     
-      <a href="../../../../install.html" class="md-nav__link">Installation</a>
+      <a href="../../../../notebooks/kinoml_object_model.html" class="md-nav__link">KinoML object model</a>
       
     
     </li>
@@ -250,27 +246,20 @@
     <li class="md-nav__item">
     
     
-      <a href="../../../../tutorials/example.html" class="md-nav__link">Tutorial 1</a>
+      <a href="../../../../notebooks/OpenEye_structural_featurizer.html" class="md-nav__link">OpenEye Structural Featurizer</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="../../../../notebooks/Schrodinger_structural_featurizer.html" class="md-nav__link">Schrodinger Structural Featurizer</a>
       
     
     </li>
     <li class="md-nav__item">
     
       <span class="md-nav__link caption"><span class="caption-text">Developers</span></span>
-    
-    </li>
-    <li class="md-nav__item">
-    
-    
-      <a href="../../../../developers/api_concepts.html" class="md-nav__link">Base concepts in our API</a>
-      
-    
-    </li>
-    <li class="md-nav__item">
-    
-    
-      <a href="../../../../developers/api_docs.html" class="md-nav__link">How to write docs with Sphinx, MyST and Material Theme</a>
-      
     
     </li>
     <li class="md-nav__item">
@@ -386,17 +375,17 @@
 <span id="kinoml-ml-torch-models"></span><h1 id="api-kinoml-ml-torch-models-index--page-root"><a class="reference internal" href="#api-kinoml-ml-torch-models-index--page-root" title="kinoml.ml.torch_models"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.ml.torch_models</span></code></a><a class="headerlink" href="#api-kinoml-ml-torch-models-index--page-root" title="Permalink to this headline">¶</a></h1>
 <section id="module-contents">
 <h2 id="module-contents">Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="kinoml.ml.torch_models._BaseModule">
-<em class="property">class </em><code class="sig-prename descclassname">kinoml.ml.torch_models.</code><code class="sig-name descname">_BaseModule</code><a class="headerlink" href="#kinoml.ml.torch_models._BaseModule" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.Module</span></code></p>
-<dl class="attribute">
-<dt id="kinoml.ml.torch_models._BaseModule.needs_input_shape">
-<code class="sig-name descname">needs_input_shape</code><em class="property"> = True</em><a class="headerlink" href="#kinoml.ml.torch_models._BaseModule.needs_input_shape" title="Permalink to this definition">¶</a></dt>
+<dl class="py class">
+<dt class="sig sig-object py" id="kinoml.ml.torch_models._BaseModule">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">kinoml.ml.torch_models.</span></span><span class="sig-name descname"><span class="pre">_BaseModule</span></span><a class="headerlink" href="#kinoml.ml.torch_models._BaseModule" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.nn.Module</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="kinoml.ml.torch_models._BaseModule.needs_input_shape">
+<span class="sig-name descname"><span class="pre">needs_input_shape</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">True</span></em><a class="headerlink" href="#kinoml.ml.torch_models._BaseModule.needs_input_shape" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-<dl class="method">
-<dt id="kinoml.ml.torch_models._BaseModule.estimate_input_shape">
-<em class="property">static </em><code class="sig-name descname">estimate_input_shape</code><span class="sig-paren">(</span><em class="sig-param">input_sample</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.torch_models._BaseModule.estimate_input_shape" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.ml.torch_models._BaseModule.estimate_input_shape">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">estimate_input_shape</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_sample</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.torch_models._BaseModule.estimate_input_shape" title="Permalink to this definition">¶</a></dt>
 <dd><p>This static method takes the same input
 as <code class="docutils literal notranslate"><span class="pre">.forward()</span></code> would and estimates the
 incoming shape so the layers can be initialized
@@ -409,10 +398,10 @@ we need.</p>
 than a Tensor, please adapt this method accordingly.</p>
 </dd></dl>
 </dd></dl>
-<dl class="class">
-<dt id="kinoml.ml.torch_models.NeuralNetworkRegression">
-<em class="property">class </em><code class="sig-prename descclassname">kinoml.ml.torch_models.</code><code class="sig-name descname">NeuralNetworkRegression</code><span class="sig-paren">(</span><em class="sig-param">input_shape</em>, <em class="sig-param">hidden_shape=100</em>, <em class="sig-param">output_shape=1</em>, <em class="sig-param">activation=F.relu</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.torch_models.NeuralNetworkRegression" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#kinoml.ml.torch_models._BaseModule" title="kinoml.ml.torch_models._BaseModule"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.ml.torch_models._BaseModule</span></code></a></p>
+<dl class="py class">
+<dt class="sig sig-object py" id="kinoml.ml.torch_models.NeuralNetworkRegression">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">kinoml.ml.torch_models.</span></span><span class="sig-name descname"><span class="pre">NeuralNetworkRegression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_shape</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hidden_shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">activation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">F.relu</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.torch_models.NeuralNetworkRegression" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#kinoml.ml.torch_models._BaseModule" title="kinoml.ml.torch_models._BaseModule"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_BaseModule</span></code></a></p>
 <p>Builds a vanilla neural network and a feed-forward pass for a ligand setting.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -424,9 +413,9 @@ than a Tensor, please adapt this method accordingly.</p>
 </ul>
 </dd>
 </dl>
-<dl class="method">
-<dt id="kinoml.ml.torch_models.NeuralNetworkRegression.forward">
-<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">system</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.torch_models.NeuralNetworkRegression.forward" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.ml.torch_models.NeuralNetworkRegression.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">system</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.torch_models.NeuralNetworkRegression.forward" title="Permalink to this definition">¶</a></dt>
 <dd><p>Defines the foward pass for a system,
 which contains the featurized molecular components and the associated measurement/label.
 Since only the featurized system is needed, the first element is retrieved.
@@ -438,18 +427,18 @@ In this case, the ligand is a 1D array of shape (<cite>length of fingerprint</ci
 </div>
 </dd></dl>
 </dd></dl>
-<dl class="class">
-<dt id="kinoml.ml.torch_models.ListOfTupleNeuralNetworkregression">
-<em class="property">class </em><code class="sig-prename descclassname">kinoml.ml.torch_models.</code><code class="sig-name descname">ListOfTupleNeuralNetworkregression</code><span class="sig-paren">(</span><em class="sig-param">input_shape</em>, <em class="sig-param">hidden_shape=100</em>, <em class="sig-param">output_shape=1</em>, <em class="sig-param">activation=F.relu</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.torch_models.ListOfTupleNeuralNetworkregression" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#kinoml.ml.torch_models.NeuralNetworkRegression" title="kinoml.ml.torch_models.NeuralNetworkRegression"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.ml.torch_models.NeuralNetworkRegression</span></code></a></p>
+<dl class="py class">
+<dt class="sig sig-object py" id="kinoml.ml.torch_models.ListOfTupleNeuralNetworkregression">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">kinoml.ml.torch_models.</span></span><span class="sig-name descname"><span class="pre">ListOfTupleNeuralNetworkregression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_shape</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hidden_shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">activation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">F.relu</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.torch_models.ListOfTupleNeuralNetworkregression" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#kinoml.ml.torch_models.NeuralNetworkRegression" title="kinoml.ml.torch_models.NeuralNetworkRegression"><code class="xref py py-obj docutils literal notranslate"><span class="pre">NeuralNetworkRegression</span></code></a></p>
 <p>This example model does not take a Tensor in, but a
 tuple of tensors. Each tensor has shape
 (n_systems, n_features).</p>
 <p>As a result, one needs to concatenate the results
 before passing it to the parent <code class="docutils literal notranslate"><span class="pre">.forward()</span></code> method.</p>
-<dl class="method">
-<dt id="kinoml.ml.torch_models.ListOfTupleNeuralNetworkregression.estimate_input_shape">
-<em class="property">static </em><code class="sig-name descname">estimate_input_shape</code><span class="sig-paren">(</span><em class="sig-param">input_sample</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.torch_models.ListOfTupleNeuralNetworkregression.estimate_input_shape" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.ml.torch_models.ListOfTupleNeuralNetworkregression.estimate_input_shape">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">estimate_input_shape</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_sample</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.torch_models.ListOfTupleNeuralNetworkregression.estimate_input_shape" title="Permalink to this definition">¶</a></dt>
 <dd><p>This static method takes the same input
 as <code class="docutils literal notranslate"><span class="pre">.forward()</span></code> would and estimates the
 incoming shape so the layers can be initialized
@@ -461,9 +450,9 @@ we need.</p>
 <p>If your <code class="docutils literal notranslate"><span class="pre">.forward()</span></code> method takes something else
 than a Tensor, please adapt this method accordingly.</p>
 </dd></dl>
-<dl class="method">
-<dt id="kinoml.ml.torch_models.ListOfTupleNeuralNetworkregression.forward">
-<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">x</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.torch_models.ListOfTupleNeuralNetworkregression.forward" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.ml.torch_models.ListOfTupleNeuralNetworkregression.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.torch_models.ListOfTupleNeuralNetworkregression.forward" title="Permalink to this definition">¶</a></dt>
 <dd><p>Defines the foward pass for a system,
 which contains the featurized molecular components and the associated measurement/label.
 Since only the featurized system is needed, the first element is retrieved.
@@ -475,10 +464,10 @@ In this case, the ligand is a 1D array of shape (<cite>length of fingerprint</ci
 </div>
 </dd></dl>
 </dd></dl>
-<dl class="class">
-<dt id="kinoml.ml.torch_models.DenseNeuralNetworkRegression">
-<em class="property">class </em><code class="sig-prename descclassname">kinoml.ml.torch_models.</code><code class="sig-name descname">DenseNeuralNetworkRegression</code><span class="sig-paren">(</span><em class="sig-param">input_shape</em>, <em class="sig-param">hidden_shape=(350</em>, <em class="sig-param">200</em>, <em class="sig-param">100</em>, <em class="sig-param">50</em>, <em class="sig-param">16)</em>, <em class="sig-param">output_shape=1</em>, <em class="sig-param">dropout_percentage=0.4</em>, <em class="sig-param">activation=F.relu</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.torch_models.DenseNeuralNetworkRegression" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#kinoml.ml.torch_models._BaseModule" title="kinoml.ml.torch_models._BaseModule"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.ml.torch_models._BaseModule</span></code></a></p>
+<dl class="py class">
+<dt class="sig sig-object py" id="kinoml.ml.torch_models.DenseNeuralNetworkRegression">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">kinoml.ml.torch_models.</span></span><span class="sig-name descname"><span class="pre">DenseNeuralNetworkRegression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_shape</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hidden_shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(350,</span> <span class="pre">200,</span> <span class="pre">100,</span> <span class="pre">50,</span> <span class="pre">16)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dropout_percentage</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">activation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">F.relu</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.torch_models.DenseNeuralNetworkRegression" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#kinoml.ml.torch_models._BaseModule" title="kinoml.ml.torch_models._BaseModule"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_BaseModule</span></code></a></p>
 <p>Builds a Dense Neural Network and a feed-forward pass.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -491,16 +480,16 @@ In this case, the ligand is a 1D array of shape (<cite>length of fingerprint</ci
 </ul>
 </dd>
 </dl>
-<dl class="method">
-<dt id="kinoml.ml.torch_models.DenseNeuralNetworkRegression.forward">
-<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">x</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.torch_models.DenseNeuralNetworkRegression.forward" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.ml.torch_models.DenseNeuralNetworkRegression.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.torch_models.DenseNeuralNetworkRegression.forward" title="Permalink to this definition">¶</a></dt>
 <dd><p>Defines the foward pass for a given input ‘x’</p>
 </dd></dl>
 </dd></dl>
-<dl class="class">
-<dt id="kinoml.ml.torch_models.ConvolutionNeuralNetworkRegression">
-<em class="property">class </em><code class="sig-prename descclassname">kinoml.ml.torch_models.</code><code class="sig-name descname">ConvolutionNeuralNetworkRegression</code><span class="sig-paren">(</span><em class="sig-param">input_shape</em>, <em class="sig-param">embedding_shape=300</em>, <em class="sig-param">kernel_shape=10</em>, <em class="sig-param">hidden_shape=100</em>, <em class="sig-param">output_shape=1</em>, <em class="sig-param">activation=F.relu</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.torch_models.ConvolutionNeuralNetworkRegression" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#kinoml.ml.torch_models._BaseModule" title="kinoml.ml.torch_models._BaseModule"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.ml.torch_models._BaseModule</span></code></a></p>
+<dl class="py class">
+<dt class="sig sig-object py" id="kinoml.ml.torch_models.ConvolutionNeuralNetworkRegression">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">kinoml.ml.torch_models.</span></span><span class="sig-name descname"><span class="pre">ConvolutionNeuralNetworkRegression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_shape</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">embedding_shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">300</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernel_shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hidden_shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">activation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">F.relu</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.torch_models.ConvolutionNeuralNetworkRegression" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#kinoml.ml.torch_models._BaseModule" title="kinoml.ml.torch_models._BaseModule"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_BaseModule</span></code></a></p>
 <p>Builds a Convolutional Neural Network and a feed-forward pass for a ligand setting.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -514,9 +503,9 @@ In this case, the ligand is a 1D array of shape (<cite>length of fingerprint</ci
 </ul>
 </dd>
 </dl>
-<dl class="method">
-<dt id="kinoml.ml.torch_models.ConvolutionNeuralNetworkRegression.forward">
-<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">system</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.torch_models.ConvolutionNeuralNetworkRegression.forward" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.ml.torch_models.ConvolutionNeuralNetworkRegression.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">system</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.torch_models.ConvolutionNeuralNetworkRegression.forward" title="Permalink to this definition">¶</a></dt>
 <dd><p>Defines the foward pass for a system,
 which contains the featurized molecular components and the associated measurement/label.
 Since only the featurized system is needed, the first element is retrieved.
@@ -528,10 +517,10 @@ In this case, the ligand is a 2D array of shape (<cite>nb of character</cite>, <
 </div>
 </dd></dl>
 </dd></dl>
-<dl class="class">
-<dt id="kinoml.ml.torch_models.ConvolutionNeuralNetworkRegressionProteinInformed">
-<em class="property">class </em><code class="sig-prename descclassname">kinoml.ml.torch_models.</code><code class="sig-name descname">ConvolutionNeuralNetworkRegressionProteinInformed</code><span class="sig-paren">(</span><em class="sig-param">input_shape</em>, <em class="sig-param">embedding_shape=300</em>, <em class="sig-param">kernel_shape=10</em>, <em class="sig-param">hidden_shape=100</em>, <em class="sig-param">output_shape=1</em>, <em class="sig-param">activation=F.relu</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.torch_models.ConvolutionNeuralNetworkRegressionProteinInformed" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#kinoml.ml.torch_models._BaseModule" title="kinoml.ml.torch_models._BaseModule"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.ml.torch_models._BaseModule</span></code></a></p>
+<dl class="py class">
+<dt class="sig sig-object py" id="kinoml.ml.torch_models.ConvolutionNeuralNetworkRegressionProteinInformed">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">kinoml.ml.torch_models.</span></span><span class="sig-name descname"><span class="pre">ConvolutionNeuralNetworkRegressionProteinInformed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_shape</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">embedding_shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">300</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernel_shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hidden_shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">activation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">F.relu</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.torch_models.ConvolutionNeuralNetworkRegressionProteinInformed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#kinoml.ml.torch_models._BaseModule" title="kinoml.ml.torch_models._BaseModule"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_BaseModule</span></code></a></p>
 <p>Builds a Convolutional Neural Network and a feed-forward pass for a protein-ligand setting.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -545,9 +534,9 @@ In this case, the ligand is a 2D array of shape (<cite>nb of character</cite>, <
 </ul>
 </dd>
 </dl>
-<dl class="method">
-<dt id="kinoml.ml.torch_models.ConvolutionNeuralNetworkRegressionProteinInformed.forward">
-<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">system</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.torch_models.ConvolutionNeuralNetworkRegressionProteinInformed.forward" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.ml.torch_models.ConvolutionNeuralNetworkRegressionProteinInformed.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">system</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.torch_models.ConvolutionNeuralNetworkRegressionProteinInformed.forward" title="Permalink to this definition">¶</a></dt>
 <dd><p>Defines the foward pass for given a system,
 which contains the featurized molecular components and the associated measurement/label.
 In this case, the input is composed of two entities:
@@ -561,10 +550,10 @@ and the protein a 2D array of shape (<cite>nb of residues</cite>, <cite>length o
 </div>
 </dd></dl>
 </dd></dl>
-<dl class="class">
-<dt id="kinoml.ml.torch_models.NeuralNetworkRegressionProteinInformed">
-<em class="property">class </em><code class="sig-prename descclassname">kinoml.ml.torch_models.</code><code class="sig-name descname">NeuralNetworkRegressionProteinInformed</code><span class="sig-paren">(</span><em class="sig-param">input_shape</em>, <em class="sig-param">embedding_shape_ligand=300</em>, <em class="sig-param">embedding_shape_protein=10</em>, <em class="sig-param">kernel_shape=10</em>, <em class="sig-param">hidden_shape=100</em>, <em class="sig-param">output_shape=1</em>, <em class="sig-param">activation=F.relu</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.torch_models.NeuralNetworkRegressionProteinInformed" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#kinoml.ml.torch_models._BaseModule" title="kinoml.ml.torch_models._BaseModule"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.ml.torch_models._BaseModule</span></code></a></p>
+<dl class="py class">
+<dt class="sig sig-object py" id="kinoml.ml.torch_models.NeuralNetworkRegressionProteinInformed">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">kinoml.ml.torch_models.</span></span><span class="sig-name descname"><span class="pre">NeuralNetworkRegressionProteinInformed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_shape</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">embedding_shape_ligand</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">300</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">embedding_shape_protein</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernel_shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hidden_shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">activation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">F.relu</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.torch_models.NeuralNetworkRegressionProteinInformed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#kinoml.ml.torch_models._BaseModule" title="kinoml.ml.torch_models._BaseModule"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_BaseModule</span></code></a></p>
 <p>Builds a Neural Network and a feed-forward pass for a protein-ligand setting.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -579,9 +568,9 @@ and the protein a 2D array of shape (<cite>nb of residues</cite>, <cite>length o
 </ul>
 </dd>
 </dl>
-<dl class="method">
-<dt id="kinoml.ml.torch_models.NeuralNetworkRegressionProteinInformed.forward">
-<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">system</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.torch_models.NeuralNetworkRegressionProteinInformed.forward" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.ml.torch_models.NeuralNetworkRegressionProteinInformed.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">system</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.torch_models.NeuralNetworkRegressionProteinInformed.forward" title="Permalink to this definition">¶</a></dt>
 <dd><p>Defines the foward pass for given a system,
 which contains the featurized molecular components and the associated measurement/label.
 In this case, the input is composed of two entities:
@@ -645,7 +634,7 @@ and the protein a 1D array of shape (<cite>length of sequence composition</cite>
               
           </div>
             Created using
-            <a href="http://www.sphinx-doc.org/">Sphinx</a> 2.4.5.
+            <a href="http://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
              and
             <a href="https://github.com/bashtage/sphinx-material/">Material for
               Sphinx</a>

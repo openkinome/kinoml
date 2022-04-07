@@ -1,9 +1,10 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
@@ -49,26 +50,23 @@
   
   
     <title>kinoml.ml.torch_geometric_models &#8212; KinoML 0.1 documentation</title>
-    <link rel="stylesheet" href="../../../../_static/material.css" type="text/css" />
-    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/material.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/twemoji.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css" />
-    <link rel="stylesheet" type="text/css" href="../../../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
-    <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
     <script src="../../../../_static/jquery.js"></script>
     <script src="../../../../_static/underscore.js"></script>
     <script src="../../../../_static/doctools.js"></script>
-    <script src="../../../../_static/language_data.js"></script>
     <script src="https://twemoji.maxcdn.com/v/latest/twemoji.min.js"></script>
     <script src="../../../../_static/twemoji.js"></script>
     <script src="../../../../_static/clipboard.min.js"></script>
     <script src="../../../../_static/copybutton.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "tex2jax_ignore|mathjax_ignore|document", "processClass": "tex2jax_process|mathjax_process|math|output_area", "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
     <link rel="shortcut icon" href="../../../../_static/custom_favicon.png"/>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
@@ -178,8 +176,6 @@
             
             <li class="md-tabs__item"><a href="../../../../index.html" class="md-tabs__link">User guide</a></li>
             
-            <li class="md-tabs__item"><a href="../../../../developers/api_concepts.html" class="md-tabs__link">Developers</a></li>
-            
             <li class="md-tabs__item"><a href="../../index.html" class="md-tabs__link">API Reference</a></li>
             
             <li class="md-tabs__item"><a href="https://openkinome.org" class="md-tabs__link">OpenKinome</a></li>
@@ -231,14 +227,14 @@
     <li class="md-nav__item">
     
     
-      <a href="../../../../getting_started.html" class="md-nav__link">Getting started</a>
+      <a href="../../../../notebooks/getting_started.html" class="md-nav__link">Getting Started</a>
       
     
     </li>
     <li class="md-nav__item">
     
     
-      <a href="../../../../install.html" class="md-nav__link">Installation</a>
+      <a href="../../../../notebooks/kinoml_object_model.html" class="md-nav__link">KinoML object model</a>
       
     
     </li>
@@ -250,27 +246,20 @@
     <li class="md-nav__item">
     
     
-      <a href="../../../../tutorials/example.html" class="md-nav__link">Tutorial 1</a>
+      <a href="../../../../notebooks/OpenEye_structural_featurizer.html" class="md-nav__link">OpenEye Structural Featurizer</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="../../../../notebooks/Schrodinger_structural_featurizer.html" class="md-nav__link">Schrodinger Structural Featurizer</a>
       
     
     </li>
     <li class="md-nav__item">
     
       <span class="md-nav__link caption"><span class="caption-text">Developers</span></span>
-    
-    </li>
-    <li class="md-nav__item">
-    
-    
-      <a href="../../../../developers/api_concepts.html" class="md-nav__link">Base concepts in our API</a>
-      
-    
-    </li>
-    <li class="md-nav__item">
-    
-    
-      <a href="../../../../developers/api_docs.html" class="md-nav__link">How to write docs with Sphinx, MyST and Material Theme</a>
-      
     
     </li>
     <li class="md-nav__item">
@@ -351,10 +340,10 @@
 <p>Implementation of some Deep Neural Networks in Pytorch using Pytorch Geometric.</p>
 <section id="module-contents">
 <h2 id="module-contents">Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="kinoml.ml.torch_geometric_models.GraphConvolutionNeuralNetwork">
-<em class="property">class </em><code class="sig-prename descclassname">kinoml.ml.torch_geometric_models.</code><code class="sig-name descname">GraphConvolutionNeuralNetwork</code><span class="sig-paren">(</span><em class="sig-param">input_shape</em>, <em class="sig-param">embedding_shape=100</em>, <em class="sig-param">hidden_shape=50</em>, <em class="sig-param">output_shape=1</em>, <em class="sig-param">activation=F.relu</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.torch_geometric_models.GraphConvolutionNeuralNetwork" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="../torch_models/index.html#kinoml.ml.torch_models._BaseModule" title="kinoml.ml.torch_models._BaseModule"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.ml.torch_models._BaseModule</span></code></a></p>
+<dl class="py class">
+<dt class="sig sig-object py" id="kinoml.ml.torch_geometric_models.GraphConvolutionNeuralNetwork">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">kinoml.ml.torch_geometric_models.</span></span><span class="sig-name descname"><span class="pre">GraphConvolutionNeuralNetwork</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_shape</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">embedding_shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hidden_shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">activation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">F.relu</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.torch_geometric_models.GraphConvolutionNeuralNetwork" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../torch_models/index.html#kinoml.ml.torch_models._BaseModule" title="kinoml.ml.torch_models._BaseModule"><code class="xref py py-obj docutils literal notranslate"><span class="pre">kinoml.ml.torch_models._BaseModule</span></code></a></p>
 <p>Builds a Graph Convolutional Network and a feed-forward pass</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -367,13 +356,13 @@
 </ul>
 </dd>
 </dl>
-<dl class="attribute">
-<dt id="kinoml.ml.torch_geometric_models.GraphConvolutionNeuralNetwork.needs_input_shape">
-<code class="sig-name descname">needs_input_shape</code><em class="property"> = True</em><a class="headerlink" href="#kinoml.ml.torch_geometric_models.GraphConvolutionNeuralNetwork.needs_input_shape" title="Permalink to this definition">¶</a></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="kinoml.ml.torch_geometric_models.GraphConvolutionNeuralNetwork.needs_input_shape">
+<span class="sig-name descname"><span class="pre">needs_input_shape</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">True</span></em><a class="headerlink" href="#kinoml.ml.torch_geometric_models.GraphConvolutionNeuralNetwork.needs_input_shape" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-<dl class="method">
-<dt id="kinoml.ml.torch_geometric_models.GraphConvolutionNeuralNetwork.estimate_input_shape">
-<em class="property">static </em><code class="sig-name descname">estimate_input_shape</code><span class="sig-paren">(</span><em class="sig-param">input_sample</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.torch_geometric_models.GraphConvolutionNeuralNetwork.estimate_input_shape" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.ml.torch_geometric_models.GraphConvolutionNeuralNetwork.estimate_input_shape">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">estimate_input_shape</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_sample</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.torch_geometric_models.GraphConvolutionNeuralNetwork.estimate_input_shape" title="Permalink to this definition">¶</a></dt>
 <dd><p>This static method takes the same input
 as <code class="docutils literal notranslate"><span class="pre">.forward()</span></code> would and estimates the
 incoming shape so the layers can be initialized
@@ -385,9 +374,9 @@ we need.</p>
 <p>If your <code class="docutils literal notranslate"><span class="pre">.forward()</span></code> method takes something else
 than a Tensor, please adapt this method accordingly.</p>
 </dd></dl>
-<dl class="method">
-<dt id="kinoml.ml.torch_geometric_models.GraphConvolutionNeuralNetwork.forward">
-<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">data</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.torch_geometric_models.GraphConvolutionNeuralNetwork.forward" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.ml.torch_geometric_models.GraphConvolutionNeuralNetwork.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.torch_geometric_models.GraphConvolutionNeuralNetwork.forward" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 </dd></dl>
 </section>
@@ -440,7 +429,7 @@ than a Tensor, please adapt this method accordingly.</p>
               
           </div>
             Created using
-            <a href="http://www.sphinx-doc.org/">Sphinx</a> 2.4.5.
+            <a href="http://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
              and
             <a href="https://github.com/bashtage/sphinx-material/">Material for
               Sphinx</a>

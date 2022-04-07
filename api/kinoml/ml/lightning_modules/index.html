@@ -1,9 +1,10 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
@@ -49,26 +50,23 @@
   
   
     <title>kinoml.ml.lightning_modules &#8212; KinoML 0.1 documentation</title>
-    <link rel="stylesheet" href="../../../../_static/material.css" type="text/css" />
-    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/material.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/twemoji.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css" />
-    <link rel="stylesheet" type="text/css" href="../../../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
-    <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
     <script src="../../../../_static/jquery.js"></script>
     <script src="../../../../_static/underscore.js"></script>
     <script src="../../../../_static/doctools.js"></script>
-    <script src="../../../../_static/language_data.js"></script>
     <script src="https://twemoji.maxcdn.com/v/latest/twemoji.min.js"></script>
     <script src="../../../../_static/twemoji.js"></script>
     <script src="../../../../_static/clipboard.min.js"></script>
     <script src="../../../../_static/copybutton.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "tex2jax_ignore|mathjax_ignore|document", "processClass": "tex2jax_process|mathjax_process|math|output_area", "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
     <link rel="shortcut icon" href="../../../../_static/custom_favicon.png"/>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
@@ -178,8 +176,6 @@
             
             <li class="md-tabs__item"><a href="../../../../index.html" class="md-tabs__link">User guide</a></li>
             
-            <li class="md-tabs__item"><a href="../../../../developers/api_concepts.html" class="md-tabs__link">Developers</a></li>
-            
             <li class="md-tabs__item"><a href="../../index.html" class="md-tabs__link">API Reference</a></li>
             
             <li class="md-tabs__item"><a href="https://openkinome.org" class="md-tabs__link">OpenKinome</a></li>
@@ -231,14 +227,14 @@
     <li class="md-nav__item">
     
     
-      <a href="../../../../getting_started.html" class="md-nav__link">Getting started</a>
+      <a href="../../../../notebooks/getting_started.html" class="md-nav__link">Getting Started</a>
       
     
     </li>
     <li class="md-nav__item">
     
     
-      <a href="../../../../install.html" class="md-nav__link">Installation</a>
+      <a href="../../../../notebooks/kinoml_object_model.html" class="md-nav__link">KinoML object model</a>
       
     
     </li>
@@ -250,27 +246,20 @@
     <li class="md-nav__item">
     
     
-      <a href="../../../../tutorials/example.html" class="md-nav__link">Tutorial 1</a>
+      <a href="../../../../notebooks/OpenEye_structural_featurizer.html" class="md-nav__link">OpenEye Structural Featurizer</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="../../../../notebooks/Schrodinger_structural_featurizer.html" class="md-nav__link">Schrodinger Structural Featurizer</a>
       
     
     </li>
     <li class="md-nav__item">
     
       <span class="md-nav__link caption"><span class="caption-text">Developers</span></span>
-    
-    </li>
-    <li class="md-nav__item">
-    
-    
-      <a href="../../../../developers/api_concepts.html" class="md-nav__link">Base concepts in our API</a>
-      
-    
-    </li>
-    <li class="md-nav__item">
-    
-    
-      <a href="../../../../developers/api_docs.html" class="md-nav__link">How to write docs with Sphinx, MyST and Material Theme</a>
-      
     
     </li>
     <li class="md-nav__item">
@@ -434,180 +423,180 @@
 <p>WIP</p>
 <section id="module-contents">
 <h2 id="module-contents">Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="kinoml.ml.lightning_modules.RootMeanSquaredError">
-<em class="property">class </em><code class="sig-prename descclassname">kinoml.ml.lightning_modules.</code><code class="sig-name descname">RootMeanSquaredError</code><a class="headerlink" href="#kinoml.ml.lightning_modules.RootMeanSquaredError" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pytorch_lightning.metrics.MeanSquaredError</span></code></p>
+<dl class="py class">
+<dt class="sig sig-object py" id="kinoml.ml.lightning_modules.RootMeanSquaredError">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">kinoml.ml.lightning_modules.</span></span><span class="sig-name descname"><span class="pre">RootMeanSquaredError</span></span><a class="headerlink" href="#kinoml.ml.lightning_modules.RootMeanSquaredError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">pytorch_lightning.metrics.MeanSquaredError</span></code></p>
 <p>WIP</p>
-<dl class="method">
-<dt id="kinoml.ml.lightning_modules.RootMeanSquaredError.compute">
-<code class="sig-name descname">compute</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.RootMeanSquaredError.compute" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.ml.lightning_modules.RootMeanSquaredError.compute">
+<span class="sig-name descname"><span class="pre">compute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.RootMeanSquaredError.compute" title="Permalink to this definition">¶</a></dt>
 <dd><p>WIP</p>
 </dd></dl>
 </dd></dl>
-<dl class="class">
-<dt id="kinoml.ml.lightning_modules.ObservationModelModule">
-<em class="property">class </em><code class="sig-prename descclassname">kinoml.ml.lightning_modules.</code><code class="sig-name descname">ObservationModelModule</code><span class="sig-paren">(</span><em class="sig-param">nn_model</em>, <em class="sig-param">optimizer</em>, <em class="sig-param">loss_function</em>, <em class="sig-param">validate=True</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.ObservationModelModule" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pytorch_lightning.LightningModule</span></code></p>
+<dl class="py class">
+<dt class="sig sig-object py" id="kinoml.ml.lightning_modules.ObservationModelModule">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">kinoml.ml.lightning_modules.</span></span><span class="sig-name descname"><span class="pre">ObservationModelModule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nn_model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss_function</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.ObservationModelModule" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">pytorch_lightning.LightningModule</span></code></p>
 <p>WIP</p>
-<dl class="method">
-<dt id="kinoml.ml.lightning_modules.ObservationModelModule.forward">
-<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">x</em>, <em class="sig-param">observation_model=_null_observation_model</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.ObservationModelModule.forward" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.ml.lightning_modules.ObservationModelModule.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">observation_model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">_null_observation_model</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.ObservationModelModule.forward" title="Permalink to this definition">¶</a></dt>
 <dd><p>WIP</p>
 </dd></dl>
-<dl class="method">
-<dt id="kinoml.ml.lightning_modules.ObservationModelModule._standard_step">
-<code class="sig-name descname">_standard_step</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">batch</em>, <em class="sig-param">batch_idx</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.ObservationModelModule._standard_step" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.ml.lightning_modules.ObservationModelModule._standard_step">
+<span class="sig-name descname"><span class="pre">_standard_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_idx</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.ObservationModelModule._standard_step" title="Permalink to this definition">¶</a></dt>
 <dd><p>WIP</p>
 </dd></dl>
-<dl class="method">
-<dt id="kinoml.ml.lightning_modules.ObservationModelModule.training_step">
-<code class="sig-name descname">training_step</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">batch</em>, <em class="sig-param">batch_idx</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.ObservationModelModule.training_step" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.ml.lightning_modules.ObservationModelModule.training_step">
+<span class="sig-name descname"><span class="pre">training_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_idx</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.ObservationModelModule.training_step" title="Permalink to this definition">¶</a></dt>
 <dd><p>WIP</p>
 </dd></dl>
-<dl class="method">
-<dt id="kinoml.ml.lightning_modules.ObservationModelModule._common_validation_test_step">
-<code class="sig-name descname">_common_validation_test_step</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">batch</em>, <em class="sig-param">batch_idx</em>, <em class="sig-param">dataloader_idx=0</em>, <em class="sig-param">metric_prefix='val'</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.ObservationModelModule._common_validation_test_step" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.ml.lightning_modules.ObservationModelModule._common_validation_test_step">
+<span class="sig-name descname"><span class="pre">_common_validation_test_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_idx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataloader_idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric_prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'val'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.ObservationModelModule._common_validation_test_step" title="Permalink to this definition">¶</a></dt>
 <dd><p>WIP</p>
 </dd></dl>
-<dl class="method">
-<dt id="kinoml.ml.lightning_modules.ObservationModelModule._common_validation_test_epoch_end">
-<code class="sig-name descname">_common_validation_test_epoch_end</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">output_results</em>, <em class="sig-param">metric_prefix='val'</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.ObservationModelModule._common_validation_test_epoch_end" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.ml.lightning_modules.ObservationModelModule._common_validation_test_epoch_end">
+<span class="sig-name descname"><span class="pre">_common_validation_test_epoch_end</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_results</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric_prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'val'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.ObservationModelModule._common_validation_test_epoch_end" title="Permalink to this definition">¶</a></dt>
 <dd><p>WIP</p>
 </dd></dl>
-<dl class="method">
-<dt id="kinoml.ml.lightning_modules.ObservationModelModule._disabled_validation_step">
-<code class="sig-name descname">_disabled_validation_step</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.ObservationModelModule._disabled_validation_step" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.ml.lightning_modules.ObservationModelModule._disabled_validation_step">
+<span class="sig-name descname"><span class="pre">_disabled_validation_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.ObservationModelModule._disabled_validation_step" title="Permalink to this definition">¶</a></dt>
 <dd><p>WIP</p>
 </dd></dl>
-<dl class="method">
-<dt id="kinoml.ml.lightning_modules.ObservationModelModule._disabled_validation_epoch_end">
-<code class="sig-name descname">_disabled_validation_epoch_end</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.ObservationModelModule._disabled_validation_epoch_end" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.ml.lightning_modules.ObservationModelModule._disabled_validation_epoch_end">
+<span class="sig-name descname"><span class="pre">_disabled_validation_epoch_end</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.ObservationModelModule._disabled_validation_epoch_end" title="Permalink to this definition">¶</a></dt>
 <dd><p>WIP</p>
 </dd></dl>
-<dl class="method">
-<dt id="kinoml.ml.lightning_modules.ObservationModelModule.test_step">
-<code class="sig-name descname">test_step</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.ObservationModelModule.test_step" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.ml.lightning_modules.ObservationModelModule.test_step">
+<span class="sig-name descname"><span class="pre">test_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.ObservationModelModule.test_step" title="Permalink to this definition">¶</a></dt>
 <dd><p>WIP</p>
 </dd></dl>
-<dl class="method">
-<dt id="kinoml.ml.lightning_modules.ObservationModelModule.test_epoch_end">
-<code class="sig-name descname">test_epoch_end</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.ObservationModelModule.test_epoch_end" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.ml.lightning_modules.ObservationModelModule.test_epoch_end">
+<span class="sig-name descname"><span class="pre">test_epoch_end</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.ObservationModelModule.test_epoch_end" title="Permalink to this definition">¶</a></dt>
 <dd><p>WIP</p>
 </dd></dl>
-<dl class="method">
-<dt id="kinoml.ml.lightning_modules.ObservationModelModule.configure_optimizers">
-<code class="sig-name descname">configure_optimizers</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.ObservationModelModule.configure_optimizers" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.ml.lightning_modules.ObservationModelModule.configure_optimizers">
+<span class="sig-name descname"><span class="pre">configure_optimizers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.ObservationModelModule.configure_optimizers" title="Permalink to this definition">¶</a></dt>
 <dd><p>WIP</p>
 </dd></dl>
 </dd></dl>
-<dl class="class">
-<dt id="kinoml.ml.lightning_modules.MultiDataModule">
-<em class="property">class </em><code class="sig-prename descclassname">kinoml.ml.lightning_modules.</code><code class="sig-name descname">MultiDataModule</code><span class="sig-paren">(</span><em class="sig-param">datasets: List[Dataset], observation_models: List[callable] = (_null_observation_model, ), **kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.MultiDataModule" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pytorch_lightning.LightningDataModule</span></code></p>
+<dl class="py class">
+<dt class="sig sig-object py" id="kinoml.ml.lightning_modules.MultiDataModule">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">kinoml.ml.lightning_modules.</span></span><span class="sig-name descname"><span class="pre">MultiDataModule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">datasets</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">torch.utils.data.Dataset</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">observation_models</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">callable</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(_null_observation_model,)</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.MultiDataModule" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">pytorch_lightning.LightningDataModule</span></code></p>
 <p>WIP</p>
-<dl class="method">
-<dt id="kinoml.ml.lightning_modules.MultiDataModule.dataset_indices_by_size">
-<code class="sig-name descname">dataset_indices_by_size</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">reverse=False</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.MultiDataModule.dataset_indices_by_size" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.ml.lightning_modules.MultiDataModule.dataset_indices_by_size">
+<span class="sig-name descname"><span class="pre">dataset_indices_by_size</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reverse</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.MultiDataModule.dataset_indices_by_size" title="Permalink to this definition">¶</a></dt>
 <dd><p>WIP</p>
 </dd></dl>
-<dl class="method">
-<dt id="kinoml.ml.lightning_modules.MultiDataModule.active_dataset">
-<em class="property">property </em><code class="sig-name descname">active_dataset</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.MultiDataModule.active_dataset" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.ml.lightning_modules.MultiDataModule.active_dataset">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">active_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.MultiDataModule.active_dataset" title="Permalink to this definition">¶</a></dt>
 <dd><p>WIP</p>
 </dd></dl>
-<dl class="method">
-<dt id="kinoml.ml.lightning_modules.MultiDataModule.active_dataset_index">
-<em class="property">property </em><code class="sig-name descname">active_dataset_index</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.MultiDataModule.active_dataset_index" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.ml.lightning_modules.MultiDataModule.active_dataset_index">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">active_dataset_index</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.MultiDataModule.active_dataset_index" title="Permalink to this definition">¶</a></dt>
 <dd><p>WIP</p>
 </dd></dl>
-<dl class="method">
-<dt id="kinoml.ml.lightning_modules.MultiDataModule._build_dataloader">
-<code class="sig-name descname">_build_dataloader</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">dataset_index=None</em>, <em class="sig-param">indices=None</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.MultiDataModule._build_dataloader" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.ml.lightning_modules.MultiDataModule._build_dataloader">
+<span class="sig-name descname"><span class="pre">_build_dataloader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indices</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.MultiDataModule._build_dataloader" title="Permalink to this definition">¶</a></dt>
 <dd><p>WIP</p>
 </dd></dl>
-<dl class="method">
-<dt id="kinoml.ml.lightning_modules.MultiDataModule.train_dataloader">
-<code class="sig-name descname">train_dataloader</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">dataset_index=None</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.MultiDataModule.train_dataloader" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.ml.lightning_modules.MultiDataModule.train_dataloader">
+<span class="sig-name descname"><span class="pre">train_dataloader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.MultiDataModule.train_dataloader" title="Permalink to this definition">¶</a></dt>
 <dd><p>WIP</p>
 </dd></dl>
-<dl class="method">
-<dt id="kinoml.ml.lightning_modules.MultiDataModule.val_dataloader">
-<code class="sig-name descname">val_dataloader</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">dataset_index=None</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.MultiDataModule.val_dataloader" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.ml.lightning_modules.MultiDataModule.val_dataloader">
+<span class="sig-name descname"><span class="pre">val_dataloader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.MultiDataModule.val_dataloader" title="Permalink to this definition">¶</a></dt>
 <dd><p>WIP</p>
 </dd></dl>
-<dl class="method">
-<dt id="kinoml.ml.lightning_modules.MultiDataModule.test_dataloader">
-<code class="sig-name descname">test_dataloader</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">dataset_index=None</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.MultiDataModule.test_dataloader" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.ml.lightning_modules.MultiDataModule.test_dataloader">
+<span class="sig-name descname"><span class="pre">test_dataloader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.MultiDataModule.test_dataloader" title="Permalink to this definition">¶</a></dt>
 <dd><p>WIP</p>
 </dd></dl>
-<dl class="method">
-<dt id="kinoml.ml.lightning_modules.MultiDataModule.get_kfold">
-<code class="sig-name descname">get_kfold</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">nfolds=5</em>, <em class="sig-param">with_validation=True</em>, <em class="sig-param">shuffle=False</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.MultiDataModule.get_kfold" title="Permalink to this definition">¶</a></dt>
-<dd><p>WIP</p>
-</dd></dl>
-</dd></dl>
-<dl class="class">
-<dt id="kinoml.ml.lightning_modules.CrossValidateTrainer">
-<em class="property">class </em><code class="sig-prename descclassname">kinoml.ml.lightning_modules.</code><code class="sig-name descname">CrossValidateTrainer</code><span class="sig-paren">(</span><em class="sig-param">nfolds=5</em>, <em class="sig-param">with_validation=True</em>, <em class="sig-param">shuffle=False</em>, <em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.CrossValidateTrainer" title="Permalink to this definition">¶</a></dt>
-<dd><p>WIP</p>
-<dl class="method">
-<dt id="kinoml.ml.lightning_modules.CrossValidateTrainer.fit">
-<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">model</em>, <em class="sig-param">datamodule</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.CrossValidateTrainer.fit" title="Permalink to this definition">¶</a></dt>
-<dd><p>WIP</p>
-</dd></dl>
-<dl class="method">
-<dt id="kinoml.ml.lightning_modules.CrossValidateTrainer._patch_paths_for_kfold">
-<code class="sig-name descname">_patch_paths_for_kfold</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">fold_trainer</em>, <em class="sig-param">fold</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.CrossValidateTrainer._patch_paths_for_kfold" title="Permalink to this definition">¶</a></dt>
-<dd><p>WIP</p>
-</dd></dl>
-<dl class="method">
-<dt id="kinoml.ml.lightning_modules.CrossValidateTrainer.test">
-<code class="sig-name descname">test</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">dataset_index=0</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.CrossValidateTrainer.test" title="Permalink to this definition">¶</a></dt>
-<dd><p>WIP</p>
-</dd></dl>
-<dl class="method">
-<dt id="kinoml.ml.lightning_modules.CrossValidateTrainer.best_run">
-<code class="sig-name descname">best_run</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.CrossValidateTrainer.best_run" title="Permalink to this definition">¶</a></dt>
-<dd><p>WIP</p>
-</dd></dl>
-<dl class="method">
-<dt id="kinoml.ml.lightning_modules.CrossValidateTrainer.clear">
-<code class="sig-name descname">clear</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.CrossValidateTrainer.clear" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.ml.lightning_modules.MultiDataModule.get_kfold">
+<span class="sig-name descname"><span class="pre">get_kfold</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nfolds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">with_validation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shuffle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.MultiDataModule.get_kfold" title="Permalink to this definition">¶</a></dt>
 <dd><p>WIP</p>
 </dd></dl>
 </dd></dl>
-<dl class="class">
-<dt id="kinoml.ml.lightning_modules.ObservationModelDataLoader">
-<em class="property">class </em><code class="sig-prename descclassname">kinoml.ml.lightning_modules.</code><code class="sig-name descname">ObservationModelDataLoader</code><span class="sig-paren">(</span><em class="sig-param">observation_model=_null_observation_model</em>, <em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.ObservationModelDataLoader" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.utils.data.DataLoader</span></code></p>
+<dl class="py class">
+<dt class="sig sig-object py" id="kinoml.ml.lightning_modules.CrossValidateTrainer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">kinoml.ml.lightning_modules.</span></span><span class="sig-name descname"><span class="pre">CrossValidateTrainer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nfolds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">with_validation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shuffle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.CrossValidateTrainer" title="Permalink to this definition">¶</a></dt>
+<dd><p>WIP</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.ml.lightning_modules.CrossValidateTrainer.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datamodule</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.CrossValidateTrainer.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>WIP</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.ml.lightning_modules.CrossValidateTrainer._patch_paths_for_kfold">
+<span class="sig-name descname"><span class="pre">_patch_paths_for_kfold</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fold_trainer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fold</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.CrossValidateTrainer._patch_paths_for_kfold" title="Permalink to this definition">¶</a></dt>
+<dd><p>WIP</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.ml.lightning_modules.CrossValidateTrainer.test">
+<span class="sig-name descname"><span class="pre">test</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.CrossValidateTrainer.test" title="Permalink to this definition">¶</a></dt>
+<dd><p>WIP</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.ml.lightning_modules.CrossValidateTrainer.best_run">
+<span class="sig-name descname"><span class="pre">best_run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.CrossValidateTrainer.best_run" title="Permalink to this definition">¶</a></dt>
+<dd><p>WIP</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.ml.lightning_modules.CrossValidateTrainer.clear">
+<span class="sig-name descname"><span class="pre">clear</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.CrossValidateTrainer.clear" title="Permalink to this definition">¶</a></dt>
+<dd><p>WIP</p>
+</dd></dl>
+</dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="kinoml.ml.lightning_modules.ObservationModelDataLoader">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">kinoml.ml.lightning_modules.</span></span><span class="sig-name descname"><span class="pre">ObservationModelDataLoader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">observation_model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">_null_observation_model</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.ObservationModelDataLoader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.utils.data.DataLoader</span></code></p>
 <p>WIP</p>
-<dl class="method">
-<dt id="kinoml.ml.lightning_modules.ObservationModelDataLoader.__iter__">
-<code class="sig-name descname">__iter__</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.ObservationModelDataLoader.__iter__" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.ml.lightning_modules.ObservationModelDataLoader.__iter__">
+<span class="sig-name descname"><span class="pre">__iter__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.ObservationModelDataLoader.__iter__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 </dd></dl>
-<dl class="class">
-<dt id="kinoml.ml.lightning_modules._IterWithObsModel">
-<em class="property">class </em><code class="sig-prename descclassname">kinoml.ml.lightning_modules.</code><code class="sig-name descname">_IterWithObsModel</code><span class="sig-paren">(</span><em class="sig-param">iterator</em>, <em class="sig-param">observation_model</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules._IterWithObsModel" title="Permalink to this definition">¶</a></dt>
+<dl class="py class">
+<dt class="sig sig-object py" id="kinoml.ml.lightning_modules._IterWithObsModel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">kinoml.ml.lightning_modules.</span></span><span class="sig-name descname"><span class="pre">_IterWithObsModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iterator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">observation_model</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules._IterWithObsModel" title="Permalink to this definition">¶</a></dt>
 <dd><p>WIP</p>
-<dl class="method">
-<dt id="kinoml.ml.lightning_modules._IterWithObsModel.__getattr__">
-<code class="sig-name descname">__getattr__</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">name: str</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules._IterWithObsModel.__getattr__" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.ml.lightning_modules._IterWithObsModel.__getattr__">
+<span class="sig-name descname"><span class="pre">__getattr__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules._IterWithObsModel.__getattr__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-<dl class="method">
-<dt id="kinoml.ml.lightning_modules._IterWithObsModel.__next__">
-<code class="sig-name descname">__next__</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules._IterWithObsModel.__next__" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.ml.lightning_modules._IterWithObsModel.__next__">
+<span class="sig-name descname"><span class="pre">__next__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules._IterWithObsModel.__next__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-<dl class="method">
-<dt id="kinoml.ml.lightning_modules._IterWithObsModel.__iter__">
-<code class="sig-name descname">__iter__</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules._IterWithObsModel.__iter__" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.ml.lightning_modules._IterWithObsModel.__iter__">
+<span class="sig-name descname"><span class="pre">__iter__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules._IterWithObsModel.__iter__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 </dd></dl>
-<dl class="class">
-<dt id="kinoml.ml.lightning_modules.AttrList">
-<em class="property">class </em><code class="sig-prename descclassname">kinoml.ml.lightning_modules.</code><code class="sig-name descname">AttrList</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.AttrList" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></p>
+<dl class="py class">
+<dt class="sig sig-object py" id="kinoml.ml.lightning_modules.AttrList">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">kinoml.ml.lightning_modules.</span></span><span class="sig-name descname"><span class="pre">AttrList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.AttrList" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code></p>
 <p>A subclass of list that can accept additional attributes.
 Should be able to be used just like a regular list.</p>
 <p>The problem:
@@ -629,19 +618,19 @@ a = L( (2 ** b for b in range(4)) , x=”Hey!” ) # [1, 2, 4, 8]
 a = L( 2 ** b for b in range(4) )( x=”Hey!” )  # [1, 2, 4, 8]
 a = L( 2 )                                     # [2]</p>
 <p>Taken from <a class="reference external" href="https://code.activestate.com/recipes/579103-python-addset-attributes-to-list/">https://code.activestate.com/recipes/579103-python-addset-attributes-to-list/</a></p>
-<dl class="method">
-<dt id="kinoml.ml.lightning_modules.AttrList.__call__">
-<code class="sig-name descname">__call__</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.AttrList.__call__" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.ml.lightning_modules.AttrList.__call__">
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.AttrList.__call__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 </dd></dl>
-<dl class="class">
-<dt id="kinoml.ml.lightning_modules.KFold3Way">
-<em class="property">class </em><code class="sig-prename descclassname">kinoml.ml.lightning_modules.</code><code class="sig-name descname">KFold3Way</code><a class="headerlink" href="#kinoml.ml.lightning_modules.KFold3Way" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.model_selection.KFold</span></code></p>
+<dl class="py class">
+<dt class="sig sig-object py" id="kinoml.ml.lightning_modules.KFold3Way">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">kinoml.ml.lightning_modules.</span></span><span class="sig-name descname"><span class="pre">KFold3Way</span></span><a class="headerlink" href="#kinoml.ml.lightning_modules.KFold3Way" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">sklearn.model_selection.KFold</span></code></p>
 <p>WIP</p>
-<dl class="method">
-<dt id="kinoml.ml.lightning_modules.KFold3Way.split">
-<code class="sig-name descname">split</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">X</em>, <em class="sig-param">y=None</em>, <em class="sig-param">groups=None</em>, <em class="sig-param">with_validation=True</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.KFold3Way.split" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.ml.lightning_modules.KFold3Way.split">
+<span class="sig-name descname"><span class="pre">split</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groups</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">with_validation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.KFold3Way.split" title="Permalink to this definition">¶</a></dt>
 <dd><p>WIP</p>
 </dd></dl>
 </dd></dl>
@@ -695,7 +684,7 @@ a = L( 2 )                                     # [2]</p>
               
           </div>
             Created using
-            <a href="http://www.sphinx-doc.org/">Sphinx</a> 2.4.5.
+            <a href="http://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
              and
             <a href="https://github.com/bashtage/sphinx-material/">Material for
               Sphinx</a>

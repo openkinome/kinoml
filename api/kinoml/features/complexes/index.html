@@ -1,9 +1,10 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
@@ -49,26 +50,23 @@
   
   
     <title>kinoml.features.complexes &#8212; KinoML 0.1 documentation</title>
-    <link rel="stylesheet" href="../../../../_static/material.css" type="text/css" />
-    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/material.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/twemoji.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css" />
-    <link rel="stylesheet" type="text/css" href="../../../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
-    <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
     <script src="../../../../_static/jquery.js"></script>
     <script src="../../../../_static/underscore.js"></script>
     <script src="../../../../_static/doctools.js"></script>
-    <script src="../../../../_static/language_data.js"></script>
     <script src="https://twemoji.maxcdn.com/v/latest/twemoji.min.js"></script>
     <script src="../../../../_static/twemoji.js"></script>
     <script src="../../../../_static/clipboard.min.js"></script>
     <script src="../../../../_static/copybutton.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "tex2jax_ignore|mathjax_ignore|document", "processClass": "tex2jax_process|mathjax_process|math|output_area", "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
     <link rel="shortcut icon" href="../../../../_static/custom_favicon.png"/>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
@@ -178,8 +176,6 @@
             
             <li class="md-tabs__item"><a href="../../../../index.html" class="md-tabs__link">User guide</a></li>
             
-            <li class="md-tabs__item"><a href="../../../../developers/api_concepts.html" class="md-tabs__link">Developers</a></li>
-            
             <li class="md-tabs__item"><a href="../../index.html" class="md-tabs__link">API Reference</a></li>
             
             <li class="md-tabs__item"><a href="https://openkinome.org" class="md-tabs__link">OpenKinome</a></li>
@@ -231,14 +227,14 @@
     <li class="md-nav__item">
     
     
-      <a href="../../../../getting_started.html" class="md-nav__link">Getting started</a>
+      <a href="../../../../notebooks/getting_started.html" class="md-nav__link">Getting Started</a>
       
     
     </li>
     <li class="md-nav__item">
     
     
-      <a href="../../../../install.html" class="md-nav__link">Installation</a>
+      <a href="../../../../notebooks/kinoml_object_model.html" class="md-nav__link">KinoML object model</a>
       
     
     </li>
@@ -250,27 +246,20 @@
     <li class="md-nav__item">
     
     
-      <a href="../../../../tutorials/example.html" class="md-nav__link">Tutorial 1</a>
+      <a href="../../../../notebooks/OpenEye_structural_featurizer.html" class="md-nav__link">OpenEye Structural Featurizer</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="../../../../notebooks/Schrodinger_structural_featurizer.html" class="md-nav__link">Schrodinger Structural Featurizer</a>
       
     
     </li>
     <li class="md-nav__item">
     
       <span class="md-nav__link caption"><span class="caption-text">Developers</span></span>
-    
-    </li>
-    <li class="md-nav__item">
-    
-    
-      <a href="../../../../developers/api_concepts.html" class="md-nav__link">Base concepts in our API</a>
-      
-    
-    </li>
-    <li class="md-nav__item">
-    
-    
-      <a href="../../../../developers/api_docs.html" class="md-nav__link">How to write docs with Sphinx, MyST and Material Theme</a>
-      
     
     </li>
     <li class="md-nav__item">
@@ -460,34 +449,34 @@
 subclasses thereof</p>
 <section id="module-contents">
 <h2 id="module-contents">Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
-<dl class="data">
-<dt id="kinoml.features.complexes.logger">
-<code class="sig-prename descclassname">kinoml.features.complexes.</code><code class="sig-name descname">logger</code><a class="headerlink" href="#kinoml.features.complexes.logger" title="Permalink to this definition">¶</a></dt>
+<dl class="py data">
+<dt class="sig sig-object py" id="kinoml.features.complexes.logger">
+<span class="sig-prename descclassname"><span class="pre">kinoml.features.complexes.</span></span><span class="sig-name descname"><span class="pre">logger</span></span><a class="headerlink" href="#kinoml.features.complexes.logger" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-<dl class="class">
-<dt id="kinoml.features.complexes.SingleLigandProteinComplexFeaturizer">
-<em class="property">class </em><code class="sig-prename descclassname">kinoml.features.complexes.</code><code class="sig-name descname">SingleLigandProteinComplexFeaturizer</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.complexes.SingleLigandProteinComplexFeaturizer" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="../core/index.html#kinoml.features.core.ParallelBaseFeaturizer" title="kinoml.features.core.ParallelBaseFeaturizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.features.core.ParallelBaseFeaturizer</span></code></a></p>
+<dl class="py class">
+<dt class="sig sig-object py" id="kinoml.features.complexes.SingleLigandProteinComplexFeaturizer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">kinoml.features.complexes.</span></span><span class="sig-name descname"><span class="pre">SingleLigandProteinComplexFeaturizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.complexes.SingleLigandProteinComplexFeaturizer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../core/index.html#kinoml.features.core.ParallelBaseFeaturizer" title="kinoml.features.core.ParallelBaseFeaturizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">kinoml.features.core.ParallelBaseFeaturizer</span></code></a></p>
 <p>Provides a minimally useful <code class="docutils literal notranslate"><span class="pre">._supports()</span></code> method for all
 ProteinLigandComplex-like featurizers.</p>
-<dl class="attribute">
-<dt id="kinoml.features.complexes.SingleLigandProteinComplexFeaturizer._COMPATIBLE_PROTEIN_TYPES">
-<code class="sig-name descname">_COMPATIBLE_PROTEIN_TYPES</code><a class="headerlink" href="#kinoml.features.complexes.SingleLigandProteinComplexFeaturizer._COMPATIBLE_PROTEIN_TYPES" title="Permalink to this definition">¶</a></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="kinoml.features.complexes.SingleLigandProteinComplexFeaturizer._COMPATIBLE_PROTEIN_TYPES">
+<span class="sig-name descname"><span class="pre">_COMPATIBLE_PROTEIN_TYPES</span></span><a class="headerlink" href="#kinoml.features.complexes.SingleLigandProteinComplexFeaturizer._COMPATIBLE_PROTEIN_TYPES" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-<dl class="attribute">
-<dt id="kinoml.features.complexes.SingleLigandProteinComplexFeaturizer._COMPATIBLE_LIGAND_TYPES">
-<code class="sig-name descname">_COMPATIBLE_LIGAND_TYPES</code><a class="headerlink" href="#kinoml.features.complexes.SingleLigandProteinComplexFeaturizer._COMPATIBLE_LIGAND_TYPES" title="Permalink to this definition">¶</a></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="kinoml.features.complexes.SingleLigandProteinComplexFeaturizer._COMPATIBLE_LIGAND_TYPES">
+<span class="sig-name descname"><span class="pre">_COMPATIBLE_LIGAND_TYPES</span></span><a class="headerlink" href="#kinoml.features.complexes.SingleLigandProteinComplexFeaturizer._COMPATIBLE_LIGAND_TYPES" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-<dl class="method">
-<dt id="kinoml.features.complexes.SingleLigandProteinComplexFeaturizer._supports">
-<code class="sig-name descname">_supports</code><span class="sig-paren">(</span><em class="sig-param">self, system: Union[ProteinLigandComplex]</em><span class="sig-paren">)</span> → bool<a class="headerlink" href="#kinoml.features.complexes.SingleLigandProteinComplexFeaturizer._supports" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.features.complexes.SingleLigandProteinComplexFeaturizer._supports">
+<span class="sig-name descname"><span class="pre">_supports</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="../../core/systems/index.html#kinoml.core.systems.ProteinLigandComplex" title="kinoml.core.systems.ProteinLigandComplex"><span class="pre">kinoml.core.systems.ProteinLigandComplex</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#kinoml.features.complexes.SingleLigandProteinComplexFeaturizer._supports" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check that exactly one protein and one ligand is present in the System</p>
 </dd></dl>
 </dd></dl>
-<dl class="class">
-<dt id="kinoml.features.complexes.MostSimilarPDBLigandFeaturizer">
-<em class="property">class </em><code class="sig-prename descclassname">kinoml.features.complexes.</code><code class="sig-name descname">MostSimilarPDBLigandFeaturizer</code><span class="sig-paren">(</span><em class="sig-param">similarity_metric: str = 'fingerprint'</em>, <em class="sig-param">cache_dir: Union[str</em>, <em class="sig-param">Path</em>, <em class="sig-param">None] = None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.complexes.MostSimilarPDBLigandFeaturizer" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#kinoml.features.complexes.SingleLigandProteinComplexFeaturizer" title="kinoml.features.complexes.SingleLigandProteinComplexFeaturizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.features.complexes.SingleLigandProteinComplexFeaturizer</span></code></a></p>
+<dl class="py class">
+<dt class="sig sig-object py" id="kinoml.features.complexes.MostSimilarPDBLigandFeaturizer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">kinoml.features.complexes.</span></span><span class="sig-name descname"><span class="pre">MostSimilarPDBLigandFeaturizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">similarity_metric</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'fingerprint'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">pathlib.Path</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.complexes.MostSimilarPDBLigandFeaturizer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#kinoml.features.complexes.SingleLigandProteinComplexFeaturizer" title="kinoml.features.complexes.SingleLigandProteinComplexFeaturizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SingleLigandProteinComplexFeaturizer</span></code></a></p>
 <p>Find the most similar co-crystallized ligand in the PDB according to a
 given SMILES and UniProt ID.</p>
 <p>The protein component of each system must be a <cite>core.proteins.Protein</cite> or
@@ -515,27 +504,27 @@ number of available CPUs.</p></li>
 initialization should fit the required toolkit when subsequently applying
 the OEDockingFeaturizer or SCHRODINGERDockingFeaturizer.</p>
 </div>
-<dl class="attribute">
-<dt id="kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._SUPPORTED_TYPES">
-<code class="sig-name descname">_SUPPORTED_TYPES</code><a class="headerlink" href="#kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._SUPPORTED_TYPES" title="Permalink to this definition">¶</a></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._SUPPORTED_TYPES">
+<span class="sig-name descname"><span class="pre">_SUPPORTED_TYPES</span></span><a class="headerlink" href="#kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._SUPPORTED_TYPES" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-<dl class="attribute">
-<dt id="kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._SUPPORTED_SIMILARITY_METRICS">
-<code class="sig-name descname">_SUPPORTED_SIMILARITY_METRICS</code><em class="property"> = ['fingerprint', 'mcs', 'openeye_shape', 'schrodinger_shape']</em><a class="headerlink" href="#kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._SUPPORTED_SIMILARITY_METRICS" title="Permalink to this definition">¶</a></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._SUPPORTED_SIMILARITY_METRICS">
+<span class="sig-name descname"><span class="pre">_SUPPORTED_SIMILARITY_METRICS</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">['fingerprint',</span> <span class="pre">'mcs',</span> <span class="pre">'openeye_shape',</span> <span class="pre">'schrodinger_shape']</span></em><a class="headerlink" href="#kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._SUPPORTED_SIMILARITY_METRICS" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-<dl class="method">
-<dt id="kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._pre_featurize">
-<code class="sig-name descname">_pre_featurize</code><span class="sig-paren">(</span><em class="sig-param">self, systems: List[ProteinLigandComplex]</em><span class="sig-paren">)</span> → None<a class="headerlink" href="#kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._pre_featurize" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._pre_featurize">
+<span class="sig-name descname"><span class="pre">_pre_featurize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">systems</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="../../core/systems/index.html#kinoml.core.systems.ProteinLigandComplex" title="kinoml.core.systems.ProteinLigandComplex"><span class="pre">kinoml.core.systems.ProteinLigandComplex</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._pre_featurize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check that SCHRODINGER variable exists.</p>
 </dd></dl>
-<dl class="method">
-<dt id="kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._check_schrodinger">
-<code class="sig-name descname">_check_schrodinger</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._check_schrodinger" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._check_schrodinger">
+<span class="sig-name descname"><span class="pre">_check_schrodinger</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._check_schrodinger" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check that SCHRODINGER variable exists.</p>
 </dd></dl>
-<dl class="method">
-<dt id="kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._featurize_one">
-<code class="sig-name descname">_featurize_one</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">system: ProteinLigandComplex</em><span class="sig-paren">)</span> → Union[ProteinLigandComplex, None]<a class="headerlink" href="#kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._featurize_one" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._featurize_one">
+<span class="sig-name descname"><span class="pre">_featurize_one</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../core/systems/index.html#kinoml.core.systems.ProteinLigandComplex" title="kinoml.core.systems.ProteinLigandComplex"><span class="pre">kinoml.core.systems.ProteinLigandComplex</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="../../core/systems/index.html#kinoml.core.systems.ProteinLigandComplex" title="kinoml.core.systems.ProteinLigandComplex"><span class="pre">kinoml.core.systems.ProteinLigandComplex</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._featurize_one" title="Permalink to this definition">¶</a></dt>
 <dd><p>Find a PDB entry with a protein of the given UniProt ID and with the most similar
 co-crystallized ligand.</p>
 <dl class="field-list simple">
@@ -551,9 +540,9 @@ expo_id. None if no suitable PDB entry was found.</p>
 </dd>
 </dl>
 </dd></dl>
-<dl class="method">
-<dt id="kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._post_featurize">
-<code class="sig-name descname">_post_featurize</code><span class="sig-paren">(</span><em class="sig-param">self, systems: List[ProteinLigandComplex], features: List[ProteinLigandComplex], keep: bool = True</em><span class="sig-paren">)</span> → List[ProteinLigandComplex]<a class="headerlink" href="#kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._post_featurize" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._post_featurize">
+<span class="sig-name descname"><span class="pre">_post_featurize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">systems</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="../../core/systems/index.html#kinoml.core.systems.ProteinLigandComplex" title="kinoml.core.systems.ProteinLigandComplex"><span class="pre">kinoml.core.systems.ProteinLigandComplex</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">features</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="../../core/systems/index.html#kinoml.core.systems.ProteinLigandComplex" title="kinoml.core.systems.ProteinLigandComplex"><span class="pre">kinoml.core.systems.ProteinLigandComplex</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="../../core/systems/index.html#kinoml.core.systems.ProteinLigandComplex" title="kinoml.core.systems.ProteinLigandComplex"><span class="pre">kinoml.core.systems.ProteinLigandComplex</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._post_featurize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run after featurizing all systems. Original systems will be replaced with systems
 returned by the featurizer. Systems that were not successfully featurized will be
 removed and listed in a log file in the current working directory.</p>
@@ -575,9 +564,9 @@ entries: the featurizer name and <code class="docutils literal notranslate"><spa
 </dd>
 </dl>
 </dd></dl>
-<dl class="method">
-<dt id="kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._get_pdb_ligand_entities">
-<code class="sig-name descname">_get_pdb_ligand_entities</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">uniprot_id: str</em><span class="sig-paren">)</span> → Union[pd.DataFrame, None]<a class="headerlink" href="#kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._get_pdb_ligand_entities" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._get_pdb_ligand_entities">
+<span class="sig-name descname"><span class="pre">_get_pdb_ligand_entities</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uniprot_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">pandas.DataFrame</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._get_pdb_ligand_entities" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get PDB ligand entities bound to protein structures of the given UniProt ID. Only X-ray
 structures will be considered. If a ligand is co-crystallized with multiple PDB structures
 the ligand entity with the lowest resolution will be returned.</p>
@@ -594,9 +583,9 @@ the ligand entity with the lowest resolution will be returned.</p>
 </dd>
 </dl>
 </dd></dl>
-<dl class="method">
-<dt id="kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._add_ligand_entity_info">
-<em class="property">static </em><code class="sig-name descname">_add_ligand_entity_info</code><span class="sig-paren">(</span><em class="sig-param">pdb_ligand_entities: pd.DataFrame</em><span class="sig-paren">)</span> → pd.DataFrame<a class="headerlink" href="#kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._add_ligand_entity_info" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._add_ligand_entity_info">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_add_ligand_entity_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pdb_ligand_entities</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pd.DataFrame</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">pd.DataFrame</span></span></span><a class="headerlink" href="#kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._add_ligand_entity_info" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add chain and expo ID information to the PDB ligand entities dataframe.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -613,9 +602,9 @@ and <cite>expo_id</cite>. PDB ligand entities without such information are remov
 </dd>
 </dl>
 </dd></dl>
-<dl class="method">
-<dt id="kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._add_pdb_resolution">
-<em class="property">static </em><code class="sig-name descname">_add_pdb_resolution</code><span class="sig-paren">(</span><em class="sig-param">pdb_ligand_entities: pd.DataFrame</em><span class="sig-paren">)</span> → pd.DataFrame<a class="headerlink" href="#kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._add_pdb_resolution" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._add_pdb_resolution">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_add_pdb_resolution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pdb_ligand_entities</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pd.DataFrame</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">pd.DataFrame</span></span></span><a class="headerlink" href="#kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._add_pdb_resolution" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add resolution information to the PDB ligand entities dataframe.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -632,9 +621,9 @@ resolution of 99.9.</p>
 </dd>
 </dl>
 </dd></dl>
-<dl class="method">
-<dt id="kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._get_most_similar_pdb_ligand_entity">
-<code class="sig-name descname">_get_most_similar_pdb_ligand_entity</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">pdb_ligand_entities: pd.DataFrame</em>, <em class="sig-param">smiles: str</em><span class="sig-paren">)</span> → Tuple[str, str, str]<a class="headerlink" href="#kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._get_most_similar_pdb_ligand_entity" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._get_most_similar_pdb_ligand_entity">
+<span class="sig-name descname"><span class="pre">_get_most_similar_pdb_ligand_entity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pdb_ligand_entities</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pd.DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">smiles</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._get_most_similar_pdb_ligand_entity" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the PDB ligand that is most similar to the given SMILES.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -649,9 +638,9 @@ resolution of 99.9.</p>
 </dd>
 </dl>
 </dd></dl>
-<dl class="method">
-<dt id="kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._by_fingerprint">
-<em class="property">static </em><code class="sig-name descname">_by_fingerprint</code><span class="sig-paren">(</span><em class="sig-param">pdb_ligand_entities: pd.DataFrame</em>, <em class="sig-param">smiles: str</em>, <em class="sig-param">max_similarity_cutoff: float = 0.0</em><span class="sig-paren">)</span> → pd.DataFrame<a class="headerlink" href="#kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._by_fingerprint" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._by_fingerprint">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_by_fingerprint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pdb_ligand_entities</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pandas.DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">smiles</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_similarity_cutoff</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">pandas.DataFrame</span></span></span><a class="headerlink" href="#kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._by_fingerprint" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the PDB ligands that are most similar to the given SMILES according to Morgan
 Fingerprints.</p>
 <dl class="field-list simple">
@@ -673,9 +662,9 @@ is set to 0.1, all ligands will be returned with a similarity of 0.77 or higher.
 </dd>
 </dl>
 </dd></dl>
-<dl class="method">
-<dt id="kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._by_mcs">
-<em class="property">static </em><code class="sig-name descname">_by_mcs</code><span class="sig-paren">(</span><em class="sig-param">pdb_ligand_entities: pd.DataFrame</em>, <em class="sig-param">smiles: str</em>, <em class="sig-param">max_bonds_cutoff: float = 0.0</em><span class="sig-paren">)</span> → pd.DataFrame<a class="headerlink" href="#kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._by_mcs" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._by_mcs">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_by_mcs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pdb_ligand_entities</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pd.DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">smiles</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_bonds_cutoff</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">pd.DataFrame</span></span></span><a class="headerlink" href="#kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._by_mcs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the PDB ligands that are most similar to the given SMILES according to the number of
 bonds in the maximum common substructures.</p>
 <dl class="field-list simple">
@@ -700,9 +689,9 @@ is 0.1, all ligands will be returned with a number of MCS bonds of 16.5
 </dd>
 </dl>
 </dd></dl>
-<dl class="method">
-<dt id="kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._by_schrodinger_shape">
-<code class="sig-name descname">_by_schrodinger_shape</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">pdb_ligand_entities: pd.DataFrame</em>, <em class="sig-param">smiles: str</em>, <em class="sig-param">max_similarity_cutoff: float = 0.0</em><span class="sig-paren">)</span> → pd.DataFrame<a class="headerlink" href="#kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._by_schrodinger_shape" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._by_schrodinger_shape">
+<span class="sig-name descname"><span class="pre">_by_schrodinger_shape</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pdb_ligand_entities</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pandas.DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">smiles</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_similarity_cutoff</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">pandas.DataFrame</span></span></span><a class="headerlink" href="#kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._by_schrodinger_shape" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the PDB ligands that are most similar to the given SMILES according to SCHRODINGER
 shape_screen.</p>
 <dl class="field-list simple">
@@ -724,9 +713,9 @@ is set to 0.1, all ligands will be returned with a similarity of 0.77 or higher.
 </dd>
 </dl>
 </dd></dl>
-<dl class="method">
-<dt id="kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._by_openeye_shape">
-<code class="sig-name descname">_by_openeye_shape</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">pdb_ligand_entities: pd.DataFrame</em>, <em class="sig-param">smiles: str</em>, <em class="sig-param">max_similarity_cutoff: float = 0.0</em><span class="sig-paren">)</span> → pd.DataFrame<a class="headerlink" href="#kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._by_openeye_shape" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._by_openeye_shape">
+<span class="sig-name descname"><span class="pre">_by_openeye_shape</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pdb_ligand_entities</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pandas.DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">smiles</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_similarity_cutoff</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">pandas.DataFrame</span></span></span><a class="headerlink" href="#kinoml.features.complexes.MostSimilarPDBLigandFeaturizer._by_openeye_shape" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the PDB ligands that are most similar to the given SMILES according to OpenEye’s
 TanimotoCombo score.</p>
 <dl class="field-list simple">
@@ -749,10 +738,10 @@ is set to 0.2, all ligands will be returned with a similarity of 1.11 or higher.
 </dl>
 </dd></dl>
 </dd></dl>
-<dl class="class">
-<dt id="kinoml.features.complexes.KLIFSConformationTemplatesFeaturizer">
-<em class="property">class </em><code class="sig-prename descclassname">kinoml.features.complexes.</code><code class="sig-name descname">KLIFSConformationTemplatesFeaturizer</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.complexes.KLIFSConformationTemplatesFeaturizer" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#kinoml.features.complexes.MostSimilarPDBLigandFeaturizer" title="kinoml.features.complexes.MostSimilarPDBLigandFeaturizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.features.complexes.MostSimilarPDBLigandFeaturizer</span></code></a></p>
+<dl class="py class">
+<dt class="sig sig-object py" id="kinoml.features.complexes.KLIFSConformationTemplatesFeaturizer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">kinoml.features.complexes.</span></span><span class="sig-name descname"><span class="pre">KLIFSConformationTemplatesFeaturizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.complexes.KLIFSConformationTemplatesFeaturizer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#kinoml.features.complexes.MostSimilarPDBLigandFeaturizer" title="kinoml.features.complexes.MostSimilarPDBLigandFeaturizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MostSimilarPDBLigandFeaturizer</span></code></a></p>
 <p>Find suitable kinase templates for modeling a kinase:inhibitor complex in
 different KLIFS conformations.</p>
 <p>The protein component of each system must be a <cite>core.proteins.KLIFSKinase</cite>,
@@ -773,23 +762,23 @@ number of available CPUs.</p></li>
 </ul>
 </dd>
 </dl>
-<dl class="attribute">
-<dt id="kinoml.features.complexes.KLIFSConformationTemplatesFeaturizer._COMPATIBLE_PROTEIN_TYPES">
-<code class="sig-name descname">_COMPATIBLE_PROTEIN_TYPES</code><a class="headerlink" href="#kinoml.features.complexes.KLIFSConformationTemplatesFeaturizer._COMPATIBLE_PROTEIN_TYPES" title="Permalink to this definition">¶</a></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="kinoml.features.complexes.KLIFSConformationTemplatesFeaturizer._COMPATIBLE_PROTEIN_TYPES">
+<span class="sig-name descname"><span class="pre">_COMPATIBLE_PROTEIN_TYPES</span></span><a class="headerlink" href="#kinoml.features.complexes.KLIFSConformationTemplatesFeaturizer._COMPATIBLE_PROTEIN_TYPES" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-<dl class="method">
-<dt id="kinoml.features.complexes.KLIFSConformationTemplatesFeaturizer._pre_featurize">
-<code class="sig-name descname">_pre_featurize</code><span class="sig-paren">(</span><em class="sig-param">self, systems: List[ProteinLigandComplex]</em><span class="sig-paren">)</span> → None<a class="headerlink" href="#kinoml.features.complexes.KLIFSConformationTemplatesFeaturizer._pre_featurize" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.features.complexes.KLIFSConformationTemplatesFeaturizer._pre_featurize">
+<span class="sig-name descname"><span class="pre">_pre_featurize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">systems</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="../../core/systems/index.html#kinoml.core.systems.ProteinLigandComplex" title="kinoml.core.systems.ProteinLigandComplex"><span class="pre">kinoml.core.systems.ProteinLigandComplex</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#kinoml.features.complexes.KLIFSConformationTemplatesFeaturizer._pre_featurize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check SCHRODINGER variable and fetch KLIFS data.</p>
 </dd></dl>
-<dl class="method">
-<dt id="kinoml.features.complexes.KLIFSConformationTemplatesFeaturizer._create_klifs_structure_db">
-<code class="sig-name descname">_create_klifs_structure_db</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.complexes.KLIFSConformationTemplatesFeaturizer._create_klifs_structure_db" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.features.complexes.KLIFSConformationTemplatesFeaturizer._create_klifs_structure_db">
+<span class="sig-name descname"><span class="pre">_create_klifs_structure_db</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.complexes.KLIFSConformationTemplatesFeaturizer._create_klifs_structure_db" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fetch structure data from KLIFS.</p>
 </dd></dl>
-<dl class="method">
-<dt id="kinoml.features.complexes.KLIFSConformationTemplatesFeaturizer._featurize_one">
-<code class="sig-name descname">_featurize_one</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">system: ProteinLigandComplex</em><span class="sig-paren">)</span> → pd.DataFrame<a class="headerlink" href="#kinoml.features.complexes.KLIFSConformationTemplatesFeaturizer._featurize_one" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.features.complexes.KLIFSConformationTemplatesFeaturizer._featurize_one">
+<span class="sig-name descname"><span class="pre">_featurize_one</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../core/systems/index.html#kinoml.core.systems.ProteinLigandComplex" title="kinoml.core.systems.ProteinLigandComplex"><span class="pre">kinoml.core.systems.ProteinLigandComplex</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">pandas.DataFrame</span></span></span><a class="headerlink" href="#kinoml.features.complexes.KLIFSConformationTemplatesFeaturizer._featurize_one" title="Permalink to this definition">¶</a></dt>
 <dd><p>Find PDB entries for different KLIFS conformations with a similar co-crystallized ligand
 and a similar pocket sequence.</p>
 <dl class="field-list simple">
@@ -805,9 +794,9 @@ and a similar pocket sequence.</p>
 </dd>
 </dl>
 </dd></dl>
-<dl class="method">
-<dt id="kinoml.features.complexes.KLIFSConformationTemplatesFeaturizer._filter_structures">
-<em class="property">static </em><code class="sig-name descname">_filter_structures</code><span class="sig-paren">(</span><em class="sig-param">structures: pd.DataFrame</em><span class="sig-paren">)</span> → pd.DataFrame<a class="headerlink" href="#kinoml.features.complexes.KLIFSConformationTemplatesFeaturizer._filter_structures" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.features.complexes.KLIFSConformationTemplatesFeaturizer._filter_structures">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_filter_structures</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">structures</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pd.DataFrame</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">pd.DataFrame</span></span></span><a class="headerlink" href="#kinoml.features.complexes.KLIFSConformationTemplatesFeaturizer._filter_structures" title="Permalink to this definition">¶</a></dt>
 <dd><p>Filter KLIFS entries for the presence of exactly one orthosteric ligand and determined
 KLIFS conformation, and remove duplicates.</p>
 <dl class="field-list simple">
@@ -824,9 +813,9 @@ KLIFS conformation, and remove duplicates.</p>
 </dd>
 </dl>
 </dd></dl>
-<dl class="method">
-<dt id="kinoml.features.complexes.KLIFSConformationTemplatesFeaturizer._get_most_similar_klifs_ligand_entity">
-<code class="sig-name descname">_get_most_similar_klifs_ligand_entity</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">structures: pd.DataFrame</em>, <em class="sig-param">smiles: str</em>, <em class="sig-param">klifs_sequence: str</em><span class="sig-paren">)</span> → Tuple[str, str, str, str, str]<a class="headerlink" href="#kinoml.features.complexes.KLIFSConformationTemplatesFeaturizer._get_most_similar_klifs_ligand_entity" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.features.complexes.KLIFSConformationTemplatesFeaturizer._get_most_similar_klifs_ligand_entity">
+<span class="sig-name descname"><span class="pre">_get_most_similar_klifs_ligand_entity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">structures</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pd.DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">smiles</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">klifs_sequence</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#kinoml.features.complexes.KLIFSConformationTemplatesFeaturizer._get_most_similar_klifs_ligand_entity" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the KLIFS entry that is most similar to the given SMILES and KLIFS pocket sequence.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -842,9 +831,9 @@ entry with the most similar ligand and KLIFS pocket sequence.</p>
 </dd>
 </dl>
 </dd></dl>
-<dl class="method">
-<dt id="kinoml.features.complexes.KLIFSConformationTemplatesFeaturizer._by_klifs_sequence">
-<em class="property">static </em><code class="sig-name descname">_by_klifs_sequence</code><span class="sig-paren">(</span><em class="sig-param">klifs_structures: pd.DataFrame</em>, <em class="sig-param">reference_klifs_sequence: str</em>, <em class="sig-param">max_similarity_cutoff: float = 0.0</em><span class="sig-paren">)</span> → pd.DataFrame<a class="headerlink" href="#kinoml.features.complexes.KLIFSConformationTemplatesFeaturizer._by_klifs_sequence" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.features.complexes.KLIFSConformationTemplatesFeaturizer._by_klifs_sequence">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_by_klifs_sequence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">klifs_structures</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pd.DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reference_klifs_sequence</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_similarity_cutoff</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">pd.DataFrame</span></span></span><a class="headerlink" href="#kinoml.features.complexes.KLIFSConformationTemplatesFeaturizer._by_klifs_sequence" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the KLIFS entries that are most similar to the given pocket sequence.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -867,9 +856,9 @@ sequence similarity of 275 (320 - (450 * 0.1)) or higher.</p></li>
 </dd>
 </dl>
 </dd></dl>
-<dl class="method">
-<dt id="kinoml.features.complexes.KLIFSConformationTemplatesFeaturizer._post_featurize">
-<code class="sig-name descname">_post_featurize</code><span class="sig-paren">(</span><em class="sig-param">self, systems: List[ProteinLigandComplex], features: List, keep: bool = True</em><span class="sig-paren">)</span> → List[ProteinLigandComplex]<a class="headerlink" href="#kinoml.features.complexes.KLIFSConformationTemplatesFeaturizer._post_featurize" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.features.complexes.KLIFSConformationTemplatesFeaturizer._post_featurize">
+<span class="sig-name descname"><span class="pre">_post_featurize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">systems</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="../../core/systems/index.html#kinoml.core.systems.ProteinLigandComplex" title="kinoml.core.systems.ProteinLigandComplex"><span class="pre">kinoml.core.systems.ProteinLigandComplex</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">features</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="../../core/systems/index.html#kinoml.core.systems.ProteinLigandComplex" title="kinoml.core.systems.ProteinLigandComplex"><span class="pre">kinoml.core.systems.ProteinLigandComplex</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#kinoml.features.complexes.KLIFSConformationTemplatesFeaturizer._post_featurize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run after featurizing all systems. Systems with a feature of None will be removed and
 listed in a log file in the current working directory. You shouldn’t need to redefine
 this method.</p>
@@ -893,10 +882,10 @@ Systems with a feature of None will be removed.</p>
 </dl>
 </dd></dl>
 </dd></dl>
-<dl class="class">
-<dt id="kinoml.features.complexes.OEComplexFeaturizer">
-<em class="property">class </em><code class="sig-prename descclassname">kinoml.features.complexes.</code><code class="sig-name descname">OEComplexFeaturizer</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.complexes.OEComplexFeaturizer" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="../core/index.html#kinoml.features.core.OEBaseModelingFeaturizer" title="kinoml.features.core.OEBaseModelingFeaturizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.features.core.OEBaseModelingFeaturizer</span></code></a>, <a class="reference internal" href="#kinoml.features.complexes.SingleLigandProteinComplexFeaturizer" title="kinoml.features.complexes.SingleLigandProteinComplexFeaturizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.features.complexes.SingleLigandProteinComplexFeaturizer</span></code></a></p>
+<dl class="py class">
+<dt class="sig sig-object py" id="kinoml.features.complexes.OEComplexFeaturizer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">kinoml.features.complexes.</span></span><span class="sig-name descname"><span class="pre">OEComplexFeaturizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.complexes.OEComplexFeaturizer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../core/index.html#kinoml.features.core.OEBaseModelingFeaturizer" title="kinoml.features.core.OEBaseModelingFeaturizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">kinoml.features.core.OEBaseModelingFeaturizer</span></code></a>, <a class="reference internal" href="#kinoml.features.complexes.SingleLigandProteinComplexFeaturizer" title="kinoml.features.complexes.SingleLigandProteinComplexFeaturizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SingleLigandProteinComplexFeaturizer</span></code></a></p>
 <p>Given systems with exactly one protein and one ligand, prepare the complex
 structure by:</p>
 <blockquote>
@@ -962,13 +951,13 @@ number of available CPUs.</p></li>
 covalent bond will be broken. This may lead to the transformation of the
 ligand into a radical.</p>
 </div>
-<dl class="attribute">
-<dt id="kinoml.features.complexes.OEComplexFeaturizer._SUPPORTED_TYPES">
-<code class="sig-name descname">_SUPPORTED_TYPES</code><a class="headerlink" href="#kinoml.features.complexes.OEComplexFeaturizer._SUPPORTED_TYPES" title="Permalink to this definition">¶</a></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="kinoml.features.complexes.OEComplexFeaturizer._SUPPORTED_TYPES">
+<span class="sig-name descname"><span class="pre">_SUPPORTED_TYPES</span></span><a class="headerlink" href="#kinoml.features.complexes.OEComplexFeaturizer._SUPPORTED_TYPES" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-<dl class="method">
-<dt id="kinoml.features.complexes.OEComplexFeaturizer._featurize_one">
-<code class="sig-name descname">_featurize_one</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">system: ProteinLigandComplex</em><span class="sig-paren">)</span> → Union[Universe, None]<a class="headerlink" href="#kinoml.features.complexes.OEComplexFeaturizer._featurize_one" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.features.complexes.OEComplexFeaturizer._featurize_one">
+<span class="sig-name descname"><span class="pre">_featurize_one</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../core/systems/index.html#kinoml.core.systems.ProteinLigandComplex" title="kinoml.core.systems.ProteinLigandComplex"><span class="pre">kinoml.core.systems.ProteinLigandComplex</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">Universe</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#kinoml.features.complexes.OEComplexFeaturizer._featurize_one" title="Permalink to this definition">¶</a></dt>
 <dd><p>Prepare a protein structure.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -983,10 +972,10 @@ ligand into a radical.</p>
 </dl>
 </dd></dl>
 </dd></dl>
-<dl class="class">
-<dt id="kinoml.features.complexes.OEDockingFeaturizer">
-<em class="property">class </em><code class="sig-prename descclassname">kinoml.features.complexes.</code><code class="sig-name descname">OEDockingFeaturizer</code><span class="sig-paren">(</span><em class="sig-param">method: str = 'Posit'</em>, <em class="sig-param">pKa_norm: bool = True</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.complexes.OEDockingFeaturizer" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="../core/index.html#kinoml.features.core.OEBaseModelingFeaturizer" title="kinoml.features.core.OEBaseModelingFeaturizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.features.core.OEBaseModelingFeaturizer</span></code></a>, <a class="reference internal" href="#kinoml.features.complexes.SingleLigandProteinComplexFeaturizer" title="kinoml.features.complexes.SingleLigandProteinComplexFeaturizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.features.complexes.SingleLigandProteinComplexFeaturizer</span></code></a></p>
+<dl class="py class">
+<dt class="sig sig-object py" id="kinoml.features.complexes.OEDockingFeaturizer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">kinoml.features.complexes.</span></span><span class="sig-name descname"><span class="pre">OEDockingFeaturizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'Posit'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pKa_norm</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.complexes.OEDockingFeaturizer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../core/index.html#kinoml.features.core.OEBaseModelingFeaturizer" title="kinoml.features.core.OEBaseModelingFeaturizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">kinoml.features.core.OEBaseModelingFeaturizer</span></code></a>, <a class="reference internal" href="#kinoml.features.complexes.SingleLigandProteinComplexFeaturizer" title="kinoml.features.complexes.SingleLigandProteinComplexFeaturizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SingleLigandProteinComplexFeaturizer</span></code></a></p>
 <p>Given systems with exactly one protein and one ligand, prepare the
 structure and dock the ligand into the prepared protein structure with
 one of OpenEye’s docking algorithms:</p>
@@ -1055,13 +1044,13 @@ conserved.</p></li>
 </ul>
 </dd>
 </dl>
-<dl class="attribute">
-<dt id="kinoml.features.complexes.OEDockingFeaturizer._SUPPORTED_TYPES">
-<code class="sig-name descname">_SUPPORTED_TYPES</code><a class="headerlink" href="#kinoml.features.complexes.OEDockingFeaturizer._SUPPORTED_TYPES" title="Permalink to this definition">¶</a></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="kinoml.features.complexes.OEDockingFeaturizer._SUPPORTED_TYPES">
+<span class="sig-name descname"><span class="pre">_SUPPORTED_TYPES</span></span><a class="headerlink" href="#kinoml.features.complexes.OEDockingFeaturizer._SUPPORTED_TYPES" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-<dl class="method">
-<dt id="kinoml.features.complexes.OEDockingFeaturizer._featurize_one">
-<code class="sig-name descname">_featurize_one</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">system: ProteinLigandComplex</em><span class="sig-paren">)</span> → Union[Universe, None]<a class="headerlink" href="#kinoml.features.complexes.OEDockingFeaturizer._featurize_one" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.features.complexes.OEDockingFeaturizer._featurize_one">
+<span class="sig-name descname"><span class="pre">_featurize_one</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../core/systems/index.html#kinoml.core.systems.ProteinLigandComplex" title="kinoml.core.systems.ProteinLigandComplex"><span class="pre">kinoml.core.systems.ProteinLigandComplex</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">Universe</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#kinoml.features.complexes.OEDockingFeaturizer._featurize_one" title="Permalink to this definition">¶</a></dt>
 <dd><p>Prepare a protein structure and dock a ligand using OpenEye’s Fred method.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1076,9 +1065,9 @@ pose was found.</p>
 </dd>
 </dl>
 </dd></dl>
-<dl class="method">
-<dt id="kinoml.features.complexes.OEDockingFeaturizer._store_docking_score">
-<em class="property">static </em><code class="sig-name descname">_store_docking_score</code><span class="sig-paren">(</span><em class="sig-param">structure: Universe</em>, <em class="sig-param">docking_pose: oechem.OEGraphMol</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.complexes.OEDockingFeaturizer._store_docking_score" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.features.complexes.OEDockingFeaturizer._store_docking_score">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_store_docking_score</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">structure</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Universe</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">docking_pose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">openeye.oechem.OEGraphMol</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.complexes.OEDockingFeaturizer._store_docking_score" title="Permalink to this definition">¶</a></dt>
 <dd><p>Store the docking score from OpenEye docking in the MDAnalysis universe._topology. If the
 Posit probability is available it will be stored as well. They cannot be stored in the
 universe object directly, because they will be lost during multiprocessing/pickling.</p>
@@ -1092,10 +1081,10 @@ universe object directly, because they will be lost during multiprocessing/pickl
 </dl>
 </dd></dl>
 </dd></dl>
-<dl class="class">
-<dt id="kinoml.features.complexes.SCHRODINGERComplexFeaturizer">
-<em class="property">class </em><code class="sig-prename descclassname">kinoml.features.complexes.</code><code class="sig-name descname">SCHRODINGERComplexFeaturizer</code><span class="sig-paren">(</span><em class="sig-param">cache_dir: Union[str</em>, <em class="sig-param">Path</em>, <em class="sig-param">None] = None</em>, <em class="sig-param">output_dir: Union[str</em>, <em class="sig-param">Path</em>, <em class="sig-param">None] = None</em>, <em class="sig-param">max_retry: int = 3</em>, <em class="sig-param">build_loops: bool = True</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.complexes.SCHRODINGERComplexFeaturizer" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#kinoml.features.complexes.SingleLigandProteinComplexFeaturizer" title="kinoml.features.complexes.SingleLigandProteinComplexFeaturizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.features.complexes.SingleLigandProteinComplexFeaturizer</span></code></a></p>
+<dl class="py class">
+<dt class="sig sig-object py" id="kinoml.features.complexes.SCHRODINGERComplexFeaturizer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">kinoml.features.complexes.</span></span><span class="sig-name descname"><span class="pre">SCHRODINGERComplexFeaturizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cache_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">pathlib.Path</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">pathlib.Path</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_retry</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">build_loops</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.complexes.SCHRODINGERComplexFeaturizer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#kinoml.features.complexes.SingleLigandProteinComplexFeaturizer" title="kinoml.features.complexes.SingleLigandProteinComplexFeaturizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SingleLigandProteinComplexFeaturizer</span></code></a></p>
 <p>Given systems with exactly one protein and one ligand, prepare the complex
 structure by:</p>
 <blockquote>
@@ -1157,18 +1146,18 @@ number of available CPUs.</p></li>
 </ul>
 </dd>
 </dl>
-<dl class="attribute">
-<dt id="kinoml.features.complexes.SCHRODINGERComplexFeaturizer._SUPPORTED_TYPES">
-<code class="sig-name descname">_SUPPORTED_TYPES</code><a class="headerlink" href="#kinoml.features.complexes.SCHRODINGERComplexFeaturizer._SUPPORTED_TYPES" title="Permalink to this definition">¶</a></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="kinoml.features.complexes.SCHRODINGERComplexFeaturizer._SUPPORTED_TYPES">
+<span class="sig-name descname"><span class="pre">_SUPPORTED_TYPES</span></span><a class="headerlink" href="#kinoml.features.complexes.SCHRODINGERComplexFeaturizer._SUPPORTED_TYPES" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-<dl class="method">
-<dt id="kinoml.features.complexes.SCHRODINGERComplexFeaturizer._pre_featurize">
-<code class="sig-name descname">_pre_featurize</code><span class="sig-paren">(</span><em class="sig-param">self, systems: List[ProteinLigandComplex]</em><span class="sig-paren">)</span> → None<a class="headerlink" href="#kinoml.features.complexes.SCHRODINGERComplexFeaturizer._pre_featurize" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.features.complexes.SCHRODINGERComplexFeaturizer._pre_featurize">
+<span class="sig-name descname"><span class="pre">_pre_featurize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">systems</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="../../core/systems/index.html#kinoml.core.systems.ProteinLigandComplex" title="kinoml.core.systems.ProteinLigandComplex"><span class="pre">kinoml.core.systems.ProteinLigandComplex</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#kinoml.features.complexes.SCHRODINGERComplexFeaturizer._pre_featurize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check that SCHRODINGER variable exists.</p>
 </dd></dl>
-<dl class="method">
-<dt id="kinoml.features.complexes.SCHRODINGERComplexFeaturizer._featurize_one">
-<code class="sig-name descname">_featurize_one</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">system: ProteinLigandComplex</em><span class="sig-paren">)</span> → Union[Universe, None]<a class="headerlink" href="#kinoml.features.complexes.SCHRODINGERComplexFeaturizer._featurize_one" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.features.complexes.SCHRODINGERComplexFeaturizer._featurize_one">
+<span class="sig-name descname"><span class="pre">_featurize_one</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../core/systems/index.html#kinoml.core.systems.ProteinLigandComplex" title="kinoml.core.systems.ProteinLigandComplex"><span class="pre">kinoml.core.systems.ProteinLigandComplex</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">Universe</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#kinoml.features.complexes.SCHRODINGERComplexFeaturizer._featurize_one" title="Permalink to this definition">¶</a></dt>
 <dd><p>Prepare a protein structure.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1182,9 +1171,9 @@ number of available CPUs.</p></li>
 </dd>
 </dl>
 </dd></dl>
-<dl class="method">
-<dt id="kinoml.features.complexes.SCHRODINGERComplexFeaturizer._system_to_name">
-<em class="property">static </em><code class="sig-name descname">_system_to_name</code><span class="sig-paren">(</span><em class="sig-param">system: ProteinLigandComplex</em><span class="sig-paren">)</span> → str<a class="headerlink" href="#kinoml.features.complexes.SCHRODINGERComplexFeaturizer._system_to_name" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.features.complexes.SCHRODINGERComplexFeaturizer._system_to_name">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_system_to_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../core/systems/index.html#kinoml.core.systems.ProteinLigandComplex" title="kinoml.core.systems.ProteinLigandComplex"><span class="pre">kinoml.core.systems.ProteinLigandComplex</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#kinoml.features.complexes.SCHRODINGERComplexFeaturizer._system_to_name" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get a name of the system based on attributes of the protein and ligand component.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1198,9 +1187,9 @@ number of available CPUs.</p></li>
 </dd>
 </dl>
 </dd></dl>
-<dl class="method">
-<dt id="kinoml.features.complexes.SCHRODINGERComplexFeaturizer._prepare_structure">
-<code class="sig-name descname">_prepare_structure</code><span class="sig-paren">(</span><em class="sig-param">self, protein: Union[Protein, KLIFSKinase]</em><span class="sig-paren">)</span> → Union[Path, None]<a class="headerlink" href="#kinoml.features.complexes.SCHRODINGERComplexFeaturizer._prepare_structure" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.features.complexes.SCHRODINGERComplexFeaturizer._prepare_structure">
+<span class="sig-name descname"><span class="pre">_prepare_structure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">protein</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="../../core/proteins/index.html#kinoml.core.proteins.Protein" title="kinoml.core.proteins.Protein"><span class="pre">kinoml.core.proteins.Protein</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="../../core/proteins/index.html#kinoml.core.proteins.KLIFSKinase" title="kinoml.core.proteins.KLIFSKinase"><span class="pre">kinoml.core.proteins.KLIFSKinase</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">pathlib.Path</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#kinoml.features.complexes.SCHRODINGERComplexFeaturizer._prepare_structure" title="Permalink to this definition">¶</a></dt>
 <dd><p>Prepare the structure with SCHRODINGER’s prepwizard.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1214,9 +1203,9 @@ number of available CPUs.</p></li>
 </dd>
 </dl>
 </dd></dl>
-<dl class="method">
-<dt id="kinoml.features.complexes.SCHRODINGERComplexFeaturizer._read_protein_structure">
-<code class="sig-name descname">_read_protein_structure</code><span class="sig-paren">(</span><em class="sig-param">self, protein: Union[Protein, KLIFSKinase]</em><span class="sig-paren">)</span> → Union[Universe, None]<a class="headerlink" href="#kinoml.features.complexes.SCHRODINGERComplexFeaturizer._read_protein_structure" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.features.complexes.SCHRODINGERComplexFeaturizer._read_protein_structure">
+<span class="sig-name descname"><span class="pre">_read_protein_structure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">protein</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="../../core/proteins/index.html#kinoml.core.proteins.Protein" title="kinoml.core.proteins.Protein"><span class="pre">kinoml.core.proteins.Protein</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="../../core/proteins/index.html#kinoml.core.proteins.KLIFSKinase" title="kinoml.core.proteins.KLIFSKinase"><span class="pre">kinoml.core.proteins.KLIFSKinase</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">Universe</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#kinoml.features.complexes.SCHRODINGERComplexFeaturizer._read_protein_structure" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the protein structure of the given protein object as MDAnalysis universe.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1233,9 +1222,9 @@ number of available CPUs.</p></li>
 </dd>
 </dl>
 </dd></dl>
-<dl class="method">
-<dt id="kinoml.features.complexes.SCHRODINGERComplexFeaturizer._preprocess_structure">
-<code class="sig-name descname">_preprocess_structure</code><span class="sig-paren">(</span><em class="sig-param">self, pdb_path: Union[str, Path], chain_id: Union[str, None], alternate_location: Union[str, None], expo_id: Union[str, None], sequence: str</em><span class="sig-paren">)</span> → Path<a class="headerlink" href="#kinoml.features.complexes.SCHRODINGERComplexFeaturizer._preprocess_structure" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.features.complexes.SCHRODINGERComplexFeaturizer._preprocess_structure">
+<span class="sig-name descname"><span class="pre">_preprocess_structure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pdb_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">pathlib.Path</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chain_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alternate_location</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expo_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sequence</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">pathlib.Path</span></span></span><a class="headerlink" href="#kinoml.features.complexes.SCHRODINGERComplexFeaturizer._preprocess_structure" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="simple">
 <dt>Pre-process a structure for SCHRODINGER’s prepwizard with the following steps:</dt><dd><ul class="simple">
 <li><p>select chain of interest</p></li>
@@ -1265,9 +1254,9 @@ number of available CPUs.</p></li>
 </dd>
 </dl>
 </dd></dl>
-<dl class="method">
-<dt id="kinoml.features.complexes.SCHRODINGERComplexFeaturizer._postprocess_structure">
-<em class="property">static </em><code class="sig-name descname">_postprocess_structure</code><span class="sig-paren">(</span><em class="sig-param">prepared_structure: Universe, protein: [Protein, KLIFSKinase]</em><span class="sig-paren">)</span> → Universe<a class="headerlink" href="#kinoml.features.complexes.SCHRODINGERComplexFeaturizer._postprocess_structure" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.features.complexes.SCHRODINGERComplexFeaturizer._postprocess_structure">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_postprocess_structure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prepared_structure</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Universe</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">protein</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="p"><span class="pre">[</span></span><a class="reference internal" href="../../core/proteins/index.html#kinoml.core.proteins.Protein" title="kinoml.core.proteins.Protein"><span class="pre">kinoml.core.proteins.Protein</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="../../core/proteins/index.html#kinoml.core.proteins.KLIFSKinase" title="kinoml.core.proteins.KLIFSKinase"><span class="pre">kinoml.core.proteins.KLIFSKinase</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Universe</span></span></span><a class="headerlink" href="#kinoml.features.complexes.SCHRODINGERComplexFeaturizer._postprocess_structure" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="simple">
 <dt>Post-process a structure prepared with SCHRODINGER’s prepwizard with the following steps:</dt><dd><ul class="simple">
 <li><p>select the chain of interest</p></li>
@@ -1293,10 +1282,10 @@ number of available CPUs.</p></li>
 </dl>
 </dd></dl>
 </dd></dl>
-<dl class="class">
-<dt id="kinoml.features.complexes.SCHRODINGERDockingFeaturizer">
-<em class="property">class </em><code class="sig-prename descclassname">kinoml.features.complexes.</code><code class="sig-name descname">SCHRODINGERDockingFeaturizer</code><span class="sig-paren">(</span><em class="sig-param">cache_dir: Union[str</em>, <em class="sig-param">Path</em>, <em class="sig-param">None] = None</em>, <em class="sig-param">output_dir: Union[str</em>, <em class="sig-param">Path</em>, <em class="sig-param">None] = None</em>, <em class="sig-param">max_retry: int = 3</em>, <em class="sig-param">build_loops: bool = True</em>, <em class="sig-param">shape_restrain: bool = True</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.complexes.SCHRODINGERDockingFeaturizer" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#kinoml.features.complexes.SCHRODINGERComplexFeaturizer" title="kinoml.features.complexes.SCHRODINGERComplexFeaturizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.features.complexes.SCHRODINGERComplexFeaturizer</span></code></a></p>
+<dl class="py class">
+<dt class="sig sig-object py" id="kinoml.features.complexes.SCHRODINGERDockingFeaturizer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">kinoml.features.complexes.</span></span><span class="sig-name descname"><span class="pre">SCHRODINGERDockingFeaturizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cache_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">pathlib.Path</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">pathlib.Path</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_retry</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">build_loops</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape_restrain</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.complexes.SCHRODINGERDockingFeaturizer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#kinoml.features.complexes.SCHRODINGERComplexFeaturizer" title="kinoml.features.complexes.SCHRODINGERComplexFeaturizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SCHRODINGERComplexFeaturizer</span></code></a></p>
 <p>Given systems with exactly one protein and one ligand, prepare the
 structure dock the ligand into its binding site identified by a
 co-crystallized ligand. The following steps will be performed:</p>
@@ -1345,9 +1334,9 @@ SMILES. Additionally, the ligand component can have the following optional
 generating the output file name and as molecule title in the docking
 pose SDF file.</p>
 </div></blockquote>
-<dl class="attribute">
-<dt>
-<code class="sig-name descname">- `macrocycle`</code></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">-</span> <span class="pre">`macrocycle`</span></span></dt>
 <dd><p>A bool specifying if the ligand shell be sampled as a
 macrocycle during docking. Docking will fail, if SCHRDODINGER does not
 consider the ligand a macrocycle.</p>
@@ -1370,13 +1359,13 @@ co-crystallized ligand.</p></li>
 </ul>
 </dd>
 </dl>
-<dl class="attribute">
-<dt id="kinoml.features.complexes.SCHRODINGERDockingFeaturizer._SUPPORTED_TYPES">
-<code class="sig-name descname">_SUPPORTED_TYPES</code><a class="headerlink" href="#kinoml.features.complexes.SCHRODINGERDockingFeaturizer._SUPPORTED_TYPES" title="Permalink to this definition">¶</a></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="kinoml.features.complexes.SCHRODINGERDockingFeaturizer._SUPPORTED_TYPES">
+<span class="sig-name descname"><span class="pre">_SUPPORTED_TYPES</span></span><a class="headerlink" href="#kinoml.features.complexes.SCHRODINGERDockingFeaturizer._SUPPORTED_TYPES" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-<dl class="method">
-<dt id="kinoml.features.complexes.SCHRODINGERDockingFeaturizer._featurize_one">
-<code class="sig-name descname">_featurize_one</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">system: ProteinLigandComplex</em><span class="sig-paren">)</span> → Union[Universe, None]<a class="headerlink" href="#kinoml.features.complexes.SCHRODINGERDockingFeaturizer._featurize_one" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.features.complexes.SCHRODINGERDockingFeaturizer._featurize_one">
+<span class="sig-name descname"><span class="pre">_featurize_one</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../core/systems/index.html#kinoml.core.systems.ProteinLigandComplex" title="kinoml.core.systems.ProteinLigandComplex"><span class="pre">kinoml.core.systems.ProteinLigandComplex</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">Universe</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#kinoml.features.complexes.SCHRODINGERDockingFeaturizer._featurize_one" title="Permalink to this definition">¶</a></dt>
 <dd><p>Prepare a protein structure and dock a ligand.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1390,9 +1379,9 @@ co-crystallized ligand.</p></li>
 </dd>
 </dl>
 </dd></dl>
-<dl class="method">
-<dt id="kinoml.features.complexes.SCHRODINGERDockingFeaturizer._dock_molecule">
-<code class="sig-name descname">_dock_molecule</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">prepared_structure_path: Path</em>, <em class="sig-param">system: ProteinLigandComplex</em>, <em class="sig-param">system_name: str</em><span class="sig-paren">)</span> → Union[Path, None]<a class="headerlink" href="#kinoml.features.complexes.SCHRODINGERDockingFeaturizer._dock_molecule" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.features.complexes.SCHRODINGERDockingFeaturizer._dock_molecule">
+<span class="sig-name descname"><span class="pre">_dock_molecule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prepared_structure_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pathlib.Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">system</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../core/systems/index.html#kinoml.core.systems.ProteinLigandComplex" title="kinoml.core.systems.ProteinLigandComplex"><span class="pre">kinoml.core.systems.ProteinLigandComplex</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">system_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">pathlib.Path</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#kinoml.features.complexes.SCHRODINGERDockingFeaturizer._dock_molecule" title="Permalink to this definition">¶</a></dt>
 <dd><p>Dock the molecule into the protein with SCHRODINGER’s Glide.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1410,9 +1399,9 @@ co-crystallized ligand.</p></li>
 </dd>
 </dl>
 </dd></dl>
-<dl class="method">
-<dt id="kinoml.features.complexes.SCHRODINGERDockingFeaturizer._replace_ligand">
-<em class="property">static </em><code class="sig-name descname">_replace_ligand</code><span class="sig-paren">(</span><em class="sig-param">pdb_path: Path</em>, <em class="sig-param">docking_pose_sdf_path: Path</em><span class="sig-paren">)</span> → Universe<a class="headerlink" href="#kinoml.features.complexes.SCHRODINGERDockingFeaturizer._replace_ligand" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.features.complexes.SCHRODINGERDockingFeaturizer._replace_ligand">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_replace_ligand</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pdb_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pathlib.Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">docking_pose_sdf_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pathlib.Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Universe</span></span></span><a class="headerlink" href="#kinoml.features.complexes.SCHRODINGERDockingFeaturizer._replace_ligand" title="Permalink to this definition">¶</a></dt>
 <dd><p>Replace the ligand in a PDB file with a ligand in an SDF file.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1429,9 +1418,9 @@ co-crystallized ligand.</p></li>
 </dd>
 </dl>
 </dd></dl>
-<dl class="method">
-<dt id="kinoml.features.complexes.SCHRODINGERDockingFeaturizer._store_docking_score">
-<em class="property">static </em><code class="sig-name descname">_store_docking_score</code><span class="sig-paren">(</span><em class="sig-param">structure: Universe</em>, <em class="sig-param">docking_pose_path: Path</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.complexes.SCHRODINGERDockingFeaturizer._store_docking_score" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.features.complexes.SCHRODINGERDockingFeaturizer._store_docking_score">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_store_docking_score</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">structure</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Universe</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">docking_pose_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pathlib.Path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.complexes.SCHRODINGERDockingFeaturizer._store_docking_score" title="Permalink to this definition">¶</a></dt>
 <dd><p>Store the docking score from OpenEye docking in the MDAnalysis universe._topology. They
 cannot be stored in the universe object directly, because they will be lost during
 multiprocessing/pickling.</p>
@@ -1444,9 +1433,9 @@ multiprocessing/pickling.</p>
 </dd>
 </dl>
 </dd></dl>
-<dl class="method">
-<dt id="kinoml.features.complexes.SCHRODINGERDockingFeaturizer._write_complex_mae">
-<code class="sig-name descname">_write_complex_mae</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">prepared_structure: Universe</em>, <em class="sig-param">docking_pose_path: Path</em>, <em class="sig-param">complex_path_mae: Path</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.complexes.SCHRODINGERDockingFeaturizer._write_complex_mae" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.features.complexes.SCHRODINGERDockingFeaturizer._write_complex_mae">
+<span class="sig-name descname"><span class="pre">_write_complex_mae</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prepared_structure</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Universe</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">docking_pose_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pathlib.Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">complex_path_mae</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pathlib.Path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.complexes.SCHRODINGERDockingFeaturizer._write_complex_mae" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write the new docked structure in MAE format.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1509,7 +1498,7 @@ multiprocessing/pickling.</p>
               
           </div>
             Created using
-            <a href="http://www.sphinx-doc.org/">Sphinx</a> 2.4.5.
+            <a href="http://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
              and
             <a href="https://github.com/bashtage/sphinx-material/">Material for
               Sphinx</a>

@@ -1,9 +1,10 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
-    <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
@@ -49,26 +50,23 @@
   
   
     <title>kinoml.datasets.groups &#8212; KinoML 0.1 documentation</title>
-    <link rel="stylesheet" href="../../../../_static/material.css" type="text/css" />
-    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/material.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/twemoji.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css" />
-    <link rel="stylesheet" type="text/css" href="../../../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
-    <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
     <script src="../../../../_static/jquery.js"></script>
     <script src="../../../../_static/underscore.js"></script>
     <script src="../../../../_static/doctools.js"></script>
-    <script src="../../../../_static/language_data.js"></script>
     <script src="https://twemoji.maxcdn.com/v/latest/twemoji.min.js"></script>
     <script src="../../../../_static/twemoji.js"></script>
     <script src="../../../../_static/clipboard.min.js"></script>
     <script src="../../../../_static/copybutton.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "tex2jax_ignore|mathjax_ignore|document", "processClass": "tex2jax_process|mathjax_process|math|output_area", "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
     <link rel="shortcut icon" href="../../../../_static/custom_favicon.png"/>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" />
@@ -178,8 +176,6 @@
             
             <li class="md-tabs__item"><a href="../../../../index.html" class="md-tabs__link">User guide</a></li>
             
-            <li class="md-tabs__item"><a href="../../../../developers/api_concepts.html" class="md-tabs__link">Developers</a></li>
-            
             <li class="md-tabs__item"><a href="../../index.html" class="md-tabs__link">API Reference</a></li>
             
             <li class="md-tabs__item"><a href="https://openkinome.org" class="md-tabs__link">OpenKinome</a></li>
@@ -231,14 +227,14 @@
     <li class="md-nav__item">
     
     
-      <a href="../../../../getting_started.html" class="md-nav__link">Getting started</a>
+      <a href="../../../../notebooks/getting_started.html" class="md-nav__link">Getting Started</a>
       
     
     </li>
     <li class="md-nav__item">
     
     
-      <a href="../../../../install.html" class="md-nav__link">Installation</a>
+      <a href="../../../../notebooks/kinoml_object_model.html" class="md-nav__link">KinoML object model</a>
       
     
     </li>
@@ -250,27 +246,20 @@
     <li class="md-nav__item">
     
     
-      <a href="../../../../tutorials/example.html" class="md-nav__link">Tutorial 1</a>
+      <a href="../../../../notebooks/OpenEye_structural_featurizer.html" class="md-nav__link">OpenEye Structural Featurizer</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="../../../../notebooks/Schrodinger_structural_featurizer.html" class="md-nav__link">Schrodinger Structural Featurizer</a>
       
     
     </li>
     <li class="md-nav__item">
     
       <span class="md-nav__link caption"><span class="caption-text">Developers</span></span>
-    
-    </li>
-    <li class="md-nav__item">
-    
-    
-      <a href="../../../../developers/api_concepts.html" class="md-nav__link">Base concepts in our API</a>
-      
-    
-    </li>
-    <li class="md-nav__item">
-    
-    
-      <a href="../../../../developers/api_docs.html" class="md-nav__link">How to write docs with Sphinx, MyST and Material Theme</a>
-      
     
     </li>
     <li class="md-nav__item">
@@ -363,13 +352,13 @@
 <p>Splitting strategies for datasets</p>
 <section id="module-contents">
 <h2 id="module-contents">Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="kinoml.datasets.groups.BaseGrouper">
-<em class="property">class </em><code class="sig-prename descclassname">kinoml.datasets.groups.</code><code class="sig-name descname">BaseGrouper</code><a class="headerlink" href="#kinoml.datasets.groups.BaseGrouper" title="Permalink to this definition">¶</a></dt>
+<dl class="py class">
+<dt class="sig sig-object py" id="kinoml.datasets.groups.BaseGrouper">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">kinoml.datasets.groups.</span></span><span class="sig-name descname"><span class="pre">BaseGrouper</span></span><a class="headerlink" href="#kinoml.datasets.groups.BaseGrouper" title="Permalink to this definition">¶</a></dt>
 <dd><p>Base class to assign groups to measurements in a DatasetProvider</p>
-<dl class="method">
-<dt id="kinoml.datasets.groups.BaseGrouper.assign">
-<code class="sig-name descname">assign</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">dataset</em>, <em class="sig-param">overwrite=False</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.groups.BaseGrouper.assign" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.datasets.groups.BaseGrouper.assign">
+<span class="sig-name descname"><span class="pre">assign</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overwrite</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.groups.BaseGrouper.assign" title="Permalink to this definition">¶</a></dt>
 <dd><p>Given a DatasetProvider, assign a key to the elements
 of each group, as provided by <code class="docutils literal notranslate"><span class="pre">.indices()</span></code></p>
 <dl class="field-list simple">
@@ -389,9 +378,9 @@ measurements modified in place.</p>
 </dd>
 </dl>
 </dd></dl>
-<dl class="method">
-<dt id="kinoml.datasets.groups.BaseGrouper.indices">
-<em class="property">abstract </em><code class="sig-name descname">indices</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">dataset</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.groups.BaseGrouper.indices" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.datasets.groups.BaseGrouper.indices">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">indices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.groups.BaseGrouper.indices" title="Permalink to this definition">¶</a></dt>
 <dd><p>Given a dataset, create a dictionary that maps keys or labels
 to a set of numerical indices. The strategy to follow will
 depend on the subclass.</p>
@@ -408,10 +397,10 @@ depend on the subclass.</p>
 </dl>
 </dd></dl>
 </dd></dl>
-<dl class="class">
-<dt id="kinoml.datasets.groups.RandomGrouper">
-<em class="property">class </em><code class="sig-prename descclassname">kinoml.datasets.groups.</code><code class="sig-name descname">RandomGrouper</code><span class="sig-paren">(</span><em class="sig-param">ratios</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.groups.RandomGrouper" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#kinoml.datasets.groups.BaseGrouper" title="kinoml.datasets.groups.BaseGrouper"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.datasets.groups.BaseGrouper</span></code></a></p>
+<dl class="py class">
+<dt class="sig sig-object py" id="kinoml.datasets.groups.RandomGrouper">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">kinoml.datasets.groups.</span></span><span class="sig-name descname"><span class="pre">RandomGrouper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ratios</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.groups.RandomGrouper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#kinoml.datasets.groups.BaseGrouper" title="kinoml.datasets.groups.BaseGrouper"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BaseGrouper</span></code></a></p>
 <p>Randomized groups following a split proportional to the provided ratios</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -420,9 +409,9 @@ dict is provided, the keys are used to label the resulting groups.
 Otherwise, the groups are 0-enumerated.</p>
 </dd>
 </dl>
-<dl class="method">
-<dt id="kinoml.datasets.groups.RandomGrouper.indices">
-<code class="sig-name descname">indices</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">dataset</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.groups.RandomGrouper.indices" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.datasets.groups.RandomGrouper.indices">
+<span class="sig-name descname"><span class="pre">indices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.groups.RandomGrouper.indices" title="Permalink to this definition">¶</a></dt>
 <dd><p>Given a dataset, create a dictionary that maps keys or labels
 to a set of numerical indices. The strategy to follow will
 depend on the subclass.</p>
@@ -439,10 +428,10 @@ depend on the subclass.</p>
 </dl>
 </dd></dl>
 </dd></dl>
-<dl class="class">
-<dt id="kinoml.datasets.groups.CallableGrouper">
-<em class="property">class </em><code class="sig-prename descclassname">kinoml.datasets.groups.</code><code class="sig-name descname">CallableGrouper</code><span class="sig-paren">(</span><em class="sig-param">function</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.groups.CallableGrouper" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#kinoml.datasets.groups.BaseGrouper" title="kinoml.datasets.groups.BaseGrouper"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.datasets.groups.BaseGrouper</span></code></a></p>
+<dl class="py class">
+<dt class="sig sig-object py" id="kinoml.datasets.groups.CallableGrouper">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">kinoml.datasets.groups.</span></span><span class="sig-name descname"><span class="pre">CallableGrouper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">function</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.groups.CallableGrouper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#kinoml.datasets.groups.BaseGrouper" title="kinoml.datasets.groups.BaseGrouper"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BaseGrouper</span></code></a></p>
 <p>A grouper that applies a user-provided function to each Measurement
 in the Dataset. Returned value should be the name of the group.</p>
 <dl class="field-list simple">
@@ -451,9 +440,9 @@ in the Dataset. Returned value should be the name of the group.</p>
 and return a <code class="docutils literal notranslate"><span class="pre">str</span></code> or <code class="docutils literal notranslate"><span class="pre">int</span></code>.</p>
 </dd>
 </dl>
-<dl class="method">
-<dt id="kinoml.datasets.groups.CallableGrouper.indices">
-<code class="sig-name descname">indices</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">dataset</em>, <em class="sig-param">progress=True</em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.groups.CallableGrouper.indices" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.datasets.groups.CallableGrouper.indices">
+<span class="sig-name descname"><span class="pre">indices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.groups.CallableGrouper.indices" title="Permalink to this definition">¶</a></dt>
 <dd><p>Given a dataset, create a dictionary that maps keys or labels
 to a set of numerical indices. The strategy to follow will
 depend on the subclass.</p>
@@ -470,10 +459,10 @@ depend on the subclass.</p>
 </dl>
 </dd></dl>
 </dd></dl>
-<dl class="class">
-<dt id="kinoml.datasets.groups.BaseFilter">
-<em class="property">class </em><code class="sig-prename descclassname">kinoml.datasets.groups.</code><code class="sig-name descname">BaseFilter</code><a class="headerlink" href="#kinoml.datasets.groups.BaseFilter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#kinoml.datasets.groups.BaseGrouper" title="kinoml.datasets.groups.BaseGrouper"><code class="xref py py-class docutils literal notranslate"><span class="pre">kinoml.datasets.groups.BaseGrouper</span></code></a></p>
+<dl class="py class">
+<dt class="sig sig-object py" id="kinoml.datasets.groups.BaseFilter">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">kinoml.datasets.groups.</span></span><span class="sig-name descname"><span class="pre">BaseFilter</span></span><a class="headerlink" href="#kinoml.datasets.groups.BaseFilter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#kinoml.datasets.groups.BaseGrouper" title="kinoml.datasets.groups.BaseGrouper"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BaseGrouper</span></code></a></p>
 <p>Base class to assign groups to measurements in a DatasetProvider</p>
 </dd></dl>
 </section>
@@ -526,7 +515,7 @@ depend on the subclass.</p>
               
           </div>
             Created using
-            <a href="http://www.sphinx-doc.org/">Sphinx</a> 2.4.5.
+            <a href="http://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
              and
             <a href="https://github.com/bashtage/sphinx-material/">Material for
               Sphinx</a>
