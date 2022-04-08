@@ -14,9 +14,9 @@ def test_protein_from_file():
 
     with resources.path("kinoml.data.proteins", "4f8o.pdb") as path:
         protein = Protein.from_file(path)
-        assert isinstance(protein.molecule, oechem.OEGraphMol) == True
+        assert isinstance(protein.molecule, oechem.OEGraphMol)
         protein = Protein.from_file(path, toolkit="MDAnalysis")
-        assert isinstance(protein.molecule, Universe) == True
+        assert isinstance(protein.molecule, Universe)
 
 
 def test_protein_from_pdb():
@@ -24,7 +24,9 @@ def test_protein_from_pdb():
     from kinoml.core.proteins import Protein
 
     protein = Protein.from_pdb("4yne")
-    assert isinstance(protein.molecule, oechem.OEGraphMol) == True
+    assert isinstance(protein.molecule, oechem.OEGraphMol)
+    protein = Protein.from_pdb("4yne", toolkit="MDAnalysis")
+    assert isinstance(protein.molecule, Universe)
 
 
 def test_lazy_protein():
@@ -32,9 +34,11 @@ def test_lazy_protein():
     from kinoml.core.proteins import Protein
 
     protein = Protein(pdb_id="4yne")
-    assert isinstance(protein._molecule, type(None)) is True
-    assert isinstance(protein.molecule, oechem.OEGraphMol) is True
-    assert isinstance(protein._molecule, oechem.OEGraphMol) is True
+    assert isinstance(protein._molecule, type(None))
+    assert isinstance(protein.molecule, oechem.OEGraphMol)
+    assert isinstance(protein._molecule, oechem.OEGraphMol)
+    protein = Protein(pdb_id="4yne", toolkit="MDAnalysis")
+    assert isinstance(protein.molecule, Universe)
 
 
 def test_klifskinase_kinase_klifs_sequence():
@@ -43,10 +47,13 @@ def test_klifskinase_kinase_klifs_sequence():
 
     kinase = KLIFSKinase(uniprot_id="P04629")
     assert len(kinase.kinase_klifs_sequence) == 85
+    assert isinstance(kinase.sequence, str)
     kinase = KLIFSKinase(kinase_klifs_id=480)
     assert len(kinase.kinase_klifs_sequence) == 85
+    assert isinstance(kinase.sequence, str)
     kinase = KLIFSKinase(structure_klifs_id=3620)
     assert len(kinase.kinase_klifs_sequence) == 85
+    assert isinstance(kinase.sequence, str)
 
 
 def test_klifskinase_structure_klifs_sequence():

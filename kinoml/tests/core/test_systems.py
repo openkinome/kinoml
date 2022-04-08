@@ -8,8 +8,6 @@ import pytest
 def test_system():
     from kinoml.core.components import MolecularComponent
     from kinoml.core.systems import System
-    from kinoml.core.measurements import BaseMeasurement
-    from kinoml.core.conditions import AssayConditions
 
     components = [MolecularComponent()]
     system = System(components=components)
@@ -26,6 +24,7 @@ def test_ligand_system():
 
     pl = LigandSystem(components=[BaseLigand()])
     assert pl.ligand == list(pl.ligands)[0]
+    assert isinstance(pl.name, str)
 
     LigandSystem(components=[], strict=False)
     with pytest.raises(AssertionError):

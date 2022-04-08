@@ -1,6 +1,7 @@
 """
 Test kinoml.core.ligands
 """
+from importlib import resources
 
 
 def test_ligand():
@@ -12,6 +13,11 @@ def test_ligand():
     from kinoml.core.components import BaseLigand
 
     smiles = "CCCCC"
+    ligand = Ligand.from_smiles(smiles=smiles)
+    assert isinstance(ligand.molecule, Molecule)
+    with resources.path("kinoml.data.molecules", "chloroform.sdf") as path:
+        ligand = Ligand.from_file(str(path))
+        assert isinstance(ligand.molecule, Molecule)
     ligand = Ligand(smiles=smiles)
     assert isinstance(ligand, BaseLigand)
     assert isinstance(ligand.molecule, Molecule)
