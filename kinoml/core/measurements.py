@@ -223,17 +223,13 @@ class PercentageDisplacementMeasurement(ObservationModelMeasurement):
 
     For the percent displacement measurements available from KinomeScan, we have the following:
 
-    $$
-    D([I]) = \frac{1}{1 + \frac{K_d}{[I]}}
-    $$
+    .. math :: D([I]) = \frac{1}{1 + \frac{K_d}{[I]}}
 
     We therefore define the following function:
 
-    $$
-    \mathbf{F}_{KinomeScan}(\Delta g, [I]) = 100 * \frac{1}{1 + \frac{exp[\Delta g] * C[M]}{[I]}},
-    $$
+    .. math :: \mathbf{F}_{KinomeScan}(\Delta g, [I]) = 100 * \frac{1}{1 + \frac{exp[\Delta g] * C[M]}{[I]}}
 
-    where $C$ is the standard concentration of 1 [M].
+    where :math:`C` is the standard concentration of 1 [M].
 
     Note
     ----
@@ -259,9 +255,7 @@ class PercentageDisplacementMeasurement(ObservationModelMeasurement):
         r"""
         Return the observation model.
 
-        $$
-        F(\Delta g) = 100 * \frac{1}{1 + \frac{exp[\Delta g] * C[M]}{[I]}},
-        $$
+        .. math:: F(\Delta g) = 100 * \frac{1}{1 + \frac{exp[\Delta g] * C[M]}{[I]}}
         """
         # TODO: Review the performance penalty of type casting
         dG_over_KT = dG_over_KT.astype("float64")
@@ -280,9 +274,7 @@ class PercentageDisplacementMeasurement(ObservationModelMeasurement):
         r"""
         Return the gradient and the hessian of the loss defined by
 
-        $$
-        L(y, \hat y) = \frac{1}{2} * (y - F(\hat y)) ** 2.
-        $$
+        .. math:: L(y, \hat y) = \frac{1}{2} * (y - F(\hat y)) ** 2
 
         See theory notes for more details.
         """
@@ -317,38 +309,28 @@ class pIC50Measurement(ObservationModelMeasurement):
     The `Cheng Prusoff <https://en.wikipedia.org/wiki/IC50#Cheng_Prusoff_equation>`_
     equation states the following relationship:
 
-    $$
-    K_i = \frac{IC50}{1+\frac{[S]}{K_m}}
-    $$
+    .. math:: K_i = \frac{IC50}{1+\frac{[S]}{K_m}}
 
     We make the following assumption (which will be relaxed in the future):
 
-    $K_i \approx K_d$
+    .. math:: K_i \approx K_d
 
     Under this assumptions, the Cheng-Prusoff equation becomes:
 
-    $$
-    IC50 \approx {1+\frac{[S]}{K_m}} * K_d
-    $$
+    .. math:: IC50 \approx {1+\frac{[S]}{K_m}} * K_d
 
     We define the following function:
 
-    $$
-    \mathbf{F}_{IC_{50}}(\Delta g) = \Big({1+\frac{[S]}{K_m}}\Big) * \mathbf{F}_{K_d}(\Delta g) = \Big({1+\frac{[S]}{K_m}}\Big) * exp[\Delta g] * C[M].
-    $$
+    .. math:: \mathbf{F}_{IC_{50}}(\Delta g) = \Big({1+\frac{[S]}{K_m}}\Big) * \mathbf{F}_{K_d}(\Delta g) = \Big({1+\frac{[S]}{K_m}}\Big) * exp[\Delta g] * C[M]
 
     Given IC50 values given in molar units, we obtain pIC50
     values in molar units using the tranformation:
 
-    $$
-    pIC50 [M] = -log_{10}(IC50[M])
-    $$
+    .. math:: pIC50 [M] = -log_{10}(IC50[M])
 
     Finally the observation model for pIC50 values is:
 
-    $$
-    \mathbf{F}_{pIC_{50}}(\Delta g) = - \frac{\Delta g + \ln\Big(\big(1+\frac{[S]}{K_m}\big)*C\Big)}{\ln(10)}.
-    $$
+    .. math:: \mathbf{F}_{pIC_{50}}(\Delta g) = - \frac{\Delta g + \ln\Big(\big(1+\frac{[S]}{K_m}\big)*C\Big)}{\ln(10)}
 
     Note
     ----
@@ -377,13 +359,11 @@ class pIC50Measurement(ObservationModelMeasurement):
         standard_conc=1,
         **kwargs,
     ):
-        """
+        r"""
         In XGBoost, observation models need to be applied within the loss function. In this specific case,
         MSE is applied and differentiated (twice) to provide the gradients and hessian matrices.
 
-        $$
-        loss = 1/2 * (observation_pIC50(preds)-labels)^2
-        $$
+        .. math:: loss = 1/2 * (observation_pIC50(preds)-labels)^2
 
         Parameters:
             dmatrix : xgboost.DMatrix
@@ -411,11 +391,11 @@ class pIC50Measurement(ObservationModelMeasurement):
 class pKiMeasurement(ObservationModelMeasurement):
 
     r"""
-    Measurement where the value(s) come from $K_i$ experiments
+    Measurement where the value(s) come from :math:`K_i` experiments
 
-    We make the assumption that $K_i \approx K_d$ and therefore
+    We make the assumption that :math:`K_i \approx K_d` and therefore
 
-    $\mathbf{F}_{pK_i} = \mathbf{F}_{pK_d}$.
+    .. math :: \mathbf{F}_{pK_i} = \mathbf{F}_{pK_d}
 
     Note
     ----
@@ -439,9 +419,7 @@ class pKiMeasurement(ObservationModelMeasurement):
         r"""
         Return the gradient and the hessian of the loss defined by
 
-        $$
-        L(y, \hat y) = \frac{1}{2} * (y - F(\hat y)) ** 2.
-        $$
+        .. math:: L(y, \hat y) = \frac{1}{2} * (y - F(\hat y)) ** 2
         """
         grad_loss = (labels + (dG_over_KT + standard_conc) / LN10) / LN10
         hess_loss = np.full(grad_loss.shape, 1 / (LN10 * LN10))
@@ -466,9 +444,8 @@ class pKdMeasurement(ObservationModelMeasurement):
 
     We define the following physics-based function
 
-    $$
-    \mathbf{F}_{pK_d}(\Delta g) = - \frac{\Delta g + \ln(C)}{\ln(10)},
-    $$
+    .. math:: \mathbf{F}_{pK_d}(\Delta g) = - \frac{\Delta g + \ln(C)}{\ln(10)}
+
     where C given in molar [M] can be adapted if measurements were undertaken at different concentrations.
 
     Note
@@ -491,9 +468,7 @@ class pKdMeasurement(ObservationModelMeasurement):
         r"""
         Return the gradient and the hessian of the loss defined by
 
-        $$
-        L(y, \hat y) = \frac{1}{2} * (y - F(\hat y)) ** 2.
-        $$
+        .. math:: L(y, \hat y) = \frac{1}{2} * (y - F(\hat y)) ** 2
         """
         grad_loss = (labels + (dG_over_KT + standard_conc) / LN10) / LN10
         hess_loss = np.full(grad_loss.shape, 1 / (LN10 * LN10))

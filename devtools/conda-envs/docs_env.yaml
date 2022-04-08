@@ -5,24 +5,28 @@ dependencies:
   # Base depends
   - python
   - pip
-
+  - ipython
+  # core
+  #- sphinx~=2.4.0
+  - sphinx
+  - jinja2<=3.0.3
+  - nbsphinx
+  - nbsphinx-link
+  - sphinx-notfound-page
+  - sphinx-prompt
+  - sphinx-copybutton
+  - sphinx-autoapi
+  - myst-parser
+  - sphinxcontrib-httpdomain
+  - linkify-it-py
+  - sphinx-panels
+  # themes
+  - sphinx-material
+  # local building
+  - sphinx-autobuild
   - pip:
       # core
-      - sphinx~=2.4.0
-      - jinja2<=3.0.3
-      - nbsphinx
-      - sphinx-notfound-page
       - sphinx-version-warning
-      - sphinx-prompt
       - sphinxemoji
-      - sphinx-copybutton
-      - sphinx-autoapi
-      - myst-parser[sphinx]
-      - sphinxcontrib-httpdomain
       - sphinx-last-updated-by-git
-      - linkify-it-py
-      - sphinx-panels
-      # themes
-      - sphinx-material
-      # local building
-      - sphinx-autobuild
+
