@@ -99,12 +99,12 @@ jobs:
       - name: Run tests
         shell: bash -l {0}
         run: |
-          pytest -v -n auto --dist loadscope --cov=kinoml --cov-report=xml --color=yes --nbval-lax -k "not read_electron_density and not Schrodinger_structural_featurizer.ipynb" examples/*.ipynb kinoml/tests/
+          pytest -v -n auto --dist loadscope --cov=kinoml --cov-report=xml --color=yes -k "not read_electron_density" kinoml/tests/
 
-      - name: Print Coverage report
+      - name: Run notebooks
         shell: bash -l {0}
         run: |
-          cat ./coverage.xml
+          pytest -v -n auto --dist loadscope --nbval-lax -k "not Schrodinger_structural_featurizer.ipynb" examples/*.ipynb
 
       - name: CodeCov
         uses: codecov/codecov-action@v1
