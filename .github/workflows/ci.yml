@@ -101,6 +101,11 @@ jobs:
         run: |
           pytest -v -n auto --dist loadscope --cov=kinoml --cov-report=xml --color=yes --nbval-lax -k "not read_electron_density and not Schrodinger_structural_featurizer.ipynb" examples/*.ipynb kinoml/tests/
 
+      - name: Print Coverage report
+        shell: bash -l {0}
+        run: |
+          cat ./coverage.xml
+
       - name: CodeCov
         uses: codecov/codecov-action@v1
         if: always()
