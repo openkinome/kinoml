@@ -13,4 +13,4 @@ comment:
   flags: null
   paths: null
 ignore:
-   - "**/test_*.rb"
+   - "**/test_*.py"
