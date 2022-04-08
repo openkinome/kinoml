@@ -189,7 +189,7 @@ def test_oeproteinstructurefeaturizer():
         systems.append(system)
 
     with resources.path("kinoml.data.proteins", "kinoml_tests_4f8o_spruce.loop_db") as loop_db:
-        featurizer = OEProteinStructureFeaturizer(loop_db=loop_db)
+        featurizer = OEProteinStructureFeaturizer(loop_db=loop_db, use_multiprocessing=False)
         systems = featurizer.featurize(systems)
         # check number of residues
         assert len(systems[0].featurizations["last"].residues) == 239

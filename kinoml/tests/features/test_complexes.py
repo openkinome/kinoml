@@ -24,7 +24,7 @@ def test_oecomplexfeaturizer():
     ligand = Ligand(name="AEBSF")
     system = ProteinLigandComplex(components=[protein, ligand])
     systems.append(system)
-    featurizer = OEComplexFeaturizer()
+    featurizer = OEComplexFeaturizer(use_multiprocessing=False)
     systems = featurizer.featurize(systems)
     # check LIG exists
     assert len(systems[0].featurizations["last"].select_atoms("resname LIG").residues) == 1
@@ -92,7 +92,7 @@ def test_oedockingfeaturizer_fred():
     )
     system = ProteinLigandComplex(components=[protein, ligand])
     systems.append(system)
-    featurizer = OEDockingFeaturizer(method="Fred")
+    featurizer = OEDockingFeaturizer(method="Fred", use_multiprocessing=False)
     systems = featurizer.featurize(systems)
     # check docking score was stored
     assert isinstance(systems[0].featurizations["last"]._topology.docking_score, float)
@@ -129,7 +129,7 @@ def test_oedockingfeaturizer_hybrid():
     )
     system = ProteinLigandComplex(components=[protein, ligand])
     systems.append(system)
-    featurizer = OEDockingFeaturizer(method="Hybrid")
+    featurizer = OEDockingFeaturizer(method="Hybrid", use_multiprocessing=False)
     systems = featurizer.featurize(systems)
     # check LIG exists
     assert len(systems[0].featurizations["last"].select_atoms("resname LIG").residues) == 1
@@ -158,7 +158,7 @@ def test_oedockingfeaturizer_posit():
     )
     system = ProteinLigandComplex(components=[protein, ligand])
     systems.append(system)
-    featurizer = OEDockingFeaturizer(method="Posit")
+    featurizer = OEDockingFeaturizer(method="Posit", use_multiprocessing=False)
     systems = featurizer.featurize(systems)
     # check LIG exists
     assert len(systems[0].featurizations["last"].select_atoms("resname LIG").residues) == 1
@@ -189,7 +189,9 @@ def test_mostsimilarpdbligandfeaturizer():
         )
         system = ProteinLigandComplex(components=[protein, ligand])
         systems.append(system)
-        featurizer = MostSimilarPDBLigandFeaturizer(similarity_metric=metric)
+        featurizer = MostSimilarPDBLigandFeaturizer(
+            similarity_metric=metric, use_multiprocessing=False
+        )
         systems = featurizer.featurize(systems)
         assert isinstance(systems[0].protein.pdb_id, str)
         assert isinstance(systems[0].protein.chain_id, str)
@@ -211,7 +213,9 @@ def test_klifsconformationtemplatesfeaturizer():
     )
     system = ProteinLigandComplex(components=[protein, ligand])
     systems.append(system)
-    featurizer = KLIFSConformationTemplatesFeaturizer(similarity_metric="fingerprint")
+    featurizer = KLIFSConformationTemplatesFeaturizer(
+        similarity_metric="fingerprint", use_multiprocessing=False
+    )
     systems = featurizer.featurize(systems)
     # check feature is dataframe
     assert isinstance(systems[0].featurizations["last"], pd.DataFrame)
