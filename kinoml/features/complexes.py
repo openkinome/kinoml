@@ -1287,7 +1287,7 @@ class OEComplexFeaturizer(OEBaseModelingFeaturizer, SingleLigandProteinComplexFe
 
         if not self.output_dir:
             logger.debug("Removing structure file ...")
-            file_path.unlink()
+            file_path.unlink(missing_ok=True)
 
         return structure
 
@@ -1534,7 +1534,7 @@ class OEDockingFeaturizer(OEBaseModelingFeaturizer, SingleLigandProteinComplexFe
 
         if not self.output_dir:
             logger.debug("Removing structure file ...")
-            file_path.unlink()
+            file_path.unlink(missing_ok=True)
 
         logger.debug("Storing docking score in MDAnalysis universe._topology ...")
         self._store_docking_score(structure, docking_pose)
@@ -2180,7 +2180,7 @@ class SCHRODINGERDockingFeaturizer(SCHRODINGERComplexFeaturizer):
             )
             self._write_complex_mae(prepared_structure, docking_pose_path, complex_path_mae)
         else:
-            docking_pose_path.unlink()
+            docking_pose_path.unlink(missing_ok=True)
 
         return prepared_structure
 
