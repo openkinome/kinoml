@@ -59,7 +59,7 @@ def test_oedockingfeaturizer_fred():
     protein.expo_id = "4EK"
     ligand = Ligand(
         smiles="C1CC(N(C1)C2=NC3=C(C=NN3C=C2)NC(=O)N4CCC(C4)O)C5=C(C=CC(=C5)F)F",
-        name="larotrectinib",
+        name="larotrectinib_fred",
     )
     system = ProteinLigandComplex(components=[protein, ligand])
     systems.append(system)
@@ -88,7 +88,7 @@ def test_oedockingfeaturizer_fred():
     ]
     ligand = Ligand(
         smiles="C1CC(N(C1)C2=NC3=C(C=NN3C=C2)NC(=O)N4CCC(C4)O)C5=C(C=CC(=C5)F)F",
-        name="larotrectinib_2",
+        name="larotrectinib_fred_2",
     )
     system = ProteinLigandComplex(components=[protein, ligand])
     systems.append(system)
@@ -125,7 +125,7 @@ def test_oedockingfeaturizer_hybrid():
     protein.expo_id = "4EK"
     ligand = Ligand(
         smiles="C1CC(N(C1)C2=NC3=C(C=NN3C=C2)NC(=O)N4CCC(C4)O)C5=C(C=CC(=C5)F)F",
-        name="larotrectinib",
+        name="larotrectinib_hybrid",
     )
     system = ProteinLigandComplex(components=[protein, ligand])
     systems.append(system)
@@ -154,7 +154,7 @@ def test_oedockingfeaturizer_posit():
     protein.expo_id = "4EK"
     ligand = Ligand(
         smiles="C1CC(N(C1)C2=NC3=C(C=NN3C=C2)NC(=O)N4CCC(C4)O)C5=C(C=CC(=C5)F)F",
-        name="larotrectinib",
+        name="larotrectinib_posit",
     )
     system = ProteinLigandComplex(components=[protein, ligand])
     systems.append(system)
