@@ -260,6 +260,6 @@ class OEProteinStructureFeaturizer(OEBaseModelingFeaturizer, SingleProteinFeatur
 
         if not self.output_dir:
             logging.debug("Removing structure file ...")
-            file_path.unlink(missing_ok=True)
+            file_path.unlink()
 
         return structure
