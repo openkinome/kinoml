@@ -49,8 +49,8 @@ def test_datasetprovider_exporter_single_tensor_same_shape():
 
     dataset = DatasetProvider(measurements=measurements)
 
-    featurizer1 = MorganFingerprintFeaturizer(radius=2, nbits=512)
-    featurizer2 = MorganFingerprintFeaturizer(radius=2, nbits=1024)
+    featurizer1 = MorganFingerprintFeaturizer(radius=2, nbits=512, use_multiprocessing=False)
+    featurizer2 = MorganFingerprintFeaturizer(radius=2, nbits=1024, use_multiprocessing=False)
     aggregated = Concatenated([featurizer1, featurizer2], axis=1)
     aggregated.featurize(dataset.systems)
     for system in systems:
@@ -96,7 +96,7 @@ def test_datasetprovider_exporter_single_tensor_different_shapes():
 
     dataset = DatasetProvider(measurements=measurements)
 
-    featurizer = OneHotSMILESFeaturizer()
+    featurizer = OneHotSMILESFeaturizer(use_multiprocessing=False)
     featurizer.featurize(dataset.systems)
     for system, smi in zip(systems, smiles_list):
         assert system.featurizations["last"].shape == (53, len(smi))
@@ -131,8 +131,8 @@ def test_datasetprovider_exporter_multiple_subtensors():
 
     dataset = DatasetProvider(measurements=measurements)
 
-    featurizer1 = MorganFingerprintFeaturizer(radius=2, nbits=512)
-    featurizer2 = MorganFingerprintFeaturizer(radius=2, nbits=1024)
+    featurizer1 = MorganFingerprintFeaturizer(radius=2, nbits=512, use_multiprocessing=False)
+    featurizer2 = MorganFingerprintFeaturizer(radius=2, nbits=1024, use_multiprocessing=False)
     aggregated = TupleOfArrays([featurizer1, featurizer2])
     aggregated.featurize(dataset.systems)
     for system in systems:
@@ -178,8 +178,8 @@ def test_datasetprovider_awkward_exporter_single_tensor_same_shape():
 
     dataset = DatasetProvider(measurements=measurements)
 
-    featurizer1 = MorganFingerprintFeaturizer(radius=2, nbits=512)
-    featurizer2 = MorganFingerprintFeaturizer(radius=2, nbits=1024)
+    featurizer1 = MorganFingerprintFeaturizer(radius=2, nbits=512, use_multiprocessing=False)
+    featurizer2 = MorganFingerprintFeaturizer(radius=2, nbits=1024, use_multiprocessing=False)
     concatenate = Concatenated([featurizer1, featurizer2], axis=1)
     aggregated = TupleOfArrays([concatenate])
     aggregated.featurize(systems)
@@ -230,7 +230,7 @@ def test_datasetprovider_awkward_exporter_single_tensor_different_shapes():
 
     dataset = DatasetProvider(measurements=measurements)
 
-    featurizer = OneHotSMILESFeaturizer()
+    featurizer = OneHotSMILESFeaturizer(use_multiprocessing=False)
     aggregated = TupleOfArrays([featurizer])
     aggregated.featurize(dataset.systems)
     for system, smi in zip(systems, smiles_list):
@@ -267,8 +267,8 @@ def test_datasetprovider_awkward_exporter_multiple_subtensors():
 
     dataset = DatasetProvider(measurements=measurements)
 
-    featurizer1 = MorganFingerprintFeaturizer(radius=2, nbits=512)
-    featurizer2 = MorganFingerprintFeaturizer(radius=2, nbits=1024)
+    featurizer1 = MorganFingerprintFeaturizer(radius=2, nbits=512, use_multiprocessing=False)
+    featurizer2 = MorganFingerprintFeaturizer(radius=2, nbits=1024, use_multiprocessing=False)
     aggregated = TupleOfArrays([featurizer1, featurizer2])
     aggregated.featurize(dataset.systems)
     for system in systems:

@@ -99,12 +99,12 @@ jobs:
       - name: Run tests
         shell: bash -l {0}
         run: |
-          pytest -v --cov=kinoml --cov-report=xml --color=yes kinoml/tests/ -k "not read_electron_density"
+          pytest -v -n auto --dist load --cov=kinoml --cov-report=xml --color=yes -k "not read_electron_density" kinoml/tests/
 
-      - name: Run notebook tests
+      - name: Run notebooks
         shell: bash -l {0}
         run: |
-          pytest -v -n auto --dist loadfile --nbval-lax --nbval-cell-timeout 6000 --current-env examples/*.ipynb -k "not Schrodinger_structural_featurizer.ipynb"
+          pytest -v -n auto --dist loadscope --nbval-lax -k "not Schrodinger_structural_featurizer.ipynb" examples/*.ipynb
 
       - name: CodeCov
         uses: codecov/codecov-action@v1

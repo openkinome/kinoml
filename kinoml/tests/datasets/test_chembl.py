@@ -8,6 +8,8 @@ def test_chembl():
 
     # we will use a small subset with 100 entries only, for speed
     chembl = ChEMBLDatasetProvider.from_source(
-        "https://github.com/openkinome/kinodata/releases/download/v0.2/activities-chembl28-sample100_v0.2.zip"
+        "https://github.com/openkinome/kinodata/releases/download/v0.3/activities-chembl29_v0.3.zip",
+        uniprot_ids=["P00533"],
+        sample=100,
     )
     assert len(chembl) == 100

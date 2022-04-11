@@ -45,17 +45,17 @@ def test_smiles_from_pdb(pdb_ids, expectation, smiles_list):
     "pdb_id, return_type",
     [
         (
-            "4YNE",  # PDB and CIF format available
+            "4YNE",
             PosixPath,
-        ),
+        ),  # PDB and CIF format available
         (
-            "1BOS",  # only CIF format available
+            "1BOS",
             PosixPath,
-        ),
+        ),  # only CIF format available
         (
-            "XXXX",  # wrong code
+            "XXXX",
             bool,
-        ),
+        ),  # wrong code
     ],
 )
 def test_download_pdb_structure(pdb_id, return_type):
@@ -86,12 +86,12 @@ def test_download_pdb_structure(pdb_id, return_type):
             PosixPath,
         ),
         (
-            "XXXX",  # wrong code
+            "XXXX",
             "X",
             "XXX",
             "xxxxx",
             bool,
-        ),
+        ),  # wrong code
     ],
 )
 def test_download_pdb_structure(pdb_id, chain_id, expo_id, smiles, return_type):

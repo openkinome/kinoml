@@ -53,8 +53,8 @@ def test_Concatenated():
 
     ligand = Ligand(smiles="CCCC")
     system = LigandSystem([ligand])
-    featurizer1 = MorganFingerprintFeaturizer(radius=2, nbits=512)
-    featurizer2 = MorganFingerprintFeaturizer(radius=2, nbits=512)
+    featurizer1 = MorganFingerprintFeaturizer(radius=2, nbits=512, use_multiprocessing=False)
+    featurizer2 = MorganFingerprintFeaturizer(radius=2, nbits=512, use_multiprocessing=False)
     concatenated = Concatenated([featurizer1, featurizer2], axis=1)
     concatenated.featurize([system])
     assert system.featurizations["last"].shape[0] == 1024
@@ -65,8 +65,8 @@ def test_TupleOfArrays():
 
     ligand = Ligand(smiles="CCCC")
     system = LigandSystem([ligand])
-    featurizer1 = MorganFingerprintFeaturizer(radius=2, nbits=512)
-    featurizer2 = MorganFingerprintFeaturizer(radius=2, nbits=1024)
+    featurizer1 = MorganFingerprintFeaturizer(radius=2, nbits=512, use_multiprocessing=False)
+    featurizer2 = MorganFingerprintFeaturizer(radius=2, nbits=1024, use_multiprocessing=False)
     aggregated = TupleOfArrays([featurizer1, featurizer2])
     aggregated.featurize([system])
     assert len(system.featurizations["last"]) == 2
@@ -96,8 +96,8 @@ def test_PadFeaturizer():
         LigandSystem([Ligand(smiles="CC")]),
         LigandSystem([Ligand(smiles="CCC")]),
     )
-    OneHotSMILESFeaturizer().featurize(systems)
-    PadFeaturizer().featurize(systems)
+    OneHotSMILESFeaturizer(use_multiprocessing=False).featurize(systems)
+    PadFeaturizer(use_multiprocessing=False).featurize(systems)
 
     for s in systems:
         assert s.featurizations["last"].shape == (53, 3)
@@ -145,8 +145,8 @@ def test_ClearFeaturizations_keeplast():
         LigandSystem([Ligand(smiles="CC")]),
         LigandSystem([Ligand(smiles="CCC")]),
     )
-    OneHotSMILESFeaturizer().featurize(systems)
-    PadFeaturizer().featurize(systems)
+    OneHotSMILESFeaturizer(use_multiprocessing=False).featurize(systems)
+    PadFeaturizer(use_multiprocessing=False).featurize(systems)
     ClearFeaturizations().featurize(systems)
 
     for s in systems:
@@ -162,8 +162,8 @@ def test_ClearFeaturizations_removeall():
         LigandSystem([Ligand(smiles="CC")]),
         LigandSystem([Ligand(smiles="CCC")]),
     )
-    OneHotSMILESFeaturizer().featurize(systems)
-    PadFeaturizer().featurize(systems)
+    OneHotSMILESFeaturizer(use_multiprocessing=False).featurize(systems)
+    PadFeaturizer(use_multiprocessing=False).featurize(systems)
     ClearFeaturizations(keys=tuple(), style="keep").featurize(systems)
 
     for s in systems:

@@ -1,6 +1,7 @@
 """
 Test ligand featurizers of `kinoml.protein`
 """
+from importlib import resources
 
 
 def test_aminoacidcompositionfeaturizer():
@@ -15,7 +16,7 @@ def test_aminoacidcompositionfeaturizer():
         ProteinSystem([Protein(uniprot_id="P00519")]),
         ProteinSystem([Protein(uniprot_id="xxxxx")]),
     ]
-    featurizer = AminoAcidCompositionFeaturizer()
+    featurizer = AminoAcidCompositionFeaturizer(use_multiprocessing=False)
     featurized_systems = featurizer.featurize(systems)
 
     assert len(featurized_systems) == 3  # filter protein with wrong UniProt ID
@@ -99,7 +100,7 @@ def test_onehotencodedsequencefeaturizer_full():
         ProteinSystem([Protein(uniprot_id="P00519")]),
         ProteinSystem([Protein(uniprot_id="xxxxx")]),
     ]
-    featurizer = OneHotEncodedSequenceFeaturizer()
+    featurizer = OneHotEncodedSequenceFeaturizer(use_multiprocessing=False)
     featurized_systems = featurizer.featurize(systems)
 
     assert len(featurized_systems) == 2  # filter protein with wrong UniProt ID and empty string
@@ -122,7 +123,9 @@ def test_onehotencodedsequencefeaturizer_klifs_kinase():
         ProteinSystem([KLIFSKinase(kinase_klifs_id=480)]),
         ProteinSystem([KLIFSKinase(structure_klifs_id=3620)]),
     ]
-    featurizer = OneHotEncodedSequenceFeaturizer(sequence_type="klifs_kinase")
+    featurizer = OneHotEncodedSequenceFeaturizer(
+        sequence_type="klifs_kinase", use_multiprocessing=False
+    )
     featurized_systems = featurizer.featurize(systems)
 
     assert len(featurized_systems) == 5  # filter protein with wrong UniProt ID and empty string
@@ -146,9 +149,53 @@ def test_onehotencodedsequencefeaturizer_klifs_structure():
         ProteinSystem([KLIFSKinase(kinase_klifs_id=480)]),
         ProteinSystem([KLIFSKinase(structure_klifs_id=3620)]),
     ]
-    featurizer = OneHotEncodedSequenceFeaturizer(sequence_type="klifs_structure")
+    featurizer = OneHotEncodedSequenceFeaturizer(
+        sequence_type="klifs_structure", use_multiprocessing=False
+    )
     featurized_systems = featurizer.featurize(systems)
 
     assert len(featurized_systems) == 2  # needs structure_klifs_sequence or structure_klifs_id
     assert list(featurized_systems[0].featurizations["last"])[0][0] == 1
     assert list(featurized_systems[1].featurizations["last"])[0][14] == 1
+
+
+def test_oeproteinstructurefeaturizer():
+    """Check OEProteinStructureFeaturizer with different inputs."""
+    from kinoml.core.proteins import Protein
+    from kinoml.core.systems import ProteinSystem
+    from kinoml.features.protein import OEProteinStructureFeaturizer
+
+    systems = []
+    # unspecifc definition of the system, only via PDB ID
+    # modeling will be performed according to the sequence stored in the PDB Header
+    protein = Protein(pdb_id="4f8o", name="PsaA")
+    system = ProteinSystem(components=[protein])
+    systems.append(system)
+    # more specific definition of the system, protein of chain A co-crystallized with ligand AES
+    # and alternate location B, modeling will be performed according to the sequence of the given
+    # UniProt ID
+    protein = Protein.from_pdb(pdb_id="4f8o", name="PsaA")
+    protein.uniprot_id = "P31522"
+    protein.chain_id = "A"
+    protein.alternate_location = "B"
+    protein.expo_id = "AES"
+    system = ProteinSystem(components=[protein])
+    systems.append(system)
+    # use a protein structure form file
+    with resources.path("kinoml.data.proteins", "4f8o_edit.pdb") as structure_path:
+        protein = Protein.from_file(file_path=structure_path, name="PsaA")
+        protein.uniprot_id = "P31522"
+        system = ProteinSystem(components=[protein])
+        systems.append(system)
+
+    with resources.path("kinoml.data.proteins", "kinoml_tests_4f8o_spruce.loop_db") as loop_db:
+        featurizer = OEProteinStructureFeaturizer(loop_db=loop_db, use_multiprocessing=False)
+        systems = featurizer.featurize(systems)
+        # check number of residues
+        assert len(systems[0].featurizations["last"].residues) == 239
+        assert len(systems[1].featurizations["last"].residues) == 216
+        assert len(systems[2].featurizations["last"].residues) == 109
+        # check numbering of first residue
+        assert systems[0].featurizations["last"].residues[0].resid == 1
+        assert systems[1].featurizations["last"].residues[0].resid == 44
+        assert systems[2].featurizations["last"].residues[0].resid == 47
