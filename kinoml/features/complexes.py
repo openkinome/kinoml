@@ -1125,10 +1125,15 @@ class OEComplexFeaturizer(OEBaseModelingFeaturizer, SingleLigandProteinComplexFe
     Given systems with exactly one protein and one ligand, prepare the complex
     structure by:
 
-     - modeling missing loops
+     - modeling missing loops with OESpruce according to the PDB header unless
+       a custom sequence is specified via the `uniprot_id` or `sequence`
+       attribute in the protein component (see below), missing sequences at
+       N- and C-termini are not modeled
      - building missing side chains
-     - mutations, if `uniprot_id` or `sequence` attribute is provided for the
-       protein component (see below)
+     - substitutions, deletions and insertions, if a `uniprot_id` or `sequence`
+       attribute is provided for the protein component alteration will be
+       modeled with OESpruce, if an alteration could not be modeled, the
+       corresponding mismatch in the structure will be deleted
      - removing everything but protein, water and ligand of interest
      - protonation at pH 7.4
 
@@ -1298,10 +1303,15 @@ class OEDockingFeaturizer(OEBaseModelingFeaturizer, SingleLigandProteinComplexFe
     structure and dock the ligand into the prepared protein structure with
     one of OpenEye's docking algorithms:
 
-     - modeling missing loops
+     - modeling missing loops with OESpruce according to the PDB header unless
+       a custom sequence is specified via the `uniprot_id` or `sequence`
+       attribute in the protein component (see below), missing sequences at
+       N- and C-termini are not modeled
      - building missing side chains
-     - mutations, if `uniprot_id` or `sequence` attribute is provided for the
-       protein component (see below)
+     - substitutions, deletions and insertions, if a `uniprot_id` or `sequence`
+       attribute is provided for the protein component alteration will be
+       modeled with OESpruce, if an alteration could not be modeled, the
+       corresponding mismatch in the structure will be deleted
      - removing everything but protein, water and ligand of interest
      - protonation at pH 7.4
      - perform docking
@@ -1574,11 +1584,15 @@ class SCHRODINGERComplexFeaturizer(SingleLigandProteinComplexFeaturizer):
     Given systems with exactly one protein and one ligand, prepare the complex
     structure by:
 
-     - modeling missing loops
+     - modeling missing loops with Prime according to the PDB header unless
+       a custom sequence is specified via the `uniprot_id` or `sequence`
+       attribute in the protein component (see below), missing sequences at
+       N- and C-termini are not modeled
      - building missing side chains
-     - mutations, if `uniprot_id` or `sequence` attribute is provided for the
-       protein component
-       (see below)
+     - substitutions, deletions and insertions, if a `uniprot_id` or `sequence`
+       attribute is provided for the protein component alteration will be first
+       deleted and subsequently the intended sequence modeled with Prime, if
+       an alteration could not be modeled, a corresponding deletion will remain
      - removing everything but protein, water and ligand of interest
      - protonation at pH 7.4
 
@@ -2032,10 +2046,15 @@ class SCHRODINGERDockingFeaturizer(SCHRODINGERComplexFeaturizer):
     structure dock the ligand into its binding site identified by a
     co-crystallized ligand. The following steps will be performed:
 
-     - modeling missing loops
+     - modeling missing loops with Prime according to the PDB header unless
+       a custom sequence is specified via the `uniprot_id` or `sequence`
+       attribute in the protein component (see below), missing sequences at
+       N- and C-termini are not modeled
      - building missing side chains
-     - mutations, if `uniprot_id` or `sequence` attribute is provided for the
-       protein component (see below)
+     - substitutions, deletions and insertions, if a `uniprot_id` or `sequence`
+       attribute is provided for the protein component alteration will be first
+       deleted and subsequently the intended sequence modeled with Prime, if
+       an alteration could not be modeled, a corresponding deletion will remain
      - removing everything but protein, water and ligand of interest
      - protonation at pH 7.4
      - docking a ligand

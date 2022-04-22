@@ -116,10 +116,15 @@ class OEProteinStructureFeaturizer(OEBaseModelingFeaturizer, SingleProteinFeatur
     """
     Given systems with exactly one protein, prepare the protein structure by:
 
-     - modeling missing loops
+     - modeling missing loops with OESpruce according to the PDB header unless
+       a custom sequence is specified via the `uniprot_id` or `sequence`
+       attribute in the protein component (see below), missing sequences at
+       N- and C-termini are not modeled
      - building missing side chains
-     - mutations, if `uniprot_id` or `sequence` attribute is provided for
-       the protein component (see below)
+     - substitutions, deletions and insertions, if a `uniprot_id` or `sequence`
+       attribute is provided for the protein component alteration will be
+       modeled with OESpruce, if an alteration could not be modeled, the
+       corresponding mismatch in the structure will be deleted
      - removing everything but protein and water
      - protonation at pH 7.4
 

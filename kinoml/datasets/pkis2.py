@@ -5,11 +5,10 @@ from typing import Union
 import pandas as pd
 
 from .core import DatasetProvider
-from ..core.proteins import KLIFSKinase
+from ..core.proteins import Protein, KLIFSKinase
 from ..core.ligands import Ligand
 from ..core.systems import ProteinLigandComplex
 from ..core.measurements import PercentageDisplacementMeasurement
-from ..core.components import BaseProtein
 from ..core.conditions import AssayConditions
 from ..utils import datapath
 
@@ -39,7 +38,8 @@ class PKIS2DatasetProvider(DatasetProvider):
         path_or_url_constructs: Union[str, Path] = datapath(
             "kinomescan/DiscoverX_489_Kinase_Assay_Construct_Information.csv"
         ),
-        protein_type: BaseProtein = KLIFSKinase,
+        protein_type: str = "KLIFSKinase",
+        toolkit: str = "OpenEye",
     ):
         """
         Create a PKIS2 DatasetProvider from the raw data.
@@ -50,9 +50,26 @@ class PKIS2DatasetProvider(DatasetProvider):
             CSV file with the protein-ligand measurements.
         path_or_url_constructs: str or pathlib.Path
             CSV file with the construct information.
-        protein_type: BaseProtein
-            The protein object type to use.
+        protein_type: str, default=KLIFSKinase
+            The protein object type to use ('Protein' or 'KLIFSKinase').
+        toolkit: str, default=OpenEye
+            The toolkit to use for creating protein objects (e.g. 'OpenEye', 'MDAnalysis'),
+            allowed values depend on the specified `protein_type`.
+
+        Raises
+        ------
+        ValueError
+            Given protein_type {protein_type} is not valid, only {protein_type_classes.keys()} are
+            allowed.
         """
+        logger.debug("Checking protein type ...")
+        protein_type_classes = {"Protein": Protein, "KLIFSKinase": KLIFSKinase}
+        if protein_type not in protein_type_classes.keys():
+            raise ValueError(
+                f"Given protein_type {protein_type} is not valid, "
+                f"only {protein_type_classes.keys()} are allowed."
+            )
+
         logger.debug("Loading CSV with construct information ...")
         constructs_df = pd.read_csv(path_or_url_constructs)
 
@@ -66,16 +83,18 @@ class PKIS2DatasetProvider(DatasetProvider):
             ncbi_id = construct["Accession Number"]
             if construct["AA Start/Stop"] == "Null":
                 # ambiguous, will consider full sequence
-                kinase = protein_type(
+                kinase = protein_type_classes[protein_type](
                     name=discoverx_id,
                     ncbi_id=ncbi_id,
+                    toolkit=toolkit,
                 )
             else:
                 first, last = [x[1:] for x in construct["AA Start/Stop"].split("/")]
-                kinase = protein_type(
+                kinase = protein_type_classes[protein_type](
                     name=discoverx_id,
                     ncbi_id=ncbi_id,
                     metadata={"construct_range": f"{first}-{last}"},
+                    toolkit=toolkit,
                 )
             kinases[discoverx_id] = kinase
 
