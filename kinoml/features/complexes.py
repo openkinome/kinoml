@@ -1596,14 +1596,6 @@ class SCHRODINGERComplexFeaturizer(SingleLigandProteinComplexFeaturizer):
      - removing everything but protein, water and ligand of interest
      - protonation at pH 7.4
 
-     - modeling missing loops
-     - building missing side chains
-     - mutations, if `uniprot_id` or `sequence` attribute is provided for the
-       protein component
-       (see below)
-     - removing everything but protein, water and ligand of interest
-     - protonation at pH 7.4
-
     The protein component of each system must be a `core.proteins.Protein` or
     a subclass thereof, must be initialized with toolkit='MDAnalysis' and give
     access to the molecular structure, e.g. via a pdb_id. Additionally, the
