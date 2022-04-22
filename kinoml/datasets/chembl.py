@@ -1,18 +1,21 @@
 """
 Creates DatasetProvider objects from ChEMBL activity data
 """
+import logging
 import random
 
 import pandas as pd
 from tqdm.auto import tqdm
 
 from .core import MultiDatasetProvider
-from ..core.components import BaseProtein
 from ..core.conditions import AssayConditions
-from ..core.proteins import KLIFSKinase
+from ..core.proteins import Protein, KLIFSKinase
 from ..core.ligands import Ligand
 from ..core.systems import ProteinLigandComplex
 from ..core.measurements import pIC50Measurement, pKiMeasurement, pKdMeasurement
+
+
+logger = logging.getLogger(__name__)
 
 
 class ChEMBLDatasetProvider(MultiDatasetProvider):
@@ -29,7 +32,8 @@ class ChEMBLDatasetProvider(MultiDatasetProvider):
         measurement_types=("pIC50", "pKi", "pKd"),
         uniprot_ids=None,
         sample=None,
-        protein_type: BaseProtein = KLIFSKinase,
+        protein_type: str = "KLIFSKinase",
+        toolkit: str = "OpenEye",
     ):
         """
         Create a MultiDatasetProvider out of the raw data contained in the zip file.
@@ -47,15 +51,32 @@ class ChEMBLDatasetProvider(MultiDatasetProvider):
             Restrict measurements to the given UniProt IDs.
         sample: int, optional=None
             If set to larger than zero, load only N data points from the dataset.
-        protein_type: BaseProtein
-            The protein object type to use.
+        protein_type: str, default=KLIFSKinase
+            The protein object type to use ('Protein' or 'KLIFSKinase').
+        toolkit: str, default=OpenEye
+            The toolkit to use for creating protein objects (e.g. 'OpenEye', 'MDAnalysis'),
+            allowed values depend on the specified `protein_type`.
+
+        Raises
+        ------
+        ValueError
+            Given protein_type {protein_type} is not valid, only {allowed_protein_types} are
+            allowed.
 
         Note
         ----
         ChEMBL aggregates data from lots of sources, so conditions are guaranteed
         to be different across experiments.
-
         """
+        logger.debug("Checking protein type ...")
+        protein_type_classes = {"Protein": Protein, "KLIFSKinase": KLIFSKinase}
+        if protein_type not in protein_type_classes.keys():
+            raise ValueError(
+                f"Given protein_type {protein_type} is not valid, "
+                f"only {protein_type_classes.keys()} are allowed."
+            )
+
+        logger.debug("Retrieving and reading CSV ...")
         cached_path = cls._download_to_cache_or_retrieve(path_or_url)
         df = pd.read_csv(cached_path)
         df = df.dropna(
@@ -65,6 +86,19 @@ class ChEMBLDatasetProvider(MultiDatasetProvider):
                 "activities.standard_type",
             ]
         )
+
+        if uniprot_ids:
+            logger.debug(f"Filtering for UniProt IDs {uniprot_ids}...")
+            df = df[df["UniprotID"].isin(uniprot_ids)]
+
+        logger.debug(f"Filtering for measurement types {measurement_types} ...")
+        chosen_types_labels = df["activities.standard_type"].isin(set(measurement_types))
+        filtered_records = df[chosen_types_labels].to_dict("records")
+
+        if sample is not None:
+            logger.debug(f"Getting sample of size {sample} ...")
+            filtered_records = random.sample(filtered_records, sample)
+
         measurement_type_classes = {
             "pIC50": pIC50Measurement,
             "pKi": pKiMeasurement,
@@ -74,12 +108,7 @@ class ChEMBLDatasetProvider(MultiDatasetProvider):
         systems = {}
         proteins = {}
         ligands = {}
-        if uniprot_ids:
-            df = df[df["UniprotID"].isin(uniprot_ids)]
-        chosen_types_labels = df["activities.standard_type"].isin(set(measurement_types))
-        filtered_records = df[chosen_types_labels].to_dict("records")
-        if sample is not None:
-            filtered_records = random.sample(filtered_records, sample)
+        logger.debug(f"Creating systems and measurements ...")
         for row in tqdm(filtered_records):
             try:
                 measurement_type_key = row["activities.standard_type"]
@@ -91,11 +120,12 @@ class ChEMBLDatasetProvider(MultiDatasetProvider):
                         "uniprot_id": row["UniprotID"],
                         "chembl_target_id": row["target_dictionary.chembl_id"],
                     }
-                    protein = protein_type(
+                    protein = protein_type_classes[protein_type](
                         sequence=protein_key,
                         name=row["UniprotID"],
                         uniprot_id=row["UniprotID"],
                         metadata=metadata,
+                        toolkit=toolkit,
                     )
                     proteins[protein_key] = protein
                 if ligand_key not in ligands:
