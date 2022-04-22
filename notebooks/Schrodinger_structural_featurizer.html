@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <meta property="article:modified_time" content="2022-04-07T01:42:00+00:00" />
+    <meta property="article:modified_time" content="2022-04-22T13:04:28+00:00" />
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   <meta name="lang:clipboard.copy" content="Copy to clipboard">
@@ -691,11 +691,15 @@ deleting the cache directory. Otherwise, you may get results from the former Kin
 Given systems with exactly one protein and one ligand, prepare the complex
 structure by:
 
- - modeling missing loops
+ - modeling missing loops with Prime according to the PDB header unless
+   a custom sequence is specified via the `uniprot_id` or `sequence`
+   attribute in the protein component (see below), missing sequences at
+   N- and C-termini are not modeled
  - building missing side chains
- - mutations, if `uniprot_id` or `sequence` attribute is provided for the
-   protein component
-   (see below)
+ - substitutions, deletions and insertions, if a `uniprot_id` or `sequence`
+   attribute is provided for the protein component alteration will be first
+   deleted and subsequently the intended sequence modeled with Prime, if
+   an alteration could not be modeled, a corresponding deletion will remain
  - removing everything but protein, water and ligand of interest
  - protonation at pH 7.4
 
@@ -819,26 +823,6 @@ logging.basicConfig(level=logging.DEBUG)
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-JobId: lt10-0-62455dbf
-JobId: lt10-1-62455dbf
-</pre></div></div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area stderr docutils container">
-<div class="highlight"><pre>
-WARNING mmpdb_write_ct: Atom 2077 of residue A:205 (AES ) has same name (H8_1) as a prior atom.
-WARNING mmpdb_write_ct: Atom 2078 of residue A:205 (AES ) has same name (H8_2) as a prior atom.
-WARNING mmpdb_write_ct: Atom 2480 of residue A:205 (AES ) has same name (H8_1) as a prior atom.
-WARNING mmpdb_write_ct: Atom 2481 of residue A:205 (AES ) has same name (H8_2) as a prior atom.
-</pre></div></div>
-</div>
 <div class="nboutput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
@@ -906,10 +890,15 @@ Given systems with exactly one protein and one ligand, prepare the
 structure dock the ligand into its binding site identified by a
 co-crystallized ligand. The following steps will be performed:
 
- - modeling missing loops
+ - modeling missing loops with Prime according to the PDB header unless
+   a custom sequence is specified via the `uniprot_id` or `sequence`
+   attribute in the protein component (see below), missing sequences at
+   N- and C-termini are not modeled
  - building missing side chains
- - mutations, if `uniprot_id` or `sequence` attribute is provided for the
-   protein component (see below)
+ - substitutions, deletions and insertions, if a `uniprot_id` or `sequence`
+   attribute is provided for the protein component alteration will be first
+   deleted and subsequently the intended sequence modeled with Prime, if
+   an alteration could not be modeled, a corresponding deletion will remain
  - removing everything but protein, water and ligand of interest
  - protonation at pH 7.4
  - docking a ligand
@@ -1020,13 +1009,9 @@ shape_restrain: bool, default=True
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-JobId: lt10-0-62455edf
-Converted file: /scratch/lsftmp/6152749.tmpdir/tmpovx75qrg.mae
+Converted file: /scratch/lsftmp/6525607.tmpdir/tmpq7th966w.mae
 Removing previous job files...
-JobId: lt10-0-62455fde
-ExitStatus: finished
-Removing previous job files...
-JobId: lt10-0-6245601f
+JobId: lu04-0-6262a247
 ExitStatus: finished
 Converted file: /lila/data/chodera/shallerd/projects/schrodinger/kinoml/examples/output/docking_without_shape_restrain/kinoml_SCHRODINGERDockingFeaturizer_NTRK1_4yne_larotrectinib_complex.mae
 </pre></div></div>
@@ -1127,9 +1112,9 @@ kinoml_SCHRODINGERDockingFeaturizer_NTRK1_4yne_larotrectinib_ligand.sdf
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Converted file: /scratch/lsftmp/6152749.tmpdir/tmp_n1sbprn.mae
+Converted file: /scratch/lsftmp/6525607.tmpdir/tmp195pmphc.mae
 Removing previous job files...
-JobId: lt10-0-624560bd
+JobId: lu04-0-6262a33d
 ExitStatus: finished
 Converted file: /lila/data/chodera/shallerd/projects/schrodinger/kinoml/examples/output/docking_with_shape_restrain/kinoml_SCHRODINGERDockingFeaturizer_NTRK1_4yne_larotrectinib_complex.mae
 </pre></div></div>
@@ -1253,7 +1238,7 @@ the OEDockingFeaturizer or SCHRODINGERDockingFeaturizer.
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-7.17 s ± 0 ns per loop (mean ± std. dev. of 1 run, 1 loop each)
+12.5 s ± 0 ns per loop (mean ± std. dev. of 1 run, 1 loop each)
 </pre></div></div>
 </div>
 </section>
@@ -1292,7 +1277,7 @@ the OEDockingFeaturizer or SCHRODINGERDockingFeaturizer.
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-2.54 s ± 0 ns per loop (mean ± std. dev. of 1 run, 1 loop each)
+6.91 s ± 0 ns per loop (mean ± std. dev. of 1 run, 1 loop each)
 </pre></div></div>
 </div>
 </section>
@@ -1338,7 +1323,7 @@ perl: warning: Falling back to the standard locale ("C").
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-JobId: lt10-0-62456159
+JobId: lu04-0-6262a42c
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -1355,7 +1340,7 @@ JobId: lt10-0-62456159
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-27.8 s ± 0 ns per loop (mean ± std. dev. of 1 run, 1 loop each)
+36.7 s ± 0 ns per loop (mean ± std. dev. of 1 run, 1 loop each)
 </pre></div></div>
 </div>
 <p>Using shape is the slowest option, but in many cases the most accurate one.</p>
@@ -1408,13 +1393,9 @@ JobId: lt10-0-62456159
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-JobId: lt10-0-62456191
-Converted file: /scratch/lsftmp/6152749.tmpdir/tmpg0s9ghna.mae
+Converted file: /scratch/lsftmp/6525607.tmpdir/tmp5xoq3zd9.mae
 Removing previous job files...
-JobId: lt10-0-6245628f
-ExitStatus: finished
-Removing previous job files...
-JobId: lt10-0-624562d1
+JobId: lu04-0-6262a474
 ExitStatus: finished
 Converted file: /lila/data/chodera/shallerd/projects/schrodinger/kinoml/examples/output/docking_pipeline/kinoml_SCHRODINGERDockingFeaturizer_NTRK1_4YNE_chainA_larotrectinib_complex.mae
 </pre></div></div>
@@ -1692,7 +1673,7 @@ n_processes : int or None, default=None
               
           </div>
             Last updated on
-              Apr 07, 2022.
+              Apr 22, 2022.
             <br/>
             Created using
             <a href="http://www.sphinx-doc.org/">Sphinx</a> 4.5.0.

@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <meta property="article:modified_time" content="2022-04-07T01:42:00+00:00" />
+    <meta property="article:modified_time" content="2022-04-22T12:08:25+00:00" />
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   <meta name="lang:clipboard.copy" content="Copy to clipboard">
@@ -1189,8 +1189,6 @@ Warning: ^
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">kinoml.datasets.chembl</span> <span class="kn">import</span> <span class="n">ChEMBLDatasetProvider</span>
 <span class="kn">from</span> <span class="nn">kinoml.datasets.pkis2</span> <span class="kn">import</span> <span class="n">PKIS2DatasetProvider</span>
-
-<span class="kn">from</span> <span class="nn">kinoml.core.proteins</span> <span class="kn">import</span> <span class="n">Protein</span>
 </pre></div>
 </div>
 </div>
@@ -1200,13 +1198,12 @@ Warning: ^
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># load data points given by the PKIS2 publication (https://doi.org/10.1371/journal.pone.0181585)</span>
 <span class="n">pkis2</span> <span class="o">=</span> <span class="n">PKIS2DatasetProvider</span><span class="o">.</span><span class="n">from_source</span><span class="p">()</span>
-<span class="n">pkis2</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">pkis2</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
-</pre></div>
+<div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
@@ -1219,11 +1216,12 @@ Warning: ^
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># load curated ChEMBL data points available at https://github.com/openkinome/kinodata</span>
 <span class="c1"># here the more general "Protein" object will be used instead of the default "KLIFSKinase"</span>
+<span class="c1"># also protein objects will be initialized with the MDAnalysis toolkit</span>
 <span class="n">chembl</span> <span class="o">=</span> <span class="n">ChEMBLDatasetProvider</span><span class="o">.</span><span class="n">from_source</span><span class="p">(</span>
     <span class="n">path_or_url</span><span class="o">=</span><span class="s2">"https://github.com/openkinome/datascripts/releases/download/v0.3/activities-chembl29_v0.3.zip"</span><span class="p">,</span>
     <span class="n">measurement_types</span><span class="o">=</span><span class="p">(</span><span class="s2">"pIC50"</span><span class="p">,</span> <span class="s2">"pKi"</span><span class="p">,</span> <span class="s2">"pKd"</span><span class="p">),</span>
-    <span class="n">sample</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">protein_type</span><span class="o">=</span><span class="n">Protein</span><span class="p">,</span>
+    <span class="n">protein_type</span><span class="o">=</span><span class="s2">"Protein"</span><span class="p">,</span>
+    <span class="n">toolkit</span><span class="o">=</span><span class="s2">"MDAnalysis"</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">chembl</span>
 </pre></div>
@@ -1233,7 +1231,7 @@ Warning: ^
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<script type="application/vnd.jupyter.widget-view+json">{"model_id": "60e6891200ac4d9cb6805e400b72eda2", "version_major": 2, "version_minor": 0}</script></div>
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "b89a3b1bc95047658f2c635c58b233ba", "version_major": 2, "version_minor": 0}</script></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
@@ -1263,7 +1261,7 @@ Warning: ^
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<script type="application/vnd.jupyter.widget-view+json">{"model_id": "5de0cf09e3f441148bd0a5f1120d4686", "version_major": 2, "version_minor": 0}</script></div>
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "4f8e922d72ca4f5886727d3da11b372e", "version_major": 2, "version_minor": 0}</script></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
@@ -1271,7 +1269,7 @@ Warning: ^
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;ChEMBLDatasetProvider with 100 measurements (pKiMeasurement=100), and 100 systems (KLIFSKinase=36, Ligand=99)&gt;
+&lt;ChEMBLDatasetProvider with 100 measurements (pKiMeasurement=100), and 100 systems (KLIFSKinase=38, Ligand=100)&gt;
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
@@ -1292,7 +1290,7 @@ Warning: ^
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;ChEMBLDatasetProvider with 100 measurements (pKiMeasurement=100), and 100 systems (KLIFSKinase=36, Ligand=99)&gt;
+&lt;ChEMBLDatasetProvider with 100 measurements (pKiMeasurement=100), and 100 systems (KLIFSKinase=38, Ligand=100)&gt;
 </pre></div></div>
 </div>
 <div class="nbinput nblast docutils container">
@@ -1319,7 +1317,7 @@ Warning: ^
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-There were 4 systems that could not be featurized!
+There were 3 systems that could not be featurized!
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -1328,7 +1326,7 @@ There were 4 systems that could not be featurized!
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;ChEMBLDatasetProvider with 96 measurements (pKiMeasurement=96), and 96 systems (KLIFSKinase=35, Ligand=95)&gt;
+&lt;ChEMBLDatasetProvider with 97 measurements (pKiMeasurement=97), and 97 systems (KLIFSKinase=37, Ligand=97)&gt;
 </pre></div></div>
 </div>
 </section>
@@ -1381,7 +1379,7 @@ There were 4 systems that could not be featurized!
               
           </div>
             Last updated on
-              Apr 07, 2022.
+              Apr 22, 2022.
             <br/>
             Created using
             <a href="http://www.sphinx-doc.org/">Sphinx</a> 4.5.0.

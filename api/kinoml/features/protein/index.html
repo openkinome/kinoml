@@ -429,10 +429,15 @@
 <p>Given systems with exactly one protein, prepare the protein structure by:</p>
 <blockquote>
 <div><ul class="simple">
-<li><p>modeling missing loops</p></li>
+<li><p>modeling missing loops with OESpruce according to the PDB header unless
+a custom sequence is specified via the <cite>uniprot_id</cite> or <cite>sequence</cite>
+attribute in the protein component (see below), missing sequences at
+N- and C-termini are not modeled</p></li>
 <li><p>building missing side chains</p></li>
-<li><p>mutations, if <cite>uniprot_id</cite> or <cite>sequence</cite> attribute is provided for
-the protein component (see below)</p></li>
+<li><p>substitutions, deletions and insertions, if a <cite>uniprot_id</cite> or <cite>sequence</cite>
+attribute is provided for the protein component alteration will be
+modeled with OESpruce, if an alteration could not be modeled, the
+corresponding mismatch in the structure will be deleted</p></li>
 <li><p>removing everything but protein and water</p></li>
 <li><p>protonation at pH 7.4</p></li>
 </ul>

@@ -308,6 +308,8 @@
               <ul class="md-nav__list">
         <li class="md-nav__item"><a href="#module-contents" class="md-nav__link">Module Contents</a><nav class="md-nav">
               <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#kinoml.datasets.chembl.logger" class="md-nav__link">logger</a>
+        </li>
         <li class="md-nav__item"><a href="#kinoml.datasets.chembl.ChEMBLDatasetProvider" class="md-nav__link">ChEMBLDatasetProvider</a><nav class="md-nav">
               <ul class="md-nav__list">
         <li class="md-nav__item"><a href="#kinoml.datasets.chembl.ChEMBLDatasetProvider.from_source" class="md-nav__link">from_source</a>
@@ -336,6 +338,10 @@
 <p>Creates DatasetProvider objects from ChEMBL activity data</p>
 <section id="module-contents">
 <h2 id="module-contents">Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
+<dl class="py data">
+<dt class="sig sig-object py" id="kinoml.datasets.chembl.logger">
+<span class="sig-prename descclassname"><span class="pre">kinoml.datasets.chembl.</span></span><span class="sig-name descname"><span class="pre">logger</span></span><a class="headerlink" href="#kinoml.datasets.chembl.logger" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 <dl class="py class">
 <dt class="sig sig-object py" id="kinoml.datasets.chembl.ChEMBLDatasetProvider">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">kinoml.datasets.chembl.</span></span><span class="sig-name descname"><span class="pre">ChEMBLDatasetProvider</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">measurements</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="../../core/measurements/index.html#kinoml.core.measurements.BaseMeasurement" title="kinoml.core.measurements.BaseMeasurement"><span class="pre">kinoml.core.measurements.BaseMeasurement</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.chembl.ChEMBLDatasetProvider" title="Permalink to this definition">¶</a></dt>
@@ -344,7 +350,7 @@
 pipelines. It will load ChEMBL activities from its releases page.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="kinoml.datasets.chembl.ChEMBLDatasetProvider.from_source">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_source</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path_or_url</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'https://github.com/openkinome/datascripts/releases/download/v0.2/activities-chembl28_v0.2.zip'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">measurement_types</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">('pIC50',</span> <span class="pre">'pKi',</span> <span class="pre">'pKd')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uniprot_ids</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">protein_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../core/components/index.html#kinoml.core.components.BaseProtein" title="kinoml.core.components.BaseProtein"><span class="pre">kinoml.core.components.BaseProtein</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">KLIFSKinase</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.chembl.ChEMBLDatasetProvider.from_source" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_source</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path_or_url</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'https://github.com/openkinome/datascripts/releases/download/v0.2/activities-chembl28_v0.2.zip'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">measurement_types</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">('pIC50',</span> <span class="pre">'pKi',</span> <span class="pre">'pKd')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uniprot_ids</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">protein_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'KLIFSKinase'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">toolkit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'OpenEye'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.chembl.ChEMBLDatasetProvider.from_source" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a MultiDatasetProvider out of the raw data contained in the zip file.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -356,8 +362,14 @@ three (pIC50, pKi, pKd) will be loaded, but you can choose a subset (
 e.g. <code class="docutils literal notranslate"><span class="pre">("pIC50",)</span></code>).</p></li>
 <li><p><strong>uniprot_ids</strong> (<em>None</em><em> or </em><em>list of str</em><em>, </em><em>default=None</em>) – Restrict measurements to the given UniProt IDs.</p></li>
 <li><p><strong>sample</strong> (<em>int</em><em>, </em><em>optional=None</em>) – If set to larger than zero, load only N data points from the dataset.</p></li>
-<li><p><strong>protein_type</strong> (<a class="reference internal" href="../../core/components/index.html#kinoml.core.components.BaseProtein" title="kinoml.core.components.BaseProtein"><em>BaseProtein</em></a>) – The protein object type to use.</p></li>
+<li><p><strong>protein_type</strong> (<em>str</em><em>, </em><em>default=KLIFSKinase</em>) – The protein object type to use (‘Protein’ or ‘KLIFSKinase’).</p></li>
+<li><p><strong>toolkit</strong> (<em>str</em><em>, </em><em>default=OpenEye</em>) – The toolkit to use for creating protein objects (e.g. ‘OpenEye’, ‘MDAnalysis’),
+allowed values depend on the specified <cite>protein_type</cite>.</p></li>
 </ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>ValueError</strong> – Given protein_type {protein_type} is not valid, only {allowed_protein_types} are
+allowed.</p>
 </dd>
 </dl>
 <div class="admonition note">

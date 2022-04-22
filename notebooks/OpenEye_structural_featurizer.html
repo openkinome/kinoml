@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <meta property="article:modified_time" content="2022-04-11T12:04:32+00:00" />
+    <meta property="article:modified_time" content="2022-04-22T13:04:28+00:00" />
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   <meta name="lang:clipboard.copy" content="Copy to clipboard">
@@ -706,10 +706,15 @@ deleting the cache directory. Otherwise, you may get results from the former Kin
 <div class="highlight"><pre>
 Given systems with exactly one protein, prepare the protein structure by:
 
- - modeling missing loops
+ - modeling missing loops with OESpruce according to the PDB header unless
+   a custom sequence is specified via the `uniprot_id` or `sequence`
+   attribute in the protein component (see below), missing sequences at
+   N- and C-termini are not modeled
  - building missing side chains
- - mutations, if `uniprot_id` or `sequence` attribute is provided for
-   the protein component (see below)
+ - substitutions, deletions and insertions, if a `uniprot_id` or `sequence`
+   attribute is provided for the protein component alteration will be
+   modeled with OESpruce, if an alteration could not be modeled, the
+   corresponding mismatch in the structure will be deleted
  - removing everything but protein and water
  - protonation at pH 7.4
 
@@ -834,70 +839,7 @@ n_processes : int or None, default=None
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<script type="application/vnd.jupyter.widget-view+json">{"model_id": "8ec25f2454394be2802d4c9f272ecfd2", "version_major": 2, "version_minor": 0}</script></div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area stderr docutils container">
-<div class="highlight"><pre>
-Warning: Failed to find residue GLU139.
-Warning: Failed to find residue HIS140.
-Warning: Failed to find residue HIS141.
-Warning: Failed to find residue HIS142.
-Warning: Failed to find residue HIS143.
-Warning: Failed to find residue HIS144.
-Warning: Failed to find residue HIS145.
-DPI: 0.17, RFree: 0.29, Resolution: 1.90
-Processing BU # 1 with title: PH 6 ANTIGEN, chains AB, alt: A
-Found unresolved N-terminal with 1 residues before ASN 2   A 1  , with sequence M
-Found unresolved C-terminal with 8 residues after GLY 137   A 1  , with sequence LEHHHHHH
-Processing BU # 2 with title: PH 6 ANTIGEN, chains AB, alt: B
-Found unresolved N-terminal with 1 residues before ASN 2   A 1  , with sequence M
-Found unresolved C-terminal with 8 residues after GLY 137   A 1  , with sequence LEHHHHHH
-Warning: Failed to find residue GLU139.
-Warning: Failed to find residue HIS140.
-Warning: Failed to find residue HIS141.
-Warning: Failed to find residue HIS142.
-Warning: Failed to find residue HIS143.
-Warning: Failed to find residue HIS144.
-Warning: Failed to find residue HIS145.
-DPI: 0.17, RFree: 0.29, Resolution: 1.90
-Processing BU # 1 with title: PH 6 ANTIGEN, chains AB
-Warning: There was a problem building some missing pieces, built as much as was possible
-   Falling back to charging other_ligands with OEMMFF94Charges
-Warning: No BioAssembly transforms found, using input molecule as biounit: PH 6 ANTIGEN(A)
-Warning: Iridium - Structure: PH 6 ANTIGEN(A) has no REMARK data
-Processing BU # 1 with title: PH 6 ANTIGEN(A), chains A
-Warning: There was a problem building some missing pieces, built as much as was possible
-Warning: Failed to find residue GLU139.
-Warning: Failed to find residue HIS140.
-Warning: Failed to find residue HIS141.
-Warning: Failed to find residue HIS142.
-Warning: Failed to find residue HIS143.
-Warning: Failed to find residue HIS144.
-Warning: Failed to find residue HIS145.
-DPI: 0.16, RFree: 0.29, Resolution: 1.90
-Processing BU # 1 with title: PH 6 ANTIGEN, chains A
-Warning: There was a problem building some missing pieces, built as much as was possible
-   Falling back to charging protein with OEMMFF94Charges
-Attempting to build loop: D between GLY 75   A 0   and THR 77   A 0
-Increased two sided crop back length from 1 to 2 to accommodate the minimum loop length in database
-Opened database /home/david/github/kinoml/kinoml/data/proteins/kinoml_tests_4f8o_spruce.loop_db
-LoopDatabase Info:
-    1 loops from RCSB last synced on 06-16-2021, were added to kinoml_tests_4f8o on 06-16-2021 using Spruce Toolkit 1.2.0.0
-    The loop database was built with a max loop length of 22, a terminus crop length of 2. Regular secondary structures were excluded
-Attempting to build loop: D between ASP 124   A 0   and SER 126   A 0
-Increased two sided crop back length from 1 to 2 to accommodate the minimum loop length in database
-Opened database /home/david/github/kinoml/kinoml/data/proteins/kinoml_tests_4f8o_spruce.loop_db
-LoopDatabase Info:
-    1 loops from RCSB last synced on 06-16-2021, were added to kinoml_tests_4f8o on 06-16-2021 using Spruce Toolkit 1.2.0.0
-    The loop database was built with a max loop length of 22, a terminus crop length of 2. Regular secondary structures were excluded
-Warning: No BioAssembly transforms found, using input molecule as biounit: PH 6 ANTIGEN(A)
-Warning: Iridium - Structure: PH 6 ANTIGEN(A) has no REMARK data
-Processing BU # 1 with title: PH 6 ANTIGEN(A), chains A
-Warning: There was a problem building some missing pieces, built as much as was possible
-</pre></div></div>
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "46546397b38a4b87aa3e9675174939ad", "version_major": 2, "version_minor": 0}</script></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
@@ -991,10 +933,15 @@ kinoml_OEProteinStructureFeaturizer_PsaA_4f8o_protein.pdb
 Given systems with exactly one protein and one ligand, prepare the complex
 structure by:
 
- - modeling missing loops
+ - modeling missing loops with OESpruce according to the PDB header unless
+   a custom sequence is specified via the `uniprot_id` or `sequence`
+   attribute in the protein component (see below), missing sequences at
+   N- and C-termini are not modeled
  - building missing side chains
- - mutations, if `uniprot_id` or `sequence` attribute is provided for the
-   protein component (see below)
+ - substitutions, deletions and insertions, if a `uniprot_id` or `sequence`
+   attribute is provided for the protein component alteration will be
+   modeled with OESpruce, if an alteration could not be modeled, the
+   corresponding mismatch in the structure will be deleted
  - removing everything but protein, water and ligand of interest
  - protonation at pH 7.4
 
@@ -1109,41 +1056,7 @@ ligand into a radical.
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<script type="application/vnd.jupyter.widget-view+json">{"model_id": "5bf76177789342e4a5a99451601b96cb", "version_major": 2, "version_minor": 0}</script></div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area stderr docutils container">
-<div class="highlight"><pre>
-Warning: Failed to find residue GLU139.
-Warning: Failed to find residue HIS140.
-Warning: Failed to find residue HIS141.
-Warning: Failed to find residue HIS142.
-Warning: Failed to find residue HIS143.
-Warning: Failed to find residue HIS144.
-Warning: Failed to find residue HIS145.
-DPI: 0.17, RFree: 0.29, Resolution: 1.90
-Processing BU # 1 with title: PH 6 ANTIGEN, chains AB, alt: A
-Warning: There was a problem building some missing pieces, built as much as was possible
-Processing BU # 2 with title: PH 6 ANTIGEN, chains AB, alt: B
-Warning: There was a problem building some missing pieces, built as much as was possible
-Warning: Failed to find residue GLU139.
-Warning: Failed to find residue HIS140.
-Warning: Failed to find residue HIS141.
-Warning: Failed to find residue HIS142.
-Warning: Failed to find residue HIS143.
-Warning: Failed to find residue HIS144.
-Warning: Failed to find residue HIS145.
-DPI: 0.17, RFree: 0.29, Resolution: 1.90
-Processing BU # 1 with title: PH 6 ANTIGEN, chains AB
-Warning: There was a problem building some missing pieces, built as much as was possible
-   Falling back to charging other_ligands with OEMMFF94Charges
-Warning: No BioAssembly transforms found, using input molecule as biounit: PH 6 ANTIGEN(A)
-Warning: Iridium - Structure: PH 6 ANTIGEN(A) has no REMARK data
-Processing BU # 1 with title: PH 6 ANTIGEN(A), chains A
-Warning: There was a problem building some missing pieces, built as much as was possible
-</pre></div></div>
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "5ed545e3ba934fa0b4e7f0c5930d51f3", "version_major": 2, "version_minor": 0}</script></div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
@@ -1203,10 +1116,15 @@ Given systems with exactly one protein and one ligand, prepare the
 structure and dock the ligand into the prepared protein structure with
 one of OpenEye's docking algorithms:
 
- - modeling missing loops
+ - modeling missing loops with OESpruce according to the PDB header unless
+   a custom sequence is specified via the `uniprot_id` or `sequence`
+   attribute in the protein component (see below), missing sequences at
+   N- and C-termini are not modeled
  - building missing side chains
- - mutations, if `uniprot_id` or `sequence` attribute is provided for the
-   protein component (see below)
+ - substitutions, deletions and insertions, if a `uniprot_id` or `sequence`
+   attribute is provided for the protein component alteration will be
+   modeled with OESpruce, if an alteration could not be modeled, the
+   corresponding mismatch in the structure will be deleted
  - removing everything but protein, water and ligand of interest
  - protonation at pH 7.4
  - perform docking
@@ -1332,23 +1250,13 @@ pKa_norm: bool, default=True
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<script type="application/vnd.jupyter.widget-view+json">{"model_id": "750257fe06704e7ab9ad4dbcb7f8d8e9", "version_major": 2, "version_minor": 0}</script></div>
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "f1f62040805c4ae98cbf0cc41b2babfb", "version_major": 2, "version_minor": 0}</script></div>
 </div>
 <div class="nboutput docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-Warning: Failed to find residue GLY-7.
-Warning: Failed to find residue ALA-6.
-Warning: Failed to find residue MET-5.
-DPI: 0.12, RFree: 0.22, Resolution: 2.02
-Processing BU # 1 with title: HIGH AFFINITY NERVE GROWTH FACTOR RECEPTOR, chains A, alt: A
-Warning: For residue ARG 702   A 1   removing clashing solvent molecule HOH 908   A 2
-Warning: There was a problem building some missing pieces, built as much as was possible
-Processing BU # 2 with title: HIGH AFFINITY NERVE GROWTH FACTOR RECEPTOR, chains A, alt: B
-Warning: For residue ARG 702   A 1   removing clashing solvent molecule HOH 908   A 2
-Warning: There was a problem building some missing pieces, built as much as was possible
 Warning: Failed to find residue GLY-7.
 Warning: Failed to find residue ALA-6.
 Warning: Failed to find residue MET-5.
@@ -1625,7 +1533,7 @@ the OEDockingFeaturizer or SCHRODINGERDockingFeaturizer.
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-4.66 s ± 0 ns per loop (mean ± std. dev. of 1 run, 1 loop each)
+5.51 s ± 0 ns per loop (mean ± std. dev. of 1 run, 1 loop each)
 </pre></div></div>
 </div>
 </section>
@@ -1666,7 +1574,7 @@ the OEDockingFeaturizer or SCHRODINGERDockingFeaturizer.
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-4.18 s ± 0 ns per loop (mean ± std. dev. of 1 run, 1 loop each)
+5.04 s ± 0 ns per loop (mean ± std. dev. of 1 run, 1 loop each)
 </pre></div></div>
 </div>
 </section>
@@ -1707,7 +1615,7 @@ the OEDockingFeaturizer or SCHRODINGERDockingFeaturizer.
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-4min 11s ± 0 ns per loop (mean ± std. dev. of 1 run, 1 loop each)
+4min 25s ± 0 ns per loop (mean ± std. dev. of 1 run, 1 loop each)
 </pre></div></div>
 </div>
 <p>Using shape is clearly the slowest option, but in many cases the most accurate one.</p>
@@ -2051,7 +1959,7 @@ n_processes : int or None, default=None
               
           </div>
             Last updated on
-              Apr 11, 2022.
+              Apr 22, 2022.
             <br/>
             Created using
             <a href="http://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
