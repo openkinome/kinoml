@@ -415,7 +415,7 @@ than a Tensor, please adapt this method accordingly.</p>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="kinoml.ml.torch_models.NeuralNetworkRegression.forward">
-<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">system</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.torch_models.NeuralNetworkRegression.forward" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">system</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.torch_models.NeuralNetworkRegression.forward" title="Permalink to this definition">¶</a></dt>
 <dd><p>Defines the foward pass for a system,
 which contains the featurized molecular components and the associated measurement/label.
 Since only the featurized system is needed, the first element is retrieved.
@@ -452,7 +452,7 @@ than a Tensor, please adapt this method accordingly.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="kinoml.ml.torch_models.ListOfTupleNeuralNetworkregression.forward">
-<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.torch_models.ListOfTupleNeuralNetworkregression.forward" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.torch_models.ListOfTupleNeuralNetworkregression.forward" title="Permalink to this definition">¶</a></dt>
 <dd><p>Defines the foward pass for a system,
 which contains the featurized molecular components and the associated measurement/label.
 Since only the featurized system is needed, the first element is retrieved.
@@ -482,7 +482,7 @@ In this case, the ligand is a 1D array of shape (<cite>length of fingerprint</ci
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="kinoml.ml.torch_models.DenseNeuralNetworkRegression.forward">
-<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.torch_models.DenseNeuralNetworkRegression.forward" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.torch_models.DenseNeuralNetworkRegression.forward" title="Permalink to this definition">¶</a></dt>
 <dd><p>Defines the foward pass for a given input ‘x’</p>
 </dd></dl>
 </dd></dl>
@@ -505,7 +505,7 @@ In this case, the ligand is a 1D array of shape (<cite>length of fingerprint</ci
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="kinoml.ml.torch_models.ConvolutionNeuralNetworkRegression.forward">
-<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">system</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.torch_models.ConvolutionNeuralNetworkRegression.forward" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">system</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.torch_models.ConvolutionNeuralNetworkRegression.forward" title="Permalink to this definition">¶</a></dt>
 <dd><p>Defines the foward pass for a system,
 which contains the featurized molecular components and the associated measurement/label.
 Since only the featurized system is needed, the first element is retrieved.
@@ -536,7 +536,7 @@ In this case, the ligand is a 2D array of shape (<cite>nb of character</cite>, <
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="kinoml.ml.torch_models.ConvolutionNeuralNetworkRegressionProteinInformed.forward">
-<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">system</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.torch_models.ConvolutionNeuralNetworkRegressionProteinInformed.forward" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">system</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.torch_models.ConvolutionNeuralNetworkRegressionProteinInformed.forward" title="Permalink to this definition">¶</a></dt>
 <dd><p>Defines the foward pass for given a system,
 which contains the featurized molecular components and the associated measurement/label.
 In this case, the input is composed of two entities:
@@ -570,7 +570,7 @@ and the protein a 2D array of shape (<cite>nb of residues</cite>, <cite>length o
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="kinoml.ml.torch_models.NeuralNetworkRegressionProteinInformed.forward">
-<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">system</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.torch_models.NeuralNetworkRegressionProteinInformed.forward" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">system</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.torch_models.NeuralNetworkRegressionProteinInformed.forward" title="Permalink to this definition">¶</a></dt>
 <dd><p>Defines the foward pass for given a system,
 which contains the featurized molecular components and the associated measurement/label.
 In this case, the input is composed of two entities:

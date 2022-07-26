@@ -358,7 +358,7 @@
 <dd><p>Base class to assign groups to measurements in a DatasetProvider</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="kinoml.datasets.groups.BaseGrouper.assign">
-<span class="sig-name descname"><span class="pre">assign</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overwrite</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.groups.BaseGrouper.assign" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">assign</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overwrite</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.groups.BaseGrouper.assign" title="Permalink to this definition">¶</a></dt>
 <dd><p>Given a DatasetProvider, assign a key to the elements
 of each group, as provided by <code class="docutils literal notranslate"><span class="pre">.indices()</span></code></p>
 <dl class="field-list simple">
@@ -380,7 +380,7 @@ measurements modified in place.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="kinoml.datasets.groups.BaseGrouper.indices">
-<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">indices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.groups.BaseGrouper.indices" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">indices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.groups.BaseGrouper.indices" title="Permalink to this definition">¶</a></dt>
 <dd><p>Given a dataset, create a dictionary that maps keys or labels
 to a set of numerical indices. The strategy to follow will
 depend on the subclass.</p>
@@ -411,7 +411,7 @@ Otherwise, the groups are 0-enumerated.</p>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="kinoml.datasets.groups.RandomGrouper.indices">
-<span class="sig-name descname"><span class="pre">indices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.groups.RandomGrouper.indices" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">indices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.groups.RandomGrouper.indices" title="Permalink to this definition">¶</a></dt>
 <dd><p>Given a dataset, create a dictionary that maps keys or labels
 to a set of numerical indices. The strategy to follow will
 depend on the subclass.</p>
@@ -442,7 +442,7 @@ and return a <code class="docutils literal notranslate"><span class="pre">str</s
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="kinoml.datasets.groups.CallableGrouper.indices">
-<span class="sig-name descname"><span class="pre">indices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.groups.CallableGrouper.indices" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">indices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.groups.CallableGrouper.indices" title="Permalink to this definition">¶</a></dt>
 <dd><p>Given a dataset, create a dictionary that maps keys or labels
 to a set of numerical indices. The strategy to follow will
 depend on the subclass.</p>

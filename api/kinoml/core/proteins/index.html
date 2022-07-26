@@ -408,17 +408,17 @@ amino acid sequence via providing a UniProt ID:</p>
 </div>
 <dl class="py method">
 <dt class="sig sig-object py" id="kinoml.core.proteins.Protein.pdb_id">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pdb_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.proteins.Protein.pdb_id" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pdb_id</span></span><a class="headerlink" href="#kinoml.core.proteins.Protein.pdb_id" title="Permalink to this definition">¶</a></dt>
 <dd><p>Decorate pdb_id to modify setter.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="kinoml.core.proteins.Protein.molecule">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">molecule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.proteins.Protein.molecule" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">molecule</span></span><a class="headerlink" href="#kinoml.core.proteins.Protein.molecule" title="Permalink to this definition">¶</a></dt>
 <dd><p>Decorate molecule to modify setter and getter.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="id0">
-<span class="sig-name descname"><span class="pre">molecule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#id0" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">molecule</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#id0" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the _molecule attribute. If the pdb_id attribute is given and _molecule is None, a
 new molecule representation will be created from the given pdb_id, e.g. in case of lazy
 instantiation. The toolkit being used depends on the toolkit attribute.</p>
@@ -433,7 +433,7 @@ instantiation. The toolkit being used depends on the toolkit attribute.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="kinoml.core.proteins.Protein.from_file">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">pathlib.Path</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">toolkit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'OpenEye'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.proteins.Protein.from_file" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">pathlib.Path</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">toolkit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'OpenEye'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.proteins.Protein.from_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a Protein from file.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -447,7 +447,7 @@ instantiation. The toolkit being used depends on the toolkit attribute.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="kinoml.core.proteins.Protein.from_pdb">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_pdb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pdb_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">toolkit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'OpenEye'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.proteins.Protein.from_pdb" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_pdb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pdb_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">toolkit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'OpenEye'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.proteins.Protein.from_pdb" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a Protein from file.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -495,23 +495,23 @@ sequence and residues of the structure via providing a KLIFS specifc structure I
 </div>
 <dl class="py method">
 <dt class="sig sig-object py" id="kinoml.core.proteins.KLIFSKinase._query_sequence_sources">
-<span class="sig-name descname"><span class="pre">_query_sequence_sources</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.proteins.KLIFSKinase._query_sequence_sources" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">_query_sequence_sources</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.proteins.KLIFSKinase._query_sequence_sources" title="Permalink to this definition">¶</a></dt>
 <dd><p>Query available sources for sequence details. Add additional methods below to allow
 fetching from other sources.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="kinoml.core.proteins.KLIFSKinase._query_klifs">
-<span class="sig-name descname"><span class="pre">_query_klifs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.proteins.KLIFSKinase._query_klifs" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">_query_klifs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.proteins.KLIFSKinase._query_klifs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Query KLIFS for the Uniprot ID, which allows fetching of the sequence.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="kinoml.core.proteins.KLIFSKinase.kinase_klifs_sequence">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">kinase_klifs_sequence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.proteins.KLIFSKinase.kinase_klifs_sequence" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">kinase_klifs_sequence</span></span><a class="headerlink" href="#kinoml.core.proteins.KLIFSKinase.kinase_klifs_sequence" title="Permalink to this definition">¶</a></dt>
 <dd><p>Decorate kinase_klifs_sequence to modify setter and getter.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="id1">
-<span class="sig-name descname"><span class="pre">kinase_klifs_sequence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#id1" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">kinase_klifs_sequence</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#id1" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the _kinase_klifs_sequence attribute. Query KLIFS for the respective sequence if
 _kinase_klifs_sequence is an empty string.</p>
 <dl class="field-list simple">
@@ -533,12 +533,12 @@ uniprot_id</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="kinoml.core.proteins.KLIFSKinase.structure_klifs_sequence">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">structure_klifs_sequence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.proteins.KLIFSKinase.structure_klifs_sequence" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">structure_klifs_sequence</span></span><a class="headerlink" href="#kinoml.core.proteins.KLIFSKinase.structure_klifs_sequence" title="Permalink to this definition">¶</a></dt>
 <dd><p>Decorate structure_klifs_sequence to modify setter and getter.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="id2">
-<span class="sig-name descname"><span class="pre">structure_klifs_sequence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#id2" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">structure_klifs_sequence</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#id2" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the _structure_klifs_sequence attribute. Query KLIFS for the respective sequence if
 _structure_klifs_sequence is an empty string.</p>
 <dl class="field-list simple">
@@ -558,12 +558,12 @@ structure_klifs_id</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="kinoml.core.proteins.KLIFSKinase.structure_klifs_residues">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">structure_klifs_residues</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.proteins.KLIFSKinase.structure_klifs_residues" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">structure_klifs_residues</span></span><a class="headerlink" href="#kinoml.core.proteins.KLIFSKinase.structure_klifs_residues" title="Permalink to this definition">¶</a></dt>
 <dd><p>Decorate structure_klifs_residues to modify setter and getter.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="id3">
-<span class="sig-name descname"><span class="pre">structure_klifs_residues</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#id3" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">structure_klifs_residues</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#id3" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the _structure_klifs_residues attribute. Query KLIFS for the respective residues if
 _structure_klifs_residues is None.</p>
 <dl class="field-list simple">

@@ -401,21 +401,21 @@
 <dd></dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="kinoml.core.sequences.Biosequence.sequence">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">sequence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.sequences.Biosequence.sequence" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">sequence</span></span><a class="headerlink" href="#kinoml.core.sequences.Biosequence.sequence" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="id0">
-<span class="sig-name descname"><span class="pre">sequence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#id0" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">sequence</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#id0" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="kinoml.core.sequences.Biosequence._query_sequence_sources">
-<span class="sig-name descname"><span class="pre">_query_sequence_sources</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.sequences.Biosequence._query_sequence_sources" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">_query_sequence_sources</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.sequences.Biosequence._query_sequence_sources" title="Permalink to this definition">¶</a></dt>
 <dd><p>Query available sources for sequence details. Overwrite method in subclasses to fetch
 data.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="kinoml.core.sequences.Biosequence.substitute">
-<span class="sig-name descname"><span class="pre">substitute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">substitution</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.sequences.Biosequence.substitute" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">substitute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">substitution</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.sequences.Biosequence.substitute" title="Permalink to this definition">¶</a></dt>
 <dd><p>Given <code class="docutils literal notranslate"><span class="pre">XYYYZ</span></code>, substitute element <code class="docutils literal notranslate"><span class="pre">X</span></code> at position <code class="docutils literal notranslate"><span class="pre">YYY</span></code> with <code class="docutils literal notranslate"><span class="pre">Z</span></code>, e.g. C1156Y.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -437,7 +437,7 @@ data.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="kinoml.core.sequences.Biosequence.delete">
-<span class="sig-name descname"><span class="pre">delete</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">first</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">last</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">insert</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.sequences.Biosequence.delete" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">delete</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">first</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">last</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">insert</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.sequences.Biosequence.delete" title="Permalink to this definition">¶</a></dt>
 <dd><p>Delete all elements between first and last positions including bounds. Optionally, provide
 an additional insert that shell be placed at the position of the deletion.</p>
 <dl class="field-list simple">
@@ -463,7 +463,7 @@ an additional insert that shell be placed at the position of the deletion.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="kinoml.core.sequences.Biosequence.insert">
-<span class="sig-name descname"><span class="pre">insert</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">position</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">insert</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.sequences.Biosequence.insert" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">insert</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">position</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">insert</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.sequences.Biosequence.insert" title="Permalink to this definition">¶</a></dt>
 <dd><p>Insert a sequence at the given position.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -549,18 +549,18 @@ metadata[“construct_range”]:</p>
 <dd></dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="kinoml.core.sequences.AminoAcidSequence._query_sequence_sources">
-<span class="sig-name descname"><span class="pre">_query_sequence_sources</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.sequences.AminoAcidSequence._query_sequence_sources" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">_query_sequence_sources</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.sequences.AminoAcidSequence._query_sequence_sources" title="Permalink to this definition">¶</a></dt>
 <dd><p>Query available sources for sequence details. Add additional methods below to allow
 fetching from other sources. Perform mutations etc if given via metadata.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="kinoml.core.sequences.AminoAcidSequence._query_uniprot">
-<span class="sig-name descname"><span class="pre">_query_uniprot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.sequences.AminoAcidSequence._query_uniprot" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">_query_uniprot</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.sequences.AminoAcidSequence._query_uniprot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fetch the amino acid sequence from UniProt.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="kinoml.core.sequences.AminoAcidSequence._query_ncbi">
-<span class="sig-name descname"><span class="pre">_query_ncbi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.sequences.AminoAcidSequence._query_ncbi" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">_query_ncbi</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.sequences.AminoAcidSequence._query_ncbi" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fetch the amino acid sequence from NCBI.</p>
 </dd></dl>
 <dl class="py method">
