@@ -326,19 +326,19 @@
         </li>
         <li class="md-nav__item"><a href="#kinoml.core.proteins.KLIFSKinase" class="md-nav__link">KLIFSKinase</a><nav class="md-nav">
               <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#kinoml.core.proteins.KLIFSKinase.kinase_klifs_sequence" class="md-nav__link">kinase_klifs_sequence</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.core.proteins.KLIFSKinase.structure_klifs_sequence" class="md-nav__link">structure_klifs_sequence</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.core.proteins.KLIFSKinase.structure_klifs_residues" class="md-nav__link">structure_klifs_residues</a>
+        </li>
         <li class="md-nav__item"><a href="#kinoml.core.proteins.KLIFSKinase._query_sequence_sources" class="md-nav__link">_query_sequence_sources</a>
         </li>
         <li class="md-nav__item"><a href="#kinoml.core.proteins.KLIFSKinase._query_klifs" class="md-nav__link">_query_klifs</a>
         </li>
-        <li class="md-nav__item"><a href="#kinoml.core.proteins.KLIFSKinase.kinase_klifs_sequence" class="md-nav__link">kinase_klifs_sequence</a>
-        </li>
         <li class="md-nav__item"><a href="#id1" class="md-nav__link">kinase_klifs_sequence</a>
         </li>
-        <li class="md-nav__item"><a href="#kinoml.core.proteins.KLIFSKinase.structure_klifs_sequence" class="md-nav__link">structure_klifs_sequence</a>
-        </li>
         <li class="md-nav__item"><a href="#id2" class="md-nav__link">structure_klifs_sequence</a>
-        </li>
-        <li class="md-nav__item"><a href="#kinoml.core.proteins.KLIFSKinase.structure_klifs_residues" class="md-nav__link">structure_klifs_residues</a>
         </li>
         <li class="md-nav__item"><a href="#id3" class="md-nav__link">structure_klifs_residues</a>
         </li></ul>
@@ -406,12 +406,12 @@ amino acid sequence via providing a UniProt ID:</p>
 </pre></div>
 </div>
 </div>
-<dl class="py method">
+<dl class="py property">
 <dt class="sig sig-object py" id="kinoml.core.proteins.Protein.pdb_id">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pdb_id</span></span><a class="headerlink" href="#kinoml.core.proteins.Protein.pdb_id" title="Permalink to this definition">¶</a></dt>
 <dd><p>Decorate pdb_id to modify setter.</p>
 </dd></dl>
-<dl class="py method">
+<dl class="py property">
 <dt class="sig sig-object py" id="kinoml.core.proteins.Protein.molecule">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">molecule</span></span><a class="headerlink" href="#kinoml.core.proteins.Protein.molecule" title="Permalink to this definition">¶</a></dt>
 <dd><p>Decorate molecule to modify setter and getter.</p>
@@ -493,6 +493,21 @@ sequence and residues of the structure via providing a KLIFS specifc structure I
 </pre></div>
 </div>
 </div>
+<dl class="py property">
+<dt class="sig sig-object py" id="kinoml.core.proteins.KLIFSKinase.kinase_klifs_sequence">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">kinase_klifs_sequence</span></span><a class="headerlink" href="#kinoml.core.proteins.KLIFSKinase.kinase_klifs_sequence" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decorate kinase_klifs_sequence to modify setter and getter.</p>
+</dd></dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="kinoml.core.proteins.KLIFSKinase.structure_klifs_sequence">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">structure_klifs_sequence</span></span><a class="headerlink" href="#kinoml.core.proteins.KLIFSKinase.structure_klifs_sequence" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decorate structure_klifs_sequence to modify setter and getter.</p>
+</dd></dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="kinoml.core.proteins.KLIFSKinase.structure_klifs_residues">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">structure_klifs_residues</span></span><a class="headerlink" href="#kinoml.core.proteins.KLIFSKinase.structure_klifs_residues" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decorate structure_klifs_residues to modify setter and getter.</p>
+</dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="kinoml.core.proteins.KLIFSKinase._query_sequence_sources">
 <span class="sig-name descname"><span class="pre">_query_sequence_sources</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.proteins.KLIFSKinase._query_sequence_sources" title="Permalink to this definition">¶</a></dt>
@@ -503,11 +518,6 @@ fetching from other sources.</p>
 <dt class="sig sig-object py" id="kinoml.core.proteins.KLIFSKinase._query_klifs">
 <span class="sig-name descname"><span class="pre">_query_klifs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.core.proteins.KLIFSKinase._query_klifs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Query KLIFS for the Uniprot ID, which allows fetching of the sequence.</p>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="kinoml.core.proteins.KLIFSKinase.kinase_klifs_sequence">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">kinase_klifs_sequence</span></span><a class="headerlink" href="#kinoml.core.proteins.KLIFSKinase.kinase_klifs_sequence" title="Permalink to this definition">¶</a></dt>
-<dd><p>Decorate kinase_klifs_sequence to modify setter and getter.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="id1">
@@ -532,11 +542,6 @@ uniprot_id</p>
 </dl>
 </dd></dl>
 <dl class="py method">
-<dt class="sig sig-object py" id="kinoml.core.proteins.KLIFSKinase.structure_klifs_sequence">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">structure_klifs_sequence</span></span><a class="headerlink" href="#kinoml.core.proteins.KLIFSKinase.structure_klifs_sequence" title="Permalink to this definition">¶</a></dt>
-<dd><p>Decorate structure_klifs_sequence to modify setter and getter.</p>
-</dd></dl>
-<dl class="py method">
 <dt class="sig sig-object py" id="id2">
 <span class="sig-name descname"><span class="pre">structure_klifs_sequence</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#id2" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the _structure_klifs_sequence attribute. Query KLIFS for the respective sequence if
@@ -555,11 +560,6 @@ structure_klifs_sequence
 structure_klifs_id</p>
 </dd>
 </dl>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="kinoml.core.proteins.KLIFSKinase.structure_klifs_residues">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">structure_klifs_residues</span></span><a class="headerlink" href="#kinoml.core.proteins.KLIFSKinase.structure_klifs_residues" title="Permalink to this definition">¶</a></dt>
-<dd><p>Decorate structure_klifs_residues to modify setter and getter.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="id3">

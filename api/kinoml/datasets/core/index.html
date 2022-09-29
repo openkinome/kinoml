@@ -312,19 +312,19 @@
         </li>
         <li class="md-nav__item"><a href="#kinoml.datasets.core.BaseDatasetProvider" class="md-nav__link">BaseDatasetProvider</a><nav class="md-nav">
               <ul class="md-nav__list">
-        <li class="md-nav__item"><a href="#kinoml.datasets.core.BaseDatasetProvider.from_source" class="md-nav__link">from_source</a>
-        </li>
-        <li class="md-nav__item"><a href="#kinoml.datasets.core.BaseDatasetProvider.observation_model" class="md-nav__link">observation_model</a>
-        </li>
         <li class="md-nav__item"><a href="#kinoml.datasets.core.BaseDatasetProvider.systems" class="md-nav__link">systems</a>
         </li>
         <li class="md-nav__item"><a href="#kinoml.datasets.core.BaseDatasetProvider.measurement_type" class="md-nav__link">measurement_type</a>
         </li>
+        <li class="md-nav__item"><a href="#kinoml.datasets.core.BaseDatasetProvider.conditions" class="md-nav__link">conditions</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.datasets.core.BaseDatasetProvider.from_source" class="md-nav__link">from_source</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.datasets.core.BaseDatasetProvider.observation_model" class="md-nav__link">observation_model</a>
+        </li>
         <li class="md-nav__item"><a href="#kinoml.datasets.core.BaseDatasetProvider.measurements_as_array" class="md-nav__link">measurements_as_array</a>
         </li>
         <li class="md-nav__item"><a href="#kinoml.datasets.core.BaseDatasetProvider.measurements_by_group" class="md-nav__link">measurements_by_group</a>
-        </li>
-        <li class="md-nav__item"><a href="#kinoml.datasets.core.BaseDatasetProvider.conditions" class="md-nav__link">conditions</a>
         </li>
         <li class="md-nav__item"><a href="#kinoml.datasets.core.BaseDatasetProvider.featurize" class="md-nav__link">featurize</a>
         </li>
@@ -342,6 +342,12 @@
         </li>
         <li class="md-nav__item"><a href="#kinoml.datasets.core.DatasetProvider" class="md-nav__link">DatasetProvider</a><nav class="md-nav">
               <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#kinoml.datasets.core.DatasetProvider.systems" class="md-nav__link">systems</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.datasets.core.DatasetProvider.measurement_type" class="md-nav__link">measurement_type</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.datasets.core.DatasetProvider.conditions" class="md-nav__link">conditions</a>
+        </li>
         <li class="md-nav__item"><a href="#kinoml.datasets.core.DatasetProvider._raw_data" class="md-nav__link">_raw_data</a>
         </li>
         <li class="md-nav__item"><a href="#kinoml.datasets.core.DatasetProvider.__len__" class="md-nav__link">__len__</a>
@@ -378,15 +384,9 @@
         </li>
         <li class="md-nav__item"><a href="#kinoml.datasets.core.DatasetProvider.loss_adapter" class="md-nav__link">loss_adapter</a>
         </li>
-        <li class="md-nav__item"><a href="#kinoml.datasets.core.DatasetProvider.systems" class="md-nav__link">systems</a>
-        </li>
-        <li class="md-nav__item"><a href="#kinoml.datasets.core.DatasetProvider.measurement_type" class="md-nav__link">measurement_type</a>
-        </li>
         <li class="md-nav__item"><a href="#kinoml.datasets.core.DatasetProvider.measurements_as_array" class="md-nav__link">measurements_as_array</a>
         </li>
         <li class="md-nav__item"><a href="#kinoml.datasets.core.DatasetProvider.split_by_groups" class="md-nav__link">split_by_groups</a>
-        </li>
-        <li class="md-nav__item"><a href="#kinoml.datasets.core.DatasetProvider.conditions" class="md-nav__link">conditions</a>
         </li>
         <li class="md-nav__item"><a href="#kinoml.datasets.core.DatasetProvider._download_to_cache_or_retrieve" class="md-nav__link">_download_to_cache_or_retrieve</a>
         </li></ul>
@@ -394,6 +394,8 @@
         </li>
         <li class="md-nav__item"><a href="#kinoml.datasets.core.MultiDatasetProvider" class="md-nav__link">MultiDatasetProvider</a><nav class="md-nav">
               <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#kinoml.datasets.core.MultiDatasetProvider.measurements" class="md-nav__link">measurements</a>
+        </li>
         <li class="md-nav__item"><a href="#kinoml.datasets.core.MultiDatasetProvider._post_featurize" class="md-nav__link">_post_featurize</a>
         </li>
         <li class="md-nav__item"><a href="#kinoml.datasets.core.MultiDatasetProvider.observation_models" class="md-nav__link">observation_models</a>
@@ -403,8 +405,6 @@
         <li class="md-nav__item"><a href="#kinoml.datasets.core.MultiDatasetProvider.observation_model" class="md-nav__link">observation_model</a>
         </li>
         <li class="md-nav__item"><a href="#kinoml.datasets.core.MultiDatasetProvider.loss_adapter" class="md-nav__link">loss_adapter</a>
-        </li>
-        <li class="md-nav__item"><a href="#kinoml.datasets.core.MultiDatasetProvider.measurements" class="md-nav__link">measurements</a>
         </li>
         <li class="md-nav__item"><a href="#kinoml.datasets.core.MultiDatasetProvider.indices_by_provider" class="md-nav__link">indices_by_provider</a>
         </li>
@@ -455,6 +455,18 @@
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">kinoml.datasets.core.</span></span><span class="sig-name descname"><span class="pre">BaseDatasetProvider</span></span><a class="headerlink" href="#kinoml.datasets.core.BaseDatasetProvider" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>API specification for dataset providers</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="kinoml.datasets.core.BaseDatasetProvider.systems">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">systems</span></span><a class="headerlink" href="#kinoml.datasets.core.BaseDatasetProvider.systems" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="kinoml.datasets.core.BaseDatasetProvider.measurement_type">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">measurement_type</span></span><a class="headerlink" href="#kinoml.datasets.core.BaseDatasetProvider.measurement_type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="kinoml.datasets.core.BaseDatasetProvider.conditions">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">conditions</span></span><a class="headerlink" href="#kinoml.datasets.core.BaseDatasetProvider.conditions" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="kinoml.datasets.core.BaseDatasetProvider.from_source">
 <em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_source</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path_or_url</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.core.BaseDatasetProvider.from_source" title="Permalink to this definition">¶</a></dt>
@@ -465,24 +477,12 @@
 <em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">observation_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'pytorch'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.core.BaseDatasetProvider.observation_model" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 <dl class="py method">
-<dt class="sig sig-object py" id="kinoml.datasets.core.BaseDatasetProvider.systems">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">systems</span></span><a class="headerlink" href="#kinoml.datasets.core.BaseDatasetProvider.systems" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="kinoml.datasets.core.BaseDatasetProvider.measurement_type">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">measurement_type</span></span><a class="headerlink" href="#kinoml.datasets.core.BaseDatasetProvider.measurement_type" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-<dl class="py method">
 <dt class="sig sig-object py" id="kinoml.datasets.core.BaseDatasetProvider.measurements_as_array">
 <em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">measurements_as_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reduce</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">np.mean</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.core.BaseDatasetProvider.measurements_as_array" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="kinoml.datasets.core.BaseDatasetProvider.measurements_by_group">
 <em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">measurements_by_group</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.core.BaseDatasetProvider.measurements_by_group" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="kinoml.datasets.core.BaseDatasetProvider.conditions">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">conditions</span></span><a class="headerlink" href="#kinoml.datasets.core.BaseDatasetProvider.conditions" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="kinoml.datasets.core.BaseDatasetProvider.featurize">
@@ -528,6 +528,18 @@ objects (or any of its subclasses). They must be of the same type!</p></li>
 <p>All measurements must be of the same type! If they are not, consider
 using <code class="docutils literal notranslate"><span class="pre">MultiDatasetProvider</span></code> instead.</p>
 </div>
+<dl class="py property">
+<dt class="sig sig-object py" id="kinoml.datasets.core.DatasetProvider.systems">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">systems</span></span><a class="headerlink" href="#kinoml.datasets.core.DatasetProvider.systems" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="kinoml.datasets.core.DatasetProvider.measurement_type">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">measurement_type</span></span><a class="headerlink" href="#kinoml.datasets.core.DatasetProvider.measurement_type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="kinoml.datasets.core.DatasetProvider.conditions">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">conditions</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">set</span></em><a class="headerlink" href="#kinoml.datasets.core.DatasetProvider.conditions" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="kinoml.datasets.core.DatasetProvider._raw_data">
 <span class="sig-name descname"><span class="pre">_raw_data</span></span><a class="headerlink" href="#kinoml.datasets.core.DatasetProvider._raw_data" title="Permalink to this definition">¶</a></dt>
@@ -753,14 +765,6 @@ from different measurement types.</p>
 backend-dependent.</p>
 </dd></dl>
 <dl class="py method">
-<dt class="sig sig-object py" id="kinoml.datasets.core.DatasetProvider.systems">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">systems</span></span><a class="headerlink" href="#kinoml.datasets.core.DatasetProvider.systems" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="kinoml.datasets.core.DatasetProvider.measurement_type">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">measurement_type</span></span><a class="headerlink" href="#kinoml.datasets.core.DatasetProvider.measurement_type" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-<dl class="py method">
 <dt class="sig sig-object py" id="kinoml.datasets.core.DatasetProvider.measurements_as_array">
 <span class="sig-name descname"><span class="pre">measurements_as_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reduce</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">np.mean</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'float32'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.core.DatasetProvider.measurements_as_array" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -778,10 +782,6 @@ this method will create more DatasetProvider instances, one per group.</p>
 </dd>
 </dl>
 </dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="kinoml.datasets.core.DatasetProvider.conditions">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">conditions</span></span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">set</span></span></span><a class="headerlink" href="#kinoml.datasets.core.DatasetProvider.conditions" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="kinoml.datasets.core.DatasetProvider._download_to_cache_or_retrieve">
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_download_to_cache_or_retrieve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path_or_url</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#kinoml.datasets.core.DatasetProvider._download_to_cache_or_retrieve" title="Permalink to this definition">¶</a></dt>
@@ -821,6 +821,13 @@ the measurements here can be of different types, but they
 will be grouped together in different sub-datasets.</p>
 </dd>
 </dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="kinoml.datasets.core.MultiDatasetProvider.measurements">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">measurements</span></span><a class="headerlink" href="#kinoml.datasets.core.MultiDatasetProvider.measurements" title="Permalink to this definition">¶</a></dt>
+<dd><p>Flattened list of all measurements present across all providers.</p>
+<p>Use <code class="docutils literal notranslate"><span class="pre">.indices_by_provider()</span></code> to obtain the corresponding slices
+to each provider.</p>
+</dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="kinoml.datasets.core.MultiDatasetProvider._post_featurize">
 <span class="sig-name descname"><span class="pre">_post_featurize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">featurizer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../features/core/index.html#kinoml.features.core.BaseFeaturizer" title="kinoml.features.core.BaseFeaturizer"><span class="pre">kinoml.features.core.BaseFeaturizer</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.core.MultiDatasetProvider._post_featurize" title="Permalink to this definition">¶</a></dt>
@@ -854,13 +861,6 @@ from different measurement types.</p>
 <em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">loss_adapter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.datasets.core.MultiDatasetProvider.loss_adapter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Observation model plus loss function, wrapped in a single callable. Return types are
 backend-dependent.</p>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="kinoml.datasets.core.MultiDatasetProvider.measurements">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">measurements</span></span><a class="headerlink" href="#kinoml.datasets.core.MultiDatasetProvider.measurements" title="Permalink to this definition">¶</a></dt>
-<dd><p>Flattened list of all measurements present across all providers.</p>
-<p>Use <code class="docutils literal notranslate"><span class="pre">.indices_by_provider()</span></code> to obtain the corresponding slices
-to each provider.</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="kinoml.datasets.core.MultiDatasetProvider.indices_by_provider">

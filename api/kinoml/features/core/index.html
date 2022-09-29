@@ -312,6 +312,8 @@
         </li>
         <li class="md-nav__item"><a href="#kinoml.features.core.BaseFeaturizer" class="md-nav__link">BaseFeaturizer</a><nav class="md-nav">
               <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#kinoml.features.core.BaseFeaturizer.name" class="md-nav__link">name</a>
+        </li>
         <li class="md-nav__item"><a href="#kinoml.features.core.BaseFeaturizer._SUPPORTED_TYPES" class="md-nav__link">_SUPPORTED_TYPES</a>
         </li>
         <li class="md-nav__item"><a href="#kinoml.features.core.BaseFeaturizer.featurize" class="md-nav__link">featurize</a>
@@ -329,8 +331,6 @@
         <li class="md-nav__item"><a href="#kinoml.features.core.BaseFeaturizer.supports" class="md-nav__link">supports</a>
         </li>
         <li class="md-nav__item"><a href="#kinoml.features.core.BaseFeaturizer._supports" class="md-nav__link">_supports</a>
-        </li>
-        <li class="md-nav__item"><a href="#kinoml.features.core.BaseFeaturizer.name" class="md-nav__link">name</a>
         </li>
         <li class="md-nav__item"><a href="#kinoml.features.core.BaseFeaturizer.__repr__" class="md-nav__link">__repr__</a>
         </li></ul>
@@ -350,13 +350,13 @@
         </li>
         <li class="md-nav__item"><a href="#kinoml.features.core.Pipeline" class="md-nav__link">Pipeline</a><nav class="md-nav">
               <ul class="md-nav__list">
-        <li class="md-nav__item"><a href="#kinoml.features.core.Pipeline._featurize" class="md-nav__link">_featurize</a>
-        </li>
-        <li class="md-nav__item"><a href="#kinoml.features.core.Pipeline.supports" class="md-nav__link">supports</a>
-        </li>
         <li class="md-nav__item"><a href="#kinoml.features.core.Pipeline.name" class="md-nav__link">name</a>
         </li>
         <li class="md-nav__item"><a href="#kinoml.features.core.Pipeline.shortname" class="md-nav__link">shortname</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.features.core.Pipeline._featurize" class="md-nav__link">_featurize</a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.features.core.Pipeline.supports" class="md-nav__link">supports</a>
         </li></ul>
             </nav>
         </li>
@@ -477,6 +477,10 @@ new representations of the molecular entities and their associated measurements.
 <dt class="sig sig-object py" id="kinoml.features.core.BaseFeaturizer">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">kinoml.features.core.</span></span><span class="sig-name descname"><span class="pre">BaseFeaturizer</span></span><a class="headerlink" href="#kinoml.features.core.BaseFeaturizer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Abstract Featurizer class.</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="kinoml.features.core.BaseFeaturizer.name">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#kinoml.features.core.BaseFeaturizer.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="kinoml.features.core.BaseFeaturizer._SUPPORTED_TYPES">
 <span class="sig-name descname"><span class="pre">_SUPPORTED_TYPES</span></span><a class="headerlink" href="#kinoml.features.core.BaseFeaturizer._SUPPORTED_TYPES" title="Permalink to this definition">¶</a></dt>
@@ -620,10 +624,6 @@ a single system and the current featurizer.</p>
 </dl>
 </dd></dl>
 <dl class="py method">
-<dt class="sig sig-object py" id="kinoml.features.core.BaseFeaturizer.name">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#kinoml.features.core.BaseFeaturizer.name" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-<dl class="py method">
 <dt class="sig sig-object py" id="kinoml.features.core.BaseFeaturizer.__repr__">
 <span class="sig-name descname"><span class="pre">__repr__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.features.core.BaseFeaturizer.__repr__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return repr(self).</p>
@@ -698,6 +698,14 @@ shares the same API but the implementation details of
 <code class="docutils literal notranslate"><span class="pre">._featurize()</span></code> are slightly different. It acts as a
 wrapper around individual <code class="docutils literal notranslate"><span class="pre">Featurizer</span></code> objects.</p>
 </div>
+<dl class="py property">
+<dt class="sig sig-object py" id="kinoml.features.core.Pipeline.name">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#kinoml.features.core.Pipeline.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="kinoml.features.core.Pipeline.shortname">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">shortname</span></span><a class="headerlink" href="#kinoml.features.core.Pipeline.shortname" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="kinoml.features.core.Pipeline._featurize">
 <span class="sig-name descname"><span class="pre">_featurize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">systems</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="../../core/systems/index.html#kinoml.core.systems.System" title="kinoml.core.systems.System"><span class="pre">kinoml.core.systems.System</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">object</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#kinoml.features.core.Pipeline._featurize" title="Permalink to this definition">¶</a></dt>
@@ -743,14 +751,6 @@ dictionary with its own key (<code class="docutils literal notranslate"><span cl
 </dd>
 </dl>
 </dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="kinoml.features.core.Pipeline.name">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#kinoml.features.core.Pipeline.name" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="kinoml.features.core.Pipeline.shortname">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">shortname</span></span><a class="headerlink" href="#kinoml.features.core.Pipeline.shortname" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
 </dd></dl>
 <dl class="py class">
 <dt class="sig sig-object py" id="kinoml.features.core.Concatenated">
