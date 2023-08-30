@@ -10,7 +10,7 @@ dependencies:
   - pip
   - pandas
   - requests
-  - pint
+  - pint =0.19.2
   - appdirs
   - tqdm
   - openff-toolkit >=0.9
