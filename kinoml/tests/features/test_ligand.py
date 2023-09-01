@@ -76,6 +76,6 @@ def test_ligand_GraphLigandFeaturizer_RDKit(smiles, n_edges, n_nodes, n_features
     system = LigandSystem([ligand])
     GraphLigandFeaturizer(use_multiprocessing=False).featurize([system])
     connectivity, features = system.featurizations["last"]
-    assert len(connectivity) == n_edges
+    assert len(connectivity[0]) == n_edges
     assert len(features) == n_nodes
     assert len(features[0]) == n_features
