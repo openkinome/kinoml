@@ -307,16 +307,26 @@ class AminoAcidSequence(Biosequence):
         : str
             The corresponding UniProt ID, empty string if not successful.
         """
-
+        from time import sleep
         import requests
-
-        url = "https://www.uniprot.org/uploadlists/"
-        params = {"from": "P_REFSEQ_AC", "to": "SWISSPROT", "format": "tab", "query": ncbi_id}
-        response = requests.get(url, params=params)
-        response = response.text.split("\n")
-        if len(response) != 3:
-            return ""
-        return response[1].split("\t")[1]
+        
+        url = "https://rest.uniprot.org/idmapping"
+        params = {"from": "RefSeq_Protein", "to": "UniProtKB", "ids": ncbi_id}
+        response = requests.post(f"{url}/run", params=params)
+        response.raise_for_status()
+        job_id = response.json()["jobId"]
+        for i in range(5):
+            response2 = requests.get(f"{url}/status/{job_id}").json()
+            if "jobStatus" in response2:
+                if response2["jobStatus"] == "RUNNING":
+                    print(i)
+                    sleep(3)
+                    continue
+            #response2["results"][0]["to"]["primaryAccession"]
+            if len(response2["results"]) == 0:
+                return ""
+            else:
+                return response2["results"][0]["to"]["primaryAccession"]
 
 
 class DNASequence(Biosequence):
