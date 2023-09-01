@@ -809,7 +809,7 @@ def generate_enantiomers(
     molecule: oechem.OEMolBase,
     max_centers: int = 12,
     force_flip: bool = False,
-    enumerate_nitrogens: bool = True,
+    enumerate_nitrogens: bool = False,
 ) -> List[oechem.OEMolBase]:
     """
     Generate enantiomers of a given molecule.
