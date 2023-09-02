@@ -98,6 +98,7 @@ def pose_molecules(
     # initialize receptor
     options = oedocking.OEPositOptions()
     options.SetIgnoreNitrogenStereo(True)  # nitrogen stereo centers can be problematic
+    options.SetAllowedClashType(oedocking.OEAllowedClashType_ANY)
     options.SetPoseRelaxMode(
         oedocking.OEPoseRelaxMode_NONE
     )  # relaxation is slow and would also affect the protein, which is currently not returned

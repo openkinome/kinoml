@@ -6,7 +6,7 @@ from __future__ import annotations
 from typing import Union
 
 import numpy as np
-from openff.toolkit.utils.exceptions import SMILESParseError
+from openff.toolkit.utils.exceptions import SMILESParseError, RadicalsNotSupportedError
 from rdkit import Chem
 
 from .core import ParallelBaseFeaturizer, BaseOneHotEncodingFeaturizer
@@ -71,7 +71,7 @@ class MorganFingerprintFeaturizer(SingleLigandFeaturizer):
 
         try:  # catch erroneous smiles not yet interpreted in case of lazy instantiation
             rdkit_mol = system.ligand.molecule.to_rdkit()
-        except SMILESParseError:
+        except (SMILESParseError, RadicalsNotSupportedError):
             return None
 
         rdkit_mol = RemoveHs(rdkit_mol)

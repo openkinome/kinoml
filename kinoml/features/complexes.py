@@ -385,13 +385,13 @@ class MostSimilarPDBLigandFeaturizer(SingleLigandProteinComplexFeaturizer):
             query = (
                 "{entries(entry_ids:["
                 + ",".join(['"' + pdb_id + '"' for pdb_id in pdb_ids_batch])
-                + "]){rcsb_id,pdbx_vrpt_summary{PDB_resolution}}}"
+                + "]){rcsb_id,rcsb_entry_info{resolution_combined}}}"
             )
             response = requests.get(base_url + urllib.parse.quote(query))
             for entry_info in json.loads(response.text)["data"]["entries"]:
                 try:
                     resolution_dict[entry_info["rcsb_id"]] = float(
-                        entry_info["pdbx_vrpt_summary"]["PDB_resolution"]
+                        entry_info["rcsb_entry_info"]["resolution_combined"][0]
                     )
                 except ValueError:
                     # add high dummy resolution
