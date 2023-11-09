@@ -16,14 +16,12 @@ KinoML
 2. **Featurization**: featurize the data so that it is machine learning readeable. KinoML offers a wide variety of featurization schemes, from ligand-only to ligand:kinase complexes.
 3. **Run structure-based experiments**: using KinoML's implemented models, with a special focus on reproducibility.
 
-The purpose of KinoML is to help users conduct ML kinase experiments, from data collection to model evaluation. Working examples showcasing how to use KinoML to perform experiments can be found [here.](kinoml/examples/experiments)
-. Note that KinoML has a focus on kinases, but it can be applied to any protein system. For more detailed instructions, working examples, and documentation, please refer to the [Documentation](https://openkinome.org/kinoml/index.html).  
 
 ### Notice
 
 Please be aware that this code is work in progress and is not guaranteed to provide the expected results. The API can change at any time without warning.
 
-### Installation
+### Conda/mamba installation
 
 KinoML and its dependencies can be installed via conda/mamba.
 
