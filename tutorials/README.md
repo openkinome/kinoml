@@ -16,9 +16,9 @@ This tutorial folder contains two subfolders:
 
 
 
-* **experiments**:  this folder contains four different experiments. The aim of these notebook are to showcase how to use KinoML to conduct experiments end-to-end, from obtaining the data from the database to training and evaluating a ML model. Note that if the user wants to run this notebooks with their own data, they can do so by adjusting the neccesary parameters within the notebooks. All experiments are divided into two parts:
+* **experiments**:  this folder contains four separate experiments. The aim of these notebook are to showcase how to use KinoML to conduct experiments end-to-end, from obtaining the data from the database to training and evaluating a ML model to predict ligand binding affinity. Note that if the user wants to run this notebooks with their own data, they can do so by adjusting the neccesary parameters within the notebooks. All experiments are divided into two parts:
 
-    1. **Featurize the data set**: obtaining the data set and featurize it with the featurization pipeline of choice
-    
-    2. **Run the experiment**: the ML model of choice, implemented in the `kinoml.ml` class is trained and evaluated
+    1. **Featurize the data set**: obtaining the data set and featurize it with the featurization pipeline of choice.
+
+    2. **Run the experiment**: the ML model of choice, implemented in the `kinoml.ml` class is trained and evaluated.
 
