@@ -22,3 +22,6 @@ This tutorial folder contains two subfolders:
 
     2. **Run the experiment**: the ML model of choice, implemented in the `kinoml.ml` class is trained and evaluated.
 
+
+Please note that the order in which the different notebooks are displayed here is the recommended order for running them, providing a more comprehensive understanding of KinoML.
+
