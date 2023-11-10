@@ -25,6 +25,8 @@ Do you want to know more about OpenKinome ecosystem? Check its [website](https:/
 
 notebooks/getting_started.nblink
 notebooks/kinoml_object_model.nblink
+notebooks/OpenEye_structural_featurizer.nblink
+notebooks/Schrodinger_structural_featurizer.nblink
 ```
 
 ```{toctree}
@@ -32,8 +34,10 @@ notebooks/kinoml_object_model.nblink
 :maxdepth: 1
 :hidden:
 
-notebooks/OpenEye_structural_featurizer.nblink
-notebooks/Schrodinger_structural_featurizer.nblink
+notebooks/ligand-only-smiles-EGFR.nblink
+notebooks/ligand-only-morgan1024-EGFR.nblink
+notebooks/kinase-ligand-informed-smiles-sequence-EGFR.nblink
+notebooks/kinase-ligand-informed-morgan-composition-EGFR.nblink
 ```
 
 ```{toctree}
