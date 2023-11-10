@@ -17,7 +17,7 @@ KinoML
 3. **Run structure-based experiments**: using KinoML's implemented models, with a special focus on reproducibility.
 
 
-The purpose of KinoML is to help users conduct ML kinase experiments, from data collection to model evaluation. Tutorials on how to use KinoML as well as Working examples showcasing how to use KinoML to perform experiments end-to-end can be found [here.](https://github.com/raquellrios/kinoml/tree/master/tutorials) Note that despite KinoML's focus being on kinases, it can be applied to any protein system. For more detailed instructions, please refer to the [Documentation](https://openkinome.org/kinoml/index.html). 
+The purpose of KinoML is to help users conduct ML kinase experiments, from data collection to model evaluation. Tutorials on how to use KinoML as well as working examples showcasing how to use KinoML to perform experiments end-to-end can be found [here.](https://github.com/raquellrios/kinoml/tree/master/tutorials) Note that despite KinoML's focus being on kinases, it can be applied to any protein system. For more detailed instructions, please refer to the [Documentation](https://openkinome.org/kinoml/index.html). 
 
 
 ### Notice
@@ -41,12 +41,12 @@ The tutorials folder is divided into two parts:
 
 1. **Getting started**: the notebooks in this folder aim to give the user an understanding of how to use KinoML to: (1) **access and download** data, (2) **featurize** data and (3) **run a** (simple) **ML model** on the featurized data obtained with KinoML to predict ligand binding affinity. Additionally, this folder contains notebooks that explain the **KinoML object model** and how to access the different objects, as well as notebooks **showcasing all the different featurizers** implemented within KinoML and how to use each of them.
 
-2. **Experiments**: this folder contains four individual structure-based experiments to predict ligand binding affinity. All experiments use KinoML to obtain the data, featurize it and train and evaluate a ML model implemented within the`kinoml.ml` class. The purpose of these experiments is to display usage examples of KinoML to to conduct end-to-end structure-based kinases experiments.
+2. **Experiments**: this folder contains four individual structure-based experiments to predict ligand binding affinity. All experiments use KinoML to obtain the data, featurize it and train and evaluate a ML model implemented within the`kinoml.ml` class. The purpose of these experiments is to display usage examples of KinoML to conduct end-to-end structure-based kinases experiments.
 
 
-For users interested in more KinoML examples, they can checkout other repositories under the initative [OpenKinome](https://github.com/openkinome/). Particularly, other two repositories of interest may be:
+For users interested in more KinoML usage examples, they can checkout other repositories under the initative [OpenKinome](https://github.com/openkinome/). Particularly, other two repositories of interest may be:
 - [experiments-binding-affinity](https://github.com/openkinome/experiments-binding-affinity): more advanced and reproducable ML experiments using KinoML
-- [kinodata](https://github.com/openkinome/kinodata): repository ready-to-use kinase-focused datasets from ChEMBL, as well as tutorials explaining how to process kinase data for ML applications. 
+- [kinodata](https://github.com/openkinome/kinodata): repository with ready-to-use kinase-focused datasets from ChEMBL, as well as tutorials explaining how to process kinase data for ML applications. 
 
 
 Copyright (c) 2019, OpenKinome
