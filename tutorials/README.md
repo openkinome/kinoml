@@ -2,8 +2,6 @@ How to use the tutorials folder
 ==============================
 This tutorial folder contains two subfolders:
 
-·PUT DISCLAIMER THAT YOU NEED THE OE LICESCE AND SCHRODINGER LICENSE
-
 
 
 * **getting_started**: this folder contains four jupyter notebook tutorials that give the user a general overview of KinoML potential usage and capabilities.
