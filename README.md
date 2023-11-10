@@ -16,7 +16,7 @@ KinoML
 2. **Featurize data**: so that it is ML readeable. KinoML offers a wide variety of featurization schemes, from ligand-only to ligand:kinase complexes.
 3. **Run structure-based experiments**: using KinoML's implemented models, with a special focus on reproducibility.
 
-![KinoML object model](../kinoml/data/fig_1_kinomltechpaper_v2.png)  
+![KinoML object model](kinoml/data/fig_1_kinomltechpaper_v2.png)  
 **Fig. 1:** KinoML workflow overview. Colors represent objects that belong to the same class.
 
 
