@@ -16,11 +16,14 @@ KinoML
 2. **Featurize data**: so that it is ML readeable. KinoML offers a wide variety of featurization schemes, from ligand-only to ligand:kinase complexes.
 3. **Run structure-based experiments**: using KinoML's implemented models, with a special focus on reproducibility.
 
-![KinoML object model](kinoml/data/fig_1_kinomltechpaper_v2.png)  
-**Fig. 1:** KinoML workflow overview. Colors represent objects that belong to the same class.
 
 
 The purpose of KinoML is to help users conduct ML kinase experiments, from data collection to model evaluation. Tutorials on how to use KinoML as well as working examples showcasing how to use KinoML to perform experiments end-to-end can be found [here.](https://github.com/raquellrios/kinoml/tree/master/tutorials) Note that despite KinoML's focus being on kinases, it can be applied to any protein system. For more detailed instructions, please refer to the [Documentation](https://openkinome.org/kinoml/index.html). 
+
+A KinoML workflow to achieve points **1, 2** and **3** is illustrated in the following image:
+
+![KinoML object model](kinoml/data/fig_1_kinomltechpaper_v2.png)  
+**Fig. 1:** KinoML workflow overview. Colors represent objects of the same class.
 
 
 
