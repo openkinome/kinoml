@@ -30,7 +30,7 @@ notebooks/Schrodinger_structural_featurizer.nblink
 ```
 
 ```{toctree}
-:caption: Tutorials
+:caption: Experiment tutorials
 :maxdepth: 1
 :hidden:
 
