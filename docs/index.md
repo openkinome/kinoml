@@ -14,9 +14,9 @@ If you are interested in this code, please wait for the official release to use 
 
 Welcome to the Documentation of KinoML! The documentation is divided into two parts:
 
-    * **Getting started**: in this section you will learn how to use KinoML to filter and download data from a data base, featurize your kinase data so that it is ML friendly and train and evaluate a ML model on your featurized kinase data. You will also learn about the KinoML object model, and how to access each of these objects. We also provide a detailed examples of how to use every featurizer implemented within KinoML.
+* **Getting started**: in this section you will learn how to use KinoML to filter and download data from a data base, featurize your kinase data so that it is ML friendly and train and evaluate a ML model on your featurized kinase data. You will also learn about the KinoML object model, and how to access each of these objects. We also provide a detailed examples of how to use every featurizer implemented within KinoML.
 
-    * **Experiment tutorials**: this section shows how to use KinoML to  ML structure-based experiments. All experiments are structure-based and they are all end to end, from data collection to model training and evaluation.
+* **Experiment tutorials**: this section shows how to use KinoML to  ML structure-based experiments. All experiments are structure-based and they are all end to end, from data collection to model training and evaluation.
 
     
 
