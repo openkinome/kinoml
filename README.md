@@ -22,7 +22,7 @@ The purpose of KinoML is to help users conduct ML kinase experiments, from data 
 
 A KinoML workflow to achieve points **1, 2** and **3** is illustrated in the following image:
 
-![KinoML object model](kinoml/data/fig_1_kinomltechpaper_v2.png)  
+![KinoML object model](kinoml/kinoml/data/fig_1_kinomltechpaper_v2.png)  
 **Fig. 1:** KinoML workflow overview. Colors represent objects of the same class.
 
 
