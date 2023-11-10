@@ -39,7 +39,7 @@ pip install https://github.com/openkinome/kinoml/archive/master.tar.gz
 
 The tutorials folder is divided into two parts:
 
-1. **Getting started**: the notebooks in this folder aim to give the user an understanding of how to use KinoML to: (1) **access and download** data, (2) **featurize** data and (3) **run a** (simple) **ML model** on the featurized data obtained with KinoML to predict ligand binding affinity. Additionally, this folder contains notebooks that explain the **KinoML object model** and how to access the different objects, as well as notebooks **showcasing all the different featurizers** implemented within KinoML and how to use each of them.
+1. **Getting started**: the notebooks in this folder aim to give the user an understanding of how to use KinoML to: (1) **access and download** data, (2) **featurize** data, and (3) **run a** (simple) **ML model** on the featurized data obtained with KinoML to predict ligand binding affinity. Additionally, this folder contains notebooks that explain the **KinoML object model** and how to access the different objects, as well as notebooks **showcasing all the different featurizers** implemented within KinoML and how to use each of them.
 
 2. **Experiments**: this folder contains four individual structure-based experiments to predict ligand binding affinity. All experiments use KinoML to obtain the data, featurize it and train and evaluate a ML model implemented within the`kinoml.ml` class. The purpose of these experiments is to display usage examples of KinoML to conduct end-to-end structure-based kinases experiments.
 
