@@ -51,7 +51,7 @@ The tutorials folder is divided into two parts:
 2. [**Experiments**](https://github.com/raquellrios/kinoml/tree/master/tutorials/experiments): this folder contains four individual structure-based experiments to predict ligand binding affinity. All experiments use KinoML to obtain the data, featurize it and train and evaluate a ML model implemented within the`kinoml.ml` class. The purpose of these experiments is to display usage examples of KinoML to conduct end-to-end structure-based kinases experiments.
 
 
-⚠️ You will need a valid OpenEye License for the featurizers of the tutorials to work. For the Schrodinger featurizers tutorial you will also need a Schrodinger License!
+⚠️ You will need a valid OpenEye License for the structural featurizers of the tutorials to work. For the Schrodinger featurizers tutorial you will also need a Schrodinger License!
 
 
 For users interested in more KinoML usage examples, they can checkout other repositories under the initative [OpenKinome](https://github.com/openkinome/). Particularly, other two repositories that may be of interest are:
