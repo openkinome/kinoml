@@ -28,7 +28,7 @@ Do you want to know more about OpenKinome ecosystem? Check its [website](https:/
 
 ```{toctree}
 :caption: User guide
-:maxdepth: 1
+:maxdepth: 3
 :hidden:
 
 notebooks/getting_started.nblink
@@ -39,7 +39,7 @@ notebooks/Schrodinger_structural_featurizer.nblink
 
 ```{toctree}
 :caption: Experiment tutorials
-:maxdepth: 1
+:maxdepth: 2
 :hidden:
 
 notebooks/ligand-only-smiles-EGFR.nblink

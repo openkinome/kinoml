@@ -136,7 +136,7 @@ html_theme_options = {
     "html_prettify": True,
     "css_minify": True,
     "repo_type": "github",
-    "globaltoc_depth": 2,
+    "globaltoc_depth": 3,
     "color_primary": "#3f51b5",
     "color_accent": "blue",
     "touch_icon": "images/custom_favicon.png",
