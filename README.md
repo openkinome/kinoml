@@ -31,7 +31,7 @@ A KinoML workflow to achieve points **1, 2** and **3** is illustrated in the fol
 
 Please be aware that this code is work in progress and is not guaranteed to provide the expected results. The API can change at any time without warning.
 
-### Conda/mamba installation
+### Installation
 
 KinoML and its dependencies can be installed via conda/mamba.
 
