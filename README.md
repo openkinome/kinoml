@@ -11,7 +11,21 @@ KinoML
 ![GitHub closed issues](https://img.shields.io/github/issues-closed-raw/openkinome/kinoml) 
 ![GitHub open issues](https://img.shields.io/github/issues/openkinome/kinoml)
 
-Machine Learning for kinase modeling. 
+**KinoML** is a modular and extensible framework for machine learning (ML) in small molecule drug discovery with a special focus on kinases. It enables users to easily:
+1. **Access and download data**: from online data sources, such as ChEMBL or PubChem as well as from their own files, with a focus on data availability and inmutability.
+2. **Featurize data**: so that it is ML readeable. KinoML offers a wide variety of featurization schemes, from ligand-only to ligand:kinase complexes.
+3. **Run structure-based experiments**: using KinoML's implemented models, with a special focus on reproducibility.
+
+
+
+The purpose of KinoML is to help users conduct ML kinase experiments, from data collection to model evaluation. Tutorials on how to use KinoML as well as working examples showcasing how to use KinoML to perform experiments end-to-end can be found [here.](https://github.com/raquellrios/kinoml/tree/master/tutorials) Note that despite KinoML's focus being on kinases, it can be applied to any protein system. For more detailed instructions, please refer to the [Documentation](https://openkinome.org/kinoml/index.html). 
+
+A KinoML workflow to achieve points **1, 2** and **3** is illustrated in the following image:
+
+![KinoML object model](kinoml/data/fig_1_kinomltechpaper_v2.png)  
+**Fig. 1:** KinoML workflow overview. Colors represent objects of the same class.
+
+
 
 ### Notice
 
@@ -30,12 +44,23 @@ pip install https://github.com/openkinome/kinoml/archive/master.tar.gz
 
 ### Usage
 
-Several notebooks providing usage examples can be found in [examples](https://github.com/openkinome/kinoml/tree/master/examples)
-including a [getting started notebook](https://github.com/openkinome/kinoml/blob/master/examples/getting_started.ipynb).  
-This framework is tightly bound to other repositories:
- - [experiments-binding-affinity](https://github.com/openkinome/experiments-binding-affinity) - for advanced and reproducable ML experiments using KinoML
- - [kinodata](https://github.com/openkinome/kinodata) - ready-to-use kinase-focused datasets from ChEMBL 
-### Copyright
+The tutorials folder is divided into two parts:
+
+1. [**Getting started**](https://github.com/raquellrios/kinoml/tree/master/tutorials/getting_started): the notebooks in this folder aim to give the user an understanding of how to use KinoML to: (1) **access and download** data, (2) **featurize** data, and (3) **run a** (simple) **ML model** on the featurized data obtained with KinoML to predict ligand binding affinity. Additionally, this folder contains notebooks that explain the **KinoML object model** and how to access the different objects, as well as notebooks **showcasing all the different featurizers** implemented within KinoML and how to use each of them.
+
+2. [**Experiments**](https://github.com/raquellrios/kinoml/tree/master/tutorials/experiments): this folder contains four individual structure-based experiments to predict ligand binding affinity. All experiments use KinoML to obtain the data, featurize it and train and evaluate a ML model implemented within the`kinoml.ml` class. The purpose of these experiments is to display usage examples of KinoML to conduct end-to-end structure-based kinases experiments.
+
+
+⚠️ You will need a valid OpenEye License for the structural featurizers of the tutorials to work. For the Schrodinger featurizers tutorial you will also need a Schrodinger License!
+
+
+For users interested in more KinoML usage examples, they can checkout other repositories under the initative [OpenKinome](https://github.com/openkinome/). Particularly, other two repositories that may be of interest are:
+
+
+- [kinodata](https://github.com/openkinome/kinodata): repository with ready-to-use kinase-focused datasets from ChEMBL, as well as tutorials explaining how to process kinase data for ML applications. 
+- [experiments-binding-affinity](https://github.com/openkinome/experiments-binding-affinity): more advanced and reproducible ML experiments using KinoML.
+
+
 
 Copyright (c) 2019, OpenKinome
 
