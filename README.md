@@ -33,13 +33,15 @@ Please be aware that this code is work in progress and is not guaranteed to prov
 
 ### Installation
 
+
 KinoML and its dependencies can be installed via conda/mamba.
 
 ```
-mamba create -n kinoml --no-default-packages
-mamba env update -n kinoml -f https://raw.githubusercontent.com/openkinome/kinoml/master/devtools/conda-envs/test_env.yaml
-conda activate kinoml
-pip install https://github.com/openkinome/kinoml/archive/master.tar.gz
+git clone https://github.com/openkinome/kinoml.git  # clone the repo
+cd kinoml  # change directory to local copy of repo
+mamba env create -n kinoml -f devtools/conda-envs/test_env.yaml
+conda activate kinoml  
+python -m pip install git+https://github.com/openkinome/kinoml.git 
 ```
 
 ### Usage
