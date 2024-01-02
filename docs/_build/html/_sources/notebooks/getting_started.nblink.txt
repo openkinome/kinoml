@@ -1,0 +1,1 @@
+{"path": "../../tutorials/getting_started/getting_started_with_kinoml.ipynb"}

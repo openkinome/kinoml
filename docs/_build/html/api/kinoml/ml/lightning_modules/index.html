@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="lang:clipboard.copy" content="Copy to clipboard">
+  <meta name="lang:clipboard.copied" content="Copied to clipboard">
+  <meta name="lang:search.language" content="en">
+  <meta name="lang:search.pipeline.stopwords" content="True">
+  <meta name="lang:search.pipeline.trimmer" content="True">
+  <meta name="lang:search.result.none" content="No matching documents">
+  <meta name="lang:search.result.one" content="1 matching document">
+  <meta name="lang:search.result.other" content="# matching documents">
+  <meta name="lang:search.tokenizer" content="[\s\-]+">
+
+  
+    <link href="https://fonts.gstatic.com/" rel="preconnect" crossorigin>
+    <link href="https://fonts.googleapis.com/css?family=Roboto+Mono:400,500,700|Roboto:300,400,400i,700&display=fallback" rel="stylesheet">
+
+    <style>
+      body,
+      input {
+        font-family: "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif
+      }
+
+      code,
+      kbd,
+      pre {
+        font-family: "Roboto Mono", "Courier New", Courier, monospace
+      }
+    </style>
+  
+
+  <link rel="stylesheet" href="../../../../_static/stylesheets/application.css"/>
+  <link rel="stylesheet" href="../../../../_static/stylesheets/application-palette.css"/>
+  <link rel="stylesheet" href="../../../../_static/stylesheets/application-fixes.css"/>
+  
+  <link rel="stylesheet" href="../../../../_static/fonts/material-icons.css"/>
+  
+  <meta name="theme-color" content="#3f51b5">
+  <script src="../../../../_static/javascripts/modernizr.js"></script>
+  
+  
+    <link rel="apple-touch-icon" href="../../../../_static/images/custom_favicon.png"/>
+  
+  
+    <title>kinoml.ml.lightning_modules &#8212; KinoML 0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=e7352e39" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/material.css?v=79c92029" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/twemoji.css?v=2199c511" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=eafc0fe6" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css?v=2a6c4383" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css?v=45cf7dbc" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css?v=d290406d" />
+    <script src="../../../../_static/documentation_options.js?v=2709fde1"></script>
+    <script src="../../../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="https://twemoji.maxcdn.com/v/latest/twemoji.min.js"></script>
+    <script src="../../../../_static/twemoji.js?v=a4381b3f"></script>
+    <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../../_static/copybutton.js?v=f281be69"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+    <link rel="icon" href="../../../../_static/custom_favicon.png"/>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="kinoml.ml.tensorflow_models" href="../tensorflow_models/index.html" />
+    <link rel="prev" title="kinoml.ml" href="../index.html" />
+  
+    <link rel="apple-touch-icon" href="../../../../_static/images/custom_favicon.png"/>
+  
+   
+
+  </head>
+  <body dir=ltr
+        data-md-color-primary=#3f51b5 data-md-color-accent=blue>
+  
+  <svg class="md-svg">
+    <defs data-children-count="0">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" width="416" height="448" viewBox="0 0 416 448" id="__github"><path fill="currentColor" d="M160 304q0 10-3.125 20.5t-10.75 19T128 352t-18.125-8.5-10.75-19T96 304t3.125-20.5 10.75-19T128 256t18.125 8.5 10.75 19T160 304zm160 0q0 10-3.125 20.5t-10.75 19T288 352t-18.125-8.5-10.75-19T256 304t3.125-20.5 10.75-19T288 256t18.125 8.5 10.75 19T320 304zm40 0q0-30-17.25-51T296 232q-10.25 0-48.75 5.25Q229.5 240 208 240t-39.25-2.75Q130.75 232 120 232q-29.5 0-46.75 21T56 304q0 22 8 38.375t20.25 25.75 30.5 15 35 7.375 37.25 1.75h42q20.5 0 37.25-1.75t35-7.375 30.5-15 20.25-25.75T360 304zm56-44q0 51.75-15.25 82.75-9.5 19.25-26.375 33.25t-35.25 21.5-42.5 11.875-42.875 5.5T212 416q-19.5 0-35.5-.75t-36.875-3.125-38.125-7.5-34.25-12.875T37 371.5t-21.5-28.75Q0 312 0 260q0-59.25 34-99-6.75-20.5-6.75-42.5 0-29 12.75-54.5 27 0 47.5 9.875t47.25 30.875Q171.5 96 212 96q37 0 70 8 26.25-20.5 46.75-30.25T376 64q12.75 25.5 12.75 54.5 0 21.75-6.75 42 34 40 34 99.5z"/></svg>
+      
+    </defs>
+  </svg>
+  
+  <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer">
+  <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search">
+  <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
+  <a href="#api/kinoml/ml/lightning_modules/index" tabindex="1" class="md-skip"> Skip to content </a>
+  <header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid">
+    <div class="md-flex navheader">
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <a href="../../../../index.html" title="KinoML 0.1 documentation"
+           class="md-header-nav__button md-logo">
+          
+            <i class="md-icon">&#xe6dd</i>
+          
+        </a>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <label class="md-icon md-icon--menu md-header-nav__button" for="__drawer"></label>
+      </div>
+      <div class="md-flex__cell md-flex__cell--stretch">
+        <div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
+          <span class="md-header-nav__topic">KinoML</span>
+          <span class="md-header-nav__topic"> kinoml.ml.lightning_modules </span>
+        </div>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <label class="md-icon md-icon--search md-header-nav__button" for="__search"></label>
+        
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" action="../../../../search.html" method="get" name="search">
+      <input type="text" class="md-search__input" name="q" placeholder=""Search""
+             autocapitalize="off" autocomplete="off" spellcheck="false"
+             data-md-component="query" data-md-state="active">
+      <label class="md-icon md-search__icon" for="__search"></label>
+      <button type="reset" class="md-icon md-search__icon" data-md-component="reset" tabindex="-1">
+        &#xE5CD;
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="result">
+          <div class="md-search-result__meta">
+            Type to start searching
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+      </div>
+      
+        <div class="md-flex__cell md-flex__cell--shrink">
+          <div class="md-header-nav__source">
+            <a href="https://github.com/openkinome/kinoml/" title="Go to repository" class="md-source" data-md-source="github">
+
+    <div class="md-source__icon">
+      <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24" width="28" height="28">
+        <use xlink:href="#__github" width="24" height="24"></use>
+      </svg>
+    </div>
+  
+  <div class="md-source__repository">
+    KinoML
+  </div>
+</a>
+          </div>
+        </div>
+      
+      
+    </div>
+  </nav>
+</header>
+
+  
+  <div class="md-container">
+    
+    
+    
+  <nav class="md-tabs" data-md-component="tabs">
+    <div class="md-tabs__inner md-grid">
+      <ul class="md-tabs__list">
+            
+            <li class="md-tabs__item"><a href="../../../../index.html" class="md-tabs__link">User guide</a></li>
+            
+            <li class="md-tabs__item"><a href="../../index.html" class="md-tabs__link">API Reference</a></li>
+            
+            <li class="md-tabs__item"><a href="https://openkinome.org" class="md-tabs__link">OpenKinome</a></li>
+          <li class="md-tabs__item"><a href="../../index.html" class="md-tabs__link"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml</span></code></a></li>
+          <li class="md-tabs__item"><a href="../index.html" class="md-tabs__link"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.ml</span></code></a></li>
+      </ul>
+    </div>
+  </nav>
+    <main class="md-main">
+      <div class="md-main__inner md-grid" data-md-component="container">
+        
+          <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+            <div class="md-sidebar__scrollwrap">
+              <div class="md-sidebar__inner">
+                <nav class="md-nav md-nav--primary" data-md-level="0">
+  <label class="md-nav__title md-nav__title--site" for="__drawer">
+    <a href="../../../../index.html" title="KinoML 0.1 documentation" class="md-nav__button md-logo">
+      
+        <i class="md-icon">&#xe6dd</i>
+      
+    </a>
+    <a href="../../../../index.html"
+       title="KinoML 0.1 documentation">KinoML</a>
+  </label>
+    <div class="md-nav__source">
+      <a href="https://github.com/openkinome/kinoml/" title="Go to repository" class="md-source" data-md-source="github">
+
+    <div class="md-source__icon">
+      <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24" width="28" height="28">
+        <use xlink:href="#__github" width="24" height="24"></use>
+      </svg>
+    </div>
+  
+  <div class="md-source__repository">
+    KinoML
+  </div>
+</a>
+    </div>
+  
+  
+
+  
+  <ul class="md-nav__list">
+    <li class="md-nav__item">
+    
+      <span class="md-nav__link caption"><span class="caption-text">User guide</span></span>
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="../../../../notebooks/getting_started.html" class="md-nav__link">Getting started with KinoML</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="../../../../notebooks/kinoml_object_model.html" class="md-nav__link">KinoML object model</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="../../../../notebooks/OpenEye_structural_featurizer.html" class="md-nav__link">OpenEye Structural Featurizer</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="../../../../notebooks/Schrodinger_structural_featurizer.html" class="md-nav__link">Schrodinger Structural Featurizer</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+      <span class="md-nav__link caption"><span class="caption-text">Experiment tutorials</span></span>
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="../../../../notebooks/ligand-only-smiles-EGFR.html" class="md-nav__link">Ligand-only SMILES experiment</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="../../../../notebooks/ligand-only-morgan1024-EGFR.html" class="md-nav__link">Ligand-only morgan 1024 experiment</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="../../../../notebooks/kinase-ligand-informed-smiles-sequence-EGFR.html" class="md-nav__link">Kinase informed SMILES experiment</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="../../../../notebooks/kinase-ligand-informed-morgan-composition-EGFR.html" class="md-nav__link">Kinase informed morgan 1024 experiment</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+      <span class="md-nav__link caption"><span class="caption-text">Developers</span></span>
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="../../index.html" class="md-nav__link">API Reference</a>
+      <ul class="md-nav__list"> 
+    <li class="md-nav__item">
+    
+    
+      <a href="../../index.html#subpackages" class="md-nav__link">Subpackages</a>
+      <ul class="md-nav__list"> 
+    <li class="md-nav__item">
+    
+    
+      <a href="../../analysis/index.html" class="md-nav__link"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.analysis</span></code></a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="../../core/index.html" class="md-nav__link"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.core</span></code></a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="../../databases/index.html" class="md-nav__link"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.databases</span></code></a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="../../datasets/index.html" class="md-nav__link"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.datasets</span></code></a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="../../docking/index.html" class="md-nav__link"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.docking</span></code></a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="../../features/index.html" class="md-nav__link"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.features</span></code></a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="../index.html" class="md-nav__link"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.ml</span></code></a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="../../modeling/index.html" class="md-nav__link"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.modeling</span></code></a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="../../optimize/index.html" class="md-nav__link"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.optimize</span></code></a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="../../workflows/index.html" class="md-nav__link"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.workflows</span></code></a>
+      
+    
+    </li></ul>
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="../../index.html#submodules" class="md-nav__link">Submodules</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="../../index.html#package-contents" class="md-nav__link">Package Contents</a>
+      
+    
+    </li></ul>
+    
+    </li>
+  </ul>
+  
+
+</nav>
+              </div>
+            </div>
+          </div>
+          <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+            <div class="md-sidebar__scrollwrap">
+              <div class="md-sidebar__inner">
+                
+<nav class="md-nav md-nav--secondary">
+    <label class="md-nav__title" for="__toc">"Contents"</label>
+  <ul class="md-nav__list" data-md-scrollfix="">
+        <li class="md-nav__item"><a href="#api-kinoml-ml-lightning-modules-index--page-root" class="md-nav__link"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.ml.lightning_modules</span></code></a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#module-contents" class="md-nav__link">Module Contents</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#kinoml.ml.lightning_modules.RootMeanSquaredError" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">RootMeanSquaredError</span></code></a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#kinoml.ml.lightning_modules.RootMeanSquaredError.compute" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">RootMeanSquaredError.compute()</span></code></a>
+        </li></ul>
+            </nav>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.ml.lightning_modules.ObservationModelModule" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">ObservationModelModule</span></code></a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#kinoml.ml.lightning_modules.ObservationModelModule.forward" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">ObservationModelModule.forward()</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.ml.lightning_modules.ObservationModelModule._standard_step" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">ObservationModelModule._standard_step()</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.ml.lightning_modules.ObservationModelModule.training_step" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">ObservationModelModule.training_step()</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.ml.lightning_modules.ObservationModelModule._common_validation_test_step" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">ObservationModelModule._common_validation_test_step()</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.ml.lightning_modules.ObservationModelModule._common_validation_test_epoch_end" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">ObservationModelModule._common_validation_test_epoch_end()</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.ml.lightning_modules.ObservationModelModule._disabled_validation_step" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">ObservationModelModule._disabled_validation_step()</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.ml.lightning_modules.ObservationModelModule._disabled_validation_epoch_end" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">ObservationModelModule._disabled_validation_epoch_end()</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.ml.lightning_modules.ObservationModelModule.test_step" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">ObservationModelModule.test_step()</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.ml.lightning_modules.ObservationModelModule.test_epoch_end" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">ObservationModelModule.test_epoch_end()</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.ml.lightning_modules.ObservationModelModule.configure_optimizers" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">ObservationModelModule.configure_optimizers()</span></code></a>
+        </li></ul>
+            </nav>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.ml.lightning_modules.MultiDataModule" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">MultiDataModule</span></code></a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#kinoml.ml.lightning_modules.MultiDataModule.active_dataset" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">MultiDataModule.active_dataset</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.ml.lightning_modules.MultiDataModule.active_dataset_index" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">MultiDataModule.active_dataset_index</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.ml.lightning_modules.MultiDataModule.dataset_indices_by_size" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">MultiDataModule.dataset_indices_by_size()</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.ml.lightning_modules.MultiDataModule._build_dataloader" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">MultiDataModule._build_dataloader()</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.ml.lightning_modules.MultiDataModule.train_dataloader" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">MultiDataModule.train_dataloader()</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.ml.lightning_modules.MultiDataModule.val_dataloader" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">MultiDataModule.val_dataloader()</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.ml.lightning_modules.MultiDataModule.test_dataloader" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">MultiDataModule.test_dataloader()</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.ml.lightning_modules.MultiDataModule.get_kfold" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">MultiDataModule.get_kfold()</span></code></a>
+        </li></ul>
+            </nav>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.ml.lightning_modules.CrossValidateTrainer" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">CrossValidateTrainer</span></code></a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#kinoml.ml.lightning_modules.CrossValidateTrainer.fit" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">CrossValidateTrainer.fit()</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.ml.lightning_modules.CrossValidateTrainer._patch_paths_for_kfold" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">CrossValidateTrainer._patch_paths_for_kfold()</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.ml.lightning_modules.CrossValidateTrainer.test" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">CrossValidateTrainer.test()</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.ml.lightning_modules.CrossValidateTrainer.best_run" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">CrossValidateTrainer.best_run()</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.ml.lightning_modules.CrossValidateTrainer.clear" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">CrossValidateTrainer.clear()</span></code></a>
+        </li></ul>
+            </nav>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.ml.lightning_modules.ObservationModelDataLoader" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">ObservationModelDataLoader</span></code></a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#kinoml.ml.lightning_modules.ObservationModelDataLoader.__iter__" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">ObservationModelDataLoader.__iter__()</span></code></a>
+        </li></ul>
+            </nav>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.ml.lightning_modules._IterWithObsModel" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">_IterWithObsModel</span></code></a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#kinoml.ml.lightning_modules._IterWithObsModel.__getattr__" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">_IterWithObsModel.__getattr__()</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.ml.lightning_modules._IterWithObsModel.__next__" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">_IterWithObsModel.__next__()</span></code></a>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.ml.lightning_modules._IterWithObsModel.__iter__" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">_IterWithObsModel.__iter__()</span></code></a>
+        </li></ul>
+            </nav>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.ml.lightning_modules.AttrList" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">AttrList</span></code></a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#kinoml.ml.lightning_modules.AttrList.__call__" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">AttrList.__call__()</span></code></a>
+        </li></ul>
+            </nav>
+        </li>
+        <li class="md-nav__item"><a href="#kinoml.ml.lightning_modules.KFold3Way" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">KFold3Way</span></code></a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#kinoml.ml.lightning_modules.KFold3Way.split" class="md-nav__link"><code class="docutils literal notranslate"><span class="pre">KFold3Way.split()</span></code></a>
+        </li></ul>
+            </nav>
+        </li></ul>
+            </nav>
+        </li></ul>
+            </nav>
+        </li>
+    
+
+<li id="searchbox" class="md-nav__item"></li>
+
+  </ul>
+</nav>
+              </div>
+            </div>
+          </div>
+        
+        <div class="md-content">
+          <article class="md-content__inner md-typeset" role="main">
+            
+  <section id="module-kinoml.ml.lightning_modules">
+<span id="kinoml-ml-lightning-modules"></span><h1 id="api-kinoml-ml-lightning-modules-index--page-root"><a class="reference internal" href="#api-kinoml-ml-lightning-modules-index--page-root" title="kinoml.ml.lightning_modules"><code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.ml.lightning_modules</span></code></a><a class="headerlink" href="#api-kinoml-ml-lightning-modules-index--page-root" title="Link to this heading">¶</a></h1>
+<p>Training loops built with pytorch-lightning</p>
+<p>WIP</p>
+<section id="module-contents">
+<h2 id="module-contents">Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="kinoml.ml.lightning_modules.RootMeanSquaredError">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">kinoml.ml.lightning_modules.</span></span><span class="sig-name descname"><span class="pre">RootMeanSquaredError</span></span><a class="headerlink" href="#kinoml.ml.lightning_modules.RootMeanSquaredError" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">pytorch_lightning.metrics.MeanSquaredError</span></code></p>
+<p>WIP</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.ml.lightning_modules.RootMeanSquaredError.compute">
+<span class="sig-name descname"><span class="pre">compute</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.RootMeanSquaredError.compute" title="Link to this definition">¶</a></dt>
+<dd><p>WIP</p>
+</dd></dl>
+</dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="kinoml.ml.lightning_modules.ObservationModelModule">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">kinoml.ml.lightning_modules.</span></span><span class="sig-name descname"><span class="pre">ObservationModelModule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nn_model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss_function</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.ObservationModelModule" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">pytorch_lightning.LightningModule</span></code></p>
+<p>WIP</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.ml.lightning_modules.ObservationModelModule.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">observation_model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">_null_observation_model</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.ObservationModelModule.forward" title="Link to this definition">¶</a></dt>
+<dd><p>WIP</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.ml.lightning_modules.ObservationModelModule._standard_step">
+<span class="sig-name descname"><span class="pre">_standard_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_idx</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.ObservationModelModule._standard_step" title="Link to this definition">¶</a></dt>
+<dd><p>WIP</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.ml.lightning_modules.ObservationModelModule.training_step">
+<span class="sig-name descname"><span class="pre">training_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_idx</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.ObservationModelModule.training_step" title="Link to this definition">¶</a></dt>
+<dd><p>WIP</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.ml.lightning_modules.ObservationModelModule._common_validation_test_step">
+<span class="sig-name descname"><span class="pre">_common_validation_test_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_idx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataloader_idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric_prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'val'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.ObservationModelModule._common_validation_test_step" title="Link to this definition">¶</a></dt>
+<dd><p>WIP</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.ml.lightning_modules.ObservationModelModule._common_validation_test_epoch_end">
+<span class="sig-name descname"><span class="pre">_common_validation_test_epoch_end</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_results</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric_prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'val'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.ObservationModelModule._common_validation_test_epoch_end" title="Link to this definition">¶</a></dt>
+<dd><p>WIP</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.ml.lightning_modules.ObservationModelModule._disabled_validation_step">
+<span class="sig-name descname"><span class="pre">_disabled_validation_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.ObservationModelModule._disabled_validation_step" title="Link to this definition">¶</a></dt>
+<dd><p>WIP</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.ml.lightning_modules.ObservationModelModule._disabled_validation_epoch_end">
+<span class="sig-name descname"><span class="pre">_disabled_validation_epoch_end</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.ObservationModelModule._disabled_validation_epoch_end" title="Link to this definition">¶</a></dt>
+<dd><p>WIP</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.ml.lightning_modules.ObservationModelModule.test_step">
+<span class="sig-name descname"><span class="pre">test_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.ObservationModelModule.test_step" title="Link to this definition">¶</a></dt>
+<dd><p>WIP</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.ml.lightning_modules.ObservationModelModule.test_epoch_end">
+<span class="sig-name descname"><span class="pre">test_epoch_end</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.ObservationModelModule.test_epoch_end" title="Link to this definition">¶</a></dt>
+<dd><p>WIP</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.ml.lightning_modules.ObservationModelModule.configure_optimizers">
+<span class="sig-name descname"><span class="pre">configure_optimizers</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.ObservationModelModule.configure_optimizers" title="Link to this definition">¶</a></dt>
+<dd><p>WIP</p>
+</dd></dl>
+</dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="kinoml.ml.lightning_modules.MultiDataModule">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">kinoml.ml.lightning_modules.</span></span><span class="sig-name descname"><span class="pre">MultiDataModule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">datasets</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">torch.utils.data.Dataset</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">observation_models</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">callable</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(_null_observation_model,)</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.MultiDataModule" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">pytorch_lightning.LightningDataModule</span></code></p>
+<p>WIP</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="kinoml.ml.lightning_modules.MultiDataModule.active_dataset">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">active_dataset</span></span><a class="headerlink" href="#kinoml.ml.lightning_modules.MultiDataModule.active_dataset" title="Link to this definition">¶</a></dt>
+<dd><p>WIP</p>
+</dd></dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="kinoml.ml.lightning_modules.MultiDataModule.active_dataset_index">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">active_dataset_index</span></span><a class="headerlink" href="#kinoml.ml.lightning_modules.MultiDataModule.active_dataset_index" title="Link to this definition">¶</a></dt>
+<dd><p>WIP</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.ml.lightning_modules.MultiDataModule.dataset_indices_by_size">
+<span class="sig-name descname"><span class="pre">dataset_indices_by_size</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reverse</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.MultiDataModule.dataset_indices_by_size" title="Link to this definition">¶</a></dt>
+<dd><p>WIP</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.ml.lightning_modules.MultiDataModule._build_dataloader">
+<span class="sig-name descname"><span class="pre">_build_dataloader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indices</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.MultiDataModule._build_dataloader" title="Link to this definition">¶</a></dt>
+<dd><p>WIP</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.ml.lightning_modules.MultiDataModule.train_dataloader">
+<span class="sig-name descname"><span class="pre">train_dataloader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.MultiDataModule.train_dataloader" title="Link to this definition">¶</a></dt>
+<dd><p>WIP</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.ml.lightning_modules.MultiDataModule.val_dataloader">
+<span class="sig-name descname"><span class="pre">val_dataloader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.MultiDataModule.val_dataloader" title="Link to this definition">¶</a></dt>
+<dd><p>WIP</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.ml.lightning_modules.MultiDataModule.test_dataloader">
+<span class="sig-name descname"><span class="pre">test_dataloader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.MultiDataModule.test_dataloader" title="Link to this definition">¶</a></dt>
+<dd><p>WIP</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.ml.lightning_modules.MultiDataModule.get_kfold">
+<span class="sig-name descname"><span class="pre">get_kfold</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nfolds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">with_validation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shuffle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.MultiDataModule.get_kfold" title="Link to this definition">¶</a></dt>
+<dd><p>WIP</p>
+</dd></dl>
+</dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="kinoml.ml.lightning_modules.CrossValidateTrainer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">kinoml.ml.lightning_modules.</span></span><span class="sig-name descname"><span class="pre">CrossValidateTrainer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nfolds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">with_validation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shuffle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.CrossValidateTrainer" title="Link to this definition">¶</a></dt>
+<dd><p>WIP</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.ml.lightning_modules.CrossValidateTrainer.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datamodule</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.CrossValidateTrainer.fit" title="Link to this definition">¶</a></dt>
+<dd><p>WIP</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.ml.lightning_modules.CrossValidateTrainer._patch_paths_for_kfold">
+<span class="sig-name descname"><span class="pre">_patch_paths_for_kfold</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fold_trainer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fold</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.CrossValidateTrainer._patch_paths_for_kfold" title="Link to this definition">¶</a></dt>
+<dd><p>WIP</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.ml.lightning_modules.CrossValidateTrainer.test">
+<span class="sig-name descname"><span class="pre">test</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.CrossValidateTrainer.test" title="Link to this definition">¶</a></dt>
+<dd><p>WIP</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.ml.lightning_modules.CrossValidateTrainer.best_run">
+<span class="sig-name descname"><span class="pre">best_run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.CrossValidateTrainer.best_run" title="Link to this definition">¶</a></dt>
+<dd><p>WIP</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.ml.lightning_modules.CrossValidateTrainer.clear">
+<span class="sig-name descname"><span class="pre">clear</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.CrossValidateTrainer.clear" title="Link to this definition">¶</a></dt>
+<dd><p>WIP</p>
+</dd></dl>
+</dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="kinoml.ml.lightning_modules.ObservationModelDataLoader">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">kinoml.ml.lightning_modules.</span></span><span class="sig-name descname"><span class="pre">ObservationModelDataLoader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">observation_model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">_null_observation_model</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.ObservationModelDataLoader" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.utils.data.DataLoader</span></code></p>
+<p>WIP</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.ml.lightning_modules.ObservationModelDataLoader.__iter__">
+<span class="sig-name descname"><span class="pre">__iter__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.ObservationModelDataLoader.__iter__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+</dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="kinoml.ml.lightning_modules._IterWithObsModel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">kinoml.ml.lightning_modules.</span></span><span class="sig-name descname"><span class="pre">_IterWithObsModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iterator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">observation_model</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules._IterWithObsModel" title="Link to this definition">¶</a></dt>
+<dd><p>WIP</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.ml.lightning_modules._IterWithObsModel.__getattr__">
+<span class="sig-name descname"><span class="pre">__getattr__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules._IterWithObsModel.__getattr__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.ml.lightning_modules._IterWithObsModel.__next__">
+<span class="sig-name descname"><span class="pre">__next__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules._IterWithObsModel.__next__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.ml.lightning_modules._IterWithObsModel.__iter__">
+<span class="sig-name descname"><span class="pre">__iter__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules._IterWithObsModel.__iter__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+</dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="kinoml.ml.lightning_modules.AttrList">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">kinoml.ml.lightning_modules.</span></span><span class="sig-name descname"><span class="pre">AttrList</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.AttrList" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code></p>
+<p>A subclass of list that can accept additional attributes.
+Should be able to be used just like a regular list.</p>
+<p>The problem:
+a = [1, 2, 4, 8]
+a.x = “Hey!” # AttributeError: ‘list’ object has no attribute ‘x’</p>
+<p>The solution:
+a = L(1, 2, 4, 8)
+a.x = “Hey!”
+print a       # [1, 2, 4, 8]
+print a.x     # “Hey!”
+print len(a)  # 4</p>
+<p>You can also do these:
+a = L( 1, 2, 4, 8 , x=”Hey!” )                 # [1, 2, 4, 8]
+a = L( 1, 2, 4, 8 )( x=”Hey!” )                # [1, 2, 4, 8]
+a = L( [1, 2, 4, 8] , x=”Hey!” )               # [1, 2, 4, 8]
+a = L( {1, 2, 4, 8} , x=”Hey!” )               # [1, 2, 4, 8]
+a = L( [2 ** b for b in range(4)] , x=”Hey!” ) # [1, 2, 4, 8]
+a = L( (2 ** b for b in range(4)) , x=”Hey!” ) # [1, 2, 4, 8]
+a = L( 2 ** b for b in range(4) )( x=”Hey!” )  # [1, 2, 4, 8]
+a = L( 2 )                                     # [2]</p>
+<p>Taken from <a class="reference external" href="https://code.activestate.com/recipes/579103-python-addset-attributes-to-list/">https://code.activestate.com/recipes/579103-python-addset-attributes-to-list/</a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.ml.lightning_modules.AttrList.__call__">
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.AttrList.__call__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+</dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="kinoml.ml.lightning_modules.KFold3Way">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">kinoml.ml.lightning_modules.</span></span><span class="sig-name descname"><span class="pre">KFold3Way</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_splits</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shuffle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.KFold3Way" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-obj docutils literal notranslate"><span class="pre">sklearn.model_selection.KFold</span></code></p>
+<p>WIP</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="kinoml.ml.lightning_modules.KFold3Way.split">
+<span class="sig-name descname"><span class="pre">split</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groups</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">with_validation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#kinoml.ml.lightning_modules.KFold3Way.split" title="Link to this definition">¶</a></dt>
+<dd><p>WIP</p>
+</dd></dl>
+</dd></dl>
+</section>
+</section>
+
+
+          </article>
+        </div>
+      </div>
+    </main>
+  </div>
+  <footer class="md-footer">
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid">
+          
+            <a href="../index.html" title="kinoml.ml"
+               class="md-flex md-footer-nav__link md-footer-nav__link--prev"
+               rel="prev">
+              <div class="md-flex__cell md-flex__cell--shrink">
+                <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
+              </div>
+              <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+                <span class="md-flex__ellipsis">
+                  <span
+                      class="md-footer-nav__direction"> "Previous" </span> <code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.ml</span></code> </span>
+              </div>
+            </a>
+          
+          
+            <a href="../tensorflow_models/index.html" title="kinoml.ml.tensorflow_models"
+               class="md-flex md-footer-nav__link md-footer-nav__link--next"
+               rel="next">
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title"><span
+                class="md-flex__ellipsis"> <span
+                class="md-footer-nav__direction"> "Next" </span> <code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml.ml.tensorflow_models</span></code> </span>
+            </div>
+            <div class="md-flex__cell md-flex__cell--shrink"><i
+                class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
+            </div>
+          
+        </a>
+        
+      </nav>
+    </div>
+    <div class="md-footer-meta md-typeset">
+      <div class="md-footer-meta__inner md-grid">
+        <div class="md-footer-copyright">
+          <div class="md-footer-copyright__highlight">
+              &#169; Copyright 2021, OpenKinome.
+              
+          </div>
+            Created using
+            <a href="http://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
+             and
+            <a href="https://github.com/bashtage/sphinx-material/">Material for
+              Sphinx</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+  <script src="../../../../_static/javascripts/application.js"></script>
+  <script>app.initialize({version: "1.0.4", url: {base: ".."}})</script>
+  </body>
+</html>

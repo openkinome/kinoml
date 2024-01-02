@@ -1,0 +1,1805 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <meta property="article:modified_time" content="2023-11-10T15:20:59+01:00" />
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="lang:clipboard.copy" content="Copy to clipboard">
+  <meta name="lang:clipboard.copied" content="Copied to clipboard">
+  <meta name="lang:search.language" content="en">
+  <meta name="lang:search.pipeline.stopwords" content="True">
+  <meta name="lang:search.pipeline.trimmer" content="True">
+  <meta name="lang:search.result.none" content="No matching documents">
+  <meta name="lang:search.result.one" content="1 matching document">
+  <meta name="lang:search.result.other" content="# matching documents">
+  <meta name="lang:search.tokenizer" content="[\s\-]+">
+
+  
+    <link href="https://fonts.gstatic.com/" rel="preconnect" crossorigin>
+    <link href="https://fonts.googleapis.com/css?family=Roboto+Mono:400,500,700|Roboto:300,400,400i,700&display=fallback" rel="stylesheet">
+
+    <style>
+      body,
+      input {
+        font-family: "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif
+      }
+
+      code,
+      kbd,
+      pre {
+        font-family: "Roboto Mono", "Courier New", Courier, monospace
+      }
+    </style>
+  
+
+  <link rel="stylesheet" href="../_static/stylesheets/application.css"/>
+  <link rel="stylesheet" href="../_static/stylesheets/application-palette.css"/>
+  <link rel="stylesheet" href="../_static/stylesheets/application-fixes.css"/>
+  
+  <link rel="stylesheet" href="../_static/fonts/material-icons.css"/>
+  
+  <meta name="theme-color" content="#3f51b5">
+  <script src="../_static/javascripts/modernizr.js"></script>
+  
+  
+    <link rel="apple-touch-icon" href="../_static/images/custom_favicon.png"/>
+  
+  
+    <title>OpenEye Structural Featurizer &#8212; KinoML 0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=e7352e39" />
+    <link rel="stylesheet" type="text/css" href="../_static/material.css?v=79c92029" />
+    <link rel="stylesheet" type="text/css" href="../_static/twemoji.css?v=2199c511" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=eafc0fe6" />
+    <link rel="stylesheet" type="text/css" href="../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css?v=2a6c4383" />
+    <link rel="stylesheet" type="text/css" href="../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css?v=45cf7dbc" />
+    <link rel="stylesheet" type="text/css" href="../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css?v=d290406d" />
+    <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
+    <script src="../_static/documentation_options.js?v=2709fde1"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="https://twemoji.maxcdn.com/v/latest/twemoji.min.js"></script>
+    <script src="../_static/twemoji.js?v=a4381b3f"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+    <script>window.MathJax = {"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}, "tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="icon" href="../_static/custom_favicon.png"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Schrodinger Structural Featurizer" href="Schrodinger_structural_featurizer.html" />
+    <link rel="prev" title="KinoML object model" href="kinoml_object_model.html" />
+  
+    <link rel="apple-touch-icon" href="../_static/images/custom_favicon.png"/>
+  
+   
+
+  </head>
+  <body dir=ltr
+        data-md-color-primary=#3f51b5 data-md-color-accent=blue>
+  
+  <svg class="md-svg">
+    <defs data-children-count="0">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" width="416" height="448" viewBox="0 0 416 448" id="__github"><path fill="currentColor" d="M160 304q0 10-3.125 20.5t-10.75 19T128 352t-18.125-8.5-10.75-19T96 304t3.125-20.5 10.75-19T128 256t18.125 8.5 10.75 19T160 304zm160 0q0 10-3.125 20.5t-10.75 19T288 352t-18.125-8.5-10.75-19T256 304t3.125-20.5 10.75-19T288 256t18.125 8.5 10.75 19T320 304zm40 0q0-30-17.25-51T296 232q-10.25 0-48.75 5.25Q229.5 240 208 240t-39.25-2.75Q130.75 232 120 232q-29.5 0-46.75 21T56 304q0 22 8 38.375t20.25 25.75 30.5 15 35 7.375 37.25 1.75h42q20.5 0 37.25-1.75t35-7.375 30.5-15 20.25-25.75T360 304zm56-44q0 51.75-15.25 82.75-9.5 19.25-26.375 33.25t-35.25 21.5-42.5 11.875-42.875 5.5T212 416q-19.5 0-35.5-.75t-36.875-3.125-38.125-7.5-34.25-12.875T37 371.5t-21.5-28.75Q0 312 0 260q0-59.25 34-99-6.75-20.5-6.75-42.5 0-29 12.75-54.5 27 0 47.5 9.875t47.25 30.875Q171.5 96 212 96q37 0 70 8 26.25-20.5 46.75-30.25T376 64q12.75 25.5 12.75 54.5 0 21.75-6.75 42 34 40 34 99.5z"/></svg>
+      
+    </defs>
+  </svg>
+  
+  <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer">
+  <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search">
+  <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
+  <a href="#notebooks/OpenEye_structural_featurizer" tabindex="1" class="md-skip"> Skip to content </a>
+  <header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid">
+    <div class="md-flex navheader">
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <a href="../index.html" title="KinoML 0.1 documentation"
+           class="md-header-nav__button md-logo">
+          
+            <i class="md-icon">&#xe6dd</i>
+          
+        </a>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <label class="md-icon md-icon--menu md-header-nav__button" for="__drawer"></label>
+      </div>
+      <div class="md-flex__cell md-flex__cell--stretch">
+        <div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
+          <span class="md-header-nav__topic">KinoML</span>
+          <span class="md-header-nav__topic"> OpenEye Structural Featurizer </span>
+        </div>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <label class="md-icon md-icon--search md-header-nav__button" for="__search"></label>
+        
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" action="../search.html" method="get" name="search">
+      <input type="text" class="md-search__input" name="q" placeholder=""Search""
+             autocapitalize="off" autocomplete="off" spellcheck="false"
+             data-md-component="query" data-md-state="active">
+      <label class="md-icon md-search__icon" for="__search"></label>
+      <button type="reset" class="md-icon md-search__icon" data-md-component="reset" tabindex="-1">
+        &#xE5CD;
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="result">
+          <div class="md-search-result__meta">
+            Type to start searching
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+      </div>
+      
+        <div class="md-flex__cell md-flex__cell--shrink">
+          <div class="md-header-nav__source">
+            <a href="https://github.com/openkinome/kinoml/" title="Go to repository" class="md-source" data-md-source="github">
+
+    <div class="md-source__icon">
+      <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24" width="28" height="28">
+        <use xlink:href="#__github" width="24" height="24"></use>
+      </svg>
+    </div>
+  
+  <div class="md-source__repository">
+    KinoML
+  </div>
+</a>
+          </div>
+        </div>
+      
+      
+    </div>
+  </nav>
+</header>
+
+  
+  <div class="md-container">
+    
+    
+    
+  <nav class="md-tabs" data-md-component="tabs">
+    <div class="md-tabs__inner md-grid">
+      <ul class="md-tabs__list">
+            
+            <li class="md-tabs__item"><a href="../index.html" class="md-tabs__link">User guide</a></li>
+            
+            <li class="md-tabs__item"><a href="../api/kinoml/index.html" class="md-tabs__link">API Reference</a></li>
+            
+            <li class="md-tabs__item"><a href="https://openkinome.org" class="md-tabs__link">OpenKinome</a></li>
+      </ul>
+    </div>
+  </nav>
+    <main class="md-main">
+      <div class="md-main__inner md-grid" data-md-component="container">
+        
+          <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+            <div class="md-sidebar__scrollwrap">
+              <div class="md-sidebar__inner">
+                <nav class="md-nav md-nav--primary" data-md-level="0">
+  <label class="md-nav__title md-nav__title--site" for="__drawer">
+    <a href="../index.html" title="KinoML 0.1 documentation" class="md-nav__button md-logo">
+      
+        <i class="md-icon">&#xe6dd</i>
+      
+    </a>
+    <a href="../index.html"
+       title="KinoML 0.1 documentation">KinoML</a>
+  </label>
+    <div class="md-nav__source">
+      <a href="https://github.com/openkinome/kinoml/" title="Go to repository" class="md-source" data-md-source="github">
+
+    <div class="md-source__icon">
+      <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24" width="28" height="28">
+        <use xlink:href="#__github" width="24" height="24"></use>
+      </svg>
+    </div>
+  
+  <div class="md-source__repository">
+    KinoML
+  </div>
+</a>
+    </div>
+  
+  
+
+  
+  <ul class="md-nav__list">
+    <li class="md-nav__item">
+    
+      <span class="md-nav__link caption"><span class="caption-text">User guide</span></span>
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="getting_started.html" class="md-nav__link">Getting started with KinoML</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="kinoml_object_model.html" class="md-nav__link">KinoML object model</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+    <label class="md-nav__link md-nav__link--active" for="__toc"> OpenEye Structural Featurizer </label>
+    
+      <a href="#" class="md-nav__link md-nav__link--active">OpenEye Structural Featurizer</a>
+      
+        
+<nav class="md-nav md-nav--secondary">
+    <label class="md-nav__title" for="__toc">"Contents"</label>
+  <ul class="md-nav__list" data-md-scrollfix="">
+        <li class="md-nav__item"><a href="#notebooks-openeye-structural-featurizer--page-root" class="md-nav__link">OpenEye Structural Featurizer</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#OEProteinStructureFeaturizer" class="md-nav__link">OEProteinStructureFeaturizer</a>
+        </li>
+        <li class="md-nav__item"><a href="#OEComplexFeaturizer" class="md-nav__link">OEComplexFeaturizer</a>
+        </li>
+        <li class="md-nav__item"><a href="#OEDockingFeaturizer" class="md-nav__link">OEDockingFeaturizer</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#Fred" class="md-nav__link">Fred</a>
+        </li>
+        <li class="md-nav__item"><a href="#Hybrid" class="md-nav__link">Hybrid</a>
+        </li>
+        <li class="md-nav__item"><a href="#Posit" class="md-nav__link">Posit</a>
+        </li></ul>
+            </nav>
+        </li>
+        <li class="md-nav__item"><a href="#MostSimilarPDBLigandFeaturizer" class="md-nav__link">MostSimilarPDBLigandFeaturizer</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#Most-common-substructure" class="md-nav__link">Most common substructure</a>
+        </li>
+        <li class="md-nav__item"><a href="#Fingerprint" class="md-nav__link">Fingerprint</a>
+        </li>
+        <li class="md-nav__item"><a href="#OpenEye&#39;s-shape" class="md-nav__link">OpenEye’s shape</a>
+        </li>
+        <li class="md-nav__item"><a href="#Pipeline-of-MostSimilarPDBLigandFeaturizer-and-OEDockingFeaturizer" class="md-nav__link">Pipeline of MostSimilarPDBLigandFeaturizer and OEDockingFeaturizer</a>
+        </li></ul>
+            </nav>
+        </li>
+        <li class="md-nav__item"><a href="#KLIFSConformationTemplatesFeaturizer" class="md-nav__link">KLIFSConformationTemplatesFeaturizer</a>
+        </li></ul>
+            </nav>
+        </li>
+    
+<li class="md-nav__item"><a class="md-nav__extra_link" href="../_sources/notebooks/OpenEye_structural_featurizer.nblink.txt">Show Source</a> </li>
+
+  </ul>
+</nav>
+      <ul class="md-nav__list"> 
+    <li class="md-nav__item">
+    
+    
+      <a href="#OEProteinStructureFeaturizer" class="md-nav__link">OEProteinStructureFeaturizer</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="#OEComplexFeaturizer" class="md-nav__link">OEComplexFeaturizer</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="#OEDockingFeaturizer" class="md-nav__link">OEDockingFeaturizer</a>
+      <ul class="md-nav__list"> 
+    <li class="md-nav__item">
+    
+    
+      <a href="#Fred" class="md-nav__link">Fred</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="#Hybrid" class="md-nav__link">Hybrid</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="#Posit" class="md-nav__link">Posit</a>
+      
+    
+    </li></ul>
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="#MostSimilarPDBLigandFeaturizer" class="md-nav__link">MostSimilarPDBLigandFeaturizer</a>
+      <ul class="md-nav__list"> 
+    <li class="md-nav__item">
+    
+    
+      <a href="#Most-common-substructure" class="md-nav__link">Most common substructure</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="#Fingerprint" class="md-nav__link">Fingerprint</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="#OpenEye&#39;s-shape" class="md-nav__link">OpenEye’s shape</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="#Pipeline-of-MostSimilarPDBLigandFeaturizer-and-OEDockingFeaturizer" class="md-nav__link">Pipeline of MostSimilarPDBLigandFeaturizer and OEDockingFeaturizer</a>
+      
+    
+    </li></ul>
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="#KLIFSConformationTemplatesFeaturizer" class="md-nav__link">KLIFSConformationTemplatesFeaturizer</a>
+      
+    
+    </li></ul>
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="Schrodinger_structural_featurizer.html" class="md-nav__link">Schrodinger Structural Featurizer</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+      <span class="md-nav__link caption"><span class="caption-text">Experiment tutorials</span></span>
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="ligand-only-smiles-EGFR.html" class="md-nav__link">Ligand-only SMILES experiment</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="ligand-only-morgan1024-EGFR.html" class="md-nav__link">Ligand-only morgan 1024 experiment</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="kinase-ligand-informed-smiles-sequence-EGFR.html" class="md-nav__link">Kinase informed SMILES experiment</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="kinase-ligand-informed-morgan-composition-EGFR.html" class="md-nav__link">Kinase informed morgan 1024 experiment</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+      <span class="md-nav__link caption"><span class="caption-text">Developers</span></span>
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="../api/kinoml/index.html" class="md-nav__link">API Reference</a>
+      
+    
+    </li>
+  </ul>
+  
+
+</nav>
+              </div>
+            </div>
+          </div>
+          <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+            <div class="md-sidebar__scrollwrap">
+              <div class="md-sidebar__inner">
+                
+<nav class="md-nav md-nav--secondary">
+    <label class="md-nav__title" for="__toc">"Contents"</label>
+  <ul class="md-nav__list" data-md-scrollfix="">
+        <li class="md-nav__item"><a href="#notebooks-openeye-structural-featurizer--page-root" class="md-nav__link">OpenEye Structural Featurizer</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#OEProteinStructureFeaturizer" class="md-nav__link">OEProteinStructureFeaturizer</a>
+        </li>
+        <li class="md-nav__item"><a href="#OEComplexFeaturizer" class="md-nav__link">OEComplexFeaturizer</a>
+        </li>
+        <li class="md-nav__item"><a href="#OEDockingFeaturizer" class="md-nav__link">OEDockingFeaturizer</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#Fred" class="md-nav__link">Fred</a>
+        </li>
+        <li class="md-nav__item"><a href="#Hybrid" class="md-nav__link">Hybrid</a>
+        </li>
+        <li class="md-nav__item"><a href="#Posit" class="md-nav__link">Posit</a>
+        </li></ul>
+            </nav>
+        </li>
+        <li class="md-nav__item"><a href="#MostSimilarPDBLigandFeaturizer" class="md-nav__link">MostSimilarPDBLigandFeaturizer</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#Most-common-substructure" class="md-nav__link">Most common substructure</a>
+        </li>
+        <li class="md-nav__item"><a href="#Fingerprint" class="md-nav__link">Fingerprint</a>
+        </li>
+        <li class="md-nav__item"><a href="#OpenEye&#39;s-shape" class="md-nav__link">OpenEye’s shape</a>
+        </li>
+        <li class="md-nav__item"><a href="#Pipeline-of-MostSimilarPDBLigandFeaturizer-and-OEDockingFeaturizer" class="md-nav__link">Pipeline of MostSimilarPDBLigandFeaturizer and OEDockingFeaturizer</a>
+        </li></ul>
+            </nav>
+        </li>
+        <li class="md-nav__item"><a href="#KLIFSConformationTemplatesFeaturizer" class="md-nav__link">KLIFSConformationTemplatesFeaturizer</a>
+        </li></ul>
+            </nav>
+        </li>
+    
+<li class="md-nav__item"><a class="md-nav__extra_link" href="../_sources/notebooks/OpenEye_structural_featurizer.nblink.txt">Show Source</a> </li>
+
+<li id="searchbox" class="md-nav__item"></li>
+
+  </ul>
+</nav>
+              </div>
+            </div>
+          </div>
+        
+        <div class="md-content">
+          <article class="md-content__inner md-typeset" role="main">
+            
+  <section id="OpenEye-Structural-Featurizer">
+<h1 id="notebooks-openeye-structural-featurizer--page-root">OpenEye Structural Featurizer<a class="headerlink" href="#notebooks-openeye-structural-featurizer--page-root" title="Link to this heading">¶</a></h1>
+<p>This notebook introduces structural modeling featurizers using the <a class="reference external" href="https://docs.eyesopen.com/toolkits/python/index.html">OpenEye toolkits</a> to prepare protein structures and to dock small molecules into their binding sites.</p>
+<p><strong>Note:</strong> All structural featurizers fetch data and/or do expensive computations. Hence, fetched data (e.g. PDB structures) and intermediate results (e.g. a prepared protein structure) are stored in a cache directory to speed up calculations when featurizing the same or similar systems multiple times. The cache directory can be specified via the <code class="docutils literal notranslate"><span class="pre">cache_dir</span></code> parameter, but also has a default (<code class="docutils literal notranslate"><span class="pre">user_cache_dir</span></code> from <code class="docutils literal notranslate"><span class="pre">appdirs</span></code>). In case you update your KinoML version you should consider
+deleting the cache directory. Otherwise, you may get results from the former KinoML version, since the intermediate results will be taken from cache.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%capture</span> --no-display
+<span class="kn">from</span> <span class="nn">importlib</span> <span class="kn">import</span> <span class="n">resources</span>
+<span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">from</span> <span class="nn">appdirs</span> <span class="kn">import</span> <span class="n">user_cache_dir</span>
+
+<span class="kn">from</span> <span class="nn">kinoml.core.ligands</span> <span class="kn">import</span> <span class="n">Ligand</span>
+<span class="kn">from</span> <span class="nn">kinoml.core.proteins</span> <span class="kn">import</span> <span class="n">Protein</span><span class="p">,</span> <span class="n">KLIFSKinase</span>
+<span class="kn">from</span> <span class="nn">kinoml.core.systems</span> <span class="kn">import</span> <span class="n">ProteinSystem</span><span class="p">,</span> <span class="n">ProteinLigandComplex</span>
+<span class="kn">from</span> <span class="nn">kinoml.features.core</span> <span class="kn">import</span> <span class="n">Pipeline</span>
+<span class="kn">from</span> <span class="nn">kinoml.features.protein</span> <span class="kn">import</span> <span class="n">OEProteinStructureFeaturizer</span>
+<span class="kn">from</span> <span class="nn">kinoml.features.complexes</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">OEComplexFeaturizer</span><span class="p">,</span>
+    <span class="n">OEDockingFeaturizer</span><span class="p">,</span>
+    <span class="n">MostSimilarPDBLigandFeaturizer</span><span class="p">,</span>
+    <span class="n">KLIFSConformationTemplatesFeaturizer</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<section id="OEProteinStructureFeaturizer">
+<h2 id="OEProteinStructureFeaturizer">OEProteinStructureFeaturizer<a class="headerlink" href="#OEProteinStructureFeaturizer" title="Link to this heading">¶</a></h2>
+<p>All OpenEye Featurizers come with an extensive doc string explaining the capabilities and requirements.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">inspect</span><span class="o">.</span><span class="n">getdoc</span><span class="p">(</span><span class="n">OEProteinStructureFeaturizer</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Given systems with exactly one protein, prepare the protein structure by:
+
+ - modeling missing loops with OESpruce according to the PDB header unless
+   a custom sequence is specified via the `uniprot_id` or `sequence`
+   attribute in the protein component (see below), missing sequences at
+   N- and C-termini are not modeled
+ - building missing side chains
+ - substitutions, deletions and insertions, if a `uniprot_id` or `sequence`
+   attribute is provided for the protein component alteration will be
+   modeled with OESpruce, if an alteration could not be modeled, the
+   corresponding mismatch in the structure will be deleted
+ - removing everything but protein and water
+ - protonation at pH 7.4
+
+The protein component of each system must be a `core.proteins.Protein`
+or a subclass thereof, must be initialized with toolkit='OpenEye' and
+give access to a molecular structure, e.g. via a pdb_id. Additionally,
+the protein component can have the following optional attributes to
+customize the protein modeling:
+
+ - `name`: A string specifying the name of the protein, will be used for
+    generating the output file name.
+ - `chain_id`: A string specifying which chain should be used.
+ - `alternate_location`: A string specifying which alternate location
+    should be used.
+ - `expo_id`: A string specifying a ligand bound to the protein of
+   interest. This is especially useful if multiple proteins are found in
+   one PDB structure.
+ - `uniprot_id`: A string specifying the UniProt ID that will be used to
+   fetch the amino acid sequence from UniProt, which will be used for
+   modeling the protein. This will supersede the sequence information
+   given in the PDB header.
+ - `sequence`: A  string specifying the amino acid sequence in
+   one-letter-codes that should be used during modeling the protein. This
+   will supersede a given `uniprot_id` and the sequence information given
+   in the PDB header.
+
+Parameters
+----------
+loop_db: str
+    The path to the loop database used by OESpruce to model missing loops.
+cache_dir: str, Path or None, default=None
+    Path to directory used for saving intermediate files. If None, default
+    location provided by `appdirs.user_cache_dir()` will be used.
+output_dir: str, Path or None, default=None
+    Path to directory used for saving output files. If None, output
+    structures will not be saved.
+use_multiprocessing : bool, default=True
+    If multiprocessing to use.
+n_processes : int or None, default=None
+    How many processes to use in case of multiprocessing. Defaults to
+    number of available CPUs.
+</pre></div></div>
+</div>
+<p>In general these featurizers will work with a minimal amount of information, e.g. just a PDB ID. However, it is recommended to be explicit as possible when defining the systems to featurize. For example, if a given PDB entry has multiple chains and ligands, the featurizer will have to guess which chain and ligand is of interest if not explicitly stated.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># collect systems to featurize, i.e. prepare the protein structure</span>
+<span class="n">systems</span> <span class="o">=</span> <span class="p">[]</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># unspecifc definition of the system, only via PDB ID</span>
+<span class="c1"># modeling will be performed according to the sequence stored in the PDB Header</span>
+<span class="n">protein</span> <span class="o">=</span> <span class="n">Protein</span><span class="p">(</span><span class="n">pdb_id</span><span class="o">=</span><span class="s2">"4f8o"</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"PsaA"</span><span class="p">)</span>
+<span class="n">system</span> <span class="o">=</span> <span class="n">ProteinSystem</span><span class="p">(</span><span class="n">components</span><span class="o">=</span><span class="p">[</span><span class="n">protein</span><span class="p">])</span>
+<span class="n">systems</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">system</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># more specific definition of the system, protein of chain A co-crystallized with ligand AES and</span>
+<span class="c1"># alternate location B, modeling will be performed according to the sequence of the given</span>
+<span class="c1"># UniProt ID</span>
+<span class="n">protein</span> <span class="o">=</span> <span class="n">Protein</span><span class="o">.</span><span class="n">from_pdb</span><span class="p">(</span><span class="n">pdb_id</span><span class="o">=</span><span class="s2">"4f8o"</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"PsaA"</span><span class="p">)</span>
+<span class="n">protein</span><span class="o">.</span><span class="n">uniprot_id</span> <span class="o">=</span> <span class="s2">"P31522"</span>
+<span class="n">protein</span><span class="o">.</span><span class="n">chain_id</span> <span class="o">=</span> <span class="s2">"A"</span>
+<span class="n">protein</span><span class="o">.</span><span class="n">alternate_location</span> <span class="o">=</span> <span class="s2">"B"</span>
+<span class="n">protein</span><span class="o">.</span><span class="n">expo_id</span> <span class="o">=</span> <span class="s2">"AES"</span>
+<span class="n">system</span> <span class="o">=</span> <span class="n">ProteinSystem</span><span class="p">(</span><span class="n">components</span><span class="o">=</span><span class="p">[</span><span class="n">protein</span><span class="p">])</span>
+<span class="n">systems</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">system</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># use a protein structure form file</span>
+<span class="k">with</span> <span class="n">resources</span><span class="o">.</span><span class="n">path</span><span class="p">(</span><span class="s2">"kinoml.data.proteins"</span><span class="p">,</span> <span class="s2">"4f8o_edit.pdb"</span><span class="p">)</span> <span class="k">as</span> <span class="n">structure_path</span><span class="p">:</span>
+    <span class="k">pass</span>
+<span class="n">protein</span> <span class="o">=</span> <span class="n">Protein</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="n">file_path</span><span class="o">=</span><span class="n">structure_path</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"PsaA"</span><span class="p">)</span>
+<span class="n">protein</span><span class="o">.</span><span class="n">uniprot_id</span> <span class="o">=</span> <span class="s2">"P31522"</span>
+<span class="n">system</span> <span class="o">=</span> <span class="n">ProteinSystem</span><span class="p">(</span><span class="n">components</span><span class="o">=</span><span class="p">[</span><span class="n">protein</span><span class="p">])</span>
+<span class="n">systems</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">system</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">resources</span><span class="o">.</span><span class="n">path</span><span class="p">(</span><span class="s2">"kinoml.data.proteins"</span><span class="p">,</span> <span class="s2">"kinoml_tests_4f8o_spruce.loop_db"</span><span class="p">)</span> <span class="k">as</span> <span class="n">loop_db</span><span class="p">:</span>
+    <span class="k">pass</span>
+<span class="n">featurizer</span> <span class="o">=</span> <span class="n">OEProteinStructureFeaturizer</span><span class="p">(</span>
+    <span class="n">loop_db</span><span class="o">=</span><span class="n">loop_db</span><span class="p">,</span>
+    <span class="n">output_dir</span><span class="o">=</span><span class="n">user_cache_dir</span><span class="p">()</span> <span class="o">+</span> <span class="s2">"/protein"</span><span class="p">,</span>
+    <span class="n">use_multiprocessing</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%capture</span> --no-display
+<span class="n">systems</span> <span class="o">=</span> <span class="n">featurizer</span><span class="o">.</span><span class="n">featurize</span><span class="p">(</span><span class="n">systems</span><span class="p">)</span>
+<span class="n">systems</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "46546397b38a4b87aa3e9675174939ad", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[&lt;ProteinSystem with 1 components (&lt;Protein name=PsaA&gt;)&gt;,
+ &lt;ProteinSystem with 1 components (&lt;Protein name=PsaA&gt;)&gt;,
+ &lt;ProteinSystem with 1 components (&lt;Protein name=PsaA&gt;)&gt;]
+</pre></div></div>
+</div>
+<p>The featurizers will return the featurized systems as an <a class="reference external" href="https://www.mdanalysis.org/">MDAnalysis universe</a>. Systems that failed will be filtered out. In case one is interested in failures, one can enable logging messages via:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>import logging
+logging.basicConfig(level=logging.DEBUG)
+</pre></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">systems</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;ProteinSystem with 1 components (&lt;Protein name=PsaA&gt;)&gt;
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">systems</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">featurizations</span><span class="p">[</span><span class="s2">"last"</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;Universe with 2381 atoms&gt;
+</pre></div></div>
+</div>
+<p>If an <code class="docutils literal notranslate"><span class="pre">output_dir</span></code> was provided, the prepared structure is saved in PDB and OEB format.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">user_cache_dir</span><span class="p">()</span> <span class="o">+</span> <span class="s2">"/protein"</span><span class="p">)</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">"*"</span><span class="p">)):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+kinoml_OEProteinStructureFeaturizer_PsaA_4f8o_chainA_altlocB_protein.oeb
+kinoml_OEProteinStructureFeaturizer_PsaA_4f8o_chainA_altlocB_protein.pdb
+kinoml_OEProteinStructureFeaturizer_PsaA_4f8o_edit_protein.oeb
+kinoml_OEProteinStructureFeaturizer_PsaA_4f8o_edit_protein.pdb
+kinoml_OEProteinStructureFeaturizer_PsaA_4f8o_protein.oeb
+kinoml_OEProteinStructureFeaturizer_PsaA_4f8o_protein.pdb
+</pre></div></div>
+</div>
+</section>
+<section id="OEComplexFeaturizer">
+<h2 id="OEComplexFeaturizer">OEComplexFeaturizer<a class="headerlink" href="#OEComplexFeaturizer" title="Link to this heading">¶</a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">inspect</span><span class="o">.</span><span class="n">getdoc</span><span class="p">(</span><span class="n">OEComplexFeaturizer</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Given systems with exactly one protein and one ligand, prepare the complex
+structure by:
+
+ - modeling missing loops with OESpruce according to the PDB header unless
+   a custom sequence is specified via the `uniprot_id` or `sequence`
+   attribute in the protein component (see below), missing sequences at
+   N- and C-termini are not modeled
+ - building missing side chains
+ - substitutions, deletions and insertions, if a `uniprot_id` or `sequence`
+   attribute is provided for the protein component alteration will be
+   modeled with OESpruce, if an alteration could not be modeled, the
+   corresponding mismatch in the structure will be deleted
+ - removing everything but protein, water and ligand of interest
+ - protonation at pH 7.4
+
+The protein component of each system must be a `core.proteins.Protein` or
+a subclass thereof, must be initialized with toolkit='OpenEye' and give
+access to the molecular structure, e.g. via a pdb_id. Additionally, the
+protein component can have the following optional attributes to customize
+the protein modeling:
+
+ - `name`: A string specifying the name of the protein, will be used for
+   generating the output file name.
+ - `chain_id`: A string specifying which chain should be used.
+ - `alternate_location`: A string specifying which alternate location
+   should be used.
+ - `expo_id`: A string specifying the ligand of interest. This is
+   especially useful if multiple ligands are present in a PDB structure.
+ - `uniprot_id`: A string specifying the UniProt ID that will be used to
+   fetch the amino acid sequence from UniProt, which will be used for
+   modeling the protein. This will supersede the sequence information
+   given in the PDB header.
+ - `sequence`: A string specifying the amino acid sequence in
+   one-letter-codes that should be used during modeling the protein. This
+   will supersede a given `uniprot_id` and the sequence information given
+   in the PDB header.
+
+The ligand component of each system must be a `core.components.BaseLigand`
+or a subclass thereof. The ligand component can have the following
+optional attributes:
+
+ - `name`: A string specifying the name of the ligand, will be used for
+   generating the output file name.
+
+Parameters
+----------
+loop_db: str
+    The path to the loop database used by OESpruce to model missing loops.
+cache_dir: str, Path or None, default=None
+    Path to directory used for saving intermediate files. If None, default
+    location provided by `appdirs.user_cache_dir()` will be used.
+output_dir: str, Path or None, default=None
+    Path to directory used for saving output files. If None, output
+    structures will not be saved.
+use_multiprocessing : bool, default=True
+    If multiprocessing to use.
+n_processes : int or None, default=None
+    How many processes to use in case of multiprocessing. Defaults to
+    number of available CPUs.
+
+Note
+----
+If the ligand of interest is covalently bonded to the protein, the
+covalent bond will be broken. This may lead to the transformation of the
+ligand into a radical.
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">systems</span> <span class="o">=</span> <span class="p">[]</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">protein</span> <span class="o">=</span> <span class="n">Protein</span><span class="p">(</span><span class="n">pdb_id</span><span class="o">=</span><span class="s2">"4f8o"</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"PsaA"</span><span class="p">)</span>
+<span class="n">ligand</span> <span class="o">=</span> <span class="n">Ligand</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"AEBSF"</span><span class="p">)</span>
+<span class="n">system</span> <span class="o">=</span> <span class="n">ProteinLigandComplex</span><span class="p">(</span><span class="n">components</span><span class="o">=</span><span class="p">[</span><span class="n">protein</span><span class="p">,</span> <span class="n">ligand</span><span class="p">])</span>
+<span class="n">systems</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">system</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">protein</span> <span class="o">=</span> <span class="n">Protein</span><span class="o">.</span><span class="n">from_pdb</span><span class="p">(</span><span class="n">pdb_id</span><span class="o">=</span><span class="s2">"4f8o"</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"PsaA"</span><span class="p">)</span>
+<span class="n">protein</span><span class="o">.</span><span class="n">uniprot_id</span> <span class="o">=</span> <span class="s2">"P31522"</span>
+<span class="n">protein</span><span class="o">.</span><span class="n">chain_id</span> <span class="o">=</span> <span class="s2">"A"</span>
+<span class="n">protein</span><span class="o">.</span><span class="n">alternate_location</span> <span class="o">=</span> <span class="s2">"B"</span>
+<span class="n">protein</span><span class="o">.</span><span class="n">expo_id</span> <span class="o">=</span> <span class="s2">"AES"</span>
+<span class="n">ligand</span> <span class="o">=</span> <span class="n">Ligand</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"AEBSF"</span><span class="p">)</span>
+<span class="n">system</span> <span class="o">=</span> <span class="n">ProteinLigandComplex</span><span class="p">(</span><span class="n">components</span><span class="o">=</span><span class="p">[</span><span class="n">protein</span><span class="p">,</span> <span class="n">ligand</span><span class="p">])</span>
+<span class="n">systems</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">system</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">featurizer</span> <span class="o">=</span> <span class="n">OEComplexFeaturizer</span><span class="p">(</span>
+    <span class="n">output_dir</span><span class="o">=</span><span class="n">user_cache_dir</span><span class="p">()</span> <span class="o">+</span> <span class="s2">"/complex"</span><span class="p">,</span>
+    <span class="n">use_multiprocessing</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%capture</span> --no-display
+<span class="n">systems</span> <span class="o">=</span> <span class="n">featurizer</span><span class="o">.</span><span class="n">featurize</span><span class="p">(</span><span class="n">systems</span><span class="p">)</span>
+<span class="n">systems</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "5ed545e3ba934fa0b4e7f0c5930d51f3", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[&lt;ProteinLigandComplex with 2 components (&lt;Protein name=PsaA&gt;, &lt;Ligand name=AEBSF&gt;)&gt;,
+ &lt;ProteinLigandComplex with 2 components (&lt;Protein name=PsaA&gt;, &lt;Ligand name=AEBSF&gt;)&gt;]
+</pre></div></div>
+</div>
+<p>If an <code class="docutils literal notranslate"><span class="pre">output_dir</span></code> was provided, the prepared structure is saved in PDB and OEB format, the prepared ligand is additionally saved in SDF format.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">user_cache_dir</span><span class="p">()</span> <span class="o">+</span> <span class="s2">"/complex"</span><span class="p">)</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">"*"</span><span class="p">)):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+kinoml_OEComplexFeaturizer_PsaA_4f8o_AEBSF_complex.oeb
+kinoml_OEComplexFeaturizer_PsaA_4f8o_AEBSF_complex.pdb
+kinoml_OEComplexFeaturizer_PsaA_4f8o_AEBSF_ligand.sdf
+kinoml_OEComplexFeaturizer_PsaA_4f8o_AEBSF_protein.oeb
+kinoml_OEComplexFeaturizer_PsaA_4f8o_AEBSF_protein.pdb
+kinoml_OEComplexFeaturizer_PsaA_4f8o_chainA_altlocB_AEBSF_complex.oeb
+kinoml_OEComplexFeaturizer_PsaA_4f8o_chainA_altlocB_AEBSF_complex.pdb
+kinoml_OEComplexFeaturizer_PsaA_4f8o_chainA_altlocB_AEBSF_ligand.sdf
+kinoml_OEComplexFeaturizer_PsaA_4f8o_chainA_altlocB_AEBSF_protein.oeb
+kinoml_OEComplexFeaturizer_PsaA_4f8o_chainA_altlocB_AEBSF_protein.pdb
+</pre></div></div>
+</div>
+</section>
+<section id="OEDockingFeaturizer">
+<h2 id="OEDockingFeaturizer">OEDockingFeaturizer<a class="headerlink" href="#OEDockingFeaturizer" title="Link to this heading">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">OEDockingFeaturizer</span></code> supports <a class="reference external" href="https://docs.eyesopen.com/toolkits/python/dockingtk/index.html">3 docking methods</a>, i.e.: - <strong>Fred</strong> - standard docking protocol - <strong>Hybrid</strong> - biased by co-crystallized ligand - <strong>Posit</strong> - bias depends on the similarity to the co-crystallized ligand</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">inspect</span><span class="o">.</span><span class="n">getdoc</span><span class="p">(</span><span class="n">OEDockingFeaturizer</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Given systems with exactly one protein and one ligand, prepare the
+structure and dock the ligand into the prepared protein structure with
+one of OpenEye's docking algorithms:
+
+ - modeling missing loops with OESpruce according to the PDB header unless
+   a custom sequence is specified via the `uniprot_id` or `sequence`
+   attribute in the protein component (see below), missing sequences at
+   N- and C-termini are not modeled
+ - building missing side chains
+ - substitutions, deletions and insertions, if a `uniprot_id` or `sequence`
+   attribute is provided for the protein component alteration will be
+   modeled with OESpruce, if an alteration could not be modeled, the
+   corresponding mismatch in the structure will be deleted
+ - removing everything but protein, water and ligand of interest
+ - protonation at pH 7.4
+ - perform docking
+
+The protein component of each system must be a `core.proteins.Protein` or
+a subclass thereof, must be initialized with toolkit='OpenEye' and give
+access to the molecular structure, e.g. via a pdb_id. Additionally, the
+protein component can have the following optional attributes to customize
+the protein modeling:
+
+ - `name`: A string specifying the name of the protein, will be used for
+   generating the output file name.
+ - `chain_id`: A string specifying which chain should be used.
+ - `alternate_location`: A string specifying which alternate location
+   should be used.
+ - `expo_id`: A string specifying a ligand bound to the protein of
+   interest. This is especially useful if multiple proteins are found in
+   one PDB structure.
+ - `uniprot_id`: A string specifying the UniProt ID that will be used to
+   fetch the amino acid sequence from UniProt, which will be used for
+   modeling the protein. This will supersede the sequence information
+   given in the PDB header.
+ - `sequence`: A string specifying the amino acid sequence in
+   one-letter-codes that should be used during modeling the protein. This
+   will supersede a given `uniprot_id` and the sequence information given
+   in the PDB header.
+ - `pocket_resids`: List of integers specifying the residues in the
+   binding pocket of interest. This attribute is required if docking with
+   Fred into an apo structure.
+
+The ligand component of each system must be a `core.ligands.Ligand` or a
+subclass thereof and give access to the molecular structure, e.g. via a
+SMILES. Additionally, the ligand component can have the following optional
+attributes:
+
+ - `name`: A string specifying the name of the ligand, will be used for
+   generating the output file name.
+
+Parameters
+----------
+method: str, default="Posit"
+    The docking method to use ["Fred", "Hybrid", "Posit"].
+loop_db: str
+    The path to the loop database used by OESpruce to model missing loops.
+cache_dir: str, Path or None, default=None
+    Path to directory used for saving intermediate files. If None, default
+    location provided by `appdirs.user_cache_dir()` will be used.
+output_dir: str, Path or None, default=None
+    Path to directory used for saving output files. If None, output
+    structures will not be saved.
+use_multiprocessing : bool, default=True
+    If multiprocessing to use.
+n_processes : int or None, default=None
+    How many processes to use in case of multiprocessing. Defaults to
+    number of available CPUs.
+pKa_norm: bool, default=True
+    Assign the predominant ionization state of the molecules to dock at pH
+    ~7.4. If False, the ionization state of the input molecules will be
+    conserved.
+</pre></div></div>
+</div>
+<section id="Fred">
+<h3 id="Fred">Fred<a class="headerlink" href="#Fred" title="Link to this heading">¶</a></h3>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">systems</span> <span class="o">=</span> <span class="p">[]</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># define the binding site for docking via co-crystallized ligand</span>
+<span class="n">protein</span> <span class="o">=</span> <span class="n">Protein</span><span class="p">(</span><span class="n">pdb_id</span><span class="o">=</span><span class="s2">"4yne"</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"NTRK1"</span><span class="p">)</span>
+<span class="n">protein</span><span class="o">.</span><span class="n">expo_id</span> <span class="o">=</span> <span class="s2">"4EK"</span>
+<span class="n">ligand</span> <span class="o">=</span> <span class="n">Ligand</span><span class="p">(</span><span class="n">smiles</span><span class="o">=</span><span class="s2">"C1CC(N(C1)C2=NC3=C(C=NN3C=C2)NC(=O)N4CCC(C4)O)C5=C(C=CC(=C5)F)F"</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"larotrectinib"</span><span class="p">)</span>
+<span class="n">system</span> <span class="o">=</span> <span class="n">ProteinLigandComplex</span><span class="p">(</span><span class="n">components</span><span class="o">=</span><span class="p">[</span><span class="n">protein</span><span class="p">,</span> <span class="n">ligand</span><span class="p">])</span>
+<span class="n">systems</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">system</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># define the binding site for docking via residue IDs</span>
+<span class="n">protein</span> <span class="o">=</span> <span class="n">Protein</span><span class="p">(</span><span class="n">pdb_id</span><span class="o">=</span><span class="s2">"4yne"</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"NTRK1"</span><span class="p">)</span>
+<span class="n">protein</span><span class="o">.</span><span class="n">pocket_resids</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="mi">516</span><span class="p">,</span> <span class="mi">517</span><span class="p">,</span> <span class="mi">521</span><span class="p">,</span> <span class="mi">524</span><span class="p">,</span> <span class="mi">542</span><span class="p">,</span> <span class="mi">544</span><span class="p">,</span> <span class="mi">573</span><span class="p">,</span> <span class="mi">589</span><span class="p">,</span> <span class="mi">590</span><span class="p">,</span> <span class="mi">591</span><span class="p">,</span> <span class="mi">592</span><span class="p">,</span> <span class="mi">595</span><span class="p">,</span> <span class="mi">596</span><span class="p">,</span> <span class="mi">654</span><span class="p">,</span> <span class="mi">655</span><span class="p">,</span> <span class="mi">656</span><span class="p">,</span> <span class="mi">657</span><span class="p">,</span> <span class="mi">667</span><span class="p">,</span> <span class="mi">668</span>
+<span class="p">]</span>
+<span class="n">ligand</span> <span class="o">=</span> <span class="n">Ligand</span><span class="p">(</span><span class="n">smiles</span><span class="o">=</span><span class="s2">"C1CC(N(C1)C2=NC3=C(C=NN3C=C2)NC(=O)N4CCC(C4)O)C5=C(C=CC(=C5)F)F"</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"larotrectinib_2"</span><span class="p">)</span>
+<span class="n">system</span> <span class="o">=</span> <span class="n">ProteinLigandComplex</span><span class="p">(</span><span class="n">components</span><span class="o">=</span><span class="p">[</span><span class="n">protein</span><span class="p">,</span> <span class="n">ligand</span><span class="p">])</span>
+<span class="n">systems</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">system</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">featurizer</span> <span class="o">=</span> <span class="n">OEDockingFeaturizer</span><span class="p">(</span>
+    <span class="n">output_dir</span><span class="o">=</span><span class="n">user_cache_dir</span><span class="p">()</span> <span class="o">+</span> <span class="s2">"/Fred"</span><span class="p">,</span>
+    <span class="n">method</span><span class="o">=</span><span class="s2">"Fred"</span><span class="p">,</span>
+    <span class="n">use_multiprocessing</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%capture</span> --no-display
+<span class="n">systems</span> <span class="o">=</span> <span class="n">featurizer</span><span class="o">.</span><span class="n">featurize</span><span class="p">(</span><span class="n">systems</span><span class="p">)</span>
+<span class="n">systems</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "f1f62040805c4ae98cbf0cc41b2babfb", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Warning: Failed to find residue GLY-7.
+Warning: Failed to find residue ALA-6.
+Warning: Failed to find residue MET-5.
+DPI: 0.12, RFree: 0.22, Resolution: 2.02
+Processing BU # 1 with title: HIGH AFFINITY NERVE GROWTH FACTOR RECEPTOR, chains A, alt: A
+Warning: For residue ARG 702   A 1   removing clashing solvent molecule HOH 908   A 2
+Warning: There was a problem building some missing pieces, built as much as was possible
+Processing BU # 2 with title: HIGH AFFINITY NERVE GROWTH FACTOR RECEPTOR, chains A, alt: B
+Warning: For residue ARG 702   A 1   removing clashing solvent molecule HOH 908   A 2
+Warning: There was a problem building some missing pieces, built as much as was possible
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[&lt;ProteinLigandComplex with 2 components (&lt;Protein name=NTRK1&gt;, &lt;Ligand name=larotrectinib&gt;)&gt;,
+ &lt;ProteinLigandComplex with 2 components (&lt;Protein name=NTRK1&gt;, &lt;Ligand name=larotrectinib_2&gt;)&gt;]
+</pre></div></div>
+</div>
+<p>Docking scores are stored in the returned MDAnalysis universe.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">system</span><span class="o">.</span><span class="n">featurizations</span><span class="p">[</span><span class="s2">"last"</span><span class="p">]</span><span class="o">.</span><span class="n">_topology</span><span class="o">.</span><span class="n">docking_score</span> <span class="k">for</span> <span class="n">system</span> <span class="ow">in</span> <span class="n">systems</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[-17.801493, -3.960361]
+</pre></div></div>
+</div>
+</section>
+<section id="Hybrid">
+<h3 id="Hybrid">Hybrid<a class="headerlink" href="#Hybrid" title="Link to this heading">¶</a></h3>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">systems</span> <span class="o">=</span> <span class="p">[]</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">protein</span> <span class="o">=</span> <span class="n">Protein</span><span class="p">(</span><span class="n">pdb_id</span><span class="o">=</span><span class="s2">"4yne"</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"NTRK1"</span><span class="p">)</span>
+<span class="n">protein</span><span class="o">.</span><span class="n">expo_id</span> <span class="o">=</span> <span class="s2">"4EK"</span>
+<span class="n">ligand</span> <span class="o">=</span> <span class="n">Ligand</span><span class="p">(</span><span class="n">smiles</span><span class="o">=</span><span class="s2">"C1CC(N(C1)C2=NC3=C(C=NN3C=C2)NC(=O)N4CCC(C4)O)C5=C(C=CC(=C5)F)F"</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"larotrectinib"</span><span class="p">)</span>
+<span class="n">system</span> <span class="o">=</span> <span class="n">ProteinLigandComplex</span><span class="p">(</span><span class="n">components</span><span class="o">=</span><span class="p">[</span><span class="n">protein</span><span class="p">,</span> <span class="n">ligand</span><span class="p">])</span>
+<span class="n">systems</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">system</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">featurizer</span> <span class="o">=</span> <span class="n">OEDockingFeaturizer</span><span class="p">(</span>
+    <span class="n">output_dir</span><span class="o">=</span><span class="n">user_cache_dir</span><span class="p">()</span> <span class="o">+</span> <span class="s2">"/Hybrid"</span><span class="p">,</span>
+    <span class="n">method</span><span class="o">=</span><span class="s2">"Hybrid"</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[29]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%capture</span> --no-display
+<span class="n">systems</span> <span class="o">=</span> <span class="n">featurizer</span><span class="o">.</span><span class="n">featurize</span><span class="p">(</span><span class="n">systems</span><span class="p">)</span>
+<span class="n">systems</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[29]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[&lt;ProteinLigandComplex with 2 components (&lt;Protein name=NTRK1&gt;, &lt;Ligand name=larotrectinib&gt;)&gt;]
+</pre></div></div>
+</div>
+</section>
+<section id="Posit">
+<h3 id="Posit">Posit<a class="headerlink" href="#Posit" title="Link to this heading">¶</a></h3>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[30]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">systems</span> <span class="o">=</span> <span class="p">[]</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[31]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">protein</span> <span class="o">=</span> <span class="n">Protein</span><span class="p">(</span><span class="n">pdb_id</span><span class="o">=</span><span class="s2">"4yne"</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"NTRK1"</span><span class="p">)</span>
+<span class="n">protein</span><span class="o">.</span><span class="n">expo_id</span> <span class="o">=</span> <span class="s2">"4EK"</span>
+<span class="n">ligand</span> <span class="o">=</span> <span class="n">Ligand</span><span class="p">(</span><span class="n">smiles</span><span class="o">=</span><span class="s2">"C1CC(N(C1)C2=NC3=C(C=NN3C=C2)NC(=O)N4CCC(C4)O)C5=C(C=CC(=C5)F)F"</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"larotrectinib"</span><span class="p">)</span>
+<span class="n">system</span> <span class="o">=</span> <span class="n">ProteinLigandComplex</span><span class="p">(</span><span class="n">components</span><span class="o">=</span><span class="p">[</span><span class="n">protein</span><span class="p">,</span> <span class="n">ligand</span><span class="p">])</span>
+<span class="n">systems</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">system</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[32]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">featurizer</span> <span class="o">=</span> <span class="n">OEDockingFeaturizer</span><span class="p">(</span>
+    <span class="n">output_dir</span><span class="o">=</span><span class="n">user_cache_dir</span><span class="p">()</span> <span class="o">+</span> <span class="s2">"/Posit"</span><span class="p">,</span>
+    <span class="n">method</span><span class="o">=</span><span class="s2">"Posit"</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[33]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%capture</span> --no-display
+<span class="n">systems</span> <span class="o">=</span> <span class="n">featurizer</span><span class="o">.</span><span class="n">featurize</span><span class="p">(</span><span class="n">systems</span><span class="p">)</span>
+<span class="n">systems</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[33]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[&lt;ProteinLigandComplex with 2 components (&lt;Protein name=NTRK1&gt;, &lt;Ligand name=larotrectinib&gt;)&gt;]
+</pre></div></div>
+</div>
+<p>Beside the docking score, the Posit probability is also stored in the returned MDAnaylsis universe.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[34]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">systems</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">featurizations</span><span class="p">[</span><span class="s2">"last"</span><span class="p">]</span><span class="o">.</span><span class="n">_topology</span><span class="o">.</span><span class="n">posit_probability</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[34]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+0.5
+</pre></div></div>
+</div>
+</section>
+</section>
+<section id="MostSimilarPDBLigandFeaturizer">
+<h2 id="MostSimilarPDBLigandFeaturizer">MostSimilarPDBLigandFeaturizer<a class="headerlink" href="#MostSimilarPDBLigandFeaturizer" title="Link to this heading">¶</a></h2>
+<p>Manually specifying the most suitable PDB structure to dock into is not practical for a larger set of ligands. Hence, the <code class="docutils literal notranslate"><span class="pre">MostSimilarPDBLigandFeaturizer</span></code> was implemented, wich can find the most suitable structure for docking in the PDB based on ligand similarity. The user can choose from one the following similarity metrics:</p>
+<ul class="simple">
+<li><p>Fingerprint</p></li>
+<li><p>Most common substructure</p></li>
+<li><p>OpenEye’s shape</p></li>
+<li><p>Schrodinger’s shape</p></li>
+</ul>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[35]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">inspect</span><span class="o">.</span><span class="n">getdoc</span><span class="p">(</span><span class="n">MostSimilarPDBLigandFeaturizer</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Find the most similar co-crystallized ligand in the PDB according to a
+given SMILES and UniProt ID.
+
+The protein component of each system must be a `core.proteins.Protein` or
+a subclass thereof, and must be initialized with a `uniprot_id` parameter.
+
+The ligand component of each system must be a `core.ligands.Ligand` or a
+subclass thereof and give access to the molecular structure, e.g. via a
+SMILES.
+
+Parameters
+----------
+similarity_metric: str, default="fingerprint"
+    The similarity metric to use to detect the structure with the most
+    similar ligand ["fingerprint", "mcs", "openeye_shape",
+    "schrodinger_shape"].
+cache_dir: str, Path or None, default=None
+    Path to directory used for saving intermediate files. If None, default
+    location provided by `appdirs.user_cache_dir()` will be used.
+use_multiprocessing : bool, default=True
+    If multiprocessing to use.
+n_processes : int or None, default=None
+    How many processes to use in case of multiprocessing. Defaults to
+    number of available CPUs.
+
+Note
+----
+The toolkit ['MDAnalysis' or 'OpenEye'] specified in the protein object
+initialization should fit the required toolkit when subsequently applying
+the OEDockingFeaturizer or SCHRODINGERDockingFeaturizer.
+</pre></div></div>
+</div>
+<section id="Most-common-substructure">
+<h3 id="Most-common-substructure">Most common substructure<a class="headerlink" href="#Most-common-substructure" title="Link to this heading">¶</a></h3>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[36]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">systems</span> <span class="o">=</span> <span class="p">[]</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[37]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">protein</span> <span class="o">=</span> <span class="n">Protein</span><span class="p">(</span><span class="n">uniprot_id</span><span class="o">=</span><span class="s2">"P04629"</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"NTRK1"</span><span class="p">)</span>
+<span class="n">ligand</span> <span class="o">=</span> <span class="n">Ligand</span><span class="p">(</span><span class="n">smiles</span><span class="o">=</span><span class="s2">"C1CC(N(C1)C2=NC3=C(C=NN3C=C2)NC(=O)N4CCC(C4)O)C5=C(C=CC(=C5)F)F"</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"larotrectinib"</span><span class="p">)</span>
+<span class="n">system</span> <span class="o">=</span> <span class="n">ProteinLigandComplex</span><span class="p">(</span><span class="n">components</span><span class="o">=</span><span class="p">[</span><span class="n">protein</span><span class="p">,</span> <span class="n">ligand</span><span class="p">])</span>
+<span class="n">systems</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">system</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[38]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">featurizer</span> <span class="o">=</span> <span class="n">MostSimilarPDBLigandFeaturizer</span><span class="p">(</span>
+    <span class="n">similarity_metric</span><span class="o">=</span><span class="s2">"mcs"</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[39]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%time</span>it -n 1 -r 1
+<span class="o">%%</span><span class="n">capture</span> <span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">display</span>
+<span class="n">systems</span> <span class="o">=</span> <span class="n">featurizer</span><span class="o">.</span><span class="n">featurize</span><span class="p">(</span><span class="n">systems</span><span class="p">)</span>
+<span class="n">systems</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">protein</span><span class="o">.</span><span class="n">pdb_id</span><span class="p">,</span> <span class="n">systems</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">protein</span><span class="o">.</span><span class="n">chain_id</span><span class="p">,</span> <span class="n">systems</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">protein</span><span class="o">.</span><span class="n">expo_id</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[39]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+('4YNE', 'A', '4EK')
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+5.51 s ± 0 ns per loop (mean ± std. dev. of 1 run, 1 loop each)
+</pre></div></div>
+</div>
+</section>
+<section id="Fingerprint">
+<h3 id="Fingerprint">Fingerprint<a class="headerlink" href="#Fingerprint" title="Link to this heading">¶</a></h3>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[40]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">featurizer</span> <span class="o">=</span> <span class="n">MostSimilarPDBLigandFeaturizer</span><span class="p">(</span>
+    <span class="n">similarity_metric</span><span class="o">=</span><span class="s2">"fingerprint"</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[41]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%time</span>it -n 1 -r 1
+<span class="o">%%</span><span class="n">capture</span> <span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">display</span>
+<span class="n">systems</span> <span class="o">=</span> <span class="n">featurizer</span><span class="o">.</span><span class="n">featurize</span><span class="p">(</span><span class="n">systems</span><span class="p">)</span>
+<span class="n">systems</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">protein</span><span class="o">.</span><span class="n">pdb_id</span><span class="p">,</span> <span class="n">systems</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">protein</span><span class="o">.</span><span class="n">chain_id</span><span class="p">,</span> <span class="n">systems</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">protein</span><span class="o">.</span><span class="n">expo_id</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[41]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+('4YNE', 'A', '4EK')
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+5.04 s ± 0 ns per loop (mean ± std. dev. of 1 run, 1 loop each)
+</pre></div></div>
+</div>
+</section>
+<section id="OpenEye's-shape">
+<h3 id="OpenEye's-shape">OpenEye’s shape<a class="headerlink" href="#OpenEye's-shape" title="Link to this heading">¶</a></h3>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[42]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">featurizer</span> <span class="o">=</span> <span class="n">MostSimilarPDBLigandFeaturizer</span><span class="p">(</span>
+    <span class="n">similarity_metric</span><span class="o">=</span><span class="s2">"openeye_shape"</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[43]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%time</span>it -n 1 -r 1
+<span class="o">%%</span><span class="n">capture</span> <span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">display</span>
+<span class="n">systems</span> <span class="o">=</span> <span class="n">featurizer</span><span class="o">.</span><span class="n">featurize</span><span class="p">(</span><span class="n">systems</span><span class="p">)</span>
+<span class="n">systems</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">protein</span><span class="o">.</span><span class="n">pdb_id</span><span class="p">,</span> <span class="n">systems</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">protein</span><span class="o">.</span><span class="n">chain_id</span><span class="p">,</span> <span class="n">systems</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">protein</span><span class="o">.</span><span class="n">expo_id</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[43]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+('4YNE', 'A', '4EK')
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+4min 25s ± 0 ns per loop (mean ± std. dev. of 1 run, 1 loop each)
+</pre></div></div>
+</div>
+<p>Using shape is clearly the slowest option, but in many cases the most accurate one.</p>
+</section>
+<section id="Pipeline-of-MostSimilarPDBLigandFeaturizer-and-OEDockingFeaturizer">
+<h3 id="Pipeline-of-MostSimilarPDBLigandFeaturizer-and-OEDockingFeaturizer">Pipeline of MostSimilarPDBLigandFeaturizer and OEDockingFeaturizer<a class="headerlink" href="#Pipeline-of-MostSimilarPDBLigandFeaturizer-and-OEDockingFeaturizer" title="Link to this heading">¶</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">MostSimilarPDBLigandFeaturizer</span></code> can be joined with the <code class="docutils literal notranslate"><span class="pre">OEDockingFeaturizer</span></code> into a <code class="docutils literal notranslate"><span class="pre">Pipeline</span></code> featurizer.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[44]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">systems</span> <span class="o">=</span> <span class="p">[]</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[45]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">protein</span> <span class="o">=</span> <span class="n">Protein</span><span class="p">(</span><span class="n">uniprot_id</span><span class="o">=</span><span class="s2">"P04629"</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"NTRK1"</span><span class="p">)</span>
+<span class="n">ligand</span> <span class="o">=</span> <span class="n">Ligand</span><span class="p">(</span><span class="n">smiles</span><span class="o">=</span><span class="s2">"C1CC(N(C1)C2=NC3=C(C=NN3C=C2)NC(=O)N4CCC(C4)O)C5=C(C=CC(=C5)F)F"</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"larotrectinib"</span><span class="p">)</span>
+<span class="n">system</span> <span class="o">=</span> <span class="n">ProteinLigandComplex</span><span class="p">(</span><span class="n">components</span><span class="o">=</span><span class="p">[</span><span class="n">protein</span><span class="p">,</span> <span class="n">ligand</span><span class="p">])</span>
+<span class="n">systems</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">system</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[46]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">featurizer</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">([</span>
+    <span class="n">MostSimilarPDBLigandFeaturizer</span><span class="p">(</span><span class="n">similarity_metric</span><span class="o">=</span><span class="s2">"fingerprint"</span><span class="p">),</span>
+    <span class="n">OEDockingFeaturizer</span><span class="p">(</span><span class="n">output_dir</span><span class="o">=</span><span class="n">user_cache_dir</span><span class="p">()</span> <span class="o">+</span> <span class="s2">"/docking_pipeline"</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">"Posit"</span><span class="p">),</span>
+<span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[47]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%capture</span> --no-display
+<span class="n">systems</span> <span class="o">=</span> <span class="n">featurizer</span><span class="o">.</span><span class="n">featurize</span><span class="p">(</span><span class="n">systems</span><span class="p">)</span>
+<span class="n">systems</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Warning: Failed to find residue GLY-7.
+Warning: Failed to find residue ALA-6.
+Warning: Failed to find residue MET-5.
+DPI: 0.12, RFree: 0.22, Resolution: 2.02
+Processing BU # 1 with title: HIGH AFFINITY NERVE GROWTH FACTOR RECEPTOR, chains A, alt: A
+Warning: For residue ARG 702   A 1   removing clashing solvent molecule HOH 908   A 2
+Warning: There was a problem building some missing pieces, built as much as was possible
+   Falling back to charging protein with OEMMFF94Charges
+Processing BU # 2 with title: HIGH AFFINITY NERVE GROWTH FACTOR RECEPTOR, chains A, alt: B
+Warning: For residue ARG 702   A 1   removing clashing solvent molecule HOH 908   A 2
+Warning: There was a problem building some missing pieces, built as much as was possible
+   Falling back to charging protein with OEMMFF94Charges
+Warning: No BioAssembly transforms found, using input molecule as biounit: HIGH AFFINITY NERVE GROWTH FACTOR RECEPTOR(A)altA
+Warning: Iridium - Structure: HIGH AFFINITY NERVE GROWTH FACTOR RECEPTOR(A)altA has no REMARK data
+Processing BU # 1 with title: HIGH AFFINITY NERVE GROWTH FACTOR RECEPTOR(A)altA, chains A
+Warning: There was a problem building some missing pieces, built as much as was possible
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[47]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[&lt;ProteinLigandComplex with 2 components (&lt;Protein name=NTRK1&gt;, &lt;Ligand name=larotrectinib&gt;)&gt;]
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[48]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">systems</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">featurizations</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[48]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{'last': &lt;Universe with 4783 atoms&gt;,
+ 'Pipeline([MostSimilarPDBLigandFeaturizer, OEDockingFeaturizer])': &lt;Universe with 4783 atoms&gt;}
+</pre></div></div>
+</div>
+</section>
+</section>
+<section id="KLIFSConformationTemplatesFeaturizer">
+<h2 id="KLIFSConformationTemplatesFeaturizer">KLIFSConformationTemplatesFeaturizer<a class="headerlink" href="#KLIFSConformationTemplatesFeaturizer" title="Link to this heading">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">KLIFSConformationTemplatesFeaturizer</span></code> searches for suitable templates to model a kinase:ligand complex in different conformations. The templates are selected based on ligand and sequence similarity.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[49]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">inspect</span><span class="o">.</span><span class="n">getdoc</span><span class="p">(</span><span class="n">KLIFSConformationTemplatesFeaturizer</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Find suitable kinase templates for modeling a kinase:inhibitor complex in
+different KLIFS conformations.
+
+The protein component of each system must be a `core.proteins.KLIFSKinase`,
+and must be initialized with a `uniprot_id` or `kinase_klifs_id` parameter.
+
+The ligand component of each system must be a `core.ligands.Ligand` or a
+subclass thereof and give access to the molecular structure, e.g. via a
+SMILES.
+
+Parameters
+----------
+similarity_metric: str, default="fingerprint"
+    The similarity metric to use to detect the structures with similar
+    ligands ["fingerprint", "mcs", "openeye_shape", "schrodinger_shape"].
+cache_dir: str, Path or None, default=None
+    Path to directory used for saving intermediate files. If None, default
+    location provided by `appdirs.user_cache_dir()` will be used.
+use_multiprocessing : bool, default=True
+    If multiprocessing to use.
+n_processes : int or None, default=None
+    How many processes to use in case of multiprocessing. Defaults to
+    number of available CPUs.
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[50]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">systems</span> <span class="o">=</span> <span class="p">[]</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[51]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">protein</span> <span class="o">=</span> <span class="n">KLIFSKinase</span><span class="p">(</span><span class="n">uniprot_id</span><span class="o">=</span><span class="s2">"P04629"</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"NTRK1"</span><span class="p">)</span>
+<span class="n">ligand</span> <span class="o">=</span> <span class="n">Ligand</span><span class="p">(</span><span class="n">smiles</span><span class="o">=</span><span class="s2">"C1CC(N(C1)C2=NC3=C(C=NN3C=C2)NC(=O)N4CCC(C4)O)C5=C(C=CC(=C5)F)F"</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"larotrectinib"</span><span class="p">)</span>
+<span class="n">system</span> <span class="o">=</span> <span class="n">ProteinLigandComplex</span><span class="p">(</span><span class="n">components</span><span class="o">=</span><span class="p">[</span><span class="n">protein</span><span class="p">,</span> <span class="n">ligand</span><span class="p">])</span>
+<span class="n">systems</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">system</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[52]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">featurizer</span> <span class="o">=</span> <span class="n">KLIFSConformationTemplatesFeaturizer</span><span class="p">(</span>
+    <span class="n">similarity_metric</span><span class="o">=</span><span class="s2">"fingerprint"</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[53]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%capture</span> --no-display
+<span class="n">systems</span> <span class="o">=</span> <span class="n">featurizer</span><span class="o">.</span><span class="n">featurize</span><span class="p">(</span><span class="n">systems</span><span class="p">)</span>
+<span class="n">systems</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[53]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[&lt;ProteinLigandComplex with 2 components (&lt;KLIFSKinase name=NTRK1&gt;, &lt;Ligand name=larotrectinib&gt;)&gt;]
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[54]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">systems</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">featurizations</span><span class="p">[</span><span class="s2">"last"</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[54]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>dfg</th>
+<th>ac_helix</th>
+<th>pdb_id</th>
+<th>chain_id</th>
+<th>expo_id</th>
+<th>ligand_similarity</th>
+<th>pocket_similarity</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>in</td>
+<td>in</td>
+<td>4yne</td>
+<td>A</td>
+<td>4EK</td>
+<td>0.568047</td>
+<td>443.0</td>
+</tr>
+<tr>
+<th>1</th>
+<td>in</td>
+<td>out</td>
+<td>6tfp</td>
+<td>A</td>
+<td>N6Z</td>
+<td>0.534031</td>
+<td>215.0</td>
+</tr>
+<tr>
+<th>2</th>
+<td>out</td>
+<td>in</td>
+<td>4pmp</td>
+<td>A</td>
+<td>31W</td>
+<td>0.482759</td>
+<td>443.0</td>
+</tr>
+<tr>
+<th>3</th>
+<td>out-like</td>
+<td>in</td>
+<td>6brj</td>
+<td>A</td>
+<td>VX6</td>
+<td>0.521739</td>
+<td>279.0</td>
+</tr>
+<tr>
+<th>4</th>
+<td>out-like</td>
+<td>out</td>
+<td>3aqv</td>
+<td>A</td>
+<td>TAK</td>
+<td>0.435754</td>
+<td>171.0</td>
+</tr>
+<tr>
+<th>5</th>
+<td>out</td>
+<td>out</td>
+<td>5jfv</td>
+<td>A</td>
+<td>6K1</td>
+<td>0.491620</td>
+<td>422.0</td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</div>
+</section>
+</section>
+
+
+          </article>
+        </div>
+      </div>
+    </main>
+  </div>
+  <footer class="md-footer">
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid">
+          
+            <a href="kinoml_object_model.html" title="KinoML object model"
+               class="md-flex md-footer-nav__link md-footer-nav__link--prev"
+               rel="prev">
+              <div class="md-flex__cell md-flex__cell--shrink">
+                <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
+              </div>
+              <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+                <span class="md-flex__ellipsis">
+                  <span
+                      class="md-footer-nav__direction"> "Previous" </span> KinoML object model </span>
+              </div>
+            </a>
+          
+          
+            <a href="Schrodinger_structural_featurizer.html" title="Schrodinger Structural Featurizer"
+               class="md-flex md-footer-nav__link md-footer-nav__link--next"
+               rel="next">
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title"><span
+                class="md-flex__ellipsis"> <span
+                class="md-footer-nav__direction"> "Next" </span> Schrodinger Structural Featurizer </span>
+            </div>
+            <div class="md-flex__cell md-flex__cell--shrink"><i
+                class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
+            </div>
+          
+        </a>
+        
+      </nav>
+    </div>
+    <div class="md-footer-meta md-typeset">
+      <div class="md-footer-meta__inner md-grid">
+        <div class="md-footer-copyright">
+          <div class="md-footer-copyright__highlight">
+              &#169; Copyright 2021, OpenKinome.
+              
+          </div>
+            Last updated on
+              Nov 10, 2023.
+            <br/>
+            Created using
+            <a href="http://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
+             and
+            <a href="https://github.com/bashtage/sphinx-material/">Material for
+              Sphinx</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+  <script src="../_static/javascripts/application.js"></script>
+  <script>app.initialize({version: "1.0.4", url: {base: ".."}})</script>
+  </body>
+</html>
