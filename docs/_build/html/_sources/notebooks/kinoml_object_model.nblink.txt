@@ -1,0 +1,1 @@
+{"path": "../../tutorials/getting_started/kinoml_object_model.ipynb", "extra-media": ["../../kinoml/data/"]}
