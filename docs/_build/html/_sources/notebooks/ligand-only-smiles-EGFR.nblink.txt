@@ -1,1 +1,0 @@
-{"path": "../../tutorials/experiments/ligand-only-smiles-EGFR/experiment_notebook.ipynb"}

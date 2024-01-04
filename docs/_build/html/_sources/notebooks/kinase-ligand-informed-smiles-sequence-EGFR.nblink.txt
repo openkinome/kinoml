@@ -1,1 +1,0 @@
-{"path": "../../tutorials/experiments/kinase-ligand-informed-smiles-sequence-EGFR/experiment_notebook.ipynb"}
