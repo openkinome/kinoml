@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <meta property="article:modified_time" content="2022-04-11T13:16:14+00:00" />
+    <meta property="article:modified_time" content="2023-12-20T14:48:30+00:00" />
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   <meta name="lang:clipboard.copy" content="Copy to clipboard">
@@ -50,14 +50,14 @@
     <link rel="apple-touch-icon" href="../_static/images/custom_favicon.png"/>
   
   
-    <title>Getting Started &#8212; KinoML 0.1 documentation</title>
+    <title>Getting started with KinoML &#8212; KinoML 0.1 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/material.css" />
     <link rel="stylesheet" type="text/css" href="../_static/twemoji.css" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" />
     <link rel="stylesheet" type="text/css" href="../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" />
     <link rel="stylesheet" type="text/css" href="../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
     <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css" />
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
@@ -75,7 +75,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="KinoML object model" href="kinoml_object_model.html" />
-    <link rel="prev" title="OpenKinome &amp; KinoML" href="../index.html" />
+    <link rel="prev" title="KinoML" href="../index.html" />
   
     <link rel="apple-touch-icon" href="../_static/images/custom_favicon.png"/>
   
@@ -114,7 +114,7 @@
       <div class="md-flex__cell md-flex__cell--stretch">
         <div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
           <span class="md-header-nav__topic">KinoML</span>
-          <span class="md-header-nav__topic"> Getting Started </span>
+          <span class="md-header-nav__topic"> Getting started with KinoML </span>
         </div>
       </div>
       <div class="md-flex__cell md-flex__cell--shrink">
@@ -230,26 +230,36 @@
     
     
     <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="__toc">
-    <label class="md-nav__link md-nav__link--active" for="__toc"> Getting Started </label>
+    <label class="md-nav__link md-nav__link--active" for="__toc"> Getting started with KinoML </label>
     
-      <a href="#" class="md-nav__link md-nav__link--active">Getting Started</a>
+      <a href="#" class="md-nav__link md-nav__link--active">Getting started with KinoML</a>
       
         
 <nav class="md-nav md-nav--secondary">
     <label class="md-nav__title" for="__toc">"Contents"</label>
   <ul class="md-nav__list" data-md-scrollfix="">
-        <li class="md-nav__item"><a href="#notebooks-getting-started--page-root" class="md-nav__link">Getting Started</a><nav class="md-nav">
+        <li class="md-nav__item"><a href="#notebooks-getting-started--page-root" class="md-nav__link">Getting started with KinoML</a><nav class="md-nav">
               <ul class="md-nav__list">
         <li class="md-nav__item"><a href="#Introduction" class="md-nav__link">Introduction</a>
         </li>
         <li class="md-nav__item"><a href="#Installation" class="md-nav__link">Installation</a>
         </li>
-        <li class="md-nav__item"><a href="#Basic-example" class="md-nav__link">Basic example</a><nav class="md-nav">
+        <li class="md-nav__item"><a href="#Basic-example" class="md-nav__link">Basic example</a>
+        </li>
+        <li class="md-nav__item"><a href="#1.-Obtaining-your-data" class="md-nav__link">1. Obtaining your data</a><nav class="md-nav">
               <ul class="md-nav__list">
         <li class="md-nav__item"><a href="#DatasetProvider" class="md-nav__link">DatasetProvider</a>
+        </li></ul>
+            </nav>
         </li>
+        <li class="md-nav__item"><a href="#2.-Featurize-your-data" class="md-nav__link">2. Featurize your data</a><nav class="md-nav">
+              <ul class="md-nav__list">
         <li class="md-nav__item"><a href="#Featurizer" class="md-nav__link">Featurizer</a>
+        </li></ul>
+            </nav>
         </li>
+        <li class="md-nav__item"><a href="#3.-ML-model-training-and-testing" class="md-nav__link">3. ML model training and testing</a><nav class="md-nav">
+              <ul class="md-nav__list">
         <li class="md-nav__item"><a href="#ML-training-and-testing" class="md-nav__link">ML training and testing</a>
         </li></ul>
             </nav>
@@ -282,6 +292,48 @@
       <a href="#Basic-example" class="md-nav__link">Basic example</a>
       
     
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="#1.-Obtaining-your-data" class="md-nav__link">1. Obtaining your data</a>
+      <ul class="md-nav__list"> 
+    <li class="md-nav__item">
+    
+    
+      <a href="#DatasetProvider" class="md-nav__link">DatasetProvider</a>
+      
+    
+    </li></ul>
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="#2.-Featurize-your-data" class="md-nav__link">2. Featurize your data</a>
+      <ul class="md-nav__list"> 
+    <li class="md-nav__item">
+    
+    
+      <a href="#Featurizer" class="md-nav__link">Featurizer</a>
+      
+    
+    </li></ul>
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="#3.-ML-model-training-and-testing" class="md-nav__link">3. ML model training and testing</a>
+      <ul class="md-nav__list"> 
+    <li class="md-nav__item">
+    
+    
+      <a href="#ML-training-and-testing" class="md-nav__link">ML training and testing</a>
+      
+    
+    </li></ul>
+    
     </li></ul>
     
     </li>
@@ -290,11 +342,6 @@
     
       <a href="kinoml_object_model.html" class="md-nav__link">KinoML object model</a>
       
-    
-    </li>
-    <li class="md-nav__item">
-    
-      <span class="md-nav__link caption"><span class="caption-text">Tutorials</span></span>
     
     </li>
     <li class="md-nav__item">
@@ -308,6 +355,39 @@
     
     
       <a href="Schrodinger_structural_featurizer.html" class="md-nav__link">Schrodinger Structural Featurizer</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+      <span class="md-nav__link caption"><span class="caption-text">Experiment tutorials</span></span>
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="ligand-only-smiles-EGFR.html" class="md-nav__link">Ligand-only SMILES experiment</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="ligand-only-morgan1024-EGFR.html" class="md-nav__link">Ligand-only morgan 1024 experiment</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="kinase-ligand-informed-smiles-sequence-EGFR.html" class="md-nav__link">Kinase informed SMILES experiment</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="kinase-ligand-informed-morgan-composition-EGFR.html" class="md-nav__link">Kinase informed morgan 1024 experiment</a>
       
     
     </li>
@@ -337,18 +417,28 @@
 <nav class="md-nav md-nav--secondary">
     <label class="md-nav__title" for="__toc">"Contents"</label>
   <ul class="md-nav__list" data-md-scrollfix="">
-        <li class="md-nav__item"><a href="#notebooks-getting-started--page-root" class="md-nav__link">Getting Started</a><nav class="md-nav">
+        <li class="md-nav__item"><a href="#notebooks-getting-started--page-root" class="md-nav__link">Getting started with KinoML</a><nav class="md-nav">
               <ul class="md-nav__list">
         <li class="md-nav__item"><a href="#Introduction" class="md-nav__link">Introduction</a>
         </li>
         <li class="md-nav__item"><a href="#Installation" class="md-nav__link">Installation</a>
         </li>
-        <li class="md-nav__item"><a href="#Basic-example" class="md-nav__link">Basic example</a><nav class="md-nav">
+        <li class="md-nav__item"><a href="#Basic-example" class="md-nav__link">Basic example</a>
+        </li>
+        <li class="md-nav__item"><a href="#1.-Obtaining-your-data" class="md-nav__link">1. Obtaining your data</a><nav class="md-nav">
               <ul class="md-nav__list">
         <li class="md-nav__item"><a href="#DatasetProvider" class="md-nav__link">DatasetProvider</a>
+        </li></ul>
+            </nav>
         </li>
+        <li class="md-nav__item"><a href="#2.-Featurize-your-data" class="md-nav__link">2. Featurize your data</a><nav class="md-nav">
+              <ul class="md-nav__list">
         <li class="md-nav__item"><a href="#Featurizer" class="md-nav__link">Featurizer</a>
+        </li></ul>
+            </nav>
         </li>
+        <li class="md-nav__item"><a href="#3.-ML-model-training-and-testing" class="md-nav__link">3. ML model training and testing</a><nav class="md-nav">
+              <ul class="md-nav__list">
         <li class="md-nav__item"><a href="#ML-training-and-testing" class="md-nav__link">ML training and testing</a>
         </li></ul>
             </nav>
@@ -369,13 +459,19 @@
         <div class="md-content">
           <article class="md-content__inner md-typeset" role="main">
             
-  <section id="Getting-Started">
-<h1 id="notebooks-getting-started--page-root">Getting Started<a class="headerlink" href="#notebooks-getting-started--page-root" title="Permalink to this headline">¶</a></h1>
+  <section id="Getting-started-with-KinoML">
+<h1 id="notebooks-getting-started--page-root">Getting started with KinoML<a class="headerlink" href="#notebooks-getting-started--page-root" title="Permalink to this headline">¶</a></h1>
 <section id="Introduction">
 <h2 id="Introduction">Introduction<a class="headerlink" href="#Introduction" title="Permalink to this headline">¶</a></h2>
-<p>KinoML is a modular and extensible framework for machine learning in small molecule drug discovery. In this notebook you will learn how to install KinoML and how to train and test an ML model with a few lines of code.</p>
+<p>KinoML is a modular and extensible framework for kinase modelling and machine learning. KinoML can be used to obtain data from online and in-house data sources and to featurize data so that it is ML-readable. KinoML also allows users to easily run ML experiments with KinoML’s implemented models.</p>
+<p>In this notebook you will learn how to install KinoML and how to: 1. Obtain your dataset from ChEMBL 2. Featurize this data 3. Train and test a simple Support Vector Classifier (SVC) ML model with your featurized data</p>
+<p>And KinoML allows you to do this with just a few lines of code!</p>
 <p>For more extensive examples and tutorials have a look at the other notebooks in the <a class="reference external" href="https://openkinome.org/kinoml/index.html">KinoML documentation</a> or at the <a class="reference external" href="https://github.com/openkinome/experiments-binding-affinity">experiments-binding-affnity</a> repository.</p>
 <p>The <a class="reference external" href="https://openkinome.org/kinoml/api/kinoml/index.html">KinoML documentation</a> also allows browsing the API.</p>
+<div class="line-block">
+<div class="line"><img alt="KinoML object model" src="../_images/fig_1_kinomltechpaper_v2.png"/></div>
+<div class="line"><strong>Fig. 1:</strong> KinoML workflow overview. Colors represent objects that belong to the same class.</div>
+</div>
 </section>
 <section id="Installation">
 <h2 id="Installation">Installation<a class="headerlink" href="#Installation" title="Permalink to this headline">¶</a></h2>
@@ -390,9 +486,13 @@ pip install https://github.com/openkinome/kinoml/archive/master.tar.gz
 <section id="Basic-example">
 <h2 id="Basic-example">Basic example<a class="headerlink" href="#Basic-example" title="Permalink to this headline">¶</a></h2>
 <p>KinoML has a strong focus on kinases, but can be applied to other proteins, if the appropriate code is written. However, the work on kinases is the easiest, since we provide cleaned kinase datasets for ChEMBL and PKIS2, which are hosted at the <a class="reference external" href="https://github.com/openkinome/kinodata">kinodata</a> repository.</p>
+</section>
+<section id="1.-Obtaining-your-data">
+<h2 id="1.-Obtaining-your-data">1. Obtaining your data<a class="headerlink" href="#1.-Obtaining-your-data" title="Permalink to this headline">¶</a></h2>
 <section id="DatasetProvider">
 <h3 id="DatasetProvider">DatasetProvider<a class="headerlink" href="#DatasetProvider" title="Permalink to this headline">¶</a></h3>
-<p>These datasets can be easily ingested using the appropriate <code class="docutils literal notranslate"><span class="pre">DatasetProvider</span></code>.</p>
+<p>KinoML’s <code class="docutils literal notranslate"><span class="pre">DatasetProvider</span></code> allows users to easily access and filter datasets. The user can specify the url of the csv file they are interested in or can use the default (as done in the example below). There are different types of <code class="docutils literal notranslate"><span class="pre">DatasetProvider</span></code> incorporated into KinoML. The one used in this notebook is <code class="docutils literal notranslate"><span class="pre">ChEMBLDatasetProvider</span></code>, which allows users to use ChEMBL datasets and filter them by specifying the measurement type (“pIC50”, “pKi”, “pKd”) and kinase uniprotID.</p>
+<p><code class="docutils literal notranslate"><span class="pre">DatasetProvider</span></code> outputs a lists of <code class="docutils literal notranslate"><span class="pre">measurement</span></code> values, and each of them will be associated to their corresponding <code class="docutils literal notranslate"><span class="pre">system</span></code>, which is formed by a protein and a ligand. Also, the <code class="docutils literal notranslate"><span class="pre">measurement</span></code> objects also have <code class="docutils literal notranslate"><span class="pre">Metadata</span></code> and <code class="docutils literal notranslate"><span class="pre">AssayConditions</span></code> associated to it, which contains information on how this measurement was obtained.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
@@ -408,9 +508,9 @@ pip install https://github.com/openkinome/kinoml/archive/master.tar.gz
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">chembl_provider</span> <span class="o">=</span> <span class="n">ChEMBLDatasetProvider</span><span class="o">.</span><span class="n">from_source</span><span class="p">(</span>
-    <span class="n">measurement_types</span><span class="o">=</span><span class="p">[</span><span class="s2">"pIC50"</span><span class="p">],</span>
-    <span class="n">uniprot_ids</span><span class="o">=</span><span class="p">[</span><span class="s2">"P00533"</span><span class="p">],</span>
-    <span class="n">sample</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
+    <span class="n">measurement_types</span><span class="o">=</span><span class="p">[</span><span class="s2">"pIC50"</span><span class="p">],</span> <span class="c1">#selecting measurement type</span>
+    <span class="n">uniprot_ids</span><span class="o">=</span><span class="p">[</span><span class="s2">"P00533"</span><span class="p">],</span> <span class="c1">#kinase of interest</span>
+    <span class="n">sample</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="c1">#number of samples you want to work with</span>
 <span class="p">)</span>
 <span class="n">chembl_provider</span>
 </pre></div>
@@ -431,7 +531,7 @@ pip install https://github.com/openkinome/kinoml/archive/master.tar.gz
 &lt;ChEMBLDatasetProvider with 1000 measurements (pIC50Measurement=1000), and 986 systems (KLIFSKinase=1, Ligand=986)&gt;
 </pre></div></div>
 </div>
-<p>Just looking at the output, we can see that there appear to be some duplicates in the <code class="docutils literal notranslate"><span class="pre">measurements</span></code>. Let’s have a look at the first measurement and the stored information.</p>
+<p>Just looking at the output, we can see that there are 1000 measurements, but only 986 systems. This means there are duplicates in the <code class="docutils literal notranslate"><span class="pre">measurements</span></code>. Ideally we would delete these duplicated entries, but since this notebook just wants to show a quick example, we will leave this for the other notebooks. Let’s continue and have a look at the first measurement and the stored information.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
@@ -517,11 +617,15 @@ array([5.13076828])
 &lt;KLIFSKinase name=P00533&gt;
 </pre></div></div>
 </div>
-<p>Each measurement comes with a <code class="docutils literal notranslate"><span class="pre">values</span></code> array representing the activity values for this measurement, which can be considered the typical <code class="docutils literal notranslate"><span class="pre">y</span></code> we want to predict in an ML experiment. The <code class="docutils literal notranslate"><span class="pre">system</span></code> object contains relevant information about <code class="docutils literal notranslate"><span class="pre">protein</span></code> and <code class="docutils literal notranslate"><span class="pre">ligand</span></code> for this measurement. The <code class="docutils literal notranslate"><span class="pre">system</span></code> information is typically <code class="docutils literal notranslate"><span class="pre">X</span></code> in an ML experiment, but is not yet in a machine-friendly format.</p>
+<p>As explained above, each measurement comes with a <code class="docutils literal notranslate"><span class="pre">values</span></code> array representing the activity values for this measurement, which can be considered the typical <code class="docutils literal notranslate"><span class="pre">y</span></code> we want to predict in an ML experiment. The <code class="docutils literal notranslate"><span class="pre">system</span></code> object contains relevant information about <code class="docutils literal notranslate"><span class="pre">protein</span></code> and <code class="docutils literal notranslate"><span class="pre">ligand</span></code> for this measurement. The <code class="docutils literal notranslate"><span class="pre">system</span></code> information is typically <code class="docutils literal notranslate"><span class="pre">X</span></code> in an ML experiment, but is not yet in a machine-friendly format.</p>
 </section>
+</section>
+<section id="2.-Featurize-your-data">
+<h2 id="2.-Featurize-your-data">2. Featurize your data<a class="headerlink" href="#2.-Featurize-your-data" title="Permalink to this headline">¶</a></h2>
 <section id="Featurizer">
 <h3 id="Featurizer">Featurizer<a class="headerlink" href="#Featurizer" title="Permalink to this headline">¶</a></h3>
-<p>To get the <code class="docutils literal notranslate"><span class="pre">X</span></code> in a machine-friendly format KinoML uses so called featurizers, which encode the information of each system. The <code class="docutils literal notranslate"><span class="pre">MorganFingerprintFeaturizer</span></code> for example will iterate over all <code class="docutils literal notranslate"><span class="pre">systems</span></code> and transform the <code class="docutils literal notranslate"><span class="pre">ligand</span></code> into a bit vector. All performed featurizations are commonly stored in the <code class="docutils literal notranslate"><span class="pre">featurizations</span></code> attribute of each system. The <code class="docutils literal notranslate"><span class="pre">last</span></code> performed featurization is stored additionally for easy access.</p>
+<p>To get the <code class="docutils literal notranslate"><span class="pre">X</span></code> (<code class="docutils literal notranslate"><span class="pre">system</span></code> information) in a machine-friendly format, KinoML uses so called featurizers, which encode the information of each system. KinoML has different featurizers implemented. In this notebook we will use the <code class="docutils literal notranslate"><span class="pre">MorganFingerprintFeaturizer</span></code>. We are going to iterate this featurizer over all <code class="docutils literal notranslate"><span class="pre">systems</span></code> and transform the <code class="docutils literal notranslate"><span class="pre">ligand</span></code> into a bit vector. All performed featurizations are commonly stored in the <code class="docutils literal notranslate"><span class="pre">featurizations</span></code> attribute of each system. The <code class="docutils literal notranslate"><span class="pre">last</span></code> performed
+featurization is stored additionally for easy access.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
@@ -599,9 +703,12 @@ array([5.13076828])
 </div>
 <p>For more details on the KinoML object model have a look at the respective <a class="reference external" href="https://openkinome.org/kinoml/notebooks/kinoml_object_model.html">notebook</a>.</p>
 </section>
+</section>
+<section id="3.-ML-model-training-and-testing">
+<h2 id="3.-ML-model-training-and-testing">3. ML model training and testing<a class="headerlink" href="#3.-ML-model-training-and-testing" title="Permalink to this headline">¶</a></h2>
 <section id="ML-training-and-testing">
 <h3 id="ML-training-and-testing">ML training and testing<a class="headerlink" href="#ML-training-and-testing" title="Permalink to this headline">¶</a></h3>
-<p>Now that we have <code class="docutils literal notranslate"><span class="pre">X</span></code> and <code class="docutils literal notranslate"><span class="pre">y</span></code>, we can run a small ML experiment. In this case, we will train a <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html">support vector classifier</a> from sklearn.</p>
+<p>Great, we have used KinoML to first obtain the data we wanted to work with, and then to featurize this data and make it ML readable. Now that we have <code class="docutils literal notranslate"><span class="pre">X</span></code> and <code class="docutils literal notranslate"><span class="pre">y</span></code>, we can run a small ML experiment. In this case, we will train a <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html">support vector classifier</a> from sklearn.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
@@ -716,7 +823,7 @@ SVC(probability=True)
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/notebooks_getting_started_24_0.png" src="../_images/notebooks_getting_started_24_0.png"/>
+<img alt="../_images/notebooks_getting_started_25_0.png" src="../_images/notebooks_getting_started_25_0.png"/>
 </div>
 </div>
 <p>For more advanced examples have a look at the <a class="reference external" href="https://github.com/openkinome/experiments-binding-affinity">experiments-binding-affinity</a> repository.</p>
@@ -734,7 +841,7 @@ SVC(probability=True)
     <div class="md-footer-nav">
       <nav class="md-footer-nav__inner md-grid">
           
-            <a href="../index.html" title="OpenKinome &amp; KinoML"
+            <a href="../index.html" title="KinoML"
                class="md-flex md-footer-nav__link md-footer-nav__link--prev"
                rel="prev">
               <div class="md-flex__cell md-flex__cell--shrink">
@@ -743,7 +850,7 @@ SVC(probability=True)
               <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
                 <span class="md-flex__ellipsis">
                   <span
-                      class="md-footer-nav__direction"> "Previous" </span> OpenKinome &amp; KinoML </span>
+                      class="md-footer-nav__direction"> "Previous" </span> KinoML </span>
               </div>
             </a>
           
@@ -771,7 +878,7 @@ SVC(probability=True)
               
           </div>
             Last updated on
-              Apr 11, 2022.
+              Dec 20, 2023.
             <br/>
             Created using
             <a href="http://www.sphinx-doc.org/">Sphinx</a> 4.5.0.

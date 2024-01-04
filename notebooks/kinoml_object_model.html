@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <meta property="article:modified_time" content="2022-04-22T16:36:09+00:00" />
+    <meta property="article:modified_time" content="2023-12-20T14:48:30+00:00" />
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   <meta name="lang:clipboard.copy" content="Copy to clipboard">
@@ -56,8 +56,8 @@
     <link rel="stylesheet" type="text/css" href="../_static/twemoji.css" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" />
     <link rel="stylesheet" type="text/css" href="../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" />
     <link rel="stylesheet" type="text/css" href="../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
     <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css" />
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
@@ -75,7 +75,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="OpenEye Structural Featurizer" href="OpenEye_structural_featurizer.html" />
-    <link rel="prev" title="Getting Started" href="getting_started.html" />
+    <link rel="prev" title="Getting started with KinoML" href="getting_started.html" />
   
     <link rel="apple-touch-icon" href="../_static/images/custom_favicon.png"/>
   
@@ -229,7 +229,7 @@
     <li class="md-nav__item">
     
     
-      <a href="getting_started.html" class="md-nav__link">Getting Started</a>
+      <a href="getting_started.html" class="md-nav__link">Getting started with KinoML</a>
       
     
     </li>
@@ -275,7 +275,21 @@
     
     
       <a href="#Molecular-components" class="md-nav__link">Molecular components</a>
+      <ul class="md-nav__list"> 
+    <li class="md-nav__item">
+    
+    
+      <a href="#Ligands" class="md-nav__link">Ligands</a>
       
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="#Proteins" class="md-nav__link">Proteins</a>
+      
+    
+    </li></ul>
     
     </li>
     <li class="md-nav__item">
@@ -310,11 +324,6 @@
     </li>
     <li class="md-nav__item">
     
-      <span class="md-nav__link caption"><span class="caption-text">Tutorials</span></span>
-    
-    </li>
-    <li class="md-nav__item">
-    
     
       <a href="OpenEye_structural_featurizer.html" class="md-nav__link">OpenEye Structural Featurizer</a>
       
@@ -324,6 +333,39 @@
     
     
       <a href="Schrodinger_structural_featurizer.html" class="md-nav__link">Schrodinger Structural Featurizer</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+      <span class="md-nav__link caption"><span class="caption-text">Experiment tutorials</span></span>
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="ligand-only-smiles-EGFR.html" class="md-nav__link">Ligand-only SMILES experiment</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="ligand-only-morgan1024-EGFR.html" class="md-nav__link">Ligand-only morgan 1024 experiment</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="kinase-ligand-informed-smiles-sequence-EGFR.html" class="md-nav__link">Kinase informed SMILES experiment</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="kinase-ligand-informed-morgan-composition-EGFR.html" class="md-nav__link">Kinase informed morgan 1024 experiment</a>
       
     
     </li>
@@ -393,7 +435,7 @@
 <code class="docutils literal notranslate"><span class="pre">Protein</span></code> and a <code class="docutils literal notranslate"><span class="pre">Ligand</span></code>. <code class="docutils literal notranslate"><span class="pre">Featurizer</span></code>s will use the input of the <code class="docutils literal notranslate"><span class="pre">MolecularComponent</span></code>s to represent the <code class="docutils literal notranslate"><span class="pre">System</span></code> in different formats for machine learning tasks, e.g. a <code class="docutils literal notranslate"><span class="pre">Ligand</span></code> as molecular fingerprint.</p>
 <div class="line-block">
 <div class="line"><img alt="KinoML object model" src="../_images/object_model.png"/></div>
-<div class="line"><strong>Fig. 1:</strong> KinoML object model</div>
+<div class="line"><strong>Fig. 2:</strong> KinoML object model.</div>
 </div>
 <p>KinoML has a focus on protein kinases but the architecture is applicable to protein targets in general. When writing your own KinoML objects it is recommended to move computational expensive tasks to the <code class="docutils literal notranslate"><span class="pre">Featurizer</span></code> level, which is capable of multi-processing. For example <code class="docutils literal notranslate"><span class="pre">Protein</span></code> objects can be initialized with nothing else but a UniProt ID. The amino acid sequence will be fetched when the <code class="docutils literal notranslate"><span class="pre">Protein</span></code>’s <code class="docutils literal notranslate"><span class="pre">sequence</span></code> attribute is called for the first time. Thus, one can quickly generate
 many <code class="docutils literal notranslate"><span class="pre">Protein</span></code> objects and the more time-consuming sequence fetching is done with multi-processing during featurization.</p>
@@ -1095,7 +1137,7 @@ There were 3 systems that could not be featurized!
     <div class="md-footer-nav">
       <nav class="md-footer-nav__inner md-grid">
           
-            <a href="getting_started.html" title="Getting Started"
+            <a href="getting_started.html" title="Getting started with KinoML"
                class="md-flex md-footer-nav__link md-footer-nav__link--prev"
                rel="prev">
               <div class="md-flex__cell md-flex__cell--shrink">
@@ -1104,7 +1146,7 @@ There were 3 systems that could not be featurized!
               <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
                 <span class="md-flex__ellipsis">
                   <span
-                      class="md-footer-nav__direction"> "Previous" </span> Getting Started </span>
+                      class="md-footer-nav__direction"> "Previous" </span> Getting started with KinoML </span>
               </div>
             </a>
           
@@ -1132,7 +1174,7 @@ There were 3 systems that could not be featurized!
               
           </div>
             Last updated on
-              Apr 22, 2022.
+              Dec 20, 2023.
             <br/>
             Created using
             <a href="http://www.sphinx-doc.org/">Sphinx</a> 4.5.0.

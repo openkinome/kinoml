@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <meta property="article:modified_time" content="2022-04-22T16:36:09+00:00" />
+    <meta property="article:modified_time" content="2023-12-20T14:48:30+00:00" />
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   <meta name="lang:clipboard.copy" content="Copy to clipboard">
@@ -56,8 +56,8 @@
     <link rel="stylesheet" type="text/css" href="../_static/twemoji.css" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" />
     <link rel="stylesheet" type="text/css" href="../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" />
     <link rel="stylesheet" type="text/css" href="../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
     <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css" />
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
@@ -74,7 +74,7 @@
     <link rel="shortcut icon" href="../_static/custom_favicon.png"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="kinoml" href="../api/kinoml/index.html" />
+    <link rel="next" title="Ligand-only SMILES experiment" href="ligand-only-smiles-EGFR.html" />
     <link rel="prev" title="OpenEye Structural Featurizer" href="OpenEye_structural_featurizer.html" />
   
     <link rel="apple-touch-icon" href="../_static/images/custom_favicon.png"/>
@@ -229,7 +229,7 @@
     <li class="md-nav__item">
     
     
-      <a href="getting_started.html" class="md-nav__link">Getting Started</a>
+      <a href="getting_started.html" class="md-nav__link">Getting started with KinoML</a>
       
     
     </li>
@@ -238,11 +238,6 @@
     
       <a href="kinoml_object_model.html" class="md-nav__link">KinoML object model</a>
       
-    
-    </li>
-    <li class="md-nav__item">
-    
-      <span class="md-nav__link caption"><span class="caption-text">Tutorials</span></span>
     
     </li>
     <li class="md-nav__item">
@@ -309,14 +304,56 @@
     
     
       <a href="#SCHRODINGERDockingFeaturizer" class="md-nav__link">SCHRODINGERDockingFeaturizer</a>
+      <ul class="md-nav__list"> 
+    <li class="md-nav__item">
+    
+    
+      <a href="#Without-shape-restrain" class="md-nav__link">Without shape restrain</a>
       
     
     </li>
     <li class="md-nav__item">
     
     
-      <a href="#MostSimilarPDBLigandFeaturizer" class="md-nav__link">MostSimilarPDBLigandFeaturizer</a>
+      <a href="#With-shape-restrain" class="md-nav__link">With shape restrain</a>
       
+    
+    </li></ul>
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="#MostSimilarPDBLigandFeaturizer" class="md-nav__link">MostSimilarPDBLigandFeaturizer</a>
+      <ul class="md-nav__list"> 
+    <li class="md-nav__item">
+    
+    
+      <a href="#Most-common-substructure" class="md-nav__link">Most common substructure</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="#Fingerprint" class="md-nav__link">Fingerprint</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="#Schrodinger&#39;s-shape" class="md-nav__link">Schrodinger’s shape</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="#Pipeline-of-MostSimilarPDBLigandFeaturizer-and-SCHRODINGERDockingFeaturizer" class="md-nav__link">Pipeline of MostSimilarPDBLigandFeaturizer and SCHRODINGERDockingFeaturizer</a>
+      
+    
+    </li></ul>
     
     </li>
     <li class="md-nav__item">
@@ -326,6 +363,39 @@
       
     
     </li></ul>
+    
+    </li>
+    <li class="md-nav__item">
+    
+      <span class="md-nav__link caption"><span class="caption-text">Experiment tutorials</span></span>
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="ligand-only-smiles-EGFR.html" class="md-nav__link">Ligand-only SMILES experiment</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="ligand-only-morgan1024-EGFR.html" class="md-nav__link">Ligand-only morgan 1024 experiment</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="kinase-ligand-informed-smiles-sequence-EGFR.html" class="md-nav__link">Kinase informed SMILES experiment</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="kinase-ligand-informed-morgan-composition-EGFR.html" class="md-nav__link">Kinase informed morgan 1024 experiment</a>
+      
     
     </li>
     <li class="md-nav__item">
@@ -1403,12 +1473,12 @@ n_processes : int or None, default=None
             </a>
           
           
-            <a href="../api/kinoml/index.html" title="kinoml"
+            <a href="ligand-only-smiles-EGFR.html" title="Ligand-only SMILES experiment"
                class="md-flex md-footer-nav__link md-footer-nav__link--next"
                rel="next">
             <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title"><span
                 class="md-flex__ellipsis"> <span
-                class="md-footer-nav__direction"> "Next" </span> <code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml</span></code> </span>
+                class="md-footer-nav__direction"> "Next" </span> Ligand-only SMILES experiment </span>
             </div>
             <div class="md-flex__cell md-flex__cell--shrink"><i
                 class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
@@ -1426,7 +1496,7 @@ n_processes : int or None, default=None
               
           </div>
             Last updated on
-              Apr 22, 2022.
+              Dec 20, 2023.
             <br/>
             Created using
             <a href="http://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
