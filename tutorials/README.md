@@ -25,5 +25,5 @@ This tutorial folder contains two subfolders:
 
 Please note that the order in which the different notebooks are displayed here is the recommended order for running them, providing a more comprehensive understanding of KinoML.
 
-⚠️ You will need a valid OpenEye License for the featurizers of the tutorials to work. For the Schrodinger featurizers tutorial (`Schrodinger_structural_featurizer_showcase.ipynb`) you will also need a Schrodinger License!
+⚠️ You will need a valid OpenEye License for the tutorials to work. For the Schrodinger featurizers tutorial (`Schrodinger_structural_featurizer_showcase.ipynb`) you will also need a Schrodinger License!
 
