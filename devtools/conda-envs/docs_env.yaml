@@ -15,7 +15,7 @@ dependencies:
   - sphinx-notfound-page
   - sphinx-prompt
   - sphinx-copybutton
-  - sphinx-autoapi>=3<4
+  - sphinx-autoapi>=3,<4
   - myst-parser
   - sphinxcontrib-httpdomain
   - linkify-it-py
