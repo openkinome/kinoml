@@ -9,7 +9,7 @@ dependencies:
   # core
   #- sphinx~=2.4.0
   - sphinx
-  - jinja2<=3.0.3
+  - jinja2
   - nbsphinx
   - nbsphinx-link
   - sphinx-notfound-page
