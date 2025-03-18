@@ -44,7 +44,7 @@ extensions = [
     "nbsphinx",
     "nbsphinx_link",
     # "sphinx_last_updated_by_git",
-    "sphinx_panels",
+    # "sphinx_panels",
     "IPython.sphinxext.ipython_console_highlighting",
 ]
 
