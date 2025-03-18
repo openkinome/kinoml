@@ -64,7 +64,7 @@ autoapi_root = "api"
 autoapi_add_toctree_entry = False
 autoapi_ignore = [
     "*migrations*",
-    "_version*",
+    "*_version*",
     "*tests*",
     "*/data/*",
 ]
