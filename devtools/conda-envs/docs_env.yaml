@@ -19,7 +19,7 @@ dependencies:
   - myst-parser
   - sphinxcontrib-httpdomain
   - linkify-it-py
-  - sphinx-panels
+  #- sphinx-panels
   # themes
   - sphinx-material
   # local building
