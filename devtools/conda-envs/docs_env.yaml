@@ -24,8 +24,8 @@ dependencies:
   - sphinx-material
   # local building
   - sphinx-autobuild
-  - pip:
+  #- pip:
       # core
       #- sphinx-version-warning
-      - sphinxemoji
-      - sphinx-last-updated-by-git
+      #- sphinxemoji
+      #- sphinx-last-updated-by-git
