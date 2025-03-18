@@ -34,7 +34,7 @@ extensions = [
     "sphinx.ext.autosectionlabel",
     "sphinx.ext.todo",
     "sphinx.ext.napoleon",
-    "sphinxemoji.sphinxemoji",
+    # "sphinxemoji.sphinxemoji",
     "sphinx-prompt",
     "sphinx_copybutton",
     # "notfound.extension",
@@ -43,7 +43,7 @@ extensions = [
     "autoapi.extension",
     "nbsphinx",
     "nbsphinx_link",
-    "sphinx_last_updated_by_git",
+    # "sphinx_last_updated_by_git",
     "sphinx_panels",
     "IPython.sphinxext.ipython_console_highlighting",
 ]
