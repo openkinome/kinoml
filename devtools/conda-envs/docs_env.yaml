@@ -26,7 +26,6 @@ dependencies:
   - sphinx-autobuild
   - pip:
       # core
-      - sphinx-version-warning
+      #- sphinx-version-warning
       - sphinxemoji
       - sphinx-last-updated-by-git
-
