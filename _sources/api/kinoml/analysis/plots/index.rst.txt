@@ -1,0 +1,18 @@
+kinoml.analysis.plots
+=====================
+
+.. py:module:: kinoml.analysis.plots
+
+.. autoapi-nested-parse::
+
+   Common plots for ML model performance analysis
+
+
+
+
+
+Module Contents
+---------------
+
+.. py:function:: predicted_vs_observed(predicted, observed, measurement_type, with_metrics=True, **kwargs)
+

@@ -1,12 +1,10 @@
-
 <!DOCTYPE html>
 
-<html>
+<html lang="en" data-content_root="../">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <meta property="article:modified_time" content="2023-12-20T14:48:30+00:00" />
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   <meta name="lang:clipboard.copy" content="Copy to clipboard">
@@ -51,27 +49,20 @@
   
   
     <title>KinoML object model &#8212; KinoML 0.1 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/material.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/twemoji.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css" />
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/jquery.js"></script>
-    <script src="../_static/underscore.js"></script>
-    <script src="../_static/doctools.js"></script>
-    <script src="https://twemoji.maxcdn.com/v/latest/twemoji.min.js"></script>
-    <script src="../_static/twemoji.js"></script>
-    <script src="../_static/clipboard.min.js"></script>
-    <script src="../_static/copybutton.js"></script>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=75810a84" />
+    <link rel="stylesheet" type="text/css" href="../_static/material.css?v=79c92029" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
+    <script src="../_static/documentation_options.js?v=2709fde1"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script>window.MathJax = {"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}, "tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <link rel="shortcut icon" href="../_static/custom_favicon.png"/>
+    <link rel="icon" href="../_static/custom_favicon.png"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="OpenEye Structural Featurizer" href="OpenEye_structural_featurizer.html" />
@@ -430,7 +421,7 @@
           <article class="md-content__inner md-typeset" role="main">
             
   <section id="KinoML-object-model">
-<h1 id="notebooks-kinoml-object-model--page-root">KinoML object model<a class="headerlink" href="#notebooks-kinoml-object-model--page-root" title="Permalink to this headline">¶</a></h1>
+<h1 id="notebooks-kinoml-object-model--page-root">KinoML object model<a class="headerlink" href="#notebooks-kinoml-object-model--page-root" title="Link to this heading">¶</a></h1>
 <p>The KinoML object model provides access to binding affinity data in the context of machine learning for small molecule drug discovery (Fig. 1). The <code class="docutils literal notranslate"><span class="pre">DatasetProvider</span></code> is the central object for storing all relevant information of a dataset. It is essentially a list of <code class="docutils literal notranslate"><span class="pre">Measurement</span></code> objects, which contain the measured <code class="docutils literal notranslate"><span class="pre">values</span></code> (singlicate or replicates), associated to a <code class="docutils literal notranslate"><span class="pre">System</span></code> plus experimental <code class="docutils literal notranslate"><span class="pre">AssayCondition</span></code>s. A <code class="docutils literal notranslate"><span class="pre">System</span></code> is a list of <code class="docutils literal notranslate"><span class="pre">MolecularComponent</span></code> objects; usually a
 <code class="docutils literal notranslate"><span class="pre">Protein</span></code> and a <code class="docutils literal notranslate"><span class="pre">Ligand</span></code>. <code class="docutils literal notranslate"><span class="pre">Featurizer</span></code>s will use the input of the <code class="docutils literal notranslate"><span class="pre">MolecularComponent</span></code>s to represent the <code class="docutils literal notranslate"><span class="pre">System</span></code> in different formats for machine learning tasks, e.g. a <code class="docutils literal notranslate"><span class="pre">Ligand</span></code> as molecular fingerprint.</p>
 <div class="line-block">
@@ -441,10 +432,10 @@
 many <code class="docutils literal notranslate"><span class="pre">Protein</span></code> objects and the more time-consuming sequence fetching is done with multi-processing during featurization.</p>
 <p>In the following section, different KinoML objects will be introduced including code examples.</p>
 <section id="Molecular-components">
-<h2 id="Molecular-components">Molecular components<a class="headerlink" href="#Molecular-components" title="Permalink to this headline">¶</a></h2>
+<h2 id="Molecular-components">Molecular components<a class="headerlink" href="#Molecular-components" title="Link to this heading">¶</a></h2>
 <p>Molecular components like ligands and proteins store molecular representations, a <code class="docutils literal notranslate"><span class="pre">name</span></code> and additional <code class="docutils literal notranslate"><span class="pre">metadata</span></code>, that may be important for working with the data and provenance.</p>
 <section id="Ligands">
-<h3 id="Ligands">Ligands<a class="headerlink" href="#Ligands" title="Permalink to this headline">¶</a></h3>
+<h3 id="Ligands">Ligands<a class="headerlink" href="#Ligands" title="Link to this heading">¶</a></h3>
 <p>Ligand objects store information about the molecular structure of a ligand, usually a small molecule with certain activity for a target.</p>
 <p>The <code class="docutils literal notranslate"><span class="pre">Ligand</span></code> object is based on the OpenFF-Toolkit <code class="docutils literal notranslate"><span class="pre">Molecule</span></code> <a class="reference external" href="https://github.com/openforcefield/openff-toolkit/blob/master/openff/toolkit/topology/molecule.py">object</a>, which can be accessed via the <code class="docutils literal notranslate"><span class="pre">molecule</span></code> attribute. This also allows usage of methods of the OpenFF-Toolkit <code class="docutils literal notranslate"><span class="pre">Molecule</span></code> including conversion to other toolkits, e.g. <a class="reference external" href="https://www.rdkit.org/docs/">RDKit</a> and <a class="reference external" href="https://docs.eyesopen.com/toolkits/python/index.html">OpenEye</a>. The <code class="docutils literal notranslate"><span class="pre">Ligand</span></code> object can be directly
 initialized via SMILES or file including interpretation of the given input, or lazely initialized via SMILES without any interpretation of the given input.</p>
@@ -452,9 +443,9 @@ initialized via SMILES or file including interpretation of the given input, or l
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">openff.toolkit.utils.exceptions</span> <span class="kn">import</span> <span class="n">SMILESParseError</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">openff.toolkit.utils.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">SMILESParseError</span>
 
-<span class="kn">from</span> <span class="nn">kinoml.core.ligands</span> <span class="kn">import</span> <span class="n">Ligand</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">kinoml.core.ligands</span><span class="w"> </span><span class="kn">import</span> <span class="n">Ligand</span>
 </pre></div>
 </div>
 </div>
@@ -572,7 +563,7 @@ Warning: ^
 </div>
 </section>
 <section id="Proteins">
-<h3 id="Proteins">Proteins<a class="headerlink" href="#Proteins" title="Permalink to this headline">¶</a></h3>
+<h3 id="Proteins">Proteins<a class="headerlink" href="#Proteins" title="Link to this heading">¶</a></h3>
 <p>Protein objects store information about the molecular structure of a protein, e.g. the target of a small molecule inhibitor.</p>
 <p>KinoML provides two different Protein objects, i.e. <code class="docutils literal notranslate"><span class="pre">Protein</span></code> (applicable to all proteins) and <code class="docutils literal notranslate"><span class="pre">KLIFSKinase</span></code> (allows access to information from the protein kinase-specific KLIFS database). Similar to <code class="docutils literal notranslate"><span class="pre">Ligand</span></code>, protein objects can be directly or lazily initialized.</p>
 <p>Again, the molecular structure is accessable via the <code class="docutils literal notranslate"><span class="pre">molecule</span></code> attribute. However, both protein objects support two toolkits, i.e. <a class="reference external" href="https://docs.mdanalysis.org/stable/index.html">MDAnalysis</a> and <a class="reference external" href="https://docs.eyesopen.com/toolkits/python/index.html">OpenEye</a>, which can be specified via the toolkit argument. A conversion from one toolkit to the other after initialization is currently not possible, but likely not needed anyway.</p>
@@ -582,7 +573,7 @@ inherit their sequence-related functionality from the <code class="docutils lite
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">kinoml.core.proteins</span> <span class="kn">import</span> <span class="n">Protein</span><span class="p">,</span> <span class="n">KLIFSKinase</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">kinoml.core.proteins</span><span class="w"> </span><span class="kn">import</span> <span class="n">Protein</span><span class="p">,</span> <span class="n">KLIFSKinase</span>
 </pre></div>
 </div>
 </div>
@@ -727,13 +718,13 @@ WELGEGAFGKVFLVAVKALDFQREAELLTMLQQHIVRFFGVLMVFEYMRHGDLNRFLRSYLAGLHFVHRDLATRNCLVIG
 </section>
 </section>
 <section id="Systems">
-<h2 id="Systems">Systems<a class="headerlink" href="#Systems" title="Permalink to this headline">¶</a></h2>
+<h2 id="Systems">Systems<a class="headerlink" href="#Systems" title="Link to this heading">¶</a></h2>
 <p>Systems store all molecular components for a given activity data point. They may only contain a <code class="docutils literal notranslate"><span class="pre">Ligand</span></code> in case of purely ligand-based featurization but can also contain a <code class="docutils literal notranslate"><span class="pre">Protein</span></code>, i.e. <code class="docutils literal notranslate"><span class="pre">LigandSystem</span></code>, <code class="docutils literal notranslate"><span class="pre">ProteinSystem</span></code>, <code class="docutils literal notranslate"><span class="pre">ProteinLigandComplex</span></code>.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">kinoml.core.systems</span> <span class="kn">import</span> <span class="n">LigandSystem</span><span class="p">,</span> <span class="n">ProteinSystem</span><span class="p">,</span> <span class="n">ProteinLigandComplex</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">kinoml.core.systems</span><span class="w"> </span><span class="kn">import</span> <span class="n">LigandSystem</span><span class="p">,</span> <span class="n">ProteinSystem</span><span class="p">,</span> <span class="n">ProteinLigandComplex</span>
 </pre></div>
 </div>
 </div>
@@ -802,13 +793,13 @@ WELGEGAFGKVFLVAVKALDFQREAELLTMLQQHIVRFFGVLMVFEYMRHGDLNRFLRSYLAGLHFVHRDLATRNCLVIG
 </div>
 </section>
 <section id="Featurizers">
-<h2 id="Featurizers">Featurizers<a class="headerlink" href="#Featurizers" title="Permalink to this headline">¶</a></h2>
+<h2 id="Featurizers">Featurizers<a class="headerlink" href="#Featurizers" title="Link to this heading">¶</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">Featurizer</span></code>s ingest <code class="docutils literal notranslate"><span class="pre">System</span></code>s to compute features for e.g. machine learning tasks. Systems failing during featurization will be removed, e.g. erroneous SMILES. Featurizations are stored in each system for later usage.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">kinoml.features.ligand</span> <span class="kn">import</span> <span class="n">MorganFingerprintFeaturizer</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">kinoml.features.ligand</span><span class="w"> </span><span class="kn">import</span> <span class="n">MorganFingerprintFeaturizer</span>
 </pre></div>
 </div>
 </div>
@@ -939,14 +930,14 @@ Warning: ^
 </div>
 </section>
 <section id="Measurements">
-<h2 id="Measurements">Measurements<a class="headerlink" href="#Measurements" title="Permalink to this headline">¶</a></h2>
+<h2 id="Measurements">Measurements<a class="headerlink" href="#Measurements" title="Link to this heading">¶</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">Measurement</span></code>s combine information for a given activity data point, i.e. <code class="docutils literal notranslate"><span class="pre">System</span></code>, <code class="docutils literal notranslate"><span class="pre">AssayCondition</span></code> and activity <code class="docutils literal notranslate"><span class="pre">values</span></code>. Currently available <code class="docutils literal notranslate"><span class="pre">Measurement</span></code> objects are <code class="docutils literal notranslate"><span class="pre">PercentageDisplacementMeasurement</span></code>, <code class="docutils literal notranslate"><span class="pre">pIC50Measurement</span></code>, <code class="docutils literal notranslate"><span class="pre">pKiMeasurement</span></code>, <code class="docutils literal notranslate"><span class="pre">pKdMeasurement</span></code>.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">kinoml.core.conditions</span> <span class="kn">import</span> <span class="n">AssayConditions</span>
-<span class="kn">from</span> <span class="nn">kinoml.core.measurements</span> <span class="kn">import</span> <span class="n">PercentageDisplacementMeasurement</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">kinoml.core.conditions</span><span class="w"> </span><span class="kn">import</span> <span class="n">AssayConditions</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">kinoml.core.measurements</span><span class="w"> </span><span class="kn">import</span> <span class="n">PercentageDisplacementMeasurement</span>
 </pre></div>
 </div>
 </div>
@@ -976,14 +967,14 @@ Warning: ^
 </div>
 </section>
 <section id="DatasetProviders">
-<h2 id="DatasetProviders">DatasetProviders<a class="headerlink" href="#DatasetProviders" title="Permalink to this headline">¶</a></h2>
+<h2 id="DatasetProviders">DatasetProviders<a class="headerlink" href="#DatasetProviders" title="Link to this heading">¶</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">DatasetProviders</span></code> are essentially a list of <code class="docutils literal notranslate"><span class="pre">Measurement</span></code>s, which can be used for machine learning experiments. <code class="docutils literal notranslate"><span class="pre">Featurizer</span></code>s can be passed to allow a featurization of all available <code class="docutils literal notranslate"><span class="pre">System</span></code>s. Currently, KinoML is shipped with <code class="docutils literal notranslate"><span class="pre">DatasetProvider</span></code>s for <a class="reference external" href="https://doi.org/10.1371/journal.pone.0181585">PKIS2</a> and <a class="reference external" href="https://www.ebi.ac.uk/chembl/">ChEMBL</a> datasets allowing quick experiment design.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">kinoml.datasets.chembl</span> <span class="kn">import</span> <span class="n">ChEMBLDatasetProvider</span>
-<span class="kn">from</span> <span class="nn">kinoml.datasets.pkis2</span> <span class="kn">import</span> <span class="n">PKIS2DatasetProvider</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">kinoml.datasets.chembl</span><span class="w"> </span><span class="kn">import</span> <span class="n">ChEMBLDatasetProvider</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">kinoml.datasets.pkis2</span><span class="w"> </span><span class="kn">import</span> <span class="n">PKIS2DatasetProvider</span>
 </pre></div>
 </div>
 </div>
@@ -1092,7 +1083,7 @@ Warning: ^
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">kinoml.features.protein</span> <span class="kn">import</span> <span class="n">OneHotEncodedSequenceFeaturizer</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">kinoml.features.protein</span><span class="w"> </span><span class="kn">import</span> <span class="n">OneHotEncodedSequenceFeaturizer</span>
 </pre></div>
 </div>
 </div>
@@ -1173,11 +1164,8 @@ There were 3 systems that could not be featurized!
               &#169; Copyright 2021, OpenKinome.
               
           </div>
-            Last updated on
-              Dec 20, 2023.
-            <br/>
             Created using
-            <a href="http://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
+            <a href="http://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
              and
             <a href="https://github.com/bashtage/sphinx-material/">Material for
               Sphinx</a>

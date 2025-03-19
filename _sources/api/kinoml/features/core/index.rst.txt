@@ -1,0 +1,839 @@
+kinoml.features.core
+====================
+
+.. py:module:: kinoml.features.core
+
+.. autoapi-nested-parse::
+
+   Featurizers can transform a ``kinoml.core.system.System`` object and produce
+   new representations of the molecular entities and their associated measurements.
+
+
+
+
+
+
+
+Module Contents
+---------------
+
+.. py:data:: logger
+
+.. py:class:: BaseFeaturizer
+
+   Abstract Featurizer class.
+
+
+   .. py:attribute:: _SUPPORTED_TYPES
+
+
+   .. py:method:: featurize(systems: List[kinoml.core.systems.System], keep=True) -> List[kinoml.core.systems.System]
+
+      Given some systems (compatible with ``_SUPPORTED_TYPES``), apply
+      the featurization scheme implemented in this class.
+
+      First, ``self.supports()`` will check whether the systems are compatible
+      with the featurization scheme. We assume all of them are equal, so only
+      the first one will be checked. Then, the Systems are passed to
+      ``self._featurize`` to handle the actual leg-work.
+
+      :param systems: This is the collection of System objects that will be transformed.
+      :type systems: list of System
+      :param keep: Whether to store the current featurizer in the ``system.featurizations``
+                   dictionary with its own key (``self.name``), in addition to ``last``.
+      :type keep: bool, optional=True
+
+      :returns: **systems** -- The same systems that were passed in.
+                The returned Systems will have an extra entry in the ``.featurizations``
+                dictionary, containing the featurized object (either a new System
+                or an array-like object) under a key named after ``.name``.
+      :rtype: list of System
+
+
+
+   .. py:method:: __call__(*args, **kwargs)
+
+      You can also call the instance directly. This forwards to
+      ``.featurize()``.
+
+
+
+   .. py:method:: _pre_featurize(systems: List[kinoml.core.systems.System]) -> None
+
+      Run before featurizing all systems. Redefine this method if needed.
+
+      :param systems: This is the collection of System objects that will be transformed.
+      :type systems: list of System
+
+
+
+   .. py:method:: _featurize(systems: List[kinoml.core.systems.System]) -> List[object]
+
+      Featurize all system objects in a serial fashion as defined in ``._featurize_one()``.
+
+      :param systems: This is the collection of System objects that will be transformed.
+      :type systems: list of System
+
+      :returns: **features**
+      :rtype: list of System or array-like
+
+
+
+   .. py:method:: _featurize_one(system: kinoml.core.systems.System) -> object
+      :abstractmethod:
+
+
+      Implement this method to do the actual leg-work for `self.featurize()`.
+      It takes a single System object and returns either a new System object
+      or an array-like object.
+
+      :param system: The System to be featurized.
+      :type system: System
+
+      :rtype: System or array-like
+
+
+
+   .. py:method:: _post_featurize(systems: List[kinoml.core.systems.System], features: List, keep: bool = True) -> List[kinoml.core.systems.System]
+
+      Run after featurizing all systems. Systems with a feature of None will be removed and
+      listed in a log file in the current working directory. You shouldn't need to redefine
+      this method.
+
+      :param systems: The systems being featurized
+      :type systems: list of System
+      :param features: The features returned by ``self._featurize``
+      :type features: list
+      :param keep: Whether to store the current featurizer in the ``system.featurizations``
+                   dictionary with its own key (``self.name``), in addition to ``last``.
+      :type keep: bool, optional=True
+
+      :returns: **filtered_systems** -- The same systems as passed, but with ``.featurizations`` extended with
+                the calculated features in two entries: the featurizer name and ``last``.
+                Systems with a feature of None will be removed.
+      :rtype: systems
+
+
+
+   .. py:method:: supports(*systems: kinoml.core.systems.System, raise_errors: bool = True) -> bool
+
+      Check if these systems are supported by this featurizer.
+
+      Do NOT reimplement in subclass. Check ``._supports()`` instead.
+
+      :param systems: Systems to be checked (by type, contained attributes, etc)
+      :type systems: list of System
+      :param raise_errors: if True, raise `ValueError` if errors were found
+      :type raise_errors: bool, optional=True
+
+      :returns: True if all systems are compatible, False otherwise
+      :rtype: bool
+
+      :raises `ValueError`` if ``._supports()`` fails and ``raise_errors`` is `True`:
+
+
+
+   .. py:method:: _supports(system: kinoml.core.systems.System) -> bool
+
+      This is the private method that actually tests for compatibility between
+      a single system and the current featurizer.
+
+      This is the method you should reimplement in your subclass.
+
+      :param system: The system that will be checked
+      :type system: System
+
+      :rtype: True if compatible, False otherwise
+
+
+
+   .. py:property:: name
+
+
+   .. py:method:: __repr__()
+
+
+.. py:class:: ParallelBaseFeaturizer(use_multiprocessing: bool = True, n_processes: Union[int, None] = None, chunksize: Union[int, None] = None, dask_client=None, **kwargs)
+
+   Bases: :py:obj:`BaseFeaturizer`
+
+
+   Abstract Featurizer class with support for multiprocessing.
+
+   :param use_multiprocessing: If multiprocessing to use.
+   :type use_multiprocessing: bool, default=True
+   :param n_processes: How many processes to use in case of multiprocessing.
+                       Defaults to number of available CPUs.
+   :type n_processes: int or None, default=None
+   :param chunksize: See https://stackoverflow.com/a/54032744/3407590.
+   :type chunksize: int, optional=None
+   :param dask_client: A dask client to manage multiprocessing. Will ignore `use_multiprocessing`
+                       `chunksize` and `n_processes` attributes.
+   :type dask_client: dask.distributed.Client or None, default=None
+
+
+   .. py:attribute:: _SUPPORTED_TYPES
+
+
+   .. py:attribute:: use_multiprocessing
+      :value: True
+
+
+
+   .. py:attribute:: n_processes
+      :value: None
+
+
+
+   .. py:attribute:: chunksize
+      :value: None
+
+
+
+   .. py:attribute:: dask_client
+      :value: None
+
+
+
+   .. py:method:: __getstate__()
+
+      Only preserve object fields that are serializable
+
+
+
+   .. py:method:: __setstate__(state)
+
+      Only preserve object fields that are serializable.
+
+
+
+   .. py:method:: _featurize(systems: List[kinoml.core.systems.System]) -> List[object]
+
+      Featurize all system objects in a parallel fashion as defined in ``._featurize_one()``.
+
+      :param systems: This is the collection of System objects that will be transformed.
+      :type systems: list of System
+
+      :returns: **features**
+      :rtype: list of System or array-like
+
+
+
+.. py:class:: Pipeline(featurizers: List[BaseFeaturizer], shortname=None, **kwargs)
+
+   Bases: :py:obj:`BaseFeaturizer`
+
+
+   Given a list of featurizers, apply them sequentially
+   on the systems (e.g. featurizer A returns X, and X is
+   taken by featurizer B, which returns Y).
+
+   :param featurizers: Featurizers to stack. They must be compatible with
+                       each other!
+   :type featurizers: iterable of BaseFeaturizer
+
+   .. note::
+
+      While ``Pipeline`` is a subclass of ``BaseFeaturizer``,
+      it should be considered a special case of such. It indeed
+      shares the same API but the implementation details of
+      ``._featurize()`` are slightly different. It acts as a
+      wrapper around individual ``Featurizer`` objects.
+
+
+   .. py:attribute:: featurizers
+
+
+   .. py:attribute:: _shortname
+      :value: None
+
+
+
+   .. py:method:: _featurize(systems: List[kinoml.core.systems.System], keep: bool = True) -> List[object]
+
+      Given a list of featurizers, apply them sequentially
+      on the systems (e.g. featurizer A returns X, and X is
+      taken by featurizer B, which returns Y) and store the
+      features in the systems.
+
+      :param systems: This is the collection of System objects that will be transformed
+      :type systems: list of System
+      :param keep: Whether to store the current featurizer in the ``system.featurizations``
+                   dictionary with its own key (``self.name``), in addition to ``last``.
+      :type keep: bool, optional=True
+
+      :returns: **features**
+      :rtype: list of System or array-like
+
+
+
+   .. py:method:: supports(*systems: kinoml.core.systems.System, raise_errors: bool = False) -> bool
+
+      Check if these systems are supported by all featurizers.
+
+      :param systems: systems to be checked (by type, contained attributes, etc)
+      :type systems: list of System
+      :param raise_errors: If True, raise ``ValueError``
+      :type raise_errors: bool, optional=False
+
+      :returns: True if all systems are compatible with all featurizers, False otherwise
+      :rtype: bool
+
+      :raises `ValueError`` if ``f.supports()`` fails and ``raise_errors`` is ``True``:
+
+
+
+   .. py:property:: name
+
+
+   .. py:property:: shortname
+
+
+.. py:class:: Concatenated(featurizers: List[BaseFeaturizer], axis: int = 1, **kwargs)
+
+   Bases: :py:obj:`Pipeline`
+
+
+   Given a list of featurizers, apply them serially and concatenate
+   the result (e.g. featurizer A returns X, and featurizer B returns Y;
+   the output is XY).
+
+   :param featurizers: These should take a System or array, but return only arrays
+                       so they can be concatenated. Note that the arrays must
+                       have the same number of dimensions. If that is not the case,
+                       you will need to reshape one of them using ``CallableFeaturizer``
+                       and a lambda function that relies on ``np.reshape`` or similar.
+   :type featurizers: list of BaseFeaturizer
+   :param axis: On which axis to concatenate. By default, it will concatenate
+                on axis ``1``, which means that the features in each pipeline
+                will be concatenated.
+   :type axis: int, optional=1
+
+   .. admonition:: Notes
+
+      This Featurizer maybe removed in the future, since it can be replaced
+      by `TupleOfArrays`.
+
+
+   .. py:attribute:: axis
+      :value: 1
+
+
+
+   .. py:method:: _featurize(systems: List[kinoml.core.systems.System], keep=True) -> numpy.ndarray
+
+      Given a list of featurizers, apply them serially and concatenate
+      the result (e.g. featurizer A returns X, and featurizer B returns Y;
+      the output is XY).
+
+      :param systems: The Systems (or arrays) to be featurized.
+      :type systems: list of System or array-like
+      :param keep: Whether to store the current featurizer in the ``system.featurizations``
+                   dictionary with its own key (``self.name``), in addition to ``last``.
+      :type keep: bool, optional=True
+
+      :returns: Concatenated arrays along specified ``axis``.
+      :rtype: np.ndarray
+
+
+
+.. py:class:: TupleOfArrays(*args, **kwargs)
+
+   Bases: :py:obj:`Pipeline`
+
+
+   Given a list of featurizers, apply them serially and return
+   the result directly as a flattened tuple of the arrays, for
+   each system. E.g; given one system, featurizer A returns X,
+   and featurizer B returns Y, Z; the output is a tuple of X, Y, Z).
+
+   The final result will be tuple of tuples.
+
+
+   .. py:method:: _featurize(systems: List[kinoml.core.systems.System], keep: bool = True) -> List
+
+      Given a list of featurizers, apply them serially and build a
+      flat tuple out of the results.
+
+      :param systems: The Systems (or arrays) to be featurized.
+      :type systems: list of System or array-like
+      :param keep: Whether to store the current featurizer in the ``system.featurizations``
+                   dictionary with its own key (``self.name``), in addition to ``last``.
+      :type keep: bool, optional=True
+
+      :returns: If the last featurizer is returning a single array,
+                the shape of the object will be (N_systems,). If
+                the last featurizer returns more than one array,
+                it will be (N_systems, M_returned_objects).
+      :rtype: tuple of (of tuples) arraylike
+
+
+
+.. py:class:: BaseOneHotEncodingFeaturizer(dictionary: dict = None, **kwargs)
+
+   Bases: :py:obj:`ParallelBaseFeaturizer`
+
+
+   Base class for Featurizers concerning one hot encoding.
+
+
+   .. py:attribute:: ALPHABET
+      :value: None
+
+
+
+   .. py:attribute:: dictionary
+      :value: None
+
+
+
+   .. py:method:: _featurize_one(system: Union[kinoml.core.systems.LigandSystem, kinoml.core.systems.ProteinLigandComplex]) -> Union[numpy.ndarray, None]
+
+      One hot encode one system.
+
+      :param system: The System to be featurized.
+      :type system: LigandSystem or ProteinLigandComplex
+
+      :rtype: array or None
+
+
+
+   .. py:method:: _retrieve_sequence(system: kinoml.core.systems.System)
+      :abstractmethod:
+
+
+      Implement in your component-specific subclass!
+
+
+
+   .. py:method:: one_hot_encode(sequence: Iterable, dictionary: dict | Sequence) -> numpy.ndarray
+      :staticmethod:
+
+
+      One-hot encode a sequence of characters, given a dictionary.
+
+      :param sequence:
+      :type sequence: Iterable
+      :param dictionary: Mapping of each character to their position in the alphabet. If
+                         a sequence-like is given, it will be enumerated into a dict.
+      :type dictionary: dict or sequuence-like
+
+      :returns: One-hot encoded matrix with shape ``(len(dictionary), len(sequence))``
+      :rtype: array-like
+
+
+
+.. py:class:: PadFeaturizer(shape: Iterable[int] = 'auto', key: Hashable = 'last', pad_with: int = 0, **kwargs)
+
+   Bases: :py:obj:`ParallelBaseFeaturizer`
+
+
+   Pads features of a given system to a desired size or length.
+
+   This class wraps ``numpy.pad`` with ``mode=constant``, auto-calculating
+   the needed additions to match the requested shape.
+
+   :param shape: The desired size of the transformed features. If "auto", shape
+                 will be estimated from the Dataset passed at runtime so it matches
+                 the largest observed.
+   :type shape: tuple of int, or "auto"
+   :param key: element to retrieve from ``System.featurizations``
+   :type key: hashable
+   :param pad_with: value to fill the array-like features with
+   :type pad_with: int
+
+
+   .. py:attribute:: shape
+      :value: 'auto'
+
+
+
+   .. py:attribute:: key
+      :value: 'last'
+
+
+
+   .. py:attribute:: pad_with
+      :value: 0
+
+
+
+   .. py:method:: _get_array(system_or_array: kinoml.core.systems.System | numpy.ndarray) -> numpy.ndarray
+
+
+   .. py:method:: _pre_featurize(systems) -> None
+
+      Compute the largest shape in the input arrays and store in shape attribute.
+
+      :param systems:
+      :type systems: list of System
+
+
+
+   .. py:method:: _featurize_one(system: kinoml.core.systems.System) -> numpy.ndarray
+
+      :param system: The System (or array) to be featurized.
+      :type system: System or array-like
+      :param options: Must contain a key ``shape`` with the expected final shape
+                      of the systems.
+      :type options: dict
+
+      :rtype: array
+
+
+
+.. py:class:: HashFeaturizer(getter: Callable[[kinoml.core.systems.System], str] = None, normalize=True, **kwargs)
+
+   Bases: :py:obj:`BaseFeaturizer`
+
+
+   Hash an attribute of the protein, such as the name or id.
+
+   :param getter: A function or lambda that takes a System and returns
+                  a string to be hashed. Default value will return
+                  whatever ``system.featurizations["last"]`` contains,
+                  as a string
+   :type getter: callable, optional
+   :param normalize: Normalizes the hash to obtain a value in the unit interval
+   :type normalize: bool, default=True
+
+
+   .. py:attribute:: getter
+
+
+   .. py:attribute:: normalize
+      :value: True
+
+
+
+   .. py:attribute:: denominator
+      :value: 115792089237316195423570985008687907853269984665640564039457584007913129639936
+
+
+
+   .. py:method:: _getter(system)
+      :staticmethod:
+
+
+
+   .. py:method:: _featurize_one(system: kinoml.core.systems.System) -> numpy.ndarray
+
+      Featurizes a component using the hash of the chosen attribute.
+
+      :param system: The System to be featurized.
+      :type system: System
+
+      :returns: Sha256'd attribute
+      :rtype: array
+
+
+
+.. py:class:: NullFeaturizer(**kwargs)
+
+   Bases: :py:obj:`ParallelBaseFeaturizer`
+
+
+   Abstract Featurizer class with support for multiprocessing.
+
+   :param use_multiprocessing: If multiprocessing to use.
+   :type use_multiprocessing: bool, default=True
+   :param n_processes: How many processes to use in case of multiprocessing.
+                       Defaults to number of available CPUs.
+   :type n_processes: int or None, default=None
+   :param chunksize: See https://stackoverflow.com/a/54032744/3407590.
+   :type chunksize: int, optional=None
+   :param dask_client: A dask client to manage multiprocessing. Will ignore `use_multiprocessing`
+                       `chunksize` and `n_processes` attributes.
+   :type dask_client: dask.distributed.Client or None, default=None
+
+
+   .. py:method:: _featurize(systems: Iterable[kinoml.core.systems.System], keep: bool = None) -> object
+
+      Featurize all system objects in a parallel fashion as defined in ``._featurize_one()``.
+
+      :param systems: This is the collection of System objects that will be transformed.
+      :type systems: list of System
+
+      :returns: **features**
+      :rtype: list of System or array-like
+
+
+
+.. py:class:: CallableFeaturizer(func: Callable[[kinoml.core.systems.System], kinoml.core.systems.System | numpy.array] | str = None, **kwargs)
+
+   Bases: :py:obj:`BaseFeaturizer`
+
+
+   Apply an arbitrary callable to a System.
+
+   :param func: Must take a System and return a System or array. If
+                ``str`` it will be ``eval``'d into a callable. If None,
+                the default callable will return ``system.featurizations["last"]``
+                for each system.
+   :type func: callable or str or None
+
+
+   .. py:attribute:: callable
+      :value: None
+
+
+
+   .. py:method:: _default_func(system)
+      :staticmethod:
+
+
+
+   .. py:method:: _featurize_one(system: kinoml.core.systems.System | numpy.ndarray) -> numpy.ndarray
+
+      :param system: The System (or array) to be featurized.
+      :type system: System or array-like
+      :param options: Unused
+      :type options: dict
+
+      :rtype: array-like
+
+
+
+.. py:class:: ClearFeaturizations(keys=('last', ), style='keep', **kwargs)
+
+   Bases: :py:obj:`BaseFeaturizer`
+
+
+   Remove keys from the ``.featurizations`` dictionary in each
+   ``System`` object. By default, it will remove all keys
+   that are not ``last``.
+
+   :param keys: Which keys to keep or remove, depending on ``style``.
+   :type keys: tuple of str, optional=("last",)
+   :param style: Whether to ``keep`` or ``remove`` the entries passed as ``keys``.
+   :type style: str, optional="keep"
+
+
+   .. py:attribute:: keys
+      :value: ('last',)
+
+
+
+   .. py:attribute:: style
+      :value: 'keep'
+
+
+
+   .. py:method:: _featurize_one(system: kinoml.core.systems.System) -> kinoml.core.systems.System
+
+      Implement this method to do the actual leg-work for `self.featurize()`.
+      It takes a single System object and returns either a new System object
+      or an array-like object.
+
+      :param system: The System to be featurized.
+      :type system: System
+
+      :rtype: System or array-like
+
+
+
+   .. py:method:: _post_featurize(systems: Iterable[kinoml.core.systems.System], features: Iterable[kinoml.core.systems.System | numpy.array], keep: bool = True) -> Iterable[kinoml.core.systems.System]
+
+      Bypass the automated population of the ``.featurizations`` dict
+      in each System
+
+
+
+.. py:class:: OEBaseModelingFeaturizer(loop_db: Union[str, None] = None, cache_dir: Union[str, pathlib.Path, None] = None, output_dir: Union[str, pathlib.Path, None] = None, **kwargs)
+
+   Bases: :py:obj:`ParallelBaseFeaturizer`
+
+
+   This abstract class defines several methods that use functionality from the OpenEye toolkit
+   for molecular modeling. Featurizers that subclass `OEBaseModelingFeaturizer` need to implement
+   at least the `_featurize_one` method.
+
+   :param loop_db: The path to the loop database used by OESpruce to model missing loops.
+   :type loop_db: str
+   :param cache_dir: Path to directory used for saving intermediate files. If None, default location
+                     provided by `appdirs.user_cache_dir()` will be used.
+   :type cache_dir: str, Path or None, default=None
+   :param output_dir: Path to directory used for saving output files. If None, output structures will not be
+                      saved.
+   :type output_dir: str, Path or None, default=None
+
+
+   .. py:attribute:: loop_db
+      :value: None
+
+
+
+   .. py:attribute:: cache_dir
+
+
+   .. py:attribute:: output_dir
+      :value: None
+
+
+
+   .. py:method:: _read_protein_structure(protein: Union[kinoml.core.proteins.Protein, kinoml.core.proteins.KLIFSKinase]) -> Union[oechem.OEGraphMol, None]
+
+      Returns the protein structure of the given protein object as OpenEye molecule.
+
+      :param protein: The protein object.
+      :type protein: Protein or KLIFSKinase
+
+      :returns: The protein structure as OpenEye molecule or None.
+      :rtype: oechem.OEGraphMol or None
+
+      :raises ValueError: If wrong toolkit was used during initialization of the protein object.
+
+
+
+   .. py:method:: _get_design_unit(structure: openeye.oechem.OEMolBase, chain_id: Union[str, None], alternate_location: Union[str, None], has_ligand: bool, ligand_name: Union[str, None], model_loops_and_caps: bool) -> Union[openeye.oechem.OEDesignUnit, None]
+
+      Get an OpenEye design unit based on the given input.
+
+      :param structure: An OpenEye molecule holding the protein structure to prepare.
+      :type structure: oechem.OEMolBase
+      :param chain_id: The chain ID of interest.
+      :type chain_id: str or None
+      :param alternate_location: The alternate location of interest.
+      :type alternate_location: str or None
+      :param has_ligand: If design unit generation should consider ligands. If True, design units will be only
+                         generated for protein ligand complexes. If False, design units will not consider
+                         co-crystallized ligands.
+      :type has_ligand: bool
+      :param ligand_name: The ligand expo ID bound to the protein of interest. Design units will be filtered to
+                          contain the respective ligand.
+      :type ligand_name: str or None
+      :param model_loops_and_caps: If loops and caps should be modeled.
+      :type model_loops_and_caps: bool
+
+      :returns: **design_unit** -- The design unit or None if no design unit was found.
+      :rtype: oechem.OEDesignUnit or None
+
+
+
+   .. py:method:: _get_components(design_unit: openeye.oechem.OEDesignUnit, chain_id: Union[str, None]) -> Tuple[oechem.OEGraphMol(), oechem.OEGraphMol(), oechem.OEGraphMol()]
+      :staticmethod:
+
+
+      Get protein, solvent and ligand components from an OpenEye design unit.
+
+      :param design_unit: The OpenEye design unit to extract components from.
+      :type design_unit: oechem.OEDesignUnit
+      :param chain_id: The chain ID of interest.
+      :type chain_id: str or None
+
+      :returns: **components** -- OpenEye molecules holding protein, solvent and ligand.
+      :rtype: tuple of oechem.OEGraphMol, oechem.OEGraphMol and oechem.OEGraphMol
+
+
+
+   .. py:method:: _process_protein(protein_structure: oechem.OEMolBase, amino_acid_sequence: str, first_id: int = 1, ligand: Union[oechem.OEMolBase, None] = None) -> oechem.OEMolBase
+
+      Process a protein structure according to the given amino acid sequence.
+
+      :param protein_structure: An OpenEye molecule holding the protein structure to process.
+      :type protein_structure: oechem.OEMolBase
+      :param amino_acid_sequence: The amino acid sequence with associated metadata.
+      :type amino_acid_sequence: str
+      :param first_id: The ID of the first amino acid in the given sequence, e.g. if only a part of a
+                       protein was expressed and used in experiment.
+      :type first_id: int, default=1
+      :param ligand: An OpenEye molecule that should be checked for heavy atom clashes with built insertions.
+      :type ligand: oechem.OEMolBase or None, default=None
+
+      :returns: An OpenEye molecule holding the processed protein structure.
+      :rtype: oechem.OEMolBase
+
+
+
+   .. py:method:: _get_protein_residue_numbers(protein_structure: oechem.OEMolBase, amino_acid_sequence: str, first_id: int = 1) -> List[int]
+      :staticmethod:
+
+
+      Get the residue numbers of a protein structure according to given amino acid sequence.
+
+      :param protein_structure: The kinase domain structure.
+      :type protein_structure: oechem.OEMolBase
+      :param amino_acid_sequence: The template amino acid sequence.
+      :type amino_acid_sequence: core.sequences.AminoAcidSequence
+      :param first_id: The ID of the first amino acid in the given sequence, e.g. if only a part of a
+                       protein was expressed and used in experiment.
+      :type first_id: int, default=1
+
+      :returns: **residue_number** -- A list of residue numbers according to the given amino acid sequence in the same order
+                as the residues in the given protein structure.
+      :rtype: list of int
+
+
+
+   .. py:method:: _assemble_components(protein: openeye.oechem.OEMolBase, solvent: openeye.oechem.OEMolBase, ligand: Union[openeye.oechem.OEMolBase, None] = None) -> openeye.oechem.OEMolBase
+
+      Assemble components of a solvated protein-ligand complex into a single OpenEye molecule.
+
+      :param protein: An OpenEye molecule holding the protein of interest.
+      :type protein: oechem.OEMolBase
+      :param solvent: An OpenEye molecule holding the solvent of interest.
+      :type solvent: oechem.OEMolBase
+      :param ligand: An OpenEye molecule holding the ligand of interest if given.
+      :type ligand: oechem.OEMolBase or None, default=None
+
+      :returns: **assembled_components** -- An OpenEye molecule holding protein, solvent and ligand if given.
+      :rtype: oechem.OEMolBase
+
+
+
+   .. py:method:: _remove_clashing_water(solvent: openeye.oechem.OEMolBase, ligand: Union[openeye.oechem.OEMolBase, None], protein: openeye.oechem.OEMolBase) -> openeye.oechem.OEGraphMol
+      :staticmethod:
+
+
+      Remove water molecules clashing with a ligand or newly modeled protein residues.
+
+      :param solvent: An OpenEye molecule holding the water molecules.
+      :type solvent: oechem.OEGraphMol
+      :param ligand: An OpenEye molecule holding the ligand or None.
+      :type ligand: oechem.OEGraphMol or None
+      :param protein: An OpenEye molecule holding the protein.
+      :type protein: oechem.OEGraphMol
+
+      :returns: An OpenEye molecule holding water molecules not clashing with the ligand or newly
+                modeled protein residues.
+      :rtype: oechem.OEGraphMol
+
+
+
+   .. py:method:: _update_pdb_header(structure: openeye.oechem.OEMolBase, protein_name: str, ligand_name: [str, None] = None, other_pdb_header_info: Union[None, Iterable[Tuple[str, str]]] = None) -> openeye.oechem.OEMolBase
+
+      Stores information about Featurizer, protein and ligand in the PDB header COMPND section in the
+      given OpenEye molecule.
+
+      :param structure: An OpenEye molecule.
+      :type structure: oechem.OEMolBase
+      :param protein_name: The name of the protein.
+      :type protein_name: str
+      :param ligand_name: The name of the ligand if present.
+      :type ligand_name: str or None, default=None
+      :param other_pdb_header_info: Tuples with information that should be saved in the PDB header. Each tuple consists of two strings,
+                                    i.e., the PDB header section (e.g. COMPND) and the respective information.
+      :type other_pdb_header_info: None or iterable of tuple of str
+
+      :returns: The OpenEye molecule containing the updated PDB header.
+      :rtype: oechem.OEMolBase
+
+
+
+   .. py:method:: _write_results(structure: openeye.oechem.OEMolBase, protein_name: str, ligand_name: Union[str, None] = None) -> pathlib.Path
+
+      Write the results from the Featurizer and retrieve the paths to protein or complex if a
+      ligand is present.
+
+      :param structure: The OpenEye molecule holding the featurized system.
+      :type structure: oechem.OEMolBase
+      :param protein_name: The name of the protein.
+      :type protein_name: str
+      :param ligand_name: The name of the ligand if present.
+      :type ligand_name: str or None, default=None
+
+      :returns: Path to prepared protein or complex if ligand is present.
+      :rtype: Path
+
+
+

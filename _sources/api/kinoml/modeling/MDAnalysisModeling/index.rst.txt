@@ -1,0 +1,226 @@
+kinoml.modeling.MDAnalysisModeling
+==================================
+
+.. py:module:: kinoml.modeling.MDAnalysisModeling
+
+
+
+
+
+
+Module Contents
+---------------
+
+.. py:data:: logger
+
+.. py:function:: read_molecule(path: Union[str, pathlib.Path], guess_bonds: bool = True) -> MDAnalysis.core.universe.Universe
+
+   Read a molecule from a file. Uses Biopython to support reading of the CIF format.
+
+   :param path: Path to molecule file.
+   :type path: str, pathlib.Path
+   :param guess_bonds: If bonds should be guessed by the van-der-Waals radius.
+   :type guess_bonds: bool, default=True
+
+   :returns: **molecule** -- The MDAnalysis universe.
+   :rtype: MDAnalysis.core.universe.Universe
+
+
+.. py:function:: write_molecule(molecule: Union[MDAnalysis.core.groups.AtomGroup], file_path: Union[str, pathlib.Path], delete_segid: bool = True)
+
+   Write an AtomGroup to a file. If written in PDB format and delete_segid is True the segid will
+   be deleted from the PDB file.
+   (https://docs.mdanalysis.org/1.0.0/documentation_pages/coordinates/PDB.html)
+
+   :param molecule: An MDAnalysis molecule holding a molecular structure.
+   :type molecule: MDAnalysis.core.groups.Atomgroup
+   :param file_path: The path to the output file.
+   :type file_path: str or pathlib.Path
+   :param delete_segid: If the segid shell be deleted in case of PDB format.
+                        (https://docs.mdanalysis.org/1.0.0/documentation_pages/coordinates/PDB.html)
+   :type delete_segid: bool, default=True
+
+
+.. py:function:: select_chain(molecule: Union[MDAnalysis.core.universe.Universe, MDAnalysis.core.groups.AtomGroup], chain_id: str) -> MDAnalysis.core.universe.Universe
+
+   Select a chain from an MDAnalysis molecule.
+
+   :param molecule: An MDAnalysis molecule holding a molecular structure.
+   :type molecule: MDAnalysis.core.universe.Universe or MDAnalysis.core.groups.Atomgroup
+   :param chain_id: Chain identifier.
+   :type chain_id: str
+
+   :returns: An MDAnalysis universe holding the selected chain.
+   :rtype: MDAnalysis.core.universe.Universe
+
+
+.. py:function:: select_altloc(molecule: Union[MDAnalysis.core.universe.Universe, MDAnalysis.core.groups.AtomGroup], altloc_id: str, altloc_fallback: bool = True) -> MDAnalysis.core.universe.Universe
+
+   Select an alternate location from an MDAnalysis molecule.
+
+   :param molecule: An MDAnalysis molecule holding a molecular structure.
+   :type molecule: MDAnalysis.core.universe.Universe or MDAnalysis.core.groups.Atomgroup
+   :param altloc_id: Alternate location identifier.
+   :type altloc_id: str
+   :param altloc_fallback: If the alternate location "A" should be used for residues that do
+                           not contain the given alternate location identifier.
+   :type altloc_fallback: bool
+
+   :returns: **selection** -- An MDAnalysis universe holding the selected alternate location.
+   :rtype: MDAnalysis.core.universe.Universe
+
+   :raises ValueError: No atoms were found with given altloc id.
+
+
+.. py:function:: remove_non_protein(molecule: Union[MDAnalysis.core.universe.Universe, MDAnalysis.core.groups.AtomGroup], exceptions: Union[None, Iterable[str]] = None, only_standard_amino_acids: bool = True, remove_water: bool = False) -> MDAnalysis.core.universe.Universe
+
+   Remove non-protein atoms from an OpenEye molecule. Water will be kept by default.
+
+   :param molecule: An MDAnalysis molecule holding a molecular structure.
+   :type molecule: MDAnalysis.core.universe.Universe or MDAnalysis.core.groups.Atomgroup
+   :param exceptions: Exceptions that should not be removed.
+   :type exceptions: None or iterable of str
+   :param only_standard_amino_acids: If only standard amino acids shell be retained, .i.e. ALA, ARG, ASN, ASP, CYS, GLN, GLU,
+                                     GLY, HIS, ILE, LEU, LYS, MET, PHE, PRO, SEC, SER, THR, TRP, TYR, VAL.
+   :type only_standard_amino_acids: bool, default=True
+   :param remove_water: If water should be removed.
+   :type remove_water: bool, default=False
+
+   :returns: An MDAnalysis universe holding the filtered structure.
+   :rtype: MDAnalysis.core.universe.Universe
+
+
+.. py:function:: delete_residues(molecule: Union[MDAnalysis.core.universe.Universe, MDAnalysis.core.groups.AtomGroup], residues: Iterable[MDAnalysis.core.groups.Residue])
+
+   Delete residues from an MDAnalysis molecule.
+
+   :param molecule: An MDAnalysis molecule holding a molecular structure.
+   :type molecule: MDAnalysis.core.universe.Universe or MDAnalysis.core.groups.Atomgroup
+   :param residues:
+   :type residues: iterable of MDAnalysis.core.groups.Residue
+
+   :returns: An MDAnalysis molecule holding a molecular structure without given residues.
+   :rtype: MDAnalysis.core.universe.Universe
+
+
+.. py:function:: delete_incomplete_backbone_residues(molecule: Union[MDAnalysis.core.universe.Universe, MDAnalysis.core.groups.AtomGroup]) -> MDAnalysis.core.universe.Universe
+
+   Delete protein residues with incomplete backbone, i.e. less than 4 backbone heavy atoms.
+
+   :param molecule: An MDAnalysis molecule holding a molecular structure.
+   :type molecule: MDAnalysis.core.universe.Universe or MDAnalysis.core.groups.Atomgroup
+
+   :returns: An MDAnalysis molecule holding a molecular structure without protein residues with
+             incomplete backbone.
+   :rtype: MDAnalysis.core.universe.Universe
+
+
+.. py:function:: delete_expression_tags(molecule: Union[MDAnalysis.core.universe.Universe, MDAnalysis.core.groups.AtomGroup], pdb_path: Union[str, pathlib.Path]) -> MDAnalysis.core.universe.Universe
+
+   Delete expression tags listed in the PDB header section "SEQADV".
+
+   :param molecule: An MDAnalysis molecule.
+   :type molecule: MDAnalysis.core.universe.Universe or MDAnalysis.core.groups.Atomgroup
+   :param pdb_path: The path to the PDB file containing the information about expression tags.
+   :type pdb_path: str or pathlib.Path
+
+   :returns: The MDAnalysis universe without expression tags.
+   :rtype: Universe
+
+
+.. py:function:: get_sequence(molecule: Union[MDAnalysis.core.universe.Universe, MDAnalysis.core.groups.AtomGroup]) -> str
+
+   Get the amino acid sequence with one letter characters of an MDAnalysis molecule.
+   All residues not named as standard amino acid will receive the character 'X'.
+
+   :param molecule: An MDAnalysis molecule.
+   :type molecule: MDAnalysis.core.universe.Universe or MDAnalysis.core.groups.Atomgroup
+
+   :returns: **sequence** -- The amino acid sequence with one letter characters.
+   :rtype: str
+
+
+.. py:function:: get_structure_sequence_alignment(molecule: Union[MDAnalysis.core.universe.Universe, MDAnalysis.core.groups.AtomGroup], sequence: str) -> Tuple[str, str]
+
+   Generate an alignment between an MDAnalysis protein structure and an amino acid sequence. The
+   provided protein structure should only contain protein residues to prevent unexpected behavior.
+   Also, this alignment was optimized for highly similar sequences, i.e. only few mutations,
+   deletions and insertions. Non protein residues will be marked with "X". The provided MDAnalysis
+   molecule needs bond information to properly work, hence use "guess_bonds=True" when loading
+   the universe.
+
+   :param molecule: An MDAnalysis molecule holding a protein structure.
+   :type molecule: MDAnalysis.core.universe.Universe or MDAnalysis.core.groups.Atomgroup
+   :param sequence: A one letter amino acid sequence.
+   :type sequence: str
+
+   :returns: * **structure_sequence_aligned** (*str*) -- The aligned protein structure sequence with gaps denoted as "-".
+             * **sequence_aligned** (*str*) -- The aligned amino acid sequence with gaps denoted as "-".
+
+
+.. py:function:: delete_alterations(molecule: Union[MDAnalysis.core.universe.Universe, MDAnalysis.core.groups.AtomGroup], sequence: str, delete_n_anchors: int = 2, short_protein_segments_cutoff: int = 3) -> MDAnalysis.core.universe.Universe
+
+   Delete residues from an MDAnalysis molecule that are not covered by the given sequence, i.e.
+   mutations and insertions. The provided protein structure should only contain protein residues
+   to prevent unexpected behavior.
+
+   :param molecule: An MDAnalysis molecule holding a protein structure.
+   :type molecule: MDAnalysis.core.universe.Universe or MDAnalysis.core.groups.Atomgroup
+   :param sequence: A one letter amino acid sequence.
+   :type sequence: str
+   :param delete_n_anchors: The number of anchoring residues to delete when deleting insertions.
+   :type delete_n_anchors: int, default=2
+   :param short_protein_segments_cutoff: If deleting residues will lead to short protein segments, delete these segments with a
+                                         length up to the specified cutoff.
+   :type short_protein_segments_cutoff: int, default=3
+
+   :returns: An MDAnalysis molecule holding a protein structure without alterations deleted.
+   :rtype: MDAnalysis.core.universe.Universe
+
+
+.. py:function:: delete_short_protein_segments(molecule: Union[MDAnalysis.core.universe.Universe, MDAnalysis.core.groups.AtomGroup], cutoff: int = 3) -> MDAnalysis.core.universe.Universe
+
+   Delete protein segments consisting of 3 or less residues. Needs to have bonding information
+   to work correctly.
+
+   :param molecule: An MDAnalysis molecule holding a protein with possibly short segments.
+   :type molecule: MDAnalysis.core.universe.Universe or MDAnalysis.core.groups.Atomgroup
+   :param cutoff: The upper bound defining a short protein segment.
+   :type cutoff: int, default=3
+
+   :returns: An MDAnalysis molecule holding the protein without short segments.
+   :rtype: MDAnalysis.core.universe.Universe
+
+
+.. py:function:: renumber_protein_residues(molecule: Union[MDAnalysis.core.universe.Universe, MDAnalysis.core.groups.AtomGroup], template_sequence: str) -> MDAnalysis.core.universe.Universe
+
+   Renumber a protein structure according to the provided sequence.
+
+   :param molecule: An MDAnalysis molecule holding a protein structure.
+   :type molecule: MDAnalysis.core.universe.Universe or MDAnalysis.core.groups.Atomgroup
+   :param template_sequence: The amino acid sequence to use for renumbering.
+   :type template_sequence: str
+
+   :returns: An MDAnalysis molecule holding the renumbered protein structure.
+   :rtype: MDAnalysis.core.universe.Universe
+
+
+.. py:function:: update_residue_identifiers(molecule: Union[MDAnalysis.core.universe.Universe, MDAnalysis.core.groups.AtomGroup], keep_protein_residue_ids: bool = True, keep_chain_ids: bool = False) -> MDAnalysis.core.universe.Universe
+
+   Update the atom, residue and chain IDs of the given molecular structure. All residues become
+   part of chain A, unless 'keep_chain_ids' is set True. Atom IDs will start from 1. Residue IDs
+   will start from 1, except 'keep_protein_residue_ids' is set True. This is especially useful, if
+   molecules were merged, which can result in overlapping atom and residue IDs as well as
+   separate chains.
+
+   :param molecule: The MDAnalysis molecule structure for updating atom and residue ids.
+   :type molecule: MDAnalysis.core.universe.Universe or MDAnalysis.core.groups.Atomgroup
+   :param keep_protein_residue_ids: If the protein residues should be kept.
+   :type keep_protein_residue_ids: bool
+   :param keep_chain_ids: If the chain IDS should be kept.
+   :type keep_chain_ids: bool
+
+   :returns: The MDAnalysis molecule structure with updated atom and residue ids.
+   :rtype: MDAnalysis.core.universe.Universe
+
+

@@ -1,0 +1,33 @@
+kinoml.modeling.alignment
+=========================
+
+.. py:module:: kinoml.modeling.alignment
+
+
+
+
+Module Contents
+---------------
+
+.. py:function:: sequence_similarity(sequence1: str, sequence2: str, open_gap_penalty: int = -11, extend_gap_penalty: int = -1, substitution_matrix: str = 'BLOSUM62') -> float
+
+   Calculate the squence similarity of two amino acid sequences.
+
+   :param sequence1: The first sequence.
+   :type sequence1: str
+   :param sequence2: The second sequence.
+   :type sequence2: str
+   :param open_gap_penalty: The penalty to open a gap.
+   :type open_gap_penalty: int
+   :param extend_gap_penalty: The penalty to extend a gap.
+   :type extend_gap_penalty: int
+   :param substitution_matrix: The substitution matrix to use during alignment.
+                               Available matrices can be found via:
+                               >>> from Bio.Align import substitution_matrices
+                               >>> substitution_matrices.load()
+   :type substitution_matrix: str
+
+   :returns: **score** -- Similarity of sequences.
+   :rtype: float
+
+

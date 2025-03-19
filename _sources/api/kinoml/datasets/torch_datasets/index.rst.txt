@@ -1,0 +1,389 @@
+kinoml.datasets.torch_datasets
+==============================
+
+.. py:module:: kinoml.datasets.torch_datasets
+
+.. autoapi-nested-parse::
+
+   Helper classes to convert between DatasetProvider objects and
+   Dataset-like objects native to the PyTorch ecosystem
+
+
+
+
+
+
+
+Module Contents
+---------------
+
+.. py:class:: PrefeaturizedTorchDataset(systems, measurements, observation_model: callable = _null_observation_model)
+
+   Bases: :py:obj:`torch.utils.data.Dataset`
+
+
+   Exposes the ``X``, ``y`` (systems and measurements, respectively)
+   arrays exported by ``DatasetProvider`` using the API expected
+   by Torch DataLoaders.
+
+   :param systems: X vectors, as exported from featurized systems in DatasetProvider
+   :type systems: array-like
+   :param measurements: y vectors, as exported from the measurement values contained in a
+                        DatasetProvider
+   :type measurements: array-like
+   :param observation_model: A function that adapts the predicted ``y`` to the observed ``y``
+                             values. Useful to combine measurement types in the same model, if
+                             they are mathematically related. Normally provided by the
+                             ``Measurement`` type class.
+   :type observation_model: callable, optional
+
+
+   .. py:attribute:: device
+      :value: 'cuda'
+
+
+
+   .. py:attribute:: systems
+
+
+   .. py:attribute:: measurements
+
+
+   .. py:attribute:: observation_model
+
+
+   .. py:method:: __getitem__(index)
+
+
+   .. py:method:: __len__()
+
+
+   .. py:method:: as_dataloader(**kwargs)
+
+      Build a PyTorch DataLoader view of this Dataset
+
+
+
+   .. py:method:: estimate_input_size() -> int
+
+      Estimate the input size for a model, using
+      the first dimension of the ``X`` vector shape.
+
+
+
+.. py:class:: TorchDataset(systems, measurements, featurizer, observation_model: callable = _null_observation_model)
+
+   Bases: :py:obj:`PrefeaturizedTorchDataset`
+
+
+   Same purpose as ``PrefeaturizedTorchDataset``, but
+   instead of taking arrays in, it takes the non-featurized
+   ``System`` and ``Measurement``objects, and applies a
+   ``featurizer`` on the fly upon access (e.g. during training).
+
+   :param systems:
+   :type systems: list of kinoml.core.systems.System
+   :param measurements:
+   :type measurements: list of kinoml.core.measurements.BaseMeasurement
+   :param featurizer: A function that takes a ``System`` and returns an array-like
+                      object.
+   :type featurizer: callable
+   :param observation_model: A function that adapts the predicted ``y`` to the observed ``y``
+                             values. Useful to combine measurement types in the same model, if
+                             they are mathematically related. Normally provided by the
+                             ``Measurement`` type class.
+   :type observation_model: callable, optional
+
+
+   .. py:attribute:: featurizer
+
+
+   .. py:method:: estimate_input_size()
+
+      Estimate the input size for a model, using
+      the first dimension of the ``X`` vector shape.
+
+
+
+   .. py:method:: __getitem__(index)
+
+      In this case, the DatasetProvider is passing System objects that will
+      be featurized (and memoized) upon access only.
+
+
+
+.. py:class:: XyTorchDataset(X, y, indices=None)
+
+   Bases: :py:obj:`torch.utils.data.Dataset`
+
+
+   Simple Torch Dataset adaptor where X and y are homogeneous tensors.
+   All systems have the shape.
+
+   :param X: Featurized systems and their measurements
+   :type X: arraylike
+   :param y: Featurized systems and their measurements
+   :type y: arraylike
+   :param indices: It will only accept train, train/test or train/test/val keys.
+   :type indices: dict of array selectors
+
+
+   .. py:attribute:: data_X
+
+
+   .. py:attribute:: data_y
+
+
+   .. py:attribute:: indices
+
+
+   .. py:method:: from_npz(path)
+      :classmethod:
+
+
+      Load ``X`` and ``y`` arrays from a NPZ file present in disk.
+      These files must expose at least two keys: ``X`` and ``y``.
+      It can also contain three more: ``idx_train``, ``idx_test``
+      and ``idx_val``, which correspond to the indices of the
+      training, test and validation subsets.
+
+      :param npz: Path to a NPZ file with the keys exposed above.
+      :type npz: str
+
+
+
+   .. py:method:: __getitem__(index)
+
+
+   .. py:method:: __len__()
+
+
+   .. py:method:: input_size()
+
+
+.. py:class:: MultiXTorchDataset(dict_of_arrays, indices=None)
+
+   Bases: :py:obj:`torch.utils.data.Dataset`
+
+
+   This class is able to load NPZ files into a ``torch.Dataset`` compliant
+   object.
+
+   It assumes the following things. If each system is characterized with
+   a single tensor:
+
+   - The X tensors can be of the same shape. In that case, the NPZ file
+     only has a single ``X`` key, preloaded and accessible via ``.data_X`.
+     When queried, it returns a view to the ``torch.tensor`` object.
+   - The X tensors have different shape. In that case, the keys of the NPZ
+     follow the ``X_s{int}`` syntax. When queried, it returns a list of
+     ``torch.tensor`` objects.
+
+   If each system is characterized with more than one tensor:
+
+   - The NPZ keys follow the ``X_s{int}_a{int}`` syntax. When queried, it
+     returns a list of tuples of ``torch.tensor`` objects.
+
+   No matter the structure of ``X``, ``y`` is assumed to be a homogeneous
+   tensor, and it will always be returned as a view to the underlying
+   ``torch.tensor`` object.
+
+   Additionally, the NPZ file might contain ``idx_train``, ``idx_test`` (and ``idx_val``)
+   arrays, specifying indices for the train / test / validation split. If provided,
+   they will be stored under an ``.indices`` dict.
+
+   :param dict_of_arrays: See above.
+   :type dict_of_arrays: dict of np.ndarray
+   :param indices:
+   :type indices: dict of np.ndarray
+
+   .. admonition:: Notes
+
+      - This object is better paired with the output of ``DatasetProvider.to_dict_of_arrays``.
+
+
+   .. py:attribute:: _data
+
+
+   .. py:attribute:: data_y
+
+
+   .. py:attribute:: shape_X
+
+
+   .. py:attribute:: shape_y
+
+
+   .. py:attribute:: indices
+
+
+   .. py:attribute:: _fast_key_access
+
+
+   .. py:attribute:: _is_npz
+      :value: None
+
+
+
+   .. py:method:: from_npz(path, lazy=True, close_filehandle=False)
+      :classmethod:
+
+
+      Load from a single NPZ file. If lazy=True, this can be very slow
+      for large amounts of arrays.
+
+      :param path: Path to the NPZ file
+      :type path: str
+      :param lazy: Whether to let Numpy load arrays on demand, upon access (True)
+                   or preload everything in memory (False)
+      :type lazy: bool, optional=True
+      :param close_filehandle: Whether to close the NPZ filehandle after reading some metadata. This will
+                               enable parallelism without preloading everything, but each access will suffer
+                               the overhead of opening the NPZ file again!
+      :type close_filehandle: bool, optional=False
+
+      .. note::
+
+         NPZ files cannot be read in parallel (you'll see CRC32 errors and others). If you want
+         to use ``DataLoader(..., num_workers=2)`` or above, you'll need to:
+
+         - A) preload everything with ``lazy=False``. This will use more RAM and incur
+           an initial waiting time.
+         - B) use ``close_filehandle=True``. This will incur a penalty upon each access,
+           because the NPZ file needs to be reloaded each time.
+
+
+
+   .. py:method:: _getitem_multi_X(accessor)
+
+      Note: This method might scale poorly and can end up being a bottleneck!
+      Most of the time is spent accessing the NPZ file on disk, though.
+
+      Some timings:
+
+      >>> ds = MultiXTorchDataset.from_npz("ChEMBLDatasetProvider.npz")
+      >>> %timeit _ = ds[0:2]
+      2.91 ms ± 222 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
+      >>> %timeit _ = ds[0:4]
+      5.59 ms ± 253 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
+      >>> %timeit _ = ds[0:8]
+      11.4 ms ± 1.02 ms per loop (mean ± std. dev. of 7 runs, 100 loops each)
+      >>> %timeit _ = ds[0:16]
+      22.7 ms ± 1.27 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
+      >>> %timeit _ = ds[0:32]
+      44.7 ms ± 4.47 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
+      >>> %timeit _ = ds[0:64]
+      87 ms ± 2.74 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
+      >>> %timeit _ = ds[0:128]
+      171 ms ± 2.68 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+
+
+
+   .. py:method:: _getitem_single_X(index)
+
+
+   .. py:method:: __getitem__(index)
+
+
+   .. py:method:: _shape_X()
+
+
+   .. py:method:: is_single_X()
+
+
+   .. py:method:: _str_keys_to_nested_dict(keys)
+
+
+   .. py:method:: _key_to_ints(key: str) -> List[int]
+      :staticmethod:
+
+
+      NPZ keys are formatted with this syntax:
+
+      ``{X|y}_{1-character str}{int}_{1-character str}{int}_``
+
+      We split by underscores and extract the ints into a list
+
+
+
+   .. py:method:: __len__()
+
+
+.. py:class:: AwkwardArrayDataset(data)
+
+   Bases: :py:obj:`torch.utils.data.Dataset`
+
+
+   Loads an Awkward array of Records.
+
+   The structure of the array dimensions needs to be:
+
+   - List of systems
+
+   ---- X1
+   ---- X2
+   ---- ...
+   ---- Xn
+   ---- y
+
+   However, X1...Xn, y are accessed by positional index, as a string.
+
+   So, to get all the X1 vectors for all systems, you'd do:
+
+   X1 = data["0"]
+   X2 = data["1"]
+
+   Since ``y`` is always the last one you can use the ``data.fields``
+   list:
+
+   y = data[data.fields[-1]]
+
+   This is essentially what ``__getitem__`` is doing for you.
+
+   It will try to consolidate tensors whenever possible, as long as
+   they have the same shape. If they do not, then you'll get a list
+   of tensors instead.
+
+   If this is the case, make sure to provide a suitable ``collate_fn``
+   function for the corresponding Dataloader! More info:
+
+   https://pytorch.org/docs/stable/data.html#dataloader-collate-fn
+
+   .. admonition:: Notes
+
+      With several tensors per system, but all of the same shape, it is faster:
+
+      >>> awk = AwkwardArrayDataset.from_parquet("same_shape.parquet")
+      >>> %timeit _ = awk[:50]
+      2.38 ms ± 286 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
+      >>> awk = AwkwardArrayDataset.from_parquet("different_shape.parquet")
+      >>> %timeit _ = awk[:50]
+      9.32 ms ± 252 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
+
+      This is probably due to the Awkward->Numpy->Torch conversions that need
+      to happen for each different-shape sub-tensor. Look in ``__getitem__``
+      for bottlenecks.
+
+
+   .. py:attribute:: data
+
+
+   .. py:method:: __len__()
+
+
+   .. py:method:: __getitem__(index)
+
+
+   .. py:method:: __repr__()
+
+
+   .. py:method:: __str__()
+
+
+   .. py:method:: from_parquet(path, **kwargs)
+      :classmethod:
+
+
+
+.. py:function:: _accessor_to_indices(accessor, full_size)
+

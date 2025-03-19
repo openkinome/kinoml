@@ -1,0 +1,61 @@
+kinoml.databases.pdb
+====================
+
+.. py:module:: kinoml.databases.pdb
+
+
+
+
+
+
+Module Contents
+---------------
+
+.. py:data:: logger
+
+.. py:function:: smiles_from_pdb(ligand_ids: Iterable[str]) -> dict
+
+   Retrieve SMILES of molecules defined by their PDB chemical identifier.
+
+   :param ligand_ids: PDB chemical identifier.
+   :type ligand_ids: iterable of str
+
+   :returns: **ligands** -- Dictionary with PDB chemical identifier as keys and SMILES as values.
+   :rtype: dict
+
+
+.. py:function:: download_pdb_structure(pdb_id: str, directory: Union[str, pathlib.Path] = user_cache_dir()) -> Union[pathlib.Path, bool]
+
+   Download a PDB structure. If the structure is not available in PDB format, it will be download
+   in CIF format.
+
+   :param pdb_id: The PDB ID of interest.
+   :type pdb_id: str
+   :param directory: The directory for saving the downloaded structure.
+   :type directory: str or Path, default=user_cache_dir
+
+   :returns: The path to the the downloaded file if successful, else False.
+   :rtype: Path or False
+
+
+.. py:function:: download_pdb_ligand(pdb_id: str, chain_id: str, expo_id: str, smiles: str = '', directory: Union[str, pathlib.Path] = user_cache_dir()) -> Union[pathlib.Path, bool]
+
+   Download a ligand co-crystallized to a PDB structure and save in SDF format. If a SMILES is
+   provided, the connectivity and protonation will be adjusted accordingly.
+
+   :param pdb_id: The PDB ID of interest.
+   :type pdb_id: str
+   :param chain_id: The chain ID of the ligand.
+   :type chain_id: str
+   :param expo_id: The residue name of the ligand.
+   :type expo_id: str
+   :param smiles: The smiles of the small molecule describing the connectivity and protonation of the
+                  ligand.
+   :type smiles: str, default=""
+   :param directory: The directory for saving the downloaded structure.
+   :type directory: str or Path, default=user_cache_dir
+
+   :returns: The path to the the processed ligand file in SDF format if successful, else False.
+   :rtype: Path or False
+
+

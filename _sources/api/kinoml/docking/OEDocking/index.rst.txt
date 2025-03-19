@@ -1,0 +1,95 @@
+kinoml.docking.OEDocking
+========================
+
+.. py:module:: kinoml.docking.OEDocking
+
+
+
+
+Module Contents
+---------------
+
+.. py:function:: resids_to_box_molecule(protein: openeye.oechem.OEMolBase, resids: List[int]) -> openeye.oechem.OEGraphMol
+
+   Retrieve a box molecule spanning the given protein residue IDs.
+
+   :param protein: An OpenEye molecule holding a protein structure.
+   :type protein: oechem.OEMolBase
+   :param resids: A list of resids defining the residues of interest.
+   :type resids: list of int
+
+   :returns: **box_molecule** -- Rectangular box molecule spanning the region of the given protein defined by the given
+             residue IDs.
+   :rtype: oechem.OEGraphMol
+
+
+.. py:function:: pose_molecules(design_unit: openeye.oechem.OEDesignUnit, molecules: List[openeye.oechem.OEMolBase], pKa_norm: bool = True, score_pose: bool = False) -> Union[List[openeye.oechem.OEGraphMol], None]
+
+   Generate a binding pose of molecules in a prepared receptor with OpenEye's Posit method.
+
+   :param design_unit: A design unit with a receptor object.
+   :type design_unit: oechem. OEDesignUnit
+   :param molecules: A list of OpenEye molecules holding prepared molecules for docking.
+   :type molecules: list of oechem.OEMolBase
+   :param pKa_norm: Assign the predominant ionization state at pH ~7.4.
+   :type pKa_norm: bool, default=True
+   :param score_pose: Score the best docking pose per ligand and add the proper SD tag.
+   :type score_pose: bool, default=False
+
+   :returns: **posed_molecules** -- A list of OpenEye molecules holding the docked molecules.
+   :rtype: list of oechem.OEGraphMol or None
+
+
+.. py:function:: run_docking(design_unit: openeye.oechem.OEDesignUnit, molecules: List[openeye.oechem.OEMolBase], dock_method: int, num_poses: int = 1, pKa_norm: bool = True) -> Union[List[openeye.oechem.OEGraphMol], None]
+
+   Dock molecules into a prepared design unit containing a receptor object.
+
+   :param design_unit: A design unit with a receptor object.
+   :type design_unit: oechem.OEDesignUnit
+   :param molecules: A list of OpenEye molecules holding prepared molecules for docking.
+   :type molecules: list of oechem.OEMolBase
+   :param dock_method: Constant defining the docking method.
+   :type dock_method: int
+   :param num_poses: Number of docking poses to generate per molecule.
+   :type num_poses: int
+   :param pKa_norm: Assign the predominant ionization state at pH ~7.4.
+   :type pKa_norm: bool, default=True
+
+   :returns: **docked_molecules** -- A list of OpenEye molecules holding the docked molecules.
+   :rtype: list of oechem.OEGraphMol or None
+
+
+.. py:function:: hybrid_docking(design_unit: openeye.oechem.OEDesignUnit, molecules: List[openeye.oechem.OEMolBase], num_poses: int = 1, pKa_norm: bool = True) -> Union[List[openeye.oechem.OEGraphMol], None]
+
+   Dock molecules into a prepared design unit containing a hybrid receptor object.
+
+   :param design_unit: A design unit with a hybrid receptor object.
+   :type design_unit: oechem.OEDesignUnit
+   :param molecules: A list of OpenEye molecules holding prepared molecules for docking.
+   :type molecules: list of oechem.OEMolBase
+   :param num_poses: Number of docking poses to generate per molecule.
+   :type num_poses: int
+   :param pKa_norm: Assign the predominant ionization state at pH ~7.4.
+   :type pKa_norm: bool, default=True
+
+   :returns: **docked_molecules** -- A list of OpenEye molecules holding the docked molecules.
+   :rtype: list of oechem.OEGraphMol or None
+
+
+.. py:function:: fred_docking(design_unit: openeye.oechem.OEDesignUnit, molecules: List[openeye.oechem.OEMolBase], num_poses: int = 1, pKa_norm: bool = True) -> Union[List[openeye.oechem.OEGraphMol], None]
+
+   Dock molecules into a prepared design unit containing a receptor object.
+
+   :param design_unit: A design unit with a receptor object.
+   :type design_unit: oechem.OEDesignUnit
+   :param molecules: A list of OpenEye molecules holding prepared molecules for docking.
+   :type molecules: list of oechem.OEMolBase
+   :param num_poses: Number of docking poses to generate per molecule.
+   :type num_poses: int
+   :param pKa_norm: Assign the predominant ionization state at pH ~7.4.
+   :type pKa_norm: bool, default=True
+
+   :returns: **docked_molecules** -- A list of OpenEye molecules holding the docked molecules.
+   :rtype: list of oechem.OEGraphMol or None
+
+

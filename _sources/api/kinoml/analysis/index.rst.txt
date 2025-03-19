@@ -1,0 +1,16 @@
+kinoml.analysis
+===============
+
+.. py:module:: kinoml.analysis
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /api/kinoml/analysis/metrics/index
+   /api/kinoml/analysis/plots/index
+
+

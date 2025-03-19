@@ -1,0 +1,78 @@
+kinoml.ml.torch_geometric_models
+================================
+
+.. py:module:: kinoml.ml.torch_geometric_models
+
+.. autoapi-nested-parse::
+
+   Implementation of some Deep Neural Networks in Pytorch using Pytorch Geometric.
+
+
+
+
+
+Module Contents
+---------------
+
+.. py:class:: GraphConvolutionNeuralNetwork(input_shape, embedding_shape=100, hidden_shape=50, output_shape=1, activation=F.relu)
+
+   Bases: :py:obj:`kinoml.ml.torch_models._BaseModule`
+
+
+   Builds a Graph Convolutional Network and a feed-forward pass
+
+   :param input_shape: Number of features per node in the graph.
+   :type input_shape: int
+   :param embedding_shape: Dimension of latent vector.
+   :type embedding_shape: int, default=100
+   :param hidden_shape: Dimension of the hidden shape.
+   :type hidden_shape: int, default=50
+   :param output_shape: Size of the last unit, representing delta_g_over_kt in our setting.
+   :type output_shape: int, default=1
+   :param _activation: The activation function used in the hidden (only!) layer of the network.
+   :type _activation: torch function, default=relu
+
+
+   .. py:attribute:: needs_input_shape
+      :value: True
+
+
+
+   .. py:method:: estimate_input_shape(input_sample)
+      :staticmethod:
+
+
+
+   .. py:attribute:: input_shape
+
+
+   .. py:attribute:: embedding_shape
+      :value: 100
+
+
+
+   .. py:attribute:: hidden_shape
+      :value: 50
+
+
+
+   .. py:attribute:: output_shape
+      :value: 1
+
+
+
+   .. py:attribute:: _activation
+
+
+   .. py:attribute:: GraphConvLayer1
+
+
+   .. py:attribute:: GraphConvLayer2
+
+
+   .. py:attribute:: linear
+
+
+   .. py:method:: forward(data)
+
+

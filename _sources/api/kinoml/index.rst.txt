@@ -1,0 +1,42 @@
+kinoml
+======
+
+.. py:module:: kinoml
+
+.. autoapi-nested-parse::
+
+   KinoML is a structure-informed machine learning library
+   with a focus on kinase modeling
+
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /api/kinoml/analysis/index
+   /api/kinoml/core/index
+   /api/kinoml/databases/index
+   /api/kinoml/datasets/index
+   /api/kinoml/docking/index
+   /api/kinoml/features/index
+   /api/kinoml/ml/index
+   /api/kinoml/modeling/index
+   /api/kinoml/optimize/index
+   /api/kinoml/utils/index
+   /api/kinoml/workflows/index
+
+
+
+
+Package Contents
+----------------
+
+.. py:data:: versions
+
+.. py:data:: __version__
+
+.. py:data:: __git_revision__
+

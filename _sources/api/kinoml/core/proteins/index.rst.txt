@@ -1,0 +1,201 @@
+kinoml.core.proteins
+====================
+
+.. py:module:: kinoml.core.proteins
+
+.. autoapi-nested-parse::
+
+   ``MolecularComponent`` objects that represent protein-like entities.
+
+
+
+
+
+
+
+Module Contents
+---------------
+
+.. py:data:: logger
+
+.. py:class:: Protein(pdb_id: str = '', molecule: Union[openeye.oechem.OEMol, openeye.oechem.OEGraphMol, MDAnalysis.core.universe.Universe, None] = None, toolkit: str = 'OpenEye', name: str = '', sequence: str = '', uniprot_id: str = '', ncbi_id: str = '', metadata: Union[dict, None] = None, **kwargs)
+
+   Bases: :py:obj:`kinoml.core.components.BaseProtein`, :py:obj:`kinoml.core.sequences.AminoAcidSequence`
+
+
+   Create a new Protein object. A molecular representation is accessible via the molecule attribute.
+
+   .. admonition:: Examples
+
+      Create a protein from file with OpenEye toolkit molecular representation:
+
+      >>> protein = Protein.from_file("data/proteins/4f8o.pdb", name="4f8o")
+
+      Create a protein from file with MDAnalysis toolkit molecular representation:
+
+      >>> protein = Protein.from_file("data/proteins/4f8o.pdb", name="4f8o", toolkit="MDAnalysis")
+
+      Create a protein from an OpenEye molecule:
+
+      >>> from kinoml.modeling.OEModeling import read_molecules
+      >>> molecule = read_molecules("data/proteins/4f8o.pdb")[0]
+      >>> protein = Protein(molecule=molecule, name="4f8o")
+
+      Create a protein from PDB ID:
+
+      >>> protein = Protein.from_pdb("4f8o")
+
+      Create a protein from PDB ID with lazy instantiation:
+
+      >>> protein = Protein(pdb_id="4f8o")
+
+      Create a protein from PDB ID with lazy instantiation and get access to the complete wildtype
+      amino acid sequence via providing a UniProt ID:
+
+      >>> protein = Protein(pdb_id="4f8o", uniprot_id="P31522")
+      >>> protein.sequence
+
+
+   .. py:attribute:: _pdb_id
+      :value: ''
+
+
+
+   .. py:attribute:: _molecule
+      :value: None
+
+
+
+   .. py:attribute:: toolkit
+      :value: 'OpenEye'
+
+
+
+   .. py:property:: pdb_id
+
+      Decorate pdb_id to modify setter.
+
+
+   .. py:property:: molecule
+
+      Decorate molecule to modify setter and getter.
+
+
+   .. py:method:: from_file(file_path: Union[pathlib.Path, str], name: str = '', toolkit: str = 'OpenEye')
+      :classmethod:
+
+
+      Create a Protein from file.
+
+      :param file_path: The path to the molecular file. Supported formats depend on the toolkit being used.
+      :type file_path: pathlib.Path or str
+      :param name: The name of the protein.
+      :type name: str, default=""
+      :param toolkit: The toolkit to use for molecular representation.
+      :type toolkit: str, default="OpenEye"
+
+
+
+   .. py:method:: from_pdb(pdb_id: str, name: str = '', toolkit: str = 'OpenEye')
+      :classmethod:
+
+
+      Create a Protein from file.
+
+      :param pdb_id: The PDB ID of the protein structure of interest.
+      :type pdb_id: str
+      :param name: The name of the protein.
+      :type name: str, default=""
+      :param toolkit: The toolkit to use for molecular representation.
+      :type toolkit: str, default="OpenEye"
+
+
+
+.. py:class:: KLIFSKinase(pdb_id: str = '', molecule: Union[openeye.oechem.OEMol, openeye.oechem.OEGraphMol, MDAnalysis.core.universe.Universe, None] = None, toolkit: str = 'OpenEye', name: str = '', sequence: str = '', uniprot_id: str = '', ncbi_id: str = '', structure_klifs_id: Union[int, None] = None, kinase_klifs_id: Union[int, None] = None, kinase_klifs_sequence: str = '', structure_klifs_sequence: str = '', structure_klifs_residues: Union[pandas.DataFrame, None] = None, metadata: Union[dict, None] = None, **kwargs)
+
+   Bases: :py:obj:`Protein`
+
+
+   Create a new KLIFSKinase object. A molecular representation is accessible via the molecule
+   attribute. Allows access to the sequence and residues of the KLIFS binding pocket.
+
+   .. admonition:: Examples
+
+      Create a KLIFS kinase from PDB ID with lazy instantiation:
+
+      >>> kinase = KLIFSKinase(pdb_id="4yne")
+
+      Create a KLIFS kinase from PDB ID with lazy instantiation and gain access to the wildtype
+      KLIFS pocket sequence via providing a UniProt ID:
+
+      >>> kinase = KLIFSKinase(pdb_id="4yne", uniprot_id="P04629")
+      >>> kinase.kinase_klifs_sequence()
+
+      Create a KLIFS kinase from PDB ID with lazy instantiation and gain access to the wildtype
+      KLIFS pocket sequence via providing a KLIFS specifc kinase ID:
+
+      >>> kinase = KLIFSKinase(pdb_id="4yne", kinase_klifs_id=480)
+      >>> kinase.kinase_klifs_sequence()  # wildtype, does not need to match the given PDB structure
+
+      Create a KLIFS kinase from PDB ID with lazy instantiation and gain access to the KLIFS pocket
+      sequence and residues of the structure via providing a KLIFS specifc structure ID:
+
+      >>> kinase = KLIFSKinase(pdb_id="4yne", structure_klifs_id=3620)
+      >>> kinase.kinase_klifs_sequence()  # wildtype, does not need to match the given PDB structure
+      >>> kinase.structure_klifs_sequence()  # specific to the structure
+      >>> kinase.structure_klifs_residues()  # specific to the structure
+
+
+   .. py:attribute:: structure_klifs_id
+      :value: None
+
+
+
+   .. py:attribute:: kinase_klifs_id
+      :value: None
+
+
+
+   .. py:attribute:: _kinase_klifs_sequence
+      :value: ''
+
+
+
+   .. py:attribute:: _structure_klifs_sequence
+      :value: ''
+
+
+
+   .. py:attribute:: _structure_klifs_residues
+      :value: None
+
+
+
+   .. py:method:: _query_sequence_sources()
+
+      Query available sources for sequence details. Add additional methods below to allow
+      fetching from other sources.
+
+
+
+   .. py:method:: _query_klifs()
+
+      Query KLIFS for the Uniprot ID, which allows fetching of the sequence.
+
+
+
+   .. py:property:: kinase_klifs_sequence
+
+      Decorate kinase_klifs_sequence to modify setter and getter.
+
+
+   .. py:property:: structure_klifs_sequence
+
+      Decorate structure_klifs_sequence to modify setter and getter.
+
+
+   .. py:property:: structure_klifs_residues
+
+      Decorate structure_klifs_residues to modify setter and getter.
+
+

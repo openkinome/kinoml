@@ -1,0 +1,193 @@
+kinoml.features.ligand
+======================
+
+.. py:module:: kinoml.features.ligand
+
+.. autoapi-nested-parse::
+
+   Featurizers that mostly concern ligand-based models
+
+
+
+
+
+Module Contents
+---------------
+
+.. py:class:: SingleLigandFeaturizer(**kwargs)
+
+   Bases: :py:obj:`kinoml.features.core.ParallelBaseFeaturizer`
+
+
+   Provides a minimally useful ``._supports()`` method for all Ligand-like featurizers.
+
+
+   .. py:attribute:: _COMPATIBLE_LIGAND_TYPES
+
+
+   .. py:method:: _supports(system: Union[kinoml.core.systems.LigandSystem, kinoml.core.systems.ProteinLigandComplex]) -> bool
+
+      Check that exactly one ligand is present in the System
+
+
+
+.. py:class:: MorganFingerprintFeaturizer(radius: int = 2, nbits: int = 512, **kwargs)
+
+   Bases: :py:obj:`SingleLigandFeaturizer`
+
+
+   Given a ``System`` containing one ``Ligand`` component, convert it to an RDKit molecule and
+   generate the Morgan fingerprints bitvectors.
+
+   :param radius: Morgan fingerprint neighborhood radius
+   :type radius: int, optional=2
+   :param nbits: Length of the resulting bit vector
+   :type nbits: int, optional=512
+
+
+   .. py:attribute:: radius
+      :value: 2
+
+
+
+   .. py:attribute:: nbits
+      :value: 512
+
+
+
+   .. py:method:: _featurize_one(system: Union[kinoml.core.systems.LigandSystem, kinoml.core.systems.ProteinLigandComplex]) -> Union[numpy.ndarray, None]
+
+      Return the Morgan fingerprint for the given system.
+
+      :param system: The System to be featurized.
+      :type system: LigandSystem or ProteinLigandComplex
+
+      :rtype: np.array or None
+
+
+
+.. py:class:: OneHotSMILESFeaturizer(smiles_type: str = 'canonical', **kwargs)
+
+   Bases: :py:obj:`kinoml.features.core.BaseOneHotEncodingFeaturizer`, :py:obj:`SingleLigandFeaturizer`
+
+
+   One-hot encodes a ``Ligand`` from a SMILES representation.
+
+   .. attribute:: ALPHABET
+
+      Defines the character-integer mapping (as a sequence)
+      of the one-hot encoding.
+
+      :type: str
+
+
+   .. py:attribute:: ALPHABET
+      :value: 'BCFHIKNOPSUVWYacegilnosru-=#1234567890.*()/+@:[]%\\LR$'
+
+
+
+   .. py:attribute:: smiles_type
+      :value: 'canonical'
+
+
+
+   .. py:method:: _retrieve_sequence(system: Union[kinoml.core.systems.LigandSystem, kinoml.core.systems.ProteinLigandComplex]) -> str
+
+      Get SMILES string from a `Ligand`-like component and postprocesses it.
+
+      Double element symbols (such as `Cl`, ``Br`` for atoms and ``@@`` for chirality)
+      are replaced with single element symbols (`L`, ``R`` and ``$`` respectively).
+
+
+
+.. py:class:: GraphLigandFeaturizer(max_in_ring_size: int = 10, **kwargs)
+
+   Bases: :py:obj:`SingleLigandFeaturizer`
+
+
+   Creates a graph representation of a `Ligand`-like component.
+   Each node (atom) is decorated with several RDKit descriptors
+   Check ```self._per_atom_features``` for details.
+
+   :param max_in_ring_size: Maximum ring size for testing whether an atom belongs to a
+                            ring or not. *Currently unused*
+   :type max_in_ring_size: int, optional=10
+
+
+   .. py:attribute:: ALL_ATOMIC_SYMBOLS
+      :value: ['C', 'N', 'O', 'S', 'F', 'Si', 'P', 'Cl', 'Br', 'Mg', 'Na', 'Ca', 'Fe', 'As', 'Al', 'I', 'B',...
+
+
+
+   .. py:attribute:: max_in_ring_size
+      :value: 10
+
+
+
+   .. py:attribute:: _hybridization_names
+
+
+   .. py:method:: _featurize_one(system: Union[kinoml.core.systems.LigandSystem, kinoml.core.systems.ProteinLigandComplex]) -> Union[tuple, None]
+
+      Featurizes ligands contained in a System as a labeled graph.
+
+      :param system: The System being featurized.
+      :type system: LigandSystem or ProteinLigandComplex
+
+      :returns: A two-tuple with:
+                - Graph connectivity of the molecule with shape ``(2, n_edges)``
+                - Feature matrix with shape ``(n_atoms, n_features)``
+      :rtype: tuple of np.array or None
+
+
+
+   .. py:method:: _per_atom_features(atom) -> numpy.ndarray
+
+      Computes desired features for each atom in the molecular graph.
+
+      :param atom: Atom to extract features from
+      :type atom: rdkit.Chem.Atom
+
+      :returns:
+
+                atomic_symbol : array
+                    the one-hot encoded atomic symbol from `ALL_ATOMIC_SYMBOLS`.
+                formal_charge : int
+                    the formal charge of atom.
+                hybridization_type : array
+                    the one-hot encoded hybridization type from
+                    ``rdkit.Chem.rdchem.HybridizationType``.
+                aromatic : bool
+                    if atom is aromatic.
+                degree : array
+                    the one-hot encoded degree of the atom in the molecule.
+                total_h : int
+                    the total number of hydrogens on the atom (implicit and explicit).
+                implicit_h : int
+                    the number of implicit hydrogens on the atom.
+                radical_electrons : int
+                    the number of radical electrons.
+      :rtype: tuple of atomic features.
+
+      .. admonition:: Notes
+
+         The atomic features are the same as in PotentialNet [1]_.
+
+         .. [1] https://doi.org/10.1021/acscentsci.8b00507
+
+
+
+   .. py:method:: _connectivity_COO_format(mol: rdkit.Chem.Mol) -> numpy.ndarray
+      :staticmethod:
+
+
+      Returns the connectivity of the molecular graph in COO format.
+
+      :param mol: RDKit molecule to extract bonds from
+      :type mol: rdkit.Chem.Mol
+
+      :returns: graph connectivity in COO format with shape ``[2, num_edges]``
+      :rtype: np.ndarray
+
+
+

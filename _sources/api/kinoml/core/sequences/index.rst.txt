@@ -1,0 +1,253 @@
+kinoml.core.sequences
+=====================
+
+.. py:module:: kinoml.core.sequences
+
+.. autoapi-nested-parse::
+
+   Sequence-like objects to build MolecularComponents and others.
+
+
+
+
+
+
+
+Module Contents
+---------------
+
+.. py:data:: logger
+
+.. py:class:: Biosequence(sequence='', name='', metadata=None, **kwargs)
+
+   Bases: :py:obj:`object`
+
+
+   Base class for string representations of biological polymers
+   (nucleic acids, peptides, proteins...).
+
+   :param sequence: The sequence in one-letter codes.
+   :type sequence: str, default=""
+   :param name: The sequence name.
+   :type name: str, default=""
+   :param metadata: Additional data as a dictionary.
+   :type metadata: dict or None, default=None
+
+
+   .. py:attribute:: ALPHABET
+
+
+   .. py:attribute:: _sequence
+      :value: ''
+
+
+
+   .. py:attribute:: name
+      :value: ''
+
+
+
+   .. py:attribute:: metadata
+
+
+   .. py:property:: sequence
+
+
+   .. py:method:: _query_sequence_sources()
+
+      Query available sources for sequence details. Overwrite method in subclasses to fetch
+      data.
+
+
+
+   .. py:method:: substitute(substitution)
+
+      Given ``XYYYZ``, substitute element ``X`` at position ``YYY`` with ``Z``, e.g. C1156Y.
+
+      :param substitution: Substitution to apply. It must be formatted as
+                           ``[existing element][1-indexed position][new element]``.
+      :type substitution: str
+
+      .. admonition:: Examples
+
+         >>> s = Biosequence(sequence="ABCD")
+         >>> s.sequence
+         "ABCD"
+         >>> s.substitute("B2F")
+         >>> s.sequence
+         "AFCD"
+
+
+
+   .. py:method:: delete(first, last, insert='')
+
+      Delete all elements between first and last positions including bounds. Optionally, provide
+      an additional insert that shell be placed at the position of the deletion.
+
+      :param first: First residue to delete (1-indexed).
+      :type first: int
+      :param last: Last residue to delete (1-indexed).
+      :type last: int
+      :param insert: Sequence that should be placed at the position of the deletion.
+      :type insert: str, default=""
+
+      .. admonition:: Examples
+
+         >>> s = Biosequence(sequence="ABCD")
+         >>> s.sequence
+         "ABCD"
+         >>> s.delete(3,3, insert="GH")
+         >>> s.sequence
+         "ABGHD"
+
+
+
+   .. py:method:: insert(position, insert)
+
+      Insert a sequence at the given position.
+
+      :param position: Position (1-indexed) to place the insertion.
+      :type position: int
+      :param insert: The sequence of the insertion.
+      :type insert: str
+
+      .. admonition:: Examples
+
+         >>> s = Biosequence(sequence="ABCD")
+         >>> s.sequence
+         "ABCD"
+         >>> s.insert(4, insert="EF")
+         >>> s.sequence
+         "ABCEFD"
+
+
+
+.. py:class:: AminoAcidSequence(uniprot_id='', ncbi_id='', sequence='', name='', metadata=None, **kwargs)
+
+   Bases: :py:obj:`Biosequence`
+
+
+   Biosequence for amino acid sequences.
+
+   :param uniprot_id: The UniProt ID.
+   :type uniprot_id: str or None, default=None
+   :param ncbi_id: The NCBI ID.
+   :type ncbi_id: str or None, default=None
+   :param sequence: The amino acid sequence in one-letter codes.
+   :type sequence: str, default=""
+   :param name: The sequence name.
+   :type name: str, default=""
+   :param metadata: Additional data as a dictionary.
+   :type metadata: dict or None, default=None
+
+   .. admonition:: Examples
+
+      Amino acid sequences can be created by providing the sequence manually or by fetching from
+      e.g. UniProt:
+
+      >>> alatripeptide = AminoAcidSequence(sequence="AAA", name="alatripeptide")
+      >>> alatripeptide.sequence
+      "AAA"
+      >>> abl1 = AminoAcidSequence(uniprot_id="P00519", name="ABL1")
+      >>> abl1.sequence[:5]
+      "MLEIC"
+
+      Fetched sequences can be altered by providing information via metadata["mutations"], i.e.:
+       - insertions - formatted like "ins123AGA"
+       - deletions - formatted like "del12-15P" (the P stands for a proline insert (optional))
+       - substitutions - formatted like "T315A"
+
+       >>> abl1 = AminoAcidSequence(
+       >>>     uniprot_id="P00519", name="ABL1", metadata={"mutations": "T315A"}
+       >>> )
+
+       Multiple mutations can be added sequentially in a single string:
+
+       >>> abl1 = AminoAcidSequence(
+       >>>     uniprot_id="P00519", name="ABL1", metadata={"mutations": "T315A del320-22P"}
+       >>> )
+
+       An artificial contruct only consisting of a part of the sequence can be specified via
+       metadata["construct_range"]:
+
+       >>> abl1 = AminoAcidSequence(
+       >>>     uniprot_id="P00519",
+       >>>     name="ABL1",
+       >>>     metadata={"mutations": "T315A", "construct_range": "229-512"}
+       >>> )
+
+
+   .. py:attribute:: ALPHABET
+      :value: 'ACDEFGHIKLMNPQRSTVWY'
+
+
+
+   .. py:attribute:: uniprot_id
+      :value: ''
+
+
+
+   .. py:attribute:: ncbi_id
+      :value: ''
+
+
+
+   .. py:method:: _query_sequence_sources()
+
+      Query available sources for sequence details. Add additional methods below to allow
+      fetching from other sources. Perform mutations etc if given via metadata.
+
+
+
+   .. py:method:: _query_uniprot()
+
+      Fetch the amino acid sequence from UniProt.
+
+
+
+   .. py:method:: _query_ncbi()
+
+      Fetch the amino acid sequence from NCBI.
+
+
+
+   .. py:method:: ncbi_to_uniprot(ncbi_id)
+      :staticmethod:
+
+
+      Convert an NCBI protein accession to the corresponding UniProt ID.
+
+      :param ncbi_id: The NCBI protein accession.
+      :type ncbi_id: str
+
+      :returns: The corresponding UniProt ID, empty string if not successful.
+      :rtype: str
+
+
+
+.. py:class:: DNASequence(sequence='', name='', metadata=None, **kwargs)
+
+   Bases: :py:obj:`Biosequence`
+
+
+   Biosequence that only allows DNA bases.
+
+
+   .. py:attribute:: ALPHABET
+      :value: 'ATCG'
+
+
+
+.. py:class:: RNASequence(sequence='', name='', metadata=None, **kwargs)
+
+   Bases: :py:obj:`Biosequence`
+
+
+   Biosequence that only allows RNA bases.
+
+
+   .. py:attribute:: ALPHABET
+      :value: 'AUCG'
+
+
+

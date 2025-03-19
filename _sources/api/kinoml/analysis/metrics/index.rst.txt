@@ -1,0 +1,46 @@
+kinoml.analysis.metrics
+=======================
+
+.. py:module:: kinoml.analysis.metrics
+
+
+
+
+Module Contents
+---------------
+
+.. py:function:: root_mean_squared_error(*args, **kwargs)
+
+   Returns the square-root of ``scikit-learn``'s ``mean_squared_error`` metric.
+   All arguments are forwarded to that function.
+
+
+.. py:function:: performance(predicted, observed, verbose=True, n_boot=100, confidence=0.95, sample_ratio=0.8, _seed=1234)
+
+   Measure the predicted vs observed performance with different metrics (R2, MSE, MAE, RMSE).
+
+   :param predicted: Data points predicted by the model.
+   :type predicted: array-like
+   :param observed: Observed data points, as available in the dataset.
+   :type observed: array-like
+   :param verbose: Whether to print results to stdout.
+   :type verbose: bool, optional=True
+   :param n_boot: Number of bootstrap iterations. Set to ``1`` to disable
+                  bootstrapping.
+   :type n_boot: int, optional=100
+   :param confidence: Confidence interval, relative to 1. Default is 95%.
+   :type confidence: float, optional=0.95
+   :param sample_ratio: Proportion of data to sample in each iteration.
+   :type sample_ratio: float, optional=0.8
+   :param _seed: Random seed. Each bootstrap iteration gets a different seed
+                 based on this initial one.
+   :type _seed: int, optional=1234
+
+   :returns: **results** -- This dictionary contains one item per metric (see above),
+             with a 4-element tuple each: mean, standard deviation, and lower and
+             upper bounds for the confidence interval.
+   :rtype: dict of tuple
+
+   .. note:: **TODO**: Reimplement samples with ``scipy.stats.norm`` or with ``numpy``.
+
+

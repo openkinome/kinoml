@@ -1,0 +1,523 @@
+kinoml.datasets.core
+====================
+
+.. py:module:: kinoml.datasets.core
+
+.. autoapi-nested-parse::
+
+   Base classes for ``DatasetProvider``-like objects
+
+
+
+
+
+
+
+Module Contents
+---------------
+
+.. py:data:: logger
+
+.. py:class:: BaseDatasetProvider
+
+   Bases: :py:obj:`object`
+
+
+   API specification for dataset providers
+
+
+   .. py:method:: from_source(path_or_url=None, **kwargs)
+      :classmethod:
+
+      :abstractmethod:
+
+
+      Parse CSV/raw files to object model.
+
+
+
+   .. py:method:: observation_model(backend='pytorch')
+      :abstractmethod:
+
+
+
+   .. py:property:: systems
+      :abstractmethod:
+
+
+
+   .. py:property:: measurement_type
+      :abstractmethod:
+
+
+
+   .. py:method:: measurements_as_array(reduce=np.mean)
+      :abstractmethod:
+
+
+
+   .. py:method:: measurements_by_group()
+      :abstractmethod:
+
+
+
+   .. py:property:: conditions
+      :abstractmethod:
+
+
+
+   .. py:method:: featurize(*featurizers: Iterable[kinoml.features.core.BaseFeaturizer])
+      :abstractmethod:
+
+
+
+   .. py:method:: featurized_systems(key='last')
+      :abstractmethod:
+
+
+
+   .. py:method:: to_dataframe(*args, **kwargs)
+      :abstractmethod:
+
+
+
+   .. py:method:: to_pytorch(**kwargs)
+      :abstractmethod:
+
+
+
+   .. py:method:: to_tensorflow(*args, **kwargs)
+      :abstractmethod:
+
+
+
+   .. py:method:: to_numpy(*args, **kwargs)
+      :abstractmethod:
+
+
+
+.. py:class:: DatasetProvider(measurements: Iterable[kinoml.core.measurements.BaseMeasurement], metadata: dict = None)
+
+   Bases: :py:obj:`BaseDatasetProvider`
+
+
+   Base object for all DatasetProvider classes.
+
+   :param measurements: A DatasetProvider holds a list of ``kinoml.core.measurements.BaseMeasurement``
+                        objects (or any of its subclasses). They must be of the same type!
+   :type measurements: list of BaseMeasurement
+   :param metadata: Extra information for provenance.
+   :type metadata: dict
+
+   .. note::
+
+      All measurements must be of the same type! If they are not, consider
+      using ``MultiDatasetProvider`` instead.
+
+
+   .. py:attribute:: _raw_data
+      :value: None
+
+
+
+   .. py:attribute:: measurements
+
+
+   .. py:attribute:: metadata
+
+
+   .. py:method:: __len__()
+
+
+   .. py:method:: __getitem__(subscript)
+
+
+   .. py:method:: __repr__() -> str
+
+
+   .. py:method:: from_source(path_or_url=None, **kwargs)
+      :classmethod:
+
+      :abstractmethod:
+
+
+      Parse CSV/raw file to object model. This method is responsible of generating
+      the objects for ``self.measurements``, if relevant. Additional kwargs will be
+      passed to ``__init__``.
+
+      You must define this in your subclass.
+
+
+
+   .. py:method:: featurize(featurizer: kinoml.features.core.BaseFeaturizer)
+
+      Given a collection of ``kinoml.features.core.BaseFeaturizers``, apply them
+      to the systems present in the ``self.measurements``.
+
+      :param featurizer: Featurization scheme that will be applied to the systems,
+                         in a stacked way.
+      :type featurizer: BaseFeaturizer
+
+      .. note::
+
+         TODO:
+             * Will the systems be properly featurized with Dask?
+
+
+
+   .. py:method:: _post_featurize(featurizer: kinoml.features.core.BaseFeaturizer)
+
+      Remove measurements with systems, that were not successfully featurized.
+
+      :param featurizer: The used featurizer.
+      :type featurizer: BaseFeaturizer
+
+
+
+   .. py:method:: featurized_systems(key='last', clear_after=False)
+
+      Return the ``key`` featurized objects from all systems.
+
+
+
+   .. py:method:: _to_dataset(style='pytorch')
+      :abstractmethod:
+
+
+      Generate a clean <style>.data.Dataset object for further steps
+      in the pipeline (model building, etc).
+
+      .. warning::
+
+          This step is lossy because the resulting objects will no longer
+          hold chemical data. Operations depending on such information,
+          must be performed first.
+
+      .. admonition:: Examples
+
+         >>> provider = DatasetProvider()
+         >>> provider.featurize()  # optional
+         >>> splitter = TimeSplitter()
+         >>> split_indices = splitter.split(provider.data)
+         >>> dataset = provider.to_dataset("pytorch")  # .featurize() under the hood
+         >>> X_train, X_test, y_train, y_test = train_test_split(dataset, split_indices)
+
+
+
+   .. py:method:: to_dataframe(*args, **kwargs)
+
+      Generates a ``pandas.DataFrame`` containing information on the systems
+      and their measurements
+
+      :rtype: pandas.DataFrame
+
+
+
+   .. py:method:: to_pytorch(featurizer=None, **kwargs)
+
+      Export dataset to a PyTorch-compatible object, via adapters
+      found in ``kinoml.torch_datasets``.
+
+
+
+   .. py:method:: to_xgboost(**kwargs)
+
+      Export dataset to a ``DMatrix`` object, native to the XGBoost framework
+
+
+
+   .. py:method:: to_tensorflow(*args, **kwargs)
+      :abstractmethod:
+
+
+
+   .. py:method:: to_numpy(featurization_key='last', y_dtype='float32', **kwargs)
+
+      Export dataset to a tuple of two Numpy arrays of same shape:
+
+      * ``X``: the featurized systems
+      * ``y``: the measurements values (must be the same measurement type)
+
+      :param featurization_key: Which featurization present in the systems will be taken
+                                to build the ``X`` array. Usually, ``last`` as provided
+                                by a ``Pipeline`` object.
+      :type featurization_key: str, optional="last"
+      :param y_dtype: Coerce Y array to this dtype
+      :param np.dtype or str: Coerce Y array to this dtype
+      :param optional="float32": Coerce Y array to this dtype
+      :param kwargs: Dict that will be forwarded to ``.measurements_as_array``,
+                     which will build the ``y`` array.
+      :type kwargs: optional,
+
+      :returns: X, y
+      :rtype: 2-tuple of np.array
+
+      .. note::
+
+         This exporter assumes that each System is featurized as a single
+         tensor with homogeneous shape throughout the system collection.
+         If this does not hold true for your current featurization
+         scheme, consider using ``.to_dict_of_arrays`` instead.
+
+
+
+   .. py:method:: to_dict_of_arrays(featurization_key='last', y_dtype='float32', _initial_system_index=0) -> dict
+
+      Export dataset to a dict-like object, compatible
+      with ``DictOfArrays`` and NPZ files.
+
+      The idea is to provide unique keys for each system
+      and their features, following the syntax
+      ``X_s{int}_v{int}``.
+
+      This object is useful when the features for each system
+      have different shapes and/or dimensionality and cannot
+      be concatenated in a single homogeneous array
+
+      :param featurization_key: Which key to access in each ``System.featurizations`` dict
+      :type featurization_key: Hashable, optional="last"
+      :param y_dtype: Which kind of dtype to use for the ``y`` array
+      :type y_dtype: np.dtype or str, optional="float32"
+      :param _initial_system_index: PRIVATE. Start counting systems in ``X_s{int}`` with this value.
+      :type _initial_system_index: int, optional=0
+
+      :returns: A dictionary that maps ``str`` keys to array-like
+                objects. Depending on the featurization scheme, keys
+                can be:
+
+                1. All systems are featurized as an array and they share the same shape
+                   -> ``X, y``
+
+                2. All N systems are featurized as an array but they do NOT share the same shape
+                   -> ``X_s0_, X_s1_, ..., X_sN_``
+
+                3. All N systems are featurized as a M-tuple of arrays (shape irrelevant)
+                   -> ``X_s0_a0_, X_s0_a1_, X_s1_a0_, X_s1_a1_, ..., X_sN_aM_``
+      :rtype: dict[str, array]
+
+      .. note::
+
+         The X keys have a trailing underscore on purpose. Otherwise, filtering
+         keys out of the dictionary by index can be deceivingly slow. For example,
+         filtering for the first system (s1) with ``key.startswith("X_s1")`` will
+         also select for X_s1, X_s10, X_s11... Hence, we filter with ``X_s{int}_``.
+
+
+
+   .. py:method:: to_awkward(featurization_key='last', y_dtype='float32', clear_after=False)
+
+      Creates an awkward array out of the featurized systems
+      and the associated measurements.
+
+      :rtype: awkward array
+
+      .. admonition:: Notes
+
+         Awkward Array is a library for nested, variable-sized data,
+         including arbitrary-length lists, records, mixed types,
+         and missing data, using NumPy-like idioms.
+
+         Arrays are dynamically typed, but operations on
+         them are compiled and fast. Their behavior coincides
+         with NumPy when array dimensions are regular
+         and generalizes when they’re not.
+
+
+
+   .. py:method:: observation_model(**kwargs)
+
+      Draft implementation of a modular observation model, based on individual contributions
+      from different measurement types.
+
+
+
+   .. py:method:: loss_adapter(**kwargs)
+
+      Observation model plus loss function, wrapped in a single callable. Return types are
+      backend-dependent.
+
+
+
+   .. py:property:: systems
+
+
+   .. py:property:: measurement_type
+
+
+   .. py:method:: measurements_as_array(reduce=np.mean, dtype='float32')
+
+
+   .. py:method:: split_by_groups() -> dict
+
+      If a ``kinoml.datasets.groups`` class has been applied to this instance,
+      this method will create more DatasetProvider instances, one per group.
+
+      :returns: Maps group key to sub-datasets
+      :rtype: dict
+
+
+
+   .. py:property:: conditions
+      :type: set
+
+
+
+   .. py:method:: _download_to_cache_or_retrieve(path_or_url) -> str
+      :classmethod:
+
+
+      Helper function to either download files to the usercache, or
+      retrieve an already cached copy.
+
+      :param path_or_url: File path or URL pointing to the required file
+      :type path_or_url: str or Path-like
+
+      :returns: If provided argument is a file, the same path, right away
+                If it was a URL, it will be the (downloaded) cached file path
+      :rtype: str
+
+
+
+.. py:class:: MultiDatasetProvider(measurements: Iterable[kinoml.core.measurements.BaseMeasurement], metadata: dict = None)
+
+   Bases: :py:obj:`DatasetProvider`
+
+
+   Adapter class that is able to expose a DatasetProvider-like
+   interface to a collection of Measurements of different types.
+
+   The different types are split into individual DatasetProvider
+   objects, stored under ``.providers``.
+
+   The rest of the API works around that list to provide
+   similar functionality as the original, single-type DatasetProvider,
+   but in plural.
+
+   :param measurements: A MultiDatasetProvider holds a list of
+                        ``kinoml.core.measurements.BaseMeasurement`` objects
+                        (or any of its subclasses). Unlike ``DatasetProvider``,
+                        the measurements here can be of different types, but they
+                        will be grouped together in different sub-datasets.
+   :type measurements: list of BaseMeasurement
+
+
+   .. py:attribute:: providers
+      :value: []
+
+
+
+   .. py:attribute:: metadata
+
+
+   .. py:method:: _post_featurize(featurizer: kinoml.features.core.BaseFeaturizer)
+
+      Remove measurements with systems, that were not successfully featurized.
+
+      :param featurizer: The used featurizer.
+      :type featurizer: BaseFeaturizer
+
+
+
+   .. py:method:: observation_models(**kwargs)
+
+      List of observation models present in this dataset,
+      one per provider (measurement type)
+
+
+
+   .. py:method:: loss_adapters(**kwargs)
+
+      List of observation models present in this dataset,
+      one per provider (measurement type)
+
+
+
+   .. py:method:: observation_model(**kwargs)
+      :abstractmethod:
+
+
+      Draft implementation of a modular observation model, based on individual contributions
+      from different measurement types.
+
+
+
+   .. py:method:: loss_adapter(**kwargs)
+      :abstractmethod:
+
+
+      Observation model plus loss function, wrapped in a single callable. Return types are
+      backend-dependent.
+
+
+
+   .. py:property:: measurements
+
+      Flattened list of all measurements present across all providers.
+
+      Use ``.indices_by_provider()`` to obtain the corresponding slices
+      to each provider.
+
+
+   .. py:method:: indices_by_provider() -> dict
+
+      Return a dict mapping each ``provider`` type to their
+      correlative indices in a hypothetically concatenated
+      dataset.
+
+      For example, if a ``MultiDatasetProvider`` contains
+      50 measurements of type A, and 25 measurements of
+      type B, this would return ``{"A": slice(0, 50), "B": slice(50, 75)}``.
+
+      .. note::
+
+         ``slice`` objects can be passed directly to item access syntax, like
+         ``list[slice(a, b)]``.
+
+
+
+   .. py:method:: to_dataframe(*args, **kwargs)
+
+      Concatenate all the providers into a single DataFrame for easier visualization.
+
+      Check ``DatasetProvider.to_dataframe()`` for more details.
+
+
+
+   .. py:method:: to_numpy(**kwargs)
+
+      List of Numpy-native arrays, as generated by each ``provider.to_numpy(...)``
+      method. Check ``DatasetProvider.to_numpy`` docstring for more details.
+
+
+
+   .. py:method:: to_pytorch(**kwargs)
+
+      List of Numpy-native arrays, as generated by each ``provider.to_pytorch(...)``
+      method. Check ``DatasetProvider.to_pytorch`` docstring for more details.
+
+
+
+   .. py:method:: to_xgboost(**kwargs)
+
+      List of Numpy-native arrays, as generated by each ``provider.to_xgboost(...)``
+      method. Check ``DatasetProvider.to_xgboost`` docstring for more details.
+
+
+
+   .. py:method:: to_dict_of_arrays(**kwargs) -> dict
+
+      Will generate a dictionary of str: np.ndarray. System indices
+      will be accumulated.
+
+
+
+   .. py:method:: to_awkward(**kwargs)
+
+      See ``DatasetProvider.to_awkward()``. ``X`` and ``y`` will
+      be concatenated along axis=0 (one provider after another)
+
+
+
+   .. py:method:: __repr__() -> str
+
+

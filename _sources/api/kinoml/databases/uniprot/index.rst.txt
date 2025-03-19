@@ -1,0 +1,24 @@
+kinoml.databases.uniprot
+========================
+
+.. py:module:: kinoml.databases.uniprot
+
+
+
+
+Module Contents
+---------------
+
+.. py:function:: download_fasta_file(uniprot_id: str, directory: Union[pathlib.Path, str] = user_cache_dir()) -> Union[pathlib.Path, bool]
+
+   Download a fasta file for a given UniProt identifier.
+
+   :param uniprot_id: The UniProt entry of interest.
+   :type uniprot_id: str
+   :param directory: The path to a directory for saving the file.
+   :type directory: Path or str
+
+   :returns: The path to the downloaded file, False if not successful.
+   :rtype: Path or bool
+
+

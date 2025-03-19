@@ -1,0 +1,453 @@
+kinoml.ml.torch_models
+======================
+
+.. py:module:: kinoml.ml.torch_models
+
+
+
+
+Module Contents
+---------------
+
+.. py:class:: _BaseModule
+
+   Bases: :py:obj:`torch.nn.Module`
+
+
+   .. py:attribute:: needs_input_shape
+      :value: True
+
+
+
+   .. py:method:: estimate_input_shape(input_sample)
+      :staticmethod:
+
+
+      This static method takes the same input
+      as ``.forward()`` would and estimates the
+      incoming shape so the layers can be initialized
+      properly.
+
+      Most of the time, ``input_sample`` would be a
+      Tensor, in which the first dimension corresponds
+      to systems, and the second is the input shape
+      we need.
+
+      If your ``.forward()`` method takes something else
+      than a Tensor, please adapt this method accordingly.
+
+
+
+.. py:class:: NeuralNetworkRegression(input_shape, hidden_shape=100, output_shape=1, activation=F.relu)
+
+   Bases: :py:obj:`_BaseModule`
+
+
+   Builds a vanilla neural network and a feed-forward pass for a ligand setting.
+
+   :param input_shape: Dimension of the input vector.
+   :type input_shape: int
+   :param hidden_shape: Number of units in the hidden layer.
+   :type hidden_shape: int, default=100
+   :param output_shape: Size of the last unit, representing delta_g_over_kt in our setting.
+   :type output_shape: int, default=1
+   :param _activation: The activation function used in the hidden (only!) layer of the network.
+   :type _activation: torch function, default: relu
+
+
+   .. py:attribute:: _activation
+
+
+   .. py:attribute:: input_shape
+
+
+   .. py:attribute:: hidden_shape
+      :value: 100
+
+
+
+   .. py:attribute:: output_shape
+      :value: 1
+
+
+
+   .. py:attribute:: fully_connected_1
+
+
+   .. py:attribute:: fully_connected_out
+
+
+   .. py:method:: forward(system)
+
+      Defines the foward pass for a system,
+      which contains the featurized molecular components and the associated measurement/label.
+      Since only the featurized system is needed, the first element is retrieved.
+      In this case, the ligand is a 1D array of shape (`length of fingerprint`).
+
+      .. admonition:: Notes
+
+         More information about how featurization are stored can be found at
+         https://github.com/openkinome/experiments-binding-affinity/blob/master/features/featurize-template.ipynb .
+
+
+
+.. py:class:: ListOfTupleNeuralNetworkregression(input_shape, hidden_shape=100, output_shape=1, activation=F.relu)
+
+   Bases: :py:obj:`NeuralNetworkRegression`
+
+
+   This example model does not take a Tensor in, but a
+   tuple of tensors. Each tensor has shape
+   (n_systems, n_features).
+
+   As a result, one needs to concatenate the results
+   before passing it to the parent ``.forward()`` method.
+
+
+   .. py:method:: estimate_input_shape(input_sample)
+      :staticmethod:
+
+
+      This static method takes the same input
+      as ``.forward()`` would and estimates the
+      incoming shape so the layers can be initialized
+      properly.
+
+      Most of the time, ``input_sample`` would be a
+      Tensor, in which the first dimension corresponds
+      to systems, and the second is the input shape
+      we need.
+
+      If your ``.forward()`` method takes something else
+      than a Tensor, please adapt this method accordingly.
+
+
+
+   .. py:method:: forward(x)
+
+      Defines the foward pass for a system,
+      which contains the featurized molecular components and the associated measurement/label.
+      Since only the featurized system is needed, the first element is retrieved.
+      In this case, the ligand is a 1D array of shape (`length of fingerprint`).
+
+      .. admonition:: Notes
+
+         More information about how featurization are stored can be found at
+         https://github.com/openkinome/experiments-binding-affinity/blob/master/features/featurize-template.ipynb .
+
+
+
+.. py:class:: DenseNeuralNetworkRegression(input_shape, hidden_shape=(350, 200, 100, 50, 16), output_shape=1, dropout_percentage=0.4, activation=F.relu)
+
+   Bases: :py:obj:`_BaseModule`
+
+
+   Builds a Dense Neural Network and a feed-forward pass.
+
+   :param input_shape: Dimension of the input vector.
+   :type input_shape: int
+   :param hidden_shape: Number of units in each of the hidden layers.
+   :type hidden_shape: list
+   :param output_shape: Size of the last unit, representing delta_g_over_kt in our setting.
+   :type output_shape: int, default=1
+   :param dropout_percentage: The percentage of hidden to by dropped at random.
+   :type dropout_percentage: float
+   :param _activation: The activation function used in the hidden (only!) layer of the network.
+   :type _activation: torch function, default=relu
+
+
+   .. py:attribute:: input_shape
+
+
+   .. py:attribute:: hidden_shape
+      :value: (350, 200, 100, 50, 16)
+
+
+
+   .. py:attribute:: output_shape
+      :value: 1
+
+
+
+   .. py:attribute:: dropout_percentage
+      :value: 0.4
+
+
+
+   .. py:attribute:: _activation
+
+
+   .. py:attribute:: fully_connected_1
+
+
+   .. py:attribute:: fully_connected_2
+
+
+   .. py:attribute:: fully_connected_3
+
+
+   .. py:attribute:: fully_connected_4
+
+
+   .. py:attribute:: fully_connected_5
+
+
+   .. py:attribute:: fully_connected_out
+
+
+   .. py:attribute:: dropout
+
+
+   .. py:method:: forward(x)
+
+      Defines the foward pass for a given input 'x'
+
+
+
+.. py:class:: ConvolutionNeuralNetworkRegression(input_shape, embedding_shape=300, kernel_shape=10, hidden_shape=100, output_shape=1, activation=F.relu)
+
+   Bases: :py:obj:`_BaseModule`
+
+
+   Builds a Convolutional Neural Network and a feed-forward pass for a ligand setting.
+
+   :param input_shape: Dimension of the input of the system.
+   :type input_shape: int
+   :param embedding_shape: Dimension of the embedding after convolution.
+   :type embedding_shape: int, default=200
+   :param kernel_shape: Size of the kernel for the convolution.
+   :type kernel_shape: int, default=10
+   :param hidden_shape: Number of units in the hidden layer.
+   :type hidden_shape: int, default=100
+   :param output_shape: Size of the last unit, representing delta_g_over_kt in our setting.
+   :type output_shape: int, default=1
+   :param activation: The activation function used in the hidden (only!) layer of the network.
+   :type activation: torch function, default=relu
+
+
+   .. py:attribute:: input_shape
+
+
+   .. py:attribute:: nb_character
+
+
+   .. py:attribute:: length_sequence
+
+
+   .. py:attribute:: embedding_shape
+      :value: 300
+
+
+
+   .. py:attribute:: kernel_shape
+      :value: 10
+
+
+
+   .. py:attribute:: hidden_shape
+      :value: 100
+
+
+
+   .. py:attribute:: output_shape
+      :value: 1
+
+
+
+   .. py:attribute:: _activation
+
+
+   .. py:attribute:: convolution
+
+
+   .. py:attribute:: temp
+
+
+   .. py:attribute:: fully_connected_1
+
+
+   .. py:attribute:: fully_connected_out
+
+
+   .. py:method:: forward(system)
+
+      Defines the foward pass for a system,
+      which contains the featurized molecular components and the associated measurement/label.
+      Since only the featurized system is needed, the first element is retrieved.
+      In this case, the ligand is a 2D array of shape (`nb of character`, `length of smiles`).
+
+      .. admonition:: Notes
+
+         More information about how featurization are stored can be found at
+         https://github.com/openkinome/experiments-binding-affinity/blob/master/features/featurize-template.ipynb .
+
+
+
+.. py:class:: ConvolutionNeuralNetworkRegressionProteinInformed(input_shape, embedding_shape=300, kernel_shape=10, hidden_shape=100, output_shape=1, activation=F.relu)
+
+   Bases: :py:obj:`_BaseModule`
+
+
+   Builds a Convolutional Neural Network and a feed-forward pass for a protein-ligand setting.
+
+   :param input_shape: Dimension of input tensors, for the ligand and the protein.
+   :type input_shape: tuple
+   :param embedding_shape: Dimension of the embedding after convolution.
+   :type embedding_shape: int, default=200
+   :param kernel_shape: Size of the kernel for the convolution.
+   :type kernel_shape: int, default=10
+   :param hidden_shape: Number of units in the hidden layer.
+   :type hidden_shape: int, default=100
+   :param output_shape: Size of the last unit, representing delta_g_over_kt in our setting.
+   :type output_shape: int, default=1
+   :param activation: The activation function used in the hidden (only!) layer of the network.
+   :type activation: torch function, default=relu
+
+
+   .. py:attribute:: input_shape
+
+
+   .. py:attribute:: embedding_shape
+      :value: 300
+
+
+
+   .. py:attribute:: kernel_shape
+      :value: 10
+
+
+
+   .. py:attribute:: hidden_shape
+      :value: 100
+
+
+
+   .. py:attribute:: output_shape
+      :value: 1
+
+
+
+   .. py:attribute:: _activation
+
+
+   .. py:attribute:: convolution_ligand
+
+
+   .. py:attribute:: temp_ligand
+
+
+   .. py:attribute:: convolution_protein
+
+
+   .. py:attribute:: temp_protein
+
+
+   .. py:attribute:: fully_connected_1
+
+
+   .. py:attribute:: fully_connected_out
+
+
+   .. py:method:: forward(system)
+
+      Defines the foward pass for given a system,
+      which contains the featurized molecular components and the associated measurement/label.
+      In this case, the input is composed of two entities:
+      ligand and protein, so the two first elements are retrieved.
+      In this case, the ligand is a 2D array of shape (`nb of character`, `length of smiles`)
+      and the protein a 2D array of shape (`nb of residues`, `length of sequence`)
+
+      .. admonition:: Notes
+
+         More information about how featurization are stored can be found at
+         https://github.com/openkinome/experiments-binding-affinity/blob/master/features/featurize-template.ipynb .
+
+
+
+.. py:class:: NeuralNetworkRegressionProteinInformed(input_shape, embedding_shape_ligand=300, embedding_shape_protein=10, kernel_shape=10, hidden_shape=100, output_shape=1, activation=F.relu)
+
+   Bases: :py:obj:`_BaseModule`
+
+
+   Builds a Neural Network and a feed-forward pass for a protein-ligand setting.
+
+   :param input_shape: Dimension of input tensors, for the ligand and the protein.
+   :type input_shape: tuple
+   :param embedding_shape_ligand: Dimension of the embedding for the ligand.
+   :type embedding_shape_ligand: int, default=300
+   :param embedding_shape_protein: Dimension of the embedding for the protein.
+   :type embedding_shape_protein: int, default=10
+   :param kernel_shape: Size of the kernel for the convolution.
+   :type kernel_shape: int, default=10
+   :param hidden_shape: Number of units in the hidden layer.
+   :type hidden_shape: int, default=100
+   :param output_shape: Size of the last unit, representing delta_g_over_kt in our setting.
+   :type output_shape: int, default=1
+   :param activation: The activation function used in the hidden (only!) layer of the network.
+   :type activation: torch function, default=relu
+
+
+   .. py:attribute:: input_shape
+
+
+   .. py:attribute:: embedding_shape_ligand
+      :value: 300
+
+
+
+   .. py:attribute:: embedding_shape_protein
+      :value: 10
+
+
+
+   .. py:attribute:: kernel_shape
+      :value: 10
+
+
+
+   .. py:attribute:: hidden_shape
+      :value: 100
+
+
+
+   .. py:attribute:: output_shape
+      :value: 1
+
+
+
+   .. py:attribute:: _activation
+
+
+   .. py:attribute:: fully_connected_ligand
+
+
+   .. py:attribute:: fully_connected_protein
+
+
+   .. py:attribute:: ligand_protein
+      :value: 310
+
+
+
+   .. py:attribute:: fully_connected_1
+
+
+   .. py:attribute:: fully_connected_out
+
+
+   .. py:method:: forward(system)
+
+      Defines the foward pass for given a system,
+      which contains the featurized molecular components and the associated measurement/label.
+      In this case, the input is composed of two entities:
+      ligand and protein, so the two first elements are retrieved.
+      In this case, the ligand is a 1D array of shape (`length of fingerprint`),
+      and the protein a 1D array of shape (`length of sequence composition`).
+
+      .. admonition:: Notes
+
+         More information about how featurization are stored can be found at
+         https://github.com/openkinome/experiments-binding-affinity/blob/master/features/featurize-template.ipynb .
+
+
+

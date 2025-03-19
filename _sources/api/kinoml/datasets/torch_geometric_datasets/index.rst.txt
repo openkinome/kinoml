@@ -1,0 +1,58 @@
+kinoml.datasets.torch_geometric_datasets
+========================================
+
+.. py:module:: kinoml.datasets.torch_geometric_datasets
+
+.. autoapi-nested-parse::
+
+   Helper classes to convert between DatasetProvider objects and
+   Dataset-like objects native to the PyTorch ecosystem
+
+
+
+
+
+Module Contents
+---------------
+
+.. py:class:: AwkwardArrayGeometricDataset(data)
+
+   Bases: :py:obj:`torch.utils.data.Dataset`
+
+
+   Loads an Awkward array of Records suitable for PyTorch Geometric.
+   It assumes the following:
+
+   - The Awkward array contains three fields: 0, 1 and 2
+   - 0: Conn. matrix  --> Data's ``edge_index``
+   - 1: Node features --> Data's ``x``
+   - 2: y labels
+
+   If more attributes are needed, you need to modify ``__getitem__`` logic
+
+
+   .. py:attribute:: data
+
+
+   .. py:method:: __len__()
+
+
+   .. py:method:: __getitem__(index)
+
+
+   .. py:method:: __iter__()
+      :abstractmethod:
+
+
+
+   .. py:method:: __repr__()
+
+
+   .. py:method:: __str__()
+
+
+   .. py:method:: from_parquet(path, **kwargs)
+      :classmethod:
+
+
+

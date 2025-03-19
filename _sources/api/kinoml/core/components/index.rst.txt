@@ -1,0 +1,54 @@
+kinoml.core.components
+======================
+
+.. py:module:: kinoml.core.components
+
+.. autoapi-nested-parse::
+
+   Base classes for all MolecularComponents.
+
+   One or more components can form a System.
+   Proteins, ligands, and other molecular entities are
+   derived the base class ``MolecularComponent``.
+
+
+
+
+
+Module Contents
+---------------
+
+.. py:class:: MolecularComponent(name='', metadata=None, *args, **kwargs)
+
+   Abstract base molecular entity.
+
+
+   .. py:attribute:: name
+      :value: ''
+
+
+
+   .. py:attribute:: metadata
+      :value: None
+
+
+
+   .. py:method:: __repr__() -> str
+
+
+.. py:class:: BaseLigand(name='', metadata=None, *args, **kwargs)
+
+   Bases: :py:obj:`MolecularComponent`
+
+
+   Base class for all ligand-like entities.
+
+
+.. py:class:: BaseProtein(name='', metadata=None, *args, **kwargs)
+
+   Bases: :py:obj:`MolecularComponent`
+
+
+   Base class for all protein-like entities.
+
+

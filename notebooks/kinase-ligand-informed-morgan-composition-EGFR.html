@@ -1,12 +1,10 @@
-
 <!DOCTYPE html>
 
-<html>
+<html lang="en" data-content_root="../">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <meta property="article:modified_time" content="2023-12-20T14:48:30+00:00" />
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   <meta name="lang:clipboard.copy" content="Copy to clipboard">
@@ -51,27 +49,20 @@
   
   
     <title>Kinase informed morgan 1024 experiment &#8212; KinoML 0.1 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/material.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/twemoji.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css" />
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/jquery.js"></script>
-    <script src="../_static/underscore.js"></script>
-    <script src="../_static/doctools.js"></script>
-    <script src="https://twemoji.maxcdn.com/v/latest/twemoji.min.js"></script>
-    <script src="../_static/twemoji.js"></script>
-    <script src="../_static/clipboard.min.js"></script>
-    <script src="../_static/copybutton.js"></script>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=75810a84" />
+    <link rel="stylesheet" type="text/css" href="../_static/material.css?v=79c92029" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
+    <script src="../_static/documentation_options.js?v=2709fde1"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script>window.MathJax = {"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}, "tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <link rel="shortcut icon" href="../_static/custom_favicon.png"/>
+    <link rel="icon" href="../_static/custom_favicon.png"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="kinoml" href="../api/kinoml/index.html" />
@@ -555,11 +546,11 @@
           <article class="md-content__inner md-typeset" role="main">
             
   <section id="Kinase-informed-morgan-1024-experiment">
-<h1 id="notebooks-kinase-ligand-informed-morgan-composition-egfr--page-root">Kinase informed morgan 1024 experiment<a class="headerlink" href="#notebooks-kinase-ligand-informed-morgan-composition-egfr--page-root" title="Permalink to this headline">¶</a></h1>
+<h1 id="notebooks-kinase-ligand-informed-morgan-composition-egfr--page-root">Kinase informed morgan 1024 experiment<a class="headerlink" href="#notebooks-kinase-ligand-informed-morgan-composition-egfr--page-root" title="Link to this heading">¶</a></h1>
 <p>In this notebook we will run an experiment using KinoML. In this case we will focus on ligands that have affinity for the kinase EGFR. To run this experiments we will use <code class="docutils literal notranslate"><span class="pre">kinoml.features.ligand.MorganFingerprintFeaturizer</span></code> and <code class="docutils literal notranslate"><span class="pre">kinoml.features.protein.AminoAcidCompositionFeaturizer</span></code> which means that we will use the ligand and protein information to train our model and run our experiments. This notebook is divided into two parts, the first part is about featurizing the dataset and the second
 part is the actual experiment.</p>
 <section id="1.-Featurize-the-dataset">
-<h2 id="1.-Featurize-the-dataset">1. Featurize the dataset<a class="headerlink" href="#1.-Featurize-the-dataset" title="Permalink to this headline">¶</a></h2>
+<h2 id="1.-Featurize-the-dataset">1. Featurize the dataset<a class="headerlink" href="#1.-Featurize-the-dataset" title="Link to this heading">¶</a></h2>
 <p>Any machine learning model will expect tensorial representations of the chemical data. This notebooks provides a workflow to achieve such goal.</p>
 <p><code class="docutils literal notranslate"><span class="pre">kinoml.dataset.DatasetProvider</span></code> objects need to be available to deal with your collection of raw measurements for protein:ligand systems. These objects are, roughly, a list of <code class="docutils literal notranslate"><span class="pre">kinoml.core.BaseMeasurement</span></code>, each containing a set of <code class="docutils literal notranslate"><span class="pre">.values</span></code> and a some extra metadata, like the <code class="docutils literal notranslate"><span class="pre">system</span></code> objects to be featurized here.</p>
 <p>In ligand-based models, protein information is only considered marginally, and most of the action happens at the ligand level. Usually starting with a string representation such as SMILES, or a database identifier such as a PubChem ID, these are promoted to (usually) RDKit objects and then transformed into a tensor of some form (e.g. fingerprints, molecular graph as an adjacency matrix, etc).</p>
@@ -579,7 +570,7 @@ part is the actual experiment.</p>
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#fuction to obtain current working path to ouput results</span>
-<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
     <span class="n">parameters</span><span class="p">[</span><span class="s2">"HERE"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">nbout</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">resolve</span><span class="p">())</span>
 </pre></div>
 </div>
@@ -593,7 +584,7 @@ part is the actual experiment.</p>
 </div>
 </div>
 <section id="✏-Define-hyper-parameters">
-<h3 id="✏-Define-hyper-parameters">✏ Define hyper parameters<a class="headerlink" href="#✏-Define-hyper-parameters" title="Permalink to this headline">¶</a></h3>
+<h3 id="✏-Define-hyper-parameters">✏ Define hyper parameters<a class="headerlink" href="#✏-Define-hyper-parameters" title="Link to this heading">¶</a></h3>
 <p>Now we will define the parameters of our featurization pipeline. Note that you can adapt these parameters to your data and any experiments you want to run. If you use a different dataset, please make sure it is processes (e.g. no empty values, repeated entries, etc…)</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
@@ -639,7 +630,7 @@ part is the actual experiment.</p>
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
 <span class="n">HERE</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">HERE</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">parent</span> <span class="ow">in</span> <span class="n">HERE</span><span class="o">.</span><span class="n">parents</span><span class="p">:</span>
@@ -686,21 +677,21 @@ Outputs in:               OUT = /home/raquellrdc/Desktop/postdoc/kinoml_tech_pap
 </div>
 </section>
 <section id="Setup-is-finished,-start-working">
-<h3 id="Setup-is-finished,-start-working">Setup is finished, start working<a class="headerlink" href="#Setup-is-finished,-start-working" title="Permalink to this headline">¶</a></h3>
+<h3 id="Setup-is-finished,-start-working">Setup is finished, start working<a class="headerlink" href="#Setup-is-finished,-start-working" title="Link to this heading">¶</a></h3>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">warnings</span> <span class="kn">import</span> <span class="n">warn</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">sys</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">warnings</span><span class="w"> </span><span class="kn">import</span> <span class="n">warn</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">awkward</span> <span class="k">as</span> <span class="nn">ak</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">awkward</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ak</span>
 
-<span class="kn">from</span> <span class="nn">kinoml.utils</span> <span class="kn">import</span> <span class="n">seed_everything</span><span class="p">,</span> <span class="n">import_object</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">kinoml.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">seed_everything</span><span class="p">,</span> <span class="n">import_object</span>
 <span class="n">seed_everything</span><span class="p">();</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">"Run started at"</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">())</span>
 </pre></div>
@@ -716,7 +707,7 @@ Run started at 2023-11-06 11:18:57.807233
 </div>
 </section>
 <section id="Load-raw-data">
-<h3 id="Load-raw-data">Load raw data<a class="headerlink" href="#Load-raw-data" title="Permalink to this headline">¶</a></h3>
+<h3 id="Load-raw-data">Load raw data<a class="headerlink" href="#Load-raw-data" title="Link to this heading">¶</a></h3>
 <blockquote>
 <div><p>This <code class="docutils literal notranslate"><span class="pre">import_object</span></code> function allows us to take a <code class="docutils literal notranslate"><span class="pre">str</span></code> containing a Python import path (e.g. <code class="docutils literal notranslate"><span class="pre">kinoml.datasets.chembl.ChEMBLDatasetProvider</span></code>) and obtain the imported object directly. That’s how we can encode classes in JSON-only <code class="docutils literal notranslate"><span class="pre">papermill</span></code> inputs.</p>
 <p>See the help message <code class="docutils literal notranslate"><span class="pre">import_object?</span></code> for more info. Note that you need an OE license</p>
@@ -879,14 +870,14 @@ Run started at 2023-11-06 11:18:57.807233
 </div>
 </section>
 <section id="Featurize">
-<h3 id="Featurize">Featurize<a class="headerlink" href="#Featurize" title="Permalink to this headline">¶</a></h3>
+<h3 id="Featurize">Featurize<a class="headerlink" href="#Featurize" title="Link to this heading">¶</a></h3>
 <p>Now, let’s convert the data set into somehting that is ML-readable!</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># build pipeline</span>
-<span class="kn">from</span> <span class="nn">kinoml.features.core</span> <span class="kn">import</span> <span class="n">Pipeline</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">kinoml.features.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pipeline</span>
 
 <span class="n">pipelines</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">pipeline_instructions</span> <span class="ow">in</span> <span class="n">PIPELINES</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
@@ -5125,13 +5116,13 @@ bond order: 1, chiral: False to atom atomic num: 1, name: , idx: 50, aromatic: F
 </div>
 </section>
 <section id="Filter">
-<h3 id="Filter">Filter<a class="headerlink" href="#Filter" title="Permalink to this headline">¶</a></h3>
+<h3 id="Filter">Filter<a class="headerlink" href="#Filter" title="Link to this heading">¶</a></h3>
 <p>Remove systems that couldn’t be featurized. Successful featurizations are stored in <code class="docutils literal notranslate"><span class="pre">measurement.system.featurizations['last']</span></code> so we test for that key existence.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">kinoml.datasets.groups</span> <span class="kn">import</span> <span class="n">CallableGrouper</span><span class="p">,</span> <span class="n">RandomGrouper</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">kinoml.datasets.groups</span><span class="w"> </span><span class="kn">import</span> <span class="n">CallableGrouper</span><span class="p">,</span> <span class="n">RandomGrouper</span>
 <span class="n">grouper</span> <span class="o">=</span> <span class="n">CallableGrouper</span><span class="p">(</span><span class="k">lambda</span> <span class="n">measurement</span><span class="p">:</span> <span class="s1">'invalid'</span> <span class="k">if</span> <span class="s1">'last'</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">measurement</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">featurizations</span> <span class="k">else</span> <span class="s1">'valid'</span><span class="p">)</span>
 <span class="n">grouper</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="n">groups</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">split_by_groups</span><span class="p">()</span>
@@ -5144,7 +5135,7 @@ bond order: 1, chiral: False to atom atomic num: 1, name: , idx: 50, aromatic: F
 </div>
 </section>
 <section id="Groups">
-<h3 id="Groups">Groups<a class="headerlink" href="#Groups" title="Permalink to this headline">¶</a></h3>
+<h3 id="Groups">Groups<a class="headerlink" href="#Groups" title="Link to this heading">¶</a></h3>
 <p>Cumulatively apply groups.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
@@ -5182,7 +5173,7 @@ bond order: 1, chiral: False to atom atomic num: 1, name: , idx: 50, aromatic: F
 </div>
 </section>
 <section id="Write-tensors-to-disk">
-<h3 id="Write-tensors-to-disk">Write tensors to disk<a class="headerlink" href="#Write-tensors-to-disk" title="Permalink to this headline">¶</a></h3>
+<h3 id="Write-tensors-to-disk">Write tensors to disk<a class="headerlink" href="#Write-tensors-to-disk" title="Link to this heading">¶</a></h3>
 <p>Output files are written to <code class="docutils literal notranslate"><span class="pre">_output/&lt;PIPELINE&gt;/&lt;DATASET&gt;/&lt;GROUP&gt;.parquet</span></code> files.</p>
 <p>Each <code class="docutils literal notranslate"><span class="pre">parquet</span></code> will contain at least two array-like objects. The dimensionality of the parquet files is built as <code class="docutils literal notranslate"><span class="pre">(systems,</span> <span class="pre">X_or_y,</span> <span class="pre">...)</span></code>. For example, the first X vector for the first system is accessed like <code class="docutils literal notranslate"><span class="pre">parquet[0,</span> <span class="pre">"0"]</span></code>. Notice how the 2nd index is a string! (<code class="docutils literal notranslate"><span class="pre">awkward</span></code> design).</p>
 <ul class="simple">
@@ -5213,7 +5204,7 @@ bond order: 1, chiral: False to atom atomic num: 1, name: , idx: 50, aromatic: F
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">kinoml.datasets.torch_datasets</span> <span class="kn">import</span> <span class="n">AwkwardArrayDataset</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">kinoml.datasets.torch_datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">AwkwardArrayDataset</span>
 <span class="n">awk</span> <span class="o">=</span> <span class="n">AwkwardArrayDataset</span><span class="o">.</span><span class="n">from_parquet</span><span class="p">(</span><span class="n">parquets</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 <span class="n">awk</span>
 </pre></div>
@@ -5270,7 +5261,7 @@ Run finished at 2023-11-06 11:19:47.801843
 </div>
 </section>
 <section id="Reproducibility-logs">
-<h3 id="Reproducibility-logs">Reproducibility logs<a class="headerlink" href="#Reproducibility-logs" title="Permalink to this headline">¶</a></h3>
+<h3 id="Reproducibility-logs">Reproducibility logs<a class="headerlink" href="#Reproducibility-logs" title="Link to this heading">¶</a></h3>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
 </pre></div>
@@ -5284,7 +5275,7 @@ Run finished at 2023-11-06 11:19:47.801843
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">kinoml.utils</span> <span class="kn">import</span> <span class="n">watermark</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">kinoml.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">watermark</span>
 <span class="n">w</span> <span class="o">=</span> <span class="n">watermark</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -5845,7 +5836,7 @@ zstd                      1.5.5                hc292b87_0
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">json</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
 
 <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">OUT</span><span class="o">/</span> <span class="s2">"watermark.txt"</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
     <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">cap</span><span class="o">.</span><span class="n">stdout</span><span class="p">)</span>
@@ -5858,9 +5849,9 @@ zstd                      1.5.5                hc292b87_0
 </section>
 </section>
 <section id="2.-💻Run-the-experiment">
-<h2 id="2.-💻Run-the-experiment">2. 💻Run the experiment<a class="headerlink" href="#2.-💻Run-the-experiment" title="Permalink to this headline">¶</a></h2>
+<h2 id="2.-💻Run-the-experiment">2. 💻Run the experiment<a class="headerlink" href="#2.-💻Run-the-experiment" title="Link to this heading">¶</a></h2>
 <section id="Train-a-model-with-PyTorch">
-<h3 id="Train-a-model-with-PyTorch">Train a model with PyTorch<a class="headerlink" href="#Train-a-model-with-PyTorch" title="Permalink to this headline">¶</a></h3>
+<h3 id="Train-a-model-with-PyTorch">Train a model with PyTorch<a class="headerlink" href="#Train-a-model-with-PyTorch" title="Link to this heading">¶</a></h3>
 <p>Now, we will train a single model using only PyTorch.</p>
 <ol class="arabic simple">
 <li><p>Tensors are loaded from Parquet files generated in the <code class="docutils literal notranslate"><span class="pre">features/</span></code> pipeline. Each Parquet becomes a Torch Dataset sublass.</p></li>
@@ -5871,7 +5862,7 @@ zstd                      1.5.5                hc292b87_0
 </ol>
 </section>
 <section id="✏Define-hyper-parameters">
-<h3 id="✏Define-hyper-parameters">✏Define hyper parameters<a class="headerlink" href="#✏Define-hyper-parameters" title="Permalink to this headline">¶</a></h3>
+<h3 id="✏Define-hyper-parameters">✏Define hyper parameters<a class="headerlink" href="#✏Define-hyper-parameters" title="Link to this heading">¶</a></h3>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
 </pre></div>
@@ -5943,8 +5934,8 @@ zstd                      1.5.5                hc292b87_0
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
 
 <span class="n">HERE</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">HERE</span><span class="p">)</span>
 
@@ -5989,24 +5980,24 @@ Outputs in:               OUT = /home/raquellrdc/Desktop/postdoc/kinoml_tech_pap
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
-<span class="kn">from</span> <span class="nn">warnings</span> <span class="kn">import</span> <span class="n">warn</span>
-<span class="kn">import</span> <span class="nn">sys</span>
-<span class="kn">import</span> <span class="nn">shutil</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">defaultdict</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">warnings</span><span class="w"> </span><span class="kn">import</span> <span class="n">warn</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">shutil</span>
 
-<span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">Markdown</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">DataLoader</span><span class="p">,</span> <span class="n">SubsetRandomSampler</span>
-<span class="kn">from</span> <span class="nn">tqdm.auto</span> <span class="kn">import</span> <span class="n">trange</span><span class="p">,</span> <span class="n">tqdm</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">Markdown</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch.utils.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataLoader</span><span class="p">,</span> <span class="n">SubsetRandomSampler</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tqdm.auto</span><span class="w"> </span><span class="kn">import</span> <span class="n">trange</span><span class="p">,</span> <span class="n">tqdm</span>
 
-<span class="kn">from</span> <span class="nn">kinoml.ml.torch_loops</span> <span class="kn">import</span> <span class="n">LRScheduler</span><span class="p">,</span> <span class="n">EarlyStopping</span>
-<span class="kn">from</span> <span class="nn">kinoml.utils</span> <span class="kn">import</span> <span class="n">seed_everything</span><span class="p">,</span> <span class="n">import_object</span>
-<span class="kn">from</span> <span class="nn">kinoml.core</span> <span class="kn">import</span> <span class="n">measurements</span> <span class="k">as</span> <span class="n">measurement_types</span>
-<span class="kn">from</span> <span class="nn">kinoml.core.measurements</span> <span class="kn">import</span> <span class="n">null_observation_model</span>
-<span class="kn">from</span> <span class="nn">kinoml.analysis.metrics</span> <span class="kn">import</span> <span class="n">performance</span>
-<span class="kn">from</span> <span class="nn">kinoml.analysis.plots</span> <span class="kn">import</span> <span class="n">predicted_vs_observed</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">kinoml.ml.torch_loops</span><span class="w"> </span><span class="kn">import</span> <span class="n">LRScheduler</span><span class="p">,</span> <span class="n">EarlyStopping</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">kinoml.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">seed_everything</span><span class="p">,</span> <span class="n">import_object</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">kinoml.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">measurements</span> <span class="k">as</span> <span class="n">measurement_types</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">kinoml.core.measurements</span><span class="w"> </span><span class="kn">import</span> <span class="n">null_observation_model</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">kinoml.analysis.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="n">performance</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">kinoml.analysis.plots</span><span class="w"> </span><span class="kn">import</span> <span class="n">predicted_vs_observed</span>
 
 <span class="c1"># Fix the seed for reproducible random splits -- otherwise we get mixed train/test groups every time, biasing the model evaluation</span>
 <span class="n">seed_everything</span><span class="p">();</span>
@@ -6024,7 +6015,7 @@ Run started at 2023-11-06 11:19:56.953210
 </div>
 </section>
 <section id="Load-featurized-data-and-create-observation-models">
-<h3 id="Load-featurized-data-and-create-observation-models">Load featurized data and create observation models<a class="headerlink" href="#Load-featurized-data-and-create-observation-models" title="Permalink to this headline">¶</a></h3>
+<h3 id="Load-featurized-data-and-create-observation-models">Load featurized data and create observation models<a class="headerlink" href="#Load-featurized-data-and-create-observation-models" title="Link to this heading">¶</a></h3>
 <p>We assume this path structure: <code class="docutils literal notranslate"><span class="pre">$REPO/features/_output/&lt;FEATURIZATION&gt;/&lt;DATASET&gt;/&lt;MEASUREMENT_TYPE&gt;.npz</span></code></p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
@@ -6084,7 +6075,7 @@ Loaded 3 datasets with a total of 3000 measurements.
 </div>
 </section>
 <section id="Prepare-splits-and-dataloaders">
-<h3 id="Prepare-splits-and-dataloaders">Prepare splits and dataloaders<a class="headerlink" href="#Prepare-splits-and-dataloaders" title="Permalink to this headline">¶</a></h3>
+<h3 id="Prepare-splits-and-dataloaders">Prepare splits and dataloaders<a class="headerlink" href="#Prepare-splits-and-dataloaders" title="Link to this heading">¶</a></h3>
 <p>Create train / test / validation subsets. Here we implement a random split, but it can take external indices if needed.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[29]:
@@ -6136,7 +6127,7 @@ Loaded 3 datasets with a total of 3000 measurements.
 </div>
 </section>
 <section id="Training-loop">
-<h3 id="Training-loop">Training loop<a class="headerlink" href="#Training-loop" title="Permalink to this headline">¶</a></h3>
+<h3 id="Training-loop">Training loop<a class="headerlink" href="#Training-loop" title="Link to this heading">¶</a></h3>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[30]:
 </pre></div>
@@ -6227,7 +6218,7 @@ Loaded 3 datasets with a total of 3000 measurements.
 </div>
 </section>
 <section id="Evaluate-model">
-<h3 id="Evaluate-model">Evaluate model<a class="headerlink" href="#Evaluate-model" title="Permalink to this headline">¶</a></h3>
+<h3 id="Evaluate-model">Evaluate model<a class="headerlink" href="#Evaluate-model" title="Link to this heading">¶</a></h3>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[32]:
 </pre></div>
@@ -6260,7 +6251,7 @@ Loaded 3 datasets with a total of 3000 measurements.
 </div>
 <div class="output_area docutils container">
 <section id="P00533__pKiMeasurement">
-<h4 id="P00533__pKiMeasurement">P00533__pKiMeasurement<a class="headerlink" href="#P00533__pKiMeasurement" title="Permalink to this headline">¶</a></h4>
+<h4 id="P00533__pKiMeasurement">P00533__pKiMeasurement<a class="headerlink" href="#P00533__pKiMeasurement" title="Link to this heading">¶</a></h4>
 </section>
 </div>
 </div>
@@ -6269,7 +6260,7 @@ Loaded 3 datasets with a total of 3000 measurements.
 </div>
 <div class="output_area docutils container">
 <section id="train">
-<h4 id="train">train<a class="headerlink" href="#train" title="Permalink to this headline">¶</a></h4>
+<h4 id="train">train<a class="headerlink" href="#train" title="Link to this heading">¶</a></h4>
 </section>
 </div>
 </div>
@@ -6296,7 +6287,7 @@ RMSE: 0.1992±0.0284 95CI=(0.1637, 0.2481)
 </div>
 <div class="output_area docutils container">
 <section id="test">
-<h4 id="test">test<a class="headerlink" href="#test" title="Permalink to this headline">¶</a></h4>
+<h4 id="test">test<a class="headerlink" href="#test" title="Link to this heading">¶</a></h4>
 </section>
 </div>
 </div>
@@ -6323,7 +6314,7 @@ RMSE: 0.2306±0.0444 95CI=(0.1689, 0.3046)
 </div>
 <div class="output_area docutils container">
 <section id="val">
-<h4 id="val">val<a class="headerlink" href="#val" title="Permalink to this headline">¶</a></h4>
+<h4 id="val">val<a class="headerlink" href="#val" title="Link to this heading">¶</a></h4>
 </section>
 </div>
 </div>
@@ -6350,7 +6341,7 @@ RMSE: 0.1661±0.0158 95CI=(0.1372, 0.1881)
 </div>
 <div class="output_area docutils container">
 <section id="P00533__pKdMeasurement">
-<h4 id="P00533__pKdMeasurement">P00533__pKdMeasurement<a class="headerlink" href="#P00533__pKdMeasurement" title="Permalink to this headline">¶</a></h4>
+<h4 id="P00533__pKdMeasurement">P00533__pKdMeasurement<a class="headerlink" href="#P00533__pKdMeasurement" title="Link to this heading">¶</a></h4>
 </section>
 </div>
 </div>
@@ -6359,7 +6350,7 @@ RMSE: 0.1661±0.0158 95CI=(0.1372, 0.1881)
 </div>
 <div class="output_area docutils container">
 <section id="id2">
-<h4 id="id2">train<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h4>
+<h4 id="id2">train<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h4>
 </section>
 </div>
 </div>
@@ -6386,7 +6377,7 @@ RMSE: 0.3301±0.1505 95CI=(0.1338, 0.5255)
 </div>
 <div class="output_area docutils container">
 <section id="id3">
-<h4 id="id3">test<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h4>
+<h4 id="id3">test<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h4>
 </section>
 </div>
 </div>
@@ -6413,7 +6404,7 @@ RMSE: 0.1486±0.0307 95CI=(0.0988, 0.1936)
 </div>
 <div class="output_area docutils container">
 <section id="id4">
-<h4 id="id4">val<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h4>
+<h4 id="id4">val<a class="headerlink" href="#id4" title="Link to this heading">¶</a></h4>
 </section>
 </div>
 </div>
@@ -6440,7 +6431,7 @@ RMSE: 0.3484±0.2344 95CI=(0.1205, 0.7065)
 </div>
 <div class="output_area docutils container">
 <section id="P00533__pIC50Measurement">
-<h4 id="P00533__pIC50Measurement">P00533__pIC50Measurement<a class="headerlink" href="#P00533__pIC50Measurement" title="Permalink to this headline">¶</a></h4>
+<h4 id="P00533__pIC50Measurement">P00533__pIC50Measurement<a class="headerlink" href="#P00533__pIC50Measurement" title="Link to this heading">¶</a></h4>
 </section>
 </div>
 </div>
@@ -6449,7 +6440,7 @@ RMSE: 0.3484±0.2344 95CI=(0.1205, 0.7065)
 </div>
 <div class="output_area docutils container">
 <section id="id5">
-<h4 id="id5">train<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h4>
+<h4 id="id5">train<a class="headerlink" href="#id5" title="Link to this heading">¶</a></h4>
 </section>
 </div>
 </div>
@@ -6476,7 +6467,7 @@ RMSE: 0.1521±0.0072 95CI=(0.1405, 0.1645)
 </div>
 <div class="output_area docutils container">
 <section id="id6">
-<h4 id="id6">test<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h4>
+<h4 id="id6">test<a class="headerlink" href="#id6" title="Link to this heading">¶</a></h4>
 </section>
 </div>
 </div>
@@ -6503,7 +6494,7 @@ RMSE: 0.1443±0.0103 95CI=(0.1297, 0.1625)
 </div>
 <div class="output_area docutils container">
 <section id="id7">
-<h4 id="id7">val<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h4>
+<h4 id="id7">val<a class="headerlink" href="#id7" title="Link to this heading">¶</a></h4>
 </section>
 </div>
 </div>
@@ -6527,7 +6518,7 @@ RMSE: 0.1579±0.0093 95CI=(0.1450, 0.1752)
 </div>
 </section>
 <section id="Summary">
-<h3 id="Summary">Summary<a class="headerlink" href="#Summary" title="Permalink to this headline">¶</a></h3>
+<h3 id="Summary">Summary<a class="headerlink" href="#Summary" title="Link to this heading">¶</a></h3>
 <p><code class="docutils literal notranslate"><span class="pre">kinase_metrics</span></code> is a nested dictionary with these dimensions:</p>
 <ul class="simple">
 <li><p>measurement type</p></li>
@@ -6538,7 +6529,7 @@ RMSE: 0.1579±0.0093 95CI=(0.1450, 0.1752)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[33]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">json</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
 
 <span class="n">display</span><span class="p">(</span><span class="n">Markdown</span><span class="p">(</span><span class="sa">f</span><span class="s2">"""</span>
 <span class="s2">### Configuration</span>
@@ -6565,7 +6556,7 @@ RMSE: 0.1579±0.0093 95CI=(0.1450, 0.1752)
 </div>
 <div class="output_area docutils container">
 <section id="Configuration">
-<h4 id="Configuration">Configuration<a class="headerlink" href="#Configuration" title="Permalink to this headline">¶</a></h4>
+<h4 id="Configuration">Configuration<a class="headerlink" href="#Configuration" title="Link to this heading">¶</a></h4>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
 <span class="w">  </span><span class="nt">"VERSION"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2023.11.06"</span><span class="p">,</span>
 <span class="w">  </span><span class="nt">"HERE"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/home/raquellrdc/Desktop/postdoc/kinoml_tech_paper_final/kinoml/examples/experiments/kinase-ligand-informed-morgan-composition-EGFR"</span><span class="p">,</span>
@@ -6692,7 +6683,7 @@ RMSE: 0.1579±0.0093 95CI=(0.1450, 0.1752)
 </div>
 <div class="output_area docutils container">
 <section id="id8">
-<h4 id="id8">P00533__pKdMeasurement<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h4>
+<h4 id="id8">P00533__pKdMeasurement<a class="headerlink" href="#id8" title="Link to this heading">¶</a></h4>
 </section>
 </div>
 </div>
@@ -6773,7 +6764,7 @@ RMSE: 0.1579±0.0093 95CI=(0.1450, 0.1752)
 </div>
 <div class="output_area docutils container">
 <section id="id9">
-<h4 id="id9">P00533__pIC50Measurement<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h4>
+<h4 id="id9">P00533__pIC50Measurement<a class="headerlink" href="#id9" title="Link to this heading">¶</a></h4>
 </section>
 </div>
 </div>
@@ -6844,7 +6835,7 @@ RMSE: 0.1579±0.0093 95CI=(0.1450, 0.1752)
 </div>
 <div class="output_area docutils container">
 <section id="id10">
-<h4 id="id10">P00533__pKiMeasurement<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h4>
+<h4 id="id10">P00533__pKiMeasurement<a class="headerlink" href="#id10" title="Link to this heading">¶</a></h4>
 </section>
 </div>
 </div>
@@ -6938,12 +6929,12 @@ Run finished at 2023-11-06 11:22:14.451640
 </div>
 </section>
 <section id="Save-reports-to-disk">
-<h3 id="Save-reports-to-disk">Save reports to disk<a class="headerlink" href="#Save-reports-to-disk" title="Permalink to this headline">¶</a></h3>
+<h3 id="Save-reports-to-disk">Save reports to disk<a class="headerlink" href="#Save-reports-to-disk" title="Link to this heading">¶</a></h3>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[36]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">kinoml.utils</span> <span class="kn">import</span> <span class="n">watermark</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">kinoml.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">watermark</span>
 <span class="n">w</span> <span class="o">=</span> <span class="n">watermark</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -7508,7 +7499,7 @@ zstd                      1.5.5                hc292b87_0
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[38]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">json</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
 
 <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">OUT</span> <span class="o">/</span> <span class="s2">"performance.json"</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
     <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">metrics</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
@@ -7557,7 +7548,7 @@ zstd                      1.5.5                hc292b87_0
                rel="next">
             <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title"><span
                 class="md-flex__ellipsis"> <span
-                class="md-footer-nav__direction"> "Next" </span> <code class="xref py py-mod docutils literal notranslate"><span class="pre">kinoml</span></code> </span>
+                class="md-footer-nav__direction"> "Next" </span> kinoml </span>
             </div>
             <div class="md-flex__cell md-flex__cell--shrink"><i
                 class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
@@ -7574,11 +7565,8 @@ zstd                      1.5.5                hc292b87_0
               &#169; Copyright 2021, OpenKinome.
               
           </div>
-            Last updated on
-              Dec 20, 2023.
-            <br/>
             Created using
-            <a href="http://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
+            <a href="http://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
              and
             <a href="https://github.com/bashtage/sphinx-material/">Material for
               Sphinx</a>

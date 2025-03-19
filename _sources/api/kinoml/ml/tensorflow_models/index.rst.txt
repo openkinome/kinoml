@@ -1,0 +1,51 @@
+kinoml.ml.tensorflow_models
+===========================
+
+.. py:module:: kinoml.ml.tensorflow_models
+
+.. autoapi-nested-parse::
+
+   Example models for TensorFlow
+
+   .. note::
+
+       This code is not currently in use.
+
+
+
+
+
+Module Contents
+---------------
+
+.. py:function:: DNN(input_dim)
+
+   DNN builds and compiles a TF model (a Deep Neural Network) that takes as input 'input_dim'
+
+   :param input_dim: Expected shape of the input data
+   :type input_dim: tuple of int
+
+   :returns: **model**
+   :rtype: tf.keras.models.Sequential
+
+
+.. py:function:: CNN(input_shape)
+
+   CNN builds and compiles a TF model (a Convolutional Neural Network) that takes as input 'input_shape'
+   :param input_shape: Expected shape of the input data
+   :type input_shape: tuple of int
+
+   :returns: **model**
+   :rtype: tf.keras.models.Sequential
+
+
+.. py:function:: MPNN(input_shape)
+
+   MPNN builds and compiles a TF model (a Message Passing Neural Network) that takes as input 'input_shape'
+   :param input_shape: Expected shape of the input data
+   :type input_shape: tuple of int
+
+   :returns: **model**
+   :rtype: tf.keras.models.Sequential
+
+

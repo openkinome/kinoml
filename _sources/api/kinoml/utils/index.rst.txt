@@ -1,0 +1,239 @@
+kinoml.utils
+============
+
+.. py:module:: kinoml.utils
+
+.. autoapi-nested-parse::
+
+   Miscellaneous utilities
+
+
+
+
+
+
+
+
+
+Module Contents
+---------------
+
+.. py:data:: APPDIR
+
+.. py:data:: PACKAGE_ROOT
+
+.. py:class:: FromDistpatcherMixin
+
+   .. py:method:: _from_dispatcher(value, handler, handler_argname, prefix)
+      :classmethod:
+
+
+
+.. py:class:: LocalFileStorage
+
+   Generate standardized paths for storing and reading data locally.
+
+
+   .. py:attribute:: DIRECTORY
+
+
+   .. py:method:: rcsb_structure_pdb(pdb_id, directory=DIRECTORY)
+      :staticmethod:
+
+
+
+   .. py:method:: rcsb_structure_cif(pdb_id, directory=DIRECTORY)
+      :staticmethod:
+
+
+
+   .. py:method:: rcsb_ligand_sdf(pdb_id, chain_id, expo_id, altloc, directory=DIRECTORY)
+      :staticmethod:
+
+
+
+   .. py:method:: rcsb_electron_density_mtz(pdb_id, directory=DIRECTORY)
+      :staticmethod:
+
+
+
+   .. py:method:: klifs_ligand_mol2(structure_id, directory=DIRECTORY)
+      :staticmethod:
+
+
+
+   .. py:method:: klifs_structure_db(directory=DIRECTORY)
+      :staticmethod:
+
+
+
+   .. py:method:: klifs_kinase_db(directory=DIRECTORY)
+      :staticmethod:
+
+
+
+   .. py:method:: featurizer_result(featurizer_name, result_details, file_format, directory=DIRECTORY)
+      :staticmethod:
+
+
+
+   .. py:method:: pdb_smiles_json(directory=DIRECTORY)
+      :staticmethod:
+
+
+
+.. py:class:: FileDownloader
+
+   Download and store files locally.
+
+
+   .. py:attribute:: DIRECTORY
+
+
+   .. py:method:: rcsb_structure_pdb(pdb_id, directory=DIRECTORY)
+      :staticmethod:
+
+
+
+   .. py:method:: rcsb_structure_cif(pdb_id, directory=DIRECTORY)
+      :staticmethod:
+
+
+
+   .. py:method:: rcsb_electron_density_mtz(pdb_id, directory=DIRECTORY)
+      :staticmethod:
+
+
+
+.. py:function:: datapath(path: str) -> pathlib.Path
+
+   Return absolute path to a file contained in this package's ``data``
+   directory.
+
+   :param path: Relative path to file in `data`.
+   :type path: str
+
+   :returns: Absolute path to the file in the KinoML data directory.
+             Existence is not checked or guaranteed.
+   :rtype: path pathlib.Path
+
+
+.. py:function:: grouper(iterable: Iterable, n: int, fillvalue: Any = None) -> Iterable
+
+   Given an iterable, consume it in n-sized groups,
+   filling it with fillvalue if needed.
+
+   :param iterable: Something that can be split in sub-items and grouped.
+   :type iterable: list, tuple, str or iterable
+   :param n: Size of the group
+   :type n: int
+   :param fillvalue: Last group will be padded with this object until
+                     ``len(group)==n``
+   :type fillvalue: object
+
+
+.. py:class:: defaultdictwithargs(call: Callable)
+
+   Bases: :py:obj:`collections.defaultdict`
+
+
+   A defaultdict that will create new values based on the missing value
+
+   :param call: Factory to be called on missing key
+   :type call: class or callable
+
+
+   .. py:attribute:: call
+
+
+   .. py:method:: __missing__(key)
+
+
+.. py:function:: download_file(url: str, path: str)
+
+   Download a file and save it locally.
+
+   :param url: URL for downloading data.
+   :type url: str
+   :param path: Path to save downloaded data.
+   :type path: str
+
+   :returns: True if successful, else False.
+   :rtype: bool
+
+
+.. py:function:: seed_everything(seed=1234)
+
+   Fix the random number generator seed in several pieces
+   of the Python runtime: Python itself, NumPy, Torch.
+
+   :param seed:
+   :type seed: int, optional=1234
+
+
+.. py:function:: watermark()
+
+   Check and log versions and environment details of the execution
+   context. We currently check for:
+
+   - Whatever ``watermark`` (the library) returns
+   - The output of ``nvidia-smi``, if available
+   - The output of ``conda info``, if available
+   - The output of ``conda list``, if available
+
+   .. note:: This assumes you are running the function inside a Jupyter notebook.
+
+
+.. py:function:: collapsible(function, *args, **kwargs)
+
+   An IPython widget that can collapse its contents.
+
+   :param function: A function that generates some kind of output
+                    (print, plots, etc). Args and kwargs will be
+                    forwarded here.
+   :type function: callable
+
+   :rtype: ipywidgets.Accordion
+
+
+.. py:function:: fill_until_next_multiple(container, multiple_of: int, factory)
+
+   Fill ``container`` with instances of ``factory`` until its length
+   reaches the next multiple of `multiple_of`.
+
+   ``container`` gets modified in place and returned.
+
+   :param container: Extendable container
+   :type container: list or set
+   :param multiple_of: The final size of container will match the next multiple
+                       of this number.
+   :type multiple_of: int
+   :param factory: This callable will be run to produce the filler elements
+                   used to extend ``container``
+   :type factory: callable
+
+   :returns: Modified in place
+   :rtype: container
+
+
+.. py:function:: import_object(import_path: str)
+
+   Import an object using its full import path
+
+   :param import_path: Full import path to object, like `kinoml.core.measurements.MeasurementType`.
+   :type import_path: str
+
+   :rtype: object
+
+
+.. py:function:: sha256_objects(objects_to_hash: Iterable[object]) -> str
+
+   Generate a SHA256 hash of pickable objects.
+
+   :param objects_to_hash: Objects that should be hashed.
+   :type objects_to_hash: Iterable of object
+
+   :returns: The SHA256 of given objects.
+   :rtype: str
+
+

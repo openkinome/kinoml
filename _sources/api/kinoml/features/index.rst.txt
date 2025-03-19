@@ -1,0 +1,25 @@
+kinoml.features
+===============
+
+.. py:module:: kinoml.features
+
+.. autoapi-nested-parse::
+
+   Featurizers will always output arrays
+   but they will use structure-oriented methods
+   underneath to do it.
+
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /api/kinoml/features/complexes/index
+   /api/kinoml/features/core/index
+   /api/kinoml/features/ligand/index
+   /api/kinoml/features/protein/index
+
+

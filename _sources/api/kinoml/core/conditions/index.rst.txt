@@ -1,0 +1,86 @@
+kinoml.core.conditions
+======================
+
+.. py:module:: kinoml.core.conditions
+
+.. autoapi-nested-parse::
+
+   Each Measurement object can store a ``conditions``
+   attribute which should contain one of the classes
+   here defined.
+
+   For example, experimental measurements can have an
+   ``AssayConditions`` object specifying the variables
+   involved in the experiment, like pH.
+
+
+
+
+
+Module Contents
+---------------
+
+.. py:class:: BaseConditions(strict: bool = True)
+
+   Contains information about the experimental conditions.
+   We ensure objects are immutable by using read-only properties
+   for all attributes. Do NOT modify private attributes or
+   hashing will break.
+
+   :param strict: Whether to perform safety checks at initialization.
+   :type strict: bool, optional=True
+
+
+   .. py:method:: check()
+
+      Perform some checks for valid values
+
+
+
+   .. py:method:: _properties(classname: bool = True) -> dict
+
+      Return a dictionary with the classname and all defined properties.
+      Used for equality comparisons in subclasses.
+
+      :param classname: Whether to include the name of the instance class
+      :type classname: bool, optional=True
+
+      :rtype: dict
+
+
+
+   .. py:method:: __hash__()
+
+
+   .. py:method:: __eq__(other)
+
+
+   .. py:method:: __repr__() -> str
+
+
+.. py:class:: AssayConditions(pH: Union[int, float] = 7.0, *args, **kwargs)
+
+   Bases: :py:obj:`BaseConditions`
+
+
+   Contains information about the experimental conditions
+   of a given assay.
+
+   :param pH: Acidity conditions
+   :type pH: int or float, optional=7.0
+
+
+   .. py:attribute:: _pH
+      :value: 7.0
+
+
+
+   .. py:property:: pH
+
+
+   .. py:method:: check()
+
+      Perform some checks for valid values
+
+
+

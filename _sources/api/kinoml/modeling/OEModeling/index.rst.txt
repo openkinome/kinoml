@@ -1,0 +1,578 @@
+kinoml.modeling.OEModeling
+==========================
+
+.. py:module:: kinoml.modeling.OEModeling
+
+
+
+
+
+
+Module Contents
+---------------
+
+.. py:data:: logger
+
+.. py:function:: read_smiles(smiles: str, add_hydrogens: bool = True) -> openeye.oechem.OEGraphMol
+
+   Read molecule from a smiles string. Explicit hydrogens will be added by default.
+
+   :param smiles: Smiles string.
+   :type smiles: str
+   :param add_hydrogens: If explicit hydrogens should be added.
+   :type add_hydrogens: bool
+
+   :returns: **molecule** -- A molecule as OpenEye molecules.
+   :rtype: oechem.OEGraphMol
+
+   :raises ValueError: Could not interpret input SMILES.
+
+
+.. py:function:: read_molecules(path: Union[str, pathlib.Path], add_hydrogens: bool = False) -> List[openeye.oechem.OEGraphMol]
+
+   Read molecules from a file. Explicit hydrogens will not be added by default.
+
+   :param path: Path to molecule file.
+   :type path: str, pathlib.Path
+   :param add_hydrogens: If explicit hydrogens should be added.
+   :type add_hydrogens: bool
+
+   :returns: **molecules** -- A List of molecules as OpenEye molecules.
+   :rtype: list of oechem.OEGraphMol
+
+   :raises ValueError: Given file does not contain valid molecules.
+
+
+.. py:function:: read_electron_density(path: Union[str, pathlib.Path]) -> openeye.oegrid.OESkewGrid
+
+   Read electron density from a file.
+
+   :param path: Path to electron density file.
+   :type path: str, pathlib.Path
+
+   :returns: **electron_density** -- A List of molecules as OpenEye molecules.
+   :rtype: oegrid.OESkewGrid or None
+
+   :raises ValueError: Not a valid electron density file or wrong format. Only MTZ is currently supported.
+
+
+.. py:function:: write_molecules(molecules: List[openeye.oechem.OEMolBase], path: Union[str, pathlib.Path])
+
+   Save molecules to file.
+
+   :param molecules: A list of OpenEye molecules for writing.
+   :type molecules: list of oechem.OEMolBase
+   :param path: File path for saving molecules.
+   :type path: str, pathlib.Path
+
+
+.. py:function:: select_chain(molecule: openeye.oechem.OEMolBase, chain_id: str) -> openeye.oechem.OEMolBase
+
+   Select a chain from an OpenEye molecule.
+
+   :param molecule: An OpenEye molecule holding a molecular structure.
+   :type molecule: oechem.OEMolBase
+   :param chain_id: Chain identifier.
+   :type chain_id: str
+
+   :returns: **selection** -- An OpenEye molecule holding the selected chain.
+   :rtype: oechem.OEMolBase
+
+   :raises ValueError: No atoms were found with given chain id.
+
+
+.. py:function:: select_altloc(molecule: openeye.oechem.OEMolBase, altloc_id: str, altloc_fallback: bool = True) -> openeye.oechem.OEMolBase
+
+   Select an alternate location from an OpenEye molecule.
+
+   :param molecule: An OpenEye molecule holding a molecular structure.
+   :type molecule: oechem.OEMolBase
+   :param altloc_id: Alternate location identifier.
+   :type altloc_id: str
+   :param altloc_fallback: If the alternate location with the highest occupancy should be used for residues that do
+                           not contain the given alternate location identifier.
+   :type altloc_fallback: bool
+
+   :returns: **selection** -- An OpenEye molecule holding the selected alternate location.
+   :rtype: oechem.OEMolBase
+
+   :raises ValueError: No atoms were found with given altloc id.
+
+
+.. py:function:: remove_non_protein(molecule: openeye.oechem.OEMolBase, exceptions: Union[None, List[str]] = None, remove_water: bool = False) -> openeye.oechem.OEMolBase
+
+   Remove non-protein atoms from an OpenEye molecule. Water will be kept by default.
+
+   :param molecule: An OpenEye molecule holding a molecular structure.
+   :type molecule: oechem.OEMolBase
+   :param exceptions: Exceptions that should not be removed.
+   :type exceptions: None or list of str
+   :param remove_water: If water should be removed.
+   :type remove_water: bool
+
+   :returns: **selection** -- An OpenEye molecule holding the filtered structure.
+   :rtype: oechem.OEMolBase
+
+
+.. py:function:: delete_residue(structure: openeye.oechem.OEMolBase, chain_id: str, residue_name: str, residue_id: int) -> openeye.oechem.OEGraphMol
+
+   Delete a residue from an OpenEye molecule.
+
+   :param structure: An OpenEye molecule with residue information.
+   :type structure: oechem.OEMolBase
+   :param chain_id: The chain id of the residue
+   :type chain_id: str
+   :param residue_name: The residue name in three letter code.
+   :type residue_name: str
+   :param residue_id: The residue id.
+   :type residue_id: int
+
+   :returns: The OpenEye molecule without the residue.
+   :rtype: oechem.OEMolBase
+
+   :raises ValueError: Defined residue was not found in given structure.
+
+
+.. py:function:: get_expression_tags(structure: openeye.oechem.OEMolBase, labels: Iterable[str] = ('EXPRESSION TAG', 'CLONING ARTIFACT')) -> List[Dict]
+
+   Get the chain id, residue name and residue id of residues in expression tags from a protein structure listed in the
+   PDB header section "SEQADV".
+
+   :param structure: An OpenEye molecule with associated PDB header section "SEQADV".
+   :type structure: oechem.OEMolBase
+   :param labels: The 'SEQADV' labels defining expression tags. Default: ('EXPRESSION TAG', 'CLONING ARTIFACT').
+   :type labels: Iterable of str
+
+   :returns: The chain id, residue name and residue id of residues in the expression tags.
+   :rtype: list of dict
+
+
+.. py:function:: assign_caps(structure: openeye.oechem.OEMolBase, real_termini: Union[Iterable[int] or None] = None) -> openeye.oechem.OEMolBase
+
+   Cap N and C termini of the given input structure. Real termini can be protected from capping
+   by providing the corresponding residue ids via the 'real_termini' argument.
+
+   :param structure: The OpenEye molecule holding the protein structure to cap.
+   :type structure: oechem.OEMolBase
+   :param real_termini: The biologically relevant real termini that should be prevented from capping.
+   :type real_termini: iterable of int or None
+
+   :returns: **structure** -- The OpenEye molecule holding the capped structure.
+   :rtype: oechem.OEMolBase
+
+
+.. py:function:: prepare_structure(structure: openeye.oechem.OEMolBase, has_ligand: bool = False, electron_density: Union[openeye.oegrid.OESkewGrid, None] = None, loop_db: Union[str, None] = None, ligand_name: Union[str, None] = None, chain_id: Union[str, None] = None, alternate_location: Union[str, None] = None, cap_termini: bool = True, real_termini: Union[List[int], None] = None) -> openeye.oechem.OEDesignUnit
+
+   Prepare an OpenEye molecule holding a protein ligand complex for docking.
+
+   :param structure: An OpenEye molecule holding a structure with protein and optionally a ligand.
+   :type structure: oechem.OEMolBase
+   :param has_ligand: If structure contains a ligand that should be used in design unit generation.
+   :type has_ligand: bool
+   :param electron_density: An OpenEye grid holding the electron density.
+   :type electron_density: oegrid.OESkewGrid
+   :param loop_db: Path to OpenEye Spruce loop database. You can request a copy at
+                   https://www.eyesopen.com/database-downloads. A testing subset (3TPP) is available
+                   at https://docs.eyesopen.com/toolkits/python/sprucetk/examples_make_design_units.html.
+   :type loop_db: str or None
+   :param ligand_name: The name of the ligand located in the binding pocket of interest.
+   :type ligand_name: str or None
+   :param chain_id: The chain id of interest. If chain id is None, best chain will be selected according to OESpruce.
+   :type chain_id: str or None
+   :param alternate_location: The alternate location of interest. If alternate location is None, best alternate location will be selected
+                              according to OEChem.
+   :type alternate_location: str or None
+   :param cap_termini: If termini should be capped with ACE and NME.
+   :type cap_termini: bool
+   :param real_termini: Residue numbers of biologically real termini will not be capped with ACE and NME.
+   :type real_termini: list of int or None
+
+   :returns: **design_unit** -- An OpenEye design unit holding the prepared structure with the highest quality among all identified design
+             units.
+   :rtype: oechem.OEDesignUnit
+
+   :raises ValueError: No design unit found with given chain ID, ligand name and alternate location.
+
+
+.. py:function:: prepare_complex(protein_ligand_complex: openeye.oechem.OEMolBase, electron_density: Union[openeye.oegrid.OESkewGrid, None] = None, loop_db: Union[str, None] = None, ligand_name: Union[str, None] = None, chain_id: Union[str, None] = None, alternate_location: Union[str, None] = None, cap_termini: bool = True, real_termini: Union[List[int], None] = None) -> openeye.oechem.OEDesignUnit
+
+   Prepare an OpenEye molecule holding a protein ligand complex for docking.
+
+   :param protein_ligand_complex: An OpenEye molecule holding a structure with protein and ligand.
+   :type protein_ligand_complex: oechem.OEMolBase
+   :param electron_density: An OpenEye grid holding the electron density.
+   :type electron_density: oegrid.OESkewGrid
+   :param loop_db: Path to OpenEye Spruce loop database.
+   :type loop_db: str or None
+   :param ligand_name: The name of the ligand located in the binding pocket of interest.
+   :type ligand_name: str or None
+   :param chain_id: The chain id of interest. If chain id is None, best chain will be selected according to OESpruce.
+   :type chain_id: str or None
+   :param alternate_location: The alternate location of interest. If alternate location is None, best alternate location will be selected
+                              according to OEChem.
+   :type alternate_location: str or None
+   :param cap_termini: If termini should be capped with ACE and NME.
+   :type cap_termini: bool
+   :param real_termini: Residue numbers of biologically real termini will not be capped with ACE and NME.
+   :type real_termini: list of int or None
+
+   :returns: **design_unit** -- An OpenEye design unit holding the prepared structure with the highest quality among all identified design
+             units.
+   :rtype: oechem.OEDesignUnit
+
+   :raises ValueError: No design unit found with given chain ID, ligand name and alternate location.
+
+
+.. py:function:: prepare_protein(protein: openeye.oechem.OEMolBase, loop_db: Union[str, None] = None, chain_id: Union[str, None] = None, alternate_location: Union[str, None] = None, cap_termini: bool = True, real_termini: Union[List[int], None] = None) -> openeye.oechem.OEDesignUnit
+
+   Prepare an OpenEye molecule holding a protein structure for docking.
+
+   :param protein: An OpenEye molecule holding a structure with protein.
+   :type protein: oechem.OEMolBase
+   :param loop_db: Path to OpenEye Spruce loop database.
+   :type loop_db: str
+   :param chain_id: The chain id of interest. If chain id is None, best chain will be selected according to OESpruce.
+   :type chain_id: str or None
+   :param alternate_location: The alternate location of interest. If alternate location is None, best alternate location will be selected
+                              according to OEChem.
+   :type alternate_location: str or None
+   :param cap_termini: If termini should be capped with ACE and NME.
+   :type cap_termini: bool
+   :param real_termini: Residue numbers of biologically real termini will not be capped with ACE and NME.
+   :type real_termini: list of int or None
+
+   :returns: **design_unit** -- An OpenEye design unit holding the prepared structure with the highest quality among all identified design
+             units.
+   :rtype: oechem.OEDesignUnit or None
+
+   :raises ValueError: No design unit found with given chain ID, ligand name and alternate location.
+
+
+.. py:function:: generate_tautomers(molecule: Union[openeye.oechem.OEMolBase, openeye.oechem.OEMCMolBase], max_generate: int = 4096, max_return: int = 16, pKa_norm: bool = True) -> List[Union[openeye.oechem.OEMolBase, openeye.oechem.OEMCMolBase]]
+
+   Generate reasonable tautomers of a given molecule.
+
+   :param molecule: An OpenEye molecule.
+   :type molecule: oechem.OEMolBase or oechem.OEMCMolBase
+   :param max_generate: Maximal number of tautomers to generate.
+   :type max_generate: int
+   :param max_return: Maximal number of tautomers to return.
+   :type max_return: int
+   :param pKa_norm: Assign the predominant ionization state at pH ~7.4.
+   :type pKa_norm: bool
+
+   :returns: **tautomers** -- A list of OpenEye molecules holding the tautomers.
+   :rtype: list of oechem.OEMolBase or oechem.OEMCMolBase
+
+
+.. py:function:: generate_enantiomers(molecule: openeye.oechem.OEMolBase, max_centers: int = 12, force_flip: bool = False, enumerate_nitrogens: bool = False) -> List[openeye.oechem.OEMolBase]
+
+   Generate enantiomers of a given molecule.
+
+   :param molecule: An OpenEye molecule.
+   :type molecule: oechem.OEMolBase
+   :param max_centers: The maximal number of stereo centers to enumerate.
+   :type max_centers: int
+   :param force_flip: If specified stereo centers should be enumerated.
+   :type force_flip: bool
+   :param enumerate_nitrogens: If nitrogens with invertible pyramidal geometry should be enumerated.
+   :type enumerate_nitrogens: bool
+
+   :returns: **enantiomers** -- A list of OpenEye molecules holding the enantiomers.
+   :rtype: list of oechem.OEMolBase
+
+
+.. py:function:: generate_conformations(molecule: openeye.oechem.OEMolBase, options: openeye.oeomega.OEOmegaOptions = oeomega.OEOmegaOptions(oeomega.OEOmegaSampling_Classic)) -> openeye.oechem.OEMCMolBase
+
+   Generate conformations of a given molecule.
+
+   :param molecule: An OpenEye molecule.
+   :type molecule: oechem.OEMolBase
+   :param options: Options for generating conformations. If the given molecule is a macrocycle only the
+                   maximal number of conformations will be changed from the defaults defined in
+                   `oeomega.OEMacrocycleOmegaOptions()`.
+   :type options: oeomega.OEOmegaOptions, default=oeomega.OEOmegaOptions(oeomega.OEOmegaSampling_Classic)
+
+   :returns: **conformations** -- An OpenEye multi-conformer molecule holding the generated conformations.
+   :rtype: oechem.OEMCMolBase
+
+
+.. py:function:: generate_reasonable_conformations(molecule: openeye.oechem.OEMolBase, options: openeye.oeomega.OEOmegaOptions = oeomega.OEOmegaOptions(oeomega.OEOmegaSampling_Classic), pKa_norm: bool = True) -> List[openeye.oechem.OEMCMolBase]
+
+   Generate conformations of reasonable enantiomers and tautomers of a given molecule.
+
+   :param molecule: An OpenEye molecule.
+   :type molecule: oechem.OEMolBase
+   :param options: Options for generating conformations. If the given molecule is a macrocycle only the
+                   maximal number of conformations will be changed from the defaults defined in
+                   `oeomega.OEMacrocycleOmegaOptions()`.
+   :type options: oeomega.OEOmegaOptions, default=oeomega.OEOmegaOptions(oeomega.OEOmegaSampling_Classic)
+   :param pKa_norm: Assign the predominant ionization state at pH ~7.4.
+   :type pKa_norm: bool
+
+   :returns: **conformations_ensemble** -- A list of OpenEye multi-conformer molecules.
+   :rtype: list of oechem.OEMCMolBase
+
+
+.. py:function:: overlay_molecules(reference_molecule: openeye.oechem.OEMolBase, fit_molecule: openeye.oechem.OEMCMolBase) -> (float, List[openeye.oechem.OEGraphMol])
+
+   Overlay a multi-conformer molecule to a single-conformer molecule and calculate the TanimotoCombo score.
+
+   :param reference_molecule: An OpenEye molecule holding a single conformation of the reference molecule for overlay.
+   :type reference_molecule: oechem.OEMolBase
+   :param fit_molecule: An OpenEye multi-conformer molecule holding the conformations of a molecule to fit during overlay.
+   :type fit_molecule: oechem.OEMCMolBase
+
+   :returns: The TanimotoCombo score and the OpenEye molecules of the best overlay
+   :rtype: float, list of oechem.OEGraphMol
+
+
+.. py:function:: enumerate_isomeric_smiles(molecule: openeye.oechem.OEMolBase) -> Set[str]
+
+   Enumerate reasonable isomeric SMILES representations of a given OpenEye molecule.
+
+   :param molecule: An OpenEye molecule.
+   :type molecule: oechem.OEMolBase
+
+   :returns: **smiles_set** -- A set of reasonable isomeric SMILES strings.
+   :rtype: set of str
+
+
+.. py:function:: are_identical_molecules(molecule1: openeye.oechem.OEMolBase, molecule2: openeye.oechem.OEMolBase) -> bool
+
+   Check if two OpenEye molecules are identical.
+
+   :param molecule1: The first OpenEye molecule.
+   :type molecule1: oechem.OEMolBase
+   :param molecule2: The second OpenEye molecule.
+   :type molecule2: oechem.OEMolBase
+
+   :returns: True if identical molecules, else False.
+   :rtype: bool
+
+
+.. py:function:: get_sequence(structure: openeye.oechem.OEMolBase) -> str
+
+   Get the amino acid sequence with one letter characters of an OpenEye molecule.
+   All residues not perceived as standard amino acid will receive the character 'X'.
+
+   :param structure: An OpenEye molecule.
+   :type structure: oechem.OEMolBase
+
+   :returns: **sequence** -- The amino acid sequence with one letter characters.
+   :rtype: str
+
+
+.. py:function:: get_structure_sequence_alignment(structure: openeye.oechem.OEMolBase, sequence: str) -> Tuple[str, str]
+
+   Generate an alignment between a protein structure and an amino acid sequence. The provided protein structure should
+   only contain protein residues to prevent unexpected behavior. Also, this alignment was optimized for highly similar
+   sequences, i.e. only few mutations, deletions and insertions. Non protein residues will be marked with "X".
+
+   :param structure: An OpenEye molecule holding a protein structure.
+   :type structure: oechem.OEMolBase
+   :param sequence: A one letter amino acid sequence.
+   :type sequence: str
+
+   :returns: * **structure_sequence_aligned** (*str*) -- The aligned protein structure sequence with gaps denoted as "-".
+             * **sequence_aligned** (*str*) -- The aligned amino acid sequence with gaps denoted as "-".
+
+
+.. py:function:: apply_deletions(target_structure: openeye.oechem.OEMolBase, template_sequence: str, delete_n_anchors: int = 2) -> openeye.oechem.OEMolBase
+
+   Apply deletions to a protein structure according to an amino acid sequence. The provided protein structure should
+   only contain protein residues to prevent unexpected behavior.
+
+   :param target_structure: An OpenEye molecule holding a protein structure for which deletions should be applied.
+   :type target_structure: oechem.OEMolBase
+   :param template_sequence: A template one letter amino acid sequence, which holds potential deletions when compared to the target
+                             structure sequence.
+   :type template_sequence: str
+   :param delete_n_anchors: Specify how many anchoring residues should be deleted at each side of the deletion. Important if connecting
+                            anchoring residues after deletion is intended, e.g. via apply_insertion. Only affects deletions in the middle
+                            of a sequence, not at the end or the beginning.
+   :type delete_n_anchors: int
+
+   :returns: **structure_with_deletions** -- An OpenEye molecule holding the protein structure with applied deletions.
+   :rtype: oechem.OEMolBase
+
+   :raises ValueError: Negative values are not allowed for 'delete_n_anchors'.
+
+
+.. py:function:: apply_insertions(target_structure: openeye.oechem.OEMolBase, template_sequence: str, loop_db: Union[str, pathlib.Path], ligand: Union[openeye.oechem.OEMolBase, None] = None) -> openeye.oechem.OEMolBase
+
+   Apply insertions to a protein structure according to an amino acid sequence. The provided protein structure should
+   only contain protein residues to prevent unexpected behavior.
+
+   :param target_structure: An OpenEye molecule holding a protein structure for which insertions should be applied.
+   :type target_structure: oechem.OEMolBase
+   :param template_sequence: A template one letter amino acid sequence, which holds potential insertions when compared to the target
+                             structure sequence.
+   :type template_sequence: str
+   :param loop_db: The path to the loop database used by OESpruce to model missing loops.
+   :type loop_db: str or Path
+   :param ligand: An OpenEye molecule that should be checked for heavy atom clashes with built insertions.
+   :type ligand: oechem.OEMolBase or None, default=None
+
+   :returns: **structure_with_insertions** -- An OpenEye molecule holding the protein structure with applied insertions.
+   :rtype: oechem.OEMolBase
+
+
+.. py:function:: apply_mutations(target_structure: openeye.oechem.OEMolBase, template_sequence: str, fallback_delete: bool = True) -> openeye.oechem.OEMolBase
+
+   Mutate a protein structure according to an amino acid sequence. The provided protein structure should only contain
+   protein residues to prevent unexpected behavior. Residues that could not be mutated will be deleted by default.
+
+   :param target_structure: An OpenEye molecule holding a protein structure to mutate.
+   :type target_structure: oechem.OEMolBase
+   :param template_sequence: A template one letter amino acid sequence, which holds potential mutations when compared to the target
+                             structure sequence.
+   :type template_sequence: str
+   :param fallback_delete: If the residue should be deleted if it could not be mutated.
+   :type fallback_delete: bool
+
+   :returns: An OpenEye molecule holding the mutated protein structure.
+   :rtype: oechem.OEMolBase
+
+   :raises ValueError: Mutation {oeresidue.GetName()}{oeresidue.GetResidueNumber()}{three_letter_code} failed!
+       Only raised when fallback_delete is set False.
+
+
+.. py:function:: delete_partial_residues(structure: openeye.oechem.OEMolBase) -> openeye.oechem.OEMolBase
+
+   Delete residues with missing sidechain or backbone atoms. The backbone is considered complete
+   if atoms C, CA and N are present.
+
+   :param structure: An OpenEye molecule holding a protein structure.
+   :type structure: oechem.OEMolBase
+
+   :returns: **structure** -- An OpenEye molecule holding only residues with completely modeled side chains.
+   :rtype: oechem.OEMolBase
+
+
+.. py:function:: delete_short_protein_segments(structure: openeye.oechem.OEMolBase) -> openeye.oechem.OEMolBase
+
+   Delete protein segments consisting of 3 or less residues.
+
+   :param structure: An OpenEye molecule holding a protein with possibly short segments.
+   :type structure: oechem.OEMolBase
+
+   :returns: **structure** -- An OpenEye molecule holding the protein without short segments.
+   :rtype: oechem.OEMolBase
+
+
+.. py:function:: delete_clashing_sidechains(structure: openeye.oechem.OEMolBase, cutoff: float = 2.0) -> openeye.oechem.OEMolBase
+
+   Delete side chains that are clashing with other atoms of the given structure.
+
+   Note: Structures containing non-protein residues may lead to unexpected behavior, since also
+   those residues will be deleted if clashing with other residues of the system. However, this
+   behavior is important to be able to also check PTMs for clashes.
+
+   :param structure: An OpenEye molecule holding a protein structure.
+   :type structure: oechem.OEMolBase
+   :param cutoff: The distance cutoff that is used for defining a heavy atom clash.
+                  Note: Going bigger than 2.3 A may lead to the deletion of residues involved in strong
+                  hydrogen bonds.
+   :type cutoff: float
+
+   :returns: **processed_structure** -- An OpenEye molecule holding the protein structure without clashing sidechains.
+   :rtype: oechem.OEMolBase
+
+
+.. py:function:: get_atom_coordinates(molecule: openeye.oechem.OEMolBase) -> List[Tuple[float, float, float]]
+
+   Retrieve the atom coordinates of an OpenEye molecule.
+
+   :param molecule: An OpenEye molecule for which the coordinates should be retrieved.
+   :type molecule: oechem.OEMolBase
+
+   :returns: **coordinates** -- The coordinates of the given molecule atoms.
+   :rtype: list of tuple of float
+
+
+.. py:function:: renumber_structure(target_structure: openeye.oechem.OEMolBase, residue_ids: Iterable[int]) -> openeye.oechem.OEGraphMol
+
+   Renumber the residues of a protein structure according to the given list of residue IDs.
+
+   :param target_structure: An OpenEye molecule holding the protein structure to renumber.
+   :type target_structure: oechem.OEMolBase
+   :param residue_ids: An iterable of residue IDs matching the order of the target structure.
+   :type residue_ids: iterable of int
+
+   :returns: **renumbered_structure** -- An OpenEye molecule holding the cropped protein structure.
+   :rtype: oechem.OEMolBase
+
+   :raises ValueError: Number of given residue IDs does not match number of residues in the given structure.
+   :raises ValueError: Given residue IDs contain wrong types, only int is allowed.
+
+
+.. py:function:: superpose_proteins(reference_protein: openeye.oechem.OEMolBase, fit_protein: openeye.oechem.OEMolBase, residues: Iterable = tuple(), chain_id: str = ' ', insertion_code: str = ' ') -> openeye.oechem.OEMolBase
+
+   Superpose a protein structure onto a reference protein. The superposition
+   can be customized to consider only the specified residues.
+
+   :param reference_protein: An OpenEye molecule holding a protein structure which will be used as reference during superposition.
+   :type reference_protein: oechem.OEMolBase
+   :param fit_protein: An OpenEye molecule holding a protein structure which will be superposed onto the reference protein.
+   :type fit_protein: oechem.OEMolBase
+   :param residues: Residues that should be used during superposition in format "GLY123".
+   :type residues: Iterable of str
+   :param chain_id: Chain identifier for residues that should be used during superposition.
+   :type chain_id: str
+   :param insertion_code: Insertion code for residues that should be used during superposition.
+   :type insertion_code: str
+
+   :returns: **superposed_protein** -- An OpenEye molecule holding the superposed protein structure.
+   :rtype: oechem.OEMolBase
+
+
+.. py:function:: update_residue_identifiers(structure: openeye.oechem.OEMolBase, keep_protein_residue_ids: bool = True, keep_chain_ids: bool = False) -> openeye.oechem.OEMolBase
+
+   Update the atom, residue and chain IDs of the given molecular structure. All residues become
+   part of chain A, unless 'keep_chain_ids' is set True. Atom IDs will start from 1. Residue IDs
+   will start from 1, except 'keep_protein_residue_ids' is set True. This is especially useful, if
+   molecules were merged, which can result in overlapping atom and residue IDs as well as
+   separate chains.
+
+   :param structure: The OpenEye molecule structure for updating atom and residue ids.
+   :type structure: oechem.OEMolBase
+   :param keep_protein_residue_ids: If the protein residues should be kept.
+   :type keep_protein_residue_ids: bool
+   :param keep_chain_ids: If the chain IDS should be kept.
+   :type keep_chain_ids: bool
+
+   :returns: **structure** -- The OpenEye molecule structure with updated atom and residue ids.
+   :rtype: oechem.OEMolBase
+
+
+.. py:function:: split_molecule_components(molecule: openeye.oechem.OEMolBase) -> List[openeye.oechem.OEGraphMol]
+
+   Split an OpenEye molecule into its bonded components.
+
+   :param molecule: An OpenEye molecule holding multiple components.
+   :type molecule: oechem.OEMolBase
+
+   :returns: **components** -- A list of OpenEye molecules holding the split components.
+   :rtype: list of oechem.OEGraphMol
+
+
+.. py:function:: residue_ids_to_residue_names(structure: openeye.oechem.OEMolBase, residue_ids: List[int], chain_id: Union[None, str] = None) -> List[str]
+
+   Get the corresponding residue names for a list of residue IDs and a give OpenEye molecule
+   with residue information.
+
+   :param structure: An OpenEye molecule with residue information.
+   :type structure: oechem.OEMolBase
+   :param residue_ids: A list of residue IDs.
+   :type residue_ids: list of int
+   :param chain_id: The chain ID to filter for.
+   :type chain_id: None or str
+
+   :returns: **residue_names** -- The corresponding residue names as three letter codes.
+   :rtype: list of str
+
+   :raises ValueError: No residue found for residue ID {resid}.
+   :raises ValueError: Found multiple residues for residue ID {resid}.
+
+

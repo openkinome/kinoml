@@ -1,0 +1,114 @@
+kinoml.ml.torch_loops
+=====================
+
+.. py:module:: kinoml.ml.torch_loops
+
+.. autoapi-nested-parse::
+
+   WIP
+
+
+
+
+
+
+
+Module Contents
+---------------
+
+.. py:function:: multi_measurement_training_loop(dataloaders, observation_models, model, optimizer, loss_function, epochs=100)
+
+   Standard training loop with multiple dataloaders and observation models.
+
+   :param dataloaders: key must refer to the measurement type present in the dataloader
+   :type dataloaders: dict of str -> torch.utils.data.DataLoader
+   :param observation_models: keys must be the same as in dataloaders, and point to pytorch-compatible callables
+                              that convert delta_over_kt to the corresponding measurement_type
+   :type observation_models: dict of str -> callable
+   :param model: instance of the model to train
+   :type model: torch.nn.Model
+   :param optimizer: instance of the optimization engine
+   :type optimizer: torch.optim.Optimizer
+   :param loss_function: instance of the loss function to apply (e.g. MSELoss())
+   :type loss_function: torch.nn.modules._Loss
+   :param epochs: number of iterations the loop will run
+   :type epochs: int
+
+   :returns: * **model** (*torch.nn.Model*) -- The trained model (same instance as provided in parameters)
+             * **loss_timeseries** (*list of float*) -- Cumulative loss per epoch
+
+
+.. py:class:: EarlyStopping(patience=5, min_delta=0)
+
+   Early stopping to stop the training when the loss does not improve after
+   certain epochs.
+
+   Taken from https://debuggercafe.com/using-learning-rate-scheduler-and-early-stopping-with-pytorch/
+
+
+   .. py:attribute:: patience
+      :value: 5
+
+
+
+   .. py:attribute:: min_delta
+      :value: 0
+
+
+
+   .. py:attribute:: counter
+      :value: 0
+
+
+
+   .. py:attribute:: best_loss
+      :value: None
+
+
+
+   .. py:attribute:: early_stop
+      :value: False
+
+
+
+   .. py:method:: __call__(val_loss)
+
+
+.. py:class:: LRScheduler(optimizer, patience=5, min_lr=1e-06, factor=0.5)
+
+   Learning rate scheduler. If the validation loss does not decrease for the
+   given number of `patience` epochs, then the learning rate will decrease by
+   by given `factor`.
+
+   Taken from https://debuggercafe.com/using-learning-rate-scheduler-and-early-stopping-with-pytorch/
+
+
+   .. py:attribute:: optimizer
+
+
+   .. py:attribute:: patience
+      :value: 5
+
+
+
+   .. py:attribute:: min_lr
+      :value: 1e-06
+
+
+
+   .. py:attribute:: factor
+      :value: 0.5
+
+
+
+   .. py:attribute:: lr_scheduler
+
+
+   .. py:method:: __call__(val_loss)
+
+
+.. py:function:: _old_training_loop()
+
+   Deprecated
+
+

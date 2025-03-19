@@ -1,0 +1,129 @@
+kinoml.core.systems
+===================
+
+.. py:module:: kinoml.core.systems
+
+.. autoapi-nested-parse::
+
+   ``System`` objects define a collection of related
+   ``MolecularComponent`` instances. They are normally
+   attached to a ``Measurement``, and, in the context
+   of a machine learning exercise, will be featurized
+   with different classes found under ``kinoml.features``.
+   Featurization turns a ``System`` into a tensor-like
+   object, like Numpy arrays.
+
+
+
+
+
+Module Contents
+---------------
+
+.. py:class:: System(components: Iterable[kinoml.core.components.MolecularComponent], strict: bool = True, *args, **kwargs)
+
+   System objects host one or more MolecularComponent.
+
+   :param components: Molecular entities defining this system
+   :type components: list of MolecularComponent
+   :param strict: Whether to perform sanity checks (default) or not.
+   :type strict: bool, optional=True
+
+   .. attribute:: featurizations
+
+      This dictionary will store the different featurization
+      steps a ``System`` is submitted to. The keys for this
+      dictionary are usually the *name* of the featurizer
+      class. Additionally, a ``Pipeline`` might define
+      a ``last`` key, indicating that particular object
+      was the final result of a chain of featurizers.
+
+      :type: dict
+
+
+   .. py:attribute:: components
+
+
+   .. py:attribute:: featurizations
+
+
+   .. py:method:: _components_by_type(type_)
+
+      Yield MolecularComponent objects of a given type only
+
+
+
+   .. py:method:: check()
+
+
+   .. py:property:: name
+      :type: str
+
+
+      Generates a readable name out of the components names
+
+
+   .. py:property:: weight
+      :type: float
+
+
+      Calculate the molecular weight of the system
+
+      Note: This is just an example on how/why this level of
+      abstraction can be useful.
+
+
+   .. py:method:: __repr__() -> str
+
+
+.. py:class:: ProteinSystem(components: Iterable[kinoml.core.components.MolecularComponent], strict: bool = True, *args, **kwargs)
+
+   Bases: :py:obj:`System`
+
+
+   A System that contains Protein objects. It defines two properties:
+
+   - ``protein``: get the first Protein found in the components
+   - ``proteins``: get all Protein objects found in the components
+
+
+   .. py:property:: protein
+
+
+   .. py:property:: proteins
+
+
+   .. py:method:: check()
+
+
+.. py:class:: LigandSystem(components: Iterable[kinoml.core.components.MolecularComponent], strict: bool = True, *args, **kwargs)
+
+   Bases: :py:obj:`System`
+
+
+   A System that contains Ligand objects. It defines two properties:
+
+   - ``ligand``: get the first Ligand found in the components
+   - ``ligands``: get all Ligand objects found in the components
+
+
+   .. py:property:: ligand
+
+
+   .. py:property:: ligands
+
+
+   .. py:method:: check()
+
+
+.. py:class:: ProteinLigandComplex(components: Iterable[kinoml.core.components.MolecularComponent], strict: bool = True, *args, **kwargs)
+
+   Bases: :py:obj:`ProteinSystem`, :py:obj:`LigandSystem`
+
+
+   A system with at least one protein and one ligand
+
+
+   .. py:method:: check()
+
+

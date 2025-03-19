@@ -1,0 +1,53 @@
+kinoml.datasets.pkis2
+=====================
+
+.. py:module:: kinoml.datasets.pkis2
+
+
+
+
+
+
+Module Contents
+---------------
+
+.. py:data:: logger
+
+.. py:class:: PKIS2DatasetProvider(measurements: Iterable[kinoml.core.measurements.BaseMeasurement], metadata: dict = None)
+
+   Bases: :py:obj:`kinoml.datasets.core.DatasetProvider`
+
+
+   Loads the PKIS2 dataset as provided in _Progress towards a public chemogenomic set for protein
+   kinases and a call for contributions [1].
+
+   [1]: DOI: 10.1371/journal.pone.0181585
+
+   .. admonition:: Examples
+
+      >>> from kinoml.datasets.pkis2 import PKIS2DatasetProvider
+      >>> provider = PKIS2DatasetProvider.from_source()
+      >>> provider
+
+
+   .. py:method:: from_source(path_or_url: Union[str, pathlib.Path] = datapath('kinomescan/journal.pone.0181585.s004.csv'), path_or_url_constructs: Union[str, pathlib.Path] = datapath('kinomescan/DiscoverX_489_Kinase_Assay_Construct_Information.csv'), protein_type: str = 'KLIFSKinase', toolkit: str = 'OpenEye')
+      :classmethod:
+
+
+      Create a PKIS2 DatasetProvider from the raw data.
+
+      :param path_or_url: CSV file with the protein-ligand measurements.
+      :type path_or_url: str or pathlib.Path
+      :param path_or_url_constructs: CSV file with the construct information.
+      :type path_or_url_constructs: str or pathlib.Path
+      :param protein_type: The protein object type to use ('Protein' or 'KLIFSKinase').
+      :type protein_type: str, default=KLIFSKinase
+      :param toolkit: The toolkit to use for creating protein objects (e.g. 'OpenEye', 'MDAnalysis'),
+                      allowed values depend on the specified `protein_type`.
+      :type toolkit: str, default=OpenEye
+
+      :raises ValueError: Given protein_type {protein_type} is not valid, only {protein_type_classes.keys()} are
+          allowed.
+
+
+

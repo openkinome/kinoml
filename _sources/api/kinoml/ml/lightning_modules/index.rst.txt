@@ -1,0 +1,357 @@
+kinoml.ml.lightning_modules
+===========================
+
+.. py:module:: kinoml.ml.lightning_modules
+
+.. autoapi-nested-parse::
+
+   Training loops built with pytorch-lightning
+
+   WIP
+
+
+
+
+
+Module Contents
+---------------
+
+.. py:class:: RootMeanSquaredError
+
+   Bases: :py:obj:`pytorch_lightning.metrics.MeanSquaredError`
+
+
+   WIP
+
+
+   .. py:method:: compute()
+
+      WIP
+
+
+
+.. py:class:: ObservationModelModule(nn_model, optimizer, loss_function, validate=True)
+
+   Bases: :py:obj:`pytorch_lightning.LightningModule`
+
+
+   WIP
+
+
+   .. py:attribute:: nn_model
+
+
+   .. py:attribute:: validate
+      :value: True
+
+
+
+   .. py:attribute:: optimizer
+
+
+   .. py:attribute:: loss_function
+
+
+   .. py:attribute:: metric_r2
+
+
+   .. py:attribute:: metric_mae
+
+
+   .. py:attribute:: metric_mse
+
+
+   .. py:attribute:: metric_rmse
+
+
+   .. py:method:: forward(x, observation_model=_null_observation_model)
+
+      WIP
+
+
+
+   .. py:method:: _standard_step(batch, batch_idx, **kwargs)
+
+      WIP
+
+
+
+   .. py:method:: training_step(batch, batch_idx, **kwargs)
+
+      WIP
+
+
+
+   .. py:method:: _common_validation_test_step(batch, batch_idx, dataloader_idx=0, metric_prefix='val', **kwargs)
+
+      WIP
+
+
+
+   .. py:method:: _common_validation_test_epoch_end(output_results, metric_prefix='val')
+
+      WIP
+
+
+
+   .. py:method:: _disabled_validation_step(*args, **kwargs)
+
+      WIP
+
+
+
+   .. py:method:: _disabled_validation_epoch_end(*args, **kwargs)
+
+      WIP
+
+
+
+   .. py:method:: test_step(*args, **kwargs)
+
+      WIP
+
+
+
+   .. py:method:: test_epoch_end(*args, **kwargs)
+
+      WIP
+
+
+
+   .. py:method:: configure_optimizers()
+
+      WIP
+
+
+
+.. py:class:: MultiDataModule(datasets: List[torch.utils.data.Dataset], observation_models: List[callable] = (_null_observation_model, ), **kwargs)
+
+   Bases: :py:obj:`pytorch_lightning.LightningDataModule`
+
+
+   WIP
+
+
+   .. py:attribute:: datasets
+
+
+   .. py:attribute:: observation_models
+
+
+   .. py:attribute:: dataloader_options
+
+
+   .. py:attribute:: measurement_types
+
+
+   .. py:attribute:: dataset_map
+
+
+   .. py:attribute:: observation_model_map
+
+
+   .. py:attribute:: _active_dataset_index
+      :value: 0
+
+
+
+   .. py:method:: dataset_indices_by_size(reverse=False)
+
+      WIP
+
+
+
+   .. py:property:: active_dataset
+
+      WIP
+
+
+   .. py:property:: active_dataset_index
+
+      WIP
+
+
+   .. py:method:: _build_dataloader(dataset_index=None, indices=None)
+
+      WIP
+
+
+
+   .. py:method:: train_dataloader(dataset_index=None)
+
+      WIP
+
+
+
+   .. py:method:: val_dataloader(dataset_index=None)
+
+      WIP
+
+
+
+   .. py:method:: test_dataloader(dataset_index=None)
+
+      WIP
+
+
+
+   .. py:method:: get_kfold(nfolds=5, with_validation=True, shuffle=False, **kwargs)
+
+      WIP
+
+
+
+.. py:class:: CrossValidateTrainer(nfolds=5, with_validation=True, shuffle=False, *args, **kwargs)
+
+   WIP
+
+
+   .. py:attribute:: nfolds
+      :value: 5
+
+
+
+   .. py:attribute:: with_validation
+      :value: True
+
+
+
+   .. py:attribute:: shuffle
+      :value: False
+
+
+
+   .. py:attribute:: trainer_args
+      :value: ()
+
+
+
+   .. py:attribute:: trainer_kwargs
+
+
+   .. py:attribute:: _models
+      :value: []
+
+
+
+   .. py:attribute:: _trainers
+      :value: []
+
+
+
+   .. py:attribute:: _dataloaders
+
+
+   .. py:method:: fit(model, datamodule)
+
+      WIP
+
+
+
+   .. py:method:: _patch_paths_for_kfold(fold_trainer, fold)
+
+      WIP
+
+
+
+   .. py:method:: test(dataset_index=0, **kwargs)
+
+      WIP
+
+
+
+   .. py:method:: best_run()
+
+      WIP
+
+
+
+   .. py:method:: clear()
+
+      WIP
+
+
+
+.. py:class:: ObservationModelDataLoader(observation_model=_null_observation_model, *args, **kwargs)
+
+   Bases: :py:obj:`torch.utils.data.DataLoader`
+
+
+   WIP
+
+
+   .. py:attribute:: observation_model
+
+
+   .. py:method:: __iter__()
+
+
+.. py:class:: _IterWithObsModel(iterator, observation_model)
+
+   WIP
+
+
+   .. py:attribute:: iterator
+
+
+   .. py:attribute:: observation_model
+
+
+   .. py:method:: __getattr__(name: str)
+
+
+   .. py:method:: __next__()
+
+
+   .. py:method:: __iter__()
+
+
+.. py:class:: AttrList(*args, **kwargs)
+
+   Bases: :py:obj:`list`
+
+
+   A subclass of list that can accept additional attributes.
+   Should be able to be used just like a regular list.
+
+   The problem:
+   a = [1, 2, 4, 8]
+   a.x = "Hey!" # AttributeError: 'list' object has no attribute 'x'
+
+   The solution:
+   a = L(1, 2, 4, 8)
+   a.x = "Hey!"
+   print a       # [1, 2, 4, 8]
+   print a.x     # "Hey!"
+   print len(a)  # 4
+
+   You can also do these:
+   a = L( 1, 2, 4, 8 , x="Hey!" )                 # [1, 2, 4, 8]
+   a = L( 1, 2, 4, 8 )( x="Hey!" )                # [1, 2, 4, 8]
+   a = L( [1, 2, 4, 8] , x="Hey!" )               # [1, 2, 4, 8]
+   a = L( {1, 2, 4, 8} , x="Hey!" )               # [1, 2, 4, 8]
+   a = L( [2 ** b for b in range(4)] , x="Hey!" ) # [1, 2, 4, 8]
+   a = L( (2 ** b for b in range(4)) , x="Hey!" ) # [1, 2, 4, 8]
+   a = L( 2 ** b for b in range(4) )( x="Hey!" )  # [1, 2, 4, 8]
+   a = L( 2 )                                     # [2]
+
+   Taken from https://code.activestate.com/recipes/579103-python-addset-attributes-to-list/
+
+
+   .. py:method:: __call__(**kwargs)
+
+
+.. py:class:: KFold3Way
+
+   Bases: :py:obj:`sklearn.model_selection.KFold`
+
+
+   WIP
+
+
+   .. py:method:: split(X, y=None, groups=None, with_validation=True)
+
+      WIP
+
+
+

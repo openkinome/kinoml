@@ -1,0 +1,446 @@
+kinoml.core.measurements
+========================
+
+.. py:module:: kinoml.core.measurements
+
+.. autoapi-nested-parse::
+
+   Measurements are the first-level citizens in a dataset.
+
+   A ``kinoml.datasets.DatasetProvider`` can be essentially considered
+   a list of ``Measurement`` objects. These objects contain:
+
+   - One or more numeric values, stored as an array under the ``.values`` attribute.
+   - The set of ``MolecularComponent`` objects that were measured, collected
+     under a ``System`` in the ``.system`` attribute.
+   - The conditions the measurement was taken under.
+
+   Read on the subclasses for more concrete information about observation models,
+   loss functions, errors and other features.
+
+
+
+
+
+
+
+
+
+Module Contents
+---------------
+
+.. py:data:: LN10
+
+.. py:class:: BaseMeasurement(values: Union[float, Iterable[float]], conditions: kinoml.core.conditions.AssayConditions, system: kinoml.core.systems.System, errors: Union[float, Iterable[float]] = np.nan, group: Union[int, str] = None, strict: bool = True, metadata: dict = None, **kwargs)
+
+   We will have several subclasses depending on the experiment.
+   They will also provide observation models tailored to it.
+
+   Values of the measurement can have more than one replicate. In fact,
+   single replicates are considered a specific case of a multi-replicate.
+
+   :param values: The numeric measurement(s). If float, it will be
+                  reshaped to a single-element array.
+   :type values: float or array-like of floats
+   :param errors: The associated errors to ``values``. Must be same
+                  shape as ``values``. If float, it will be
+                  reshaped to a single-element array.
+   :type errors: float or array-like of floats, optional
+   :param conditions: Experimental conditions of this measurement
+   :type conditions: AssayConditions
+   :param system: Molecular entities measured, contained in a System object
+   :type system: System
+   :param group: A label that identifies this measurement as part of a group.
+                 Useful to split datasets according to shared properties,
+                 like research group, measured molecule(s), etc.
+   :type group: int or str, optional
+   :param metadata: Provenance data for this measurement
+   :type metadata: dict, optional
+   :param strict: Whether to perform safe checks at initialization.
+   :type strict: bool, optional=True
+
+   .. attribute:: RANGE
+
+      Acceptable range of measurement values, as stored in ``values``
+
+      :type: tuple of float
+
+   .. note:: TODO: Investigate possible uses for ``pint``
+
+
+   .. py:attribute:: RANGE
+
+
+   .. py:attribute:: _values
+
+
+   .. py:attribute:: _errors
+
+
+   .. py:attribute:: conditions
+
+
+   .. py:attribute:: system
+
+
+   .. py:attribute:: group
+      :value: None
+
+
+
+   .. py:attribute:: metadata
+
+
+   .. py:property:: values
+
+
+   .. py:property:: errors
+
+
+   .. py:method:: check()
+
+      Perform some checks for valid values
+
+
+
+   .. py:method:: __eq__(other)
+
+
+   .. py:method:: __repr__() -> str
+
+
+.. py:class:: ObservationModelMeasurement(values: Union[float, Iterable[float]], conditions: kinoml.core.conditions.AssayConditions, system: kinoml.core.systems.System, errors: Union[float, Iterable[float]] = np.nan, group: Union[int, str] = None, strict: bool = True, metadata: dict = None, **kwargs)
+
+   Bases: :py:obj:`BaseMeasurement`
+
+
+   A base class that implements the concept of *observation models* and
+   *loss function* adapters.
+
+   Read on the ``.observation_model`` and ``.loss_adapter``
+   class methods for more information.
+
+
+   .. py:method:: observation_model(backend='pytorch')
+      :classmethod:
+
+
+      The observation_model function must be defined per Measurement type, in the appropriate
+      subclass. It dispatches to underlying static methods, suffixed by the
+      backend (e.g. `_observation_model_pytorch`, `_observation_model_tensorflow`). These methods are
+      _static_, so they do not have access to the class. This is done on purpose
+      for composability of modular observation_model functions.
+      The signature is, hence, undefined.
+
+      There are some standardized keyword arguments we use by convention, though:
+
+      - `values`
+      - `errors`
+
+
+
+   .. py:method:: _observation_model(backend='pytorch', type_=None)
+      :classmethod:
+
+
+
+   .. py:method:: _observation_model_null(dG_over_KT)
+      :staticmethod:
+
+
+
+   .. py:method:: _observation_model_pytorch(*args, **kwargs)
+      :staticmethod:
+
+      :abstractmethod:
+
+
+
+   .. py:method:: _observation_model_xgboost(*args, **kwargs)
+      :staticmethod:
+
+      :abstractmethod:
+
+
+
+   .. py:method:: loss_adapter(backend='pytorch')
+      :classmethod:
+
+
+      Some frameworks require objective functions to include the
+      observation model transformation in the same callable. This
+      method provides a factory of such methods.
+
+
+
+   .. py:method:: _loss_adapter_generic(predicted, observed, loss_func, loss_kwargs=None, pre_loss_func=None, pre_loss_kwargs=None, post_loss_func=None, post_loss_kwargs=None)
+      :staticmethod:
+
+
+
+   .. py:method:: _loss_adapter_pytorch(predicted, observed, loss_func, **kwargs)
+      :classmethod:
+
+
+
+   .. py:method:: _post_loss_adapter(loss, **kwargs)
+      :staticmethod:
+
+
+
+.. py:class:: PercentageDisplacementMeasurement(values: Union[float, Iterable[float]], conditions: kinoml.core.conditions.AssayConditions, system: kinoml.core.systems.System, errors: Union[float, Iterable[float]] = np.nan, group: Union[int, str] = None, strict: bool = True, metadata: dict = None, **kwargs)
+
+   Bases: :py:obj:`ObservationModelMeasurement`
+
+
+   Measurement where the value(s) must be percentage(s) of displacement.
+
+   For the percent displacement measurements available from KinomeScan, we have the following:
+
+   .. math :: D([I]) = \frac{1}{1 + \frac{K_d}{[I]}}
+
+   We therefore define the following function:
+
+   .. math :: \mathbf{F}_{KinomeScan}(\Delta g, [I]) = 100 * \frac{1}{1 + \frac{exp[\Delta g] * C[M]}{[I]}}
+
+   where :math:`C` is the standard concentration of 1 [M].
+
+   .. note:: The acceptable range for this measurement is [0, 100], inclusive.
+
+
+   .. py:attribute:: RANGE
+      :value: (0, 100)
+
+
+
+   .. py:method:: check()
+
+      Perform some checks for valid values
+
+
+
+   .. py:method:: _observation_model_pytorch(dG_over_KT, inhibitor_conc=1, standard_conc=1, **kwargs)
+      :staticmethod:
+
+
+
+   .. py:method:: _observation_model_numpy(dG_over_KT, inhibitor_conc=1, standard_conc=1, **kwargs)
+      :staticmethod:
+
+
+      Return the observation model.
+
+      .. math:: F(\Delta g) = 100 * \frac{1}{1 + \frac{exp[\Delta g] * C[M]}{[I]}}
+
+
+
+   .. py:attribute:: _observation_model_xgboost
+
+
+   .. py:method:: _post_loss_adapter(loss, **kwargs)
+      :staticmethod:
+
+
+
+   .. py:method:: _loss_adapter_xgboost_mse(labels, dG_over_KT, inhibitor_conc=1, standard_conc=1, **kwargs)
+      :staticmethod:
+
+
+      Return the gradient and the hessian of the loss defined by
+
+      .. math:: L(y, \hat y) = \frac{1}{2} * (y - F(\hat y)) ** 2
+
+      See theory notes for more details.
+
+
+
+.. py:class:: pIC50Measurement(values: Union[float, Iterable[float]], conditions: kinoml.core.conditions.AssayConditions, system: kinoml.core.systems.System, errors: Union[float, Iterable[float]] = np.nan, group: Union[int, str] = None, strict: bool = True, metadata: dict = None, **kwargs)
+
+   Bases: :py:obj:`ObservationModelMeasurement`
+
+
+   Measurement where the value(s) come from pIC50 experiments
+
+   We use the Cheng Prusoff equation here.
+
+   The `Cheng Prusoff <https://en.wikipedia.org/wiki/IC50#Cheng_Prusoff_equation>`_
+   equation states the following relationship:
+
+   .. math:: K_i = \frac{IC50}{1+\frac{[S]}{K_m}}
+
+   We make the following assumption (which will be relaxed in the future):
+
+   .. math:: K_i \approx K_d
+
+   Under this assumptions, the Cheng-Prusoff equation becomes:
+
+   .. math:: IC50 \approx {1+\frac{[S]}{K_m}} * K_d
+
+   We define the following function:
+
+   .. math:: \mathbf{F}_{IC_{50}}(\Delta g) = \Big({1+\frac{[S]}{K_m}}\Big) * \mathbf{F}_{K_d}(\Delta g) = \Big({1+\frac{[S]}{K_m}}\Big) * exp[\Delta g] * C[M]
+
+   Given IC50 values given in molar units, we obtain pIC50
+   values in molar units using the tranformation:
+
+   .. math:: pIC50 [M] = -log_{10}(IC50[M])
+
+   Finally the observation model for pIC50 values is:
+
+   .. math:: \mathbf{F}_{pIC_{50}}(\Delta g) = - \frac{\Delta g + \ln\Big(\big(1+\frac{[S]}{K_m}\big)*C\Big)}{\ln(10)}
+
+   .. note:: The acceptable range for this measurement is [0, 15], inclusive.
+
+
+   .. py:attribute:: RANGE
+      :value: (0, 15)
+
+
+
+   .. py:method:: _observation_model_pytorch(dG_over_KT, substrate_conc=1e-06, michaelis_constant=1, standard_conc=1, **kwargs)
+      :staticmethod:
+
+
+
+   .. py:attribute:: _observation_model_numpy
+
+
+   .. py:attribute:: _observation_model_xgboost
+
+
+   .. py:method:: _loss_adapter_xgboost_mse(labels, dG_over_KT, substrate_conc=1e-06, michaelis_constant=1, standard_conc=1, **kwargs)
+      :staticmethod:
+
+
+      In XGBoost, observation models need to be applied within the loss function. In this specific case,
+      MSE is applied and differentiated (twice) to provide the gradients and hessian matrices.
+
+      .. math:: loss = 1/2 * (observation_pIC50(preds)-labels)^2
+
+      :param dmatrix: xgboost.DMatrix
+                      Passed automatically by the xgboost loop
+
+
+
+   .. py:method:: _post_loss_adapter(loss, **kwargs)
+      :staticmethod:
+
+
+
+   .. py:method:: check()
+
+      Perform some checks for valid values
+
+
+
+.. py:class:: pKiMeasurement(values: Union[float, Iterable[float]], conditions: kinoml.core.conditions.AssayConditions, system: kinoml.core.systems.System, errors: Union[float, Iterable[float]] = np.nan, group: Union[int, str] = None, strict: bool = True, metadata: dict = None, **kwargs)
+
+   Bases: :py:obj:`ObservationModelMeasurement`
+
+
+   Measurement where the value(s) come from :math:`K_i` experiments
+
+   We make the assumption that :math:`K_i \approx K_d` and therefore
+
+   .. math :: \mathbf{F}_{pK_i} = \mathbf{F}_{pK_d}
+
+   .. note:: The acceptable range for this measurement is [0, 100], inclusive.
+
+
+   .. py:attribute:: RANGE
+      :value: (0, 15)
+
+
+
+   .. py:method:: _observation_model_pytorch(dG_over_KT, standard_conc=1, **kwargs)
+      :staticmethod:
+
+
+
+   .. py:attribute:: _observation_model_numpy
+
+
+   .. py:attribute:: _observation_model_xgboost
+
+
+   .. py:method:: _loss_adapter_xgboost_mse(labels, dG_over_KT, standard_conc=1, **kwargs)
+      :staticmethod:
+
+
+      Return the gradient and the hessian of the loss defined by
+
+      .. math:: L(y, \hat y) = \frac{1}{2} * (y - F(\hat y)) ** 2
+
+
+
+   .. py:method:: _post_loss_adapter(loss, **kwargs)
+      :staticmethod:
+
+
+
+   .. py:method:: check()
+
+      Perform some checks for valid values
+
+
+
+.. py:class:: pKdMeasurement(values: Union[float, Iterable[float]], conditions: kinoml.core.conditions.AssayConditions, system: kinoml.core.systems.System, errors: Union[float, Iterable[float]] = np.nan, group: Union[int, str] = None, strict: bool = True, metadata: dict = None, **kwargs)
+
+   Bases: :py:obj:`ObservationModelMeasurement`
+
+
+   Measurement where the value(s) come from Kd experiments
+
+   We define the following physics-based function
+
+   .. math:: \mathbf{F}_{pK_d}(\Delta g) = - \frac{\Delta g + \ln(C)}{\ln(10)}
+
+   where C given in molar [M] can be adapted if measurements were undertaken at different concentrations.
+
+   .. note:: The acceptable range for this measurement is [0, 15], inclusive.
+
+
+   .. py:attribute:: RANGE
+      :value: (0, 15)
+
+
+
+   .. py:method:: _observation_model_pytorch(dG_over_KT, standard_conc=1, **kwargs)
+      :staticmethod:
+
+
+
+   .. py:attribute:: _observation_model_numpy
+
+
+   .. py:attribute:: _observation_model_xgboost
+
+
+   .. py:method:: _loss_adapter_xgboost_mse(labels, dG_over_KT, standard_conc=1, **kwargs)
+      :staticmethod:
+
+
+      Return the gradient and the hessian of the loss defined by
+
+      .. math:: L(y, \hat y) = \frac{1}{2} * (y - F(\hat y)) ** 2
+
+
+
+   .. py:method:: _post_loss_adapter(loss, **kwargs)
+      :staticmethod:
+
+
+
+   .. py:method:: check()
+
+      Perform some checks for valid values
+
+
+
+.. py:function:: null_observation_model(arg)
+
+   A callable that returns ``arg`` directly. It works as an
+   identity function when observation models need to be disabled
+   for a particular experiment.
+
+

@@ -1,0 +1,62 @@
+kinoml.datasets.chembl
+======================
+
+.. py:module:: kinoml.datasets.chembl
+
+.. autoapi-nested-parse::
+
+   Creates DatasetProvider objects from ChEMBL activity data
+
+
+
+
+
+
+
+Module Contents
+---------------
+
+.. py:data:: logger
+
+.. py:class:: ChEMBLDatasetProvider(measurements: Iterable[kinoml.core.measurements.BaseMeasurement], metadata: dict = None)
+
+   Bases: :py:obj:`kinoml.datasets.core.MultiDatasetProvider`
+
+
+   This provider relies heavily on ``openkinome/kinodata`` data ingestion
+   pipelines. It will load ChEMBL activities from its releases page.
+
+
+   .. py:method:: from_source(path_or_url='https://github.com/openkinome/datascripts/releases/download/v0.2/activities-chembl28_v0.2.zip', measurement_types=('pIC50', 'pKi', 'pKd'), uniprot_ids=None, sample=None, protein_type: str = 'KLIFSKinase', toolkit: str = 'OpenEye')
+      :classmethod:
+
+
+      Create a MultiDatasetProvider out of the raw data contained in the zip file.
+
+      :param path_or_url: path or URL to a (zipped) CSV file containing activities from ChEMBL,
+                          using schema detailed below.
+      :type path_or_url: str, optional
+      :param measurement_types: Which measurement types must be imported from the CSV. By default, all
+                                three (pIC50, pKi, pKd) will be loaded, but you can choose a subset (
+                                e.g. ``("pIC50",)``).
+      :type measurement_types: tuple of str, optional
+      :param uniprot_ids: Restrict measurements to the given UniProt IDs.
+      :type uniprot_ids: None or list of str, default=None
+      :param sample: If set to larger than zero, load only N data points from the dataset.
+      :type sample: int, optional=None
+      :param protein_type: The protein object type to use ('Protein' or 'KLIFSKinase').
+      :type protein_type: str, default=KLIFSKinase
+      :param toolkit: The toolkit to use for creating protein objects (e.g. 'OpenEye', 'MDAnalysis'),
+                      allowed values depend on the specified `protein_type`.
+      :type toolkit: str, default=OpenEye
+
+      :raises ValueError: Given protein_type {protein_type} is not valid, only {allowed_protein_types} are
+          allowed.
+
+      .. note::
+
+         ChEMBL aggregates data from lots of sources, so conditions are guaranteed
+         to be different across experiments.
+
+
+

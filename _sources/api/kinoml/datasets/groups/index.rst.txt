@@ -1,0 +1,122 @@
+kinoml.datasets.groups
+======================
+
+.. py:module:: kinoml.datasets.groups
+
+.. autoapi-nested-parse::
+
+   Splitting strategies for datasets
+
+
+
+
+
+Module Contents
+---------------
+
+.. py:class:: BaseGrouper
+
+   Base class to assign groups to measurements in a DatasetProvider
+
+
+   .. py:method:: assign(dataset, overwrite=False, **kwargs)
+
+      Given a DatasetProvider, assign a key to the elements
+      of each group, as provided by ``.indices()``
+
+      :param dataset:
+      :type dataset: DatasetProvider
+      :param overwrite: If a measurement has been assigned a group already,
+                        do not overwrite unless this option is set to True.
+      :type overwrite: bool, optional=False
+
+      :returns: **dataset** -- The same dataset passed in the input, with
+                measurements modified in place.
+      :rtype: DatasetProvider
+
+
+
+   .. py:method:: indices(dataset, **kwargs)
+      :abstractmethod:
+
+
+      Given a dataset, create a dictionary that maps keys or labels
+      to a set of numerical indices. The strategy to follow will
+      depend on the subclass.
+
+      :param dataset:
+      :type dataset: DatasetProvider
+
+      :returns: Maps ``int` or ``str`` to a list of ``int``
+      :rtype: dict
+
+
+
+.. py:class:: RandomGrouper(ratios)
+
+   Bases: :py:obj:`BaseGrouper`
+
+
+   Randomized groups following a split proportional to the provided ratios
+
+   :param ratios: 1-based ratios for the different groups. They must sum 1.0. If a
+                  dict is provided, the keys are used to label the resulting groups.
+                  Otherwise, the groups are 0-enumerated.
+   :type ratios: tuple or dict
+
+
+   .. py:attribute:: ratios
+
+
+   .. py:method:: indices(dataset, **kwargs)
+
+      Given a dataset, create a dictionary that maps keys or labels
+      to a set of numerical indices. The strategy to follow will
+      depend on the subclass.
+
+      :param dataset:
+      :type dataset: DatasetProvider
+
+      :returns: Maps ``int` or ``str`` to a list of ``int``
+      :rtype: dict
+
+
+
+.. py:class:: CallableGrouper(function)
+
+   Bases: :py:obj:`BaseGrouper`
+
+
+   A grouper that applies a user-provided function to each Measurement
+   in the Dataset. Returned value should be the name of the group.
+
+   :param function: This function must be able to take a ``Measurement`` object
+                    and return a ``str`` or ``int``.
+   :type function: callable
+
+
+   .. py:attribute:: function
+
+
+   .. py:method:: indices(dataset, progress=True)
+
+      Given a dataset, create a dictionary that maps keys or labels
+      to a set of numerical indices. The strategy to follow will
+      depend on the subclass.
+
+      :param dataset:
+      :type dataset: DatasetProvider
+
+      :returns: Maps ``int` or ``str`` to a list of ``int``
+      :rtype: dict
+
+
+
+.. py:class:: BaseFilter
+
+   Bases: :py:obj:`BaseGrouper`
+
+
+   Base class to assign groups to measurements in a DatasetProvider
+
+

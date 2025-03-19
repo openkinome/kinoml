@@ -1,0 +1,20 @@
+kinoml.datasets
+===============
+
+.. py:module:: kinoml.datasets
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /api/kinoml/datasets/chembl/index
+   /api/kinoml/datasets/core/index
+   /api/kinoml/datasets/groups/index
+   /api/kinoml/datasets/pkis2/index
+   /api/kinoml/datasets/torch_datasets/index
+   /api/kinoml/datasets/torch_geometric_datasets/index
+
+

@@ -1,0 +1,975 @@
+kinoml.features.complexes
+=========================
+
+.. py:module:: kinoml.features.complexes
+
+.. autoapi-nested-parse::
+
+   Featurizers that can only get applied to ProteinLigandComplexes or
+   subclasses thereof
+
+
+
+
+
+
+
+Module Contents
+---------------
+
+.. py:data:: logger
+
+.. py:class:: SingleLigandProteinComplexFeaturizer(**kwargs)
+
+   Bases: :py:obj:`kinoml.features.core.ParallelBaseFeaturizer`
+
+
+   Provides a minimally useful ``._supports()`` method for all
+   ProteinLigandComplex-like featurizers.
+
+
+   .. py:attribute:: _COMPATIBLE_PROTEIN_TYPES
+
+
+   .. py:attribute:: _COMPATIBLE_LIGAND_TYPES
+
+
+   .. py:method:: _supports(system: Union[kinoml.core.systems.ProteinLigandComplex]) -> bool
+
+      Check that exactly one protein and one ligand is present in the System
+
+
+
+.. py:class:: MostSimilarPDBLigandFeaturizer(similarity_metric: str = 'fingerprint', cache_dir: Union[str, pathlib.Path, None] = None, **kwargs)
+
+   Bases: :py:obj:`SingleLigandProteinComplexFeaturizer`
+
+
+   Find the most similar co-crystallized ligand in the PDB according to a
+   given SMILES and UniProt ID.
+
+   The protein component of each system must be a `core.proteins.Protein` or
+   a subclass thereof, and must be initialized with a `uniprot_id` parameter.
+
+   The ligand component of each system must be a `core.ligands.Ligand` or a
+   subclass thereof and give access to the molecular structure, e.g. via a
+   SMILES.
+
+   :param similarity_metric: The similarity metric to use to detect the structure with the most
+                             similar ligand ["fingerprint", "mcs", "openeye_shape",
+                             "schrodinger_shape"].
+   :type similarity_metric: str, default="fingerprint"
+   :param cache_dir: Path to directory used for saving intermediate files. If None, default
+                     location provided by `appdirs.user_cache_dir()` will be used.
+   :type cache_dir: str, Path or None, default=None
+   :param use_multiprocessing: If multiprocessing to use.
+   :type use_multiprocessing: bool, default=True
+   :param n_processes: How many processes to use in case of multiprocessing. Defaults to
+                       number of available CPUs.
+   :type n_processes: int or None, default=None
+
+   .. note::
+
+      The toolkit ['MDAnalysis' or 'OpenEye'] specified in the protein object
+      initialization should fit the required toolkit when subsequently applying
+      the OEDockingFeaturizer or SCHRODINGERDockingFeaturizer.
+
+
+   .. py:attribute:: _SUPPORTED_TYPES
+
+
+   .. py:attribute:: _SUPPORTED_SIMILARITY_METRICS
+      :value: ('fingerprint', 'mcs', 'openeye_shape', 'schrodinger_shape')
+
+
+
+   .. py:attribute:: similarity_metric
+      :value: 'fingerprint'
+
+
+
+   .. py:attribute:: cache_dir
+
+
+   .. py:method:: _pre_featurize(systems: List[kinoml.core.systems.ProteinLigandComplex]) -> None
+
+      Check that SCHRODINGER variable exists.
+
+
+
+   .. py:method:: _check_schrodinger()
+
+      Check that SCHRODINGER variable exists.
+
+
+
+   .. py:method:: _featurize_one(system: kinoml.core.systems.ProteinLigandComplex) -> Union[kinoml.core.systems.ProteinLigandComplex, None]
+
+      Find a PDB entry with a protein of the given UniProt ID and with the most similar
+      co-crystallized ligand.
+
+      :param system: A system object holding a protein and a ligand component.
+      :type system: ProteinLigandComplex
+
+      :returns: The same system, but with additional protein attributes, i.e. pdb_id, chain_id and
+                expo_id. None if no suitable PDB entry was found.
+      :rtype: ProteinLigandComplex or None
+
+
+
+   .. py:method:: _post_featurize(systems: List[kinoml.core.systems.ProteinLigandComplex], features: List[kinoml.core.systems.ProteinLigandComplex], keep: bool = True) -> List[kinoml.core.systems.ProteinLigandComplex]
+
+      Run after featurizing all systems. Original systems will be replaced with systems
+      returned by the featurizer. Systems that were not successfully featurized will be
+      removed and listed in a log file in the current working directory.
+
+      :param systems: The systems being featurized.
+      :type systems: list of ProteinLigandComplex
+      :param features: The features returned by ``self._featurize``, i.e. new systems.
+      :type features: list of ProteinLigandComplex
+      :param keep: Whether to store the current featurizer in the ``system.featurizations``
+                   dictionary with its own key (``self.name``), in addition to ``last``.
+      :type keep: bool, optional=True
+
+      :returns: The new systems with ``.featurizations`` extended with the calculated features in two
+                entries: the featurizer name and ``last``.
+      :rtype: list of ProteinLigandComplex
+
+
+
+   .. py:method:: _get_pdb_ligand_entities(uniprot_id: str) -> Union[pandas.DataFrame, None]
+
+      Get PDB ligand entities bound to protein structures of the given UniProt ID. Only X-ray
+      structures will be considered. If a ligand is co-crystallized with multiple PDB structures
+      the ligand entity with the lowest resolution will be returned.
+
+      :param uniprot_id: The UniProt ID of the protein of interest.
+      :type uniprot_id: str
+
+      :returns: A DataFrame with columns `ligand_entity`, `pdb_id`, `non_polymer_id`, `chain_id`,
+                `expo_id` and `resolution`. None if no suitable ligand entities were found.
+      :rtype: pd.DataFrame or None
+
+
+
+   .. py:method:: _add_ligand_entity_info(pdb_ligand_entities: pd.DataFrame) -> pd.DataFrame
+      :staticmethod:
+
+
+      Add chain and expo ID information to the PDB ligand entities dataframe.
+
+      :param pdb_ligand_entities: The PDB ligand entities dataframe with a column named `ligand_entity`. This column
+                                  must contain strings in the format '4YNE_3', i.e. the third non polymer entity of
+                                  PDB entry 4YNE.
+      :type pdb_ligand_entities: pd.DataFrame
+
+      :returns: The same PDB ligand entities dataframe but with additional columns named `chain_id`
+                and `expo_id`. PDB ligand entities without such information are removed.
+      :rtype: pd.DataFrame
+
+
+
+   .. py:method:: _add_pdb_resolution(pdb_ligand_entities: pd.DataFrame) -> pd.DataFrame
+      :staticmethod:
+
+
+      Add resolution information to the PDB ligand entities dataframe.
+
+      :param pdb_ligand_entities: The PDB ligand entities dataframe with a column named `pdb_id`. This column must
+                                  contain strings in the format '4YNE', i.e. PDB entry 4YNE.
+      :type pdb_ligand_entities: pd.DataFrame
+
+      :returns: The same PDB ligand entities dataframe but with an additional column named
+                `resolution`. PDB ligand entities without such information will get a dummy
+                resolution of 99.9.
+      :rtype: pd.DataFrame
+
+
+
+   .. py:method:: _get_most_similar_pdb_ligand_entity(pdb_ligand_entities: pd.DataFrame, smiles: str) -> Tuple[str, str, str]
+
+      Get the PDB ligand that is most similar to the given SMILES.
+
+      :param pdb_ligand_entities: The PDB ligand entities dataframe with columns named `pdb_id`, `chain_id` and
+                                  `expo_id`.
+      :type pdb_ligand_entities: pd.DataFrame
+
+      :returns: The PDB, chain and expo ID of the most similar ligand.
+      :rtype: tuple of str
+
+
+
+   .. py:method:: _by_fingerprint(pdb_ligand_entities: pandas.DataFrame, smiles: str, max_similarity_cutoff: float = 0.0) -> pandas.DataFrame
+      :staticmethod:
+
+
+      Get the PDB ligands that are most similar to the given SMILES according to Morgan
+      Fingerprints.
+
+      :param pdb_ligand_entities: The PDB ligand entities dataframe with columns named `pdb_id`, `chain_id`, `expo_id`
+                                  and `smiles`.
+      :type pdb_ligand_entities: pd.DataFrame
+      :param smiles: The SMILES representation of the molecule to search for similar PDB ligands.
+      :type smiles: str
+      :param max_similarity_cutoff: The cutoff to use for selecting similar ligands based on the highest detected
+                                    similarity. If the highest detected similarity is 0.87 and the `max_similarity_cutoff`
+                                    is set to 0.1, all ligands will be returned with a similarity of 0.77 or higher.
+      :type max_similarity_cutoff: float, default=0.0
+
+      :returns: The most similar ligands.
+      :rtype: pd.DataFrame
+
+
+
+   .. py:method:: _by_mcs(pdb_ligand_entities: pd.DataFrame, smiles: str, max_bonds_cutoff: float = 0.0) -> pd.DataFrame
+      :staticmethod:
+
+
+      Get the PDB ligands that are most similar to the given SMILES according to the number of
+      bonds in the maximum common substructures.
+
+      :param pdb_ligand_entities: The PDB ligand entities dataframe with columns named `pdb_id`, `chain_id`, `expo_id`
+                                  and `smiles`.
+      :type pdb_ligand_entities: pd.DataFrame
+      :param smiles: The SMILES representation of the molecule to search for similar PDB ligands.
+      :type smiles: str
+      :param max_bonds_cutoff: The cutoff to use for selecting similar ligands based on the highest detected number
+                               of MCS bonds and the possible maximum of MCS bonds. The possible maximum number is
+                               calculated from the number of bonds in the given `smiles`. If the possible maximum
+                               number is 35, the highest number of detected mcs bonds is 20 and the `max_bonds_cutoff`
+                               is 0.1, all ligands will be returned with a number of MCS bonds of 16.5
+                               (20 - (35 * 0.1)) or higher.
+      :type max_bonds_cutoff: float, default=0.0
+
+      :returns: The most similar ligands.
+      :rtype: pd.DataFrame
+
+
+
+   .. py:method:: _by_schrodinger_shape(pdb_ligand_entities: pandas.DataFrame, smiles: str, max_similarity_cutoff: float = 0.0) -> pandas.DataFrame
+
+      Get the PDB ligands that are most similar to the given SMILES according to SCHRODINGER
+      shape_screen.
+
+      :param pdb_ligand_entities: The PDB ligand entities dataframe with columns named `pdb_id`, `chain_id`, `expo_id`
+                                  and `smiles`.
+      :type pdb_ligand_entities: pd.DataFrame
+      :param smiles: The SMILES representation of the molecule to search for similar PDB ligands.
+      :type smiles: str
+      :param max_similarity_cutoff: The cutoff to use for selecting similar ligands based on the highest detected
+                                    similarity. If the highest detected similarity is 0.87 and the `max_similarity_cutoff`
+                                    is set to 0.1, all ligands will be returned with a similarity of 0.77 or higher.
+      :type max_similarity_cutoff: float, default=0.0
+
+      :returns: The most similar ligands.
+      :rtype: pd.DataFrame
+
+
+
+   .. py:method:: _by_openeye_shape(pdb_ligand_entities: pandas.DataFrame, smiles: str, max_similarity_cutoff: float = 0.0) -> pandas.DataFrame
+
+      Get the PDB ligands that are most similar to the given SMILES according to OpenEye's
+      TanimotoCombo score.
+
+      :param pdb_ligand_entities: The PDB ligand entities dataframe with columns named `pdb_id`, `chain_id`, `expo_id`
+                                  and `smiles`.
+      :type pdb_ligand_entities: pd.DataFrame
+      :param smiles: The SMILES representation of the molecule to search for similar PDB ligands.
+      :type smiles: str
+      :param max_similarity_cutoff: The cutoff to use for selecting similar ligands based on the highest detected
+                                    similarity. If the highest detected similarity is 1.31 and the `max_similarity_cutoff`
+                                    is set to 0.2, all ligands will be returned with a similarity of 1.11 or higher.
+      :type max_similarity_cutoff: float, default=0.0
+
+      :returns: The most similar ligands.
+      :rtype: pd.DataFrame
+
+
+
+.. py:class:: KLIFSConformationTemplatesFeaturizer(**kwargs)
+
+   Bases: :py:obj:`MostSimilarPDBLigandFeaturizer`
+
+
+   Find suitable kinase templates for modeling a kinase:inhibitor complex in
+   different KLIFS conformations.
+
+   The protein component of each system must be a `core.proteins.KLIFSKinase`,
+   and must be initialized with a `uniprot_id` or `kinase_klifs_id` parameter.
+
+   The ligand component of each system must be a `core.ligands.Ligand` or a
+   subclass thereof and give access to the molecular structure, e.g. via a
+   SMILES.
+
+   :param similarity_metric: The similarity metric to use to detect the structures with similar
+                             ligands ["fingerprint", "mcs", "openeye_shape", "schrodinger_shape"].
+   :type similarity_metric: str, default="fingerprint"
+   :param cache_dir: Path to directory used for saving intermediate files. If None, default
+                     location provided by `appdirs.user_cache_dir()` will be used.
+   :type cache_dir: str, Path or None, default=None
+   :param use_multiprocessing: If multiprocessing to use.
+   :type use_multiprocessing: bool, default=True
+   :param n_processes: How many processes to use in case of multiprocessing. Defaults to
+                       number of available CPUs.
+   :type n_processes: int or None, default=None
+
+
+   .. py:attribute:: _COMPATIBLE_PROTEIN_TYPES
+
+
+   .. py:method:: _pre_featurize(systems: List[kinoml.core.systems.ProteinLigandComplex]) -> None
+
+      Check SCHRODINGER variable and fetch KLIFS data.
+
+
+
+   .. py:method:: _create_klifs_structure_db()
+
+      Fetch structure data from KLIFS.
+
+
+
+   .. py:method:: _featurize_one(system: kinoml.core.systems.ProteinLigandComplex) -> pandas.DataFrame
+
+      Find PDB entries for different KLIFS conformations with a similar co-crystallized ligand
+      and a similar pocket sequence.
+
+      :param system: A system object holding a protein and a ligand component.
+      :type system: ProteinLigandComplex
+
+      :returns: A dataframe with columns for `dfg`, `ac_helix`, `pdb_id`, `chain_id`, `expo_id`,
+                `ligand_similarity` and `sequence_similarity`.
+      :rtype: DataFrame
+
+
+
+   .. py:method:: _filter_structures(structures: pd.DataFrame) -> pd.DataFrame
+      :staticmethod:
+
+
+      Filter KLIFS entries for the presence of exactly one orthosteric ligand and determined
+      KLIFS conformation, and remove duplicates.
+
+      :param structures: The KLIFS entries to filter, need to contain the columns `ligand.expo_id`,
+                         `structure.pdb_id`, `structure.dfg`, `structure.ac_helix`, `structure.qualityscore`,
+                         `structure.resolution`, `structure.chain` and `structure.alternate_model`.
+      :type structures: DataFrame
+
+      :returns: The filtered KLIFS entries.
+      :rtype: DataFrame
+
+
+
+   .. py:method:: _get_most_similar_klifs_ligand_entity(structures: pd.DataFrame, smiles: str, klifs_sequence: str) -> Tuple[str, str, str, str, str]
+
+      Get the KLIFS entry that is most similar to the given SMILES and KLIFS pocket sequence.
+
+      :param structures: The KLIFS entries dataframe with columns named `structure.pdb_id`, `structure.chain`,
+                         `structure.expo_id`, `smiles` and `structure.pocket`.
+      :type structures: pd.DataFrame
+
+      :returns: The PDB ID, chain ID, expo ID, ligand similarity and pocket similarity of the KLIFS
+                entry with the most similar ligand and KLIFS pocket sequence.
+      :rtype: tuple of str
+
+
+
+   .. py:method:: _by_klifs_sequence(klifs_structures: pd.DataFrame, reference_klifs_sequence: str, max_similarity_cutoff: float = 0.0) -> pd.DataFrame
+      :staticmethod:
+
+
+      Get the KLIFS entries that are most similar to the given pocket sequence.
+
+      :param reference_klifs_sequence: The PDB ligand entities dataframe with a column named `structure.pocket`.
+      :type reference_klifs_sequence: pd.DataFrame
+      :param reference_klifs_sequence: The sequence for calculating the similarity.
+      :type reference_klifs_sequence: str
+      :param max_similarity_cutoff: The cutoff to use for selecting similar sequences based on the highest detected
+                                    sequence similarity and the possible maximum of sequence similarity. The possible
+                                    maximum sequence similarity is aligning the reference sequence to itself. If the
+                                    possible maximum sequence similarity is 450, the highest detected sequence similarity
+                                    is 320 and the `max_similarity_cutoff` is 0.1, all entries will be returned with a
+                                    sequence similarity of 275 (320 - (450 * 0.1)) or higher.
+      :type max_similarity_cutoff: float, default=0.0
+
+      :returns: The KLIFS entries with the most similar pocket sequences.
+      :rtype: pd.DataFrame
+
+
+
+   .. py:method:: _post_featurize(systems: List[kinoml.core.systems.ProteinLigandComplex], features: List, keep: bool = True) -> List[kinoml.core.systems.ProteinLigandComplex]
+
+      Run after featurizing all systems. Systems with a feature of None will be removed and
+      listed in a log file in the current working directory. You shouldn't need to redefine
+      this method.
+
+      :param systems: The systems being featurized
+      :type systems: list of System
+      :param features: The features returned by ``self._featurize``
+      :type features: list
+      :param keep: Whether to store the current featurizer in the ``system.featurizations``
+                   dictionary with its own key (``self.name``), in addition to ``last``.
+      :type keep: bool, optional=True
+
+      :returns: **filtered_systems** -- The same systems as passed, but with ``.featurizations`` extended with
+                the calculated features in two entries: the featurizer name and ``last``.
+                Systems with a feature of None will be removed.
+      :rtype: systems
+
+
+
+.. py:class:: OEComplexFeaturizer(**kwargs)
+
+   Bases: :py:obj:`kinoml.features.core.OEBaseModelingFeaturizer`, :py:obj:`SingleLigandProteinComplexFeaturizer`
+
+
+   Given systems with exactly one protein and one ligand, prepare the complex
+   structure by:
+
+    - modeling missing loops with OESpruce according to the PDB header unless
+      a custom sequence is specified via the `uniprot_id` or `sequence`
+      attribute in the protein component (see below), missing sequences at
+      N- and C-termini are not modeled
+    - building missing side chains
+    - substitutions, deletions and insertions, if a `uniprot_id` or `sequence`
+      attribute is provided for the protein component alteration will be
+      modeled with OESpruce, if an alteration could not be modeled, the
+      corresponding mismatch in the structure will be deleted
+    - removing everything but protein, water and ligand of interest
+    - protonation at pH 7.4
+
+   The protein component of each system must be a `core.proteins.Protein` or
+   a subclass thereof, must be initialized with toolkit='OpenEye' and give
+   access to the molecular structure, e.g. via a pdb_id. Additionally, the
+   protein component can have the following optional attributes to customize
+   the protein modeling:
+
+    - `name`: A string specifying the name of the protein, will be used for
+      generating the output file name.
+    - `chain_id`: A string specifying which chain should be used.
+    - `alternate_location`: A string specifying which alternate location
+      should be used.
+    - `expo_id`: A string specifying the ligand of interest. This is
+      especially useful if multiple ligands are present in a PDB structure.
+    - `uniprot_id`: A string specifying the UniProt ID that will be used to
+      fetch the amino acid sequence from UniProt, which will be used for
+      modeling the protein. This will supersede the sequence information
+      given in the PDB header.
+    - `sequence`: A string specifying the amino acid sequence in
+      one-letter-codes that should be used during modeling the protein. This
+      will supersede a given `uniprot_id` and the sequence information given
+      in the PDB header.
+
+   The ligand component of each system must be a `core.components.BaseLigand`
+   or a subclass thereof. The ligand component can have the following
+   optional attributes:
+
+    - `name`: A string specifying the name of the ligand, will be used for
+      generating the output file name.
+
+   :param loop_db: The path to the loop database used by OESpruce to model missing loops.
+   :type loop_db: str
+   :param cache_dir: Path to directory used for saving intermediate files. If None, default
+                     location provided by `appdirs.user_cache_dir()` will be used.
+   :type cache_dir: str, Path or None, default=None
+   :param output_dir: Path to directory used for saving output files. If None, output
+                      structures will not be saved.
+   :type output_dir: str, Path or None, default=None
+   :param use_multiprocessing: If multiprocessing to use.
+   :type use_multiprocessing: bool, default=True
+   :param n_processes: How many processes to use in case of multiprocessing. Defaults to
+                       number of available CPUs.
+   :type n_processes: int or None, default=None
+
+   .. note::
+
+      If the ligand of interest is covalently bonded to the protein, the
+      covalent bond will be broken. This may lead to the transformation of the
+      ligand into a radical.
+
+
+   .. py:attribute:: _SUPPORTED_TYPES
+
+
+   .. py:method:: _featurize_one(system: kinoml.core.systems.ProteinLigandComplex) -> Union[Universe, None]
+
+      Prepare a protein structure.
+
+      :param system: A system object holding a protein and a ligand component.
+      :type system: ProteinLigandComplex
+
+      :returns: An MDAnalysis universe of the featurized system. None if no design unit was found.
+      :rtype: Universe or None
+
+
+
+.. py:class:: OEDockingFeaturizer(method: str = 'Posit', pKa_norm: bool = True, **kwargs)
+
+   Bases: :py:obj:`kinoml.features.core.OEBaseModelingFeaturizer`, :py:obj:`SingleLigandProteinComplexFeaturizer`
+
+
+   Given systems with exactly one protein and one ligand, prepare the
+   structure and dock the ligand into the prepared protein structure with
+   one of OpenEye's docking algorithms:
+
+    - modeling missing loops with OESpruce according to the PDB header unless
+      a custom sequence is specified via the `uniprot_id` or `sequence`
+      attribute in the protein component (see below), missing sequences at
+      N- and C-termini are not modeled
+    - building missing side chains
+    - substitutions, deletions and insertions, if a `uniprot_id` or `sequence`
+      attribute is provided for the protein component alteration will be
+      modeled with OESpruce, if an alteration could not be modeled, the
+      corresponding mismatch in the structure will be deleted
+    - removing everything but protein, water and ligand of interest
+    - protonation at pH 7.4
+    - perform docking
+
+   The protein component of each system must be a `core.proteins.Protein` or
+   a subclass thereof, must be initialized with toolkit='OpenEye' and give
+   access to the molecular structure, e.g. via a pdb_id. Additionally, the
+   protein component can have the following optional attributes to customize
+   the protein modeling:
+
+    - `name`: A string specifying the name of the protein, will be used for
+      generating the output file name.
+    - `chain_id`: A string specifying which chain should be used.
+    - `alternate_location`: A string specifying which alternate location
+      should be used.
+    - `expo_id`: A string specifying a ligand bound to the protein of
+      interest. This is especially useful if multiple proteins are found in
+      one PDB structure.
+    - `uniprot_id`: A string specifying the UniProt ID that will be used to
+      fetch the amino acid sequence from UniProt, which will be used for
+      modeling the protein. This will supersede the sequence information
+      given in the PDB header.
+    - `sequence`: A string specifying the amino acid sequence in
+      one-letter-codes that should be used during modeling the protein. This
+      will supersede a given `uniprot_id` and the sequence information given
+      in the PDB header.
+    - `pocket_resids`: List of integers specifying the residues in the
+      binding pocket of interest. This attribute is required if docking with
+      Fred into an apo structure.
+
+   The ligand component of each system must be a `core.ligands.Ligand` or a
+   subclass thereof and give access to the molecular structure, e.g. via a
+   SMILES. Additionally, the ligand component can have the following optional
+   .. attribute:: - `name`
+
+      A string specifying the name of the ligand, will be used for
+      generating the output file name.
+
+   :param method: The docking method to use ["Fred", "Hybrid", "Posit"].
+   :type method: str, default="Posit"
+   :param loop_db: The path to the loop database used by OESpruce to model missing loops.
+   :type loop_db: str
+   :param cache_dir: Path to directory used for saving intermediate files. If None, default
+                     location provided by `appdirs.user_cache_dir()` will be used.
+   :type cache_dir: str, Path or None, default=None
+   :param output_dir: Path to directory used for saving output files. If None, output
+                      structures will not be saved.
+   :type output_dir: str, Path or None, default=None
+   :param use_multiprocessing: If multiprocessing to use.
+   :type use_multiprocessing: bool, default=True
+   :param n_processes: How many processes to use in case of multiprocessing. Defaults to
+                       number of available CPUs.
+   :type n_processes: int or None, default=None
+   :param pKa_norm: Assign the predominant ionization state of the molecules to dock at pH
+                    ~7.4. If False, the ionization state of the input molecules will be
+                    conserved.
+   :type pKa_norm: bool, default=True
+
+
+   .. py:attribute:: method
+      :value: 'Posit'
+
+
+
+   .. py:attribute:: pKa_norm
+      :value: True
+
+
+
+   .. py:attribute:: _SUPPORTED_TYPES
+
+
+   .. py:method:: _featurize_one(system: kinoml.core.systems.ProteinLigandComplex) -> Union[Universe, None]
+
+      Prepare a protein structure and dock a ligand using OpenEye's Fred method.
+
+      :param system: A system object holding a protein and a ligand component.
+      :type system: ProteinLigandComplex
+
+      :returns: An MDAnalysis universe of the featurized system. None if no design unit or docking
+                pose was found.
+      :rtype: Universe or None
+
+
+
+   .. py:method:: _store_docking_score(structure: Universe, docking_pose: openeye.oechem.OEGraphMol)
+      :staticmethod:
+
+
+      Store the docking score from OpenEye docking in the MDAnalysis universe._topology. If the
+      Posit probability is available it will be stored as well. They cannot be stored in the
+      universe object directly, because they will be lost during multiprocessing/pickling.
+
+      :param structure: The docked structure as MDAnalysis universe.
+      :type structure: Universe
+      :param docking_pose: The docking pose.
+      :type docking_pose: oechem.OEGraphMol
+
+
+
+.. py:class:: SCHRODINGERComplexFeaturizer(cache_dir: Union[str, pathlib.Path, None] = None, output_dir: Union[str, pathlib.Path, None] = None, max_retry: int = 3, build_loops: bool = True, **kwargs)
+
+   Bases: :py:obj:`SingleLigandProteinComplexFeaturizer`
+
+
+   Given systems with exactly one protein and one ligand, prepare the complex
+   structure by:
+
+    - modeling missing loops with Prime according to the PDB header unless
+      a custom sequence is specified via the `uniprot_id` or `sequence`
+      attribute in the protein component (see below), missing sequences at
+      N- and C-termini are not modeled
+    - building missing side chains
+    - substitutions, deletions and insertions, if a `uniprot_id` or `sequence`
+      attribute is provided for the protein component alteration will be first
+      deleted and subsequently the intended sequence modeled with Prime, if
+      an alteration could not be modeled, a corresponding deletion will remain
+    - removing everything but protein, water and ligand of interest
+    - protonation at pH 7.4
+
+   The protein component of each system must be a `core.proteins.Protein` or
+   a subclass thereof, must be initialized with toolkit='MDAnalysis' and give
+   access to the molecular structure, e.g. via a pdb_id. Additionally, the
+   protein component can have the following optional attributes to customize
+   the protein modeling:
+
+    - `name`: A string specifying the name of the protein, will be used for
+      generating the output file name.
+    - `chain_id`: A string specifying which chain should be used.
+    - `alternate_location`: A string specifying which alternate location
+      should be used.
+    - `expo_id`: A string specifying the ligand of interest. This is
+      especially useful if multiple ligands are present in a PDB structure.
+    - `uniprot_id`: A string specifying the UniProt ID that will be used to
+      fetch the amino acid sequence from UniProt, which will be used for
+      modeling the protein. This will supersede the sequence information
+      given in the PDB header.
+    - `sequence`: A string specifying the amino acid sequence in
+      one-letter-codes that should be used during modeling the protein. This
+      will supersede a given `uniprot_id` and the sequence information given
+      in the PDB header.
+
+   The ligand component of each system must be a `core.components.BaseLigand`
+   or a subclass thereof. The ligand component can have the following
+   optional attributes:
+
+    - `name`: A string specifying the name of the ligand, will be used for
+      generating the output file name.
+
+   :param cache_dir: Path to directory used for saving intermediate files. If None, default
+                     location provided by `appdirs.user_cache_dir()` will be used.
+   :type cache_dir: str, Path or None, default=None
+   :param output_dir: Path to directory used for saving output files. If None, output
+                      structures will not be saved.
+   :type output_dir: str, Path or None, default=None
+   :param use_multiprocessing: If multiprocessing to use.
+   :type use_multiprocessing: bool, default=True
+   :param n_processes: How many processes to use in case of multiprocessing. Defaults to
+                       number of available CPUs.
+   :type n_processes: int or None, default=None
+   :param max_retry: The maximal number of attempts to try running the prepwizard step.
+   :type max_retry: int, default=3
+   :param build_loops: If missing loops shell be built. Is also needed to model mutations.
+   :type build_loops: bool, default=True
+
+
+   .. py:attribute:: cache_dir
+
+
+   .. py:attribute:: output_dir
+      :value: None
+
+
+
+   .. py:attribute:: max_retry
+      :value: 3
+
+
+
+   .. py:attribute:: build_loops
+      :value: True
+
+
+
+   .. py:attribute:: _SUPPORTED_TYPES
+
+
+   .. py:method:: _pre_featurize(systems: List[kinoml.core.systems.ProteinLigandComplex]) -> None
+
+      Check that SCHRODINGER variable exists.
+
+
+
+   .. py:method:: _featurize_one(system: kinoml.core.systems.ProteinLigandComplex) -> Union[Universe, None]
+
+      Prepare a protein structure.
+
+      :param system: A system object holding a protein and a ligand component.
+      :type system: ProteinLigandComplex
+
+      :returns: An MDAnalysis universe of the featurized system or None if not successful.
+      :rtype: Universe or None
+
+
+
+   .. py:method:: _system_to_name(system: kinoml.core.systems.ProteinLigandComplex) -> str
+      :staticmethod:
+
+
+      Get a name of the system based on attributes of the protein and ligand component.
+
+      :param system: The system with protein and ligand component.
+      :type system: ProteinLigandComplex
+
+      :returns: A descriptive name of the system
+      :rtype: str
+
+
+
+   .. py:method:: _prepare_structure(protein: Union[kinoml.core.proteins.Protein, kinoml.core.proteins.KLIFSKinase]) -> Union[pathlib.Path, None]
+
+      Prepare the structure with SCHRODINGER's prepwizard.
+
+      :param protein: The path to the input structure file in PDB format.
+      :type protein: Path
+
+      :returns: The path to the prepared structure if successful.
+      :rtype: Path or None
+
+
+
+   .. py:method:: _read_protein_structure(protein: Union[kinoml.core.proteins.Protein, kinoml.core.proteins.KLIFSKinase]) -> Union[Universe, None]
+
+      Returns the protein structure of the given protein object as MDAnalysis universe.
+
+      :param protein: The protein object.
+      :type protein: Protein or KLIFSKinase
+
+      :returns: The protein structure as MDAnalysis universe or None.
+      :rtype: Universe or None
+
+      :raises ValueError: If wrong toolkit was used during initialization of the protein object.
+
+
+
+   .. py:method:: _preprocess_structure(pdb_path: Union[str, pathlib.Path], chain_id: Union[str, None], alternate_location: Union[str, None], expo_id: Union[str, None], sequence: str) -> pathlib.Path
+
+      Pre-process a structure for SCHRODINGER's prepwizard with the following steps:
+       - select chain of interest
+       - select alternate location of interest
+       - remove all ligands but ligand of interest
+       - remove expression tags
+       - delete protein alterations differing from given sequence
+       - renumber protein residues according to the given sequence
+
+      :param pdb_path: Path to the structure file in PDB format.
+      :type pdb_path: str or Path
+      :param chain_id: The chain ID of interest.
+      :type chain_id: str or None
+      :param alternate_location: The alternate location of interest.
+      :type alternate_location: str or None
+      :param expo_id: The resname of the ligand of interest.
+      :type expo_id: str or None
+      :param sequence: The amino acid sequence of the protein.
+      :type sequence: str
+
+      :returns: The path to the cleaned structure.
+      :rtype: Path
+
+
+
+   .. py:method:: _postprocess_structure(prepared_structure: Universe, protein: [kinoml.core.proteins.Protein, kinoml.core.proteins.KLIFSKinase]) -> Universe
+      :staticmethod:
+
+
+      Post-process a structure prepared with SCHRODINGER's prepwizard with the following steps:
+       - select the chain of interest
+       - select the alternate location of interest
+       - remove all ligands but the ligands of interest
+       - update residue identifiers, e.g. atom indices, chain ID, residue IDs of non-protein
+
+      :param prepared_structure: The structure prepared by SCHRODINGER's prepwizard.
+      :type prepared_structure: Universe
+      :param protein: The protein component of the system.
+      :type protein: Protein or KLIFSKinase
+
+      :returns: The post-processed structure.
+      :rtype: Universe
+
+
+
+.. py:class:: SCHRODINGERDockingFeaturizer(cache_dir: Union[str, pathlib.Path, None] = None, output_dir: Union[str, pathlib.Path, None] = None, max_retry: int = 3, build_loops: bool = True, shape_restrain: bool = True, **kwargs)
+
+   Bases: :py:obj:`SCHRODINGERComplexFeaturizer`
+
+
+   Given systems with exactly one protein and one ligand, prepare the
+   structure dock the ligand into its binding site identified by a
+   co-crystallized ligand. The following steps will be performed:
+
+    - modeling missing loops with Prime according to the PDB header unless
+      a custom sequence is specified via the `uniprot_id` or `sequence`
+      attribute in the protein component (see below), missing sequences at
+      N- and C-termini are not modeled
+    - building missing side chains
+    - substitutions, deletions and insertions, if a `uniprot_id` or `sequence`
+      attribute is provided for the protein component alteration will be first
+      deleted and subsequently the intended sequence modeled with Prime, if
+      an alteration could not be modeled, a corresponding deletion will remain
+    - removing everything but protein, water and ligand of interest
+    - protonation at pH 7.4
+    - docking a ligand
+
+   The protein component of each system must be a `core.proteins.Protein` or
+   a subclass thereof, must be initialized with toolkit='MDAnalysis' and give
+   access to the molecular structure, e.g. via a pdb_id. Additionally, the
+   protein component can have the following optional attributes to customize
+   the protein modeling:
+
+    - `name`: A string specifying the name of the protein, will be used for
+      generating the output file name.
+    - `chain_id`: A string specifying which chain should be used.
+    - `alternate_location`: A string specifying which alternate location
+      should be used.
+    - `expo_id`: A string specifying a ligand bound to the protein of
+      interest. This is especially useful if multiple proteins are found in
+      one PDB structure.
+    - `uniprot_id`: A string specifying the UniProt ID that will be used to
+      fetch the amino acid sequence from UniProt, which will be used for
+      modeling the protein. This will supersede the sequence information
+      given in the PDB header.
+    - `sequence`: A string specifying the amino acid sequence in
+      one-letter-codes that should be used during modeling the protein. This
+      will supersede a given `uniprot_id` and the sequence information given
+      in the PDB header.
+
+   The ligand component of each system must be a `core.ligands.Ligand` or a
+   subclass thereof and give access to the molecular structure, e.g. via a
+   SMILES. Additionally, the ligand component can have the following optional
+   .. attribute:: - `name`
+
+      A string specifying the name of the ligand, will be used for
+      generating the output file name and as molecule title in the docking
+      pose SDF file.
+
+   .. attribute:: - `macrocycle`
+
+      A bool specifying if the ligand shell be sampled as a
+      macrocycle during docking. Docking will fail, if SCHRDODINGER does not
+      consider the ligand a macrocycle.
+
+   :param cache_dir: Path to directory used for saving intermediate files. If None, default
+                     location provided by `appdirs.user_cache_dir()` will be used.
+   :type cache_dir: str, Path or None, default=None
+   :param output_dir: Path to directory used for saving output files. If None, output
+                      structures will not be saved.
+   :type output_dir: str, Path or None, default=None
+   :param use_multiprocessing: If multiprocessing to use.
+   :type use_multiprocessing: bool, default=True
+   :param n_processes: How many processes to use in case of multiprocessing. Defaults to
+                       number of available CPUs.
+   :type n_processes: int or None, default=None
+   :param max_retry: The maximal number of attempts to try running the prepwizard and
+                     docking steps.
+   :type max_retry: int, default=3
+   :param build_loops: If missing loops shell be built. Is also needed to model mutations.
+   :type build_loops: bool, default=True
+   :param shape_restrain: If the docking shell be performed with shape restrain based on the
+                          co-crystallized ligand.
+   :type shape_restrain: bool, default=True
+
+
+   .. py:attribute:: shape_restrain
+      :value: True
+
+
+
+   .. py:attribute:: _SUPPORTED_TYPES
+
+
+   .. py:method:: _featurize_one(system: kinoml.core.systems.ProteinLigandComplex) -> Union[Universe, None]
+
+      Prepare a protein structure and dock a ligand.
+
+      :param system: A system object holding a protein and a ligand component.
+      :type system: ProteinLigandComplex
+
+      :returns: An MDAnalysis universe of the featurized system or None if not successful.
+      :rtype: Universe or None
+
+
+
+   .. py:method:: _dock_molecule(prepared_structure_path: pathlib.Path, system: kinoml.core.systems.ProteinLigandComplex, system_name: str) -> Union[pathlib.Path, None]
+
+      Dock the molecule into the protein with SCHRODINGER's Glide.
+
+      :param prepared_structure_path: A prepared protein structure, ready for docking.
+      :type prepared_structure_path: Path
+      :param system: The system that is being featurized.
+      :type system: ProteinLigandComplex
+      :param system_name: A descriptive name of the system.
+      :type system_name: str
+
+      :returns: The path to the generated docking pose, None if not successful.
+      :rtype: Path or None
+
+
+
+   .. py:method:: _replace_ligand(pdb_path: pathlib.Path, docking_pose_sdf_path: pathlib.Path) -> Universe
+      :staticmethod:
+
+
+      Replace the ligand in a PDB file with a ligand in an SDF file.
+
+      :param pdb_path: Path to the PDB file of the protein ligand complex.
+      :type pdb_path: Path
+      :param docking_pose_sdf_path: Path to the molecule in SDF format that shell be added to the structure.
+      :type docking_pose_sdf_path: Path
+
+      :returns: The structure with replaced ligand.
+      :rtype: Universe
+
+
+
+   .. py:method:: _store_docking_score(structure: Universe, docking_pose_path: pathlib.Path)
+      :staticmethod:
+
+
+      Store the docking score from OpenEye docking in the MDAnalysis universe._topology. They
+      cannot be stored in the universe object directly, because they will be lost during
+      multiprocessing/pickling.
+
+      :param structure: The docked structure as MDAnalysis universe.
+      :type structure: Universe
+      :param docking_pose_path: The path to the docking pose.
+      :type docking_pose_path: Path
+
+
+
+   .. py:method:: _write_complex_mae(prepared_structure: Universe, docking_pose_path: pathlib.Path, complex_path_mae: pathlib.Path)
+
+      Write the new docked structure in MAE format.
+
+      :param prepared_structure: The prepared structure containing the docked ligand with resname LIG.
+      :type prepared_structure: Universe
+      :param docking_pose_path: The prepared docking pose including correct bonding information.
+      :type docking_pose_path: Path
+      :param complex_path_mae: The path for the output file in MAE format.
+      :type complex_path_mae: Path
+
+
+

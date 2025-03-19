@@ -1,0 +1,46 @@
+kinoml.docking.SCHRODINGERDocking
+=================================
+
+.. py:module:: kinoml.docking.SCHRODINGERDocking
+
+
+
+
+
+
+Module Contents
+---------------
+
+.. py:data:: logger
+
+.. py:function:: run_glide(schrodinger_directory: Union[pathlib.Path, str], input_file_mae: Union[pathlib.Path, str], output_file_sdf: Union[pathlib.Path, str], mols_smiles: List[str], ligand_resname: Union[str, None], n_poses: int = 1, mols_names: Union[List[str], None] = None, shape_restrain: bool = True, macrocyles: bool = False, precision: str = 'XP', cache_dir: Union[pathlib.Path, str] = user_cache_dir())
+
+   Run glide for protein ligand docking.
+
+   :param schrodinger_directory: The path to the directory of the Schrodinger installation.
+   :type schrodinger_directory: Path or str
+   :param input_file_mae: The path to the input file in MAE format containing the protein structure to dock to and a
+                          co-crystallized ligand in the binding pocket of interest.
+   :type input_file_mae: Path or str
+   :param output_file_sdf: The path to the output file of the generated in docking poses in SDF format.
+   :type output_file_sdf: Path or str
+   :param mols_smiles: The molecules to dock as SMILES representation.
+   :type mols_smiles: list of str
+   :param ligand_resname: The resname of the co-crystallized ligand, which will be used for pocket definition.
+   :type ligand_resname: str or None
+   :param mols_names: The names of the molecules to dock. Will be used as molecule title in the SDF file. If
+                      None, names will be numbers (1,..,len(mols_smiles).
+   :type mols_names: None or list of str, default=None
+   :param n_poses: Number of poses to generate per molecule.
+   :type n_poses: int, default=1
+   :param shape_restrain: If the co-crystallized ligand shell be used for shape restrained docking.
+   :type shape_restrain: bool, default=True
+   :param macrocyles: Macrocycle conformations will be sampled with an appropriate algorithm. All non-
+                      macrocyclic molecules by detected by SCHRODINGER will be skipped.
+   :type macrocyles: bool, default=False
+   :param precision: The docking precision to use ["HTVS", "SP", "XP"].
+   :type precision: str, default="XP"
+   :param cache_dir: Path to a directory for caching grids for docking.
+   :type cache_dir: Path or str, default=appdirs.user_cache_dir()
+
+

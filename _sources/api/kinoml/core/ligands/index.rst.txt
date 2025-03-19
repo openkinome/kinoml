@@ -1,0 +1,97 @@
+kinoml.core.ligands
+===================
+
+.. py:module:: kinoml.core.ligands
+
+.. autoapi-nested-parse::
+
+   ``MolecularComponent`` objects that represent ligand-like entities.
+
+
+
+
+
+
+
+Module Contents
+---------------
+
+.. py:data:: logger
+
+.. py:class:: Ligand(molecule: Union[openff.toolkit.topology.Molecule, None] = None, smiles: str = '', name: str = '', metadata: Union[dict, None] = None, **kwargs)
+
+   Bases: :py:obj:`kinoml.core.components.BaseLigand`
+
+
+   Create a new Ligand object. An openff representation is accessible via the molecule attribute.
+
+   .. admonition:: Examples
+
+      Create a ligand from file:
+
+      >>> ligand = Ligand.from_file("data/molecules/chloroform.sdf", name="chloroform")
+
+      Create a ligand from an openff molecule:
+
+      >>> from openff.toolkit.topology import Molecule
+      >>> molecule = Molecule.from_file("data/molecules/chloroform.sdf")
+      >>> ligand = Ligand(molecule=molecule, name="chloroform")
+
+      Create a ligand from SMILES:
+
+      >>> ligand = Ligand.from_smiles("C(Cl)(Cl)Cl", name="chloroform")
+
+      Create a ligand from SMILES with lazy instantiation:
+
+      >>> ligand = Ligand(smiles="C(Cl)(Cl)Cl", name="chloroform")
+
+
+   .. py:attribute:: _molecule
+      :value: None
+
+
+
+   .. py:attribute:: _smiles
+      :value: ''
+
+
+
+   .. py:property:: molecule
+
+      Decorate molecule to modify setter and getter.
+
+
+   .. py:method:: from_smiles(smiles: str, name: str = '', allow_undefined_stereo: bool = True, **kwargs)
+      :classmethod:
+
+
+      Create a Ligand from a SMILES representation.
+
+      :param smiles: smiles: str
+                     The SMILES representation of the ligand.
+      :type smiles: str
+      :param name: The name of the ligand.
+      :type name: str, default=""
+      :param allow_undefined_stereo: If undefined stereo centers should be allowed.
+      :type allow_undefined_stereo: bool, default=True
+      :param kwargs: Any keyword arguments allowed for the from_smiles method of the openff molecule class.
+
+
+
+   .. py:method:: from_file(file_path: Union[pathlib.Path, str], name: str = '', allow_undefined_stereo: bool = True, **kwargs)
+      :classmethod:
+
+
+      Create a Ligand from file.
+
+      :param file_path: The path to the molecular file. For supported formats see the openff molecule
+                        documentation.
+      :type file_path: pathlib.Path or str
+      :param name: The name of the ligand.
+      :type name: str, default=""
+      :param allow_undefined_stereo: If undefined stereo centers should be allowed.
+      :type allow_undefined_stereo: bool, default=True
+      :param kwargs: Any keyword arguments allowed for the from_file method of the openff molecule class.
+
+
+

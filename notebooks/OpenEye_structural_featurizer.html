@@ -1,12 +1,10 @@
-
 <!DOCTYPE html>
 
-<html>
+<html lang="en" data-content_root="../">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <meta property="article:modified_time" content="2023-12-20T14:48:30+00:00" />
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   <meta name="lang:clipboard.copy" content="Copy to clipboard">
@@ -51,27 +49,20 @@
   
   
     <title>OpenEye Structural Featurizer &#8212; KinoML 0.1 documentation</title>
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/material.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/twemoji.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css" />
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/jquery.js"></script>
-    <script src="../_static/underscore.js"></script>
-    <script src="../_static/doctools.js"></script>
-    <script src="https://twemoji.maxcdn.com/v/latest/twemoji.min.js"></script>
-    <script src="../_static/twemoji.js"></script>
-    <script src="../_static/clipboard.min.js"></script>
-    <script src="../_static/copybutton.js"></script>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=75810a84" />
+    <link rel="stylesheet" type="text/css" href="../_static/material.css?v=79c92029" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
+    <script src="../_static/documentation_options.js?v=2709fde1"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script>window.MathJax = {"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}, "tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <link rel="shortcut icon" href="../_static/custom_favicon.png"/>
+    <link rel="icon" href="../_static/custom_favicon.png"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Schrodinger Structural Featurizer" href="Schrodinger_structural_featurizer.html" />
@@ -489,7 +480,7 @@
           <article class="md-content__inner md-typeset" role="main">
             
   <section id="OpenEye-Structural-Featurizer">
-<h1 id="notebooks-openeye-structural-featurizer--page-root">OpenEye Structural Featurizer<a class="headerlink" href="#notebooks-openeye-structural-featurizer--page-root" title="Permalink to this headline">¶</a></h1>
+<h1 id="notebooks-openeye-structural-featurizer--page-root">OpenEye Structural Featurizer<a class="headerlink" href="#notebooks-openeye-structural-featurizer--page-root" title="Link to this heading">¶</a></h1>
 <p>This notebook introduces structural modeling featurizers using the <a class="reference external" href="https://docs.eyesopen.com/toolkits/python/index.html">OpenEye toolkits</a> to prepare protein structures and to dock small molecules into their binding sites.</p>
 <p><strong>Note:</strong> All structural featurizers fetch data and/or do expensive computations. Hence, fetched data (e.g. PDB structures) and intermediate results (e.g. a prepared protein structure) are stored in a cache directory to speed up calculations when featurizing the same or similar systems multiple times. The cache directory can be specified via the <code class="docutils literal notranslate"><span class="pre">cache_dir</span></code> parameter, but also has a default (<code class="docutils literal notranslate"><span class="pre">user_cache_dir</span></code> from <code class="docutils literal notranslate"><span class="pre">appdirs</span></code>). In case you update your KinoML version you should consider
 deleting the cache directory. Otherwise, you may get results from the former KinoML version, since the intermediate results will be taken from cache.</p>
@@ -498,18 +489,18 @@ deleting the cache directory. Otherwise, you may get results from the former Kin
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%capture</span> --no-display
-<span class="kn">from</span> <span class="nn">importlib</span> <span class="kn">import</span> <span class="n">resources</span>
-<span class="kn">import</span> <span class="nn">inspect</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">importlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">resources</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">inspect</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
-<span class="kn">from</span> <span class="nn">appdirs</span> <span class="kn">import</span> <span class="n">user_cache_dir</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">appdirs</span><span class="w"> </span><span class="kn">import</span> <span class="n">user_cache_dir</span>
 
-<span class="kn">from</span> <span class="nn">kinoml.core.ligands</span> <span class="kn">import</span> <span class="n">Ligand</span>
-<span class="kn">from</span> <span class="nn">kinoml.core.proteins</span> <span class="kn">import</span> <span class="n">Protein</span><span class="p">,</span> <span class="n">KLIFSKinase</span>
-<span class="kn">from</span> <span class="nn">kinoml.core.systems</span> <span class="kn">import</span> <span class="n">ProteinSystem</span><span class="p">,</span> <span class="n">ProteinLigandComplex</span>
-<span class="kn">from</span> <span class="nn">kinoml.features.core</span> <span class="kn">import</span> <span class="n">Pipeline</span>
-<span class="kn">from</span> <span class="nn">kinoml.features.protein</span> <span class="kn">import</span> <span class="n">OEProteinStructureFeaturizer</span>
-<span class="kn">from</span> <span class="nn">kinoml.features.complexes</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">kinoml.core.ligands</span><span class="w"> </span><span class="kn">import</span> <span class="n">Ligand</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">kinoml.core.proteins</span><span class="w"> </span><span class="kn">import</span> <span class="n">Protein</span><span class="p">,</span> <span class="n">KLIFSKinase</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">kinoml.core.systems</span><span class="w"> </span><span class="kn">import</span> <span class="n">ProteinSystem</span><span class="p">,</span> <span class="n">ProteinLigandComplex</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">kinoml.features.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pipeline</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">kinoml.features.protein</span><span class="w"> </span><span class="kn">import</span> <span class="n">OEProteinStructureFeaturizer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">kinoml.features.complexes</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">OEComplexFeaturizer</span><span class="p">,</span>
     <span class="n">OEDockingFeaturizer</span><span class="p">,</span>
     <span class="n">MostSimilarPDBLigandFeaturizer</span><span class="p">,</span>
@@ -519,7 +510,7 @@ deleting the cache directory. Otherwise, you may get results from the former Kin
 </div>
 </div>
 <section id="OEProteinStructureFeaturizer">
-<h2 id="OEProteinStructureFeaturizer">OEProteinStructureFeaturizer<a class="headerlink" href="#OEProteinStructureFeaturizer" title="Permalink to this headline">¶</a></h2>
+<h2 id="OEProteinStructureFeaturizer">OEProteinStructureFeaturizer<a class="headerlink" href="#OEProteinStructureFeaturizer" title="Link to this heading">¶</a></h2>
 <p>All OpenEye Featurizers come with an extensive doc string explaining the capabilities and requirements.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
@@ -746,7 +737,7 @@ kinoml_OEProteinStructureFeaturizer_PsaA_4f8o_protein.pdb
 </div>
 </section>
 <section id="OEComplexFeaturizer">
-<h2 id="OEComplexFeaturizer">OEComplexFeaturizer<a class="headerlink" href="#OEComplexFeaturizer" title="Permalink to this headline">¶</a></h2>
+<h2 id="OEComplexFeaturizer">OEComplexFeaturizer<a class="headerlink" href="#OEComplexFeaturizer" title="Link to this heading">¶</a></h2>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
@@ -927,7 +918,7 @@ kinoml_OEComplexFeaturizer_PsaA_4f8o_chainA_altlocB_AEBSF_protein.pdb
 </div>
 </section>
 <section id="OEDockingFeaturizer">
-<h2 id="OEDockingFeaturizer">OEDockingFeaturizer<a class="headerlink" href="#OEDockingFeaturizer" title="Permalink to this headline">¶</a></h2>
+<h2 id="OEDockingFeaturizer">OEDockingFeaturizer<a class="headerlink" href="#OEDockingFeaturizer" title="Link to this heading">¶</a></h2>
 <p>The <code class="docutils literal notranslate"><span class="pre">OEDockingFeaturizer</span></code> supports <a class="reference external" href="https://docs.eyesopen.com/toolkits/python/dockingtk/index.html">3 docking methods</a>, i.e.:</p>
 <ul class="simple">
 <li><p><strong>Fred</strong> - standard docking protocol</p></li>
@@ -1022,7 +1013,7 @@ pKa_norm: bool, default=True
 </pre></div></div>
 </div>
 <section id="Fred">
-<h3 id="Fred">Fred<a class="headerlink" href="#Fred" title="Permalink to this headline">¶</a></h3>
+<h3 id="Fred">Fred<a class="headerlink" href="#Fred" title="Link to this heading">¶</a></h3>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
 </pre></div>
@@ -1134,7 +1125,7 @@ Warning: There was a problem building some missing pieces, built as much as was 
 </div>
 </section>
 <section id="Hybrid">
-<h3 id="Hybrid">Hybrid<a class="headerlink" href="#Hybrid" title="Permalink to this headline">¶</a></h3>
+<h3 id="Hybrid">Hybrid<a class="headerlink" href="#Hybrid" title="Link to this heading">¶</a></h3>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
 </pre></div>
@@ -1187,7 +1178,7 @@ Warning: There was a problem building some missing pieces, built as much as was 
 </div>
 </section>
 <section id="Posit">
-<h3 id="Posit">Posit<a class="headerlink" href="#Posit" title="Permalink to this headline">¶</a></h3>
+<h3 id="Posit">Posit<a class="headerlink" href="#Posit" title="Link to this heading">¶</a></h3>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[30]:
 </pre></div>
@@ -1259,7 +1250,7 @@ Warning: There was a problem building some missing pieces, built as much as was 
 </section>
 </section>
 <section id="MostSimilarPDBLigandFeaturizer">
-<h2 id="MostSimilarPDBLigandFeaturizer">MostSimilarPDBLigandFeaturizer<a class="headerlink" href="#MostSimilarPDBLigandFeaturizer" title="Permalink to this headline">¶</a></h2>
+<h2 id="MostSimilarPDBLigandFeaturizer">MostSimilarPDBLigandFeaturizer<a class="headerlink" href="#MostSimilarPDBLigandFeaturizer" title="Link to this heading">¶</a></h2>
 <p>Manually specifying the most suitable PDB structure to dock into is not practical for a larger set of ligands. Hence, the <code class="docutils literal notranslate"><span class="pre">MostSimilarPDBLigandFeaturizer</span></code> was implemented, wich can find the most suitable structure for docking in the PDB based on ligand similarity. The user can choose from one the following similarity metrics:</p>
 <ul class="simple">
 <li><p>Fingerprint</p></li>
@@ -1313,7 +1304,7 @@ the OEDockingFeaturizer or SCHRODINGERDockingFeaturizer.
 </pre></div></div>
 </div>
 <section id="Most-common-substructure">
-<h3 id="Most-common-substructure">Most common substructure<a class="headerlink" href="#Most-common-substructure" title="Permalink to this headline">¶</a></h3>
+<h3 id="Most-common-substructure">Most common substructure<a class="headerlink" href="#Most-common-substructure" title="Link to this heading">¶</a></h3>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[36]:
 </pre></div>
@@ -1373,7 +1364,7 @@ the OEDockingFeaturizer or SCHRODINGERDockingFeaturizer.
 </div>
 </section>
 <section id="Fingerprint">
-<h3 id="Fingerprint">Fingerprint<a class="headerlink" href="#Fingerprint" title="Permalink to this headline">¶</a></h3>
+<h3 id="Fingerprint">Fingerprint<a class="headerlink" href="#Fingerprint" title="Link to this heading">¶</a></h3>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[40]:
 </pre></div>
@@ -1414,7 +1405,7 @@ the OEDockingFeaturizer or SCHRODINGERDockingFeaturizer.
 </div>
 </section>
 <section id="OpenEye's-shape">
-<h3 id="OpenEye's-shape">OpenEye’s shape<a class="headerlink" href="#OpenEye's-shape" title="Permalink to this headline">¶</a></h3>
+<h3 id="OpenEye's-shape">OpenEye’s shape<a class="headerlink" href="#OpenEye's-shape" title="Link to this heading">¶</a></h3>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[42]:
 </pre></div>
@@ -1456,7 +1447,7 @@ the OEDockingFeaturizer or SCHRODINGERDockingFeaturizer.
 <p>Using shape is clearly the slowest option, but in many cases the most accurate one.</p>
 </section>
 <section id="Pipeline-of-MostSimilarPDBLigandFeaturizer-and-OEDockingFeaturizer">
-<h3 id="Pipeline-of-MostSimilarPDBLigandFeaturizer-and-OEDockingFeaturizer">Pipeline of MostSimilarPDBLigandFeaturizer and OEDockingFeaturizer<a class="headerlink" href="#Pipeline-of-MostSimilarPDBLigandFeaturizer-and-OEDockingFeaturizer" title="Permalink to this headline">¶</a></h3>
+<h3 id="Pipeline-of-MostSimilarPDBLigandFeaturizer-and-OEDockingFeaturizer">Pipeline of MostSimilarPDBLigandFeaturizer and OEDockingFeaturizer<a class="headerlink" href="#Pipeline-of-MostSimilarPDBLigandFeaturizer-and-OEDockingFeaturizer" title="Link to this heading">¶</a></h3>
 <p>The <code class="docutils literal notranslate"><span class="pre">MostSimilarPDBLigandFeaturizer</span></code> can be joined with the <code class="docutils literal notranslate"><span class="pre">OEDockingFeaturizer</span></code> into a <code class="docutils literal notranslate"><span class="pre">Pipeline</span></code> featurizer.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[44]:
@@ -1551,7 +1542,7 @@ Warning: There was a problem building some missing pieces, built as much as was 
 </section>
 </section>
 <section id="KLIFSConformationTemplatesFeaturizer">
-<h2 id="KLIFSConformationTemplatesFeaturizer">KLIFSConformationTemplatesFeaturizer<a class="headerlink" href="#KLIFSConformationTemplatesFeaturizer" title="Permalink to this headline">¶</a></h2>
+<h2 id="KLIFSConformationTemplatesFeaturizer">KLIFSConformationTemplatesFeaturizer<a class="headerlink" href="#KLIFSConformationTemplatesFeaturizer" title="Link to this heading">¶</a></h2>
 <p>The <code class="docutils literal notranslate"><span class="pre">KLIFSConformationTemplatesFeaturizer</span></code> searches for suitable templates to model a kinase:ligand complex in different conformations. The templates are selected based on ligand and sequence similarity.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[49]:
@@ -1793,11 +1784,8 @@ n_processes : int or None, default=None
               &#169; Copyright 2021, OpenKinome.
               
           </div>
-            Last updated on
-              Dec 20, 2023.
-            <br/>
             Created using
-            <a href="http://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
+            <a href="http://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
              and
             <a href="https://github.com/bashtage/sphinx-material/">Material for
               Sphinx</a>

@@ -1,0 +1,78 @@
+kinoml.modeling.SCHRODINGERModeling
+===================================
+
+.. py:module:: kinoml.modeling.SCHRODINGERModeling
+
+
+
+
+
+
+Module Contents
+---------------
+
+.. py:data:: logger
+
+.. py:function:: run_prepwizard(schrodinger_directory: Union[pathlib.Path, str], input_file: Union[pathlib.Path, str], output_file: Union[pathlib.Path, str], cap_termini: bool = True, build_loops: bool = True, sequence: Union[str, None] = None, chain_id: str = '', protein_pH: str = 'neutral', propka_pH: float = 7.4, epik_pH: float = 7.4, force_field: str = '3')
+
+   Run the prepwizard utility to prepare a protein structure.
+
+   :param schrodinger_directory: The path to the directory of the Schrodinger installation.
+   :type schrodinger_directory: Path or str
+   :param input_file: The path to the input file.
+   :type input_file: Path or str
+   :param output_file: The path to the output file.
+   :type output_file: Path or str
+   :param cap_termini: If termini should be capped.
+   :type cap_termini: bool, default=True
+   :param build_loops: If loops should be built.
+   :type build_loops: bool, default=True
+   :param sequence: The amino acid sequence in single letter codes that should be used for loop building.
+                    Also needs the chain_id parameter to work correctly.
+   :type sequence: str or None
+   :param chain_id: The chain ID of the protein that should be modeled based on the given sequence.
+   :type chain_id: str, default=""
+   :param protein_pH: The pH used during protonation of the protein ('very_low', 'low', 'neutral', 'high').
+   :type protein_pH: str, default='neutral'
+   :param propka_pH: Run PROPKA at given pH.
+   :type propka_pH: float, default=7.4
+   :param epik_pH: The pH used during protonation of the ligand.
+   :type epik_pH: float, default=7.4
+   :param force_field: Force field to use during minimization (2005, 3)
+   :type force_field: str, default='3'
+
+
+.. py:function:: mae_to_pdb(schrodinger_directory: Union[str, pathlib.Path], mae_file_path: Union[str, pathlib.Path], pdb_file_path: Union[str, pathlib.Path])
+
+   Convert a structure file from MAE to PDB format.
+
+   :param schrodinger_directory: The path to the directory of the Schrodinger installation.
+   :type schrodinger_directory: str or pathlib.Path
+   :param mae_file_path: The path to the input file in MAE format.
+   :type mae_file_path: str or pathlib.Path
+   :param pdb_file_path: The path to the output file in PDB format.
+   :type pdb_file_path: str or pathlib.Path
+
+
+.. py:function:: shape_screen(schrodinger_directory: Union[pathlib.Path, str], query_path: Union[str, pathlib.Path], library_path: Union[str, pathlib.Path], output_sdf_path: Union[str, pathlib.Path], flexible: bool = True, thorough_sampling: bool = True, keep_best_match_only: bool = True)
+
+   Run the shape_screen tool to align a library of small molecules to the given shape query.
+
+   :param schrodinger_directory: The path to the directory of the Schrodinger installation.
+   :type schrodinger_directory: Path or str
+   :param query_path: The path to a valid shape query, e.g. an SDF file with one or more small molecules.
+   :type query_path: Path or str
+   :param library_path: The path to a valid ligand library for shape screening, e.g. and SDF file with one more
+                        small molecules.
+   :type library_path: Path or str
+   :param output_sdf_path: The path to the output SDF file of the shape screening.
+   :type output_sdf_path: Path or str
+   :param flexible: If conformers shell be generated for the small molecule library to screen.
+   :type flexible: bool, default=True
+   :param thorough_sampling: If conformations shell thoroughly sampled.
+   :type thorough_sampling: bool, default=True
+   :param keep_best_match_only: In case multiple shape queries, if only the results for best matching shape query shell
+                                be returned.
+   :type keep_best_match_only: bool, default=True
+
+

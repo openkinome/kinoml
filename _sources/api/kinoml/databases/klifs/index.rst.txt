@@ -1,0 +1,25 @@
+kinoml.databases.klifs
+======================
+
+.. py:module:: kinoml.databases.klifs
+
+
+
+
+Module Contents
+---------------
+
+.. py:function:: klifs_kinase_from_uniprot_id(uniprot_id: str) -> pandas.DataFrame
+
+   Retrieve KLIFS kinase details about the kinase matching the given Uniprot ID.
+
+   :param uniprot_id: Uniprot identifier.
+   :type uniprot_id: str
+
+   :returns: **kinase** -- KLIFS kinase details.
+   :rtype: pd.Series
+
+   :raises ValueError:: No KLIFS kinase found for UniProt ID.
+   :raises ValueError:: Multiple KLIFS kinases found for UniProt ID.
+
+
