@@ -78,6 +78,9 @@ Module Contents
 
    .. py:method:: _retrieve_sequence(system: Union[kinoml.core.systems.ProteinSystem, kinoml.core.systems.ProteinLigandComplex]) -> str
 
+      Implement in your component-specific subclass!
+
+
 
 .. py:class:: OEProteinStructureFeaturizer(**kwargs)
 
