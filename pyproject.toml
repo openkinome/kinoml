@@ -1,0 +1,59 @@
+[project]
+name = "kinoml"
+version = "0.1.0"
+description = "Structure-informed machine learning for kinase modeling"
+requires-python = ">=3.9"
+dependencies = [
+  "pandas",
+  "requests",
+  "pint==0.19.2",
+  "appdirs",
+  "tqdm",
+  "openff-toolkit",
+  "xgboost",
+  "openeye-toolkits>=2020.2.0",
+  "bravado",
+  "biopandas",
+  "awkward",
+  "pyarrow>=6.0.1",
+  "mdanalysis>=2.0.0",
+  "matplotlib",
+  "ruamel.yaml",
+  "dask",
+  "dask-jobqueue",
+  "papermill==2.2.*",
+  "watermark",
+  "torch>=1.8.0",
+  "torch-geometric",
+  "pytorch-lightning",
+  "jupyterlab",
+  "nglview",
+  "pytest",
+  "pytest-cov",
+  "pytest-xdist",
+  "codecov",
+  "nbval",
+  "Sklearn_PyTorch",
+  "opencadd"
+]
+
+[[tool.uv.sources.openeye-toolkits]]
+index = "openeye-toolkits-conda"
+
+[[tool.uv.sources.opencadd]]
+url = "https://github.com/volkamerlab/opencadd/archive/master.zip"
+
+[[tool.uv.sources.openff-toolkit]]
+url = "https://github.com/openforcefield/openff-toolkit/archive/2227553ed732d4c91f81879baa8fca853869ea51.zip"
+
+[[tool.uv.sources.Sklearn_PyTorch]]
+url = "https://github.com/ValentinFigue/Sklearn_PyTorch/archive/1b56a43e41de331ecdf73d08418f75bb34c9fa06.tar.gz"
+
+[[tool.uv.index]]
+name = "openeye-toolkits-conda"
+url = "https://pypi.anaconda.org/OpenEye/simple"
+
+[build-system]
+requires = [ "setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
