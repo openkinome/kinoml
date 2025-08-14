@@ -1,0 +1,57 @@
+name: test
+channels:
+  - pytorch
+  - nvidia
+  - pyg
+  - conda-forge
+  - openeye
+dependencies:
+  # base depends
+  - python
+  - pip
+  - pandas
+  - requests
+  - pint =0.19.2
+  - appdirs
+  - tqdm
+  - openff-toolkit >0.9
+  - xgboost
+  - openeye-toolkits >=2020.2.0
+  - biotite
+  - bravado
+  - biopandas
+  - awkward
+  - pyarrow >=6.0.1
+  - mdanalysis >=2.0.0
+  - opencadd
+  - matplotlib-base
+  - ruamel.yaml
+
+  # distributed computing
+  - dask
+  - dask-jobqueue
+
+  # reproducible workflows
+  - papermill 2.2.*
+  - watermark
+
+  # pytorch with CUDA support
+  - pytorch >=1.8.0
+  - pytorch-cuda=11.7
+  - pyg
+  - pytorch-lightning
+
+  # development
+  - jupyterlab
+  - nglview
+
+  # testing
+  - pytest
+  - pytest-cov
+  - pytest-xdist
+  - codecov
+  - nbval
+
+  - pip:
+      # PyTorch trees
+      - https://github.com/ValentinFigue/Sklearn_PyTorch/archive/1b56a43e41de331ecdf73d08418f75bb34c9fa06.tar.gz
