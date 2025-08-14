@@ -24,8 +24,8 @@ setup(
     author='OpenKinome',
     author_email='jaime.rodriguez-guerra@choderalab.org',
     description=short_description[0],
-    long_description=long_description,
-    long_description_content_type="text/markdown",
+    # long_description=long_description,
+    # long_description_content_type="text/markdown",
     version="0.1",
     license='MIT',
 
