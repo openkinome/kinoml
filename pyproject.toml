@@ -10,7 +10,7 @@ dependencies = [
   "pint==0.19.2",
   "appdirs",
   "tqdm",
-  "openff-toolkit<=0.9",
+  "openff-toolkit @ git+https://github.com/openforcefield/openff-toolkit.git@0.14.5",
   "openff-units @ git+https://github.com/openforcefield/openff-units.git@0.2.0",
   "openff-utilities @ git+https://github.com/openforcefield/openff-utilities.git@v0.1.13",
   "xgboost",
@@ -37,7 +37,7 @@ dependencies = [
   "codecov",
   "nbval",
   "Sklearn_PyTorch",
-  "opencadd",
+  "opencadd @ git+https://github.com/volkamerlab/opencadd.git@v1.0.1",
   "openmm>=8.3.1",
   "cachetools>=5.5.2",
   "rdkit==2022.3.3",
@@ -45,12 +45,6 @@ dependencies = [
 
 [[tool.uv.sources.openeye-toolkits]]
 index = "openeye-toolkits-conda"
-
-[[tool.uv.sources.opencadd]]
-url = "https://github.com/volkamerlab/opencadd/archive/master.zip"
-
-[[tool.uv.sources.openff-toolkit]]
-url = "https://github.com/openforcefield/openff-toolkit/archive/2227553ed732d4c91f81879baa8fca853869ea51.zip"
 
 [[tool.uv.sources.Sklearn_PyTorch]]
 url = "https://github.com/ValentinFigue/Sklearn_PyTorch/archive/1b56a43e41de331ecdf73d08418f75bb34c9fa06.tar.gz"

@@ -2720,9 +2720,9 @@ requires-dist = [
     { name = "nbval" },
     { name = "nglview" },
     { name = "numpy", specifier = "<2.0" },
-    { name = "opencadd", url = "https://github.com/volkamerlab/opencadd/archive/master.zip" },
+    { name = "opencadd", git = "https://github.com/volkamerlab/opencadd.git?rev=v1.0.1" },
     { name = "openeye-toolkits", specifier = ">=2020.2.0", index = "https://pypi.anaconda.org/OpenEye/simple" },
-    { name = "openff-toolkit", url = "https://github.com/openforcefield/openff-toolkit/archive/2227553ed732d4c91f81879baa8fca853869ea51.zip" },
+    { name = "openff-toolkit", git = "https://github.com/openforcefield/openff-toolkit.git?rev=0.14.5" },
     { name = "openff-units", git = "https://github.com/openforcefield/openff-units.git?rev=0.2.0" },
     { name = "openff-utilities", git = "https://github.com/openforcefield/openff-utilities.git?rev=v0.1.13" },
     { name = "openmm", specifier = ">=8.3.1" },
@@ -4192,9 +4192,8 @@ wheels = [
 
 [[package]]
 name = "opencadd"
-version = "0+unknown"
-source = { url = "https://github.com/volkamerlab/opencadd/archive/master.zip" }
-sdist = { hash = "sha256:8b973a689f963abf50af57238f3d3f48b146861bd3073356684554c396a90aa3" }
+version = "1.0.1"
+source = { git = "https://github.com/volkamerlab/opencadd.git?rev=v1.0.1#37714e63f11f88a357bf2792924f5c93156b8c52" }
 
 [[package]]
 name = "openeye-toolkits"
@@ -4211,8 +4210,7 @@ wheels = [
 [[package]]
 name = "openff-toolkit"
 version = "0.14.5"
-source = { url = "https://github.com/openforcefield/openff-toolkit/archive/2227553ed732d4c91f81879baa8fca853869ea51.zip" }
-sdist = { hash = "sha256:df8da1f5bb3f7d4dffe806bbde998854a68762e82a44aea2e5db144ab1a24252" }
+source = { git = "https://github.com/openforcefield/openff-toolkit.git?rev=0.14.5#2227553ed732d4c91f81879baa8fca853869ea51" }
 
 [[package]]
 name = "openff-units"
