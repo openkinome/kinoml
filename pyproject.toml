@@ -2,14 +2,17 @@
 name = "kinoml"
 version = "0.1.0"
 description = "Structure-informed machine learning for kinase modeling"
-requires-python = ">=3.9"
+requires-python = ">=3.8,<3.12"
 dependencies = [
   "pandas",
+  "numpy < 2.0",
   "requests",
   "pint==0.19.2",
   "appdirs",
   "tqdm",
-  "openff-toolkit",
+  "openff-toolkit<=0.9",
+  "openff-units @ git+https://github.com/openforcefield/openff-units.git@0.2.0",
+  "openff-utilities @ git+https://github.com/openforcefield/openff-utilities.git@v0.1.13",
   "xgboost",
   "openeye-toolkits>=2020.2.0",
   "bravado",
@@ -34,7 +37,10 @@ dependencies = [
   "codecov",
   "nbval",
   "Sklearn_PyTorch",
-  "opencadd"
+  "opencadd",
+  "openmm>=8.3.1",
+  "cachetools>=5.5.2",
+  "rdkit==2022.3.3",
 ]
 
 [[tool.uv.sources.openeye-toolkits]]
