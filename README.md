@@ -33,10 +33,26 @@ Please be aware that this code is work in progress and is not guaranteed to prov
 
 ### Installation
 
+#### Option 1: Install with Docker
+
+A prebuilt Docker image of this software is available on Docker Hub:
+
+**Image:** `openkinome/kinoml:v1`  
+**Link:** [Docker Hub page](https://hub.docker.com/r/openkinome/kinoml)
+
+```bash
+# Download the container image
+docker pull openkinome/kinoml:v1
+
+# Run the software
+docker run --rm openkinome/kinoml:v1 --help 
+```
+
+#### Option 2: Install with conda/mamba
 
 KinoML and its dependencies can be installed via conda/mamba.
 
-```
+```bash
 git clone https://github.com/openkinome/kinoml.git  # clone the repo
 cd kinoml  # change directory to local copy of repo
 mamba env create -n kinoml -f devtools/conda-envs/test_env.yaml
