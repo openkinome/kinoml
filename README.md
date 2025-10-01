@@ -11,7 +11,7 @@ KinoML
 ![GitHub closed issues](https://img.shields.io/github/issues-closed-raw/openkinome/kinoml) 
 ![GitHub open issues](https://img.shields.io/github/issues/openkinome/kinoml)
 
-**KinoML** is a modular and extensible framework for machine learning (ML) in small molecule drug discovery with a special focus on kinases. It enables users to easily:
+**KinoML** is a modular and extensible framework for machine learning (ML) in small molecule drug discovery with a special focus on kinases. The publication can be found [here](https://www.biorxiv.org/content/10.1101/2024.09.10.612176v1). KinoML enables users to easily:
 1. **Access and download data**: from online data sources, such as ChEMBL or PubChem as well as from their own files, with a focus on data availability and inmutability.
 2. **Featurize data**: so that it is ML readeable. KinoML offers a wide variety of featurization schemes, from ligand-only to ligand:kinase complexes.
 3. **Run structure-based experiments**: using KinoML's implemented models, with a special focus on reproducibility.
