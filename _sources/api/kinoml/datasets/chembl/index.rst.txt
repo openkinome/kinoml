@@ -18,7 +18,7 @@ Module Contents
 
 .. py:data:: logger
 
-.. py:class:: ChEMBLDatasetProvider(measurements: Iterable[kinoml.core.measurements.BaseMeasurement], metadata: dict = None)
+.. py:class:: ChEMBLDatasetProvider
 
    Bases: :py:obj:`kinoml.datasets.core.MultiDatasetProvider`
 
