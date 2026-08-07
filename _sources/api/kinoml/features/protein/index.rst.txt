@@ -67,8 +67,6 @@ Module Contents
 
 
    .. py:attribute:: ALPHABET
-      :value: 'ACDEFGHIKLMNPQRSTVWY'
-
 
 
    .. py:attribute:: sequence_type
@@ -77,9 +75,6 @@ Module Contents
 
 
    .. py:method:: _retrieve_sequence(system: Union[kinoml.core.systems.ProteinSystem, kinoml.core.systems.ProteinLigandComplex]) -> str
-
-      Implement in your component-specific subclass!
-
 
 
 .. py:class:: OEProteinStructureFeaturizer(**kwargs)
