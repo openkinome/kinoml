@@ -13,7 +13,7 @@ Module Contents
 
 .. py:data:: logger
 
-.. py:class:: PKIS2DatasetProvider(measurements: Iterable[kinoml.core.measurements.BaseMeasurement], metadata: dict = None)
+.. py:class:: PKIS2DatasetProvider
 
    Bases: :py:obj:`kinoml.datasets.core.DatasetProvider`
 
