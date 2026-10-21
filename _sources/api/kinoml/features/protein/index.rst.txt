@@ -67,6 +67,8 @@ Module Contents
 
 
    .. py:attribute:: ALPHABET
+      :value: 'ACDEFGHIKLMNPQRSTVWY'
+
 
 
    .. py:attribute:: sequence_type
